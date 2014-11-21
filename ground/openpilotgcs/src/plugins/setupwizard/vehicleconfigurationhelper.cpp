@@ -235,7 +235,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
                 AuxMagSettings *magSettings = AuxMagSettings::GetInstance(m_uavoManager);
                 Q_ASSERT(magSettings);
                 AuxMagSettings::DataFields magsData = magSettings->getData();
-                magsData.Usage = AuxMagSettings::USAGE_BOTH;
+                magsData.Usage = AuxMagSettings::USAGE_AUXONLY;
                 magSettings->setData(magsData);
                 addModifiedObject(magSettings, tr("Writing External Mag sensor settings"));
                 break;

@@ -1,0 +1,2154 @@
+{
+    "battery": "3s 1300",
+    "comment": "",
+    "controller": "CC3D",
+    "esc": "Tiger 12amp simonk",
+    "motor": "Tiger MN1806-14 2300kv",
+    "name": "QAV250",
+    "nick": "soundpod",
+    "objects": [
+        {
+            "fields": [
+                {
+                    "name": "VbarSensitivity",
+                    "type": "float32",
+                    "unit": "frac",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 0.5
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0.5
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0.5
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarRollPI",
+                    "type": "float32",
+                    "unit": "1/(deg/s)",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.004999999888241291
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0020000000949949026
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarPitchPI",
+                    "type": "float32",
+                    "unit": "1/(deg/s)",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.004999999888241291
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0020000000949949026
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarYawPI",
+                    "type": "float32",
+                    "unit": "1/(deg/s)",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.004999999888241291
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0020000000949949026
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarTau",
+                    "type": "float32",
+                    "unit": "sec",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.5
+                        }
+                    ]
+                },
+                {
+                    "name": "GyroTau",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.004999999888241291
+                        }
+                    ]
+                },
+                {
+                    "name": "DerivativeGamma",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 1
+                        }
+                    ]
+                },
+                {
+                    "name": "AxisLockKp",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 2.5
+                        }
+                    ]
+                },
+                {
+                    "name": "WeakLevelingKp",
+                    "type": "float32",
+                    "unit": "(deg/s)/deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.10000000149011612
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMaxPowerFactor",
+                    "type": "float32",
+                    "unit": "x",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 3
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlPowerTrim",
+                    "type": "float32",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 100
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlPowerDelayComp",
+                    "type": "float32",
+                    "unit": "sec",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.25
+                        }
+                    ]
+                },
+                {
+                    "name": "ScaleToAirspeed",
+                    "type": "float32",
+                    "unit": "m/s",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "ScaleToAirspeedLimits",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Min",
+                            "value": 0.05000000074505806
+                        },
+                        {
+                            "name": "Max",
+                            "value": 3
+                        }
+                    ]
+                },
+                {
+                    "name": "FlightModeMap",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "1",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "2",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "3",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "4",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "5",
+                            "value": "Bank1"
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarGyroSuppress",
+                    "type": "int8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 30
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarPiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarMaxAngle",
+                    "type": "uint8",
+                    "unit": "deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 10
+                        }
+                    ]
+                },
+                {
+                    "name": "DerivativeCutoff",
+                    "type": "uint8",
+                    "unit": "Hz",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 20
+                        }
+                    ]
+                },
+                {
+                    "name": "MaxAxisLock",
+                    "type": "uint8",
+                    "unit": "deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 30
+                        }
+                    ]
+                },
+                {
+                    "name": "MaxAxisLockRate",
+                    "type": "uint8",
+                    "unit": "deg/s",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 2
+                        }
+                    ]
+                },
+                {
+                    "name": "MaxWeakLevelingRate",
+                    "type": "uint8",
+                    "unit": "deg/s",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 5
+                        }
+                    ]
+                },
+                {
+                    "name": "RattitudeModeTransition",
+                    "type": "uint8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 80
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMinThrust",
+                    "type": "int8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 5
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMaxThrust",
+                    "type": "uint8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 90
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMaxAngle",
+                    "type": "uint8",
+                    "unit": "deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 105
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlFlightModeSwitchPosEnable",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "1",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "2",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "3",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "4",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "5",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlInvertedThrustReversing",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Unreversed"
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlInvertedPowerOutput",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Zero"
+                        }
+                    ]
+                },
+                {
+                    "name": "LowThrottleZeroIntegral",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "TRUE"
+                        }
+                    ]
+                }
+            ],
+            "id": "236F6DEC",
+            "instance": 0,
+            "name": "StabilizationSettings",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "ManualRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 300
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 300
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 300
+                        }
+                    ]
+                },
+                {
+                    "name": "MaximumRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 300
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 300
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 300
+                        }
+                    ]
+                },
+                {
+                    "name": "RollRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0016499999910593033
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0026400000788271427
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 1.2999999853491317e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0039300001226365566
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.006289999932050705
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.0999999580672011e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "YawRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0049399998970329762
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0078999996185302734
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.9999998989515007e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "YawPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "AcroInsanityFactor",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.40000000596046448
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleCurve",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.30000001192092896
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.15000000596046448
+                        },
+                        {
+                            "name": "50",
+                            "value": 0
+                        },
+                        {
+                            "name": "75",
+                            "value": -0.15000000596046448
+                        },
+                        {
+                            "name": "100",
+                            "value": -0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "YawMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 35
+                        }
+                    ]
+                },
+                {
+                    "name": "StickExpo",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "EnablePiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "EnableThrustPIDScaling",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleSource",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "ActuatorDesiredThrust"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleTarget",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "PID"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleAxes",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Roll Pitch"
+                        }
+                    ]
+                }
+            ],
+            "id": "E8EBBD48",
+            "instance": 0,
+            "name": "StabilizationSettingsBank1",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "ManualRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 220
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 220
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 220
+                        }
+                    ]
+                },
+                {
+                    "name": "MaximumRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 300
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 300
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 300
+                        }
+                    ]
+                },
+                {
+                    "name": "RollRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0030000000260770321
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.3000000257743523e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0030000000260770321
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.3000000257743523e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "YawRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0062000001780688763
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 4.9999998736893758e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "YawPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "AcroInsanityFactor",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.40000000596046448
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleCurve",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.30000001192092896
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.15000000596046448
+                        },
+                        {
+                            "name": "50",
+                            "value": 0
+                        },
+                        {
+                            "name": "75",
+                            "value": -0.15000000596046448
+                        },
+                        {
+                            "name": "100",
+                            "value": -0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "YawMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 35
+                        }
+                    ]
+                },
+                {
+                    "name": "StickExpo",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "EnablePiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "TRUE"
+                        }
+                    ]
+                },
+                {
+                    "name": "EnableThrustPIDScaling",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleSource",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "ActuatorDesiredThrust"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleTarget",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "PID"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleAxes",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Roll Pitch"
+                        }
+                    ]
+                }
+            ],
+            "id": "70E9539A",
+            "instance": 0,
+            "name": "StabilizationSettingsBank2",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "ManualRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 220
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 220
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 220
+                        }
+                    ]
+                },
+                {
+                    "name": "MaximumRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 300
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 300
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 300
+                        }
+                    ]
+                },
+                {
+                    "name": "RollRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0030000000260770321
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.3000000257743523e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0030000000260770321
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.3000000257743523e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "YawRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0062000001780688763
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 4.9999998736893758e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "YawPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "AcroInsanityFactor",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.40000000596046448
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleCurve",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.30000001192092896
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.15000000596046448
+                        },
+                        {
+                            "name": "50",
+                            "value": 0
+                        },
+                        {
+                            "name": "75",
+                            "value": -0.15000000596046448
+                        },
+                        {
+                            "name": "100",
+                            "value": -0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "YawMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 35
+                        }
+                    ]
+                },
+                {
+                    "name": "StickExpo",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "EnablePiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "TRUE"
+                        }
+                    ]
+                },
+                {
+                    "name": "EnableThrustPIDScaling",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleSource",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "ActuatorDesiredThrust"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleTarget",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "PID"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleAxes",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Roll Pitch"
+                        }
+                    ]
+                }
+            ],
+            "id": "C02DAA6A",
+            "instance": 0,
+            "name": "StabilizationSettingsBank3",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "MaxAccel",
+                    "type": "float32",
+                    "unit": "units/sec",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 1000
+                        }
+                    ]
+                },
+                {
+                    "name": "FeedForward",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "AccelTime",
+                    "type": "float32",
+                    "unit": "ms",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "DecelTime",
+                    "type": "float32",
+                    "unit": "ms",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrottleCurve1",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.22499999403953552
+                        },
+                        {
+                            "name": "50",
+                            "value": 0.44999998807907104
+                        },
+                        {
+                            "name": "75",
+                            "value": 0.67499995231628418
+                        },
+                        {
+                            "name": "100",
+                            "value": 0.89999997615814209
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrottleCurve2",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.22499999403953552
+                        },
+                        {
+                            "name": "50",
+                            "value": 0.44999998807907104
+                        },
+                        {
+                            "name": "75",
+                            "value": 0.67499995231628418
+                        },
+                        {
+                            "name": "100",
+                            "value": 0.89999997615814209
+                        }
+                    ]
+                },
+                {
+                    "name": "MixerValueRoll",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "MixerValuePitch",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "MixerValueYaw",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "Curve2Source",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Throttle"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer1Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer1Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": -64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer2Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer2Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": -64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer3Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer3Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": -64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": -64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": -64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer4Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer4Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": -64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer5Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer5Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer6Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer6Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer7Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer7Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer8Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer8Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer9Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer9Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer10Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer10Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer11Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer11Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer12Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer12Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                }
+            ],
+            "id": "7BF2CFA8",
+            "instance": 0,
+            "name": "MixerSettings",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "P",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "PositionNorth",
+                            "value": 10
+                        },
+                        {
+                            "name": "PositionEast",
+                            "value": 10
+                        },
+                        {
+                            "name": "PositionDown",
+                            "value": 10
+                        },
+                        {
+                            "name": "VelocityNorth",
+                            "value": 1
+                        },
+                        {
+                            "name": "VelocityEast",
+                            "value": 1
+                        },
+                        {
+                            "name": "VelocityDown",
+                            "value": 1
+                        },
+                        {
+                            "name": "AttitudeQ1",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "AttitudeQ2",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "AttitudeQ3",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "AttitudeQ4",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "GyroDriftX",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftY",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftZ",
+                            "value": 9.9999999747524271e-07
+                        }
+                    ]
+                },
+                {
+                    "name": "Q",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "GyroX",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "GyroY",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "GyroZ",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "AccelX",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "AccelY",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "AccelZ",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "GyroDriftX",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftY",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftZ",
+                            "value": 9.9999999747524271e-07
+                        }
+                    ]
+                },
+                {
+                    "name": "R",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "GPSPosNorth",
+                            "value": 1
+                        },
+                        {
+                            "name": "GPSPosEast",
+                            "value": 1
+                        },
+                        {
+                            "name": "GPSPosDown",
+                            "value": 1000000
+                        },
+                        {
+                            "name": "GPSVelNorth",
+                            "value": 0.0010000000474974513
+                        },
+                        {
+                            "name": "GPSVelEast",
+                            "value": 0.0010000000474974513
+                        },
+                        {
+                            "name": "GPSVelDown",
+                            "value": 0.0010000000474974513
+                        },
+                        {
+                            "name": "MagX",
+                            "value": 10
+                        },
+                        {
+                            "name": "MagY",
+                            "value": 10
+                        },
+                        {
+                            "name": "MagZ",
+                            "value": 10
+                        },
+                        {
+                            "name": "BaroZ",
+                            "value": 0.0099999997764825821
+                        }
+                    ]
+                },
+                {
+                    "name": "FakeR",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "FakeGPSPosIndoor",
+                            "value": 10
+                        },
+                        {
+                            "name": "FakeGPSVelIndoor",
+                            "value": 1
+                        },
+                        {
+                            "name": "FakeGPSVelAirspeed",
+                            "value": 1000
+                        }
+                    ]
+                }
+            ],
+            "id": "5E91213C",
+            "instance": 0,
+            "name": "EKFConfiguration",
+            "setting": true
+        }
+    ],
+    "owner": "nick",
+    "propeller": "HQ 5x4",
+    "servo": "",
+    "size": "250mm",
+    "subtype": 2,
+    "type": 1,
+    "uuid": "{a0b2ad97-e1c4-48b7-a5c4-0181dab0df01}",
+    "weight": "438g exluding batt"
+}

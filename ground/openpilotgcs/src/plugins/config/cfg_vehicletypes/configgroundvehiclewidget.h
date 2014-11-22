@@ -50,6 +50,7 @@ public:
     ~ConfigGroundVehicleWidget();
 
     virtual void refreshWidgetsValues(QString frameType);
+    virtual void initMixerCurves(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
 protected:

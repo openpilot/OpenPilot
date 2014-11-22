@@ -165,6 +165,29 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         }
         break;
     case VehicleConfigurationSource::CONTROLLER_REVO:
+        // Reset all ports, Revo has Modem, no Telemtry on any serial port
+        data.RM_RcvrPort  = HwSettings::RM_RCVRPORT_DISABLED;
+
+        data.RM_MainPort  = HwSettings::RM_MAINPORT_DISABLED;
+
+        data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DISABLED;
+
+        switch (m_configSource->getInputType()) {
+        case VehicleConfigurationSource::INPUT_PWM:
+            data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PWM;
+            break;
+        case VehicleConfigurationSource::INPUT_PPM:
+            data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PPM;
+            break;
+        case VehicleConfigurationSource::INPUT_SBUS:
+            data.RM_MainPort  = HwSettings::RM_MAINPORT_SBUS;
+            break;
+        case VehicleConfigurationSource::INPUT_DSM:
+            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM;
+            break;
+        default:
+            break;
+        }
     case VehicleConfigurationSource::CONTROLLER_NANO:
     case VehicleConfigurationSource::CONTROLLER_DISCOVERYF4:
         // Reset all ports

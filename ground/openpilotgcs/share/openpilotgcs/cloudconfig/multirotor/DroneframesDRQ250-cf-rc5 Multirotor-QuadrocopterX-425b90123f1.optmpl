@@ -4,7 +4,7 @@
     "controller": "CC3D",
     "esc": "tiger 12a",
     "motor": "Sunnysky 2204 2300kv",
-    "name": "Droneframes DRQ250 - cf",
+    "name": "Droneframes DRQ250CF",
     "nick": "Universe",
     "objects": [
         {

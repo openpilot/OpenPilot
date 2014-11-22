@@ -164,39 +164,19 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             break;
         }
         break;
-    case VehicleConfigurationSource::CONTROLLER_REVO:
-        // Reset all ports, Revo has Modem, no Telemtry on any serial port
-        data.RM_RcvrPort  = HwSettings::RM_RCVRPORT_DISABLED;
-
-        data.RM_MainPort  = HwSettings::RM_MAINPORT_DISABLED;
-
-        data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DISABLED;
-
-        switch (m_configSource->getInputType()) {
-        case VehicleConfigurationSource::INPUT_PWM:
-            data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PWM;
-            break;
-        case VehicleConfigurationSource::INPUT_PPM:
-            data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PPM;
-            break;
-        case VehicleConfigurationSource::INPUT_SBUS:
-            data.RM_MainPort  = HwSettings::RM_MAINPORT_SBUS;
-            break;
-        case VehicleConfigurationSource::INPUT_DSM:
-            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM;
-            break;
-        default:
-            break;
-        }
+    case VehicleConfigurationSource::CONTROLLER_REVO:      
     case VehicleConfigurationSource::CONTROLLER_NANO:
     case VehicleConfigurationSource::CONTROLLER_DISCOVERYF4:
-        // Reset all ports
+        // Reset all ports to their defaults
         data.RM_RcvrPort  = HwSettings::RM_RCVRPORT_DISABLED;
-
-        // Default mainport to be active telemetry link
-        data.RM_MainPort  = HwSettings::RM_MAINPORT_TELEMETRY;
-
         data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DISABLED;
+
+        // Revo uses inbuilt Modem do not set mainport to be active telemetry link for the Revo
+        if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+            data.RM_MainPort  = HwSettings::RM_MAINPORT_DISABLED;
+        } else {
+            data.RM_MainPort = HwSettings::RM_MAINPORT_TELEMETRY;
+        }
 
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
@@ -206,9 +186,11 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PPM;
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
-            // We have to set telemetry on flexport since s.bus needs the mainport.
             data.RM_MainPort  = HwSettings::RM_MAINPORT_SBUS;
-            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_TELEMETRY;
+            // We have to set telemetry on flexport since s.bus needs the mainport on all but Revo.
+            if (m_configSource->getControllerType() != VehicleConfigurationSource::CONTROLLER_REVO) {
+                data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_TELEMETRY;
+            }
             break;
         case VehicleConfigurationSource::INPUT_DSM:
             data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM;

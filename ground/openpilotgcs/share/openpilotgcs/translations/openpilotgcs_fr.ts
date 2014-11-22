@@ -6180,10 +6180,6 @@ p, li { white-space: pre-wrap; }
         <translation>Options de Configuration et Calibration</translation>
     </message>
     <message>
-        <source>Start Configuration Wizard</source>
-        <translation type="vanished">Démarrer l&apos;Assistant de Configuration</translation>
-    </message>
-    <message>
         <location/>
         <source>Manual Calibration</source>
         <translation>Calibration Manuelle</translation>
@@ -6733,15 +6729,6 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Live Testing</source>
         <translation>Test en Temps Réel</translation>
-    </message>
-    <message>
-        <source>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
-</source>
-        <translation type="vanished">Configurer ici &quot;TurboPWM&quot; : 500Hz est une valeur classique pour les multirotors.</translation>
-    </message>
-    <message>
-        <source>500</source>
-        <translation type="vanished">500</translation>
     </message>
     <message>
         <location/>
@@ -9111,7 +9098,7 @@ les données en cache</translation>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+202"/>
+        <location line="+200"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -10383,18 +10370,18 @@ p, li { white-space: pre-wrap; }
         <location line="+24"/>
         <location line="+24"/>
         <location line="+44"/>
-        <location line="+207"/>
+        <location line="+202"/>
         <location line="+70"/>
         <source>Configuration OK</source>
         <translation>Configuration OK</translation>
     </message>
     <message>
-        <location line="-312"/>
+        <location line="-307"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign a Yaw channel&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter le canal de Yaw&lt;/font&gt;</translation>
     </message>
     <message>
-        <location line="+383"/>
+        <location line="+378"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign all %1 motor channels&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter tous les %1 canaux moteurs&lt;/font&gt;</translation>
     </message>
@@ -10466,26 +10453,26 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+369"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+380"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+1141"/>
+        <location line="+1177"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1140"/>
+        <location line="-1176"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+217"/>
+        <location line="+213"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
@@ -10681,7 +10668,7 @@ Bougez le manche %1.</translation>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+650"/>
+        <location line="+690"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
@@ -11017,7 +11004,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <location line="+50"/>
         <location line="+21"/>
         <location line="+12"/>
-        <location line="+25"/>
+        <location line="+19"/>
         <location line="+13"/>
         <location line="+15"/>
         <location line="+38"/>
@@ -11025,7 +11012,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-169"/>
+        <location line="-163"/>
         <source>Vehicle type: </source>
         <translation>Type de véhicule : </translation>
     </message>
@@ -11152,18 +11139,8 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <source>Spektrum satellite (DSM2)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Spektrum satellite (DSMX10BIT)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Spektrum satellite (DSMX11BIT)</source>
-        <translation></translation>
+        <source>Spektrum Satellite</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -11179,14 +11156,6 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <location line="+3"/>
         <source>Rapid ESC (%1 Hz)</source>
         <translation>Contrôleur Rapide (%1 Hz)</translation>
-    </message>
-    <message>
-        <source>Standard ESC (50 Hz)</source>
-        <translation type="vanished">Contrôleur Standard (50 Hz)</translation>
-    </message>
-    <message>
-        <source>Rapid ESC (500 Hz)</source>
-        <translation type="vanished">Contrôleur Rapide (500Hz)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -11277,7 +11246,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Échoué !</translation>
     </message>
     <message>
-        <location line="+143"/>
+        <location line="+131"/>
         <source>Writing External Mag sensor settings</source>
         <translation>Écriture paramètres Compas Externe</translation>
     </message>
@@ -11329,7 +11298,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+106"/>
         <source>Writing mixer settings</source>
         <translation>Écriture paramètres mixeur</translation>
     </message>
@@ -11339,7 +11308,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres véhicule</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+35"/>
         <source>Writing manual control defaults</source>
         <translation>Écriture contrôles manuels par défaut</translation>
     </message>
@@ -15143,7 +15112,7 @@ Please try again.</source>
 <context>
     <name>AirSpeedPage</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/airspeedpage.cpp" line="+65"/>
+        <location filename="../../../src/plugins/setupwizard/pages/airspeedpage.cpp" line="+63"/>
         <source>OpenPilot Airspeed Sensor Selection</source>
         <translation>Sélection Capteur Vitesse Air OpenPilot</translation>
     </message>

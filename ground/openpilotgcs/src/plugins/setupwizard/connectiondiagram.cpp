@@ -162,9 +162,7 @@ void ConnectionDiagram::setupGraphicsScene()
         case VehicleConfigurationSource::INPUT_SBUS:
             elementsToShow << QString("%1sbus").arg(prefix);
             break;
-        case VehicleConfigurationSource::INPUT_DSMX10:
-        case VehicleConfigurationSource::INPUT_DSMX11:
-        case VehicleConfigurationSource::INPUT_DSM2:
+        case VehicleConfigurationSource::INPUT_DSM:
             elementsToShow << QString("%1satellite").arg(prefix);
             break;
         default:

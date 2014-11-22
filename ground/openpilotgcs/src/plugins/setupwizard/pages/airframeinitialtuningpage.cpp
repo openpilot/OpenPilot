@@ -31,6 +31,7 @@
 #include <QJsonArray>
 #include <QDir>
 #include "vehicletemplateexportdialog.h"
+#include "utils/pathutils.h"
 
 AirframeInitialTuningPage::AirframeInitialTuningPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
@@ -178,7 +179,7 @@ void AirframeInitialTuningPage::loadValidFiles()
     }
     m_templates.clear();
 
-    QDir templateDir(QString("%1/%2/").arg(VehicleTemplateExportDialog::EXPORT_BASE_NAME).arg(m_dir));
+    QDir templateDir(QString("%1/%2/").arg(Utils::PathUtils().InsertDataPath("%%DATAPATH%%cloudconfig")).arg(m_dir));
     QStringList names;
     names << "*.optmpl";
     templateDir.setNameFilters(names);

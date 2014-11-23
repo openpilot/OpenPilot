@@ -4,7 +4,7 @@
     "controller": "CC3D",
     "esc": "afro 30a",
     "motor": "Tiger 2216 v2 1100kv",
-    "name": "Qav400",
+    "name": "QAV400",
     "nick": "Failsafe",
     "objects": [
         {

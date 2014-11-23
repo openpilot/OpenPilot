@@ -157,29 +157,26 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             data.CC_MainPort  = HwSettings::CC_MAINPORT_SBUS;
             data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_TELEMETRY;
             break;
-        case VehicleConfigurationSource::INPUT_DSMX10:
-            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSMX10BIT;
-            break;
-        case VehicleConfigurationSource::INPUT_DSMX11:
-            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSMX11BIT;
-            break;
-        case VehicleConfigurationSource::INPUT_DSM2:
-            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSM2;
+        case VehicleConfigurationSource::INPUT_DSM:
+            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSM;
             break;
         default:
             break;
         }
         break;
-    case VehicleConfigurationSource::CONTROLLER_REVO:
+    case VehicleConfigurationSource::CONTROLLER_REVO:      
     case VehicleConfigurationSource::CONTROLLER_NANO:
     case VehicleConfigurationSource::CONTROLLER_DISCOVERYF4:
-        // Reset all ports
+        // Reset all ports to their defaults
         data.RM_RcvrPort  = HwSettings::RM_RCVRPORT_DISABLED;
-
-        // Default mainport to be active telemetry link
-        data.RM_MainPort  = HwSettings::RM_MAINPORT_TELEMETRY;
-
         data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DISABLED;
+
+        // Revo uses inbuilt Modem do not set mainport to be active telemetry link for the Revo
+        if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+            data.RM_MainPort  = HwSettings::RM_MAINPORT_DISABLED;
+        } else {
+            data.RM_MainPort = HwSettings::RM_MAINPORT_TELEMETRY;
+        }
 
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
@@ -189,18 +186,14 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PPM;
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
-            // We have to set telemetry on flexport since s.bus needs the mainport.
             data.RM_MainPort  = HwSettings::RM_MAINPORT_SBUS;
-            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_TELEMETRY;
+            // We have to set telemetry on flexport since s.bus needs the mainport on all but Revo.
+            if (m_configSource->getControllerType() != VehicleConfigurationSource::CONTROLLER_REVO) {
+                data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_TELEMETRY;
+            }
             break;
-        case VehicleConfigurationSource::INPUT_DSMX10:
-            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSMX10BIT;
-            break;
-        case VehicleConfigurationSource::INPUT_DSMX11:
-            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSMX11BIT;
-            break;
-        case VehicleConfigurationSource::INPUT_DSM2:
-            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM2;
+        case VehicleConfigurationSource::INPUT_DSM:
+            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM;
             break;
         default:
             break;
@@ -741,9 +734,7 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
     case VehicleConfigurationSource::INPUT_SBUS:
         channelType = ManualControlSettings::CHANNELGROUPS_SBUS;
         break;
-    case VehicleConfigurationSource::INPUT_DSMX10:
-    case VehicleConfigurationSource::INPUT_DSMX11:
-    case VehicleConfigurationSource::INPUT_DSM2:
+    case VehicleConfigurationSource::INPUT_DSM:
         channelType = ManualControlSettings::CHANNELGROUPS_DSMFLEXIPORT;
         break;
     default:

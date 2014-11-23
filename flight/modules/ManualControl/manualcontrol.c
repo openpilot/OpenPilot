@@ -189,6 +189,12 @@ static void manualControlTask(void)
         newMode = modeSettings.FlightModePosition[position];
     }
 
+    if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD &&
+            (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f)) {
+            newMode = FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
+    }
+
+
     // Depending on the mode update the Stabilization or Actuator objects
     const controlHandler *handler = &handler_MANUAL;
     switch (newMode) {

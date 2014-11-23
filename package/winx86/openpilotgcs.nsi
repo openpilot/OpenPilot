@@ -72,7 +72,7 @@
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
-  VIAddVersionKey "LegalCopyright" "© 2010-2014 The OpenPilot Team"
+  VIAddVersionKey "LegalCopyright" "Â© 2010-2014 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
 ;--------------------------------
@@ -93,7 +93,7 @@
 ;--------------------------------
 ; Branding
 
-  BrandingText "© 2010-2014 The OpenPilot Team, http://www.openpilot.org"
+  BrandingText "Â© 2010-2014 The OpenPilot Team, http://www.openpilot.org"
 
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE

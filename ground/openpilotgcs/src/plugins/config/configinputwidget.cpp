@@ -868,10 +868,9 @@ void ConfigInputWidget::setChannel(int newChan)
                                        "Move the %1 stick.")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
     }
 
-    if (manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory") ||
-        manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("FlightMode")) {
+    if (manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory")) {
         ui->wzNext->setEnabled(true);
-        ui->wzNext->setText(tr("Next/Skip"));
+        ui->wzNext->setText(tr("Next / Skip"));
         ui->wzText->setText(ui->wzText->text() + tr(" Alternatively, click Next to skip this channel."));
     } else {
         ui->wzNext->setEnabled(false);

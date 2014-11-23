@@ -72,7 +72,6 @@ struct pios_dsm_state {
 struct pios_dsm_dev {
     enum pios_dsm_dev_magic   magic;
     const struct pios_dsm_cfg *cfg;
-    enum pios_dsm_proto proto;
     struct pios_dsm_state     state;
 };
 
@@ -269,7 +268,6 @@ int32_t PIOS_DSM_Init(uint32_t *dsm_id,
                       const struct pios_dsm_cfg *cfg,
                       const struct pios_com_driver *driver,
                       uint32_t lower_id,
-                      enum pios_dsm_proto proto,
                       uint8_t bind)
 {
     PIOS_DEBUG_Assert(dsm_id);
@@ -285,7 +283,6 @@ int32_t PIOS_DSM_Init(uint32_t *dsm_id,
 
     /* Bind the configuration to the device instance */
     dsm_dev->cfg   = cfg;
-    dsm_dev->proto = proto;
 
     /* Bind the receiver if requested */
     if (bind) {

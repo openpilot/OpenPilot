@@ -257,6 +257,7 @@ void PIOS_Board_Init(void)
     /* Configure the flexi port */
     /* Careful about this init as it is timing sensitive and must be executed before the DSM_BIND_MIN_DELAY_US runs out (specified in pios_dsm_priv.h). */
     uint8_t hwsettings_DSMxBind;
+    HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
     uint8_t hwsettings_cc_flexiport;
     HwSettingsCC_FlexiPortGet(&hwsettings_cc_flexiport);
 
@@ -331,27 +332,9 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PPM_FLEXI */
         break;
-    case HWSETTINGS_CC_FLEXIPORT_DSM2:
-    case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
-    case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
+    case HWSETTINGS_CC_FLEXIPORT_DSM:
 #if defined(PIOS_INCLUDE_DSM)
         {
-            enum pios_dsm_proto proto;
-            switch (hwsettings_cc_flexiport) {
-            case HWSETTINGS_CC_FLEXIPORT_DSM2:
-                proto = PIOS_DSM_PROTO_DSM2;
-                break;
-            case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
-                proto = PIOS_DSM_PROTO_DSMX10BIT;
-                break;
-            case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
-                proto = PIOS_DSM_PROTO_DSMX11BIT;
-                break;
-            default:
-                PIOS_Assert(0);
-                break;
-            }
-
             uint32_t pios_usart_dsm_id;
             if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_flexi_cfg)) {
                 PIOS_Assert(0);
@@ -362,7 +345,7 @@ void PIOS_Board_Init(void)
                               &pios_dsm_flexi_cfg,
                               &pios_usart_com_driver,
                               pios_usart_dsm_id,
-                              proto, hwsettings_DSMxBind)) {
+                              hwsettings_DSMxBind)) {
                 PIOS_Assert(0);
             }
 
@@ -420,6 +403,7 @@ void PIOS_Board_Init(void)
     }
     break;
     }
+
 
 #if defined(PIOS_INCLUDE_USB)
     /* Initialize board specific USB data */
@@ -578,7 +562,7 @@ void PIOS_Board_Init(void)
 #endif /* PIOS_INCLUDE_USB */
 
     /* Configure the main IO port */
-    HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
+
     uint8_t hwsettings_cc_mainport;
     HwSettingsCC_MainPortGet(&hwsettings_cc_mainport);
 
@@ -644,27 +628,9 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_GPS */
         break;
-    case HWSETTINGS_CC_MAINPORT_DSM2:
-    case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
-    case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
+    case HWSETTINGS_CC_MAINPORT_DSM:
 #if defined(PIOS_INCLUDE_DSM)
         {
-            enum pios_dsm_proto proto;
-            switch (hwsettings_cc_mainport) {
-            case HWSETTINGS_CC_MAINPORT_DSM2:
-                proto = PIOS_DSM_PROTO_DSM2;
-                break;
-            case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
-                proto = PIOS_DSM_PROTO_DSMX10BIT;
-                break;
-            case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
-                proto = PIOS_DSM_PROTO_DSMX11BIT;
-                break;
-            default:
-                PIOS_Assert(0);
-                break;
-            }
-
             uint32_t pios_usart_dsm_id;
             if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_main_cfg)) {
                 PIOS_Assert(0);
@@ -675,7 +641,7 @@ void PIOS_Board_Init(void)
                               &pios_dsm_main_cfg,
                               &pios_usart_com_driver,
                               pios_usart_dsm_id,
-                              proto, 0)) {
+                              0)) {
                 PIOS_Assert(0);
             }
 

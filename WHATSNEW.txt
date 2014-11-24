@@ -1,3 +1,16 @@
+--- RELEASE-14.10-RC8 ---
+This release candidate does add the following fixes/enhancements over the previous RC7
+
+The full list of features, improvements and bugfixes in this RC8 is accessible here:
+http://progress.openpilot.org/issues/?filter=11867
+
+** Improvement
+    * [OP-1635] - Remove Quah H frome wizard to avoid confusion with Quad X
+    * [OP-1627] - Clean up PiOS DSM post Matt fix
+    * [OP-1624] - Make Aux Mag default if selected via Wizard
+    * [OP-1625] - Satellite dsm2/dsmX channel resolution autodetection.
+
+
 --- RELEASE-14.10-RC7 --- 
 This release candidate does add the following fixes/enhancements over the previous RC6
 

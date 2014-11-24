@@ -191,13 +191,10 @@ static void manualControlTask(void)
 
     if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM &&
             (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f)) {
-	    // TODO Only select this if stablized1 is one of the valide
-	    // flight mode settings
-	    // TODO add option to select mode
-            newMode = FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
+	    // Follow code assumes Stabi1 to Stabi6 are contiguous and
+	    // PositionRoamStabiSelect_Stabilized1 is a 0 by definition.
+            newMode = FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 + modeSettings.PositionRoamStabiSelect;
     }
-    else { newMode = FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM; }
-
 
     // Depending on the mode update the Stabilization or Actuator objects
     const controlHandler *handler = &handler_MANUAL;

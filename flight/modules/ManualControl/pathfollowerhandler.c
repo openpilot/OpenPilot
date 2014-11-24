@@ -66,6 +66,7 @@ void pathFollowerHandler(bool newinit)
             break;
 
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
             plan_setup_positionHold();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:

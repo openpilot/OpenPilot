@@ -189,10 +189,14 @@ static void manualControlTask(void)
         newMode = modeSettings.FlightModePosition[position];
     }
 
-    if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD &&
+    if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM &&
             (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f)) {
+	    // TODO Only select this if stablized1 is one of the valide
+	    // flight mode settings
+	    // TODO add option to select mode
             newMode = FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
     }
+    else { newMode = FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM; }
 
 
     // Depending on the mode update the Stabilization or Actuator objects
@@ -218,6 +222,7 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
     case FLIGHTSTATUS_FLIGHTMODE_POI:
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
         handler = &handler_PATHFOLLOWER;
         break;
     case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:

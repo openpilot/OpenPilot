@@ -55,7 +55,7 @@
 StabilizationData stabSettings;
 
 // Private variables
-static int cur_flight_mode = -1;
+static int cur_flightmode_position = -1;
 
 // Private functions
 static void SettingsUpdatedCb(UAVObjEvent *ev);
@@ -185,27 +185,29 @@ static void FlightModeSwitchUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     ManualControlCommandFlightModeSwitchPositionGet(&fm);
 
-    if (fm == cur_flight_mode) {
+    if (fm == cur_flightmode_position) {
         return;
     }
-    cur_flight_mode = fm;
+    cur_flightmode_position = fm;
     SettingsBankUpdatedCb(NULL);
 }
 
 static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    if (cur_flight_mode < 0 || cur_flight_mode >= FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
+    if (cur_flightmode_position < 0 || cur_flightmode_position >= FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
         return;
     }
-    if ((ev) && ((stabSettings.settings.FlightModeMap[cur_flight_mode] == 0 && ev->obj != StabilizationSettingsBank1Handle()) ||
-                 (stabSettings.settings.FlightModeMap[cur_flight_mode] == 1 && ev->obj != StabilizationSettingsBank2Handle()) ||
-                 (stabSettings.settings.FlightModeMap[cur_flight_mode] == 2 && ev->obj != StabilizationSettingsBank3Handle()) ||
-                 stabSettings.settings.FlightModeMap[cur_flight_mode] > 2)) {
+    if ((ev) && ((stabSettings.settings.FlightModeMap[cur_flightmode_position] == 0 && ev->obj != StabilizationSettingsBank1Handle()) ||
+                 (stabSettings.settings.FlightModeMap[cur_flightmode_position] == 1 && ev->obj != StabilizationSettingsBank2Handle()) ||
+                 (stabSettings.settings.FlightModeMap[cur_flightmode_position] == 2 && ev->obj != StabilizationSettingsBank3Handle()) ||
+                 stabSettings.settings.FlightModeMap[cur_flightmode_position] > 2)) {
         return;
     }
 
 
-    switch (stabSettings.settings.FlightModeMap[cur_flight_mode]) {
+    // If position roam switches flight mode to a Stabi_n, we nevertheless use the
+    // bank selected by position roam.
+    switch (stabSettings.settings.FlightModeMap[cur_flightmode_position]) {
     case 0:
         StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *)&stabSettings.stabBank);
         break;
@@ -362,7 +364,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     }
 
     // force flight mode update
-    cur_flight_mode = -1;
+    cur_flightmode_position = -1;
 
     // Rattitude stick angle where the attitude to rate transition happens
     if (stabSettings.settings.RattitudeModeTransition < (uint8_t)10) {

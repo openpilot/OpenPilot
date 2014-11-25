@@ -42,6 +42,7 @@
 #include <systemsettings.h>
 #include <stabilizationdesired.h>
 #include <callbackinfo.h>
+#include <vtolpathfollowersettings.h>
 
 
 // Private constants
@@ -156,6 +157,7 @@ int32_t ManualControlInitialize()
     ManualControlSettingsInitialize();
     FlightModeSettingsInitialize();
     SystemSettingsInitialize();
+    VtolPathFollowerSettingsInitialize();
 
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);
 
@@ -185,15 +187,38 @@ static void manualControlTask(void)
 
     uint8_t position = cmd.FlightModeSwitchPosition;
     uint8_t newMode  = flightStatus.FlightMode;
+    uint8_t newPositionRoamState  = flightStatus.PositionRoamState;
+    uint8_t newPositionRoamThrustMode  = flightStatus.PositionRoamThrustMode;
     if (position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
         newMode = modeSettings.FlightModePosition[position];
     }
 
-    if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM &&
-            (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f)) {
-	    // Follow code assumes Stabi1 to Stabi6 are contiguous and
-	    // PositionRoamStabiSelect_Stabilized1 is a 0 by definition.
-            newMode = FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 + modeSettings.PositionRoamStabiSelect;
+    if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM) {
+
+            if (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f) {
+	        // Following code assumes Stabi1 to Stabi6 are contiguous and
+	        // PositionRoamStabiSelect_Stabilized1 is a 0 by definition.
+                newMode = FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 + modeSettings.PositionRoamStabiSelect;
+                newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED;
+
+                // Check vtol thrust control and override if need be the thrust mode
+                // of the PositionRoamStabiSelect-ed option
+                VtolPathFollowerSettingsData vtolPathFollowerSettings;
+	        VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
+                if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
+                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MANUAL;
+                }
+                else { //auto thrust control requires altitude controlled throttle in the Stabi mode
+                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MIXED;
+                }
+            }
+            else {
+        	// Move to braking state until confirmed zero velocity then position hold
+                newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
+            }
+    }
+    else {
+        newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_NONE;
     }
 
     // Depending on the mode update the Stabilization or Actuator objects
@@ -237,10 +262,13 @@ static void manualControlTask(void)
     // FlightMode needs to be set correctly on first run (otherwise ControlChain is invalid)
     static bool firstRun = true;
 
-    if (flightStatus.FlightMode != newMode || firstRun) {
+    if (flightStatus.FlightMode != newMode || firstRun ||
+	newPositionRoamState != flightStatus.PositionRoamState) {
         firstRun = false;
         flightStatus.ControlChain = handler->controlChain;
         flightStatus.FlightMode   = newMode;
+        flightStatus.PositionRoamState = newPositionRoamState;
+        flightStatus.PositionRoamThrustMode = newPositionRoamThrustMode;
         FlightStatusSet(&flightStatus);
         newinit = true;
     }

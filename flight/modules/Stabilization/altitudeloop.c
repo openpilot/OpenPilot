@@ -229,7 +229,7 @@ static void altitudeHoldTask(void)
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
-    if (thrustMode == DIRECT || thrustMode == ALTITUDEROAM && altitudeRoamThrustMode == ALTITUDEROAM_DIRECT) {
+    if (thrustMode == DIRECT || (thrustMode == ALTITUDEROAM && altitudeRoamThrustMode == ALTITUDEROAM_DIRECT)) {
         thrustDemand = thrustSetpoint;
     }
     else {

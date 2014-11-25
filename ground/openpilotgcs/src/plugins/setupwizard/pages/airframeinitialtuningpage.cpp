@@ -160,11 +160,9 @@ bool AirframeInitialTuningPage::airframeIsCompatible(int vehicleType, int vehicl
 
     int wizSubType = getWizard()->getVehicleSubType();
     switch (vehicleType) {
-    case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
     case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
     {
-        return wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_H ||
-               wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
+        return wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
     }
     default:
         return vehicleSubType == wizSubType;
@@ -211,16 +209,20 @@ void AirframeInitialTuningPage::loadValidFiles()
 
 void AirframeInitialTuningPage::setupTemplateList()
 {
-    QListWidgetItem *item = new QListWidgetItem(tr("Current Tuning"), ui->templateList);
-
-    item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
+    QListWidgetItem *item;
     foreach(QString templ, m_templates.keys()) {
         QJsonObject *json = m_templates[templ];
 
         item = new QListWidgetItem(json->value("name").toString(), ui->templateList);
         item->setData(Qt::UserRole + 1, QVariant::fromValue(json));
     }
+    ui->templateList->sortItems(Qt::AscendingOrder);
+
+    item = new QListWidgetItem(tr("Current Tuning"));
+    item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
+    ui->templateList->insertItem(0, item);
     ui->templateList->setCurrentRow(0);
+    //TODO Add generics to top under item Current tuning
 }
 
 QString AirframeInitialTuningPage::getTemplateKey(QJsonObject *templ)

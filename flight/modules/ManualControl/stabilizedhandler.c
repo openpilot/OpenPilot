@@ -171,7 +171,7 @@ void stabilizedHandler(bool newinit)
             stabilization.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
 	}
 	else {
-            stabilization.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO;
+            stabilization.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEROAM;
 	}
     }
     else {

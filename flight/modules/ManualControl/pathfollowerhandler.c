@@ -56,7 +56,9 @@ void pathFollowerHandler(bool newinit)
     }
 
     uint8_t flightMode;
+    uint8_t positionRoamFlightMode;
     FlightStatusFlightModeGet(&flightMode);
+    FlightStatusPositionRoamStateSet(&positionRoamFlightMode);
 
     if (newinit) {
         // After not being in this mode for a while init at current height
@@ -65,8 +67,17 @@ void pathFollowerHandler(bool newinit)
             plan_setup_returnToBase();
             break;
 
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+            if (positionRoamFlightMode == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
+        	// Just initiated braking after returning from stabi control
+                // plan_setup_Braking();
+            }
+            else if (positionRoamFlightMode = FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD) {
+                plan_setup_positionHold(); // this probably won't occur, it will be called
+					   // directly at end of braking.
+            }
+	    break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
             plan_setup_positionHold();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
@@ -108,6 +119,11 @@ void pathFollowerHandler(bool newinit)
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         plan_run_AutoCruise();
         break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+        if (positionRoamFlightMode == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
+           // plan_run_Braking();
+        }
+	break;
     default:
         break;
     }

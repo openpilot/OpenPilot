@@ -42,8 +42,9 @@
 #include <systemsettings.h>
 #include <stabilizationdesired.h>
 #include <callbackinfo.h>
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <vtolpathfollowersettings.h>
-
+#endif
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -157,8 +158,9 @@ int32_t ManualControlInitialize()
     ManualControlSettingsInitialize();
     FlightModeSettingsInitialize();
     SystemSettingsInitialize();
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     VtolPathFollowerSettingsInitialize();
-
+#endif
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);
 
     return 0;
@@ -193,6 +195,7 @@ static void manualControlTask(void)
         newMode = modeSettings.FlightModePosition[position];
     }
 
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM) {
 
             if (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f) {
@@ -220,6 +223,7 @@ static void manualControlTask(void)
     else {
         newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_NONE;
     }
+#endif
 
     // Depending on the mode update the Stabilization or Actuator objects
     const controlHandler *handler = &handler_MANUAL;

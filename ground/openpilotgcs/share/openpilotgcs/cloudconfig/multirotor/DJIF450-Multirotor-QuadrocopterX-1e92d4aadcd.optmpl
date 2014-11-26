@@ -1,0 +1,2155 @@
+{
+    "battery": "",
+    "comment": "Light Acro flyer \ngood gps tune \nacro + friendly :)",
+    "controller": "Revolution",
+    "esc": "Afro esc 30AMP",
+    "motor": "Sunnysky 2212 980kv",
+    "name": "DJI F450 ",
+    "nick": "Failsafe",
+    "objects": [
+        {
+            "fields": [
+                {
+                    "name": "VbarSensitivity",
+                    "type": "float32",
+                    "unit": "frac",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 0.5
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0.5
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0.5
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarRollPI",
+                    "type": "float32",
+                    "unit": "1/(deg/s)",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.004999999888241291
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0020000000949949026
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarPitchPI",
+                    "type": "float32",
+                    "unit": "1/(deg/s)",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.004999999888241291
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0020000000949949026
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarYawPI",
+                    "type": "float32",
+                    "unit": "1/(deg/s)",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.004999999888241291
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0020000000949949026
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarTau",
+                    "type": "float32",
+                    "unit": "sec",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.5
+                        }
+                    ]
+                },
+                {
+                    "name": "GyroTau",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.004999999888241291
+                        }
+                    ]
+                },
+                {
+                    "name": "DerivativeGamma",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 1
+                        }
+                    ]
+                },
+                {
+                    "name": "AxisLockKp",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 2.5
+                        }
+                    ]
+                },
+                {
+                    "name": "WeakLevelingKp",
+                    "type": "float32",
+                    "unit": "(deg/s)/deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.10000000149011612
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMaxPowerFactor",
+                    "type": "float32",
+                    "unit": "x",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 3
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlPowerTrim",
+                    "type": "float32",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 100
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlPowerDelayComp",
+                    "type": "float32",
+                    "unit": "sec",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.25
+                        }
+                    ]
+                },
+                {
+                    "name": "ScaleToAirspeed",
+                    "type": "float32",
+                    "unit": "m/s",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "ScaleToAirspeedLimits",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Min",
+                            "value": 0.05000000074505806
+                        },
+                        {
+                            "name": "Max",
+                            "value": 3
+                        }
+                    ]
+                },
+                {
+                    "name": "FlightModeMap",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "1",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "2",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "3",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "4",
+                            "value": "Bank1"
+                        },
+                        {
+                            "name": "5",
+                            "value": "Bank1"
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarGyroSuppress",
+                    "type": "int8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 30
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarPiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "VbarMaxAngle",
+                    "type": "uint8",
+                    "unit": "deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 10
+                        }
+                    ]
+                },
+                {
+                    "name": "DerivativeCutoff",
+                    "type": "uint8",
+                    "unit": "Hz",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 20
+                        }
+                    ]
+                },
+                {
+                    "name": "MaxAxisLock",
+                    "type": "uint8",
+                    "unit": "deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 30
+                        }
+                    ]
+                },
+                {
+                    "name": "MaxAxisLockRate",
+                    "type": "uint8",
+                    "unit": "deg/s",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 2
+                        }
+                    ]
+                },
+                {
+                    "name": "MaxWeakLevelingRate",
+                    "type": "uint8",
+                    "unit": "deg/s",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 5
+                        }
+                    ]
+                },
+                {
+                    "name": "RattitudeModeTransition",
+                    "type": "uint8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 80
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMinThrust",
+                    "type": "int8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 5
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMaxThrust",
+                    "type": "uint8",
+                    "unit": "%",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 90
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlMaxAngle",
+                    "type": "uint8",
+                    "unit": "deg",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 105
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlFlightModeSwitchPosEnable",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "1",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "2",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "3",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "4",
+                            "value": "FALSE"
+                        },
+                        {
+                            "name": "5",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlInvertedThrustReversing",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Unreversed"
+                        }
+                    ]
+                },
+                {
+                    "name": "CruiseControlInvertedPowerOutput",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Zero"
+                        }
+                    ]
+                },
+                {
+                    "name": "LowThrottleZeroIntegral",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "TRUE"
+                        }
+                    ]
+                }
+            ],
+            "id": "236F6DEC",
+            "instance": 0,
+            "name": "StabilizationSettings",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "ManualRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 200
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 200
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 210
+                        }
+                    ]
+                },
+                {
+                    "name": "MaximumRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 300
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 300
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 300
+                        }
+                    ]
+                },
+                {
+                    "name": "RollRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0031999999191612005
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.4000000596279278e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0031999999191612005
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.4000000596279278e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "YawRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0076999999582767487
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.010400000028312206
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 5.5000000429572538e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.9000000953674316
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.9000000953674316
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "YawPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "AcroInsanityFactor",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.40999999642372131
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleCurve",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.17570838332176208
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.051423884928226471
+                        },
+                        {
+                            "name": "50",
+                            "value": -0.038573265075683594
+                        },
+                        {
+                            "name": "75",
+                            "value": -0.16285775601863861
+                        },
+                        {
+                            "name": "100",
+                            "value": -0.33428734540939331
+                        }
+                    ]
+                },
+                {
+                    "name": "RollMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 60
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 60
+                        }
+                    ]
+                },
+                {
+                    "name": "YawMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 35
+                        }
+                    ]
+                },
+                {
+                    "name": "StickExpo",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 10
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 10
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": -4
+                        }
+                    ]
+                },
+                {
+                    "name": "EnablePiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "EnableThrustPIDScaling",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "TRUE"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleSource",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "ActuatorDesiredThrust"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleTarget",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "PD"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleAxes",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Roll Pitch"
+                        }
+                    ]
+                }
+            ],
+            "id": "E8EBBD48",
+            "instance": 0,
+            "name": "StabilizationSettingsBank1",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "ManualRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 200
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 200
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 220
+                        }
+                    ]
+                },
+                {
+                    "name": "MaximumRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 300
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 300
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 300
+                        }
+                    ]
+                },
+                {
+                    "name": "RollRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.00279999990016222
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.004999999888241291
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 2.9999999242136255e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0046999999321997166
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0073000001721084118
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 4.8000001697801054e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "YawRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0087000001221895218
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.016100000590085983
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 5.199999941396527e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.7999999523162842
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 3
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "YawPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "AcroInsanityFactor",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.46000000834465027
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleCurve",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.017129398882389069
+                        },
+                        {
+                            "name": "25",
+                            "value": -0.0085789738222956657
+                        },
+                        {
+                            "name": "50",
+                            "value": -0.042859181761741638
+                        },
+                        {
+                            "name": "75",
+                            "value": -0.1328563392162323
+                        },
+                        {
+                            "name": "100",
+                            "value": -0.28285634517669678
+                        }
+                    ]
+                },
+                {
+                    "name": "RollMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "YawMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 35
+                        }
+                    ]
+                },
+                {
+                    "name": "StickExpo",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 10
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 10
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": -4
+                        }
+                    ]
+                },
+                {
+                    "name": "EnablePiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "EnableThrustPIDScaling",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "TRUE"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleSource",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "ActuatorDesiredThrust"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleTarget",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "PD"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleAxes",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Roll Pitch"
+                        }
+                    ]
+                }
+            ],
+            "id": "70E9539A",
+            "instance": 0,
+            "name": "StabilizationSettingsBank2",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "ManualRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 220
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 220
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 220
+                        }
+                    ]
+                },
+                {
+                    "name": "MaximumRate",
+                    "type": "float32",
+                    "unit": "degrees/sec",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 300
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 300
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 300
+                        }
+                    ]
+                },
+                {
+                    "name": "RollRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0030000000260770321
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.3000000257743523e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0030000000260770321
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0065000001341104507
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 3.3000000257743523e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "YawRatePID",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 0.0062000001780688763
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "Kd",
+                            "value": 4.9999998736893758e-05
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "YawPI",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "Kp",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "Ki",
+                            "value": 0
+                        },
+                        {
+                            "name": "ILimit",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "AcroInsanityFactor",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.40000000596046448
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleCurve",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0.30000001192092896
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.15000000596046448
+                        },
+                        {
+                            "name": "50",
+                            "value": 0
+                        },
+                        {
+                            "name": "75",
+                            "value": -0.15000000596046448
+                        },
+                        {
+                            "name": "100",
+                            "value": -0.30000001192092896
+                        }
+                    ]
+                },
+                {
+                    "name": "RollMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "PitchMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 55
+                        }
+                    ]
+                },
+                {
+                    "name": "YawMax",
+                    "type": "uint8",
+                    "unit": "degrees",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 35
+                        }
+                    ]
+                },
+                {
+                    "name": "StickExpo",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "EnablePiroComp",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "TRUE"
+                        }
+                    ]
+                },
+                {
+                    "name": "EnableThrustPIDScaling",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "FALSE"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleSource",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "ActuatorDesiredThrust"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleTarget",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "PID"
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrustPIDScaleAxes",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Roll Pitch"
+                        }
+                    ]
+                }
+            ],
+            "id": "C02DAA6A",
+            "instance": 0,
+            "name": "StabilizationSettingsBank3",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "MaxAccel",
+                    "type": "float32",
+                    "unit": "units/sec",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 1000
+                        }
+                    ]
+                },
+                {
+                    "name": "FeedForward",
+                    "type": "float32",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "AccelTime",
+                    "type": "float32",
+                    "unit": "ms",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "DecelTime",
+                    "type": "float32",
+                    "unit": "ms",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrottleCurve1",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.22499999403953552
+                        },
+                        {
+                            "name": "50",
+                            "value": 0.44999998807907104
+                        },
+                        {
+                            "name": "75",
+                            "value": 0.67499995231628418
+                        },
+                        {
+                            "name": "100",
+                            "value": 0.89999997615814209
+                        }
+                    ]
+                },
+                {
+                    "name": "ThrottleCurve2",
+                    "type": "float32",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 0
+                        },
+                        {
+                            "name": "25",
+                            "value": 0.22499999403953552
+                        },
+                        {
+                            "name": "50",
+                            "value": 0.44999998807907104
+                        },
+                        {
+                            "name": "75",
+                            "value": 0.67499995231628418
+                        },
+                        {
+                            "name": "100",
+                            "value": 0.89999997615814209
+                        }
+                    ]
+                },
+                {
+                    "name": "MixerValueRoll",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "MixerValuePitch",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "MixerValueYaw",
+                    "type": "int8",
+                    "unit": "percent",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": 50
+                        }
+                    ]
+                },
+                {
+                    "name": "Curve2Source",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Throttle"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer1Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer1Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": -64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer2Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer2Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": -64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer3Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer3Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": -64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": -64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": -64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer4Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Motor"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer4Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 127
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 64
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": -64
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 64
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer5Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer5Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer6Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer6Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer7Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer7Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer8Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer8Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer9Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer9Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer10Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer10Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer11Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer11Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer12Type",
+                    "type": "enum",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "0",
+                            "value": "Disabled"
+                        }
+                    ]
+                },
+                {
+                    "name": "Mixer12Vector",
+                    "type": "int8",
+                    "unit": "",
+                    "values": [
+                        {
+                            "name": "ThrottleCurve1",
+                            "value": 0
+                        },
+                        {
+                            "name": "ThrottleCurve2",
+                            "value": 0
+                        },
+                        {
+                            "name": "Roll",
+                            "value": 0
+                        },
+                        {
+                            "name": "Pitch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Yaw",
+                            "value": 0
+                        }
+                    ]
+                }
+            ],
+            "id": "7BF2CFA8",
+            "instance": 0,
+            "name": "MixerSettings",
+            "setting": true
+        },
+        {
+            "fields": [
+                {
+                    "name": "P",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "PositionNorth",
+                            "value": 10
+                        },
+                        {
+                            "name": "PositionEast",
+                            "value": 10
+                        },
+                        {
+                            "name": "PositionDown",
+                            "value": 10
+                        },
+                        {
+                            "name": "VelocityNorth",
+                            "value": 1
+                        },
+                        {
+                            "name": "VelocityEast",
+                            "value": 1
+                        },
+                        {
+                            "name": "VelocityDown",
+                            "value": 1
+                        },
+                        {
+                            "name": "AttitudeQ1",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "AttitudeQ2",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "AttitudeQ3",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "AttitudeQ4",
+                            "value": 0.0070000002160668373
+                        },
+                        {
+                            "name": "GyroDriftX",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftY",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftZ",
+                            "value": 9.9999999747524271e-07
+                        }
+                    ]
+                },
+                {
+                    "name": "Q",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "GyroX",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "GyroY",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "GyroZ",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "AccelX",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "AccelY",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "AccelZ",
+                            "value": 0.0099999997764825821
+                        },
+                        {
+                            "name": "GyroDriftX",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftY",
+                            "value": 9.9999999747524271e-07
+                        },
+                        {
+                            "name": "GyroDriftZ",
+                            "value": 9.9999999747524271e-07
+                        }
+                    ]
+                },
+                {
+                    "name": "R",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "GPSPosNorth",
+                            "value": 1
+                        },
+                        {
+                            "name": "GPSPosEast",
+                            "value": 1
+                        },
+                        {
+                            "name": "GPSPosDown",
+                            "value": 1000000
+                        },
+                        {
+                            "name": "GPSVelNorth",
+                            "value": 0.0010000000474974513
+                        },
+                        {
+                            "name": "GPSVelEast",
+                            "value": 0.0010000000474974513
+                        },
+                        {
+                            "name": "GPSVelDown",
+                            "value": 0.0010000000474974513
+                        },
+                        {
+                            "name": "MagX",
+                            "value": 10
+                        },
+                        {
+                            "name": "MagY",
+                            "value": 10
+                        },
+                        {
+                            "name": "MagZ",
+                            "value": 10
+                        },
+                        {
+                            "name": "BaroZ",
+                            "value": 0.0099999997764825821
+                        }
+                    ]
+                },
+                {
+                    "name": "FakeR",
+                    "type": "float32",
+                    "unit": "1^2",
+                    "values": [
+                        {
+                            "name": "FakeGPSPosIndoor",
+                            "value": 10
+                        },
+                        {
+                            "name": "FakeGPSVelIndoor",
+                            "value": 1
+                        },
+                        {
+                            "name": "FakeGPSVelAirspeed",
+                            "value": 1000
+                        }
+                    ]
+                }
+            ],
+            "id": "5E91213C",
+            "instance": 0,
+            "name": "EKFConfiguration",
+            "setting": true
+        }
+    ],
+    "owner": "Jim",
+    "photo": "iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAIAAABEtEjdAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAgAElEQVR4nOzdeZRdV30n+t/e+0x3qlu3ZlWVSqWSbE0esAGPzHY72EwOPAgJoQOLkDC5kzQx9Oq8btJJhzxeQjqdFyADDg2ExA4hDG7cLAbbGAsbW7YGW7Yka3BJqrnq1p3PtPf+vT+26vioZDnYBA3Hv8/S0irdunXr3lul79nnt/f5bYaIQAghJFv42X4ChBBC/u1RuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNCSAZRuBNC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iTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwQk7gABiTtAQOIOEJC4AwT0H6Ess7cQBVQoAAAAAElFTkSuQmCC",
+    "propeller": "APC SLOWFLY 8x4.7",
+    "servo": "",
+    "size": "450mm",
+    "subtype": 2,
+    "type": 1,
+    "uuid": "{c8abfd34-7193-42cc-8d19-a1e92d4aadcd}",
+    "weight": "1058"
+}

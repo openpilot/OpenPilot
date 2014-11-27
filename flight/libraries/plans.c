@@ -35,6 +35,7 @@
 #include <pathdesired.h>
 #include <positionstate.h>
 #include <flightmodesettings.h>
+#include <velocitystate.h>
 #include <manualcontrolcommand.h>
 #include <attitudestate.h>
 #include <sin_lookup.h>
@@ -55,6 +56,7 @@ void plan_initialize()
     FlightModeSettingsInitialize();
     AttitudeStateInitialize();
     ManualControlCommandInitialize();
+    VelocityStateInitialize();
 }
 
 /**
@@ -83,6 +85,7 @@ void plan_setup_positionHold()
 
     PathDesiredSet(&pathDesired);
 }
+
 
 /**
  * @brief setup pathplanner/pathfollower for return to base
@@ -474,3 +477,53 @@ void plan_run_AutoCruise()
     pathDesired.Start.Down  = pathDesired.End.Down;
     PathDesiredSet(&pathDesired);
 }
+
+/**
+ * @brief setup pathplanner/pathfollower for braking in positionroam
+ */
+void plan_setup_braking()
+{
+    PositionStateData positionState;
+    VelocityStateData velocityState ;
+
+    PositionStateGet(&positionState);
+    PathDesiredData pathDesired;
+    PathDesiredGet(&pathDesired);
+    VelocityStateGet(&velocityState);
+
+    FlightModeSettingsPositionHoldOffsetData offset;
+    FlightModeSettingsPositionHoldOffsetGet(&offset);
+
+    // Depending on velocity we with enter position hold directly
+    // or do preliminary braking before entering position hold
+    float velocity = sqrt( velocityState.North * velocityState.North + velocityState.East * velocityState.East);
+    if (velocity < 0.5f || velocity > 30.0f ) {
+	pathDesired.End.North        = positionState.North;
+	pathDesired.End.East         = positionState.East;
+	pathDesired.End.Down         = positionState.Down;
+	pathDesired.Start.North      = positionState.North + offset.Horizontal; // in FlyEndPoint the direction of this vector does not matter
+	pathDesired.Start.East       = positionState.East;
+	pathDesired.Start.Down       = positionState.Down;
+	pathDesired.StartingVelocity = 0.0f;
+	pathDesired.EndingVelocity   = 0.0f;
+	pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+
+
+    } else {
+	pathDesired.Start.North      = positionState.North;
+	pathDesired.Start.East       = positionState.East;
+	pathDesired.Start.Down       = positionState.Down;
+
+    	pathDesired.End.North        = positionState.North + velocityState.North * 3.0f;
+    	pathDesired.End.East         = positionState.East + velocityState.East * 3.0f;
+    	pathDesired.End.Down         = positionState.Down;
+
+    	pathDesired.StartingVelocity = velocity;
+    	pathDesired.EndingVelocity   = 0.0f;
+    	pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+    }
+    PathDesiredSet(&pathDesired);
+}
+
+
+

@@ -68,6 +68,11 @@ void plan_setup_land();
 void plan_run_land();
 
 /**
+ * @brief setup pathplanner/pathfollower for braking
+ */
+void plan_setup_brake();
+
+/**
  * @brief setup pathfollower for positionvario
  */
 void plan_setup_PositionVarioFPV();

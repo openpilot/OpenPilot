@@ -147,7 +147,9 @@ static void pathPlannerTask()
                 static uint32_t braking_counter = 0;
 
         	if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
-        	    braking_counter = 50;
+        	    FlightModeSettingsPositionRoamBrakeTimeoutGet(&braking_counter);
+        	    braking_counter *= (1000.0f / PATH_PLANNER_UPDATE_RATE_MS);   // UAVO was in seconds.
+
         	    flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER;
         	    FlightStatusSet(&flightStatus);
         	}

@@ -113,6 +113,7 @@
         <field name="LandingVelocity" units="m" type="float" elements="1" defaultvalue="0.4"/>
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="10,2"/>
         <field name="PositionRoamStabiSelect" units="" type="enum" elements="1" options="Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6" defaultvalue="Stabilized1"/>
+        <field name="PositionRoamBrakeTimeout" units="s" type="float" elements="1" defaultvalue="5.0"/>
 	<!-- optimized for current vtolpathfollower,
 	     for fixed wing pathfollower set to Horizontal=500,Vertical=5 -->
         <access gcs="readwrite" flight="readwrite"/>

@@ -52,7 +52,7 @@
 ****************************/
 
 // ! Check a stabilization mode switch position for safety
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol);
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool positionroam);
 
 /**
  * Run a preflight check over the hardware configuration
@@ -110,26 +110,36 @@ int32_t configuration_check()
             ADDSEVERITY(!multirotor);
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol, false));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol, false));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol, false));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED4:
-            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol, false));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED5:
-            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol, false));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
-            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol, false));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
             ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
             break;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
+          {
+            // Check positionRoam's stabi-selected mode is ok
+            uint8_t positionRoamStabiSelect;
+            FlightModeSettingsPositionRoamStabiSelectGet(&positionRoamStabiSelect);
+            ADDSEVERITY(check_stabilization_settings((positionRoamStabiSelect+1), multirotor, coptercontrol, true));
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(navCapableFusion);
+          }
+          break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
             // Revo supports PathPlanner and that must be OK or we are not sane
@@ -141,7 +151,6 @@ int32_t configuration_check()
         }
         // intentionally no break as this also needs pathfollower
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOFPV:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOLOS:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIONSEW:
@@ -184,7 +193,7 @@ int32_t configuration_check()
  * @param[in] index Which stabilization mode to check
  * @returns true or false
  */
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol)
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool positionroam)
 {
     uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
@@ -220,6 +229,15 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
                 return false;
             }
         }
+    }
+
+    if (positionroam) {
+        // For multirotors verify that roll/pitch/yaw are not set to "none"
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if (! (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ATTITUDE ||
+        	   modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATTITUDE)   ) {
+                return false;
+            }
     }
 
     // coptercontrol cannot do altitude holding

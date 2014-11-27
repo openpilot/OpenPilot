@@ -215,9 +215,10 @@ static void manualControlTask(void)
                     newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MIXED;
                 }
             }
-            else {
-        	// Move to braking state until confirmed zero velocity then position hold
-                newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
+            else if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM ||
+        	    (flightStatus.PositionRoamState != FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD &&
+       	             flightStatus.PositionRoamState != FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER) ) {
+        	    newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
             }
     }
     else {

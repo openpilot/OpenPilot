@@ -5,7 +5,7 @@
 
 	<!-- Note these enumerated values should be the same as ManualControlSettings -->
         <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,PositionVarioFPV,PositionVarioLOS,PositionVarioNSEW,ReturnToBase,Land,PathPlanner,POI,AutoCruise,PositionRoam"/>
-        <field name="PositionRoamState" units="" type="enum" elements="1" options="None,PositionHold,Stabilized,Braking" defaultvalue="None"/>
+        <field name="PositionRoamState" units="" type="enum" elements="1" options="None,Stabilized,Braking,BrakingTimer,PositionHold" defaultvalue="None"/>
         <field name="PositionRoamThrustMode" units="" type="enum" elements="1" options="Manual,Mixed" defaultvalue="Manual"/>
 
 	<field name="ControlChain" units="bool" type="enum" options="false,true">

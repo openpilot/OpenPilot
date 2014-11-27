@@ -70,7 +70,7 @@ void plan_run_land();
 /**
  * @brief setup pathplanner/pathfollower for braking
  */
-void plan_setup_brake();
+void plan_setup_braking();
 
 /**
  * @brief setup pathfollower for positionvario

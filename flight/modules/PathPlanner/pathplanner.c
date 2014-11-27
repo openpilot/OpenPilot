@@ -140,8 +140,31 @@ static void pathPlannerTask()
 
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
-    if (flightStatus.ControlChain.PathPlanner != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+
+    if (flightStatus.ControlChain.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+
+            if (flightStatus.FlightMode  == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM) {
+                static uint32_t braking_counter = 0;
+
+        	if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
+        	    braking_counter = 50;
+        	    flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER;
+        	    FlightStatusSet(&flightStatus);
+        	}
+        	else if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER) {
+        	    if (braking_counter > 0) braking_counter--;
+        	    else {
+        		plan_setup_positionHold();
+        	        flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD;
+        	        FlightStatusSet(&flightStatus);
+        	    }
+        	}
+           }
+           return;
+    }
+    else if (flightStatus.ControlChain.PathPlanner != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
         pathplanner_active = false;
+
         if (!validPathPlan) {
             // unverified path plans are only a warning while we are not in pathplanner mode
             // so it does not prevent arming. However manualcontrols safety check

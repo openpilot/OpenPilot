@@ -31,8 +31,11 @@
 #include "connectiondiagram.h"
 #include "ui_connectiondiagram.h"
 
+const char *ConnectionDiagram::FILE_NAME   = ":/setupwizard/resources/connection-diagrams.svg";
+const int ConnectionDiagram::IMAGE_PADDING = 10;
+
 ConnectionDiagram::ConnectionDiagram(QWidget *parent, VehicleConfigurationSource *configSource) :
-    QDialog(parent), ui(new Ui::ConnectionDiagram), m_configSource(configSource), m_background(0)
+    QDialog(parent), ui(new Ui::ConnectionDiagram), m_configSource(configSource)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Connection Diagram"));
@@ -48,33 +51,32 @@ void ConnectionDiagram::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
-    ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
+    fitInView();
 }
 
 void ConnectionDiagram::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 
-    ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
+    fitInView();
+}
+
+void ConnectionDiagram::fitInView()
+{
+    ui->connectionDiagram->setSceneRect(m_scene->itemsBoundingRect());
+    ui->connectionDiagram->fitInView(
+        m_scene->itemsBoundingRect().adjusted(-IMAGE_PADDING, -IMAGE_PADDING, IMAGE_PADDING, IMAGE_PADDING),
+        Qt::KeepAspectRatio);
 }
 
 void ConnectionDiagram::setupGraphicsScene()
 {
     m_renderer = new QSvgRenderer();
-    if (QFile::exists(QString(":/setupwizard/resources/connection-diagrams.svg")) &&
-        m_renderer->load(QString(":/setupwizard/resources/connection-diagrams.svg")) &&
+    if (QFile::exists(QString(FILE_NAME)) &&
+        m_renderer->load(QString(FILE_NAME)) &&
         m_renderer->isValid()) {
         m_scene = new QGraphicsScene(this);
         ui->connectionDiagram->setScene(m_scene);
-        // ui->connectionDiagram->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-
-        m_background = new QGraphicsSvgItem();
-        m_background->setSharedRenderer(m_renderer);
-        m_background->setElementId("background");
-        m_background->setOpacity(0);
-        // m_background->setFlags(QGraphicsItem::ItemClipsToShape);
-        m_background->setZValue(-1);
-        m_scene->addItem(m_background);
 
         QList<QString> elementsToShow;
 
@@ -85,6 +87,9 @@ void ConnectionDiagram::setupGraphicsScene()
             break;
         case VehicleConfigurationSource::CONTROLLER_REVO:
             elementsToShow << "controller-revo";
+            break;
+        case VehicleConfigurationSource::CONTROLLER_NANO:
+            elementsToShow << "controller-nano";
             break;
         case VehicleConfigurationSource::CONTROLLER_OPLINK:
         default:
@@ -121,36 +126,81 @@ void ConnectionDiagram::setupGraphicsScene()
             }
             break;
         case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+            switch (m_configSource->getVehicleSubType()) {
+            case VehicleConfigurationSource::FIXED_WING_DUAL_AILERON:
+                elementsToShow << "aileron";
+                break;
+            case VehicleConfigurationSource::FIXED_WING_AILERON:
+                elementsToShow << "aileron-single";
+                break;
+            case VehicleConfigurationSource::FIXED_WING_ELEVON:
+                elementsToShow << "elevon";
+                break;
+            default:
+                break;
+            }
         case VehicleConfigurationSource::VEHICLE_HELI:
         case VehicleConfigurationSource::VEHICLE_SURFACE:
         default:
             break;
         }
 
+        QString prefix = "";
+        if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+            prefix = "nano-";
+        }
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
-            elementsToShow << "pwm";
+            elementsToShow << QString("%1pwm").arg(prefix);
             break;
         case VehicleConfigurationSource::INPUT_PPM:
-            elementsToShow << "ppm";
+            elementsToShow << QString("%1ppm").arg(prefix);
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
-            elementsToShow << "sbus";
+            elementsToShow << QString("%1sbus").arg(prefix);
             break;
-        case VehicleConfigurationSource::INPUT_DSMX10:
-        case VehicleConfigurationSource::INPUT_DSMX11:
-        case VehicleConfigurationSource::INPUT_DSM2:
-            elementsToShow << "satellite";
+        case VehicleConfigurationSource::INPUT_DSM:
+            elementsToShow << QString("%1satellite").arg(prefix);
+            break;
+        default:
+            break;
+        }
+
+        if (m_configSource->getVehicleType() == VehicleConfigurationSource::VEHICLE_FIXEDWING &&
+            m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_ESTIMATE) {
+            switch (m_configSource->getAirspeedType()) {
+            case VehicleConfigurationSource::AIRSPEED_EAGLETREE:
+                elementsToShow << QString("%1eagletree-speed-sensor").arg(prefix);
+                break;
+            case VehicleConfigurationSource::AIRSPEED_MS4525:
+                elementsToShow << QString("%1ms4525-speed-sensor").arg(prefix);
+                break;
+            default:
+                break;
+            }
+        }
+
+        if (m_configSource->getInputType() == VehicleConfigurationSource::INPUT_SBUS) {
+            prefix = QString("flexi-%1").arg(prefix);
+        }
+        switch (m_configSource->getGpsType()) {
+        case VehicleConfigurationSource::GPS_DISABLED:
+            break;
+        case VehicleConfigurationSource::GPS_NMEA:
+            elementsToShow << QString("%1generic-nmea").arg(prefix);
+            break;
+        case VehicleConfigurationSource::GPS_PLATINUM:
+            elementsToShow << QString("%1OPGPS-v9").arg(prefix);
+            break;
+        case VehicleConfigurationSource::GPS_UBX:
+            elementsToShow << QString("%1OPGPS-v8-ublox").arg(prefix);
             break;
         default:
             break;
         }
 
         setupGraphicsSceneItems(elementsToShow);
-
-        ui->connectionDiagram->setSceneRect(m_background->boundingRect());
-        ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
-
+        fitInView();
         qDebug() << "Scene complete";
     }
 }
@@ -158,8 +208,6 @@ void ConnectionDiagram::setupGraphicsScene()
 void ConnectionDiagram::setupGraphicsSceneItems(QList<QString> elementsToShow)
 {
     qreal z = 0;
-
-    // QRectF backgBounds = m_renderer->boundsOnElement("background");
 
     foreach(QString elementId, elementsToShow) {
         if (m_renderer->elementExists(elementId)) {
@@ -172,10 +220,6 @@ void ConnectionDiagram::setupGraphicsSceneItems(QList<QString> elementsToShow)
             QMatrix matrix = m_renderer->matrixForElement(elementId);
             QRectF orig    = matrix.mapRect(m_renderer->boundsOnElement(elementId));
             element->setPos(orig.x(), orig.y());
-
-            // QRectF orig = m_renderer->boundsOnElement(elementId);
-            // element->setPos(orig.x() - backgBounds.x(), orig.y() - backgBounds.y());
-
             m_scene->addItem(element);
             qDebug() << "Adding " << elementId << " to scene at " << element->pos();
         } else {
@@ -188,7 +232,7 @@ void ConnectionDiagram::on_saveButton_clicked()
 {
     QImage image(2200, 1100, QImage::Format_ARGB32);
 
-    image.fill(0);
+    image.fill(Qt::white);
     QPainter painter(&image);
     m_scene->render(&painter);
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Images (*.png *.xpm *.jpg)"));

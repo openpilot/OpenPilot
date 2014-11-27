@@ -3,6 +3,7 @@
         <file>images/help2.png</file>
         <file>images/ahrs-calib.svg</file>
         <file>images/multirotor-shapes.svg</file>
+        <file>images/fixedwing-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
         <file>images/help.png</file>
@@ -45,5 +46,6 @@
         <file>images/calibration/empty.png</file>
         <file>images/calibration/plane-swd.png</file>
         <file>images/calibration/board-swd.png</file>
+        <file>images/gear.png</file>
     </qresource>
 </RCC>

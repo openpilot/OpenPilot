@@ -94,8 +94,6 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.h \
-    $$UAVOBJECT_SYNTHETICS/relaytuning.h \
-    $$UAVOBJECT_SYNTHETICS/relaytuningsettings.h \
     $$UAVOBJECT_SYNTHETICS/ratedesired.h \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.h \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
@@ -127,6 +125,9 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.h \
+    $$UAVOBJECT_SYNTHETICS/auxmagsensor.h \
+    $$UAVOBJECT_SYNTHETICS/auxmagsettings.h \
+    $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.h \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
@@ -197,8 +198,6 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/relaytuningsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/relaytuning.cpp \
     $$UAVOBJECT_SYNTHETICS/ratedesired.cpp \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.cpp \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \
@@ -231,5 +230,8 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.cpp \
+    $$UAVOBJECT_SYNTHETICS/auxmagsensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/auxmagsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/perfcounter.cpp
-    
+

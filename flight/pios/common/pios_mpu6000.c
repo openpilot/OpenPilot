@@ -33,15 +33,13 @@
 
 #ifdef PIOS_INCLUDE_MPU6000
 
-#include "fifo_buffer.h"
-
+#include <pios_constants.h>
 /* Global Variables */
 
 enum pios_mpu6000_dev_magic {
     PIOS_MPU6000_DEV_MAGIC = 0x9da9b3ed,
 };
 
-#define PIOS_MPU6000_MAX_DOWNSAMPLE 2
 struct mpu6000_dev {
     uint32_t     spi_id;
     uint32_t     slave_num;
@@ -53,29 +51,58 @@ struct mpu6000_dev {
     enum pios_mpu6000_dev_magic   magic;
 };
 
+#ifdef PIOS_MPU6000_ACCEL
+#define PIOS_MPU6000_SAMPLES_BYTES    14
+#define PIOS_MPU6000_SENSOR_FIRST_REG PIOS_MPU6000_ACCEL_X_OUT_MSB
+#else
+#define PIOS_MPU6000_SENSOR_FIRST_REG PIOS_MPU6000_TEMP_OUT_MSB
+#define PIOS_MPU6000_SAMPLES_BYTES    8
+#endif
+
+typedef union {
+    uint8_t buffer[1 + PIOS_MPU6000_SAMPLES_BYTES];
+    struct {
+        uint8_t dummy;
+#ifdef PIOS_MPU6000_ACCEL
+        uint8_t Accel_X_h;
+        uint8_t Accel_X_l;
+        uint8_t Accel_Y_h;
+        uint8_t Accel_Y_l;
+        uint8_t Accel_Z_h;
+        uint8_t Accel_Z_l;
+#endif
+        uint8_t Temperature_h;
+        uint8_t Temperature_l;
+        uint8_t Gyro_X_h;
+        uint8_t Gyro_X_l;
+        uint8_t Gyro_Y_h;
+        uint8_t Gyro_Y_l;
+        uint8_t Gyro_Z_h;
+        uint8_t Gyro_Z_l;
+    } data;
+} mpu6000_data_t;
+
+#define GET_SENSOR_DATA(mpudataptr, sensor) (mpudataptr.data.sensor##_h << 8 | mpudataptr.data.sensor##_l)
+
 // ! Global structure for this device device
 static struct mpu6000_dev *dev;
 volatile bool mpu6000_configured = false;
+static mpu6000_data_t mpu6000_data;
 
 // ! Private functions
-static struct mpu6000_dev *PIOS_MPU6000_alloc(void);
+static struct mpu6000_dev *PIOS_MPU6000_alloc(const struct pios_mpu6000_cfg *cfg);
 static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev *dev);
 static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const *cfg);
 static int32_t PIOS_MPU6000_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_MPU6000_GetReg(uint8_t address);
-
-#define GRAV                       9.81f
-
-#ifdef PIOS_MPU6000_ACCEL
-#define PIOS_MPU6000_SAMPLES_BYTES 14
-#else
-#define PIOS_MPU6000_SAMPLES_BYTES 8
-#endif
-
+static void PIOS_MPU6000_SetSpeed(const bool fast);
+static bool PIOS_MPU6000_HandleData();
+static bool PIOS_MPU6000_ReadFifo(bool *woken);
+static bool PIOS_MPU6000_ReadSensor(bool *woken);
 /**
  * @brief Allocate a new device
  */
-static struct mpu6000_dev *PIOS_MPU6000_alloc(void)
+static struct mpu6000_dev *PIOS_MPU6000_alloc(const struct pios_mpu6000_cfg *cfg)
 {
     struct mpu6000_dev *mpu6000_dev;
 
@@ -86,7 +113,7 @@ static struct mpu6000_dev *PIOS_MPU6000_alloc(void)
 
     mpu6000_dev->magic = PIOS_MPU6000_DEV_MAGIC;
 
-    mpu6000_dev->queue = xQueueCreate(PIOS_MPU6000_MAX_DOWNSAMPLE, sizeof(struct pios_mpu6000_data));
+    mpu6000_dev->queue = xQueueCreate(cfg->max_downsample + 1, sizeof(struct pios_mpu6000_data));
     if (mpu6000_dev->queue == NULL) {
         vPortFree(mpu6000_dev);
         return NULL;
@@ -119,7 +146,7 @@ static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev *vdev)
  */
 int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg *cfg)
 {
-    dev = PIOS_MPU6000_alloc();
+    dev = PIOS_MPU6000_alloc(cfg);
     if (dev == NULL) {
         return -1;
     }
@@ -129,9 +156,7 @@ int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios
     dev->cfg = cfg;
 
     /* Configure the MPU6000 Sensor */
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
     PIOS_MPU6000_Config(cfg);
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
 
     /* Set up EXTI line */
     PIOS_EXTI_Init(cfg->exti_cfg);
@@ -234,11 +259,6 @@ int32_t PIOS_MPU6000_ConfigureRanges(
         return -1;
     }
 
-    // TODO: check that changing the SPI clock speed is safe
-    // to do here given that interrupts are enabled and the bus has
-    // not been claimed/is not claimed during this call
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
-
     // update filter settings
     while (PIOS_MPU6000_SetReg(PIOS_MPU6000_DLPF_CFG_REG, filterSetting) != 0) {
         ;
@@ -267,7 +287,6 @@ int32_t PIOS_MPU6000_ConfigureRanges(
 
     dev->accel_range = accelRange;
 #endif
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
     return 0;
 }
 
@@ -275,7 +294,7 @@ int32_t PIOS_MPU6000_ConfigureRanges(
  * @brief Claim the SPI bus for the accel communications and select this chip
  * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
  */
-static int32_t PIOS_MPU6000_ClaimBus()
+static int32_t PIOS_MPU6000_ClaimBus(bool fast_spi)
 {
     if (PIOS_MPU6000_Validate(dev) != 0) {
         return -1;
@@ -283,8 +302,19 @@ static int32_t PIOS_MPU6000_ClaimBus()
     if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
         return -2;
     }
+    PIOS_MPU6000_SetSpeed(fast_spi);
     PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
     return 0;
+}
+
+
+static void PIOS_MPU6000_SetSpeed(const bool fast)
+{
+    if (fast) {
+        PIOS_SPI_SetClockSpeed(dev->spi_id, dev->cfg->fast_prescaler);
+    } else {
+        PIOS_SPI_SetClockSpeed(dev->spi_id, dev->cfg->std_prescaler);
+    }
 }
 
 /**
@@ -293,7 +323,7 @@ static int32_t PIOS_MPU6000_ClaimBus()
  * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
  *                      task has is now eligible to run, else unchanged
  */
-static int32_t PIOS_MPU6000_ClaimBusISR(bool *woken)
+static int32_t PIOS_MPU6000_ClaimBusISR(bool *woken, bool fast_spi)
 {
     if (PIOS_MPU6000_Validate(dev) != 0) {
         return -1;
@@ -301,6 +331,7 @@ static int32_t PIOS_MPU6000_ClaimBusISR(bool *woken)
     if (PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
         return -2;
     }
+    PIOS_MPU6000_SetSpeed(fast_spi);
     PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
     return 0;
 }
@@ -342,7 +373,7 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
 {
     uint8_t data;
 
-    if (PIOS_MPU6000_ClaimBus() != 0) {
+    if (PIOS_MPU6000_ClaimBus(false) != 0) {
         return -1;
     }
 
@@ -363,7 +394,7 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
  */
 static int32_t PIOS_MPU6000_SetReg(uint8_t reg, uint8_t data)
 {
-    if (PIOS_MPU6000_ClaimBus() != 0) {
+    if (PIOS_MPU6000_ClaimBus(false) != 0) {
         return -1;
     }
 
@@ -393,7 +424,7 @@ int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data *data)
     uint8_t buf[7] = { PIOS_MPU6000_GYRO_X_OUT_MSB | 0x80, 0, 0, 0, 0, 0, 0 };
     uint8_t rec[7];
 
-    if (PIOS_MPU6000_ClaimBus() != 0) {
+    if (PIOS_MPU6000_ClaimBus(true) != 0) {
         return -1;
     }
 
@@ -460,16 +491,16 @@ float PIOS_MPU6000_GetAccelScale()
 {
     switch (dev->accel_range) {
     case PIOS_MPU6000_ACCEL_2G:
-        return GRAV / 16384.0f;
+        return PIOS_CONST_MKS_GRAV_ACCEL_F / 16384.0f;
 
     case PIOS_MPU6000_ACCEL_4G:
-        return GRAV / 8192.0f;
+        return PIOS_CONST_MKS_GRAV_ACCEL_F / 8192.0f;
 
     case PIOS_MPU6000_ACCEL_8G:
-        return GRAV / 4096.0f;
+        return PIOS_CONST_MKS_GRAV_ACCEL_F / 4096.0f;
 
     case PIOS_MPU6000_ACCEL_16G:
-        return GRAV / 2048.0f;
+        return PIOS_CONST_MKS_GRAV_ACCEL_F / 2048.0f;
     }
     return 0;
 }
@@ -504,7 +535,7 @@ static int32_t PIOS_MPU6000_GetInterruptStatusRegISR(bool *woken)
     /* Interrupt Status register can be read at high SPI clock speed */
     uint8_t data;
 
-    if (PIOS_MPU6000_ClaimBusISR(woken) != 0) {
+    if (PIOS_MPU6000_ClaimBusISR(woken, false) != 0) {
         return -1;
     }
     PIOS_SPI_TransferByte(dev->spi_id, (0x80 | PIOS_MPU6000_INT_STATUS_REG));
@@ -525,29 +556,16 @@ static int32_t PIOS_MPU6000_ResetFifoISR(bool *woken)
 {
     int32_t result = 0;
 
-    /* Register writes must be at < 1MHz SPI clock.
-     * Speed can only be changed when SPI bus semaphore is held, but
-     * device chip select must not be enabled, so we use the direct
-     * SPI bus claim call here */
-    if (PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
+    if (PIOS_MPU6000_ClaimBusISR(woken, false) != 0) {
         return -1;
     }
-    /* Reduce SPI clock speed. */
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
-    /* Enable chip select */
-    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
     /* Reset FIFO. */
     if (PIOS_SPI_TransferByte(dev->spi_id, 0x7f & PIOS_MPU6000_USER_CTRL_REG) != 0) {
         result = -2;
     } else if (PIOS_SPI_TransferByte(dev->spi_id, (dev->cfg->User_ctl | PIOS_MPU6000_USERCTL_FIFO_RST)) != 0) {
         result = -2;
     }
-    /* Disable chip select. */
-    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
-    /* Increase SPI clock speed. */
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
-    /* Release the SPI bus semaphore. */
-    PIOS_SPI_ReleaseBusISR(dev->spi_id, woken);
+    PIOS_MPU6000_ReleaseBusISR(woken);
     return result;
 }
 
@@ -562,7 +580,7 @@ static int32_t PIOS_MPU6000_FifoDepthISR(bool *woken)
     uint8_t mpu6000_send_buf[3] = { PIOS_MPU6000_FIFO_CNT_MSB | 0x80, 0, 0 };
     uint8_t mpu6000_rec_buf[3];
 
-    if (PIOS_MPU6000_ClaimBusISR(woken) != 0) {
+    if (PIOS_MPU6000_ClaimBusISR(woken, false) != 0) {
         return -1;
     }
 
@@ -604,6 +622,97 @@ bool PIOS_MPU6000_IRQHandler(void)
         return false;
     }
 
+    bool read_ok = false;
+    if (dev->cfg->User_ctl & PIOS_MPU6000_USERCTL_FIFO_EN) {
+        read_ok = PIOS_MPU6000_ReadFifo(&woken);
+    } else {
+        read_ok = PIOS_MPU6000_ReadSensor(&woken);
+    }
+    if (read_ok) {
+        bool woken2 = PIOS_MPU6000_HandleData();
+        woken |= woken2;
+    }
+
+    mpu6000_irq++;
+
+    mpu6000_time_us = PIOS_DELAY_DiffuS(timeval);
+
+    return woken;
+}
+
+static bool PIOS_MPU6000_HandleData()
+{
+    // Rotate the sensor to OP convention.  The datasheet defines X as towards the right
+    // and Y as forward.  OP convention transposes this.  Also the Z is defined negatively
+    // to our convention
+
+    static struct pios_mpu6000_data data;
+
+    // Currently we only support rotations on top so switch X/Y accordingly
+    switch (dev->cfg->orientation) {
+    case PIOS_MPU6000_TOP_0DEG:
+#ifdef PIOS_MPU6000_ACCEL
+        data.accel_y = GET_SENSOR_DATA(mpu6000_data, Accel_X); // chip X
+        data.accel_x = GET_SENSOR_DATA(mpu6000_data, Accel_Y); // chip Y
+#endif
+        data.gyro_y  = GET_SENSOR_DATA(mpu6000_data, Gyro_X); // chip X
+        data.gyro_x  = GET_SENSOR_DATA(mpu6000_data, Gyro_Y); // chip Y
+        break;
+    case PIOS_MPU6000_TOP_90DEG:
+        // -1 to bring it back to -32768 +32767 range
+#ifdef PIOS_MPU6000_ACCEL
+        data.accel_y = -1 - (GET_SENSOR_DATA(mpu6000_data, Accel_Y)); // chip Y
+        data.accel_x = GET_SENSOR_DATA(mpu6000_data, Accel_X); // chip X
+#endif
+        data.gyro_y  = -1 - (GET_SENSOR_DATA(mpu6000_data, Gyro_Y)); // chip Y
+        data.gyro_x  = GET_SENSOR_DATA(mpu6000_data, Gyro_X); // chip X
+        break;
+    case PIOS_MPU6000_TOP_180DEG:
+#ifdef PIOS_MPU6000_ACCEL
+        data.accel_y = -1 - (GET_SENSOR_DATA(mpu6000_data, Accel_X)); // chip X
+        data.accel_x = -1 - (GET_SENSOR_DATA(mpu6000_data, Accel_Y)); // chip Y
+#endif
+        data.gyro_y  = -1 - (GET_SENSOR_DATA(mpu6000_data, Gyro_X)); // chip X
+        data.gyro_x  = -1 - (GET_SENSOR_DATA(mpu6000_data, Gyro_Y)); // chip Y
+        break;
+    case PIOS_MPU6000_TOP_270DEG:
+#ifdef PIOS_MPU6000_ACCEL
+        data.accel_y = GET_SENSOR_DATA(mpu6000_data, Accel_Y); // chip Y
+        data.accel_x = -1 - (GET_SENSOR_DATA(mpu6000_data, Accel_X)); // chip X
+#endif
+        data.gyro_y  = GET_SENSOR_DATA(mpu6000_data, Gyro_Y); // chip Y
+        data.gyro_x  = -1 - (GET_SENSOR_DATA(mpu6000_data, Gyro_X)); // chip X
+        break;
+    }
+#ifdef PIOS_MPU6000_ACCEL
+    data.accel_z     = -1 - (GET_SENSOR_DATA(mpu6000_data, Accel_Z));
+#endif
+    data.gyro_z      = -1 - (GET_SENSOR_DATA(mpu6000_data, Gyro_Z));
+    data.temperature = GET_SENSOR_DATA(mpu6000_data, Temperature);
+
+    BaseType_t higherPriorityTaskWoken;
+    xQueueSendToBackFromISR(dev->queue, (void *)&data, &higherPriorityTaskWoken);
+    return higherPriorityTaskWoken == pdTRUE;
+}
+
+static bool PIOS_MPU6000_ReadSensor(bool *woken)
+{
+    const uint8_t mpu6000_send_buf[1 + PIOS_MPU6000_SAMPLES_BYTES] = { PIOS_MPU6000_SENSOR_FIRST_REG | 0x80 };
+
+    if (PIOS_MPU6000_ClaimBusISR(woken, true) != 0) {
+        return false;
+    }
+    if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_data.buffer[0], sizeof(mpu6000_data_t), NULL) < 0) {
+        PIOS_MPU6000_ReleaseBusISR(woken);
+        mpu6000_fails++;
+        return false;
+    }
+    PIOS_MPU6000_ReleaseBusISR(woken);
+    return true;
+}
+
+static bool PIOS_MPU6000_ReadFifo(bool *woken)
+{
     /* Temporary fix for OP-1049. Expected to be superceded for next major release
      * by code changes for OP-1039.
      * Read interrupt status register to check for FIFO overflow. Must be the
@@ -611,128 +720,57 @@ bool PIOS_MPU6000_IRQHandler(void)
      * any read clears in the status register (PIOS_MPU6000_INT_CLR_ANYRD set in
      * interrupt config register) */
     int32_t result;
-    if ((result = PIOS_MPU6000_GetInterruptStatusRegISR(&woken)) < 0) {
-        return woken;
+
+    if ((result = PIOS_MPU6000_GetInterruptStatusRegISR(woken)) < 0) {
+        return false;
     }
     if (result & PIOS_MPU6000_INT_STATUS_FIFO_OVERFLOW) {
         /* The FIFO has overflowed, so reset it,
          * to enable sample sync to be recovered.
          * If the reset fails, we are in trouble, but
          * we keep trying on subsequent interrupts. */
-        PIOS_MPU6000_ResetFifoISR(&woken);
+        PIOS_MPU6000_ResetFifoISR(woken);
         /* Return and wait for the next new sample. */
-        return woken;
+        return false;
     }
 
     /* Usual case - FIFO has not overflowed. */
-    mpu6000_count = PIOS_MPU6000_FifoDepthISR(&woken);
+    mpu6000_count = PIOS_MPU6000_FifoDepthISR(woken);
     if (mpu6000_count < PIOS_MPU6000_SAMPLES_BYTES) {
-        return woken;
+        return false;
     }
 
-    if (PIOS_MPU6000_ClaimBusISR(&woken) != 0) {
-        return woken;
+    if (PIOS_MPU6000_ClaimBusISR(woken, true) != 0) {
+        return false;
     }
 
-    static uint8_t mpu6000_send_buf[1 + PIOS_MPU6000_SAMPLES_BYTES] = { PIOS_MPU6000_FIFO_REG | 0x80 };
-    static uint8_t mpu6000_rec_buf[1 + PIOS_MPU6000_SAMPLES_BYTES];
+    const uint8_t mpu6000_send_buf[1 + PIOS_MPU6000_SAMPLES_BYTES] = { PIOS_MPU6000_FIFO_REG | 0x80 };
 
-    if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-        PIOS_MPU6000_ReleaseBusISR(&woken);
+    if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_data.buffer[0], sizeof(mpu6000_data_t), NULL) < 0) {
+        PIOS_MPU6000_ReleaseBusISR(woken);
         mpu6000_fails++;
-        return woken;
+        return false;
     }
 
-    PIOS_MPU6000_ReleaseBusISR(&woken);
-
-    static struct pios_mpu6000_data data;
+    PIOS_MPU6000_ReleaseBusISR(woken);
 
     // In the case where extras samples backed up grabbed an extra
     if (mpu6000_count >= PIOS_MPU6000_SAMPLES_BYTES * 2) {
         mpu6000_fifo_backup++;
-        if (PIOS_MPU6000_ClaimBusISR(&woken) != 0) {
-            return woken;
+        if (PIOS_MPU6000_ClaimBusISR(woken, true) != 0) {
+            return false;
         }
 
-        if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-            PIOS_MPU6000_ReleaseBusISR(&woken);
+        if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_data.buffer[0], sizeof(mpu6000_data_t), NULL) < 0) {
+            PIOS_MPU6000_ReleaseBusISR(woken);
             mpu6000_fails++;
-            return woken;
+            return false;
         }
 
-        PIOS_MPU6000_ReleaseBusISR(&woken);
+        PIOS_MPU6000_ReleaseBusISR(woken);
     }
-
-    // Rotate the sensor to OP convention.  The datasheet defines X as towards the right
-    // and Y as forward.  OP convention transposes this.  Also the Z is defined negatively
-    // to our convention
-#if defined(PIOS_MPU6000_ACCEL)
-    // Currently we only support rotations on top so switch X/Y accordingly
-    switch (dev->cfg->orientation) {
-    case PIOS_MPU6000_TOP_0DEG:
-        data.accel_y = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2]; // chip X
-        data.accel_x = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]; // chip Y
-        data.gyro_y  = mpu6000_rec_buf[9] << 8 | mpu6000_rec_buf[10]; // chip X
-        data.gyro_x  = mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12]; // chip Y
-        break;
-    case PIOS_MPU6000_TOP_90DEG:
-        // -1 to bring it back to -32768 +32767 range
-        data.accel_y = -1 - (mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]); // chip Y
-        data.accel_x = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2]; // chip X
-        data.gyro_y  = -1 - (mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12]); // chip Y
-        data.gyro_x  = mpu6000_rec_buf[9] << 8 | mpu6000_rec_buf[10]; // chip X
-        break;
-    case PIOS_MPU6000_TOP_180DEG:
-        data.accel_y = -1 - (mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2]); // chip X
-        data.accel_x = -1 - (mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]); // chip Y
-        data.gyro_y  = -1 - (mpu6000_rec_buf[9] << 8 | mpu6000_rec_buf[10]); // chip X
-        data.gyro_x  = -1 - (mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12]); // chip Y
-        break;
-    case PIOS_MPU6000_TOP_270DEG:
-        data.accel_y = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]; // chip Y
-        data.accel_x = -1 - (mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2]); // chip X
-        data.gyro_y  = mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12]; // chip Y
-        data.gyro_x  = -1 - (mpu6000_rec_buf[9] << 8 | mpu6000_rec_buf[10]); // chip X
-        break;
-    }
-    data.gyro_z      = -1 - (mpu6000_rec_buf[13] << 8 | mpu6000_rec_buf[14]);
-    data.accel_z     = -1 - (mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6]);
-    data.temperature = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
-#else /* if defined(PIOS_MPU6000_ACCEL) */
-    data.gyro_x      = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
-    data.gyro_y      = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
-    switch (dev->cfg->orientation) {
-    case PIOS_MPU6000_TOP_0DEG:
-        data.gyro_y = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
-        data.gyro_x = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
-        break;
-    case PIOS_MPU6000_TOP_90DEG:
-        data.gyro_y = -1 - (mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6]); // chip Y
-        data.gyro_x = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]; // chip X
-        break;
-    case PIOS_MPU6000_TOP_180DEG:
-        data.gyro_y = -1 - (mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]);
-        data.gyro_x = -1 - (mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6]);
-        break;
-    case PIOS_MPU6000_TOP_270DEG:
-        data.gyro_y = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6]; // chip Y
-        data.gyro_x = -1 - (mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]); // chip X
-        break;
-    }
-    data.gyro_z = -1 - (mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8]);
-    data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
-#endif /* if defined(PIOS_MPU6000_ACCEL) */
-
-    signed portBASE_TYPE higherPriorityTaskWoken;
-    xQueueSendToBackFromISR(dev->queue, (void *)&data, &higherPriorityTaskWoken);
-
-    mpu6000_irq++;
-
-    mpu6000_time_us = PIOS_DELAY_DiffuS(timeval);
-
-    return woken || higherPriorityTaskWoken == pdTRUE;
+    return true;
 }
-
 #endif /* PIOS_INCLUDE_MPU6000 */
 
 /**

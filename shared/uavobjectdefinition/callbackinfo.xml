@@ -8,6 +8,7 @@
 			<elementname>AltitudeHold</elementname>
 			<elementname>Stabilization0</elementname>
 			<elementname>Stabilization1</elementname>
+			<elementname>PathFollower</elementname>
 			<elementname>PathPlanner0</elementname>
 			<elementname>PathPlanner1</elementname>
 			<elementname>ManualControl</elementname>
@@ -20,6 +21,7 @@
 			<elementname>AltitudeHold</elementname>
 			<elementname>Stabilization0</elementname>
 			<elementname>Stabilization1</elementname>
+			<elementname>PathFollower</elementname>
 			<elementname>PathPlanner0</elementname>
 			<elementname>PathPlanner1</elementname>
 			<elementname>ManualControl</elementname>
@@ -36,6 +38,7 @@
 			<elementname>AltitudeHold</elementname>
 			<elementname>Stabilization0</elementname>
 			<elementname>Stabilization1</elementname>
+			<elementname>PathFollower</elementname>
 			<elementname>PathPlanner0</elementname>
 			<elementname>PathPlanner1</elementname>
 			<elementname>ManualControl</elementname>

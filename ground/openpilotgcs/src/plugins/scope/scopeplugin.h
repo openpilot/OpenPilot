@@ -45,7 +45,7 @@ public:
     void shutdown();
 
 private:
-    ScopeGadgetFactory *mf;
+    ScopeGadgetFactory *m_scopeFactory;
 };
 
 #endif /* SCOPEPLUGIN_H_ */

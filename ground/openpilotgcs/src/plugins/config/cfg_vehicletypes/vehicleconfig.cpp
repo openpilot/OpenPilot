@@ -29,6 +29,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "systemsettings.h"
+#include <QtCore/qmath.h>
 
 #include <QDebug>
 
@@ -253,6 +254,9 @@ void VehicleConfig::setMixerVectorValue(UAVDataObject *mixer, int channel, Mixer
     if (channel >= 0 && channel < mixerVectors.count()) {
         UAVObjectField *field = mixer->getField(mixerVectors.at(channel));
         Q_ASSERT(field);
+
+        // Normalize mixer values
+        value = (value < 0) ? qFloor(value) : qCeil(value);
 
         if (field) {
             field->setDouble(value, elementName);

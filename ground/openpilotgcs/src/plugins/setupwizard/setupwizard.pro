@@ -19,10 +19,11 @@ HEADERS += setupwizardplugin.h \
     pages/notyetimplementedpage.h \
     pages/multipage.h \
     pages/fixedwingpage.h \
+    pages/airspeedpage.h \
+    pages/gpspage.h \
     pages/helipage.h \
     pages/surfacepage.h \
     pages/abstractwizardpage.h \
-    pages/outputpage.h \
     pages/inputpage.h \
     pages/summarypage.h \
     vehicleconfigurationsource.h \
@@ -35,7 +36,13 @@ HEADERS += setupwizardplugin.h \
     pages/autoupdatepage.h \
     pages/revocalibrationpage.h \
     biascalibrationutil.h \
-    pages/biascalibrationpage.h
+    pages/esccalibrationpage.h \
+    pages/biascalibrationpage.h \
+    pages/escpage.h \
+    pages/servopage.h \
+    pages/selectionpage.h \
+    pages/airframeinitialtuningpage.h \
+    vehicletemplateexportdialog.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -46,10 +53,11 @@ SOURCES += setupwizardplugin.cpp \
     pages/notyetimplementedpage.cpp \
     pages/multipage.cpp \
     pages/fixedwingpage.cpp \
+    pages/airspeedpage.cpp \
+    pages/gpspage.cpp \
     pages/helipage.cpp \
     pages/surfacepage.cpp \
     pages/abstractwizardpage.cpp \
-    pages/outputpage.cpp \
     pages/inputpage.cpp \
     pages/summarypage.cpp \
     vehicleconfigurationsource.cpp \
@@ -62,7 +70,13 @@ SOURCES += setupwizardplugin.cpp \
     pages/autoupdatepage.cpp \
     pages/revocalibrationpage.cpp \
     biascalibrationutil.cpp \
-    pages/biascalibrationpage.cpp
+    pages/biascalibrationpage.cpp \
+    pages/esccalibrationpage.cpp \
+    pages/escpage.cpp \
+    pages/servopage.cpp \
+    pages/selectionpage.cpp \
+    pages/airframeinitialtuningpage.cpp \
+    vehicletemplateexportdialog.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -72,11 +86,8 @@ FORMS += \
     pages/controllerpage.ui \
     pages/vehiclepage.ui \
     pages/notyetimplementedpage.ui \
-    pages/multipage.ui \
-    pages/fixedwingpage.ui \
     pages/helipage.ui \
     pages/surfacepage.ui \
-    pages/outputpage.ui \
     pages/inputpage.ui \
     pages/summarypage.ui \
     connectiondiagram.ui \
@@ -85,7 +96,13 @@ FORMS += \
     pages/savepage.ui \
     pages/autoupdatepage.ui \
     pages/revocalibrationpage.ui \
-    pages/biascalibrationpage.ui
+    pages/biascalibrationpage.ui \
+    pages/esccalibrationpage.ui \
+    pages/escpage.ui \
+    pages/servopage.ui \
+    pages/selectionpage.ui \
+    pages/airframeinitialtuningpage.ui \
+    vehicletemplateexportdialog.ui
 
 RESOURCES += \
     wizardResources.qrc

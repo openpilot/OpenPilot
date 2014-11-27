@@ -1092,6 +1092,53 @@ static const struct pios_usart_cfg pios_usart_hkosd_flexi_cfg = {
     },
 };
 
+static const struct pios_usart_cfg pios_usart_rcvrport_cfg = {
+    .regs  = USART6,
+    .remap = GPIO_AF_USART6,
+    .init  = {
+        .USART_BaudRate   = 57600,
+        .USART_WordLength = USART_WordLength_8b,
+        .USART_Parity     = USART_Parity_No,
+        .USART_StopBits   = USART_StopBits_1,
+        .USART_HardwareFlowControl             = USART_HardwareFlowControl_None,
+        .USART_Mode                            = USART_Mode_Rx | USART_Mode_Tx,
+    },
+    .irq                                       = {
+        .init                                  = {
+            .NVIC_IRQChannel    = USART6_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+
+    .tx                                        = {
+        // *  7: PC6 = TIM8 CH1, USART6 TX
+        .gpio = GPIOC,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_6,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+        .pin_source                            = GPIO_PinSource6,
+    },
+
+    .rx                                        = {
+        // *  8: PC7 = TIM8 CH2, USART6 RX
+        .gpio = GPIOC,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_7,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+        .pin_source                            = GPIO_PinSource7,
+    }
+};
+
 #if defined(PIOS_INCLUDE_COM)
 
 #include <pios_com_priv.h>
@@ -1964,7 +2011,7 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
 #endif /* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_USB_CDC */
 
 #ifdef PIOS_INCLUDE_WS2811
-#include <pios_ws2811.h>
+#include <pios_ws2811_cfg.h>
 #include <hwsettings.h>
 #define PIOS_WS2811_TIM_DIVIDER (PIOS_PERIPHERAL_APB2_CLOCK / (800000 * PIOS_WS2811_TIM_PERIOD))
 

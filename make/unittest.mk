@@ -52,6 +52,10 @@ CXXFLAGS += -g -Wall -Wextra
 # Flags passed to the C compiler
 CONLYFLAGS += -std=gnu99
 
+# UNIT_TEST allows to for example to have optional test fixture code enabled or private code exposed in application modules. 
+CFLAGS += -DUNIT_TEST
+CPPFLAGS += -DUNIT_TEST
+
 # Common compiler flags
 CFLAGS += -O0 -g
 CFLAGS += -Wall -Werror

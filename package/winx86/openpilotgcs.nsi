@@ -1,7 +1,7 @@
-﻿#
+#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2013.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2014.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
-  VIAddVersionKey "LegalCopyright" "© 2010-2013 The OpenPilot Team"
+  VIAddVersionKey "LegalCopyright" "© 2010-2014 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
 ;--------------------------------
@@ -93,7 +93,7 @@
 ;--------------------------------
 ; Branding
 
-  BrandingText "© 2010-2013 The OpenPilot Team, http://www.openpilot.org"
+  BrandingText "© 2010-2014 The OpenPilot Team, http://www.openpilot.org"
 
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
@@ -193,10 +193,10 @@ SectionEnd
 
 ; Copy GCS resources
 Section "-Resources" InSecResources
+  SetOutPath "$INSTDIR\share\openpilotgcs\cloudconfig"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\cloudconfig\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\default_configurations"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\default_configurations\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\stylesheets"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\stylesheets\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\dials"
@@ -207,6 +207,8 @@ Section "-Resources" InSecResources
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\models\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\pfd"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\pfd\*"
+  SetOutPath "$INSTDIR\share\openpilotgcs\stylesheets"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\stylesheets\*"
 SectionEnd
 
 ; Copy Notify plugin sound files
@@ -301,7 +303,7 @@ Section ; create uninstall info
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayIcon" '"$INSTDIR\bin\openpilotgcs.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "Publisher" "OpenPilot Team"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Italian Stallion"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Mini Me"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "URLInfoAbout" "http://www.openpilot.org"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "HelpLink" "http://wiki.openpilot.org"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "EstimatedSize" 100600

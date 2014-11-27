@@ -1779,7 +1779,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>true</useOpenGL>
+          <useOpenGL>false</useOpenGL>
         </data>
       </Google__PCT__20Sat>
       <Memory__PCT__20Only>
@@ -1799,7 +1799,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>true</useOpenGL>
+          <useOpenGL>false</useOpenGL>
         </data>
       </Memory__PCT__20Only>
       <default>
@@ -1819,7 +1819,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>true</useOpenGL>
+          <useOpenGL>false</useOpenGL>
         </data>
       </default>
     </OPMapGadget>    
@@ -2520,47 +2520,11 @@
       <splitter>
         <side0>
           <side0>
-            <side0>
-              <side0>
-                <classId>LineardialGadget</classId>
-                <gadget>
-                  <activeConfiguration>Flight Time</activeConfiguration>
-                </gadget>
-                <type>uavGadget</type>
-              </side0>
-              <side1>
-                <side0>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Arm Status</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side0>
-                <side1>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Flight mode</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side1>
-                <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAYwAAAAIAAAB7)</splitterSizes>
-                <type>splitter</type>
-              </side1>
-              <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAZgAAAAIAAADf)</splitterSizes>
-              <type>splitter</type>
-            </side0>
-            <side1>
               <classId>PfdQmlGadget</classId>
               <gadget>
                 <activeConfiguration>NoTerrain</activeConfiguration>
               </gadget>
               <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>2</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAQAAAAAIAAAG4)</splitterSizes>
-            <type>splitter</type>
           </side0>
           <side1>
             <side0>
@@ -2582,7 +2546,7 @@
             <type>splitter</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABqQAAAAIAAADm)</splitterSizes>
+         <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACigAAAAIAAAE0)</splitterSizes>
           <type>splitter</type>
         </side0>
         <side1>
@@ -2593,7 +2557,7 @@
           <type>uavGadget</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACdgAAAAIAAAMp)</splitterSizes>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADXwAAAAIAAAQc)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>

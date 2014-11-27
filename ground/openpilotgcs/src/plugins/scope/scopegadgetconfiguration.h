@@ -77,7 +77,6 @@ public:
     }
     void replacePlotCurveConfig(QList<PlotCurveConfiguration *> m_plotCurveConfigs);
 
-
     // Configurations getter functions
     int plotType()
     {

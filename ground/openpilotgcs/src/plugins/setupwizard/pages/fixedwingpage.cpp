@@ -26,17 +26,49 @@
  */
 
 #include "fixedwingpage.h"
-#include "ui_fixedwingpage.h"
+#include "setupwizard.h"
 
 FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
-    ui(new Ui::FixedWingPage)
-{
-    ui->setupUi(this);
-    setFinalPage(true);
-}
+    SelectionPage(wizard, QString(":/setupwizard/resources/fixedwing-shapes-wizard-no-numbers.svg"), parent)
+{}
 
 FixedWingPage::~FixedWingPage()
+{}
+
+void FixedWingPage::initializePage(VehicleConfigurationSource *settings)
 {
-    delete ui;
+    Q_UNUSED(settings);
+}
+
+bool FixedWingPage::validatePage(SelectionItem *selectedItem)
+{
+    getWizard()->setVehicleSubType((SetupWizard::VEHICLE_SUB_TYPE)selectedItem->id());
+    return true;
+}
+
+void FixedWingPage::setupSelection(Selection *selection)
+{
+    selection->setTitle(tr("OpenPilot Fixed-wing Configuration"));
+    selection->setText(tr("This part of the wizard will set up the OpenPilot controller for use with a fixed-wing "
+                          "flying aircraft utilizing servos. The wizard supports the most common types of fixed-wing "
+                          "aircraft, other variants of fixed-wing aircraft can be configured by using custom "
+                          "configuration options in the Configuration plugin in the GCS.\n\n"
+                          "Please select the type of fixed-wing you want to create a configuration for below:"));
+    selection->addItem(tr("Aileron Dual Servos"),
+                       tr("This setup expects a traditional airframe using two independent aileron servos "
+                          "on their own channel (not connected by Y adapter) plus an elevator and a rudder."),
+                       "aileron",
+                       SetupWizard::FIXED_WING_DUAL_AILERON);
+
+    selection->addItem(tr("Aileron Single Servo"),
+                       tr("This setup expects a traditional airframe using a single aileron servo or two servos "
+                          "connected by a Y adapter plus an elevator and a rudder."),
+                       "aileron-single",
+                       SetupWizard::FIXED_WING_AILERON);
+
+    selection->addItem(tr("Elevon"),
+                       tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet "
+                          "supported. Setup should include only two elevons, and should explicitly not include a rudder."),
+                       "elevon",
+                       SetupWizard::FIXED_WING_ELEVON);
 }

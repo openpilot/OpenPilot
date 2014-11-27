@@ -26,7 +26,9 @@
  */
 #include "modeluavoproxy.h"
 #include "extensionsystem/pluginmanager.h"
+#include "uavobjecthelper.h"
 
+#include <QProgressDialog>
 #include <math.h>
 
 ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObject(parent), myModel(model)
@@ -37,91 +39,127 @@ ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObjec
 
     objMngr = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objMngr != NULL);
-
-    completionCountdown = 0;
-    successCountdown    = 0;
 }
 
 void ModelUavoProxy::sendPathPlan()
 {
     modelToObjects();
 
-    PathPlan *pathPlan = PathPlan::GetInstance(objMngr, 0);
-    connect(pathPlan, SIGNAL(transactionCompleted(UAVObject *, bool)),
-            this, SLOT(pathPlanElementSent(UAVObject *, bool)), Qt::UniqueConnection);
+    PathPlan *pathPlan      = PathPlan::GetInstance(objMngr);
 
-    Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
-    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)),
-            this, SLOT(pathPlanElementSent(UAVObject *, bool)), Qt::UniqueConnection);
+    const int waypointCount = pathPlan->getWaypointCount();
+    const int actionCount   = pathPlan->getPathActionCount();
 
-    PathAction *action = PathAction::GetInstance(objMngr, 0);
-    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)),
-            this, SLOT(pathPlanElementSent(UAVObject *, bool)), Qt::UniqueConnection);
+    QProgressDialog progress(tr("Sending the path plan to the board... "), "", 0, 1 + waypointCount + actionCount);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setCancelButton(NULL);
+    progress.show();
 
-    // we will start 3 update all
-    completionCountdown = 3;
-    successCountdown    = completionCountdown;
+    UAVObjectUpdaterHelper updateHelper;
 
-    pathPlan->updated();
-    waypoint->updatedAll();
-    action->updatedAll();
-}
+    // send PathPlan
+    bool success = (updateHelper.doObjectAndWait(pathPlan) == UAVObjectUpdaterHelper::SUCCESS);
+    progress.setValue(1);
 
-void ModelUavoProxy::pathPlanElementSent(UAVObject *obj, bool success)
-{
-    obj->disconnect(this);
-
-    completionCountdown--;
-    successCountdown -= success ? 1 : 0;
-
-    if (completionCountdown == 0) {
-        qDebug() << "ModelUavoProxy::pathPlanSent - completed" << (successCountdown == 0);
-        if (successCountdown == 0) {
-            QMessageBox::information(NULL, tr("Path Plan Upload Successful"), tr("Path plan upload was successful."));
-        } else {
-            QMessageBox::critical(NULL, tr("Path Plan Upload Failed"), tr("Failed to upload the path plan !"));
+    if (success) {
+        // send Waypoint instances
+        qDebug() << "sending" << waypointCount << "waypoints";
+        for (int i = 0; i < waypointCount; ++i) {
+            Waypoint *waypoint = Waypoint::GetInstance(objMngr, i);
+            success = (updateHelper.doObjectAndWait(waypoint) == UAVObjectUpdaterHelper::SUCCESS);
+            if (!success) {
+                break;
+            }
+            progress.setValue(progress.value() + 1);
         }
     }
+
+    if (success) {
+        // send PathAction instances
+        qDebug() << "sending" << actionCount << "path actions";
+        for (int i = 0; i < actionCount; ++i) {
+            PathAction *action = PathAction::GetInstance(objMngr, i);
+            success = (updateHelper.doObjectAndWait(action) == UAVObjectUpdaterHelper::SUCCESS);
+            if (!success) {
+                break;
+            }
+            progress.setValue(progress.value() + 1);
+        }
+    }
+
+    qDebug() << "ModelUavoProxy::pathPlanSent - completed" << success;
+    if (!success) {
+        QMessageBox::critical(NULL, tr("Sending Path Plan Failed!"), tr("Failed to send the path plan to the board."));
+    }
+
+    progress.close();
 }
 
 void ModelUavoProxy::receivePathPlan()
 {
-    PathPlan *pathPlan = PathPlan::GetInstance(objMngr, 0);
+    QProgressDialog progress(tr("Receiving the path plan from the board... "), "", 0, 0);
 
-    connect(pathPlan, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(pathPlanElementReceived(UAVObject *, bool)));
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setCancelButton(NULL);
+    progress.show();
 
-    Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
-    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(pathPlanElementReceived(UAVObject *, bool)));
+    UAVObjectRequestHelper requestHelper;
 
-    PathAction *action = PathAction::GetInstance(objMngr, 0);
-    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(pathPlanElementReceived(UAVObject *, bool)));
+    PathPlan *pathPlan = PathPlan::GetInstance(objMngr);
+    bool success = (requestHelper.doObjectAndWait(pathPlan) == UAVObjectUpdaterHelper::SUCCESS);
 
-    // we will start 3 update requests
-    completionCountdown = 3;
-    successCountdown    = completionCountdown;
+    const int waypointCount = pathPlan->getWaypointCount();
+    const int actionCount   = pathPlan->getPathActionCount();
 
-    pathPlan->requestUpdate();
-    waypoint->requestUpdateAll();
-    action->requestUpdateAll();
-}
+    progress.setMaximum(1 + waypointCount + actionCount);
+    progress.setValue(1);
 
-void ModelUavoProxy::pathPlanElementReceived(UAVObject *obj, bool success)
-{
-    obj->disconnect(this);
-
-    completionCountdown--;
-    successCountdown -= success ? 1 : 0;
-
-    if (completionCountdown == 0) {
-        qDebug() << "ModelUavoProxy::pathPlanReceived - completed" << (successCountdown == 0);
-        if (successCountdown == 0) {
-            if (objectsToModel()) {
-                QMessageBox::information(NULL, tr("Path Plan Download Successful"), tr("Path plan download was successful."));
+    if (success && (waypointCount > objMngr->getNumInstances(Waypoint::OBJID))) {
+        // allocate needed Waypoint instances
+        Waypoint *waypoint = new Waypoint;
+        waypoint->initialize(waypointCount - 1, waypoint->getMetaObject());
+        success = objMngr->registerObject(waypoint);
+    }
+    if (success) {
+        // request Waypoint instances
+        qDebug() << "requesting" << waypointCount << "waypoints";
+        for (int i = 0; i < waypointCount; ++i) {
+            Waypoint *waypoint = Waypoint::GetInstance(objMngr, i);
+            success = (requestHelper.doObjectAndWait(waypoint) == UAVObjectRequestHelper::SUCCESS);
+            if (!success) {
+                break;
             }
-        } else {
-            QMessageBox::critical(NULL, tr("Path Plan Download Failed"), tr("Failed to download the path plan !"));
+            progress.setValue(progress.value() + 1);
         }
     }
+
+    if (success && (actionCount > objMngr->getNumInstances(PathAction::OBJID))) {
+        // allocate needed PathAction instances
+        PathAction *action = new PathAction;
+        action->initialize(actionCount - 1, action->getMetaObject());
+        success = objMngr->registerObject(action);
+    }
+    if (success) {
+        // request PathAction isntances
+        qDebug() << "requesting" << actionCount << "path actions";
+        for (int i = 0; i < actionCount; ++i) {
+            PathAction *action = PathAction::GetInstance(objMngr, i);
+            success = (requestHelper.doObjectAndWait(action) == UAVObjectRequestHelper::SUCCESS);
+            if (!success) {
+                break;
+            }
+            progress.setValue(progress.value() + 1);
+        }
+    }
+
+    qDebug() << "ModelUavoProxy::pathPlanReceived - completed" << success;
+    if (success) {
+        objectsToModel();
+    } else {
+        QMessageBox::critical(NULL, tr("Receiving Path Plan Failed!"), tr("Failed to receive the path plan from the board."));
+    }
+
+    progress.close();
 }
 
 // update waypoint and path actions UAV objects

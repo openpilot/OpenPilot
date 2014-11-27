@@ -72,6 +72,17 @@ isEmpty(GCS_BUILD_TREE) {
     GCS_BUILD_TREE = $$cleanPath($$OUT_PWD)
     GCS_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 }
+
+# Find the tools directory,
+# try from Makefile (not run by Qt Creator),
+TOOLS_DIR = $$(TOOLS_DIR)
+isEmpty(TOOLS_DIR) {
+    # check for custom enviroment variable,
+    TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
+    # fallback to default location.
+    isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
+}
+
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
     GCS_APP_TARGET   = "OpenPilot GCS"
@@ -83,16 +94,38 @@ macx {
     GCS_DATA_BASENAME = Resources
     GCS_DOC_PATH     = $$GCS_DATA_PATH/doc
     copydata = 1
+    copyqt = 1
 } else {
+    !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
     win32 {
+        SDL_DIR = $$(SDL_DIR)
+        isEmpty(SDL_DIR):SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
+
+        OPENSSL_DIR = $$(OPENSSL_DIR)
+        isEmpty(OPENSSL_DIR):OPENSSL_DIR = $${TOOLS_DIR}/openssl-1.0.1e-win32
+
+        MESAWIN_DIR = $$(MESAWIN_DIR)
+        isEmpty(MESAWIN_DIR):MESAWIN_DIR = $${TOOLS_DIR}/mesawin
+
         contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
         GCS_APP_TARGET   = openpilotgcs
+        copyqt = $$copydata
     } else {
         GCS_APP_WRAPPER  = openpilotgcs
         GCS_APP_TARGET   = openpilotgcs.bin
         GCS_QT_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5
         GCS_QT_PLUGINS_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/plugins
         GCS_QT_QML_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/qml
+
+        QT_INSTALL_DIR = $$clean_path($$[QT_INSTALL_LIBS]/../../../..)
+        equals(QT_INSTALL_DIR, $$TOOLS_DIR) {
+            copyqt = 1
+        } else {
+            copyqt = 0 
+        }
+
+        FORCE_COPY_QT = $$(FORCE_COPY_QT)
+        !isEmpty(FORCE_COPY_QT):copyqt = 1 
     }
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
@@ -100,7 +133,6 @@ macx {
     GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
     GCS_DATA_BASENAME = share/openpilotgcs
     GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc
-    !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
 }
 
 

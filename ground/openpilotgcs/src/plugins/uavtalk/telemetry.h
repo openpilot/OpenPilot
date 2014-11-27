@@ -79,8 +79,6 @@ public:
     void resetStats();
     void transactionTimeout(ObjectTransactionInfo *info);
 
-signals:
-
 private:
     // Constants
     static const int REQ_TIMEOUT_MS = 250;

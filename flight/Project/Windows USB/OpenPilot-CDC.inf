@@ -3,7 +3,7 @@ Signature = "$Windows NT$"
 Class = Ports
 ClassGuid = {4D36E978-E325-11CE-BFC1-08002BE10318}
 Provider = %ProviderName%
-DriverVer=02/22/2013,2.0.0.0
+DriverVer=11/21/2014,3.0.0.0
 CatalogFile.NTx86  = OpenPilot-CDC_x86.cat 
 CatalogFile.NTamd64 = OpenPilot-CDC_amd64.cat
 

@@ -107,6 +107,8 @@ private:
     SerialPluginConfiguration *m_config;
     SerialPluginOptionsPage *m_optionspage;
 
+    QList<QSerialPortInfo> availablePorts();
+
 protected slots:
     void onEnumerationChanged();
 

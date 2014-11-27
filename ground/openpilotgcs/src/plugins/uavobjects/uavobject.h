@@ -38,6 +38,9 @@
 #include <QFile>
 #include <stdint.h>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QJsonObject>
+
 #include "uavobjectfield.h"
 
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -129,9 +132,18 @@ public:
     QString toString();
     QString toStringBrief();
     QString toStringData();
+
     void toXML(QXmlStreamWriter *xmlWriter);
+    void fromXML(QXmlStreamReader *xmlReader);
+
+    void toJson(QJsonObject &jsonObject);
+    void fromJson(const QJsonObject &jsonObject);
+
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
+
+    bool isKnown() const;
+    void setIsKnown(bool isKnown);
 
     virtual bool isSettingsObject();
     virtual bool isDataObject();
@@ -169,9 +181,7 @@ signals:
     void updateRequested(UAVObject *obj, bool all = false);
     void transactionCompleted(UAVObject *obj, bool success);
     void newInstance(UAVObject *obj);
-
-private slots:
-    void fieldUpdated(UAVObjectField *field);
+    void isKnownChanged(UAVObject *obj, bool isKnown);
 
 protected:
     quint32 objID;
@@ -188,6 +198,12 @@ protected:
     void initializeFields(QList<UAVObjectField *> & fields, quint8 *data, quint32 numBytes);
     void setDescription(const QString & description);
     void setCategory(const QString & category);
+
+private:
+    bool m_isKnown;
+
+private slots:
+    void fieldUpdated(UAVObjectField *field);
 };
 
 #endif // UAVOBJECT_H

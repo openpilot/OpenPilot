@@ -282,8 +282,8 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+</string>
                 </property>
                 <item>
                  <property name="text">
@@ -318,6 +318,11 @@ Leave at 50Hz for fixed wing.</string>
                 <item>
                  <property name="text">
                   <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -340,8 +345,8 @@ Leave at 50Hz for fixed wing.</string>
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+</string>
                 </property>
                 <item>
                  <property name="text">
@@ -376,6 +381,11 @@ Leave at 50Hz for fixed wing.</string>
                 <item>
                  <property name="text">
                   <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -420,8 +430,8 @@ Leave at 50Hz for fixed wing.</string>
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+</string>
                 </property>
                 <item>
                  <property name="text">
@@ -456,6 +466,11 @@ Leave at 50Hz for fixed wing.</string>
                 <item>
                  <property name="text">
                   <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -478,8 +493,8 @@ Leave at 50Hz for fixed wing.</string>
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+</string>
                 </property>
                 <item>
                  <property name="text">
@@ -514,6 +529,11 @@ Leave at 50Hz for fixed wing.</string>
                 <item>
                  <property name="text">
                   <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -546,8 +566,8 @@ Leave at 50Hz for fixed wing.</string>
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+</string>
                 </property>
                 <item>
                  <property name="text">
@@ -582,6 +602,11 @@ Leave at 50Hz for fixed wing.</string>
                 <item>
                  <property name="text">
                   <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -604,8 +629,8 @@ Leave at 50Hz for fixed wing.</string>
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+</string>
                 </property>
                 <item>
                  <property name="text">
@@ -640,6 +665,11 @@ Leave at 50Hz for fixed wing.</string>
                 <item>
                  <property name="text">
                   <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
                  </property>
                 </item>
                </widget>

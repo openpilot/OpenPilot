@@ -4,6 +4,7 @@ Rectangle {
     id: container
     width: 1024
     height: 768
+    anchors.horizontalCenter: parent.horizontalCenter
 
     color: "#272727"
 
@@ -30,10 +31,10 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         // distribute a vertical space between the icons blocks an community widget as:
         // top - 48% - Icons - 27% - CommunityWidget - 25% - bottom
-        y: (parent.height - buttons.height - communityPanel.height) * 0.48
+        y: (parent.height - buttons.height - communityPanel.height - versionInfo.height) * 0.48
         width: parent.width
         height: 600
-        spacing: (parent.height - buttons.height - communityPanel.height) * 0.1
+        spacing: (parent.height - buttons.height - communityPanel.height - versionInfo.height) * 0.1
 
         Row {
             //if the buttons grid overlaps vertically with the wizard buttons,
@@ -108,6 +109,43 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             width: Math.min(sourceSize.width, container.width)
             height: Math.min(450, container.height*0.5)
+        }
+
+        Row {
+            id: versionInfo
+
+            height: 18
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: textOpVersion.width + textOpVersionAvailable.width + this.spacing
+            spacing: 16
+
+            Text {
+                id: textOpVersion
+                color: "#c4c0c0"
+                text: welcomePlugin.versionString
+                font.bold: true
+                styleColor: "#00000000"
+                font.pixelSize: 14
+            }
+            Text {
+                id: textOpVersionAvailable
+                color: "#5fcf07"
+                text: welcomePlugin.newVersionText
+                font.bold: true
+                font.underline: true
+                styleColor: "#00000000"
+                font.pixelSize: 14
+                MouseArea{
+                    id: mouseAreaOpVersionAvailable
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    width: parent.width
+                    height: parent.height
+                    onClicked: {
+                        welcomePlugin.openUrl("http://wiki.openpilot.org/display/BUILDS/OpenPilot+Software+Downloads")
+                    }
+                }
+            }
         }
     }
 }

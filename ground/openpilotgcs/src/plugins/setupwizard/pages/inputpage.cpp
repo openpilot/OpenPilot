@@ -54,7 +54,7 @@ bool InputPage::validatePage()
     } else if (ui->sbusButton->isChecked()) {
         getWizard()->setInputType(SetupWizard::INPUT_SBUS);
     } else if (ui->spectrumButton->isChecked()) {
-        getWizard()->setInputType(SetupWizard::INPUT_DSM2);
+        getWizard()->setInputType(SetupWizard::INPUT_DSM);
     } else {
         getWizard()->setInputType(SetupWizard::INPUT_PWM);
     }
@@ -85,15 +85,16 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
         case VehicleConfigurationSource::INPUT_SBUS:
             return data.CC_MainPort != HwSettings::CC_MAINPORT_SBUS;
 
-        case VehicleConfigurationSource::INPUT_DSM2:
+        case VehicleConfigurationSource::INPUT_DSM:
             // TODO: Handle all of the DSM types ?? Which is most common?
-            return data.CC_MainPort != HwSettings::CC_MAINPORT_DSM2;
+            return data.CC_MainPort != HwSettings::CC_MAINPORT_DSM;
 
         default: return true;
         }
         break;
     }
     case SetupWizard::CONTROLLER_REVO:
+    case SetupWizard::CONTROLLER_DISCOVERYF4:
     {
         switch (selectedType) {
         case VehicleConfigurationSource::INPUT_PWM:
@@ -105,9 +106,9 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
         case VehicleConfigurationSource::INPUT_SBUS:
             return data.RM_MainPort != HwSettings::CC_MAINPORT_SBUS;
 
-        case VehicleConfigurationSource::INPUT_DSM2:
+        case VehicleConfigurationSource::INPUT_DSM:
             // TODO: Handle all of the DSM types ?? Which is most common?
-            return data.RM_MainPort != HwSettings::CC_MAINPORT_DSM2;
+            return data.RM_MainPort != HwSettings::CC_MAINPORT_DSM;
 
         default: return true;
         }

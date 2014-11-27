@@ -250,3 +250,8 @@ void check_bor()
         }
     }
 }
+
+int32_t platform_senddata(const uint8_t *msg, uint16_t msg_len)
+{
+    return PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, msg, msg_len);
+}

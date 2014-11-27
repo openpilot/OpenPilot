@@ -35,7 +35,6 @@ MODULES += Altitude/revolution
 MODULES += Airspeed
 #MODULES += AltitudeHold # now integrated in Stabilization
 MODULES += Stabilization
-MODULES += VtolPathFollower
 MODULES += ManualControl
 MODULES += Receiver
 MODULES += Actuator
@@ -45,7 +44,7 @@ MODULES += CameraStab
 MODULES += Battery
 MODULES += FirmwareIAP
 MODULES += PathPlanner
-MODULES += FixedWingPathFollower
+MODULES += PathFollower
 MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
@@ -74,6 +73,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/alarms.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
+    SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
 
     #ifeq ($(DEBUG), YES)
@@ -86,6 +86,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
 
     ## UAVObjects
     include ./UAVObjects.inc

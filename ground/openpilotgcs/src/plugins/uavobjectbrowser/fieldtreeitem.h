@@ -52,11 +52,13 @@ class FieldTreeItem : public TreeItem {
     Q_OBJECT
 public:
 
-    FieldTreeItem(int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        TreeItem(data, parent), m_index(index) {}
+    FieldTreeItem(int index, const QList<QVariant> &data, UAVObjectField *field, TreeItem *parent = 0) :
+        TreeItem(data, parent), m_index(index), m_field(field)
+    {}
 
-    FieldTreeItem(int index, const QVariant &data, TreeItem *parent = 0) :
-        TreeItem(data, parent), m_index(index) {}
+    FieldTreeItem(int index, const QVariant &data, UAVObjectField *field, TreeItem *parent = 0) :
+        TreeItem(data, parent), m_index(index), m_field(field)
+    {}
 
     bool isEditable()
     {
@@ -67,19 +69,27 @@ public:
     virtual QVariant getEditorValue(QWidget *editor) = 0;
     virtual void setEditorValue(QWidget *editor, QVariant value) = 0;
     virtual void apply() {}
+    virtual bool isKnown()
+    {
+        return parent()->isKnown();
+    }
+
 
 protected:
     int m_index;
+    UAVObjectField *m_field;
 };
 
 class EnumFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     EnumFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_enumOptions(field->getOptions()), m_field(field) {}
+        FieldTreeItem(index, data, field, parent), m_enumOptions(field->getOptions())
+    {}
 
     EnumFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_enumOptions(field->getOptions()), m_field(field) {}
+        FieldTreeItem(index, data, field, parent), m_enumOptions(field->getOptions())
+    {}
 
     void setData(QVariant value, int column)
     {
@@ -148,20 +158,19 @@ public:
 
 private:
     QStringList m_enumOptions;
-    UAVObjectField *m_field;
 };
 
 class IntFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     IntFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {
         setMinMaxValues();
     }
 
     IntFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {
         setMinMaxValues();
     }
@@ -246,7 +255,6 @@ public:
     }
 
 private:
-    UAVObjectField *m_field;
     int m_minValue;
     int m_maxValue;
 };
@@ -255,10 +263,10 @@ class FloatFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     FloatFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, bool scientific = false, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field), m_useScientificNotation(scientific) {}
+        FieldTreeItem(index, data, field, parent), m_useScientificNotation(scientific) {}
 
     FloatFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, bool scientific = false, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field), m_useScientificNotation(scientific) {}
+        FieldTreeItem(index, data, field, parent), m_useScientificNotation(scientific) {}
 
     void setData(QVariant value, int column)
     {
@@ -324,7 +332,6 @@ public:
     }
 
 private:
-    UAVObjectField *m_field;
     bool m_useScientificNotation;
 };
 
@@ -332,18 +339,18 @@ class HexFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     HexFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {}
 
     HexFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {}
 
     QWidget *createEditor(QWidget *parent)
     {
         QLineEdit *lineEdit = new QLineEdit(parent);
 
-        lineEdit->setInputMask(QString(maxLength(), 'H'));
+        lineEdit->setInputMask(QString(TreeItem::maxHexStringLength(m_field->getType()), 'H'));
 
         return lineEdit;
     }
@@ -385,8 +392,6 @@ public:
     }
 
 private:
-    UAVObjectField *m_field;
-
     QVariant toHexString(QVariant value)
     {
         QString str;
@@ -401,35 +406,73 @@ private:
 
         return str.toString().toUInt(&ok, 16);
     }
+};
 
-    int maxLength()
+class CharFieldTreeItem : public FieldTreeItem {
+    Q_OBJECT
+public:
+    CharFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+        FieldTreeItem(index, data, field, parent)
+    {}
+
+    CharFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
+        FieldTreeItem(index, data, field, parent)
+    {}
+
+    QWidget *createEditor(QWidget *parent)
     {
-        int maxLength = 0;
+        QLineEdit *lineEdit = new QLineEdit(parent);
 
-        switch (m_field->getType()) {
-        case UAVObjectField::INT8:
-            maxLength = 2;
-            break;
-        case UAVObjectField::INT16:
-            maxLength = 4;
-            break;
-        case UAVObjectField::INT32:
-            maxLength = 8;
-            break;
-        case UAVObjectField::UINT8:
-            maxLength = 2;
-            break;
-        case UAVObjectField::UINT16:
-            maxLength = 4;
-            break;
-        case UAVObjectField::UINT32:
-            maxLength = 8;
-            break;
-        default:
-            Q_ASSERT(false);
-            break;
+        lineEdit->setInputMask(QString(1, 'N'));
+
+        return lineEdit;
+    }
+
+    QVariant getEditorValue(QWidget *editor)
+    {
+        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
+
+        return lineEdit->text();
+    }
+
+    void setEditorValue(QWidget *editor, QVariant value)
+    {
+        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
+
+        lineEdit->setText(value.toString());
+    }
+
+    void setData(QVariant value, int column)
+    {
+        setChanged(m_field->getValue(m_index) != toUInt(value));
+        TreeItem::setData(value, column);
+    }
+
+    void apply()
+    {
+        m_field->setValue(toUInt(data()), m_index);
+        setChanged(false);
+    }
+
+    void update()
+    {
+        QVariant value = toChar(m_field->getValue(m_index));
+
+        if (data() != value || changed()) {
+            TreeItem::setData(value);
+            setHighlight(true);
         }
-        return maxLength;
+    }
+
+private:
+    QVariant toChar(QVariant value)
+    {
+        return value.toChar();
+    }
+
+    QVariant toUInt(QVariant str)
+    {
+        return QVariant(str.toString().at(0).toLatin1());
     }
 };
 

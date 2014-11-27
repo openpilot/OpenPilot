@@ -49,13 +49,15 @@ ifeq ($(MCU),cortex-m3)
     include $(PIOS)/stm32f10x/library.mk
 else ifeq ($(MCU),cortex-m4)
     include $(PIOS)/stm32f4xx/library.mk
+else ifeq ($(MCU),cortex-m0)
+    include $(PIOS)/stm32f0x/library.mk
 else
     $(error Unsupported MCU: $(MCU))
 endif
 
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
-
+ifneq ($(PIOS_APPS_MINIMAL),YES)
 ## PIOS Hardware (Common Peripherals)
 SRC += $(PIOSCOMMON)/pios_adxl345.c
 SRC += $(PIOSCOMMON)/pios_bma180.c
@@ -64,7 +66,7 @@ SRC += $(PIOSCOMMON)/pios_etasv3.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/pios_hcsr04.c
 SRC += $(PIOSCOMMON)/pios_hmc5843.c
-SRC += $(PIOSCOMMON)/pios_hmc5883.c
+SRC += $(PIOSCOMMON)/pios_hmc5x83.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
@@ -74,28 +76,37 @@ SRC += $(PIOSCOMMON)/pios_ms5611.c
 SRC += $(PIOSCOMMON)/pios_oplinkrcvr.c
 SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_wavplay.c
+SRC += $(PIOSCOMMON)/pios_rfm22b.c
+SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
+SRC += $(PIOSCOMMON)/pios_rcvr.c
+SRC += $(PIOSCOMMON)/pios_sbus.c
+SRC += $(PIOSCOMMON)/pios_sdcard.c
+
+## Misc library functions
+SRC += $(FLIGHTLIB)/sanitycheck.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(MATHLIB)/sin_lookup.c
+SRC += $(MATHLIB)/pid.c
 
 ## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
+SRC += $(PIOSCOMMON)/pios_flash_jedec.c
+SRC += $(PIOSCOMMON)/pios_debuglog.c
+endif
+
 SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_crc.c
-SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
-SRC += $(PIOSCOMMON)/pios_flash_jedec.c
-SRC += $(PIOSCOMMON)/pios_debuglog.c
 SRC += $(PIOSCOMMON)/pios_deltatime.c
-SRC += $(PIOSCOMMON)/pios_rcvr.c
-SRC += $(PIOSCOMMON)/pios_rfm22b.c
-SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
-SRC += $(PIOSCOMMON)/pios_sbus.c
-SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_led.c
 
+ifneq ($(PIOS_OMITS_USB),YES)
 ## PIOS USB related files
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
-
+endif
 ## PIOS system code
 SRC += $(PIOSCOMMON)/pios_task_monitor.c
 SRC += $(PIOSCOMMON)/pios_callbackscheduler.c
@@ -104,12 +115,11 @@ SRC += $(PIOSCOMMON)/pios_instrumentation.c
 SRC += $(PIOSCOMMON)/pios_mem.c
 ## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c
-SRC += $(FLIGHTLIB)/sanitycheck.c
-SRC += $(FLIGHTLIB)/CoordinateConversions.c
-SRC += $(MATHLIB)/sin_lookup.c
-SRC += $(MATHLIB)/pid.c
+
 SRC += $(MATHLIB)/mathmisc.c
+SRC += $(MATHLIB)/butterworth.c
 SRC += $(FLIGHTLIB)/printf-stdarg.c
+SRC += $(FLIGHTLIB)/optypes.c
 
 ## Modules
 SRC += $(foreach mod, $(MODULES), $(sort $(wildcard $(OPMODULEDIR)/$(mod)/*.c)))
@@ -184,6 +194,9 @@ ifeq ($(MCU),cortex-m3)
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_sections.ld
 else ifeq ($(MCU),cortex-m4)
     LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
+else ifeq ($(MCU),cortex-m0)
+    LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_memory.ld
+    LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_sections.ld
 endif
 
 # Add jtag targets (program and wipe)

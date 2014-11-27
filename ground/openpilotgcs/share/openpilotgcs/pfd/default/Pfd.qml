@@ -76,9 +76,15 @@ Rectangle {
             VsiScale {
                 anchors.fill: parent
                 sceneSize: sceneItem.viewportSize
+                visible: qmlWidget.altitudeUnit != 0
             }
 
             Info {
+                anchors.fill: parent
+                sceneSize: sceneItem.viewportSize
+            }
+
+            Panels {
                 anchors.fill: parent
                 sceneSize: sceneItem.viewportSize
             }

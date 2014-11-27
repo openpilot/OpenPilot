@@ -29,7 +29,6 @@
  */
 
 #include "inc/manualcontrol.h"
-#include <pios_struct_helper.h>
 #include <sanitycheck.h>
 #include <manualcontrolcommand.h>
 #include <accessorydesired.h>
@@ -215,6 +214,15 @@ void armHandler(bool newinit)
         break;
 
     case ARM_STATE_DISARMING_TIMEOUT:
+    {
+        // we should never reach the disarming timeout if the pathfollower is engaged - reset timeout
+        FlightStatusControlChainData cc;
+        FlightStatusControlChainGet(&cc);
+        if (cc.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            armedDisarmStart = sysTime;
+        }
+    }
+
         // We get here when armed while throttle low, even when the arming timeout is not enabled
         if ((settings.ArmedTimeout != 0) && (timeDifferenceMs(armedDisarmStart, sysTime) > settings.ArmedTimeout)) {
             armState = ARM_STATE_DISARMED;
@@ -259,7 +267,7 @@ static bool okToArm(void)
 
     // Check each alarm
     for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++) {
-        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
+        if (SystemAlarmsAlarmToArray(alarms.Alarm)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
             if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
             }

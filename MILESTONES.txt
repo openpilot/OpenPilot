@@ -169,32 +169,6 @@ C: Kavin Gustafson (k_g)
 D: October 2012
 V: http://www.youtube.com/watch?v=MGO68TqIwKk
 
-M: First successful flight using just a mobile phone
-C: Jose (please complete details), demoed in Portugal
-D: 
-V: 
-
-M: First CopterControl over 10km FixedWing navigation flight
-C: 
-D: 
-V: 
-
-M: First successful flight using the GCS only and no RC TX
-C: 
-D: 
-V: 
-
-M: First CopterControl Navigation on RC Ground Vechicle
-C: 
-D: 
-V: 
-
-M: First CopterControl Navigation on RC Water Vechicle
-C: 
-D: 
-V: 
-
-
 M: First Revo Navigated flight on a FixedWing
 C: It got done somewhere along the line, likely Corvus.
 
@@ -203,15 +177,56 @@ C: Eric Price (Corvus Corax)
 D: March 2012
 V: 
 
+M: First Revo 20km Navigated flight on a FixedWing
+C: Eric Price / Team OP
+D: Greece 2013
+V: https://vimeo.com/71956880
+
+M: First Auto spot landing on a fixed Wing using Revo
+C: Eric Price (Corvus Corax)
+D: Greece 2013
+V:
+
 M: First Revo Navigated flight on a MultiRotor
 C: It got done somewhere along the line, James or Sami
 
 M: First Revo 1km Navigated flight on a MultiRotor
+C: Jackson Russell
+D: Greece 2013
+V: 
+
+M: First Revo 5km Navigated flight on a MultiRotor
+C: Rodney Grainger (roddersNZ)
+D: September 2014
+V: https://www.youtube.com/watch?v=DYawRGz5KYM
+
+M: First Revo 6km Navigated flight on a MultiRotor
 C:
 D:
 V:
 
-M: First Revo 5km Navigated flight on a MultiRotor
+M: First Revo 7km Navigated flight on a MultiRotor
+C:
+D:
+V:
+
+M: First Revo 8km Navigated flight on a MultiRotor
+C: Jim Allen Thibodaux
+D: September 2014
+V: http://www.youtube.com/watch?v=oeJF8U2k9FA
+
+M: First Revo 9km Navigated flight on a MultiRotor
+C:
+D:
+V:
+
+M: First Revo 10km Navigated flight on a MultiRotor
+C:
+D:
+V:
+
+
+M: First Revo Position Hold on a Heli
 C:
 D:
 V:
@@ -231,33 +246,8 @@ C:
 D:
 V:
 
-M: First Revo Altitude Hold using Sonar
-C: 
-D: 
-V: 
-
-M: First use of the Magic Waypoint feature
-C:
-D:
-V:
-
-M: First Auto spot landing on a fixed Wing using Revo
-C:
-D:
-V:
-
-M: First Auto take-off on a MultiRotor using Revo
-C:
-D:
-V:
-
 M: First Auto landing on a MultiRotor using Revo
-C: Sami (please complete details)
-D:
-V:
-
-M: First Auto take-off on a Heli using Revo
-C:
+C: Sami
 D:
 V:
 

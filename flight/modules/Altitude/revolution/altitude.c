@@ -41,14 +41,23 @@
 #include "altitude.h"
 #include "barosensor.h" // object that will be updated by the module
 #include "revosettings.h"
+#include <mathmisc.h>
 #if defined(PIOS_INCLUDE_HCSR04)
 #include "sonaraltitude.h" // object that will be updated by the module
 #endif
 #include "taskinfo.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 550
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
+#define STACK_SIZE_BYTES    550
+#define TASK_PRIORITY       (tskIDLE_PRIORITY + 1)
+
+// Interval in number of sample to recalculate temp bias
+#define TEMP_CALIB_INTERVAL 10
+
+// LPF
+#define TEMP_DT             (1.0f / 120.0f)
+#define TEMP_LPF_FC         5.0f
+static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC));
 
 // Private types
 
@@ -57,6 +66,11 @@ static xTaskHandle taskHandle;
 static RevoSettingsBaroTempCorrectionPolynomialData baroCorrection;
 static RevoSettingsBaroTempCorrectionExtentData baroCorrectionExtent;
 static volatile bool tempCorrectionEnabled;
+
+static float baro_temp_bias   = 0;
+static float baro_temperature = NAN;
+static uint8_t temp_calibration_count = 0;
+
 // Private functions
 static void altitudeTask(void *parameters);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
@@ -166,13 +180,22 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
         temp  = PIOS_MS5611_GetTemperature();
         press = PIOS_MS5611_GetPressure();
 
-        if (tempCorrectionEnabled) {
+        if (isnan(baro_temperature)) {
+            baro_temperature = temp;
+        }
+
+        baro_temperature = temp_alpha * (temp - baro_temperature) + baro_temperature;
+
+        if (tempCorrectionEnabled && !temp_calibration_count) {
+            temp_calibration_count = TEMP_CALIB_INTERVAL;
             // pressure bias = A + B*t + C*t^2 + D * t^3
             // in case the temperature is outside of the calibrated range, uses the nearest extremes
-            float ctemp = temp > baroCorrectionExtent.max ? baroCorrectionExtent.max :
-                          (temp < baroCorrectionExtent.min ? baroCorrectionExtent.min : temp);
-            press -= baroCorrection.a + ((baroCorrection.d * ctemp + baroCorrection.c) * ctemp + baroCorrection.b) * ctemp;
+            float ctemp = boundf(baro_temperature, baroCorrectionExtent.max, baroCorrectionExtent.min);
+            baro_temp_bias = baroCorrection.a + ((baroCorrection.d * ctemp + baroCorrection.c) * ctemp + baroCorrection.b) * ctemp;
         }
+
+        press -= baro_temp_bias;
+
         float altitude = 44330.0f * (1.0f - powf((press) / MS5611_P0, (1.0f / 5.255f)));
 
         if (!isnan(altitude)) {

@@ -90,10 +90,10 @@ void PIOS_ADC_DMC_irq_handler(void)
 
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
-#if defined(PIOS_INCLUDE_HMC5883)
-#include "pios_hmc5883.h"
-static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
-    .vector = PIOS_HMC5883_IRQHandler,
+#if defined(PIOS_INCLUDE_HMC5X83)
+#include "pios_hmc5x83.h"
+static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
+    .vector = PIOS_HMC5x83_IRQHandler,
     .line   = EXTI_Line7,
     .pin    = {
         .gpio = GPIOB,
@@ -123,14 +123,15 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
     },
 };
 
-static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
-    .exti_cfg  = &pios_exti_hmc5883_cfg,
-    .M_ODR     = PIOS_HMC5883_ODR_75,
-    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5883_GAIN_1_9,
-    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
+static const struct pios_hmc5x83_cfg pios_hmc5x83_cfg = {
+    .exti_cfg  = &pios_exti_hmc5x83_cfg,
+    .M_ODR     = PIOS_HMC5x83_ODR_75,
+    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain      = PIOS_HMC5x83_GAIN_1_9,
+    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver    = &PIOS_HMC5x83_I2C_DRIVER,
 };
-#endif /* PIOS_INCLUDE_HMC5883 */
+#endif /* PIOS_INCLUDE_HMC5X83 */
 
 /**
  * Configuration for the MS5611 chip
@@ -275,7 +276,7 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
 }
 
 static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg,
-                                     const struct pios_com_driver *usart_com_driver, enum pios_dsm_proto *proto,
+                                     const struct pios_com_driver *usart_com_driver,
                                      ManualControlSettingsChannelGroupsOptions channelgroup, uint8_t *bind)
 {
     uint32_t pios_usart_dsm_id;
@@ -286,7 +287,7 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
 
     uint32_t pios_dsm_id;
     if (PIOS_DSM_Init(&pios_dsm_id, pios_dsm_cfg, usart_com_driver,
-                      pios_usart_dsm_id, *proto, *bind)) {
+                      pios_usart_dsm_id, *bind)) {
         PIOS_Assert(0);
     }
 
@@ -613,34 +614,14 @@ void PIOS_Board_Init(void)
         }
 #endif
         break;
-    case HWSETTINGS_RM_MAINPORT_DSM2:
-    case HWSETTINGS_RM_MAINPORT_DSMX10BIT:
-    case HWSETTINGS_RM_MAINPORT_DSMX11BIT:
-    {
-        enum pios_dsm_proto proto;
-        switch (hwsettings_mainport) {
-        case HWSETTINGS_RM_MAINPORT_DSM2:
-            proto = PIOS_DSM_PROTO_DSM2;
-            break;
-        case HWSETTINGS_RM_MAINPORT_DSMX10BIT:
-            proto = PIOS_DSM_PROTO_DSMX10BIT;
-            break;
-        case HWSETTINGS_RM_MAINPORT_DSMX11BIT:
-            proto = PIOS_DSM_PROTO_DSMX11BIT;
-            break;
-        default:
-            PIOS_Assert(0);
-            break;
-        }
-
+    case HWSETTINGS_RM_MAINPORT_DSM:
         // Force binding to zero on the main port
         hwsettings_DSMxBind = 0;
 
         // TODO: Define the various Channelgroup for Revo dsm inputs and handle here
         PIOS_Board_configure_dsm(&pios_usart_dsm_main_cfg, &pios_dsm_main_cfg,
-                                 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT, &hwsettings_DSMxBind);
-    }
-    break;
+                                 &pios_usart_com_driver, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT, &hwsettings_DSMxBind);
+        break;
     case HWSETTINGS_RM_MAINPORT_DEBUGCONSOLE:
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
         {
@@ -682,30 +663,11 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_FLEXIPORT_GPS:
         PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1, &pios_usart_com_driver, &pios_com_gps_id);
         break;
-    case HWSETTINGS_RM_FLEXIPORT_DSM2:
-    case HWSETTINGS_RM_FLEXIPORT_DSMX10BIT:
-    case HWSETTINGS_RM_FLEXIPORT_DSMX11BIT:
-    {
-        enum pios_dsm_proto proto;
-        switch (hwsettings_flexiport) {
-        case HWSETTINGS_RM_FLEXIPORT_DSM2:
-            proto = PIOS_DSM_PROTO_DSM2;
-            break;
-        case HWSETTINGS_RM_FLEXIPORT_DSMX10BIT:
-            proto = PIOS_DSM_PROTO_DSMX10BIT;
-            break;
-        case HWSETTINGS_RM_FLEXIPORT_DSMX11BIT:
-            proto = PIOS_DSM_PROTO_DSMX11BIT;
-            break;
-        default:
-            PIOS_Assert(0);
-            break;
-        }
+    case HWSETTINGS_RM_FLEXIPORT_DSM:
         // TODO: Define the various Channelgroup for Revo dsm inputs and handle here
         PIOS_Board_configure_dsm(&pios_usart_dsm_flexi_cfg, &pios_dsm_flexi_cfg,
-                                 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMFLEXIPORT, &hwsettings_DSMxBind);
-    }
-    break;
+                                 &pios_usart_com_driver, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMFLEXIPORT, &hwsettings_DSMxBind);
+        break;
     case HWSETTINGS_RM_FLEXIPORT_DEBUGCONSOLE:
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
         {
@@ -929,8 +891,8 @@ void PIOS_Board_Init(void)
     PIOS_ADC_Init(&pios_adc_cfg);
 #endif
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+#if defined(PIOS_INCLUDE_HMC5X83)
+    PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_pressure_adapter_id, 0);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)

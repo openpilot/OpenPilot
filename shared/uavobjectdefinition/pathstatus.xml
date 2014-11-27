@@ -7,7 +7,12 @@
 	<field name="Status" units="" type="enum" elements="1" options="InProgress,Completed,Warning,Critical"/>
 	<field name="fractional_progress" units="" type="float" elements="1"/>
 	<field name="error" units="m" type="float" elements="1"/>
-
+	<field name="path_direction_north" units="m" type="float" elements="1"/>
+	<field name="path_direction_east" units="m" type="float" elements="1"/>
+	<field name="path_direction_down" units="m" type="float" elements="1"/>
+	<field name="correction_direction_north" units="m" type="float" elements="1"/>
+	<field name="correction_direction_east" units="m" type="float" elements="1"/>
+	<field name="correction_direction_down" units="m" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

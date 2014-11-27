@@ -56,6 +56,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/alarms.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
+    SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
 
     ## OSD fonts
@@ -70,12 +71,15 @@ ifndef TESTAPP
 
     ## Misc library functions
     SRC += $(FLIGHTLIB)/WorldMagModel.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
     SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
     SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
     SRC += $(OPUAVSYNTHDIR)/flightstatus.c
+    SRC += $(OPUAVSYNTHDIR)/flightmodesettings.c
+    SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
     SRC += $(OPUAVSYNTHDIR)/systemstats.c
     SRC += $(OPUAVSYNTHDIR)/systemalarms.c
     SRC += $(OPUAVSYNTHDIR)/systemsettings.c
@@ -96,6 +100,8 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/osdsettings.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/magsensor.c
+    SRC += $(OPUAVSYNTHDIR)/auxmagsensor.c
+    SRC += $(OPUAVSYNTHDIR)/gpsextendedstatus.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

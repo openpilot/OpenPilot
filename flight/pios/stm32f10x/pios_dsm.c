@@ -180,7 +180,7 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
 {
     struct pios_dsm_state *state = &(dsm_dev->state);
     /* Fix resolution for detection. */
-    static uint8_t resolution = 11;
+    static uint8_t resolution    = 11;
     uint32_t channel_log = 0;
 
 #ifdef DSM_LOST_FRAME_COUNTER
@@ -213,8 +213,7 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
         /* extract and save the channel value */
         uint8_t channel_num = (word >> resolution) & 0x0f;
         if (channel_num < PIOS_DSM_NUM_INPUTS) {
-            if (channel_log & (1 << channel_num))
-            {
+            if (channel_log & (1 << channel_num)) {
                 /* Found duplicate! */
                 /* Update resolution and restart processing the current frame. */
                 resolution = 10;
@@ -282,7 +281,7 @@ int32_t PIOS_DSM_Init(uint32_t *dsm_id,
     }
 
     /* Bind the configuration to the device instance */
-    dsm_dev->cfg   = cfg;
+    dsm_dev->cfg = cfg;
 
     /* Bind the receiver if requested */
     if (bind) {

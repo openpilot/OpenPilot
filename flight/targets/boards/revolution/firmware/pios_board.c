@@ -643,7 +643,7 @@ void PIOS_Board_Init(void)
         // TODO: Define the various Channelgroup for Revo dsm inputs and handle here
         PIOS_Board_configure_dsm(&pios_usart_dsm_main_cfg, &pios_dsm_main_cfg,
                                  &pios_usart_com_driver, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT, &hwsettings_DSMxBind);
-    break;
+        break;
     case HWSETTINGS_RM_MAINPORT_DEBUGCONSOLE:
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
         {

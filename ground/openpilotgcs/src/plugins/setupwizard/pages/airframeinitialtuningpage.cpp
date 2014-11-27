@@ -210,6 +210,7 @@ void AirframeInitialTuningPage::loadValidFiles()
 void AirframeInitialTuningPage::setupTemplateList()
 {
     QListWidgetItem *item;
+
     foreach(QString templ, m_templates.keys()) {
         QJsonObject *json = m_templates[templ];
 
@@ -222,7 +223,7 @@ void AirframeInitialTuningPage::setupTemplateList()
     item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
     ui->templateList->insertItem(0, item);
     ui->templateList->setCurrentRow(0);
-    //TODO Add generics to top under item Current tuning
+    // TODO Add generics to top under item Current tuning
 }
 
 QString AirframeInitialTuningPage::getTemplateKey(QJsonObject *templ)

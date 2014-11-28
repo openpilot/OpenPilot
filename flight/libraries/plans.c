@@ -35,6 +35,7 @@
 #include <pathdesired.h>
 #include <positionstate.h>
 #include <flightmodesettings.h>
+#include <flightstatus.h>
 #include <velocitystate.h>
 #include <manualcontrolcommand.h>
 #include <attitudestate.h>
@@ -54,6 +55,7 @@ void plan_initialize()
     PositionStateInitialize();
     PathDesiredInitialize();
     FlightModeSettingsInitialize();
+    FlightStatusInitialize();
     AttitudeStateInitialize();
     ManualControlCommandInitialize();
     VelocityStateInitialize();
@@ -480,6 +482,8 @@ void plan_run_AutoCruise()
 
 /**
  * @brief setup pathplanner/pathfollower for braking in positionroam
+ *        braking_timeout = false: Attempt to enter flyvector for braking
+ *        braking_timeout = true: Revert to position hold
  */
 void plan_setup_braking(uint8_t braking_timeout)
 {
@@ -491,16 +495,34 @@ void plan_setup_braking(uint8_t braking_timeout)
     PathDesiredGet(&pathDesired);
     VelocityStateGet(&velocityState);
 
-    FlightModeSettingsPositionHoldOffsetData offset;
-    FlightModeSettingsPositionHoldOffsetGet(&offset);
+    float brakeRate;
+    FlightModeSettingsPositionRoamBrakeRateGet(&brakeRate);
+    if (brakeRate < 0.2f) brakeRate = 0.2f;  // set a minimum to avoid a divide by zero potential below
 
-    // Depending on velocity we with enter position hold directly
-    // or do preliminary braking before entering position hold
-    if ( braking_timeout ) {
+    // Calculate the velocity
+    float velocity = sqrtf( velocityState.North * velocityState.North + velocityState.East * velocityState.East);
+
+    // Calculate the desired time to zero velocity.
+    float time_to_stopped = 0.5f;  // we allow at least 0.5 seconds to rotate to a brake angle.
+    time_to_stopped += velocity / brakeRate;
+
+    // Sanity check the brake rate by ensuring that the time to stop is within a range.
+    if (time_to_stopped < 1.0f) time_to_stopped = 1.0f;
+    else if (time_to_stopped > 5.0f) time_to_stopped = 5.0f;
+
+    // calculate the distance we will travel
+    float north_delta = velocityState.North * 0.5f; // we allow at least 0.5s to rotate to brake angle
+    north_delta += (time_to_stopped - 0.5f) * 0.5f * velocityState.North;
+    float east_delta = velocityState.East * 0.5f; // we allow at least 0.5s to rotate to brake angle
+    east_delta += (time_to_stopped - 0.5f) * 0.5f * velocityState.East;
+    float net_delta = sqrtf(east_delta * east_delta + north_delta*north_delta );
+
+    // if the distance is small, enter PH directly
+    if ( braking_timeout  || net_delta < 0.5f) {
 	pathDesired.End.North        = positionState.North;
 	pathDesired.End.East         = positionState.East;
 	pathDesired.End.Down         = positionState.Down;
-	pathDesired.Start.North      = positionState.North; // + offset.Horizontal; // in FlyEndPoint the direction of this vector does not matter
+	pathDesired.Start.North      = positionState.North;
 	pathDesired.Start.East       = positionState.East;
 	pathDesired.Start.Down       = positionState.Down;
 	pathDesired.StartingVelocity = 0.0f;
@@ -512,14 +534,14 @@ void plan_setup_braking(uint8_t braking_timeout)
 	pathDesired.Start.East       = positionState.East;
 	pathDesired.Start.Down       = positionState.Down;
 
-    	pathDesired.End.North        = positionState.North + velocityState.North * 3.0f;
-    	pathDesired.End.East         = positionState.East + velocityState.East * 3.0f;
+    	pathDesired.End.North        = positionState.North + north_delta;
+    	pathDesired.End.East         = positionState.East + east_delta;
     	pathDesired.End.Down         = positionState.Down;
 
-        float velocity = sqrt( velocityState.North * velocityState.North + velocityState.East * velocityState.East);
     	pathDesired.StartingVelocity = velocity;
     	pathDesired.EndingVelocity   = 0.0f;
     	pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+    	FlightStatusPositionRoamBrakeTimeoutSet(time_to_stopped);
     }
     PathDesiredSet(&pathDesired);
 }

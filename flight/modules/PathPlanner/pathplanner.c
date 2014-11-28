@@ -82,7 +82,8 @@ static WaypointActiveData waypointActive;
 static WaypointData waypoint;
 static PathActionData pathAction;
 static bool pathplanner_active = false;
-
+static uint32_t positionroam_lastcalled;
+static float positionroam_braking_timeout = 0.0f;
 
 /**
  * Module initialization
@@ -95,6 +96,8 @@ int32_t PathPlannerStart()
     WaypointActiveConnectCallback(commandUpdated);
     PathActionConnectCallback(commandUpdated);
     PathStatusConnectCallback(statusUpdated);
+
+    positionroam_lastcalled = PIOS_DELAY_GetRaw();
 
     // Start main task callback
     PIOS_CALLBACKSCHEDULER_Dispatch(pathPlannerHandle);
@@ -144,19 +147,19 @@ static void pathPlannerTask()
     if (flightStatus.ControlChain.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
 
             if (flightStatus.FlightMode  == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM) {
-                static uint32_t braking_counter = 0;
-                float braking_timeout = 5;
+        	float positionroam_raw_time_now = PIOS_DELAY_GetRaw();
+        	float dT = fabsf(positionroam_raw_time_now - positionroam_lastcalled) * 1.0e-6f;
+        	positionroam_lastcalled = positionroam_raw_time_now;
 
         	if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
-        	    FlightModeSettingsPositionRoamBrakeTimeoutGet(&braking_timeout);
-        	    braking_counter = (uint32_t)(braking_timeout * (1000.0f / PATH_PLANNER_UPDATE_RATE_MS)) ;   // UAVO was in seconds.
-
+        	    // restart countdown value to ~5 seconds. This is a calculated value.
+        	    // The slower the initial velocity, the smaller this timeout gets
+        	    FlightStatusPositionRoamBrakeTimeoutGet(&positionroam_braking_timeout);
         	    flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER;
         	    FlightStatusSet(&flightStatus);
         	}
         	else if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER) {
-        	    if (braking_counter > 0) braking_counter--;
-        	    else {
+        	    if ( (positionroam_braking_timeout -= dT) < 0.0f) {
         		plan_setup_braking(true); // braking timeout true
         	        flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD;
         	        FlightStatusSet(&flightStatus);

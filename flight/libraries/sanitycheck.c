@@ -137,6 +137,7 @@ int32_t configuration_check()
             FlightModeSettingsPositionRoamStabiSelectGet(&positionRoamStabiSelect);
             ADDSEVERITY(check_stabilization_settings((positionRoamStabiSelect+1), multirotor, coptercontrol, true));
             ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(multirotor);
             ADDSEVERITY(navCapableFusion);
           }
           break;

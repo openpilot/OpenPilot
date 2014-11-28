@@ -541,7 +541,7 @@ void plan_setup_braking(uint8_t braking_timeout)
     	pathDesired.StartingVelocity = velocity;
     	pathDesired.EndingVelocity   = 0.0f;
     	pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
-    	FlightStatusPositionRoamBrakeTimeoutSet(time_to_stopped);
+    	FlightStatusPositionRoamBrakeTimeoutSet(&time_to_stopped);
     }
     PathDesiredSet(&pathDesired);
 }

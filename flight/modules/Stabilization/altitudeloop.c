@@ -52,14 +52,13 @@
 
 #define STACK_SIZE_BYTES  512
 // Private types
-typedef enum { ALTITUDEROAM_HOLD = 0, ALTITUDEROAM_VARIO = 1, ALTITUDEROAM_DIRECT = 2 } AltitudeRoamThrustModeType;
 
 // Private variables
 static DelayedCallbackInfo *altitudeHoldCBInfo;
 static AltitudeHoldSettingsData altitudeHoldSettings;
 static struct pid pid0, pid1;
 static ThrustModeType thrustMode;
-static AltitudeRoamThrustModeType altitudeRoamThrustMode;
+static AltitudeHoldStatusAltitudeRoamThrustModeOptions altitudeRoamThrustMode;
 static PiOSDeltatimeConfig timeval;
 static float thrustSetpoint = 0.0f;
 static float thrustDemand   = 0.0f;
@@ -113,17 +112,17 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
             // Change to direct submode of AltitudeRoam
             thrustSetpoint = setpoint;
             thrustDemand = setpoint;
-            altitudeRoamThrustMode = ALTITUDEROAM_DIRECT;
+            altitudeRoamThrustMode = ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_DIRECT;
             newaltitude    = false;
         }
         else if (setpoint < DEADBAND_LOW) {
             // Change to vario-low submode of AltitudeRoam
             thrustSetpoint = -(-(thrustExp * powf((DEADBAND_LOW - (setpoint < 0 ? 0 : setpoint)) / DEADBAND_LOW, 3) + (255 - thrustExp) * (DEADBAND_LOW - setpoint) / DEADBAND_LOW) / 255 * thrustRate);
-            altitudeRoamThrustMode = ALTITUDEROAM_VARIO;
+            altitudeRoamThrustMode = ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_VARIO;
             newaltitude    = true;
-        } else if (altitudeRoamThrustMode != ALTITUDEROAM_HOLD) {
+        } else if (altitudeRoamThrustMode != ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_HOLD) {
             // Re-initialise to a hold submode of AltitudeRoam
-            altitudeRoamThrustMode = ALTITUDEROAM_HOLD;
+            altitudeRoamThrustMode = ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_HOLD;
             startThrust = setpoint;
             pid_zero(&pid0);
             pid_zero(&pid1);
@@ -204,15 +203,14 @@ static void altitudeHoldTask(void)
         altitudeHoldStatus.VelocityDesired = thrustSetpoint;
         break;
     case ALTITUDEROAM:
+        altitudeHoldStatus.AltitudeRoamThrustMode = altitudeRoamThrustMode;
         switch (altitudeRoamThrustMode) {
-          case ALTITUDEROAM_HOLD:
+          case ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_HOLD:
             // altitude control loop
             altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, &scaler, thrustSetpoint, positionStateDown, dT);
             break;
-          case ALTITUDEROAM_DIRECT:
-            thrustDemand = thrustSetpoint;
-            break;
-          case ALTITUDEROAM_VARIO:
+          case ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_DIRECT:
+          case ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_VARIO:
             altitudeHoldStatus.VelocityDesired = thrustSetpoint;
             break;
           default:
@@ -229,7 +227,7 @@ static void altitudeHoldTask(void)
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
-    if (thrustMode == DIRECT || (thrustMode == ALTITUDEROAM && altitudeRoamThrustMode == ALTITUDEROAM_DIRECT)) {
+    if (thrustMode == DIRECT || (thrustMode == ALTITUDEROAM && altitudeRoamThrustMode == ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_DIRECT)) {
         thrustDemand = thrustSetpoint;
     }
     else {

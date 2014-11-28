@@ -30,6 +30,7 @@
 
 #ifndef PLANS_H_
 #define PLANS_H_
+#include <pios.h>
 #include <pios_math.h>
 
 /** \page standard Plans
@@ -70,7 +71,7 @@ void plan_run_land();
 /**
  * @brief setup pathplanner/pathfollower for braking
  */
-void plan_setup_braking();
+void plan_setup_braking(uint8_t braking_timeout);
 
 /**
  * @brief setup pathfollower for positionvario

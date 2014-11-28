@@ -70,7 +70,7 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
             if (positionRoamFlightMode == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
         	// Just initiated braking after returning from stabi control
-                plan_setup_braking();
+                plan_setup_braking(false);
             }
             else if (positionRoamFlightMode == FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD) {
                 plan_setup_positionHold(); // this probably won't occur, it will be called

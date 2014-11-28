@@ -481,7 +481,7 @@ void plan_run_AutoCruise()
 /**
  * @brief setup pathplanner/pathfollower for braking in positionroam
  */
-void plan_setup_braking()
+void plan_setup_braking(uint8_t braking_timeout)
 {
     PositionStateData positionState;
     VelocityStateData velocityState ;
@@ -496,20 +496,18 @@ void plan_setup_braking()
 
     // Depending on velocity we with enter position hold directly
     // or do preliminary braking before entering position hold
-    float velocity = sqrt( velocityState.North * velocityState.North + velocityState.East * velocityState.East);
-    if (velocity < 0.5f || velocity > 30.0f ) {
+    if ( braking_timeout ) {
 	pathDesired.End.North        = positionState.North;
 	pathDesired.End.East         = positionState.East;
 	pathDesired.End.Down         = positionState.Down;
-	pathDesired.Start.North      = positionState.North + offset.Horizontal; // in FlyEndPoint the direction of this vector does not matter
+	pathDesired.Start.North      = positionState.North; // + offset.Horizontal; // in FlyEndPoint the direction of this vector does not matter
 	pathDesired.Start.East       = positionState.East;
 	pathDesired.Start.Down       = positionState.Down;
 	pathDesired.StartingVelocity = 0.0f;
 	pathDesired.EndingVelocity   = 0.0f;
 	pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-
-
     } else {
+
 	pathDesired.Start.North      = positionState.North;
 	pathDesired.Start.East       = positionState.East;
 	pathDesired.Start.Down       = positionState.Down;
@@ -518,6 +516,7 @@ void plan_setup_braking()
     	pathDesired.End.East         = positionState.East + velocityState.East * 3.0f;
     	pathDesired.End.Down         = positionState.Down;
 
+        float velocity = sqrt( velocityState.North * velocityState.North + velocityState.East * velocityState.East);
     	pathDesired.StartingVelocity = velocity;
     	pathDesired.EndingVelocity   = 0.0f;
     	pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;

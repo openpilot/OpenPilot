@@ -238,6 +238,7 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
         	   modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATTITUDE)   ) {
                 return false;
             }
+        }
     }
 
     // coptercontrol cannot do altitude holding

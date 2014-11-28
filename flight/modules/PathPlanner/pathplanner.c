@@ -145,10 +145,11 @@ static void pathPlannerTask()
 
             if (flightStatus.FlightMode  == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM) {
                 static uint32_t braking_counter = 0;
+                float braking_timeout = 5;
 
         	if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
-        	    FlightModeSettingsPositionRoamBrakeTimeoutGet(&braking_counter);
-        	    braking_counter *= (1000.0f / PATH_PLANNER_UPDATE_RATE_MS);   // UAVO was in seconds.
+        	    FlightModeSettingsPositionRoamBrakeTimeoutGet(&braking_timeout);
+        	    braking_counter = (uint32_t)(braking_timeout * (1000.0f / PATH_PLANNER_UPDATE_RATE_MS)) ;   // UAVO was in seconds.
 
         	    flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER;
         	    FlightStatusSet(&flightStatus);
@@ -156,7 +157,7 @@ static void pathPlannerTask()
         	else if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER) {
         	    if (braking_counter > 0) braking_counter--;
         	    else {
-        		plan_setup_positionHold();
+        		plan_setup_braking(true); // braking timeout true
         	        flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD;
         	        FlightStatusSet(&flightStatus);
         	    }

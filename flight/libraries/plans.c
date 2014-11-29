@@ -505,9 +505,10 @@ void plan_setup_braking(uint8_t braking_timeout)
     // Calculate the desired time to zero velocity.
     float time_to_stopped = 0.5f;  // we allow at least 0.5 seconds to rotate to a brake angle.
     time_to_stopped += velocity / brakeRate;
+    time_to_stopped += 1.0f;  // allow to operate for 1 second more before entering position hold
 
     // Sanity check the brake rate by ensuring that the time to stop is within a range.
-    if (time_to_stopped < 1.0f) time_to_stopped = 1.0f;
+    if (time_to_stopped < 0.5f) time_to_stopped = 0.5f;
     else if (time_to_stopped > 5.0f) time_to_stopped = 5.0f;
 
     // calculate the distance we will travel
@@ -517,8 +518,11 @@ void plan_setup_braking(uint8_t braking_timeout)
     east_delta += (time_to_stopped - 0.5f) * 0.5f * velocityState.East;
     float net_delta = sqrtf(east_delta * east_delta + north_delta*north_delta );
 
+    FlightStatusPositionRoamStateOptions positionRoamFlightMode;
+
     // if the distance is small, enter PH directly
-    if ( braking_timeout  || net_delta < 0.5f) {
+    // if velocity less than error assume zero
+    if ( braking_timeout  || net_delta < 0.2f || velocity < 0.15f) {
 	pathDesired.End.North        = positionState.North;
 	pathDesired.End.East         = positionState.East;
 	pathDesired.End.Down         = positionState.Down;
@@ -528,6 +532,7 @@ void plan_setup_braking(uint8_t braking_timeout)
 	pathDesired.StartingVelocity = 0.0f;
 	pathDesired.EndingVelocity   = 0.0f;
 	pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+    	positionRoamFlightMode = FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD ;
     } else {
 
 	pathDesired.Start.North      = positionState.North;
@@ -541,8 +546,12 @@ void plan_setup_braking(uint8_t braking_timeout)
     	pathDesired.StartingVelocity = velocity;
     	pathDesired.EndingVelocity   = 0.0f;
     	pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
-    	FlightStatusPositionRoamBrakeTimeoutSet(&time_to_stopped);
+    	// change state to start of braking.  pathfollowering will then
+    	// start a new timer and move to braketimer state
+	positionRoamFlightMode = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
     }
+    FlightStatusPositionRoamBrakeTimeoutSet(&time_to_stopped);
+    FlightStatusPositionRoamStateSet(&positionRoamFlightMode);
     PathDesiredSet(&pathDesired);
 }
 

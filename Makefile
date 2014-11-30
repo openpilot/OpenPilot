@@ -909,7 +909,7 @@ source:
 	$(V1) $(MKDIR) -p "$(SOURCE_DIR)"
 	$(V1) $(VERSION_INFO) \
 		--jsonpath="$(SOURCE_DIR)"
-	$(eval SOURCE_NAME := "$(SOURCE_DIR)/OpenPilot.tar")
+	$(eval SOURCE_NAME := "$(SOURCE_DIR)/OpenPilot-$(shell git describe).tar")
 	$(V1) git archive --prefix="OpenPilot/" -o "$(SOURCE_NAME)" HEAD
 	$(V1) tar --append --file="$(SOURCE_NAME)" \
 		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \

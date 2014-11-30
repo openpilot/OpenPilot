@@ -14,6 +14,8 @@ from string import Template
 import optparse
 import hashlib
 import sys
+import os.path
+import json
 
 class Repo:
     """A simple git repository HEAD commit info class
@@ -90,6 +92,23 @@ class Repo:
         if self._rc:
             self._dirty = True
 
+    def _load_json(self):
+        """Loads the repo data from version-info.json"""
+        json_path = os.path.join(self._path, 'version-info.json')
+        if os.path.isfile(json_path):
+            with open(json_path) as json_file:
+               json_data = json.load(json_file)
+
+            self._hash = json_data['hash']
+            self._origin = json_data['origin']
+            self._time = json_data['time']
+            self._tag = json_data['tag']
+            self._branch = json_data['branch']
+            self._dirty = json_data['dirty']
+
+            return True
+        return False
+
     def __init__(self, path = "."):
         """Initialize object instance and read repo info"""
         self._path = path
@@ -101,6 +120,8 @@ class Repo:
             self._get_tag()
             self._get_branch()
             self._get_dirty()
+        elif self._load_json():
+            pass
         else:
             self._hash = None
             self._origin = None

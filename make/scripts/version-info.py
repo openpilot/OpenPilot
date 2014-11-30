@@ -213,6 +213,21 @@ class Repo:
         print "label:      ", self.label()
         print "revision:   ", self.revision()
 
+    def save_to_json(self, path):
+        """Saves the repo data to version-info.json"""
+
+        json_data = dict()
+        json_data['hash'] = self._hash
+        json_data['origin'] = self._origin
+        json_data['time'] = self._time
+        json_data['tag'] = self._tag
+        json_data['branch'] = self._branch
+        json_data['dirty'] = self._dirty
+
+        json_path = os.path.join(path, 'version-info.json')
+        with open(json_path, 'w') as json_file:
+           json.dump(json_data, json_file)
+
 def file_from_template(tpl_name, out_name, dict):
     """Create or update file from template using dictionary
 
@@ -408,6 +423,8 @@ string given.
                         help='board revision, for example, 0x01');
     parser.add_option('--uavodir', default = "",
                         help='uav object definition directory');
+    parser.add_option('--jsonpath',
+                        help='path to save version info');
     (args, positional_args) = parser.parse_args()
 
     # Process arguments.  No advanced error handling is here.
@@ -458,6 +475,9 @@ string given.
 
     if args.outfile != None:
         file_from_template(args.template, args.outfile, dictionary)
+
+    if args.jsonpath != None:
+        r.save_to_json(args.jsonpath)
 
     return 0
 

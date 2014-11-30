@@ -65,9 +65,13 @@ $(if $(filter-out undefined,$(origin $(1))),
 )
 endef
 
-# These specific variables can influence gcc in unexpected (and undesirable) ways
+# These specific variables can influence compilation in unexpected (and undesirable) ways
+# gcc flags
 SANITIZE_GCC_VARS := TMPDIR GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH
-SANITIZE_GCC_VARS += CFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# preprocessor flags
+SANITIZE_GCC_VARS += CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# make flags
+SANITIZE_GCC_VARS += CFLAGS CXXFLAGS CPPFLAGS LDFLAGS LDLIBS
 $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowed)))
 
 # These specific variables used to be valid but now they make no sense

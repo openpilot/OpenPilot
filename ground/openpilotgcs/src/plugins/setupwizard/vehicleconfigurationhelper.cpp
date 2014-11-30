@@ -164,7 +164,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             break;
         }
         break;
-    case VehicleConfigurationSource::CONTROLLER_REVO:      
+    case VehicleConfigurationSource::CONTROLLER_REVO:
     case VehicleConfigurationSource::CONTROLLER_NANO:
     case VehicleConfigurationSource::CONTROLLER_DISCOVERYF4:
         // Reset all ports to their defaults
@@ -173,7 +173,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
 
         // Revo uses inbuilt Modem do not set mainport to be active telemetry link for the Revo
         if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-            data.RM_MainPort  = HwSettings::RM_MAINPORT_DISABLED;
+            data.RM_MainPort = HwSettings::RM_MAINPORT_DISABLED;
         } else {
             data.RM_MainPort = HwSettings::RM_MAINPORT_TELEMETRY;
         }
@@ -186,7 +186,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PPM;
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
-            data.RM_MainPort  = HwSettings::RM_MAINPORT_SBUS;
+            data.RM_MainPort = HwSettings::RM_MAINPORT_SBUS;
             // We have to set telemetry on flexport since s.bus needs the mainport on all but Revo.
             if (m_configSource->getControllerType() != VehicleConfigurationSource::CONTROLLER_REVO) {
                 data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_TELEMETRY;
@@ -292,7 +292,6 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
-        case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
             setupQuadCopter();
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
@@ -407,7 +406,6 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             }
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
-        case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
             data.ChannelUpdateFreq[0] = escFrequence;
             data.ChannelUpdateFreq[1] = escFrequence;
@@ -655,11 +653,6 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
             mSettings->setMixerValueRoll(100);
             mSettings->setMixerValuePitch(100);
-            mSettings->setMixerValueYaw(50);
-            break;
-        case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
-            mSettings->setMixerValueRoll(50);
-            mSettings->setMixerValuePitch(70);
             mSettings->setMixerValueYaw(50);
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:
@@ -1068,44 +1061,6 @@ void VehicleConfigurationHelper::setupQuadCopter()
         channels[3].throttle2 = 0;
         channels[3].roll      = 50;
         channels[3].pitch     = -50;
-        channels[3].yaw = 50;
-
-        guiSettings.multi.VTOLMotorNW = 1;
-        guiSettings.multi.VTOLMotorNE = 2;
-        guiSettings.multi.VTOLMotorSE = 3;
-        guiSettings.multi.VTOLMotorSW = 4;
-
-        break;
-    }
-    case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
-    {
-        frame = SystemSettings::AIRFRAMETYPE_QUADH;
-        channels[0].type      = MIXER_TYPE_MOTOR;
-        channels[0].throttle1 = 100;
-        channels[0].throttle2 = 0;
-        channels[0].roll      = 50;
-        channels[0].pitch     = 70;
-        channels[0].yaw = -50;
-
-        channels[1].type      = MIXER_TYPE_MOTOR;
-        channels[1].throttle1 = 100;
-        channels[1].throttle2 = 0;
-        channels[1].roll      = -50;
-        channels[1].pitch     = 70;
-        channels[1].yaw = 50;
-
-        channels[2].type      = MIXER_TYPE_MOTOR;
-        channels[2].throttle1 = 100;
-        channels[2].throttle2 = 0;
-        channels[2].roll      = -50;
-        channels[2].pitch     = -70;
-        channels[2].yaw = -50;
-
-        channels[3].type      = MIXER_TYPE_MOTOR;
-        channels[3].throttle1 = 100;
-        channels[3].throttle2 = 0;
-        channels[3].roll      = 50;
-        channels[3].pitch     = -70;
         channels[3].yaw = 50;
 
         guiSettings.multi.VTOLMotorNW = 1;

@@ -112,11 +112,6 @@ QString VehicleTemplateExportDialog::setupVehicleType()
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
         return tr("Multirotor - Quadrocopter X");
 
-    case SystemSettings::AIRFRAMETYPE_QUADH:
-        m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
-        m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_H;
-        return tr("Multirotor - Quadrocopter H");
-
     case SystemSettings::AIRFRAMETYPE_QUADP:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS;

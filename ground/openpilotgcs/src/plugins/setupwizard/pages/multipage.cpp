@@ -77,11 +77,6 @@ void MultiPage::setupSelection(Selection *selection)
                        "quad-plus",
                        SetupWizard::MULTI_ROTOR_QUAD_PLUS);
 
-    selection->addItem(tr("Quadcopter H"),
-                       tr("Quadcopter H, Blackout miniH"),
-                       "quad-h",
-                       SetupWizard::MULTI_ROTOR_QUAD_H);
-
     selection->addItem(tr("Hexacopter"),
                        tr("A multirotor with six motors, one motor in front."),
                        "quad-hexa",

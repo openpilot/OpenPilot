@@ -47,6 +47,7 @@ export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DI
 export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
+export SOURCE_DIR  := $(ROOT_DIR)/build/source
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -898,6 +899,27 @@ build-info:
 
 ##############################
 #
+# Source for distribution
+#
+##############################
+
+.PHONY: source
+source:
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(BUILD_DIR)/source)"
+	$(V1) $(MKDIR) -p "$(SOURCE_DIR)"
+	$(V1) $(VERSION_INFO) \
+		--jsonpath="$(SOURCE_DIR)"
+	$(eval SOURCE_NAME := "$(SOURCE_DIR)/OpenPilot.tar")
+	$(V1) git archive --prefix="OpenPilot/" -o "$(SOURCE_NAME)" HEAD
+	$(V1) tar --append --file="$(SOURCE_NAME)" \
+		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
+		"$(SOURCE_DIR)/version-info.json"
+	$(V1) gzip -f "$(SOURCE_NAME)"
+
+
+
+##############################
+#
 # Help message, the default Makefile goal
 #
 ##############################
@@ -1031,6 +1053,7 @@ help:
 	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
+	@$(ECHO) "     source               - Generate source archive for distribution"
 	@$(ECHO)
 	@$(ECHO) "   [Code Formatting]"
 	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code according to the project's standards"

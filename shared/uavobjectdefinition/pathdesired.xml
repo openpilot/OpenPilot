@@ -12,7 +12,7 @@
 		FixedAttitude,
 		SetAccessory,
 		Land,
-		DisarmAlarm" default="0"/>
+		DisarmAlarm,Brake" default="0"/>
 	<!-- Endpoint mode - move directly towards endpoint regardless of position -->
 	<!-- Straight Mode - move across linear path through Start towards the waypoint end, adjusting velocity - continue straight -->
 	<!-- Circle Mode - move a circular pattern around End with radius End-Start (straight line in the vertical)-->
@@ -20,6 +20,8 @@
 
 	<field name="UID" units="" type="int16" elements="1" default="0"/>
 	<!-- unique ID confirmed with pathfollower in pathstatus to acknowledge a change in PathDesired -->
+	
+	<field name="Timeout" units="s" type="float" elements="1" default="5"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>

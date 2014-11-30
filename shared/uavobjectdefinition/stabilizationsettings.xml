@@ -46,6 +46,10 @@
 
 	<field name="ScaleToAirspeed" units="m/s" type="float" elements="1" defaultvalue="0"/>
 	<field name="ScaleToAirspeedLimits" units="" type="float" elementnames="Min,Max" defaultvalue="0.05,3"/>
+	<field name="FlightModeGPSAssistMap" units="" type="enum"
+	    options="None,Vector"
+	    elements="6"
+	    defaultvalue="None,None,None,None,None,None"/>
 
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

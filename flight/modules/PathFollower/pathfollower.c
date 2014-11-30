@@ -54,6 +54,7 @@
 #include <sin_lookup.h>
 #include <pathdesired.h>
 #include <paths.h>
+#include "plans.h"
 #include <sanitycheck.h>
 
 
@@ -109,6 +110,8 @@ static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
 static VtolPathFollowerSettingsData vtolPathFollowerSettings;
+static uint32_t positionroam_lastcalled;
+static float positionroam_braking_timeout = 0.0f;
 
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
@@ -183,6 +186,8 @@ int32_t PathFollowerInitialize()
     PathDesiredConnectCallback(SettingsUpdatedCb);
     AirspeedStateConnectCallback(airspeedStateUpdatedCb);
 
+    positionroam_lastcalled = PIOS_DELAY_GetuS();
+
     return 0;
 }
 MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
@@ -213,6 +218,7 @@ static void pathFollowerTask(void)
     switch (pathDesired.Mode) {
     case PATHDESIRED_MODE_FLYENDPOINT:
     case PATHDESIRED_MODE_FLYVECTOR:
+    case PATHDESIRED_MODE_BRAKE:
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
     case PATHDESIRED_MODE_FLYCIRCLELEFT:
     {
@@ -238,6 +244,37 @@ static void pathFollowerTask(void)
         break;
     }
     PathStatusSet(&pathStatus);
+
+    // TODO how much more can I put into PathDesired and PathStatus instead of
+    // FlightStatus for PositionRoamState.  Give we support a Brake mode now
+    // in PathDesired, PathStatus can have substates for PositionRoam
+    if (flightStatus.FlightModeGPSAssist  != FLIGHTSTATUS_FLIGHTMODEGPSASSIST_NONE &&
+     	flightStatus.PositionRoamState != FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD) {
+
+	// gps assisted and we are yet to change state to full position hold assistance mode
+        uint32_t positionroam_raw_time_now = PIOS_DELAY_GetuS();
+        uint32_t delta_time = positionroam_raw_time_now - positionroam_lastcalled;
+        float dT = (float)delta_time * 1.0e-6f;
+        if (dT > (((float)updatePeriod)/1000.0f) ) dT = ((float)updatePeriod)/1000.0f;
+        positionroam_lastcalled = positionroam_raw_time_now;
+
+        if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
+            // restart countdown value to ~5 seconds. This is a calculated value.
+            // The slower the initial velocity, the smaller this timeout gets
+            positionroam_braking_timeout = pathDesired.Timeout;
+            if (positionroam_braking_timeout < 1.0f) positionroam_braking_timeout = 1.0f;
+            flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER;
+            FlightStatusPositionRoamStateSet(&(flightStatus.PositionRoamState));
+        }
+        else if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER) {
+            positionroam_braking_timeout -= dT;
+            if ( positionroam_braking_timeout < 0.0f) {
+        	plan_setup_braking(true); // braking timeout true
+                flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD;
+                FlightStatusPositionRoamStateSet(&(flightStatus.PositionRoamState));
+            }
+        }
+    }
 
     PIOS_CALLBACKSCHEDULER_Schedule(pathFollowerCBInfo, updatePeriod, CALLBACK_UPDATEMODE_SOONER);
 }

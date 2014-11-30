@@ -545,12 +545,12 @@ void plan_setup_braking(uint8_t braking_timeout)
 
     	pathDesired.StartingVelocity = velocity;
     	pathDesired.EndingVelocity   = 0.0f;
-    	pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+    	pathDesired.Mode = PATHDESIRED_MODE_BRAKE;
+    	pathDesired.Timeout = time_to_stopped;
     	// change state to start of braking.  pathfollowering will then
     	// start a new timer and move to braketimer state
 	positionRoamFlightMode = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
     }
-    FlightStatusPositionRoamBrakeTimeoutSet(&time_to_stopped);
     FlightStatusPositionRoamStateSet(&positionRoamFlightMode);
     PathDesiredSet(&pathDesired);
 }

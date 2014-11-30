@@ -180,8 +180,7 @@ const LedSequence_t *flightModeMap[] = {
     [FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE]      = &notifications[NOTIFY_SEQUENCE_ARMED_FM_RTH],
     [FLIGHTSTATUS_FLIGHTMODE_LAND] = &notifications[NOTIFY_SEQUENCE_ARMED_FM_LAND],
     [FLIGHTSTATUS_FLIGHTMODE_POI] = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS],
-    [FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE]        = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS],
-    [FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM]        = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS],
+    [FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE]        = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS]
 };
 
 // List of alarms to show with attached sequences for each status

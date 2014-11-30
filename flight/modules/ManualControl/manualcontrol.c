@@ -44,6 +44,7 @@
 #include <callbackinfo.h>
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <vtolpathfollowersettings.h>
+#include <stabilizationsettings.h>
 #endif
 
 // Private constants
@@ -112,8 +113,10 @@ static DelayedCallbackInfo *callbackHandle;
 // Private functions
 static void configurationUpdatedCb(UAVObjEvent *ev);
 static void commandUpdatedCb(UAVObjEvent *ev);
-
 static void manualControlTask(void);
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+static uint8_t isGPSAssistedFlightMode( uint8_t position);
+#endif
 
 #define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
 
@@ -160,6 +163,7 @@ int32_t ManualControlInitialize()
     SystemSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     VtolPathFollowerSettingsInitialize();
+    StabilizationSettingsInitialize();
 #endif
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);
 
@@ -189,42 +193,12 @@ static void manualControlTask(void)
 
     uint8_t position = cmd.FlightModeSwitchPosition;
     uint8_t newMode  = flightStatus.FlightMode;
+    uint8_t newFlightModeGPSAssist = flightStatus.FlightModeGPSAssist;
     uint8_t newPositionRoamState  = flightStatus.PositionRoamState;
     uint8_t newPositionRoamThrustMode  = flightStatus.PositionRoamThrustMode;
     if (position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
         newMode = modeSettings.FlightModePosition[position];
     }
-
-#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    if (newMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM) {
-
-            if (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f) {
-	        // Following code assumes Stabi1 to Stabi6 are contiguous and
-	        // PositionRoamStabiSelect_Stabilized1 is a 0 by definition.
-                newMode = FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 + modeSettings.PositionRoamStabiSelect;
-                newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED;
-
-                // Check vtol thrust control and override if need be the thrust mode
-                // of the PositionRoamStabiSelect-ed option
-                VtolPathFollowerSettingsData vtolPathFollowerSettings;
-	        VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
-                if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
-                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MANUAL;
-                }
-                else { //auto thrust control requires altitude controlled throttle in the Stabi mode
-                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MIXED;
-                }
-            }
-            else if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM ||
-        	    (flightStatus.PositionRoamState != FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD &&
-       	             flightStatus.PositionRoamState != FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER) ) {
-        	    newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
-            }
-    }
-    else {
-        newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_NONE;
-    }
-#endif
 
     // Depending on the mode update the Stabilization or Actuator objects
     const controlHandler *handler = &handler_MANUAL;
@@ -239,8 +213,41 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
         handler = &handler_STABILIZED;
+
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+        newFlightModeGPSAssist = isGPSAssistedFlightMode( position );
+        if (newFlightModeGPSAssist) {
+            if (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f) {
+                newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED;
+
+                // Check vtol thrust control and override if need be the thrust mode
+                // of the PositionRoamStabiSelect-ed option
+                VtolPathFollowerSettingsData vtolPathFollowerSettings;
+	        VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
+                if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
+                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MANUAL;
+                }
+                else { //auto thrust control requires altitude controlled throttle in the Stabi mode
+                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MIXED;
+                }
+            }
+            else {
+
+        	// ok sticks centered (pitch and roll is 0.0 exactly thanks to deadband code in receiver.c
+        	// handler is pathfollower
+        	handler = &handler_PATHFOLLOWER;
+
+        	// if existing state is none is previously stablised, initiate to braking
+        	if ( flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_NONE ||
+       	             flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED ) {
+        	    newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
+        	}
+            }
+        }
+#endif
         break;
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
@@ -249,7 +256,6 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
     case FLIGHTSTATUS_FLIGHTMODE_POI:
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
         handler = &handler_PATHFOLLOWER;
         break;
     case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
@@ -272,6 +278,7 @@ static void manualControlTask(void)
         firstRun = false;
         flightStatus.ControlChain = handler->controlChain;
         flightStatus.FlightMode   = newMode;
+        flightStatus.FlightModeGPSAssist = newFlightModeGPSAssist;
         flightStatus.PositionRoamState = newPositionRoamState;
         flightStatus.PositionRoamThrustMode = newPositionRoamThrustMode;
         FlightStatusSet(&flightStatus);
@@ -297,6 +304,27 @@ static void commandUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
 }
+
+
+/**
+ * Check and set modes for gps assisted stablised flight modes
+ */
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+static uint8_t isGPSAssistedFlightMode( uint8_t position)
+{
+
+    uint8_t isGPSAssistedFlag = STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NONE;
+    uint8_t FlightModeGPSAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NUMELEM];
+
+    StabilizationSettingsFlightModeGPSAssistMapGet(FlightModeGPSAssistMap);
+
+    if (position < STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NUMELEM) {
+        isGPSAssistedFlag = FlightModeGPSAssistMap[position];
+    }
+
+    return isGPSAssistedFlag;
+}
+#endif
 
 /**
  * @}

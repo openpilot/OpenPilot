@@ -78,31 +78,31 @@
                units=""
                type="enum"
                elements="6"
-               options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,PositionVarioFPV,PositionVarioLOS,PositionVarioNSEW,ReturnToBase,Land,PathPlanner,POI,AutoCruise,PositionRoam"
+               options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,PositionVarioFPV,PositionVarioLOS,PositionVarioNSEW,ReturnToBase,Land,PathPlanner,POI,AutoCruise"
                defaultvalue="Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6"
                limits="\
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
+                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
+                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
+                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
+                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
+                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise:PositionRoam,\
+                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
@@ -112,7 +112,6 @@
         <field name="ReturnToBaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="10"/>
         <field name="LandingVelocity" units="m" type="float" elements="1" defaultvalue="0.4"/>
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="10,2"/>
-        <field name="PositionRoamStabiSelect" units="" type="enum" elements="1" options="Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6" defaultvalue="Stabilized1"/>
         <field name="PositionRoamBrakeRate" units="m/s2" type="float" elements="1" defaultvalue="1.8"/>
 	<!-- optimized for current vtolpathfollower,
 	     for fixed wing pathfollower set to Horizontal=500,Vertical=5 -->

@@ -36,6 +36,7 @@
 #include <manualcontrolsettings.h>
 #include <flightmodesettings.h>
 #include <systemsettings.h>
+#include <stabilizationsettings.h>
 #include <systemalarms.h>
 #include <revosettings.h>
 #include <positionstate.h>
@@ -52,7 +53,7 @@
 ****************************/
 
 // ! Check a stabilization mode switch position for safety
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool positionroam);
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted);
 
 /**
  * Run a preflight check over the hardware configuration
@@ -101,46 +102,46 @@ int32_t configuration_check()
     // modes
     uint8_t num_modes;
     uint8_t modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
+    uint8_t FlightModeGPSAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NUMELEM];
     ManualControlSettingsFlightModeNumberGet(&num_modes);
+    StabilizationSettingsFlightModeGPSAssistMapGet(FlightModeGPSAssistMap);
     FlightModeSettingsFlightModePositionGet(modes);
 
     for (uint32_t i = 0; i < num_modes; i++) {
+
+	uint8_t gps_assisted = FlightModeGPSAssistMap[i];
+	if (gps_assisted) {
+
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(multirotor);
+            ADDSEVERITY(navCapableFusion);
+	}
+
         switch (modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
             ADDSEVERITY(!multirotor);
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol, false));
+            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol, false));
+            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol, false));
+            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED4:
-            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol, false));
+            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED5:
-            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol, false));
+            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
-            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol, false));
+            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
             ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
             break;
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
-          {
-            // Check positionRoam's stabi-selected mode is ok
-            uint8_t positionRoamStabiSelect;
-            FlightModeSettingsPositionRoamStabiSelectGet(&positionRoamStabiSelect);
-            ADDSEVERITY(check_stabilization_settings((positionRoamStabiSelect+1), multirotor, coptercontrol, true));
-            ADDSEVERITY(!coptercontrol);
-            ADDSEVERITY(multirotor);
-            ADDSEVERITY(navCapableFusion);
-          }
-          break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
             // Revo supports PathPlanner and that must be OK or we are not sane
@@ -194,7 +195,7 @@ int32_t configuration_check()
  * @param[in] index Which stabilization mode to check
  * @returns true or false
  */
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool positionroam)
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted)
 {
     uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
@@ -232,7 +233,7 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
         }
     }
 
-    if (positionroam) {
+    if (gpsassisted) {
         // For multirotors verify that roll/pitch/yaw are not set to "none"
         for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
             if (! (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ATTITUDE ||

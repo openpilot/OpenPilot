@@ -905,15 +905,15 @@ build-info:
 
 .PHONY: source
 source:
-	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(BUILD_DIR)/source)"
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(SOURCE_DIR))"
 	$(V1) $(MKDIR) -p "$(SOURCE_DIR)"
 	$(V1) $(VERSION_INFO) \
 		--jsonpath="$(SOURCE_DIR)"
-	$(eval SOURCE_NAME := "$(SOURCE_DIR)/OpenPilot-$(shell git describe).tar")
+	$(eval SOURCE_NAME := $(call toprel, "$(SOURCE_DIR)/OpenPilot-$(shell git describe).tar"))
 	$(V1) git archive --prefix="OpenPilot/" -o "$(SOURCE_NAME)" HEAD
 	$(V1) tar --append --file="$(SOURCE_NAME)" \
 		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
-		"$(SOURCE_DIR)/version-info.json"
+		$(call toprel, "$(SOURCE_DIR)/version-info.json")
 	$(V1) gzip -f "$(SOURCE_NAME)"
 
 

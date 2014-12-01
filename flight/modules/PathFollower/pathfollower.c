@@ -110,8 +110,6 @@ static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
 static VtolPathFollowerSettingsData vtolPathFollowerSettings;
-static uint32_t positionroam_lastcalled;
-static float positionroam_braking_timeout = 0.0f;
 
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
@@ -186,8 +184,6 @@ int32_t PathFollowerInitialize()
     PathDesiredConnectCallback(SettingsUpdatedCb);
     AirspeedStateConnectCallback(airspeedStateUpdatedCb);
 
-    positionroam_lastcalled = PIOS_DELAY_GetuS();
-
     return 0;
 }
 MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
@@ -245,36 +241,6 @@ static void pathFollowerTask(void)
     }
     PathStatusSet(&pathStatus);
 
-    // TODO how much more can I put into PathDesired and PathStatus instead of
-    // FlightStatus for PositionRoamState.  Give we support a Brake mode now
-    // in PathDesired, PathStatus can have substates for PositionRoam
-    if (flightStatus.FlightModeGPSAssist  != FLIGHTSTATUS_FLIGHTMODEGPSASSIST_NONE &&
-     	flightStatus.PositionRoamState != FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD) {
-
-	// gps assisted and we are yet to change state to full position hold assistance mode
-        uint32_t positionroam_raw_time_now = PIOS_DELAY_GetuS();
-        uint32_t delta_time = positionroam_raw_time_now - positionroam_lastcalled;
-        float dT = (float)delta_time * 1.0e-6f;
-        if (dT > (((float)updatePeriod)/1000.0f) ) dT = ((float)updatePeriod)/1000.0f;
-        positionroam_lastcalled = positionroam_raw_time_now;
-
-        if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
-            // restart countdown value to ~5 seconds. This is a calculated value.
-            // The slower the initial velocity, the smaller this timeout gets
-            positionroam_braking_timeout = pathDesired.Timeout;
-            if (positionroam_braking_timeout < 1.0f) positionroam_braking_timeout = 1.0f;
-            flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER;
-            FlightStatusPositionRoamStateSet(&(flightStatus.PositionRoamState));
-        }
-        else if (flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKINGTIMER) {
-            positionroam_braking_timeout -= dT;
-            if ( positionroam_braking_timeout < 0.0f) {
-        	plan_setup_braking(true); // braking timeout true
-                flightStatus.PositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_POSITIONHOLD;
-                FlightStatusPositionRoamStateSet(&(flightStatus.PositionRoamState));
-            }
-        }
-    }
 
     PIOS_CALLBACKSCHEDULER_Schedule(pathFollowerCBInfo, updatePeriod, CALLBACK_UPDATEMODE_SOONER);
 }
@@ -462,6 +428,14 @@ static uint8_t updateAutoPilotVtol()
         updateVtolDesiredAttitudeEmergencyFallback();
     }
     break;
+    }
+
+
+    if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+        pathDesired.Timeout -= updatePeriod/1000.0f;
+        if (pathDesired.Timeout < 0.0f || pathStatus.fractional_progress > 0.90f) {
+        	plan_setup_braking(true); // braking timeout true
+        }
     }
 
     switch (returnmode) {
@@ -656,6 +630,10 @@ static void updatePathVelocity(float kFF, bool limited)
     VelocityStateGet(&velocityState);
 
     const float dT = updatePeriod / 1000.0f;
+
+    if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+	kFF = 0.0f;
+    }
 
     // look ahead kFF seconds
     float cur[3]   = { positionState.North + (velocityState.North * kFF),
@@ -1139,6 +1117,9 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         }
     }
 
+
+    //TODO We might want to avoid this for braking...
+
     if ( // emergency flyaway detection
         ( // integral already at its limit
             vtolPathFollowerSettings.HorizontalVelPID.ILimit - fabsf(global.PIDvel[0].iAccumulator) < 1e-6f ||
@@ -1168,6 +1149,9 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
                                eastCommand * cosf(DEG2RAD(attitudeState.Yaw)),
                                -vtolPathFollowerSettings.MaxRollPitch, vtolPathFollowerSettings.MaxRollPitch);
 
+
+    // For braking we shold override??
+
     if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
         // For now override thrust with manual control.  Disable at your risk, quad goes to China.
         ManualControlCommandData manualControl;
@@ -1175,6 +1159,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         stabDesired.Thrust = manualControl.Thrust;
     }
 
+    // rattitude ?
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     if (yaw_attitude) {

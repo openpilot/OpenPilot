@@ -164,19 +164,7 @@ void stabilizedHandler(bool newinit)
             0; // this is an invalid mode
     }
 
-    // Adjust thrust mode as required if position roam
-    if (flightStatus.PositionRoamState != FLIGHTSTATUS_POSITIONROAMSTATE_NONE) {
-        //   are we manual thrust in vtol?
-	if (flightStatus.PositionRoamThrustMode == FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MANUAL) {
-            stabilization.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
-	}
-	else {
-            stabilization.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEROAM;
-	}
-    }
-    else {
-        stabilization.StabilizationMode.Thrust = stab_settings[3];
-    }
+    stabilization.StabilizationMode.Thrust = stab_settings[3];
     stabilization.Thrust = cmd.Thrust;
     StabilizationDesiredSet(&stabilization);
 }

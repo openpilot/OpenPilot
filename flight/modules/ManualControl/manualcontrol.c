@@ -43,7 +43,6 @@
 #include <stabilizationdesired.h>
 #include <callbackinfo.h>
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-#include <vtolpathfollowersettings.h>
 #include <stabilizationsettings.h>
 #endif
 
@@ -162,7 +161,6 @@ int32_t ManualControlInitialize()
     FlightModeSettingsInitialize();
     SystemSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    VtolPathFollowerSettingsInitialize();
     StabilizationSettingsInitialize();
 #endif
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);
@@ -195,7 +193,6 @@ static void manualControlTask(void)
     uint8_t newMode  = flightStatus.FlightMode;
     uint8_t newFlightModeGPSAssist = flightStatus.FlightModeGPSAssist;
     uint8_t newPositionRoamState  = flightStatus.PositionRoamState;
-    uint8_t newPositionRoamThrustMode  = flightStatus.PositionRoamThrustMode;
     if (position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
         newMode = modeSettings.FlightModePosition[position];
     }
@@ -219,25 +216,13 @@ static void manualControlTask(void)
         if (newFlightModeGPSAssist) {
             if (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f) {
                 newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED;
-
-                // Check vtol thrust control and override if need be the thrust mode
-                // of the PositionRoamStabiSelect-ed option
-                VtolPathFollowerSettingsData vtolPathFollowerSettings;
-	        VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
-                if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
-                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MANUAL;
-                }
-                else { //auto thrust control requires altitude controlled throttle in the Stabi mode
-                    newPositionRoamThrustMode = FLIGHTSTATUS_POSITIONROAMTHRUSTMODE_MIXED;
-                }
             }
             else {
-
         	// ok sticks centered (pitch and roll is 0.0 exactly thanks to deadband code in receiver.c
         	// handler is pathfollower
         	handler = &handler_PATHFOLLOWER;
 
-        	// if existing state is none is previously stablised, initiate to braking
+        	// if existing state is none or previously stablised, initiate to braking
         	if ( flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_NONE ||
        	             flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED ) {
         	    newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
@@ -280,7 +265,6 @@ static void manualControlTask(void)
         flightStatus.FlightMode   = newMode;
         flightStatus.FlightModeGPSAssist = newFlightModeGPSAssist;
         flightStatus.PositionRoamState = newPositionRoamState;
-        flightStatus.PositionRoamThrustMode = newPositionRoamThrustMode;
         FlightStatusSet(&flightStatus);
         newinit = true;
     }

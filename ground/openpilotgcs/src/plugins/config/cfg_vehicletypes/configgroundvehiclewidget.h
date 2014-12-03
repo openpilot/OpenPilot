@@ -50,13 +50,17 @@ public:
     ~ConfigGroundVehicleWidget();
 
     virtual void refreshWidgetsValues(QString frameType);
+    virtual void initMixerCurves(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
 protected:
     void enableControls(bool enable);
+    void resizeEvent(QResizeEvent *);
+    void showEvent(QShowEvent *);
 
 private:
     Ui_GroundConfigWidget *m_aircraft;
+    QGraphicsSvgItem *m_vehicleImg;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);

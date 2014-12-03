@@ -105,11 +105,11 @@ static const controlHandler handler_PATHPLANNER = {
     },
     .handler           = &pathPlannerHandler,
 };
+static uint32_t thrustAtBrakeStart = 0.0f;
 
 #endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
-static uint32_t thrustAtBrakeStart = 0.0f;
 
 // Private functions
 static void configurationUpdatedCb(UAVObjEvent *ev);
@@ -188,8 +188,10 @@ static void manualControlTask(void)
     FlightStatusGet(&flightStatus);
     ManualControlCommandData cmd;
     ManualControlCommandGet(&cmd);
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     VtolPathFollowerSettingsData vtolPathFollowerSettings;
     VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
+#endif
 
     FlightModeSettingsData modeSettings;
     FlightModeSettingsGet(&modeSettings);
@@ -226,7 +228,7 @@ static void manualControlTask(void)
 
             // assess throttle state
             bool throttleNeutral = false;
-	    float throttleRangeDelta = vtolPathFollowerSettings.ThrustLimits.Neutral * 0.2f;
+	    float throttleRangeDelta = vtolPathFollowerSettings.ThrustLimits.Neutral * 0.35f;
 	    float throttleNeutralLow = vtolPathFollowerSettings.ThrustLimits.Neutral - throttleRangeDelta;
 	    float throttleNeutralHi = vtolPathFollowerSettings.ThrustLimits.Neutral + throttleRangeDelta;
 	    if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) throttleNeutral = true;

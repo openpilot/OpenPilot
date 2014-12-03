@@ -44,6 +44,7 @@
 #include <callbackinfo.h>
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <stabilizationsettings.h>
+#include <vtolpathfollowersettings.h>
 #endif
 
 // Private constants
@@ -108,13 +109,14 @@ static const controlHandler handler_PATHPLANNER = {
 #endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
+static uint32_t thrustAtBrakeStart;
 
 // Private functions
 static void configurationUpdatedCb(UAVObjEvent *ev);
 static void commandUpdatedCb(UAVObjEvent *ev);
 static void manualControlTask(void);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-static uint8_t isGPSAssistedFlightMode( uint8_t position);
+static uint8_t isAssistedFlightMode( uint8_t position);
 #endif
 
 #define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
@@ -162,6 +164,7 @@ int32_t ManualControlInitialize()
     SystemSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     StabilizationSettingsInitialize();
+    VtolPathFollowerSettingsInitialize();
 #endif
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);
 
@@ -185,14 +188,17 @@ static void manualControlTask(void)
     FlightStatusGet(&flightStatus);
     ManualControlCommandData cmd;
     ManualControlCommandGet(&cmd);
+    VtolPathFollowerSettingsData vtolPathFollowerSettings;
+    VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
 
     FlightModeSettingsData modeSettings;
     FlightModeSettingsGet(&modeSettings);
 
     uint8_t position = cmd.FlightModeSwitchPosition;
     uint8_t newMode  = flightStatus.FlightMode;
-    uint8_t newFlightModeGPSAssist = flightStatus.FlightModeGPSAssist;
-    uint8_t newPositionRoamState  = flightStatus.PositionRoamState;
+    uint8_t newFlightModeAssist = flightStatus.FlightModeAssist;
+    uint8_t newAssistedControlState  = flightStatus.AssistedControlState;
+    uint8_t newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_NONE;
     if (position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
         newMode = modeSettings.FlightModePosition[position];
     }
@@ -212,22 +218,74 @@ static void manualControlTask(void)
         handler = &handler_STABILIZED;
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-        newFlightModeGPSAssist = isGPSAssistedFlightMode( position );
-        if (newFlightModeGPSAssist) {
-            if (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f) {
-                newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED;
-            }
-            else {
-        	// ok sticks centered (pitch and roll is 0.0 exactly thanks to deadband code in receiver.c
-        	// handler is pathfollower
-        	handler = &handler_PATHFOLLOWER;
+        newFlightModeAssist = isAssistedFlightMode( position );
+        if (newFlightModeAssist) {
 
-        	// if existing state is none or previously stablised, initiate to braking
-        	if ( flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_NONE ||
-       	             flightStatus.PositionRoamState == FLIGHTSTATUS_POSITIONROAMSTATE_STABILIZED ) {
-        	    newPositionRoamState = FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING;
-        	}
+            // assess roll/pitch state
+            bool flagRollPitchHasInput = (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f);
+
+            // assess throttle state
+            bool throttleNeutral = false;
+	    float throttleRangeDelta = vtolPathFollowerSettings.ThrustLimits.Neutral * 0.2;
+	    float throttleNeutralLow = vtolPathFollowerSettings.ThrustLimits.Neutral - throttleRangeDelta;
+	    float throttleNeutralHi = vtolPathFollowerSettings.ThrustLimits.Neutral + throttleRangeDelta;
+	    if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) throttleNeutral = true;
+
+            uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
+            switch (flightStatus.AssistedThrottleState) {
+              case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO:
+        	if (throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOCENTERED;
+        	break;
+              case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOCENTERED:
+        	if (!throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+        	break;
             }
+
+            if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_VECTORMANUALTHRUST) {
+        	pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+            }
+
+	    switch (flightStatus.AssistedControlState) {
+		  case  FLIGHTSTATUS_ASSISTEDCONTROLSTATE_STABILIZED:
+		    if (!flagRollPitchHasInput) {
+			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKING;
+			newAssistedThrottleState = pathfollowerthrustmode;
+			handler = &handler_PATHFOLLOWER;
+			thrustAtBrakeStart = cmd.Throttle; // Thrust or throttle???
+		    }
+		    // otherwise stabi handler and manual thrust
+		    break;
+
+		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKING:
+		    if (flagRollPitchHasInput) { // sticks can easily override braking
+			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_STABILIZED;
+			newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+			// and stabi handler
+		    }
+		    else {
+			// when braking always auto throttle for this mode
+			newAssistedThrottleState = pathfollowerthrustmode;
+			handler = &handler_PATHFOLLOWER;
+			if (cmd.Throttle != thrustAtBrakeStart) newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+		    }
+		    break;
+
+		    // transition from braking to positionhold will retain throttle state in auto
+		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_POSITIONHOLD:
+		    if (throttleNeutral && flagRollPitchHasInput) { // need neutral to break from PH
+			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_STABILIZED;
+			newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+			// and stabi handler
+		    }
+		    else {
+
+			// need a scheme to revert to manual if centered
+			newAssistedThrottleState = pathfollowerthrustmode;
+			handler = &handler_PATHFOLLOWER;
+		    }
+		    break;
+	    }
+
         }
 #endif
         break;
@@ -259,12 +317,12 @@ static void manualControlTask(void)
     static bool firstRun = true;
 
     if (flightStatus.FlightMode != newMode || firstRun ||
-	newPositionRoamState != flightStatus.PositionRoamState) {
+	newAssistedControlState != flightStatus.AssistedControlState) {
         firstRun = false;
         flightStatus.ControlChain = handler->controlChain;
         flightStatus.FlightMode   = newMode;
-        flightStatus.FlightModeGPSAssist = newFlightModeGPSAssist;
-        flightStatus.PositionRoamState = newPositionRoamState;
+        flightStatus.FlightModeAssist = newFlightModeAssist; // TODO Where do I use this???
+        flightStatus.AssistedControlState = newAssistedControlState;
         FlightStatusSet(&flightStatus);
         newinit = true;
     }
@@ -294,19 +352,19 @@ static void commandUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
  * Check and set modes for gps assisted stablised flight modes
  */
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-static uint8_t isGPSAssistedFlightMode( uint8_t position)
+static uint8_t isAssistedFlightMode( uint8_t position)
 {
 
-    uint8_t isGPSAssistedFlag = STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NONE;
-    uint8_t FlightModeGPSAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NUMELEM];
+    uint8_t isAssistedFlag = STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE;
+    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
 
-    StabilizationSettingsFlightModeGPSAssistMapGet(FlightModeGPSAssistMap);
+    StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
 
-    if (position < STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NUMELEM) {
-        isGPSAssistedFlag = FlightModeGPSAssistMap[position];
+    if (position < STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM) {
+        isAssistedFlag = FlightModeAssistMap[position];
     }
 
-    return isGPSAssistedFlag;
+    return isAssistedFlag;
 }
 #endif
 

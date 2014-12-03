@@ -71,7 +71,7 @@ void plan_run_land();
 /**
  * @brief setup pathplanner/pathfollower for braking
  */
-void plan_setup_braking(uint8_t braking_timeout);
+void plan_setup_assistedcontrol(uint8_t timeout_occurred);
 
 /**
  * @brief setup pathfollower for positionvario

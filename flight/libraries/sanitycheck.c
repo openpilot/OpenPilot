@@ -102,19 +102,20 @@ int32_t configuration_check()
     // modes
     uint8_t num_modes;
     uint8_t modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
-    uint8_t FlightModeGPSAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEGPSASSISTMAP_NUMELEM];
+    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
     ManualControlSettingsFlightModeNumberGet(&num_modes);
-    StabilizationSettingsFlightModeGPSAssistMapGet(FlightModeGPSAssistMap);
+    StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
     FlightModeSettingsFlightModePositionGet(modes);
 
     for (uint32_t i = 0; i < num_modes; i++) {
 
-	uint8_t gps_assisted = FlightModeGPSAssistMap[i];
+	uint8_t gps_assisted = FlightModeAssistMap[i];
 	if (gps_assisted) {
 
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(multirotor);
             ADDSEVERITY(navCapableFusion);
+
 	}
 
         switch (modes[i]) {

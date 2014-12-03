@@ -56,9 +56,9 @@ void pathFollowerHandler(bool newinit)
     }
 
     uint8_t flightMode;
-    uint8_t positionRoamFlightMode;
+    uint8_t assistedControlFlightMode;
     FlightStatusFlightModeGet(&flightMode);
-    FlightStatusPositionRoamStateGet(&positionRoamFlightMode);
+    FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if (newinit) {
         // After not being in this mode for a while init at current height
@@ -92,9 +92,9 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
         case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
         case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-            if (positionRoamFlightMode == FLIGHTSTATUS_POSITIONROAMSTATE_BRAKING) {
+            if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKING) {
         	// Just initiated braking after returning from stabi control
-                plan_setup_braking(false);
+                plan_setup_assistedcontrol(false);
             }
             break;
 

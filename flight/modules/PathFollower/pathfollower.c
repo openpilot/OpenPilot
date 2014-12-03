@@ -1173,7 +1173,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
 
     if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL ||
-	flightStatus.FlightModeAssist && flightStatus.AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL ) {
+	(flightStatus.FlightModeAssist && flightStatus.AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) ) {
 	ManualControlCommandData manualControl;
 	ManualControlCommandGet(&manualControl);
         stabDesired.Thrust = manualControl.Thrust;

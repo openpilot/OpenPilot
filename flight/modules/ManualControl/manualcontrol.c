@@ -295,6 +295,16 @@ static void manualControlTask(void)
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+        newFlightModeAssist = isAssistedFlightMode( position );
+        if (newFlightModeAssist) {
+            newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
+            if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST) {
+	        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+            }
+            else {
+	        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO; // still gets overridden by vtol settings
+            }
+        }
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:

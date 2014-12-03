@@ -120,6 +120,7 @@ int32_t configuration_check()
 
         switch (modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
+            ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!multirotor);
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
@@ -141,6 +142,7 @@ int32_t configuration_check()
             ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
+            ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
@@ -151,9 +153,13 @@ int32_t configuration_check()
             SystemAlarmsAlarmData alarms;
             SystemAlarmsAlarmGet(&alarms);
             ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
+            ADDSEVERITY(!gps_assisted);
         }
-        // intentionally no break as this also needs pathfollower
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(navCapableFusion);
+            break;
+
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOFPV:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOLOS:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIONSEW:
@@ -161,6 +167,7 @@ int32_t configuration_check()
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
+            ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(navCapableFusion);
             break;

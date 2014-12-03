@@ -67,7 +67,13 @@ void pathFollowerHandler(bool newinit)
             plan_setup_returnToBase();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            plan_setup_positionHold();
+            if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE) {
+        	// Just initiated braking after returning from stabi control
+                plan_setup_assistedcontrol(false);
+            }
+            else {
+                plan_setup_positionHold();
+            }
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
             plan_setup_PositionVarioFPV();

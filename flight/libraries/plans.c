@@ -540,6 +540,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 	pathDesired.StartingVelocity = 0.0f;
 	pathDesired.EndingVelocity   = 0.0f;
 	pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+    	pathDesired.Timeout = 0.0f; // not applicable in this mode
     	assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_POSITIONHOLD ;
     } else {
 
@@ -555,7 +556,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
     	pathDesired.StartingVelocity = velocity;
     	pathDesired.EndingVelocity   = 0.0f;
     	pathDesired.Mode = PATHDESIRED_MODE_BRAKE;
-    	pathDesired.Timeout = time_to_stopped;
+    	pathDesired.Timeout = time_to_stopped; // only applicable in this mode
 	assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKING;
     }
     FlightStatusAssistedControlStateSet(&assistedControlFlightMode);

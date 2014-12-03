@@ -109,7 +109,7 @@ static const controlHandler handler_PATHPLANNER = {
 #endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
-static uint32_t thrustAtBrakeStart;
+static uint32_t thrustAtBrakeStart = 0.0f;
 
 // Private functions
 static void configurationUpdatedCb(UAVObjEvent *ev);
@@ -226,7 +226,7 @@ static void manualControlTask(void)
 
             // assess throttle state
             bool throttleNeutral = false;
-	    float throttleRangeDelta = vtolPathFollowerSettings.ThrustLimits.Neutral * 0.2;
+	    float throttleRangeDelta = vtolPathFollowerSettings.ThrustLimits.Neutral * 0.2f;
 	    float throttleNeutralLow = vtolPathFollowerSettings.ThrustLimits.Neutral - throttleRangeDelta;
 	    float throttleNeutralHi = vtolPathFollowerSettings.ThrustLimits.Neutral + throttleRangeDelta;
 	    if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) throttleNeutral = true;
@@ -251,7 +251,7 @@ static void manualControlTask(void)
 			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKING;
 			newAssistedThrottleState = pathfollowerthrustmode;
 			handler = &handler_PATHFOLLOWER;
-			thrustAtBrakeStart = cmd.Throttle; // Thrust or throttle???
+			thrustAtBrakeStart = cmd.Thrust;
 		    }
 		    // otherwise stabi handler and manual thrust
 		    break;
@@ -266,7 +266,10 @@ static void manualControlTask(void)
 			// when braking always auto throttle for this mode
 			newAssistedThrottleState = pathfollowerthrustmode;
 			handler = &handler_PATHFOLLOWER;
-			if (cmd.Throttle != thrustAtBrakeStart) newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+			// except if user adjusts thrust in which case revert to manual
+			float thrustLo = 0.95f * thrustAtBrakeStart;
+			float thrustHi = 1.05f * thrustAtBrakeStart;
+			if (cmd.Thrust < thrustLo || cmd.Thrust > thrustHi) newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
 		    }
 		    break;
 
@@ -317,12 +320,14 @@ static void manualControlTask(void)
     static bool firstRun = true;
 
     if (flightStatus.FlightMode != newMode || firstRun ||
-	newAssistedControlState != flightStatus.AssistedControlState) {
+	newAssistedControlState != flightStatus.AssistedControlState ||
+	flightStatus.AssistedThrottleState != newAssistedThrottleState) {
         firstRun = false;
         flightStatus.ControlChain = handler->controlChain;
         flightStatus.FlightMode   = newMode;
-        flightStatus.FlightModeAssist = newFlightModeAssist; // TODO Where do I use this???
+        flightStatus.FlightModeAssist = newFlightModeAssist;
         flightStatus.AssistedControlState = newAssistedControlState;
+        flightStatus.AssistedThrottleState = newAssistedThrottleState;
         FlightStatusSet(&flightStatus);
         newinit = true;
     }

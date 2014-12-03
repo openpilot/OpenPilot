@@ -71,4 +71,10 @@ void FixedWingPage::setupSelection(Selection *selection)
                           "supported. Setup should include only two elevons, and should explicitly not include a rudder."),
                        "elevon",
                        SetupWizard::FIXED_WING_ELEVON);
+
+    selection->addItem(tr("Vtail"),
+                       tr("This setup expects a traditional glider airframe using two independent aileron servos "
+                          "on their own channel (not connected by Y adapter) plus Vtail mixing elevator/rudder."),
+                       "vtail",
+                       SetupWizard::FIXED_WING_VTAIL);
 }

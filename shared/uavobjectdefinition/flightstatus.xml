@@ -6,9 +6,9 @@
 	<!-- Note these enumerated values should be the same as ManualControlSettings -->
         <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,PositionVarioFPV,PositionVarioLOS,PositionVarioNSEW,ReturnToBase,Land,PathPlanner,POI,AutoCruise"/>
         <!-- the options for FlightModeAssist needs to match the StablizationSettings' assist options -->
-        <field name="FlightModeAssist" units="" type="enum" elements="1" options="None,VectorManualThrust,VectorAutoThrust"/>
-        <field name="AssistedControlState" units="" type="enum" elements="1" options="Stabilized,Braking,PositionHold" defaultvalue="Stabilized"/>
-        <field name="AssistedThrottleState" units="" type="enum" elements="1" options="None,Auto,AutoCentered,Manual" defaultvalue="None"/>
+        <field name="FlightModeAssist" units="" type="enum" elements="1" options="None,GPSAssistManualThrust,GPSAssist"/>
+        <field name="AssistedControlState" units="" type="enum" elements="1" options="Primary,Brake,Hold" defaultvalue="Primary"/>
+        <field name="AssistedThrottleState" units="" type="enum" elements="1" options="Manual,Auto,AutoOverride" defaultvalue="Manual"/>
 
 	<field name="ControlChain" units="bool" type="enum" options="false,true">
 		<elementnames>

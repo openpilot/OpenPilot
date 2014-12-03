@@ -110,6 +110,7 @@ static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
 static VtolPathFollowerSettingsData vtolPathFollowerSettings;
+static FlightStatusData flightStatus;
 
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
@@ -194,8 +195,6 @@ MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
  */
 static void pathFollowerTask(void)
 {
-    FlightStatusData flightStatus;
-
     FlightStatusGet(&flightStatus);
 
     if (flightStatus.ControlChain.PathFollower != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
@@ -392,28 +391,39 @@ static uint8_t updateAutoPilotVtol()
         // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
         bool yaw_attitude = true;
         float yaw = 0.0f;
-        switch (vtolPathFollowerSettings.YawControl) {
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
-            yaw_attitude = false;
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
-            yaw = updateTailInBearing();
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
-            yaw = updateCourseBearing();
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
-            yaw = updatePathBearing();
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
-            yaw = updatePOIBearing();
-            break;
+
+        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+	      yaw_attitude = false;
+        }
+        else {
+	  switch (vtolPathFollowerSettings.YawControl) {
+	  case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
+	      yaw_attitude = false;
+	      break;
+	  case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
+	      yaw = updateTailInBearing();
+	      break;
+	  case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
+	      yaw = updateCourseBearing();
+	      break;
+	  case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
+	      yaw = updatePathBearing();
+	      break;
+	  case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
+	      yaw = updatePOIBearing();
+	      break;
+	  }
         }
         result = updateVtolDesiredAttitude(yaw_attitude, yaw);
 
-        // switch to emergency follower if follower indicates problems
-        if (!result && (vtolPathFollowerSettings.FlyawayEmergencyFallback != VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DISABLED)) {
-            global.vtolEmergencyFallbackSwitch = true;
+        if (!result) {
+            if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+        	plan_setup_assistedcontrol(true); // revert braking to position hold, user can always stick override
+            }
+            else if (vtolPathFollowerSettings.FlyawayEmergencyFallback != VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DISABLED) {
+                // switch to emergency follower if follower indicates problems
+                global.vtolEmergencyFallbackSwitch = true;
+            }
         }
     }
     break;
@@ -431,10 +441,16 @@ static uint8_t updateAutoPilotVtol()
     }
 
 
+    // Brake mode end condition checks
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         pathDesired.Timeout -= updatePeriod/1000.0f;
-        if (pathDesired.Timeout < 0.0f || pathStatus.fractional_progress > 0.90f) {
-        	plan_setup_braking(true); // braking timeout true
+        PathDesiredTimeoutSet(&pathDesired.Timeout);
+        if (pathDesired.Timeout < 0.0f ||
+            pathStatus.fractional_progress > 0.90f ||
+            pathStatus.error > 5.0f ) {
+                // this will update mode to true position hold
+	        // pathdesired mode will be fly to endpoint
+        	plan_setup_assistedcontrol(true); // braking timeout true
         }
     }
 
@@ -1078,18 +1094,18 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     AttitudeStateGet(&attitudeState);
     StabilizationBankGet(&stabSettings);
 
-    // Testing code - refactor into manual control command
-    ManualControlCommandData manualControlData;
-    ManualControlCommandGet(&manualControlData);
 
-    // scale velocity if it is above configured maximum
-    float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
-    if (velH > vtolPathFollowerSettings.HorizontalVelMax) {
-        velocityDesired.North *= vtolPathFollowerSettings.HorizontalVelMax / velH;
-        velocityDesired.East  *= vtolPathFollowerSettings.HorizontalVelMax / velH;
-    }
-    if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings.VerticalVelMax) {
-        velocityDesired.Down *= vtolPathFollowerSettings.VerticalVelMax / fabsf(velocityDesired.Down);
+    if (pathDesired.Mode != PATHDESIRED_MODE_BRAKE) {
+      // scale velocity if it is above configured maximum
+      // for braking, we can not help it if initial velocity was greater
+      float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
+      if (velH > vtolPathFollowerSettings.HorizontalVelMax) {
+	  velocityDesired.North *= vtolPathFollowerSettings.HorizontalVelMax / velH;
+	  velocityDesired.East  *= vtolPathFollowerSettings.HorizontalVelMax / velH;
+      }
+      if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings.VerticalVelMax) {
+	  velocityDesired.Down *= vtolPathFollowerSettings.VerticalVelMax / fabsf(velocityDesired.Down);
+      }
     }
 
     // Compute desired north command
@@ -1106,6 +1122,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     downError    = -downError;
     downCommand  = pid_apply(&global.PIDvel[2], downError, dT);
 
+    // Generally in braking the downError will be an increased altitude.  We really will rely on cruisecontrol to backoff.
     stabDesired.Thrust = boundf(downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
 
 
@@ -1117,8 +1134,6 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         }
     }
 
-
-    //TODO We might want to avoid this for braking...
 
     if ( // emergency flyaway detection
         ( // integral already at its limit
@@ -1142,24 +1157,28 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
     // craft should move similarly for 5 deg roll versus 5 deg pitch
+
+    float maxPitch =  vtolPathFollowerSettings.MaxRollPitch;
+    if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+	maxPitch = vtolPathFollowerSettings.MaxBrakePitch;
+    }
+
     stabDesired.Pitch = boundf(-northCommand * cosf(DEG2RAD(attitudeState.Yaw)) +
                                -eastCommand * sinf(DEG2RAD(attitudeState.Yaw)),
-                               -vtolPathFollowerSettings.MaxRollPitch, vtolPathFollowerSettings.MaxRollPitch);
+                               -maxPitch, maxPitch);
     stabDesired.Roll  = boundf(-northCommand * sinf(DEG2RAD(attitudeState.Yaw)) +
                                eastCommand * cosf(DEG2RAD(attitudeState.Yaw)),
-                               -vtolPathFollowerSettings.MaxRollPitch, vtolPathFollowerSettings.MaxRollPitch);
+                               -maxPitch, maxPitch);
 
 
-    // For braking we shold override??
 
-    if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
-        // For now override thrust with manual control.  Disable at your risk, quad goes to China.
-        ManualControlCommandData manualControl;
-        ManualControlCommandGet(&manualControl);
+    if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL ||
+	flightStatus.FlightModeAssist && flightStatus.AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL ) {
+	ManualControlCommandData manualControl;
+	ManualControlCommandGet(&manualControl);
         stabDesired.Thrust = manualControl.Thrust;
     }
 
-    // rattitude ?
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     if (yaw_attitude) {
@@ -1167,7 +1186,9 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         stabDesired.Yaw = yaw_direction;
     } else {
         stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
-        stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControlData.Yaw;
+	ManualControlCommandData manualControl;
+	ManualControlCommandGet(&manualControl);
+        stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
     }
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL;
     StabilizationDesiredSet(&stabDesired);

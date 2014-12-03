@@ -253,9 +253,6 @@ static void stabilizationOuterloopTask()
             case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO:
                 rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEVARIO, reinit);
                 break;
-            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEROAM:
-                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEROAM, reinit);
-                break;
 #endif /* REVOLUTION */
             case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
             default:

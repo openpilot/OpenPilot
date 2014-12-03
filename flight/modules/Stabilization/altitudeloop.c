@@ -58,7 +58,6 @@ static DelayedCallbackInfo *altitudeHoldCBInfo;
 static AltitudeHoldSettingsData altitudeHoldSettings;
 static struct pid pid0, pid1;
 static ThrustModeType thrustMode;
-static AltitudeHoldStatusAltitudeRoamThrustModeOptions altitudeRoamThrustMode;
 static PiOSDeltatimeConfig timeval;
 static float thrustSetpoint = 0.0f;
 static float thrustDemand   = 0.0f;
@@ -104,35 +103,6 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
         thrustDemand   = 0.0f;
         thrustMode     = DIRECT;
         newaltitude    = true;
-    } else if (mode == ALTITUDEROAM) {
-
-        thrustMode     = ALTITUDEROAM;
-
-        if (setpoint > DEADBAND_HIGH) {
-            // Change to direct submode of AltitudeRoam
-            thrustSetpoint = setpoint;
-            thrustDemand = setpoint;
-            altitudeRoamThrustMode = ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_DIRECT;
-            newaltitude    = false;
-        }
-        else if (setpoint < DEADBAND_LOW) {
-            // Change to vario-low submode of AltitudeRoam
-            thrustSetpoint = -(-(thrustExp * powf((DEADBAND_LOW - (setpoint < 0 ? 0 : setpoint)) / DEADBAND_LOW, 3) + (255 - thrustExp) * (DEADBAND_LOW - setpoint) / DEADBAND_LOW) / 255 * thrustRate);
-            altitudeRoamThrustMode = ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_VARIO;
-            newaltitude    = true;
-        } else if (altitudeRoamThrustMode != ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_HOLD) {
-            // Re-initialise to a hold submode of AltitudeRoam
-            altitudeRoamThrustMode = ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_HOLD;
-            startThrust = setpoint;
-            pid_zero(&pid0);
-            pid_zero(&pid1);
-            newaltitude = true;
-        } else if (newaltitude == true) {
-            thrustSetpoint = posState.Down;
-            newaltitude    = false;
-        }
-
-
     } else if (mode == ALTITUDEVARIO && setpoint > DEADBAND_HIGH) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
@@ -202,22 +172,6 @@ static void altitudeHoldTask(void)
     case ALTITUDEVARIO:
         altitudeHoldStatus.VelocityDesired = thrustSetpoint;
         break;
-    case ALTITUDEROAM:
-        altitudeHoldStatus.AltitudeRoamThrustMode = altitudeRoamThrustMode;
-        switch (altitudeRoamThrustMode) {
-          case ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_HOLD:
-            // altitude control loop
-            altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, &scaler, thrustSetpoint, positionStateDown, dT);
-            break;
-          case ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_DIRECT:
-          case ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_VARIO:
-            altitudeHoldStatus.VelocityDesired = thrustSetpoint;
-            break;
-          default:
-            altitudeHoldStatus.VelocityDesired = 0;
-            break;
-        }
-        break;
     default:
         altitudeHoldStatus.VelocityDesired = 0;
         break;
@@ -227,7 +181,7 @@ static void altitudeHoldTask(void)
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
-    if (thrustMode == DIRECT || (thrustMode == ALTITUDEROAM && altitudeRoamThrustMode == ALTITUDEHOLDSTATUS_ALTITUDEROAMTHRUSTMODE_DIRECT)) {
+    if (thrustMode == DIRECT ) {
         thrustDemand = thrustSetpoint;
     }
     else {

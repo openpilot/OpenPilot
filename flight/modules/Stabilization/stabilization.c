@@ -174,10 +174,6 @@ static void StabilizationDesiredUpdatedCb(__attribute__((unused)) UAVObjEvent *e
             StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
             StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
             break;
-        case STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEROAM:
-            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEROAM;
-            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
-            break;
         }
     }
     StabilizationStatusSet(&status);

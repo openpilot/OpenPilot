@@ -79,9 +79,11 @@ $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowe
 SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER CLEAN_BUILD
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
-# Make sure this isn't being run as root (no whoami on Windows, but that is ok here)
+# Make sure this isn't being run as root unless installing (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
-    $(error You should not be running this as root)
+    ifneq ($(MAKECMDGOALS), install)
+        $(error You should not be running this as root)
+    endif
 endif
 
 # Decide on a verbosity level based on the V= parameter
@@ -924,6 +926,46 @@ dist:
 
 ##############################
 #
+# Install OpenPilot
+#
+##############################
+prefix  := /usr/local
+bindir  := $(prefix)/bin
+libdir  := $(prefix)/lib
+datadir := $(prefix)/share
+
+INSTALL = cp -a --no-preserve=ownership
+LN = ln
+LN_S = ln -s
+
+ifeq ($(MAKECMDGOALS), install)
+        ifneq ($(UNAME), Linux)
+            $(error install only supported for Linux)
+        endif
+endif
+
+
+.PHONY: install
+install:
+	@$(ECHO) " INSTALLING TO $(DESTDIR)/)"
+	$(V1) $(MKDIR) -p $(DESTDIR)$(bindir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/applications
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/pixmaps
+	$(V1) $(MKDIR) -p $(DESTDIR)$(udevdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/openpilotgcs.bin $(DESTDIR)$(bindir)/openpilot-gcs
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/udp_test $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/openpilotgcs $(DESTDIR)$(libdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/share/openpilotgcs $(DESTDIR)$(datadir)
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps
+	$(V1) rm $(DESTDIR)/$(datadir)/openpilotgcs/translations/Makefile
+
+
+
+##############################
+#
 # Help message, the default Makefile goal
 #
 ##############################
@@ -1058,6 +1100,7 @@ help:
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
 	@$(ECHO) "     dist                 - Generate source archive for distribution"
+	@$(ECHO) "     install              - Install to \"DESTDIR\" with prefix \"prefix\" (Linux only)"
 	@$(ECHO)
 	@$(ECHO) "   [Code Formatting]"
 	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code according to the project's standards"

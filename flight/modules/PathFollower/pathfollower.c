@@ -105,8 +105,6 @@ struct Globals {
 struct NeutralThrustEstimation {
   uint32_t count;
   float sum;
-  float min;
-  float max;
   float average;
   float correction;
   float algo_erro_check;
@@ -327,8 +325,6 @@ static void resetGlobals()
     neutralThrustEst.start_sampling = false;
     neutralThrustEst.count = 0;
     neutralThrustEst.sum = 0.0f;
-    neutralThrustEst.min = 0.0f;
-    neutralThrustEst.max = 0.0f;
     neutralThrustEst.have_correction = false;
     neutralThrustEst.average = 0.0f;
     neutralThrustEst.correction = 0.0f;
@@ -1168,8 +1164,6 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 	    if (neutralThrustEst.start_sampling) {
 		neutralThrustEst.count++;
 		neutralThrustEst.sum += downCommand;
-		if (downCommand < neutralThrustEst.min)  neutralThrustEst.min = downCommand;
-		if (downCommand > neutralThrustEst.max)  neutralThrustEst.max = downCommand;
 
 		if (neutralThrustEst.count == 60) {
 		    // 3 seconds have past
@@ -1211,8 +1205,6 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 		neutralThrustEst.start_sampling = true;
 		neutralThrustEst.count = 0;
 		neutralThrustEst.sum = 0.0f;
-		neutralThrustEst.min = 0.0f;
-		neutralThrustEst.max = 0.0f;
 	    }
 	}
 	else {

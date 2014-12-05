@@ -47,6 +47,7 @@ export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DI
 export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
+export SOURCE_DIR  := $(ROOT_DIR)/build/source
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -65,9 +66,13 @@ $(if $(filter-out undefined,$(origin $(1))),
 )
 endef
 
-# These specific variables can influence gcc in unexpected (and undesirable) ways
+# These specific variables can influence compilation in unexpected (and undesirable) ways
+# gcc flags
 SANITIZE_GCC_VARS := TMPDIR GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH
-SANITIZE_GCC_VARS += CFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# preprocessor flags
+SANITIZE_GCC_VARS += CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# make flags
+SANITIZE_GCC_VARS += CFLAGS CXXFLAGS CPPFLAGS LDFLAGS LDLIBS
 $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowed)))
 
 # These specific variables used to be valid but now they make no sense
@@ -898,6 +903,27 @@ build-info:
 
 ##############################
 #
+# Source for distribution
+#
+##############################
+
+.PHONY: source
+source:
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(SOURCE_DIR))"
+	$(V1) $(MKDIR) -p "$(SOURCE_DIR)"
+	$(V1) $(VERSION_INFO) \
+		--jsonpath="$(SOURCE_DIR)"
+	$(eval SOURCE_NAME := $(call toprel, "$(SOURCE_DIR)/OpenPilot-$(shell git describe).tar"))
+	$(V1) git archive --prefix="OpenPilot/" -o "$(SOURCE_NAME)" HEAD
+	$(V1) tar --append --file="$(SOURCE_NAME)" \
+		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
+		$(call toprel, "$(SOURCE_DIR)/version-info.json")
+	$(V1) gzip -f "$(SOURCE_NAME)"
+
+
+
+##############################
+#
 # Help message, the default Makefile goal
 #
 ##############################
@@ -1031,6 +1057,7 @@ help:
 	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
+	@$(ECHO) "     source               - Generate source archive for distribution"
 	@$(ECHO)
 	@$(ECHO) "   [Code Formatting]"
 	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code according to the project's standards"

@@ -133,7 +133,9 @@ static void PIOS_DSM_Bind(struct pios_dsm_dev *dsm_dev, uint8_t bind)
     GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 
     /* Wait until the bind window opens. */
-    while(PIOS_DELAY_GetuS() < DSM_BIND_MIN_DELAY_US);
+    while (PIOS_DELAY_GetuS() < DSM_BIND_MIN_DELAY_US) {
+        ;
+    }
 
     for (int i = 0; i < bind; i++) {
         /* RX line, drive low for 120us */

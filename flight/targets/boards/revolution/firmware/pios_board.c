@@ -359,7 +359,6 @@ static void PIOS_Board_PPM_callback(const int16_t *channels)
 
 void PIOS_Board_Init(void)
 {
-
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
 #if defined(PIOS_INCLUDE_LED)

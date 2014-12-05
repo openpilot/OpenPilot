@@ -1,0 +1,13 @@
+<xml>
+    <object name="Adjustments" singleinstance="true" settings="false" category="Navigation">
+        <description>Automatically calculated adjustments to parameters used into auto flight modes. Can come from @ref PathFollower </description>
+
+	<field name="NeutralThrustOffset" units="" type="float" elements="1" defaultvalue="0"/>
+	<field name="NeutralThrustAlgoError" units="" type="float" elements="1" defaultvalue="0"/>
+
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

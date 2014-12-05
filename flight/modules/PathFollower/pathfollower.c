@@ -74,6 +74,7 @@
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
 #include <stabilizationbank.h>
+#include <adjustments.h>
 
 
 // Private constants
@@ -100,6 +101,19 @@ struct Globals {
     float vtolEmergencyFallback;
     bool  vtolEmergencyFallbackSwitch;
 };
+
+struct NeutralThrustEstimation {
+  uint32_t count;
+  float sum;
+  float min;
+  float max;
+  float average;
+  float correction;
+  float algo_erro_check;
+  bool start_sampling;
+  bool have_correction;
+};
+static struct NeutralThrustEstimation neutralThrustEst;
 
 
 // Private variables
@@ -174,6 +188,8 @@ int32_t PathFollowerInitialize()
     ManualControlCommandInitialize();
     SystemSettingsInitialize();
     StabilizationBankInitialize();
+    AdjustmentsInitialize();
+
 
     // reset integrals
     resetGlobals();
@@ -305,6 +321,17 @@ static void resetGlobals()
     global.poiRadius = 0.0f;
     global.vtolEmergencyFallback = 0;
     global.vtolEmergencyFallbackSwitch = false;
+
+    // reset neutral thrust assessment. We restart this process
+    // and do once for each position hold engagement
+    neutralThrustEst.start_sampling = false;
+    neutralThrustEst.count = 0;
+    neutralThrustEst.sum = 0.0f;
+    neutralThrustEst.min = 0.0f;
+    neutralThrustEst.max = 0.0f;
+    neutralThrustEst.have_correction = false;
+    neutralThrustEst.average = 0.0f;
+    neutralThrustEst.correction = 0.0f;
 }
 
 static uint8_t updateAutoPilotByFrameType()
@@ -1076,6 +1103,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     AttitudeStateData attitudeState;
     StabilizationBankData stabSettings;
     SystemSettingsData systemSettings;
+    AdjustmentsData adjustments;
 
     float northError;
     float northCommand;
@@ -1093,6 +1121,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     VelocityDesiredGet(&velocityDesired);
     AttitudeStateGet(&attitudeState);
     StabilizationBankGet(&stabSettings);
+    AdjustmentsGet(&adjustments);
 
 
     if (pathDesired.Mode != PATHDESIRED_MODE_BRAKE) {
@@ -1122,8 +1151,78 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     downError    = -downError;
     downCommand  = pid_apply(&global.PIDvel[2], downError, dT);
 
+    if (neutralThrustEst.have_correction != true) {
+	// reassess the correction value for this position hold period if not already done
+
+	// Assess if position hold state running
+	bool ph_active =
+	    ( (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD  &&
+			      flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) ||
+	    (flightStatus.FlightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE  &&
+			      flightStatus.AssistedControlState == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD) );
+
+	bool stable = (fabsf(velocityDesired.Down) < 0.1f && fabsf(velocityState.Down) < 0.1f && fabsf(downError) < 0.2f);
+
+	if (ph_active && stable) {
+
+	    if (neutralThrustEst.start_sampling) {
+		neutralThrustEst.count++;
+		neutralThrustEst.sum += downCommand;
+		if (downCommand < neutralThrustEst.min)  neutralThrustEst.min = downCommand;
+		if (downCommand > neutralThrustEst.max)  neutralThrustEst.max = downCommand;
+
+		if (neutralThrustEst.count == 60) {
+		    // 3 seconds have past
+		    // lets take an average
+		    neutralThrustEst.average = neutralThrustEst.sum/60.0f;
+
+		    // Let the size of the correction to something reasonable.  The largest
+		    float checked_average = neutralThrustEst.average;
+		    if (checked_average > 0.2f) checked_average = 0.2f;
+		    else if (checked_average < -0.2f) checked_average = -0.2f;
+
+		    // We always limit the correction to the size of the current i term
+		    float iterm = global.PIDvel[2].iAccumulator/1000.0f;
+		    if (fabsf(checked_average) > fabsf(iterm)) {
+			neutralThrustEst.correction = iterm;
+			global.PIDvel[2].iAccumulator = 0.0f;
+		    }
+		    else {
+			neutralThrustEst.correction = checked_average;
+			global.PIDvel[2].iAccumulator -= neutralThrustEst.correction * 1000.0f;
+
+		    }
+		    // recalculate downCommand now that i is adjusted
+		    float new_downCommand  = pid_apply(&global.PIDvel[2], downError, 0.0f);  // we generally don't have a d controller
+		    neutralThrustEst.algo_erro_check = (new_downCommand + neutralThrustEst.correction) - downCommand;
+		    downCommand = new_downCommand;
+		    neutralThrustEst.start_sampling = false;
+		    neutralThrustEst.have_correction = true;
+
+		    // Write a new adjustment value
+		    adjustments.NeutralThrustOffset = neutralThrustEst.correction;
+		    adjustments.NeutralThrustAlgoError = neutralThrustEst.algo_erro_check;
+		    AdjustmentsNeutralThrustOffsetSet(&adjustments.NeutralThrustOffset);
+		    AdjustmentsNeutralThrustAlgoErrorSet(&adjustments.NeutralThrustAlgoError);
+		}
+	    }
+	    else {
+		// start a tick count
+		neutralThrustEst.start_sampling = true;
+		neutralThrustEst.count = 0;
+		neutralThrustEst.sum = 0.0f;
+		neutralThrustEst.min = 0.0f;
+		neutralThrustEst.max = 0.0f;
+	    }
+	}
+	else {
+	    // reset sampling as we did't get 3 continuous seconds
+	    neutralThrustEst.start_sampling = false;
+	}
+    } //else we already have a correction for this PH run
+
     // Generally in braking the downError will be an increased altitude.  We really will rely on cruisecontrol to backoff.
-    stabDesired.Thrust = boundf(downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
+    stabDesired.Thrust = boundf(adjustments.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
 
 
     // DEBUG HACK: allow user to skew compass on purpose to see if emergency failsafe kicks in
@@ -1177,6 +1276,10 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 	ManualControlCommandData manualControl;
 	ManualControlCommandGet(&manualControl);
         stabDesired.Thrust = manualControl.Thrust;
+    }
+    else {
+	// When in auto throttle for 0 downward velocity and 0ish distance error,
+	// keep a running average for throttle neutral
     }
 
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

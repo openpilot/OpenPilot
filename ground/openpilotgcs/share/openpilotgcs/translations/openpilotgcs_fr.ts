@@ -10460,13 +10460,13 @@ Voulez-vous toujours continuer ?</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+1177"/>
+        <location line="+1176"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1176"/>
+        <location line="-1175"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
@@ -10658,8 +10658,8 @@ Move the %1 stick.</source>
 Bougez le manche %1.</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Next/Skip</source>
+        <location line="+6"/>
+        <source>Next / Skip</source>
         <translation>Suivant / Sauter</translation>
     </message>
     <message>
@@ -11246,7 +11246,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Échoué !</translation>
     </message>
     <message>
-        <location line="+131"/>
+        <location line="+136"/>
         <source>Writing External Mag sensor settings</source>
         <translation>Écriture paramètres Compas Externe</translation>
     </message>
@@ -14613,7 +14613,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation>Résumé d&apos;informations sur le Véhicule.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.cpp" line="+119"/>
+        <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.cpp" line="+120"/>
         <source>Name of Vehicle: </source>
         <translation>Nom du Véhicule : </translation>
     </message>

@@ -329,7 +329,7 @@ int ConfigVehicleTypeWidget::frameCategory(QString frameType)
         return ConfigVehicleTypeWidget::HELICOPTER;
     } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
                || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
-               || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
+               || frameType == "GroundVehicleMotorcycle" || frameType == "Motorcycle") {
         return ConfigVehicleTypeWidget::GROUND;
     } else {
         return ConfigVehicleTypeWidget::CUSTOM;

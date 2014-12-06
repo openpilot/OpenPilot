@@ -109,9 +109,6 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
                 elementsToShow << "quad-p";
                 break;
-            case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
-                elementsToShow << "quad-h";
-                break;
             case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
                 elementsToShow << "hexa";
                 break;
@@ -138,6 +135,9 @@ void ConnectionDiagram::setupGraphicsScene()
                 break;
             case VehicleConfigurationSource::FIXED_WING_ELEVON:
                 elementsToShow << "elevon";
+                break;
+            case VehicleConfigurationSource::FIXED_WING_VTAIL:
+                elementsToShow << "vtail";
                 break;
             default:
                 break;

@@ -100,9 +100,9 @@
 
 #define DSM_CHANNELS_PER_FRAME 7
 #define DSM_FRAME_LENGTH       (1 + 1 + DSM_CHANNELS_PER_FRAME * 2)
-#define DSM_DSM2_RES_MASK      0x0010
 #define DSM_2ND_FRAME_MASK     0x8000
-
+/* lower this value as needed if your satellite requires less delay to enter binding. */
+#define DSM_BIND_MIN_DELAY_US  90000
 /*
  * Include lost frame counter and provide it as a last channel value
  * for debugging. Currently is not used by the receiver layer.

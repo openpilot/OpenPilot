@@ -4,7 +4,7 @@
     "controller": "Revolution",
     "esc": "KISS 2-4S 18A",
     "motor": "Multistar ELITE 2204-2300kv",
-    "name": "RD290 Mini Hex  (fpv-reconn.com)",
+    "name": "RD290 Mini Hex",
     "nick": "liftbag",
     "objects": [
         {

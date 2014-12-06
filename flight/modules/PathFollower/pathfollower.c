@@ -60,6 +60,7 @@
 #include <fixedwingpathfollowersettings.h>
 #include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
+#include <groundpathfollowersettings.h>
 #include <flightstatus.h>
 #include <pathstatus.h>
 #include <positionstate.h>
@@ -95,6 +96,7 @@ struct Globals {
     struct pid PIDcourse;
     struct pid PIDspeed;
     struct pid PIDpower;
+    struct pid PIDgndspeed;
     float poiRadius;
     float vtolEmergencyFallback;
     bool  vtolEmergencyFallbackSwitch;
@@ -109,6 +111,7 @@ static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
 static VtolPathFollowerSettingsData vtolPathFollowerSettings;
+static GroundPathFollowerSettingsData groundPathFollowerSettings;
 
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
@@ -121,6 +124,7 @@ static void SettingsUpdatedCb(UAVObjEvent *ev);
 static uint8_t updateAutoPilotByFrameType();
 static uint8_t updateAutoPilotFixedWing();
 static uint8_t updateAutoPilotVtol();
+static uint8_t updateAutoPilotGround();
 static float updateTailInBearing();
 static float updateCourseBearing();
 static float updatePathBearing();
@@ -131,6 +135,7 @@ static uint8_t updateFixedDesiredAttitude();
 static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction);
 static void updateFixedAttitude();
 static void updateVtolDesiredAttitudeEmergencyFallback();
+static uint8_t updateGroundDesiredAttitude();
 static void airspeedStateUpdatedCb(UAVObjEvent *ev);
 static bool correctCourse(float *C, float *V, float *F, float s);
 
@@ -215,6 +220,10 @@ static void pathFollowerTask(void)
     case PATHDESIRED_MODE_FLYVECTOR:
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
     case PATHDESIRED_MODE_FLYCIRCLELEFT:
+    case PATHDESIRED_MODE_DRIVEENDPOINT:
+    case PATHDESIRED_MODE_DRIVEVECTOR:
+    case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
+    case PATHDESIRED_MODE_DRIVECIRCLELEFT:
     {
         uint8_t result = updateAutoPilotByFrameType();
         if (result) {
@@ -258,6 +267,10 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     pid_configure(&global.PIDvel[1], vtolPathFollowerSettings.HorizontalVelPID.Kp, vtolPathFollowerSettings.HorizontalVelPID.Ki, vtolPathFollowerSettings.HorizontalVelPID.Kd, vtolPathFollowerSettings.HorizontalVelPID.ILimit);
     pid_configure(&global.PIDvel[2], vtolPathFollowerSettings.VerticalVelPID.Kp, vtolPathFollowerSettings.VerticalVelPID.Ki, vtolPathFollowerSettings.VerticalVelPID.Kd, vtolPathFollowerSettings.VerticalVelPID.ILimit);
 
+    GroundPathFollowerSettingsGet(&groundPathFollowerSettings);
+
+    pid_configure(&global.PIDgndspeed, groundPathFollowerSettings.SpeedPI.Kp, groundPathFollowerSettings.SpeedPI.Ki, 0.0f, groundPathFollowerSettings.SpeedPI.ILimit);
+
     PathDesiredGet(&pathDesired);
 }
 
@@ -300,6 +313,7 @@ static void resetGlobals()
     pid_zero(&global.PIDcourse);
     pid_zero(&global.PIDspeed);
     pid_zero(&global.PIDpower);
+    pid_zero(&global.PIDgndspeed);
     global.poiRadius = 0.0f;
     global.vtolEmergencyFallback = 0;
     global.vtolEmergencyFallbackSwitch = false;
@@ -309,13 +323,16 @@ static uint8_t updateAutoPilotByFrameType()
 {
     FrameType_t frameType = GetCurrentFrameType();
 
-    if (frameType == FRAME_TYPE_CUSTOM || frameType == FRAME_TYPE_GROUND) {
+    if (frameType == FRAME_TYPE_CUSTOM) {
         switch (vtolPathFollowerSettings.TreatCustomCraftAs) {
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
             frameType = FRAME_TYPE_FIXED_WING;
             break;
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
             frameType = FRAME_TYPE_MULTIROTOR;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
+            frameType = FRAME_TYPE_GROUND;
             break;
         }
     }
@@ -324,6 +341,11 @@ static uint8_t updateAutoPilotByFrameType()
     case FRAME_TYPE_HELI:
         updatePeriod = vtolPathFollowerSettings.UpdatePeriod;
         return updateAutoPilotVtol();
+
+        break;
+    case FRAME_TYPE_GROUND:
+        updatePeriod = groundPathFollowerSettings.UpdatePeriod;
+        return updateAutoPilotGround();
 
         break;
     case FRAME_TYPE_FIXED_WING:
@@ -437,6 +459,20 @@ static uint8_t updateAutoPilotVtol()
     }
 }
 
+/**
+ * fixed wing autopilot:
+ * straight forward:
+ * 1. update path velocity for limited motion crafts
+ * 2. update attitude according to default fixed wing pathfollower algorithm
+ */
+static uint8_t updateAutoPilotGround()
+{
+    pid_configure(&global.PIDposH[0], groundPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    pid_configure(&global.PIDposH[1], groundPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    pid_configure(&global.PIDposV, 0.0f, 0.0f, 0.0f, 0.0f);
+    updatePathVelocity(fixedWingPathFollowerSettings.CourseFeedForward, true);
+    return updateGroundDesiredAttitude();
+}
 
 /**
  * Compute bearing of current takeoff location
@@ -1216,6 +1252,44 @@ static void updateVtolDesiredAttitudeEmergencyFallback()
     StabilizationDesiredSet(&stabDesired);
 }
 
+/**
+ * Compute desired attitude for ground vehicles
+ */
+static uint8_t updateGroundDesiredAttitude()
+{
+    const float dT = updatePeriod / 1000.0f;
+
+    VelocityDesiredData velocityDesired;
+    VelocityStateData velocityState;
+    StabilizationDesiredData stabDesired;
+
+    VelocityStateGet(&velocityState);
+    VelocityDesiredGet(&velocityDesired);
+
+    float courseCommand;
+    float speedError;
+    float speedCommand;
+
+    courseCommand      = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North));
+
+    speedError         = sqrtf(squaref(velocityDesired.East) + squaref(velocityDesired.North)) - sqrtf(squaref(velocityState.East) + squaref(velocityState.North));
+
+    speedCommand       = pid_apply(&global.PIDgndspeed, speedError, dT);
+
+    stabDesired.Roll   = 0.0f;
+    stabDesired.Pitch  = 0.0f;
+    stabDesired.Yaw    = courseCommand;
+
+    stabDesired.Thrust = boundf(speedCommand + groundPathFollowerSettings.ThrustLimit.Neutral, groundPathFollowerSettings.ThrustLimit.Min, groundPathFollowerSettings.ThrustLimit.Max);
+
+    stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.Pitch  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.Yaw    = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
+    StabilizationDesiredSet(&stabDesired);
+
+    return 1;
+}
 
 /**
  * Compute desired attitude from a fixed preset

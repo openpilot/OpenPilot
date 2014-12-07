@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       surfacepage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
  * @addtogroup SurfacePage
@@ -26,17 +26,47 @@
  */
 
 #include "surfacepage.h"
-#include "ui_surfacepage.h"
+#include "setupwizard.h"
 
 SurfacePage::SurfacePage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
-    ui(new Ui::SurfacePage)
-{
-    ui->setupUi(this);
-    setFinalPage(true);
-}
+    SelectionPage(wizard, QString(":/setupwizard/resources/ground-shapes-wizard-no-numbers.svg"), parent)
+{}
 
 SurfacePage::~SurfacePage()
+{}
+
+void SurfacePage::initializePage(VehicleConfigurationSource *settings)
 {
-    delete ui;
+    Q_UNUSED(settings);
+}
+
+bool SurfacePage::validatePage(SelectionItem *selectedItem)
+{
+    getWizard()->setVehicleSubType((SetupWizard::VEHICLE_SUB_TYPE)selectedItem->id());
+    return true;
+}
+
+void SurfacePage::setupSelection(Selection *selection)
+{
+    selection->setTitle(tr("OpenPilot Ground Vehicle Configuration"));
+    selection->setText(tr("This part of the wizard will set up the OpenPilot controller for use with a ground "
+                          "vehicle utilizing servos. The wizard supports the most common types of ground vehicle, "
+                          "other variants can be configured by using customconfiguration options in the "
+                          "Configuration plugin in the GCS.\n\n"
+                          "Please select the type of ground vehicle you want to create a configuration for below:"));
+
+    selection->addItem(tr("Car"),
+                       tr("This setup expects a traditional car a rear motor and a front streering servo"),
+                       "car",
+                       SetupWizard::GROUNDVEHICLE_CAR);
+
+    selection->addItem(tr("Tank"),
+                       tr("This setup expects a traditional vehicle using only two motors and differential steering"),
+                       "tank",
+                       SetupWizard::GROUNDVEHICLE_DIFFERENTIAL);
+
+    selection->addItem(tr("Motorcycle"),
+                       tr("This setup currently expects a motorcyle setup, using one motor and one servo for steering."),
+                       "motorbike",
+                       SetupWizard::GROUNDVEHICLE_MOTORCYCLE);
 }

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       multipage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       selectionpage.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup MultiPage
+ * @addtogroup SelectionPage
  * @{
  * @brief
  *****************************************************************************/

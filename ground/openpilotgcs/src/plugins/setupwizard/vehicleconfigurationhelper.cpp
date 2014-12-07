@@ -335,9 +335,25 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
     case VehicleConfigurationSource::VEHICLE_HELI:
         // TODO: Implement settings for Helis
         break;
+
     case VehicleConfigurationSource::VEHICLE_SURFACE:
-        // TODO: Implement settings for Surface
+    {
+        switch (m_configSource->getVehicleSubType()) {
+        case VehicleConfigurationSource::GROUNDVEHICLE_CAR:
+            setupCar();
+            break;
+        case VehicleConfigurationSource::GROUNDVEHICLE_DIFFERENTIAL:
+            setupTank();
+            break;
+        case VehicleConfigurationSource::GROUNDVEHICLE_MOTORCYCLE:
+            setupMotorcycle();
+            break;
+        default:
+            break;
+        }
         break;
+    }
+
     default:
         break;
     }
@@ -475,8 +491,36 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         break;
 
     case VehicleConfigurationSource::VEHICLE_SURFACE:
-        // TODO: Implement settings for ground vehicle types
+    {
+        ActuatorSettings::DataFields data = actSettings->getData();
+
+        QList<actuatorChannelSettings> actuatorSettings = m_configSource->getActuatorSettings();
+        for (quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
+            data.ChannelType[i]    = ActuatorSettings::CHANNELTYPE_PWM;
+            data.ChannelAddr[i]    = i;
+            data.ChannelMin[i]     = actuatorSettings[i].channelMin;
+            data.ChannelNeutral[i] = actuatorSettings[i].channelNeutral;
+            data.ChannelMax[i]     = actuatorSettings[i].channelMax;
+        }
+
+        for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
+            data.ChannelUpdateFreq[i] = servoFrequence;
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                if (i == 1) {
+                    data.ChannelUpdateFreq[i] = escFrequence;
+                }
+            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                if (i == 2) {
+                    data.ChannelUpdateFreq[i] = escFrequence;
+                }
+            }
+        }
+
+        actSettings->setData(data);
+        addModifiedObject(actSettings, tr("Writing actuator settings"));
+
         break;
+    }
 
     default:
         break;
@@ -635,6 +679,9 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         }
     }
 
+    // Default maxThrottle
+    float maxThrottle = 0.9;
+
     // Save mixer values for sliders
     switch (m_configSource->getVehicleType()) {
     case VehicleConfigurationSource::VEHICLE_MULTI:
@@ -682,13 +729,44 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         mSettings->setMixerValueRoll(100);
         mSettings->setMixerValuePitch(100);
         mSettings->setMixerValueYaw(100);
+        maxThrottle = 1;
         break;
     case VehicleConfigurationSource::VEHICLE_HELI:
-    case VehicleConfigurationSource::VEHICLE_SURFACE:
-        // TODO: Implement mixer / sliders settings for other vehicle types?
         break;
+    case VehicleConfigurationSource::VEHICLE_SURFACE:
+    {
+        switch (m_configSource->getVehicleSubType()) {
+        case VehicleConfigurationSource::GROUNDVEHICLE_MOTORCYCLE:
+        case VehicleConfigurationSource::GROUNDVEHICLE_CAR:
+            mSettings->setMixerValueRoll(100);
+            mSettings->setMixerValuePitch(100);
+            mSettings->setMixerValueYaw(100);
+            maxThrottle = 1;
+            break;
+        case VehicleConfigurationSource::GROUNDVEHICLE_DIFFERENTIAL:
+            mSettings->setMixerValueRoll(100);
+            mSettings->setMixerValuePitch(100);
+            mSettings->setMixerValueYaw(100);
+            maxThrottle = 0.8;
+            break;
+        default:
+            break;
+        }
+    }
+
+    break;
     default:
         break;
+    }
+
+    // Apply Throttle curve max 90% for Multis, 100% for FixedWing/car/Motorbike, 80% for Tank
+    QString throttlePattern = "ThrottleCurve%1";
+    for (int i = 1; i <= 2; i++) {
+        UAVObjectField *field = mSettings->getField(throttlePattern.arg(i));
+        Q_ASSERT(field);
+        for (quint32 i = 0; i < field->getNumElements(); i++) {
+            field->setValue(i * (maxThrottle / (field->getNumElements() - 1)), i);
+        }
     }
 
     // Apply updates
@@ -891,7 +969,7 @@ void VehicleConfigurationHelper::resetVehicleConfig()
     for (int i = 1; i <= 2; i++) {
         UAVObjectField *field = mSettings->getField(throttlePattern.arg(i));
         Q_ASSERT(field);
-        // Wizard support only Multirotors - Set default curve with 90% max
+        // Set default curve at 90% max for Multirotors
         for (quint32 i = 0; i < field->getNumElements(); i++) {
             field->setValue(i * (0.9f / (field->getNumElements() - 1)), i);
         }
@@ -1928,4 +2006,109 @@ void VehicleConfigurationHelper::setupVtail()
 
     applyMixerConfiguration(channels);
     applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL, guiSettings);
+}
+
+/*
+ *
+ * Ground vehicles
+ *
+ */
+
+void VehicleConfigurationHelper::setupCar()
+{
+    // Typical vehicle setup
+    // 1. Setup mixer data
+    // 2. Setup GUI data
+    // 3. Apply changes
+
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+
+    // Steering Servo (Chan 1)
+    channels[0].type      = MIXER_TYPE_SERVO;
+    channels[0].throttle1 = 0;
+    channels[0].throttle2 = 0;
+    channels[0].roll      = 0;
+    channels[0].pitch     = 0;
+    channels[0].yaw       = 100;
+
+    // Motor (Chan 2)
+    channels[1].type      = MIXER_TYPE_MOTOR;
+    channels[1].throttle1 = 0;
+    channels[1].throttle2 = 100;
+    channels[1].roll      = 0;
+    channels[1].pitch     = 0;
+    channels[1].yaw       = 0;
+
+    guiSettings.ground.GroundVehicleSteering1 = 1;
+    guiSettings.ground.GroundVehicleThrottle2 = 2;
+
+    applyMixerConfiguration(channels);
+    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR, guiSettings);
+}
+
+void VehicleConfigurationHelper::setupTank()
+{
+    // Typical vehicle setup
+    // 1. Setup mixer data
+    // 2. Setup GUI data
+    // 3. Apply changes
+
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+
+    // Left Motor (Chan 1)
+    channels[0].type      = MIXER_TYPE_SERVO;
+    channels[0].throttle1 = 0;
+    channels[0].throttle2 = 100;
+    channels[0].roll      = 0;
+    channels[0].pitch     = 0;
+    channels[0].yaw       = 100;
+
+    // Right Motor (Chan 2)
+    channels[1].type      = MIXER_TYPE_MOTOR;
+    channels[1].throttle1 = 0;
+    channels[1].throttle2 = 100;
+    channels[1].roll      = 0;
+    channels[1].pitch     = 0;
+    channels[1].yaw       = -100;
+
+    guiSettings.ground.GroundVehicleThrottle1 = 1;
+    guiSettings.ground.GroundVehicleThrottle2 = 2;
+
+    applyMixerConfiguration(channels);
+    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL, guiSettings);
+}
+
+void VehicleConfigurationHelper::setupMotorcycle()
+{
+    // Typical vehicle setup
+    // 1. Setup mixer data
+    // 2. Setup GUI data
+    // 3. Apply changes
+
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+
+    // Steering Servo (Chan 1)
+    channels[0].type      = MIXER_TYPE_SERVO;
+    channels[0].throttle1 = 0;
+    channels[0].throttle2 = 0;
+    channels[0].roll      = 0;
+    channels[0].pitch     = 0;
+    channels[0].yaw       = 100;
+
+    // Motor (Chan 2)
+    channels[1].type      = MIXER_TYPE_MOTOR;
+    channels[1].throttle1 = 0;
+    channels[1].throttle2 = 100;
+    channels[1].roll      = 0;
+    channels[1].pitch     = 0;
+    channels[1].yaw       = 0;
+
+    guiSettings.ground.GroundVehicleSteering1 = 1;
+    guiSettings.ground.GroundVehicleThrottle2 = 2;
+
+    applyMixerConfiguration(channels);
+    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE, guiSettings);
 }

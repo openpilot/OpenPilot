@@ -32,6 +32,7 @@
 
 const QString OutputCalibrationPage::MULTI_SVG_FILE     = QString(":/setupwizard/resources/multirotor-shapes.svg");
 const QString OutputCalibrationPage::FIXEDWING_SVG_FILE = QString(":/setupwizard/resources/fixedwing-shapes-wizard.svg");
+const QString OutputCalibrationPage::GROUND_SVG_FILE    = QString(":/setupwizard/resources/ground-shapes-wizard.svg");
 
 OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent), ui(new Ui::OutputCalibrationPage), m_vehicleBoundsItem(0),
@@ -216,6 +217,42 @@ void OutputCalibrationPage::setupVehicle()
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
+
+    // Ground vehicles
+    case SetupWizard::GROUNDVEHICLE_CAR:
+        loadSVGFile(GROUND_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 2;
+        m_vehicleElementIds << "car" << "car-frame" << "car-motor" << "car-steering";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2;
+        m_channelIndex << 0 << 1 << 0;
+
+        setupActuatorMinMaxAndNeutral(0, 1, 2);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+    case SetupWizard::GROUNDVEHICLE_DIFFERENTIAL:
+        loadSVGFile(GROUND_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 1;
+        m_vehicleElementIds << "tank" << "tank-frame" << "tank-left-motor" << "tank-right-motor";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2;
+        m_channelIndex << 0 << 1 << 0;
+
+        setupActuatorMinMaxAndNeutral(0, 1, 2);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+    case SetupWizard::GROUNDVEHICLE_MOTORCYCLE:
+        loadSVGFile(GROUND_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 2;
+        m_vehicleElementIds << "motorbike" << "motorbike-frame" << "motorbike-motor" << "motorbike-steering";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2;
+        m_channelIndex << 0 << 1 << 0;
+
+        setupActuatorMinMaxAndNeutral(0, 1, 2);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+
     default:
         break;
     }

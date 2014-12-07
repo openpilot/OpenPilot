@@ -131,7 +131,12 @@ int SetupWizard::nextId() const
         return PAGE_ESC;
 
     case PAGE_FIXEDWING:
-        return PAGE_SERVO;
+    case PAGE_SURFACE:
+        if (getVehicleSubType() == GROUNDVEHICLE_DIFFERENTIAL) {
+            return PAGE_ESC;
+        } else {
+            return PAGE_SERVO;
+        }
 
     case PAGE_INPUT:
         if (isRestartNeeded()) {
@@ -333,6 +338,24 @@ QString SetupWizard::getSummaryText()
         break;
     case VEHICLE_SURFACE:
         summary.append(tr("Surface vehicle"));
+
+        summary.append("<br>");
+        summary.append("<b>").append(tr("Vehicle sub type: ")).append("</b>");
+        switch (getVehicleSubType()) {
+        case SetupWizard::GROUNDVEHICLE_CAR:
+            summary.append(tr("Car"));
+            break;
+        case SetupWizard::GROUNDVEHICLE_DIFFERENTIAL:
+            summary.append(tr("Tank"));
+            break;
+        case SetupWizard::GROUNDVEHICLE_MOTORCYCLE:
+            summary.append(tr("Motorcycle"));
+            break;
+        default:
+            summary.append(tr("Unknown"));
+            break;
+        }
+
         break;
     default:
         summary.append(tr("Unknown"));
@@ -371,7 +394,8 @@ QString SetupWizard::getSummaryText()
     }
 
     // If Tricopter show tail servo speed
-    if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING) {
+    if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING
+        || getVehicleSubType() == GROUNDVEHICLE_MOTORCYCLE || getVehicleSubType() == GROUNDVEHICLE_CAR) {
         summary.append("<br>");
         summary.append("<b>").append(tr("Servo type: ")).append("</b>");
         switch (getServoType()) {

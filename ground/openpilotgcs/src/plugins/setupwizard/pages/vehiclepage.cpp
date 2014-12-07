@@ -51,6 +51,7 @@ bool VehiclePage::validatePage()
         getWizard()->setVehicleType(SetupWizard::VEHICLE_HELI);
     } else if (ui->surfaceButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_SURFACE);
+        getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     } else {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_UNKNOWN);
     }

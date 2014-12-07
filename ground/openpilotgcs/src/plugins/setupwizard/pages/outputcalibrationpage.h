@@ -103,6 +103,7 @@ private:
 
     static const QString MULTI_SVG_FILE;
     static const QString FIXEDWING_SVG_FILE;
+    static const QString GROUND_SVG_FILE;
 };
 
 #endif // OUTPUTCALIBRATIONPAGE_H

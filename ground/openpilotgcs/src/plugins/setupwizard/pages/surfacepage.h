@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       surfacepage.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
  * @addtogroup SurfacePage
@@ -28,21 +28,19 @@
 #ifndef SURFACEPAGE_H
 #define SURFACEPAGE_H
 
-#include "abstractwizardpage.h"
+#include "selectionpage.h"
 
-namespace Ui {
-class SurfacePage;
-}
-
-class SurfacePage : public AbstractWizardPage {
+class SurfacePage : public SelectionPage {
     Q_OBJECT
 
 public:
     explicit SurfacePage(SetupWizard *wizard, QWidget *parent = 0);
     ~SurfacePage();
 
-private:
-    Ui::SurfacePage *ui;
+protected:
+    void initializePage(VehicleConfigurationSource *settings);
+    bool validatePage(SelectionItem *selectedItem);
+    void setupSelection(Selection *selection);
 };
 
 #endif // SURFACEPAGE_H

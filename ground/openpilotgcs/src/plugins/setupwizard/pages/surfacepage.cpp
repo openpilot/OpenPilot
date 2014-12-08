@@ -51,12 +51,12 @@ void SurfacePage::setupSelection(Selection *selection)
     selection->setTitle(tr("OpenPilot Ground Vehicle Configuration"));
     selection->setText(tr("This part of the wizard will set up the OpenPilot controller for use with a ground "
                           "vehicle utilizing servos. The wizard supports the most common types of ground vehicle, "
-                          "other variants can be configured by using customconfiguration options in the "
+                          "other variants can be configured by using custom configuration options in the "
                           "Configuration plugin in the GCS.\n\n"
                           "Please select the type of ground vehicle you want to create a configuration for below:"));
 
     selection->addItem(tr("Car"),
-                       tr("This setup expects a traditional car a rear motor and a front streering servo"),
+                       tr("This setup expects a traditional car with a rear motor and a front streering servo"),
                        "car",
                        SetupWizard::GROUNDVEHICLE_CAR);
 

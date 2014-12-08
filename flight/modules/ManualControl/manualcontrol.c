@@ -228,29 +228,22 @@ static void manualControlTask(void)
 
             // assess throttle state
             bool throttleNeutral = false;
+            // TODO Add in adjustments
 	    float throttleRangeDelta = vtolPathFollowerSettings.ThrustLimits.Neutral * 0.35f;
 	    float throttleNeutralLow = vtolPathFollowerSettings.ThrustLimits.Neutral - throttleRangeDelta;
 	    float throttleNeutralHi = vtolPathFollowerSettings.ThrustLimits.Neutral + throttleRangeDelta;
 	    if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) throttleNeutral = true;
 
-            uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
-            switch (flightStatus.AssistedThrottleState) {
-              case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO:
-        	if (throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE;
-        	break;
-              case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE:
-        	if (!throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-        	break;
-            }
-
-            if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST) {
-        	pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-            }
-
 	    switch (flightStatus.AssistedControlState) {
 		  case  FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
 		    if (!flagRollPitchHasInput) {
 			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
+
+			uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
+			if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST) {
+			    pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+			}
+
 			newAssistedThrottleState = pathfollowerthrustmode;
 			handler = &handler_PATHFOLLOWER;
 			thrustAtBrakeStart = cmd.Thrust;
@@ -265,6 +258,10 @@ static void manualControlTask(void)
 			// and stabi handler
 		    }
 		    else {
+			uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
+			if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST) {
+			    pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+			}
 			// when braking always auto throttle for this mode
 			newAssistedThrottleState = pathfollowerthrustmode;
 			handler = &handler_PATHFOLLOWER;
@@ -277,17 +274,44 @@ static void manualControlTask(void)
 
 		    // transition from braking to positionhold will retain throttle state in auto
 		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD:
-		    if (throttleNeutral && flagRollPitchHasInput) { // need neutral to break from PH
-			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
-			newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-			// and stabi handler
+
+		    if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST) {
+
+			if (flagRollPitchHasInput) { // need neutral to break from PH
+			    newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+			    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+			    // and stabi handler
+		        }
+		        else {
+		            newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+		            handler = &handler_PATHFOLLOWER;
+			}
 		    }
 		    else {
 
-			// need a scheme to revert to manual if centered
-			newAssistedThrottleState = pathfollowerthrustmode;
-			handler = &handler_PATHFOLLOWER;
+			if (throttleNeutral && flagRollPitchHasInput) { // need neutral to break from PH
+			    newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+			    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+			    // and stabi handler
+			}
+			else {
+			    uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
+			    switch (flightStatus.AssistedThrottleState) {
+			      case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO:
+				if (throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE;
+				break;
+			      case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE:
+				if (!throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+				break;
+			    }
+
+			    newAssistedThrottleState = pathfollowerthrustmode;
+			    handler = &handler_PATHFOLLOWER;
+			}
+
 		    }
+
+
 		    break;
 	    }
 

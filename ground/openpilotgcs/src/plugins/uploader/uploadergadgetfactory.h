@@ -49,9 +49,11 @@ public:
     bool isAutoUpdateCapable();
 private:
     bool isautocapable;
+
 signals:
-    void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
+    void autoUpdateSignal(uploader::ProgressStep, QVariant);
     void autoUpdate(bool erase);
+    void reboot();
 };
 
 #endif // UPLOADERGADGETFACTORY_H

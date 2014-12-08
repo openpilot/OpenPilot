@@ -91,6 +91,19 @@ private:
     int result;
 };
 
+class ResultEventLoop : public QEventLoop {
+    Q_OBJECT
+public:
+    int run(int millisTimout);
+
+public slots:
+    void success();
+    void fail();
+
+private:
+    QTimer m_timer;
+};
+
 class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
     Q_OBJECT
 
@@ -100,6 +113,7 @@ public:
 
     static const int BOARD_EVENT_TIMEOUT;
     static const int AUTOUPDATE_CLOSE_TIMEOUT;
+    static const int AUTOUPDATE_TIMEOUT;
 
     void log(QString str);
     bool autoUpdateCapable();
@@ -114,9 +128,13 @@ public slots:
     void autoUpdateFlashProgress(int);
 
 signals:
-    void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
-    void boardHalted();
-    void boardBooted();
+    void progressUpdate(uploader::ProgressStep, QVariant);
+    void bootloaderFailed();
+    void bootloaderSuccess();
+    void bootFailed();
+    void bootSuccess();
+    void autoUpdateFailed();
+    void autoUpdateSuccess();
 
 private:
     Ui_UploaderWidget *m_config;
@@ -154,7 +172,7 @@ private slots:
     bool autoUpdate(bool erase);
     void finishAutoUpdate();
     void closeAutoUpdate();
-    void autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value);
+    void autoUpdateStatus(uploader::ProgressStep status, QVariant value);
 };
 
 #endif // UPLOADERGADGETWIDGET_H

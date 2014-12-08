@@ -17,7 +17,7 @@ AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     Q_ASSERT(uploader);
     connect(ui->startUpdate, SIGNAL(clicked()), this, SLOT(disableButtons()));
     connect(ui->startUpdate, SIGNAL(clicked()), this, SLOT(autoUpdate()));
-    connect(uploader, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(updateStatus(uploader::AutoUpdateStep, QVariant)));
+    connect(uploader, SIGNAL(autoUpdateSignal(uploader::ProgressStep, QVariant)), this, SLOT(updateStatus(uploader::ProgressStep, QVariant)));
 }
 
 AutoUpdatePage::~AutoUpdatePage()
@@ -44,7 +44,7 @@ void AutoUpdatePage::autoUpdate()
     uploader->autoUpdate(ui->eraseSettings->isChecked());
 }
 
-void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant value)
+void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
 {
     QString msg;
 

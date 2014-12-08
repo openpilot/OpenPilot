@@ -46,7 +46,7 @@ public:
     ~AutoUpdatePage();
 
 private slots:
-    void updateStatus(uploader::AutoUpdateStep, QVariant);
+    void updateStatus(uploader::ProgressStep, QVariant);
     void disableButtons()
     {
         enableButtons(false);

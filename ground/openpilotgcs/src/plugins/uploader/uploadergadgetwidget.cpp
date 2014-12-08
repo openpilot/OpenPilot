@@ -46,7 +46,7 @@
 
 const int UploaderGadgetWidget::BOARD_EVENT_TIMEOUT = 20000;
 const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
-const int UploaderGadgetWidget::AUTOUPDATE_TIMEOUT = 60000;
+const int UploaderGadgetWidget::AUTOUPDATE_TIMEOUT  = 60000;
 
 TimedDialog::TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent, Qt::WindowFlags flags) :
     QProgressDialog(labelText, tr("Cancel"), 0, timeout, parent, flags), bar(new QProgressBar(this))
@@ -619,6 +619,7 @@ bool UploaderGadgetWidget::autoUpdateCapable()
 bool UploaderGadgetWidget::autoUpdate(bool erase)
 {
     ResultEventLoop eventLoop;
+
     connect(this, SIGNAL(bootloaderSuccess()), &eventLoop, SLOT(success()));
     connect(this, SIGNAL(bootloaderFailed()), &eventLoop, SLOT(fail()));
 
@@ -641,7 +642,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     emit progressUpdate(JUMP_TO_BL, QVariant());
 
     if (!dfu->enterDFU(0) || !dfu->findDevices() ||
-            (dfu->numberOfDevices != 1) || dfu->numberOfDevices > 5) {
+        (dfu->numberOfDevices != 1) || dfu->numberOfDevices > 5) {
         delete dfu;
         dfu = NULL;
         cm->resumePolling();
@@ -1053,17 +1054,20 @@ int UploaderGadgetWidget::cannotResetMessageBox()
 }
 
 
-int ResultEventLoop::run(int millisTimout) {
+int ResultEventLoop::run(int millisTimout)
+{
     m_timer.singleShot(millisTimout, this, SLOT(fail()));
     return exec();
 }
 
-void ResultEventLoop::success() {
+void ResultEventLoop::success()
+{
     m_timer.stop();
     exit(0);
 }
 
-void ResultEventLoop::fail() {
+void ResultEventLoop::fail()
+{
     m_timer.stop();
     exit(-1);
 }

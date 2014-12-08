@@ -38,6 +38,7 @@ void AutoUpdatePage::enableButtons(bool enable = false)
 void AutoUpdatePage::autoUpdate()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pm);
     UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
     Q_ASSERT(uploader);

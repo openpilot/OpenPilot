@@ -27,6 +27,10 @@
 
 #include "rebootpage.h"
 #include "ui_rebootpage.h"
+#include <extensionsystem/pluginmanager.h>
+#include <uavobjectutil/uavobjectutilmanager.h>
+#include <extensionsystem/pluginmanager.h>
+#include "uploader/uploadergadgetfactory.h"
 
 RebootPage::RebootPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
@@ -35,6 +39,11 @@ RebootPage::RebootPage(SetupWizard *wizard, QWidget *parent) :
     ui->setupUi(this);
     ui->yellowLabel->setVisible(false);
     ui->redLabel->setVisible(true);
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(uploader);
+    connect(ui->rebootButton, SIGNAL(clicked()), uploader, SIGNAL(reboot()));
 }
 
 RebootPage::~RebootPage()

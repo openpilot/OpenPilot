@@ -235,7 +235,7 @@ void OutputCalibrationPage::setupVehicle()
         m_wizardIndexes << 0 << 1 << 1;
         m_vehicleElementIds << "tank" << "tank-frame" << "tank-left-motor" << "tank-right-motor";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2;
-        m_channelIndex << 0 << 1 << 0;
+        m_channelIndex << 0 << 0 << 1;
 
         setupActuatorMinMaxAndNeutral(0, 1, 2);
 

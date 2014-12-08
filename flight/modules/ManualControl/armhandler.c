@@ -278,9 +278,9 @@ static bool okToArm(void)
 
     StabilizationDesiredStabilizationModeData stabDesired;
 
-    uint8_t flightMode;
-    FlightStatusFlightModeGet(&flightMode);
-    switch (flightMode) {
+    FlightStatusData flightStatus;
+    FlightStatusGet(&flightStatus);
+    switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
@@ -293,9 +293,16 @@ static bool okToArm(void)
         if (stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEHOLD ||
             stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO) {
             return false;
-        } else {
-            return true;
         }
+
+        // avoid assisted control with auto throttle.  As it sits waiting to launch,
+        // it will move to hold, and auto thrust will auto launch otherwise!
+        if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST) {
+            return false;
+        }
+
+        return true;
+
         break;
 
     default:

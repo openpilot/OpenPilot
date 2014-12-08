@@ -242,7 +242,7 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     }
 
     if (gpsassisted) {
-        // For multirotors verify that roll/pitch/yaw are not set to "none"
+        // For multirotors verify that roll/pitch are either attitude or rattitude
         for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
             if (! (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ATTITUDE ||
         	   modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATTITUDE)   ) {

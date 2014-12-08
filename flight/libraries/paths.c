@@ -162,7 +162,7 @@ static void path_vector(PathDesiredData *path, float *cur_point, struct path_sta
 
     if (dist_path > 1e-6f) {
         // Compute direction to travel & progress
-        status->fractional_progress = dot / (dist_path * dist_path);
+        status->fractional_progress = fabsf( dot / (dist_path * dist_path));
     } else {
         // Fly towards the endpoint to prevent flying away,
         // but assume progress=1 either way.

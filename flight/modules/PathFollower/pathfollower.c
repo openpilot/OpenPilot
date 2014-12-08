@@ -224,6 +224,8 @@ static void pathFollowerTask(void)
 
     pathStatus.UID    = pathDesired.UID;
     pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
+    pathStatus.path_time += updatePeriod / 1000.0f;
+
     switch (pathDesired.Mode) {
     case PATHDESIRED_MODE_FLYENDPOINT:
     case PATHDESIRED_MODE_FLYVECTOR:
@@ -328,6 +330,8 @@ static void resetGlobals()
     neutralThrustEst.have_correction = false;
     neutralThrustEst.average = 0.0f;
     neutralThrustEst.correction = 0.0f;
+
+    pathStatus.path_time = 0.0f;
 }
 
 static uint8_t updateAutoPilotByFrameType()
@@ -466,10 +470,9 @@ static uint8_t updateAutoPilotVtol()
 
     // Brake mode end condition checks
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
-        pathDesired.Timeout -= updatePeriod/1000.0f;
-        PathDesiredTimeoutSet(&pathDesired.Timeout);
-        if (pathDesired.Timeout < 0.0f ||
-            pathStatus.fractional_progress > 0.90f ||
+        if (pathStatus.path_time > pathDesired.Timeout  ||
+            pathStatus.fractional_progress > 0.99f ||
+            pathStatus.fractional_progress < 0.0f ||
             pathStatus.error > 5.0f ) {
                 // this will update mode to true position hold
 	        // pathdesired mode will be fly to endpoint
@@ -1092,6 +1095,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 {
     const float dT = updatePeriod / 1000.0f;
     uint8_t result = 1;
+    bool manual_thrust = false;
 
     VelocityDesiredData velocityDesired;
     VelocityStateData velocityState;
@@ -1147,7 +1151,14 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     downError    = -downError;
     downCommand  = pid_apply(&global.PIDvel[2], downError, dT);
 
-    if (neutralThrustEst.have_correction != true) {
+
+    if ((vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL &&
+	flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE ) ||
+	(flightStatus.FlightModeAssist && flightStatus.AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) ) {
+	manual_thrust = true;
+    }
+
+    if (!manual_thrust && neutralThrustEst.have_correction != true) {
 	// reassess the correction value for this position hold period if not already done
 
 	// Assess if position hold state running
@@ -1157,7 +1168,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 	    (flightStatus.FlightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE  &&
 			      flightStatus.AssistedControlState == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD) );
 
-	bool stable = (fabsf(velocityDesired.Down) < 0.1f && fabsf(velocityState.Down) < 0.1f && fabsf(downError) < 0.2f);
+	bool stable = (fabsf(velocityDesired.Down) < 0.2f && fabsf(velocityState.Down) < 0.2f && fabsf(downError) < 0.2f);
 
 	if (ph_active && stable) {
 
@@ -1165,7 +1176,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 		neutralThrustEst.count++;
 		neutralThrustEst.sum += downCommand;
 
-		if (neutralThrustEst.count == 60) {
+		if (neutralThrustEst.count >= 60) {
 		    // 3 seconds have past
 		    // lets take an average
 		    neutralThrustEst.average = neutralThrustEst.sum/60.0f;
@@ -1263,15 +1274,10 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
 
 
-    if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL ||
-	(flightStatus.FlightModeAssist && flightStatus.AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) ) {
+    if (manual_thrust) {
 	ManualControlCommandData manualControl;
 	ManualControlCommandGet(&manualControl);
         stabDesired.Thrust = manualControl.Thrust;
-    }
-    else {
-	// When in auto throttle for 0 downward velocity and 0ish distance error,
-	// keep a running average for throttle neutral
     }
 
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

@@ -109,7 +109,6 @@ public slots:
     void onAutopilotDisconnect();
     void populate();
     void openHelp();
-    bool autoUpdate();
     void autoUpdateDisconnectProgress(int);
     void autoUpdateConnectProgress(int);
     void autoUpdateFlashProgress(int);
@@ -133,6 +132,7 @@ private:
     int confirmEraseSettingsMessageBox();
     int cannotHaltMessageBox();
     int cannotResetMessageBox();
+    void startAutoUpdate(bool erase);
 
 private slots:
     void onPhysicalHWConnect();
@@ -150,6 +150,8 @@ private slots:
     void downloadStarted();
     void downloadEnded(bool succeed);
     void startAutoUpdate();
+    void startAutoUpdateErase();
+    bool autoUpdate(bool erase);
     void finishAutoUpdate();
     void closeAutoUpdate();
     void autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value);

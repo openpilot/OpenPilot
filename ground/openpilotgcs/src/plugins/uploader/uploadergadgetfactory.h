@@ -51,7 +51,7 @@ private:
     bool isautocapable;
 signals:
     void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
-    void autoUpdate();
+    void autoUpdate(bool erase);
 };
 
 #endif // UPLOADERGADGETFACTORY_H

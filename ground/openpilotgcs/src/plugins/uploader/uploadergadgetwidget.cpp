@@ -157,8 +157,10 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     getSerialPorts();
 
     connect(m_config->autoUpdateButton, SIGNAL(clicked()), this, SLOT(startAutoUpdate()));
+    connect(m_config->autoUpdateEraseButton, SIGNAL(clicked()), this, SLOT(startAutoUpdateErase()));
     connect(m_config->autoUpdateOkButton, SIGNAL(clicked()), this, SLOT(closeAutoUpdate()));
     m_config->autoUpdateButton->setEnabled(autoUpdateCapable());
+    m_config->autoUpdateEraseButton->setEnabled(autoUpdateCapable());
     m_config->autoUpdateGroupBox->setVisible(false);
 
     m_config->refreshPorts->setIcon(QIcon(":uploader/images/view-refresh.svg"));
@@ -606,7 +608,7 @@ bool UploaderGadgetWidget::autoUpdateCapable()
     return QDir(":/firmware").exists();
 }
 
-bool UploaderGadgetWidget::autoUpdate()
+bool UploaderGadgetWidget::autoUpdate(bool erase)
 {
     goToBootloader();
 
@@ -705,7 +707,7 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
-    systemBoot();
+    commonSystemBoot(false, erase);
     emit autoUpdateSignal(SUCCESS, QVariant());
     return true;
 }
@@ -877,6 +879,16 @@ void UploaderGadgetWidget::downloadEnded(bool succeed)
 
 void UploaderGadgetWidget::startAutoUpdate()
 {
+    startAutoUpdate(false);
+}
+
+void UploaderGadgetWidget::startAutoUpdateErase()
+{
+    startAutoUpdate(true);
+}
+
+void UploaderGadgetWidget::startAutoUpdate(bool erase)
+{
     m_config->autoUpdateProgressBar->setValue(0);
     autoUpdateStatus(uploader::JUMP_TO_BL, QVariant());
     m_config->buttonFrame->setEnabled(false);
@@ -885,7 +897,7 @@ void UploaderGadgetWidget::startAutoUpdate()
     m_config->autoUpdateOkButton->setEnabled(false);
 
     connect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
-    autoUpdate();
+    autoUpdate(erase);
 }
 
 void UploaderGadgetWidget::finishAutoUpdate()

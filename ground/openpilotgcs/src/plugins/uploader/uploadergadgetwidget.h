@@ -116,6 +116,8 @@ public slots:
 
 signals:
     void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
+    void boardHalted();
+    void boardBooted();
 
 private:
     Ui_UploaderWidget *m_config;

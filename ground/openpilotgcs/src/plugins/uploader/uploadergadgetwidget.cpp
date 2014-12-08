@@ -330,6 +330,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
         clearLog();
         log("IAP Step 1");
         fwIAP->updated();
+        emit autoUpdateSignal(JUMP_TO_BL, QVariant(1));
         break;
     case IAP_STATE_STEP_1:
         if (!success) {
@@ -338,6 +339,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(goToBootloader(UAVObject *, bool)));
             m_config->haltButton->setEnabled(true);
+            emit autoUpdateSignal(FAILURE, QVariant());
             break;
         }
         sleep(600);
@@ -345,6 +347,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
         currentStep = IAP_STATE_STEP_2;
         log("IAP Step 2");
         fwIAP->updated();
+        emit autoUpdateSignal(JUMP_TO_BL, QVariant(2));
         break;
     case IAP_STATE_STEP_2:
         if (!success) {
@@ -353,12 +356,14 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(goToBootloader(UAVObject *, bool)));
             m_config->haltButton->setEnabled(true);
+            emit autoUpdateSignal(FAILURE, QVariant());
             break;
         }
         sleep(600);
         fwIAP->getField("Command")->setValue("3344");
         currentStep = IAP_STEP_RESET;
         log("IAP Step 3");
+        emit autoUpdateSignal(JUMP_TO_BL, QVariant(3));
         fwIAP->updated();
         break;
     case IAP_STEP_RESET:
@@ -369,6 +374,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             log("Reset did NOT happen");
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(goToBootloader(UAVObject *, bool)));
             m_config->haltButton->setEnabled(true);
+            emit autoUpdateSignal(FAILURE, QVariant());
             break;
         }
 
@@ -382,6 +388,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
         cm->suspendPolling();
         sleep(200);
         log("Board Halt");
+        emit autoUpdateSignal(JUMP_TO_BL, QVariant(4));
         m_config->boardStatus->setText(tr("Bootloader"));
         if (dlj.startsWith("USB")) {
             m_config->telemetryLink->setCurrentIndex(m_config->telemetryLink->findText("USB"));
@@ -410,6 +417,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             currentStep = IAP_STATE_READY;
             m_config->boardStatus->setText(tr("Bootloader?"));
             m_config->haltButton->setEnabled(true);
+            emit autoUpdateSignal(FAILURE, QVariant());
             return;
         }
         dfu->AbortOperation();
@@ -420,9 +428,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             cm->resumePolling();
             currentStep = IAP_STATE_READY;
             m_config->boardStatus->setText(tr("Bootloader?"));
+            emit autoUpdateSignal(FAILURE, QVariant());
             return;
         }
-        // dfu.StatusRequest();
 
         sleep(500);
         dfu->findDevices();
@@ -432,6 +440,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
+            emit autoUpdateSignal(FAILURE, QVariant());
             return;
         }
         // Delete all previous tabs:
@@ -451,6 +460,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
 
         // Need to re-enable in case we were not connected
         bootButtonsSetEnable(true);
+        emit autoUpdateSignal(JUMP_TO_BL, QVariant(5));
 
         if (resetOnly) {
             resetOnly = false;
@@ -458,10 +468,12 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             systemBoot();
             break;
         }
+        emit boardHalted();
     }
     break;
     case IAP_STATE_BOOTLOADER:
         // We should never end up here anyway.
+        emit autoUpdateSignal(FAILURE, QVariant());
         break;
     }
 }
@@ -535,7 +547,6 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot, bool erase)
 {
     clearLog();
     bootButtonsSetEnable(false);
-
     // Suspend telemety & polling in case it is not done yet
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     cm->disconnectDevice();
@@ -586,6 +597,7 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot, bool erase)
     currentStep = IAP_STATE_READY;
     log("You can now reconnect telemetry...");
     delete dfu; // Frees up the USB/Serial port too
+    emit boardBooted();
     dfu = NULL;
 }
 
@@ -596,33 +608,18 @@ bool UploaderGadgetWidget::autoUpdateCapable()
 
 bool UploaderGadgetWidget::autoUpdate()
 {
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    goToBootloader();
 
-    cm->disconnectDevice();
-    cm->suspendPolling();
+    QEventLoop eventLoop;
+    connect(this, SIGNAL(boardHalted()), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
+
     if (dfu) {
         delete dfu;
         dfu = NULL;
     }
 
-    if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
-        // wait for all boards to be disconnected
-        ConnectionWaiter waiter(0, BOARD_EVENT_TIMEOUT);
-        connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateDisconnectProgress(int)));
-        if (waiter.exec() == ConnectionWaiter::TimedOut) {
-            emit autoUpdateSignal(FAILURE, QVariant(tr("Timed out while waiting for all boards to be disconnected!")));
-            return false;
-        }
-    }
-
-    // wait for a board to connect
-    ConnectionWaiter waiter(1, BOARD_EVENT_TIMEOUT);
-    connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateConnectProgress(int)));
-    if (waiter.exec() == ConnectionWaiter::TimedOut) {
-        emit autoUpdateSignal(FAILURE, QVariant(tr("Timed out while waiting for a board to be connected!")));
-        return false;
-    }
-
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     dfu = new DFUObject(DFU_DEBUG, false, QString());
     dfu->AbortOperation();
     emit autoUpdateSignal(JUMP_TO_BL, QVariant());
@@ -687,10 +684,10 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
-    QEventLoop eventLoop;
     firmware = file.readAll();
+    QEventLoop eventLoop2;
     connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateFlashProgress(int)));
-    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &eventLoop, SLOT(quit()));
+    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &eventLoop2, SLOT(quit()));
     emit autoUpdateSignal(UPLOADING_FW, QVariant());
     if (!dfu->enterDFU(0)) {
         emit autoUpdateSignal(FAILURE, QVariant());
@@ -701,7 +698,7 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
-    eventLoop.exec();
+    eventLoop2.exec();
     QByteArray desc = firmware.right(100);
     emit autoUpdateSignal(UPLOADING_DESC, QVariant());
     if (dfu->UploadDescription(desc) != OP_DFU::Last_operation_Success) {
@@ -880,6 +877,8 @@ void UploaderGadgetWidget::downloadEnded(bool succeed)
 
 void UploaderGadgetWidget::startAutoUpdate()
 {
+    m_config->autoUpdateProgressBar->setValue(0);
+    autoUpdateStatus(uploader::JUMP_TO_BL, QVariant());
     m_config->buttonFrame->setEnabled(false);
     m_config->splitter->setEnabled(false);
     m_config->autoUpdateGroupBox->setVisible(true);
@@ -926,8 +925,10 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVa
         m_config->autoUpdateProgressBar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
         break;
     case uploader::JUMP_TO_BL:
-        m_config->autoUpdateProgressBar->setValue(0);
         m_config->autoUpdateLabel->setText(tr("Bringing the board into boot loader mode."));
+        m_config->autoUpdateProgressBar->setFormat(tr("Step %1").arg(value.toInt()));
+        m_config->autoUpdateProgressBar->setMaximum(5);
+        m_config->autoUpdateProgressBar->setValue(value.toInt());
         break;
     case uploader::LOADING_FW:
         m_config->autoUpdateLabel->setText(tr("Preparing to upload firmware to the board."));

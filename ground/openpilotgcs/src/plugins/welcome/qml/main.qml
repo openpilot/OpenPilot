@@ -4,7 +4,6 @@ Rectangle {
     id: container
     width: 1024
     height: 768
-    anchors.horizontalCenter: parent.horizontalCenter
 
     color: "#272727"
 

@@ -537,6 +537,9 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 	pathDesired.Start.North      = positionState.North;
 	pathDesired.Start.East       = positionState.East;
 	pathDesired.Start.Down       = positionState.Down;
+	pathDesired.StartingVelocityVector.North      = velocityState.North;
+	pathDesired.StartingVelocityVector.East       = velocityState.East;
+	pathDesired.StartingVelocityVector.Down       = velocityState.Down;
 	pathDesired.StartingVelocity = 0.0f;
 	pathDesired.EndingVelocity   = 0.0f;
 	pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;

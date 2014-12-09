@@ -62,6 +62,7 @@
 #include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
+#include <flightmodesettings.h>
 #include <pathstatus.h>
 #include <positionstate.h>
 #include <velocitystate.h>
@@ -140,6 +141,7 @@ static float updateCourseBearing();
 static float updatePathBearing();
 static float updatePOIBearing();
 static void processPOI();
+static void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float *updatedVelocity);
 static void updatePathVelocity(float kFF, bool limited);
 static uint8_t updateFixedDesiredAttitude();
 static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction);
@@ -469,11 +471,15 @@ static uint8_t updateAutoPilotVtol()
 
 
     // Brake mode end condition checks
+    // todo capture enter-hold reason code
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
-        if (pathStatus.path_time > pathDesired.Timeout  ||
-            pathStatus.fractional_progress > 0.99f ||
-            pathStatus.fractional_progress < 0.0f ||
-            pathStatus.error > 5.0f ) {
+        if (pathStatus.path_time > pathDesired.Timeout  || // enter hold on timeout
+            pathStatus.fractional_progress > 0.97f ||	   // enter hold if achieved 97% reduction in start velocity
+            pathStatus.fractional_progress < 0.0f ||	   // enter hold if current greater than start!
+            (pathStatus.error < 0.5f && 		   // if desired is 0 and speed has slowed enter hold
+        	(pathStatus.path_direction_north < 0.000001f &&
+        	pathStatus.path_direction_east < 0.000001f &&
+        	pathStatus.path_direction_down < 0.000001f) ) ) {
                 // this will update mode to true position hold
 	        // pathdesired mode will be fly to endpoint
         	plan_setup_assistedcontrol(true); // braking timeout true
@@ -660,6 +666,23 @@ static void processPOI()
     }
 }
 
+static void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float *updatedVelocity)
+{
+    if (startingVelocity >= 0.0f) {
+	*updatedVelocity = startingVelocity - dT*brakeRate;
+	if (*updatedVelocity < 0.0f) {
+	    *updatedVelocity = 0.0f;
+	}
+    }
+    else {
+	*updatedVelocity = startingVelocity + dT*brakeRate;
+	if (*updatedVelocity > 0.0f) {
+	    *updatedVelocity = 0.0f;
+	}
+    }
+    return;
+}
+
 /**
  * Compute desired velocity from the current position and path
  */
@@ -670,61 +693,86 @@ static void updatePathVelocity(float kFF, bool limited)
     PositionStateGet(&positionState);
     VelocityStateData velocityState;
     VelocityStateGet(&velocityState);
+    VelocityDesiredData velocityDesired;
 
     const float dT = updatePeriod / 1000.0f;
 
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
-	kFF = 0.0f;
+        float brakeRate;
+        FlightModeSettingsAssistedControlBrakeRateGet(&brakeRate);
+        if (brakeRate < 0.2f) brakeRate = 0.2f;  // set a minimum to avoid a divide by zero potential below
+        updateBrakeVelocity(pathDesired.StartingVelocityVector.North, pathStatus.path_time, brakeRate, &velocityDesired.North);
+        updateBrakeVelocity(pathDesired.StartingVelocityVector.East,  pathStatus.path_time, brakeRate, &velocityDesired.East);
+        updateBrakeVelocity(pathDesired.StartingVelocityVector.Down,  pathStatus.path_time, brakeRate, &velocityDesired.Down);
+
+        float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
+        cur_velocity = sqrtf(cur_velocity);
+        float desired_velocity = velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East + velocityDesired.Down * velocityDesired.Down;
+        desired_velocity = sqrtf(desired_velocity);
+
+	// update pathstatus
+	pathStatus.error      = cur_velocity - desired_velocity;
+	pathStatus.fractional_progress  = 1.0f;
+	if (pathDesired.StartingVelocity > 0.0f) {
+	    pathStatus.fractional_progress  = ( pathDesired.StartingVelocity - cur_velocity) / pathDesired.StartingVelocity;
+	}
+	pathStatus.path_direction_north = velocityDesired.North;
+	pathStatus.path_direction_east  = velocityDesired.East;
+	pathStatus.path_direction_down  = velocityDesired.Down;
+
+	pathStatus.correction_direction_north = velocityDesired.North - velocityState.North;
+	pathStatus.correction_direction_east  = velocityDesired.East - velocityState.East;
+	pathStatus.correction_direction_down  = velocityDesired.Down - velocityState.Down;
+    }
+    else {
+	// look ahead kFF seconds
+	float cur[3]   = { positionState.North + (velocityState.North * kFF),
+	    positionState.East + (velocityState.East * kFF),
+	    positionState.Down + (velocityState.Down * kFF) };
+	struct path_status progress;
+	path_progress(&pathDesired, cur, &progress);
+
+	// calculate velocity - can be zero if waypoints are too close
+	velocityDesired.North = progress.path_vector[0];
+	velocityDesired.East  = progress.path_vector[1];
+	velocityDesired.Down  = progress.path_vector[2];
+
+	if (limited &&
+	    // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
+	    // it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
+	    // once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
+	    // leading to an S-shape snake course the wrong way
+	    // this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
+	    // turn steep unless there is enough space complete the turn before crossing the flightpath
+	    // in this case the plane effectively needs to be turned around
+	    // indicators:
+	    // difference between correction_direction and velocitystate >90 degrees and
+	    // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
+	    // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
+	    // calculating angles < 90 degrees through dot products
+	    (vector_lengthf(progress.path_vector, 2) > 1e-6f) &&
+	    ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
+	    ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
+	    ;
+	} else {
+	    // calculate correction
+	    velocityDesired.North += pid_apply(&global.PIDposH[0], progress.correction_vector[0], dT);
+	    velocityDesired.East  += pid_apply(&global.PIDposH[1], progress.correction_vector[1], dT);
+	}
+	velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
+
+	// update pathstatus
+	pathStatus.error      = progress.error;
+	pathStatus.fractional_progress  = progress.fractional_progress;
+	pathStatus.path_direction_north = progress.path_vector[0];
+	pathStatus.path_direction_east  = progress.path_vector[1];
+	pathStatus.path_direction_down  = progress.path_vector[2];
+
+	pathStatus.correction_direction_north = progress.correction_vector[0];
+	pathStatus.correction_direction_east  = progress.correction_vector[1];
+	pathStatus.correction_direction_down  = progress.correction_vector[2];
     }
 
-    // look ahead kFF seconds
-    float cur[3]   = { positionState.North + (velocityState.North * kFF),
-                       positionState.East + (velocityState.East * kFF),
-                       positionState.Down + (velocityState.Down * kFF) };
-    struct path_status progress;
-
-    path_progress(&pathDesired, cur, &progress);
-
-    // calculate velocity - can be zero if waypoints are too close
-    VelocityDesiredData velocityDesired;
-    velocityDesired.North = progress.path_vector[0];
-    velocityDesired.East  = progress.path_vector[1];
-    velocityDesired.Down  = progress.path_vector[2];
-
-    if (limited &&
-        // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
-        // it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
-        // once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
-        // leading to an S-shape snake course the wrong way
-        // this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
-        // turn steep unless there is enough space complete the turn before crossing the flightpath
-        // in this case the plane effectively needs to be turned around
-        // indicators:
-        // difference between correction_direction and velocitystate >90 degrees and
-        // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
-        // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
-        // calculating angles < 90 degrees through dot products
-        (vector_lengthf(progress.path_vector, 2) > 1e-6f) &&
-        ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
-        ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
-        ;
-    } else {
-        // calculate correction
-        velocityDesired.North += pid_apply(&global.PIDposH[0], progress.correction_vector[0], dT);
-        velocityDesired.East  += pid_apply(&global.PIDposH[1], progress.correction_vector[1], dT);
-    }
-    velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
-
-    // update pathstatus
-    pathStatus.error      = progress.error;
-    pathStatus.fractional_progress  = progress.fractional_progress;
-    pathStatus.path_direction_north = progress.path_vector[0];
-    pathStatus.path_direction_east  = progress.path_vector[1];
-    pathStatus.path_direction_down  = progress.path_vector[2];
-
-    pathStatus.correction_direction_north = progress.correction_vector[0];
-    pathStatus.correction_direction_east  = progress.correction_vector[1];
-    pathStatus.correction_direction_down  = progress.correction_vector[2];
 
     VelocityDesiredSet(&velocityDesired);
 }

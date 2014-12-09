@@ -3,7 +3,7 @@
         <description>The endpoint or path the craft is trying to achieve.  Can come from @ref ManualControl or @ref PathPlanner </description>
 
 	<field name="Start" units="m" type="float" elementnames="North,East,Down" default="0"/>
-        <field name="End" units="m" type="float" elementnames="North,East,Down" default="0"/>
+    <field name="End" units="m" type="float" elementnames="North,East,Down" default="0"/>
 	<field name="StartingVelocity" units="m/s" type="float" elements="1" default="0"/>
 	<field name="EndingVelocity" units="m/s" type="float" elements="1" default="0"/>
 
@@ -22,6 +22,7 @@
 	<!-- unique ID confirmed with pathfollower in pathstatus to acknowledge a change in PathDesired -->
 	
 	<field name="Timeout" units="s" type="float" elements="1" default="5"/>
+	<field name="StartingVelocityVector" units="m/s" type="float" elementnames="North,East,Down" default="0"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>

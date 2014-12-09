@@ -618,17 +618,27 @@ bool UploaderGadgetWidget::autoUpdateCapable()
 
 bool UploaderGadgetWidget::autoUpdate(bool erase)
 {
-    ResultEventLoop eventLoop;
+    if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() == 0) {
+        ConnectionWaiter waiter(1, BOARD_EVENT_TIMEOUT);
+        connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateConnectProgress(int)));
+        if (waiter.exec() == ConnectionWaiter::TimedOut) {
+            emit progressUpdate(FAILURE, QVariant(tr("Timed out while waiting for a board to be connected!")));
+            emit autoUpdateFailed();
+            return false;
+        }
+    } else {
+        ResultEventLoop eventLoop;
 
-    connect(this, SIGNAL(bootloaderSuccess()), &eventLoop, SLOT(success()));
-    connect(this, SIGNAL(bootloaderFailed()), &eventLoop, SLOT(fail()));
+        connect(this, SIGNAL(bootloaderSuccess()), &eventLoop, SLOT(success()));
+        connect(this, SIGNAL(bootloaderFailed()), &eventLoop, SLOT(fail()));
 
-    goToBootloader();
+        goToBootloader();
 
-    if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
-        emit progressUpdate(FAILURE, QVariant());
-        emit autoUpdateFailed();
-        return false;
+        if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
+            emit progressUpdate(FAILURE, QVariant());
+            emit autoUpdateFailed();
+            return false;
+        }
     }
 
     if (dfu) {

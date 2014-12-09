@@ -46,7 +46,7 @@ Core::IUAVGadget *UploaderGadgetFactory::createGadget(QWidget *parent)
     isautocapable = gadgetWidget->autoUpdateCapable();
     connect(this, SIGNAL(autoUpdate(bool)), gadgetWidget, SLOT(autoUpdate(bool)));
     connect(this, SIGNAL(reboot()), gadgetWidget, SLOT(systemReset()));
-    connect(gadgetWidget, SIGNAL(autoUpdateSignal(uploader::ProgressStep, QVariant)), this, SIGNAL(autoUpdateSignal(uploader::ProgressStep, QVariant)));
+    connect(gadgetWidget, SIGNAL(progressUpdate(uploader::ProgressStep,QVariant)), this, SIGNAL(progressUpdate(uploader::ProgressStep, QVariant)));
     return new UploaderGadget(QString("Uploader"), gadgetWidget, parent);
 }
 

@@ -51,7 +51,7 @@ private:
     bool isautocapable;
 
 signals:
-    void autoUpdateSignal(uploader::ProgressStep, QVariant);
+    void progressUpdate(uploader::ProgressStep, QVariant);
     void autoUpdate(bool erase);
     void reboot();
 };

@@ -232,12 +232,14 @@ static void manualControlTask(void)
 
             // assess throttle state
             bool throttleNeutral = false;
+            bool throttleNeutralOrLow = false;
             float neutralThrustOffset = 0.0f;
             AdjustmentsNeutralThrustOffsetGet(&neutralThrustOffset);
 	    float throttleRangeDelta = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) * 0.2f;
 	    float throttleNeutralLow = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) - throttleRangeDelta;
 	    float throttleNeutralHi = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) + throttleRangeDelta;
 	    if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) throttleNeutral = true;
+	    if (cmd.Thrust < throttleNeutralHi) throttleNeutralOrLow = true;
 
 	    // determine default thrust mode for hold/brake states
 	    uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
@@ -302,7 +304,7 @@ static void manualControlTask(void)
 			     newAssistedThrottleState != FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) {
 			// ok auto thrust mode applies in hold unless overridden
 
-			if (throttleNeutral && flagRollPitchHasInput) {
+			if (throttleNeutralOrLow && flagRollPitchHasInput) {
 			    // throttle is neutral approximately and stick input present so revert to primary mode control
 			    newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
 			    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None

@@ -19,7 +19,10 @@
 	<field name="EmergencyFallbackYawRate" units="(deg/s)/deg" type="float" elementnames="kP,Max" defaultvalue="2.0, 30.0"/>
         <field name="MaxRollPitch" units="deg" type="float" elements="1" defaultvalue="25"/>
         <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="50"/>
-        <field name="MaxBrakePitch" units="deg" type="float" elements="1" defaultvalue="45"/>
+        <field name="MaxBrakePitch" units="deg" type="float" elements="1" defaultvalue="30"/>
+        <field name="BrakeHorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="8.0, 0.0, 0.03, 15"/>
+        <field name="BrakeVerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1, 0.0, 0.01, 1.0"/>
+        <field name="BrakeVelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="0"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

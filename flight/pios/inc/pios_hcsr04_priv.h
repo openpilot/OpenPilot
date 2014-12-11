@@ -32,6 +32,7 @@
 #define PIOS_HCSR04_PRIV_H
 
 #include <pios.h>
+#include <stdint.h>
 #include <pios_stm32.h>
 
 #include <pios_tim_priv.h>

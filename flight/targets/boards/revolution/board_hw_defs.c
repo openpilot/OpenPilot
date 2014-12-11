@@ -2144,3 +2144,45 @@ void PIOS_WS2811_irq_handler(void)
     PIOS_WS2811_DMA_irq_handler();
 }
 #endif // PIOS_INCLUDE_WS2811
+
+
+#ifdef PIOS_INCLUDE_HCSR04
+#include <pios_hcsr04_priv.h>
+#include <hwsettings.h>
+
+
+static const struct pios_tim_channel pios_tim_hcsr04_port_all_channels[] = {
+    {
+        .timer = TIM8,
+        .timer_chan = TIM_Channel_3,
+        .pin   = {
+            .gpio = GPIOC,
+            .init = {
+                .GPIO_Pin   = GPIO_Pin_8,
+                .GPIO_Mode  = GPIO_Mode_OUT, // Was GPIO_Mode_IPD
+                .GPIO_Speed = GPIO_Speed_2MHz,
+            },
+        },
+        .remap = GPIO_AF_TIM8,
+    },
+};
+
+const struct pios_hcsr04_cfg pios_hcsr04_cfg = {
+    .tim_ic_init         = {
+        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
+        .TIM_ICSelection = TIM_ICSelection_DirectTI,
+        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
+        .TIM_ICFilter    = 0x0,
+    },
+    .channels     = pios_tim_hcsr04_port_all_channels,
+    .num_channels = NELEMENTS(pios_tim_hcsr04_port_all_channels),
+    .trigger             = {
+        .gpio = GPIOC,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Mode  = GPIO_Mode_OUT, // was GPIO_Mode_Out_PP
+            .GPIO_Speed = GPIO_Speed_2MHz,
+        },
+    },
+};
+#endif /* if defined(PIOS_INCLUDE_HCSR04) */

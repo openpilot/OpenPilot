@@ -36,6 +36,9 @@
 #include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
 #include <pios_ws2811.h>
+#ifdef PIOS_INCLUDE_HCSR04
+#include <pios_hcsr04_priv.h>
+#endif
 
 
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
@@ -842,6 +845,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
     case HWSETTINGS_RM_RCVRPORT_PPMPWM:
     case HWSETTINGS_RM_RCVRPORT_PPMTELEMETRY:
+    case HWSETTINGS_RM_RCVRPORT_PPMSONAR:
 #if defined(PIOS_INCLUDE_PPM)
         PIOS_Board_configure_ppm(&pios_ppm_cfg);
 
@@ -945,6 +949,21 @@ void PIOS_Board_Init(void)
     }
 
 #endif // PIOS_INCLUDE_WS2811
+
+
+#ifdef PIOS_INCLUDE_HCSR04
+    if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMSONAR ||
+        hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_SONAR ) {
+	//static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pwm_cfg)
+
+	/* Set up the receiver port. */
+	uint32_t pios_pwm_id;
+	PIOS_HCSR04_Init(&pios_pwm_id, &pios_hcsr04_cfg);
+    }
+#endif
+
+
+
 }
 
 /**

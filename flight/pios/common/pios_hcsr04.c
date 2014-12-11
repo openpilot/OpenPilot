@@ -39,7 +39,7 @@
 
 /* Local Variables */
 /* 100 ms timeout without updates on channels */
-const static uint32_t PWM_SUPERVISOR_TIMEOUT = 100000;
+static const uint32_t PWM_SUPERVISOR_TIMEOUT = 100000;
 
 struct pios_hcsr04_dev *hcsr04_dev_loc;
 
@@ -97,7 +97,7 @@ static struct pios_hcsr04_dev *PIOS_PWM_alloc(void)
 
 static void PIOS_HCSR04_tim_overflow_cb(uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
 static void PIOS_HCSR04_tim_edge_cb(uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
-const static struct pios_tim_callbacks tim_callbacks = {
+static const struct pios_tim_callbacks tim_callbacks = {
     .overflow = PIOS_HCSR04_tim_overflow_cb,
     .edge     = PIOS_HCSR04_tim_edge_cb,
 };
@@ -217,6 +217,7 @@ int32_t PIOS_HCSR04_Completed(void)
 static void PIOS_HCSR04_tim_overflow_cb(uint32_t tim_id, uint32_t context, uint8_t channel, uint16_t count)
 {
     struct pios_hcsr04_dev *hcsr04_dev = (struct pios_hcsr04_dev *)context;
+    tim_id = tim_id;
 
     if (!PIOS_HCSR04_validate(hcsr04_dev)) {
         /* Invalid device specified */
@@ -242,6 +243,8 @@ static void PIOS_HCSR04_tim_edge_cb(uint32_t tim_id, uint32_t context, uint8_t c
 {
     /* Recover our device context */
     struct pios_hcsr04_dev *hcsr04_dev = (struct pios_hcsr04_dev *)context;
+
+    tim_id = tim_id;
 
     if (!PIOS_HCSR04_validate(hcsr04_dev)) {
         /* Invalid device specified */

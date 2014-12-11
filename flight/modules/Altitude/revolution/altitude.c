@@ -114,7 +114,7 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
 #if defined(PIOS_INCLUDE_HCSR04)
     SonarAltitudeData sonardata;
     int32_t value = 0, timeout = 10, sample_rate = 0;
-    float coeff   = 0.25, height_out = 0, height_in = 0;
+    float coeff   = 0.25f, height_out = 0.0f, height_in = 0.0f;
     PIOS_HCSR04_Trigger();
 #endif
 

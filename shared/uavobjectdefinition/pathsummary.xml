@@ -1,0 +1,19 @@
+<xml>
+    <object name="PathSummary" singleinstance="true" settings="false" category="Navigation">
+        <description>Summary of a completed path segment  Can come from any @ref PathFollower module</description>
+
+	<field name="UID" units="" type="int16" elements="1" default="0"/>
+	<!-- unique ID confirmed with pathfollower in pathsummary to acknowledge a completed in PathDesired brake sequence -->
+	<field name="brake_exit_reason" units="" type="enum" elements="1" options="Timeout,PathCompleted,PathError"/>
+	<field name="brake_distance_offset" units="m" type="float" elements="1"/>
+	<field name="time_remaining" units="m" type="float" elements="1"/>
+	<field name="fractional_progress" units="" type="float" elements="1"/>
+	<field name="decelrate" units="m/s2" type="float" elements="1"/>
+	<field name="brakeRateActualDesiredRatio" units="m/s2" type="float" elements="1"/>
+	<field name="velocityIntoHold" units="m/s" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

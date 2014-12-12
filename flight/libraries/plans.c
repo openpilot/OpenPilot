@@ -494,7 +494,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
     PathDesiredGet(&pathDesired);
 
     FlightStatusAssistedControlStateOptions assistedControlFlightMode;
-    FlightStatusAssistedControlStateSet(&assistedControlFlightMode);
+    FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if ( timeout_occurred ) {
 	// Expected to be in brake mode first

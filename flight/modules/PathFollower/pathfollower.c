@@ -76,6 +76,7 @@
 #include <systemsettings.h>
 #include <stabilizationbank.h>
 #include <adjustments.h>
+#include <pathsummary.h>
 
 
 // Private constants
@@ -125,6 +126,7 @@ static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
 static VtolPathFollowerSettingsData vtolPathFollowerSettings;
 static FlightStatusData flightStatus;
+static PathSummaryData pathSummary;
 
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
@@ -176,7 +178,9 @@ int32_t PathFollowerInitialize()
     FixedWingPathFollowerStatusInitialize();
     VtolPathFollowerSettingsInitialize();
     FlightStatusInitialize();
+    FlightModeSettingsInitialize();
     PathStatusInitialize();
+    PathSummaryInitialize();
     PathDesiredInitialize();
     PositionStateInitialize();
     VelocityStateInitialize();
@@ -225,9 +229,17 @@ static void pathFollowerTask(void)
         processPOI();
     }
 
+    int16_t old_uid = pathStatus.UID;
     pathStatus.UID    = pathDesired.UID;
     pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
-    pathStatus.path_time += updatePeriod / 1000.0f;
+    if (pathDesired.Timeout > 0.0f) {
+	if (old_uid != pathStatus.UID) {
+	    pathStatus.path_time = 0.0f;
+	}
+	else {
+	    pathStatus.path_time += updatePeriod / 1000.0f;
+	}
+    }
 
     switch (pathDesired.Mode) {
     case PATHDESIRED_MODE_FLYENDPOINT:
@@ -484,15 +496,15 @@ static uint8_t updateAutoPilotVtol()
 
 	bool exit_brake = false;
         if (pathStatus.path_time > pathDesired.Timeout) { // enter hold on timeout
-            pathStatus.brake_exit_reason = PATHSTATUS_BRAKE_EXIT_REASON_TIMEOUT;
+            pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_TIMEOUT;
             exit_brake = true;
         }
         else if (pathStatus.fractional_progress > 0.9f) {   // enter hold if achieved 90% reduction in start velocity
-            pathStatus.brake_exit_reason = PATHSTATUS_BRAKE_EXIT_REASON_PATHCOMPLETED;
+            pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
             exit_brake = true;
         }
         else if (pathStatus.fractional_progress < 0.0f) { 	   // enter hold if current greater than start!
-            pathStatus.brake_exit_reason = PATHSTATUS_BRAKE_EXIT_REASON_PATHERROR;
+            pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHERROR;
             exit_brake = true;
         }
 
@@ -505,7 +517,21 @@ static uint8_t updateAutoPilotVtol()
             float north_offset = pathDesired.End.North - p.North;
             float east_offset = pathDesired.End.East - p.East;
             float down_offset = pathDesired.End.Down - p.Down;
-            pathStatus.brake_distance_offset = sqrtf(north_offset * north_offset + east_offset*east_offset + down_offset*down_offset);
+            pathSummary.brake_distance_offset = sqrtf(north_offset * north_offset + east_offset*east_offset + down_offset*down_offset);
+            pathSummary.time_remaining = pathDesired.Timeout - pathStatus.path_time;
+            pathSummary.fractional_progress = pathStatus.fractional_progress;
+            VelocityStateData velocityState;
+            VelocityStateGet(&velocityState);
+            float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
+            cur_velocity = sqrtf(cur_velocity);
+            pathSummary.decelrate = (pathDesired.StartingVelocity - cur_velocity) / pathStatus.path_time;
+            float brakeRate;
+            FlightModeSettingsAssistedControlBrakeRateGet(&brakeRate);
+            pathSummary.brakeRateActualDesiredRatio = pathSummary.decelrate / brakeRate;
+            pathSummary.velocityIntoHold = cur_velocity;
+            pathSummary.UID = pathStatus.UID;
+            PathSummarySet(&pathSummary);
+
             plan_setup_assistedcontrol(true); // braking timeout true
         }
     }

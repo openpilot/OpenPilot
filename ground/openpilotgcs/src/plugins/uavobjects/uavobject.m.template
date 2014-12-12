@@ -86,7 +86,7 @@ while (1)
 	if (bufferlen < headerIdx + 12); break; end
 	sync = buffer(headerIdx);
 	% printf('%x ', sync);
-	headerIdx += 1;
+	headerIdx = headerIdx + 1;
 	if sync ~= correctSyncByte
 		wrongSyncByte = wrongSyncByte + 1;
 		continue
@@ -99,7 +99,7 @@ while (1)
 
 	% get msg type (quint8 1 byte ) should be 0x20/0xA0, ignore the rest
 	msgType = buffer(headerIdx);
-	headerIdx += 1;
+	headerIdx = headerIdx + 1;
 	if msgType ~= correctMsgByte && msgType ~= correctTimestampedByte
 		% fixme: it should read the whole message payload instead of skipping and blindly searching for next sync byte.
 		fprintf('\nSkipping message type: %x \n', msgType);
@@ -108,16 +108,16 @@ while (1)
 
 	% get msg size (quint16 2 bytes) excludes crc, include msg header and data payload
 	msgSize = uint32(typecast(buffer(headerIdx:headerIdx + 1), 'uint16'));
-	headerIdx += 2;
+	headerIdx = headerIdx + 2;
 
 	% get obj id (quint32 4 bytes)
 	objID = typecast(uint8(buffer(headerIdx:headerIdx + 3)), 'uint32'); 
-	headerIdx += 4;
+	headerIdx = headerIdx + 4;
 
 	% get instance id (quint16 2 bytes)
 	instID = typecast(uint8(buffer(headerIdx:headerIdx + 1)),  'uint16');
 	% printf('Id %x type %x size %u Inst %x ', objID, msgType, msgSize, instID);
-	headerIdx += 2;
+	headerIdx = headerIdx + 2;
 
 	% get timestamp if needed (quint32 4 bytes)
 	if msgType == correctMsgByte
@@ -125,12 +125,12 @@ while (1)
 	elseif msgType == correctTimestampedByte
 		timestamp = typecast(uint8(buffer(headerIdx:headerIdx + 3)),  'uint32');
 	%	printf('ts %u');
-		headerIdx += 4;
+		headerIdx = headerIdx + 4;
 		datasize = msgSize - headerLen - timestampLen;
 	end
 	% printf('\n');
 	bufferIdx = headerIdx;
-	headerIdx += datasize + crcLen + oplHeaderLen;
+	headerIdx = headerIdx + datasize + crcLen + oplHeaderLen;
 
 	%% Read object
 

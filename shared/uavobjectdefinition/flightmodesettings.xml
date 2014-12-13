@@ -112,7 +112,7 @@
         <field name="ReturnToBaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="10"/>
         <field name="LandingVelocity" units="m" type="float" elements="1" defaultvalue="0.4"/>
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="10,2"/>
-        <field name="AssistedControlBrakeRate" units="m/s2" type="float" elements="1" defaultvalue="1.8"/>
+        <field name="AssistedControlBrakeRate" units="m/s2" type="float" elements="1" defaultvalue="3.5"/>
 	<!-- optimized for current vtolpathfollower,
 	     for fixed wing pathfollower set to Horizontal=500,Vertical=5 -->
         <access gcs="readwrite" flight="readwrite"/>

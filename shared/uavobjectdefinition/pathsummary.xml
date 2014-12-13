@@ -6,10 +6,10 @@
 	<!-- unique ID confirmed with pathfollower in pathsummary to acknowledge a completed in PathDesired brake sequence -->
 	<field name="brake_exit_reason" units="" type="enum" elements="1" options="Timeout,PathCompleted,PathError"/>
 	<field name="brake_distance_offset" units="m" type="float" elements="1"/>
-	<field name="time_remaining" units="m" type="float" elements="1"/>
+	<field name="time_remaining" units="s" type="float" elements="1"/>
 	<field name="fractional_progress" units="" type="float" elements="1"/>
 	<field name="decelrate" units="m/s2" type="float" elements="1"/>
-	<field name="brakeRateActualDesiredRatio" units="m/s2" type="float" elements="1"/>
+	<field name="brakeRateActualDesiredRatio" units="" type="float" elements="1"/>
 	<field name="velocityIntoHold" units="m/s" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>

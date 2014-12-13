@@ -30,7 +30,7 @@
 
 #ifndef PLANS_H_
 #define PLANS_H_
-#include <pios.h>
+#include <stdint.h>
 #include <pios_math.h>
 
 /** \page standard Plans

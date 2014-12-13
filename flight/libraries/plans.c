@@ -544,13 +544,13 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 	velocity = sqrtf(velocity);
 
 	// Calculate the desired time to zero velocity.
-	float time_to_stopped = 0.5f;  // we allow at least 0.5 seconds to rotate to a brake angle.
+	float time_to_stopped = 0.3f;  // we allow at least 0.3 seconds to rotate to a brake angle.
 	time_to_stopped += velocity / brakeRate;
-	time_to_stopped += 1.0f;  // allow to operate for 1 second more before entering position hold
+	time_to_stopped += 0.5f;  // allow to operate for 0.5 second more before entering position hold
 
 	// Sanity check the brake rate by ensuring that the time to stop is within a range.
 	if (time_to_stopped < 0.1f) time_to_stopped = 0.1f;
-	else if (time_to_stopped > 8.0f) time_to_stopped = 8.0f;
+	else if (time_to_stopped > 6.0f) time_to_stopped = 6.0f;
 
 	// calculate the distance we will travel
 	float north_delta = velocityState.North * 0.5f; // we allow at least 0.5s to rotate to brake angle

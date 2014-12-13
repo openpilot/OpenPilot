@@ -144,7 +144,7 @@ static float updateCourseBearing();
 static float updatePathBearing();
 static float updatePOIBearing();
 static void processPOI();
-static void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float *updatedVelocity);
+static void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
 static void updatePathVelocity(float kFF, bool limited);
 static uint8_t updateFixedDesiredAttitude();
 static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction);
@@ -503,10 +503,6 @@ static uint8_t updateAutoPilotVtol()
             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
             exit_brake = true;
         }
-        else if (pathStatus.fractional_progress < 0.0f) { 	   // enter hold if current greater than start!
-            pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHERROR;
-            exit_brake = true;
-        }
 
         if (exit_brake) {
             // Calculate the distance error between the originally desired
@@ -716,16 +712,22 @@ static void processPOI()
     }
 }
 
-static void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float *updatedVelocity)
+static void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity)
 {
     if (startingVelocity >= 0.0f) {
 	*updatedVelocity = startingVelocity - dT*brakeRate;
+	if (*updatedVelocity > currentVelocity) {
+	    *updatedVelocity = currentVelocity;
+	}
 	if (*updatedVelocity < 0.0f) {
 	    *updatedVelocity = 0.0f;
 	}
     }
     else {
 	*updatedVelocity = startingVelocity + dT*brakeRate;
+	if (*updatedVelocity < currentVelocity) {
+	    *updatedVelocity = currentVelocity;
+	}
 	if (*updatedVelocity > 0.0f) {
 	    *updatedVelocity = 0.0f;
 	}
@@ -751,9 +753,9 @@ static void updatePathVelocity(float kFF, bool limited)
         float brakeRate;
         FlightModeSettingsAssistedControlBrakeRateGet(&brakeRate);
         if (brakeRate < 0.2f) brakeRate = 0.2f;  // set a minimum to avoid a divide by zero potential below
-        updateBrakeVelocity(pathDesired.StartingVelocityVector.North, pathStatus.path_time, brakeRate, &velocityDesired.North);
-        updateBrakeVelocity(pathDesired.StartingVelocityVector.East,  pathStatus.path_time, brakeRate, &velocityDesired.East);
-        updateBrakeVelocity(pathDesired.StartingVelocityVector.Down,  pathStatus.path_time, brakeRate, &velocityDesired.Down);
+        updateBrakeVelocity(pathDesired.StartingVelocityVector.North, pathStatus.path_time, brakeRate, velocityState.North, &velocityDesired.North);
+        updateBrakeVelocity(pathDesired.StartingVelocityVector.East,  pathStatus.path_time, brakeRate, velocityState.East, &velocityDesired.East);
+        updateBrakeVelocity(pathDesired.StartingVelocityVector.Down,  pathStatus.path_time, brakeRate, velocityState.Down, &velocityDesired.Down);
 
         float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
         cur_velocity = sqrtf(cur_velocity);
@@ -765,6 +767,9 @@ static void updatePathVelocity(float kFF, bool limited)
 	pathStatus.fractional_progress  = 1.0f;
 	if (pathDesired.StartingVelocity > 0.0f) {
 	    pathStatus.fractional_progress  = ( pathDesired.StartingVelocity - cur_velocity) / pathDesired.StartingVelocity;
+
+	    //sometimes current velocity can exceed starting velocity due to initial acceleration
+	    if (pathStatus.fractional_progress < 0.0f) pathStatus.fractional_progress = 0.0f;
 	}
 	pathStatus.path_direction_north = velocityDesired.North;
 	pathStatus.path_direction_east  = velocityDesired.East;

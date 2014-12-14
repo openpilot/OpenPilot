@@ -75,15 +75,6 @@ static const controlHandler handler_STABILIZED = {
 };
 
 
-static const controlHandler handler_AUTOTUNE = {
-    .controlChain      = {
-        .Stabilization = false,
-        .PathFollower  = false,
-        .PathPlanner   = false,
-    },
-    .handler           = NULL,
-};
-
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 static const controlHandler handler_PATHFOLLOWER = {
     .controlChain      = {
@@ -205,9 +196,10 @@ static void manualControlTask(void)
         break;
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
+    case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+    case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
+    case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
     case FLIGHTSTATUS_FLIGHTMODE_POI:
@@ -218,9 +210,6 @@ static void manualControlTask(void)
         handler = &handler_PATHPLANNER;
         break;
 #endif
-    case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
-        handler = &handler_AUTOTUNE;
-        break;
         // There is no default, so if a flightmode is forgotten the compiler can throw a warning!
     }
 

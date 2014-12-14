@@ -8,13 +8,13 @@ Item {
 
                               //  DisArmed , Arming, Armed
     property variant armColors : ["gray", "orange", "green"]
-                      
+               
                       // All 'manual modes' are green, 'assisted' modes in cyan
-                      // "MANUAL","STAB 1","STAB 2", "STAB 3", "STAB 4", "STAB 5", "STAB 6", "AUTOTUNE",
-                      // "POS HOLD", "POS VFPV", "POS VLOS", "POS VNSEW", "RTB", "LAND", "PATHPLANNER", "POI", "AUTOCRUISE"
+                      // "MANUAL","STAB 1","STAB 2", "STAB 3", "STAB 4", "STAB 5", "STAB 6",
+                      // "POS HOLD", "COURSE LOCK", "POS ROAM", "HOME LEASH", "ABS POS", "RTB", "LAND", "PATHPLANNER", "POI", "AUTOCRUISE"
 
-    property variant flightmodeColors : ["gray", "green", "green", "green", "green", "green", "green", "red", 
-                                         "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan"]
+    property variant flightmodeColors : ["gray", "green", "green", "green", "green", "green", "green", 
+                                         "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan"]
 
                       // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,
                       // AltitudeHold,AltitudeVario,CruiseControl + Auto mode (VTOL/Wing pathfollower)
@@ -26,9 +26,9 @@ Item {
                       // SystemSettings.AirframeType 3 - 18 : VtolPathFollower, check ThrustControl
  
     property var thrust_mode: FlightStatus.FlightMode < 7 ? StabilizationDesired.StabilizationMode_Thrust : 
-                              FlightStatus.FlightMode > 7 && SystemSettings.AirframeType > 2 && SystemSettings.AirframeType < 19
+                              FlightStatus.FlightMode > 6 && SystemSettings.AirframeType > 2 && SystemSettings.AirframeType < 19
                               && VtolPathFollowerSettings.ThrustControl == 1 ? 11 : 
-                              FlightStatus.FlightMode > 7 && SystemSettings.AirframeType < 3 ? 11: 0 
+                              FlightStatus.FlightMode > 6 && SystemSettings.AirframeType < 3 ? 11: 0 
 
 
     property real flight_time: Math.round(SystemStats.FlightTime / 1000)
@@ -200,8 +200,8 @@ Item {
 
             Text {
                 anchors.centerIn: parent
-                text: ["MANUAL","STAB 1","STAB 2", "STAB 3", "STAB 4", "STAB 5", "STAB 6", "AUTOTUNE", "POS HOLD", "POS VFPV",
-                       "POS VLOS", "POS VNSEW", "RTB", "LAND", "PATHPLAN", "POI", "AUTOCRUISE"][FlightStatus.FlightMode]
+                text: ["MANUAL","STAB 1","STAB 2", "STAB 3", "STAB 4", "STAB 5", "STAB 6", "POS HOLD", "COURSELOCK",
+                       "POS ROAM", "HOME LEASH", "ABS POS", "RTB", "LAND", "PATHPLAN", "POI", "AUTOCRUISE"][FlightStatus.FlightMode]
                 font {
                     family: "Arial"
                     pixelSize: Math.floor(parent.height * 0.74)

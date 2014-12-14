@@ -22,7 +22,7 @@ Item {
         id: telemetry_rate
         text: GCSTelemetryStats.TxDataRate.toFixed()+"/"+GCSTelemetryStats.RxDataRate.toFixed()
         color: "white"
-        font.family: "Arial"
+        font.family: pt_bold.name
         font.pixelSize: telemetry_status.height * 0.75
 
         anchors.top: telemetry_status.bottom
@@ -33,7 +33,7 @@ Item {
         id: gps_text
         text: "GPS: " + GPSPositionSensor.Satellites + "\nPDP: " + Math.round(GPSPositionSensor.PDOP*10)/10
         color: "white"
-        font.family: "Arial"
+        font.family: pt_bold.name
         font.pixelSize: telemetry_status.height * 0.75
 
         visible: GPSPositionSensor.Satellites > 0
@@ -52,7 +52,7 @@ Item {
 
 
         color: "white"
-        font.family: "Arial"
+        font.family: pt_bold.name
 
         //I think it should be pixel size,
         //but making it more consistent with C++ version instead

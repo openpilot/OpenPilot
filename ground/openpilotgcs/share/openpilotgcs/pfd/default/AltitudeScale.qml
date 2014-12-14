@@ -45,7 +45,7 @@ Item {
                             text: altitude_scale.topNumber - index
                             color: "white"
                             font.pixelSize: parent.height / 3
-                            font.family: "Arial"
+                            font.family: pt_bold.name
 
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.verticalCenter: parent.top
@@ -100,7 +100,7 @@ Item {
             text: "  " +altitude.toFixed(1)
             color: "white"
             font {
-                family: "Arial"
+                family: pt_bold.name
                 pixelSize: parent.height * 0.35
                 weight: Font.DemiBold
             }
@@ -125,7 +125,7 @@ Item {
             text: qmlWidget.altitudeUnit
             color: "cyan"
             font {
-                family: "Arial"
+                family: pt_bold.name
                 pixelSize: parent.height * 0.6
                 weight: Font.DemiBold
             }

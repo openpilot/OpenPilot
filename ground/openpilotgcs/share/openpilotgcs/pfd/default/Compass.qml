@@ -88,7 +88,7 @@ Item {
             text: Math.floor(AttitudeState.Yaw).toFixed()
             color: "white"
             font {
-                family: "Arial"
+                family: pt_bold.name
                 pixelSize: parent.height * 1.2
             }
             anchors.centerIn: parent

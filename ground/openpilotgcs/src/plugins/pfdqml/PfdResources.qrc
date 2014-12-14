@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/pfdqml">
+        <file>fonts/PTN77F.ttf</file>
+        <file>fonts/PTS75F.ttf</file>
+    </qresource>
+</RCC>

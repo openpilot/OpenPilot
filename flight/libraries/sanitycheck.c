@@ -102,15 +102,12 @@ int32_t configuration_check()
     FlightModeSettingsFlightModePositionGet(modes);
 
     for (uint32_t i = 0; i < num_modes; i++) {
-
-	uint8_t gps_assisted = FlightModeAssistMap[i];
-	if (gps_assisted) {
-
+        uint8_t gps_assisted = FlightModeAssistMap[i];
+        if (gps_assisted) {
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(multirotor);
             ADDSEVERITY(navCapableFusion);
-
-	}
+        }
 
         switch (modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
@@ -235,8 +232,8 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     if (gpsassisted) {
         // For multirotors verify that roll/pitch are either attitude or rattitude
         for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
-            if (! (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ATTITUDE ||
-        	   modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATTITUDE)   ) {
+            if (!(modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ATTITUDE ||
+                  modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATTITUDE)) {
                 return false;
             }
         }

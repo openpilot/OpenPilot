@@ -110,7 +110,7 @@ static void configurationUpdatedCb(UAVObjEvent *ev);
 static void commandUpdatedCb(UAVObjEvent *ev);
 static void manualControlTask(void);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-static uint8_t isAssistedFlightMode( uint8_t position);
+static uint8_t isAssistedFlightMode(uint8_t position);
 #endif
 
 #define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
@@ -193,7 +193,7 @@ static void manualControlTask(void)
 
     uint8_t position = cmd.FlightModeSwitchPosition;
     uint8_t newMode  = flightStatus.FlightMode;
-    uint8_t newFlightModeAssist = flightStatus.FlightModeAssist;
+    uint8_t newFlightModeAssist      = flightStatus.FlightModeAssist;
     uint8_t newAssistedControlState  = flightStatus.AssistedControlState;
     uint8_t newAssistedThrottleState = flightStatus.AssistedThrottleState;
     if (position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
@@ -215,9 +215,8 @@ static void manualControlTask(void)
         handler = &handler_STABILIZED;
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-        newFlightModeAssist = isAssistedFlightMode( position );
+        newFlightModeAssist = isAssistedFlightMode(position);
         if (newFlightModeAssist) {
-
             // assess roll/pitch state
             bool flagRollPitchHasInput = (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f);
 
@@ -226,140 +225,138 @@ static void manualControlTask(void)
             bool throttleNeutralOrLow = false;
             float neutralThrustOffset = 0.0f;
             AdjustmentsNeutralThrustOffsetGet(&neutralThrustOffset);
-	    float throttleRangeDelta = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) * 0.2f;
-	    float throttleNeutralLow = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) - throttleRangeDelta;
-	    float throttleNeutralHi = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) + throttleRangeDelta;
-	    if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) throttleNeutral = true;
-	    if (cmd.Thrust < throttleNeutralHi) throttleNeutralOrLow = true;
+            float throttleRangeDelta  = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) * 0.2f;
+            float throttleNeutralLow  = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) - throttleRangeDelta;
+            float throttleNeutralHi   = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) + throttleRangeDelta;
+            if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) {
+                throttleNeutral = true;
+            }
+            if (cmd.Thrust < throttleNeutralHi) {
+                throttleNeutralOrLow = true;
+            }
 
-	    // determine default thrust mode for hold/brake states
-	    uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-	    if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST) {
-		pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
-	    }
+            // determine default thrust mode for hold/brake states
+            uint8_t pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+            if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST) {
+                pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
+            }
 
-	    switch (newAssistedControlState) {
+            switch (newAssistedControlState) {
+            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
+                if (!flagRollPitchHasInput) {
+                    // no stick input on roll/pitch so enter brake state
+                    newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
+                    newAssistedThrottleState = pathfollowerthrustmode;
+                    handler  = &handler_PATHFOLLOWER;
+                    // retain thrust cmd for later comparison with actual in braking
+                    thrustAtBrakeStart = cmd.Thrust;
+                    thrustLo = 0.95f * thrustAtBrakeStart;
+                    thrustHi = 1.05f * thrustAtBrakeStart;
+                } else {
+                    // stick input so stay in primary mode control state
+                    // newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+                    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
+                }
+                break;
 
-		  case  FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
-		    if (!flagRollPitchHasInput) {
-			// no stick input on roll/pitch so enter brake state
-			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
-			newAssistedThrottleState = pathfollowerthrustmode;
-			handler = &handler_PATHFOLLOWER;
-			// retain thrust cmd for later comparison with actual in braking
-			thrustAtBrakeStart = cmd.Thrust;
-			thrustLo = 0.95f * thrustAtBrakeStart;
-			thrustHi = 1.05f * thrustAtBrakeStart;
-		    }
-		    else {
-			// stick input so stay in primary mode control state
-			// newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
-			newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
-		    }
-		    break;
+            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE:
+                if (flagRollPitchHasInput) {
+                    // stick input during brake sequence allows immediate resumption of control
+                    newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+                    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
+                } else {
+                    // no stick input, stay in brake mode
+                    newAssistedThrottleState = pathfollowerthrustmode;
+                    handler = &handler_PATHFOLLOWER;
+                    // if user adjusts thrust in which case revert to manual
+                    if (cmd.Thrust < thrustLo || cmd.Thrust > thrustHi) {
+                        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+                    }
+                }
+                break;
 
-		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE:
-		    if (flagRollPitchHasInput) {
-			// stick input during brake sequence allows immediate resumption of control
-			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
-			newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
-		    }
-		    else {
-			// no stick input, stay in brake mode
-			newAssistedThrottleState = pathfollowerthrustmode;
-			handler = &handler_PATHFOLLOWER;
-			// if user adjusts thrust in which case revert to manual
-			if (cmd.Thrust < thrustLo || cmd.Thrust > thrustHi) newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-		    }
-		    break;
+            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD:
 
-		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD:
+                if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST ||
+                    (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST &&
+                     newAssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL)) {
+                    // for manual throttle states/modes, stick control immediately reverts to primary mode control
+                    if (flagRollPitchHasInput) {
+                        newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+                        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
+                    } else {
+                        // otherwise stay in the hold state
+                        // newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
+                        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+                        handler = &handler_PATHFOLLOWER;
+                    }
+                } else if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST &&
+                           newAssistedThrottleState != FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) {
+                    // ok auto thrust mode applies in hold unless overridden
 
-		    if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST ||
-			(newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST &&
-			    newAssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) ) {
+                    if (throttleNeutralOrLow && flagRollPitchHasInput) {
+                        // throttle is neutral approximately and stick input present so revert to primary mode control
+                        newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+                        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
+                    } else {
+                        // otherwise hold, autothrust, no stick input...we watch throttle for need to change mode
+                        switch (newAssistedThrottleState) {
+                        case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO:
+                            // whilst in auto, watch for neutral range, from which we allow override
+                            if (throttleNeutral) {
+                                pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE;
+                            } else { pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO; }
+                            break;
+                        case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE:
+                            // previously user has set throttle to neutral range, apply a deadband and revert to manual
+                            // if moving out of deadband.  This allows for landing in hold state.
+                            if (!throttleNeutral) {
+                                pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+                            } else { pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE; }
+                            break;
+                        case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL:
+                            pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+                            break;
+                        }
 
-			// for manual throttle states/modes, stick control immediately reverts to primary mode control
-			if (flagRollPitchHasInput) {
-			    newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
-			    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
-		        }
-		        else {
-		            // otherwise stay in the hold state
-			    //newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
-		            newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-		            handler = &handler_PATHFOLLOWER;
-			}
-		    }
-		    else if (newFlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST &&
-			     newAssistedThrottleState != FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) {
-			// ok auto thrust mode applies in hold unless overridden
-
-			if (throttleNeutralOrLow && flagRollPitchHasInput) {
-			    // throttle is neutral approximately and stick input present so revert to primary mode control
-			    newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
-			    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
-			}
-			else {
-			    // otherwise hold, autothrust, no stick input...we watch throttle for need to change mode
-			    switch (newAssistedThrottleState) {
-			      case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO:
-				// whilst in auto, watch for neutral range, from which we allow override
-				if (throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE;
-				else pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
-				break;
-			      case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE:
-				// previously user has set throttle to neutral range, apply a deadband and revert to manual
-				// if moving out of deadband.  This allows for landing in hold state.
-				if (!throttleNeutral) pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-				else pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTOOVERRIDE;
-				break;
-			      case FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL:
-				pathfollowerthrustmode = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-				break;
-			    }
-
-			    newAssistedThrottleState = pathfollowerthrustmode;
-			    handler = &handler_PATHFOLLOWER;
-			}
-
-		    }
-		    break;
-	    }
-
+                        newAssistedThrottleState = pathfollowerthrustmode;
+                        handler = &handler_PATHFOLLOWER;
+                    }
+                }
+                break;
+            }
         }
-#endif
+#endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
         break;
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-        newFlightModeAssist = isAssistedFlightMode( position );
+        newFlightModeAssist = isAssistedFlightMode(position);
         if (newFlightModeAssist) {
+            switch (newFlightModeAssist) {
+            case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST:
+                newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+                break;
+            case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST:
+                newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
+                break;
+            case FLIGHTSTATUS_FLIGHTMODEASSIST_NONE:
+            default:
+                newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
+                break;
+            }
 
-	    switch (newFlightModeAssist) {
-	      case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST:
-		    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
-		break;
-	      case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST:
-		    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
-		break;
-	      case FLIGHTSTATUS_FLIGHTMODEASSIST_NONE:
-	      default:
-		    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
-		break;
-	    }
-
-	    switch (newAssistedControlState) {
-		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE:
-			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
-			break;
-		  case  FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
-			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
-			break;
-		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD:
-			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
-			break;
-	    }
+            switch (newAssistedControlState) {
+            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE:
+                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
+                break;
+            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
+                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
+                break;
+            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD:
+                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
+                break;
+            }
         }
         handler = &handler_PATHFOLLOWER;
         break;
@@ -377,7 +374,7 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
         handler = &handler_PATHPLANNER;
         break;
-#endif
+#endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
         // There is no default, so if a flightmode is forgotten the compiler can throw a warning!
     }
 
@@ -387,13 +384,13 @@ static void manualControlTask(void)
     static bool firstRun = true;
 
     if (flightStatus.FlightMode != newMode || firstRun ||
-	newAssistedControlState != flightStatus.AssistedControlState ||
-	flightStatus.AssistedThrottleState != newAssistedThrottleState) {
+        newAssistedControlState != flightStatus.AssistedControlState ||
+        flightStatus.AssistedThrottleState != newAssistedThrottleState) {
         firstRun = false;
-        flightStatus.ControlChain = handler->controlChain;
-        flightStatus.FlightMode   = newMode;
-        flightStatus.FlightModeAssist = newFlightModeAssist;
-        flightStatus.AssistedControlState = newAssistedControlState;
+        flightStatus.ControlChain          = handler->controlChain;
+        flightStatus.FlightMode            = newMode;
+        flightStatus.FlightModeAssist      = newFlightModeAssist;
+        flightStatus.AssistedControlState  = newAssistedControlState;
         flightStatus.AssistedThrottleState = newAssistedThrottleState;
         FlightStatusSet(&flightStatus);
         newinit = true;
@@ -424,9 +421,8 @@ static void commandUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
  * Check and set modes for gps assisted stablised flight modes
  */
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-static uint8_t isAssistedFlightMode( uint8_t position)
+static uint8_t isAssistedFlightMode(uint8_t position)
 {
-
     uint8_t isAssistedFlag = STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE;
     uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
 

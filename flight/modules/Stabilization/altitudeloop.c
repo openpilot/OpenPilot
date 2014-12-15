@@ -175,16 +175,13 @@ static void altitudeHoldTask(void)
     default:
         altitudeHoldStatus.VelocityDesired = 0;
         break;
-
-
     }
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
-    if (thrustMode == DIRECT ) {
+    if (thrustMode == DIRECT) {
         thrustDemand = thrustSetpoint;
-    }
-    else {
+    } else {
         // velocity control loop
         thrustDemand = startThrust - pid_apply_setpoint(&pid1, &scaler, altitudeHoldStatus.VelocityDesired, velocityStateDown, dT);
     }

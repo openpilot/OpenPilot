@@ -4,6 +4,9 @@
 
 	<field name="NeutralThrustOffset" units="" type="float" elements="1" defaultvalue="0"/>
 	<field name="NeutralThrustAlgoError" units="" type="float" elements="1" defaultvalue="0"/>
+	<field name="NeutralThrustOffsetUnchecked" units="" type="float" elements="1" defaultvalue="0"/>
+	<field name="NeutralThrustAccumulator" units="" type="float" elements="1" defaultvalue="0"/>
+	<field name="NeutralThrustILimit" units="" type="float" elements="1" defaultvalue="0"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>

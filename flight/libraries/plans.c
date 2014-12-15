@@ -39,6 +39,7 @@
 #include <velocitystate.h>
 #include <manualcontrolcommand.h>
 #include <attitudestate.h>
+#include <vtolpathfollowersettings.h>
 #include <sin_lookup.h>
 
 #define UPDATE_EXPECTED 0.02f
@@ -59,6 +60,7 @@ void plan_initialize()
     AttitudeStateInitialize();
     ManualControlCommandInitialize();
     VelocityStateInitialize();
+    VtolPathFollowerSettingsInitialize();
 }
 
 /**
@@ -515,7 +517,10 @@ void plan_run_AutoCruise()
  *        timeout_occurred = false: Attempt to enter flyvector for braking
  *        timeout_occurred = true: Revert to position hold
  */
-
+#define ASSISTEDCONTROL_BRAKERATE_MINIMUM 0.2f   // m/s2
+#define ASSISTEDCONTROL_TIMETOSTOP_MINIMUM 0.5f	 // seconds
+#define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 5.0f	 // seconds
+#define ASSISTEDCONTROL_DELAY_TO_BRAKE 0.5f	 // seconds
 void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 {
     PositionStateData positionState;
@@ -535,8 +540,6 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
             // retain original start and end velocity...which is not used in this mode anyway
             // change mode to hold position
             pathDesired.Mode    = PATHDESIRED_MODE_FLYENDPOINT;
-            // clear timeout period but not used in this mode anyway.
-            pathDesired.Timeout = 0.0f; // not applicable in this mode
             // keep original starting velocity. Not used except useful for debugging
             // change assisted mode to hold.
             assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
@@ -551,10 +554,6 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
             pathDesired.StartingVelocity = 0.0f;
             pathDesired.EndingVelocity   = 0.0f;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-            pathDesired.StartingVelocityVector.North = 0.0f;
-            pathDesired.StartingVelocityVector.East  = 0.0f;
-            pathDesired.StartingVelocityVector.Down  = 0.0f;
-            pathDesired.Timeout = 0.0f; // not applicable in this mode
             // keep original starting velocity. Not used except useful for debugging
             // change assisted mode to hold.
             assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
@@ -562,63 +561,51 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
     } else {
         VelocityStateData velocityState;
         VelocityStateGet(&velocityState);
-        const uint8_t brake3d = true;
         float brakeRate;
-        FlightModeSettingsAssistedControlBrakeRateGet(&brakeRate);
-        if (brakeRate < 0.2f) {
-            brakeRate = 0.2f; // set a minimum to avoid a divide by zero potential below
+        VtolPathFollowerSettingsBrakeRateGet(&brakeRate);
+        if (brakeRate < ASSISTEDCONTROL_BRAKERATE_MINIMUM) {
+            brakeRate = ASSISTEDCONTROL_BRAKERATE_MINIMUM; // set a minimum to avoid a divide by zero potential below
         }
         // Calculate the velocity
-        float velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East;
-        if (brake3d) {
-            velocity += velocityState.Down * velocityState.Down;
-        }
+        float velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
         velocity = sqrtf(velocity);
 
         // Calculate the desired time to zero velocity.
-        float time_to_stopped = 0.3f; // we allow at least 0.3 seconds to rotate to a brake angle.
+        float time_to_stopped = ASSISTEDCONTROL_DELAY_TO_BRAKE; // we allow at least 0.5 seconds to rotate to a brake angle.
         time_to_stopped += velocity / brakeRate;
-        time_to_stopped += 0.5f; // allow to operate for 0.5 second more before entering position hold
 
         // Sanity check the brake rate by ensuring that the time to stop is within a range.
-        if (time_to_stopped < 0.1f) {
-            time_to_stopped = 0.1f;
-        } else if (time_to_stopped > 6.0f) {
-            time_to_stopped = 6.0f;
+        if (time_to_stopped < ASSISTEDCONTROL_TIMETOSTOP_MINIMUM) {
+            time_to_stopped = ASSISTEDCONTROL_TIMETOSTOP_MINIMUM;
+        } else if (time_to_stopped > ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM) {
+            time_to_stopped = ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM;
         }
 
         // calculate the distance we will travel
-        float north_delta = velocityState.North * 0.5f; // we allow at least 0.5s to rotate to brake angle
-        north_delta += (time_to_stopped - 0.5f) * 0.5f * velocityState.North;
-        float east_delta  = velocityState.East * 0.5f; // we allow at least 0.5s to rotate to brake angle
-        east_delta  += (time_to_stopped - 0.5f) * 0.5f * velocityState.East;
-        float down_delta  = velocityState.Down * 0.5f;
-        down_delta  += (time_to_stopped - 0.5f) * 0.5f * velocityState.Down;
-        float net_delta   = east_delta * east_delta + north_delta * north_delta;
-        if (brake3d) {
-            net_delta += down_delta * down_delta;
-        }
+        float north_delta = velocityState.North * ASSISTEDCONTROL_DELAY_TO_BRAKE; // we allow at least 0.5s to rotate to brake angle
+        north_delta += (time_to_stopped - ASSISTEDCONTROL_DELAY_TO_BRAKE) * 0.5f * velocityState.North; // area under the linear deceleration plot
+        float east_delta  = velocityState.East * ASSISTEDCONTROL_DELAY_TO_BRAKE; // we allow at least 0.5s to rotate to brake angle
+        east_delta  += (time_to_stopped - ASSISTEDCONTROL_DELAY_TO_BRAKE) * 0.5f * velocityState.East; // area under the linear deceleration plot
+        float down_delta  = velocityState.Down * ASSISTEDCONTROL_DELAY_TO_BRAKE;
+        down_delta  += (time_to_stopped - ASSISTEDCONTROL_DELAY_TO_BRAKE) * 0.5f * velocityState.Down; // area under the linear deceleration plot
+        float net_delta   = east_delta * east_delta + north_delta * north_delta  + down_delta * down_delta;
         net_delta = sqrtf(net_delta);
-
 
         pathDesired.Start.North = positionState.North;
         pathDesired.Start.East  = positionState.East;
         pathDesired.Start.Down  = positionState.Down;
-        pathDesired.StartingVelocityVector.North = velocityState.North;
-        pathDesired.StartingVelocityVector.East  = velocityState.East;
-        pathDesired.StartingVelocityVector.Down  = velocityState.Down;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH] = velocityState.North;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST] = velocityState.East;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN] = velocityState.Down;
 
         pathDesired.End.North = positionState.North + north_delta;
         pathDesired.End.East  = positionState.East + east_delta;
-        pathDesired.End.Down  = positionState.Down;
-        if (brake3d) {
-            pathDesired.End.Down += down_delta;
-        }
+        pathDesired.End.Down  = positionState.Down + down_delta;
 
         pathDesired.StartingVelocity = velocity;
         pathDesired.EndingVelocity   = 0.0f;
         pathDesired.Mode = PATHDESIRED_MODE_BRAKE;
-        pathDesired.Timeout = time_to_stopped; // only applicable in this mode
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] = time_to_stopped;
         assistedControlFlightMode    = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
     }
     FlightStatusAssistedControlStateSet(&assistedControlFlightMode);

@@ -20,9 +20,6 @@
 
 	<field name="UID" units="" type="int16" elements="1" default="0"/>
 	<!-- unique ID confirmed with pathfollower in pathstatus to acknowledge a change in PathDesired -->
-	
-	<field name="Timeout" units="s" type="float" elements="1" default="5"/>
-	<field name="StartingVelocityVector" units="m/s" type="float" elementnames="North,East,Down" default="0"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>

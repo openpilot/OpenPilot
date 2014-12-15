@@ -95,8 +95,8 @@
 struct Globals {
     struct pid PIDposH[2];
     struct pid PIDposV;
-    struct pid PIDvel[3];
-    struct pid BrakePIDvel[3];
+    struct pid PIDvel[3];  // North, East, Down
+    struct pid BrakePIDvel[2]; // North, East
     struct pid PIDcourse;
     struct pid PIDspeed;
     struct pid PIDpower;
@@ -232,7 +232,7 @@ static void pathFollowerTask(void)
     int16_t old_uid = pathStatus.UID;
     pathStatus.UID    = pathDesired.UID;
     pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
-    if (pathDesired.Timeout > 0.0f) {
+    if (pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] > 0.0f) {
         if (old_uid != pathStatus.UID) {
             pathStatus.path_time = 0.0f;
         } else {
@@ -292,7 +292,6 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     pid_configure(&global.BrakePIDvel[0], vtolPathFollowerSettings.BrakeHorizontalVelPID.Kp, vtolPathFollowerSettings.BrakeHorizontalVelPID.Ki, vtolPathFollowerSettings.BrakeHorizontalVelPID.Kd, vtolPathFollowerSettings.BrakeHorizontalVelPID.ILimit);
     pid_configure(&global.BrakePIDvel[1], vtolPathFollowerSettings.BrakeHorizontalVelPID.Kp, vtolPathFollowerSettings.BrakeHorizontalVelPID.Ki, vtolPathFollowerSettings.BrakeHorizontalVelPID.Kd, vtolPathFollowerSettings.BrakeHorizontalVelPID.ILimit);
-    pid_configure(&global.BrakePIDvel[2], vtolPathFollowerSettings.BrakeVerticalVelPID.Kp, vtolPathFollowerSettings.BrakeVerticalVelPID.Ki, vtolPathFollowerSettings.BrakeVerticalVelPID.Kd, vtolPathFollowerSettings.BrakeVerticalVelPID.ILimit);
 
     PathDesiredGet(&pathDesired);
 }
@@ -335,7 +334,6 @@ static void resetGlobals()
     pid_zero(&global.PIDvel[2]);
     pid_zero(&global.BrakePIDvel[0]);
     pid_zero(&global.BrakePIDvel[1]);
-    pid_zero(&global.BrakePIDvel[2]);
     pid_zero(&global.PIDcourse);
     pid_zero(&global.PIDspeed);
     pid_zero(&global.PIDpower);
@@ -488,13 +486,12 @@ static uint8_t updateAutoPilotVtol()
 
 
     // Brake mode end condition checks
-    // todo capture enter-hold reason code
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         bool exit_brake = false;
-        if (pathStatus.path_time > pathDesired.Timeout) { // enter hold on timeout
+        if (pathStatus.path_time > pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT]) { // enter hold on timeout
             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_TIMEOUT;
             exit_brake = true;
-        } else if (pathStatus.fractional_progress > 0.9f) { // enter hold if achieved 90% reduction in start velocity
+        } else if (pathStatus.fractional_progress > 0.95f) { // enter hold if achieved 95% reduction in start velocity
             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
             exit_brake = true;
         }
@@ -509,16 +506,14 @@ static uint8_t updateAutoPilotVtol()
             float east_offset  = pathDesired.End.East - p.East;
             float down_offset  = pathDesired.End.Down - p.Down;
             pathSummary.brake_distance_offset = sqrtf(north_offset * north_offset + east_offset * east_offset + down_offset * down_offset);
-            pathSummary.time_remaining = pathDesired.Timeout - pathStatus.path_time;
-            pathSummary.fractional_progress   = pathStatus.fractional_progress;
+            pathSummary.time_remaining = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] - pathStatus.path_time;
+            pathSummary.fractional_progress = pathStatus.fractional_progress;
             VelocityStateData velocityState;
             VelocityStateGet(&velocityState);
             float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
             cur_velocity = sqrtf(cur_velocity);
             pathSummary.decelrate = (pathDesired.StartingVelocity - cur_velocity) / pathStatus.path_time;
-            float brakeRate;
-            FlightModeSettingsAssistedControlBrakeRateGet(&brakeRate);
-            pathSummary.brakeRateActualDesiredRatio = pathSummary.decelrate / brakeRate;
+            pathSummary.brakeRateActualDesiredRatio = pathSummary.decelrate / vtolPathFollowerSettings.BrakeRate;
             pathSummary.velocityIntoHold = cur_velocity;
             pathSummary.UID = pathStatus.UID;
             PathSummarySet(&pathSummary);
@@ -743,14 +738,13 @@ static void updatePathVelocity(float kFF, bool limited)
     const float dT = updatePeriod / 1000.0f;
 
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
-        float brakeRate;
-        FlightModeSettingsAssistedControlBrakeRateGet(&brakeRate);
+        float brakeRate = vtolPathFollowerSettings.BrakeRate;
         if (brakeRate < 0.2f) {
             brakeRate = 0.2f; // set a minimum to avoid a divide by zero potential below
         }
-        updateBrakeVelocity(pathDesired.StartingVelocityVector.North, pathStatus.path_time, brakeRate, velocityState.North, &velocityDesired.North);
-        updateBrakeVelocity(pathDesired.StartingVelocityVector.East, pathStatus.path_time, brakeRate, velocityState.East, &velocityDesired.East);
-        updateBrakeVelocity(pathDesired.StartingVelocityVector.Down, pathStatus.path_time, brakeRate, velocityState.Down, &velocityDesired.Down);
+        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH], pathStatus.path_time, brakeRate, velocityState.North, &velocityDesired.North);
+        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST], pathStatus.path_time, brakeRate, velocityState.East, &velocityDesired.East);
+        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN], pathStatus.path_time, brakeRate, velocityState.Down, &velocityDesired.Down);
 
         float cur_velocity     = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
         cur_velocity     = sqrtf(cur_velocity);
@@ -1248,12 +1242,11 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     if (pathDesired.Mode != PATHDESIRED_MODE_BRAKE) {
         northCommand = pid_apply(&global.PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings.VelocityFeedforward;
         eastCommand  = pid_apply(&global.PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings.VelocityFeedforward;
-        downCommand  = pid_apply(&global.PIDvel[2], downError, dT);
     } else {
         northCommand = pid_apply(&global.BrakePIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings.BrakeVelocityFeedforward;
         eastCommand  = pid_apply(&global.BrakePIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings.BrakeVelocityFeedforward;
-        downCommand  = pid_apply(&global.BrakePIDvel[2], downError, dT);
     }
+    downCommand  = pid_apply(&global.PIDvel[2], downError, dT);
 
 
     if ((vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL &&
@@ -1262,7 +1255,9 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         manual_thrust = true;
     }
 
-    if (!manual_thrust && neutralThrustEst.have_correction != true) {
+    // if auto thrust and we have not run a correction calc, and downCommand is greater than Min which is a quick way to
+    // exclude the situation where we are grounded and zero/low thrust.
+    if (!manual_thrust && neutralThrustEst.have_correction != true && downCommand > vtolPathFollowerSettings.ThrustLimits.Min) {
         // reassess the correction value for this position hold period if not already done
 
         // Assess if position hold state running
@@ -1272,7 +1267,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
              (flightStatus.FlightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE &&
               flightStatus.AssistedControlState == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD));
 
-        bool stable = (fabsf(velocityDesired.Down) < 0.2f && fabsf(velocityState.Down) < 0.3f && fabsf(downError) < 0.3f);
+        bool stable = (fabsf(velocityDesired.Down) < 0.2f && fabsf(velocityState.Down) < 0.3f && fabsf(downError) < 1.0f);
 
         if (ph_active && stable) {
             if (neutralThrustEst.start_sampling) {
@@ -1311,8 +1306,10 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
                     // Write a new adjustment value
                     adjustments.NeutralThrustOffset    = neutralThrustEst.correction;
                     adjustments.NeutralThrustAlgoError = neutralThrustEst.algo_erro_check;
-                    AdjustmentsNeutralThrustOffsetSet(&adjustments.NeutralThrustOffset);
-                    AdjustmentsNeutralThrustAlgoErrorSet(&adjustments.NeutralThrustAlgoError);
+                    adjustments.NeutralThrustOffsetUnchecked = neutralThrustEst.average;
+                    adjustments.NeutralThrustAccumulator =  iterm;
+                    adjustments.NeutralThrustILimit = global.PIDvel[2].iLim;
+                    AdjustmentsSet(&adjustments);
                 }
             } else {
                 // start a tick count
@@ -1364,7 +1361,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
     float maxPitch = vtolPathFollowerSettings.MaxRollPitch;
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
-        maxPitch = vtolPathFollowerSettings.MaxBrakePitch;
+        maxPitch = vtolPathFollowerSettings.BrakeMaxPitch;
     }
 
     stabDesired.Pitch = boundf(-northCommand * cosf(DEG2RAD(attitudeState.Yaw)) +

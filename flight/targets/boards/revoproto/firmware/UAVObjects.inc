@@ -19,6 +19,7 @@
 # These are the UAVObjects supposed to be build as part of the OpenPilot target
 # (all architectures)
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += adjustments
 UAVOBJSRCFILENAMES += accelgyrosettings
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
@@ -76,6 +77,7 @@ UAVOBJSRCFILENAMES += pathaction
 UAVOBJSRCFILENAMES += pathdesired
 UAVOBJSRCFILENAMES += pathplan
 UAVOBJSRCFILENAMES += pathstatus
+UAVOBJSRCFILENAMES += pathsummary
 UAVOBJSRCFILENAMES += positionstate
 UAVOBJSRCFILENAMES += ratedesired
 UAVOBJSRCFILENAMES += ekfconfiguration

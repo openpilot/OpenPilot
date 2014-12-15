@@ -75,14 +75,17 @@ void pathFollowerHandler(bool newinit)
                 plan_setup_positionHold();
             }
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
-            plan_setup_PositionVarioFPV();
+        case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
+            plan_setup_CourseLock();
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
-            plan_setup_PositionVarioLOS();
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+            plan_setup_PositionRoam();
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
-            plan_setup_PositionVarioNSEW();
+        case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
+            plan_setup_HomeLeash();
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
+            plan_setup_AbsolutePosition();
             break;
 
         case FLIGHTSTATUS_FLIGHTMODE_LAND:
@@ -111,14 +114,17 @@ void pathFollowerHandler(bool newinit)
     }
 
     switch (flightMode) {
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
-        plan_run_PositionVarioFPV();
+    case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
+        plan_run_CourseLock();
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
-        plan_run_PositionVarioLOS();
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+        plan_run_PositionRoam();
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
-        plan_run_PositionVarioNSEW();
+    case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
+        plan_run_HomeLeash();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
+        plan_run_AbsolutePosition();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
         plan_run_land();

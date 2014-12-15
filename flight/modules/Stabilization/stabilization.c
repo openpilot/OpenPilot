@@ -102,7 +102,6 @@ int32_t StabilizationInitialize()
     StabilizationSettingsBank3Initialize();
     RateDesiredInitialize();
     ManualControlCommandInitialize(); // only used for PID bank selection based on flight mode switch
-    // Code required for relay tuning
     sin_lookup_initalize();
 
     stabilizationOuterloopInit();

@@ -47,7 +47,7 @@ export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DI
 export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
-export SOURCE_DIR  := $(ROOT_DIR)/build/source
+export DIST_DIR    := $(ROOT_DIR)/build/dist
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -79,9 +79,11 @@ $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowe
 SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER CLEAN_BUILD
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
-# Make sure this isn't being run as root (no whoami on Windows, but that is ok here)
+# Make sure this isn't being run as root unless installing (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
-    $(error You should not be running this as root)
+    ifeq ($(filter install install_qt,$(MAKECMDGOALS)),)
+        $(error You should not be running this as root)
+    endif
 endif
 
 # Decide on a verbosity level based on the V= parameter
@@ -906,19 +908,65 @@ build-info:
 #
 ##############################
 
-.PHONY: source
-source:
-	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(SOURCE_DIR))"
-	$(V1) $(MKDIR) -p "$(SOURCE_DIR)"
+.PHONY: dist
+dist:
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_DIR))"
+	$(V1) $(MKDIR) -p "$(DIST_DIR)"
 	$(V1) $(VERSION_INFO) \
-		--jsonpath="$(SOURCE_DIR)"
-	$(eval SOURCE_NAME := $(call toprel, "$(SOURCE_DIR)/OpenPilot-$(shell git describe).tar"))
-	$(V1) git archive --prefix="OpenPilot/" -o "$(SOURCE_NAME)" HEAD
-	$(V1) tar --append --file="$(SOURCE_NAME)" \
+		--jsonpath="$(DIST_DIR)"
+	$(eval DIST_NAME := $(call toprel, "$(DIST_DIR)/OpenPilot-$(shell git describe).tar"))
+	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
+	$(V1) tar --append --file="$(DIST_NAME)" \
 		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
-		$(call toprel, "$(SOURCE_DIR)/version-info.json")
-	$(V1) gzip -f "$(SOURCE_NAME)"
+		$(call toprel, "$(DIST_DIR)/version-info.json")
+	$(V1) gzip -f "$(DIST_NAME)"
 
+
+
+##############################
+#
+# Install OpenPilot
+#
+##############################
+prefix  := /usr/local
+bindir  := $(prefix)/bin
+libdir  := $(prefix)/lib
+datadir := $(prefix)/share
+
+INSTALL = cp -a --no-preserve=ownership
+LN = ln
+LN_S = ln -s
+
+ifeq ($(MAKECMDGOALS), install)
+        ifneq ($(UNAME), Linux)
+            $(error install only supported for Linux)
+        endif
+endif
+
+
+.PHONY: install
+install:
+	@$(ECHO) " INSTALLING GCS TO $(DESTDIR)/)"
+	$(V1) $(MKDIR) -p $(DESTDIR)$(bindir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/applications
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/pixmaps
+	$(V1) $(MKDIR) -p $(DESTDIR)$(udevdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/openpilotgcs.bin $(DESTDIR)$(bindir)/openpilot-gcs
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/udp_test $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/openpilotgcs $(DESTDIR)$(libdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/share/openpilotgcs $(DESTDIR)$(datadir)
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps
+	$(V1) rm $(DESTDIR)/$(datadir)/openpilotgcs/translations/Makefile
+
+
+.PHONY: install_qt
+install_qt:
+	@$(ECHO) " INSTALLING QT TO $(DESTDIR)/)"
+	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/qt5 $(DESTDIR)$(libdir)
 
 
 ##############################
@@ -1056,7 +1104,9 @@ help:
 	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
-	@$(ECHO) "     source               - Generate source archive for distribution"
+	@$(ECHO) "     dist                 - Generate source archive for distribution"
+	@$(ECHO) "     install              - Install GCS to \"DESTDIR\" with prefix \"prefix\" (Linux only)"
+	@$(ECHO) "     install_qt           - Install QT to \"DESTDIR\" with prefix \"prefix\" (Linux only)"
 	@$(ECHO)
 	@$(ECHO) "   [Code Formatting]"
 	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code according to the project's standards"

@@ -79,15 +79,6 @@ static const controlHandler handler_STABILIZED = {
 };
 
 
-static const controlHandler handler_AUTOTUNE = {
-    .controlChain      = {
-        .Stabilization = false,
-        .PathFollower  = false,
-        .PathPlanner   = false,
-    },
-    .handler           = NULL,
-};
-
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 static const controlHandler handler_PATHFOLLOWER = {
     .controlChain      = {
@@ -346,12 +337,15 @@ static void manualControlTask(void)
         if (newFlightModeAssist) {
 
 	    switch (newFlightModeAssist) {
+    case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
 	      case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST:
 		    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
 		break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
 	      case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST:
 		    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO;
 		break;
+    case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
 	      case FLIGHTSTATUS_FLIGHTMODEASSIST_NONE:
 	      default:
 		    newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
@@ -362,6 +356,7 @@ static void manualControlTask(void)
 		  case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE:
 			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
 			break;
+    case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
 		  case  FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
 			newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
 			break;
@@ -388,9 +383,6 @@ static void manualControlTask(void)
         handler = &handler_PATHPLANNER;
         break;
 #endif
-    case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
-        handler = &handler_AUTOTUNE;
-        break;
         // There is no default, so if a flightmode is forgotten the compiler can throw a warning!
     }
 

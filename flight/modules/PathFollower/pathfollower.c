@@ -491,7 +491,7 @@ static uint8_t updateAutoPilotVtol()
         if (pathStatus.path_time > pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT]) { // enter hold on timeout
             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_TIMEOUT;
             exit_brake = true;
-        } else if (pathStatus.fractional_progress > 0.95f) { // enter hold if achieved 95% reduction in start velocity
+        } else if (pathStatus.fractional_progress > 0.90f) { // enter hold if achieved 90% reduction in start velocity
             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
             exit_brake = true;
         }

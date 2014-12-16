@@ -519,8 +519,9 @@ void plan_run_AutoCruise()
  */
 #define ASSISTEDCONTROL_BRAKERATE_MINIMUM  0.2f   // m/s2
 #define ASSISTEDCONTROL_TIMETOSTOP_MINIMUM 0.5f // seconds
-#define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 5.0f // seconds
-#define ASSISTEDCONTROL_DELAY_TO_BRAKE     0.5f      // seconds
+#define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 6.0f // seconds
+#define ASSISTEDCONTROL_DELAY_TO_BRAKE     1.0f      // seconds
+#define ASSISTEDCONTROL_TIMEOUT_MULTIPLIER 2.0f      // actual deceleration rate can be 50% of desired...timeouts need to cater for this
 void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 {
     PositionStateData positionState;
@@ -605,7 +606,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
         pathDesired.StartingVelocity = velocity;
         pathDesired.EndingVelocity   = 0.0f;
         pathDesired.Mode = PATHDESIRED_MODE_BRAKE;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] = time_to_stopped;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] = time_to_stopped * ASSISTEDCONTROL_TIMEOUT_MULTIPLIER;
         assistedControlFlightMode    = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
     }
     FlightStatusAssistedControlStateSet(&assistedControlFlightMode);

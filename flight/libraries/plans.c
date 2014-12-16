@@ -517,10 +517,10 @@ void plan_run_AutoCruise()
  *        timeout_occurred = false: Attempt to enter flyvector for braking
  *        timeout_occurred = true: Revert to position hold
  */
-#define ASSISTEDCONTROL_BRAKERATE_MINIMUM 0.2f   // m/s2
-#define ASSISTEDCONTROL_TIMETOSTOP_MINIMUM 0.5f	 // seconds
-#define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 5.0f	 // seconds
-#define ASSISTEDCONTROL_DELAY_TO_BRAKE 0.5f	 // seconds
+#define ASSISTEDCONTROL_BRAKERATE_MINIMUM  0.2f   // m/s2
+#define ASSISTEDCONTROL_TIMETOSTOP_MINIMUM 0.5f // seconds
+#define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 5.0f // seconds
+#define ASSISTEDCONTROL_DELAY_TO_BRAKE     0.5f      // seconds
 void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 {
     PositionStateData positionState;
@@ -539,7 +539,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
             // keep original start location
             // retain original start and end velocity...which is not used in this mode anyway
             // change mode to hold position
-            pathDesired.Mode    = PATHDESIRED_MODE_FLYENDPOINT;
+            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
             // keep original starting velocity. Not used except useful for debugging
             // change assisted mode to hold.
             assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
@@ -588,15 +588,15 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
         east_delta  += (time_to_stopped - ASSISTEDCONTROL_DELAY_TO_BRAKE) * 0.5f * velocityState.East; // area under the linear deceleration plot
         float down_delta  = velocityState.Down * ASSISTEDCONTROL_DELAY_TO_BRAKE;
         down_delta  += (time_to_stopped - ASSISTEDCONTROL_DELAY_TO_BRAKE) * 0.5f * velocityState.Down; // area under the linear deceleration plot
-        float net_delta   = east_delta * east_delta + north_delta * north_delta  + down_delta * down_delta;
-        net_delta = sqrtf(net_delta);
+        float net_delta   = east_delta * east_delta + north_delta * north_delta + down_delta * down_delta;
+        net_delta    = sqrtf(net_delta);
 
         pathDesired.Start.North = positionState.North;
         pathDesired.Start.East  = positionState.East;
         pathDesired.Start.Down  = positionState.Down;
         pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH] = velocityState.North;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST] = velocityState.East;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN] = velocityState.Down;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST]  = velocityState.East;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN]  = velocityState.Down;
 
         pathDesired.End.North = positionState.North + north_delta;
         pathDesired.End.East  = positionState.East + east_delta;

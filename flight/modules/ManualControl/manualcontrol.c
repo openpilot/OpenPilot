@@ -384,6 +384,7 @@ static void manualControlTask(void)
     static bool firstRun = true;
 
     if (flightStatus.FlightMode != newMode || firstRun ||
+        newFlightModeAssist != flightStatus.FlightModeAssist ||
         newAssistedControlState != flightStatus.AssistedControlState ||
         flightStatus.AssistedThrottleState != newAssistedThrottleState) {
         firstRun = false;

@@ -95,7 +95,7 @@
 struct Globals {
     struct pid PIDposH[2];
     struct pid PIDposV;
-    struct pid PIDvel[3];  // North, East, Down
+    struct pid PIDvel[3]; // North, East, Down
     struct pid BrakePIDvel[2]; // North, East
     struct pid PIDcourse;
     struct pid PIDspeed;
@@ -507,7 +507,7 @@ static uint8_t updateAutoPilotVtol()
             float down_offset  = pathDesired.End.Down - p.Down;
             pathSummary.brake_distance_offset = sqrtf(north_offset * north_offset + east_offset * east_offset + down_offset * down_offset);
             pathSummary.time_remaining = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] - pathStatus.path_time;
-            pathSummary.fractional_progress = pathStatus.fractional_progress;
+            pathSummary.fractional_progress   = pathStatus.fractional_progress;
             VelocityStateData velocityState;
             VelocityStateGet(&velocityState);
             float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
@@ -1246,7 +1246,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         northCommand = pid_apply(&global.BrakePIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings.BrakeVelocityFeedforward;
         eastCommand  = pid_apply(&global.BrakePIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings.BrakeVelocityFeedforward;
     }
-    downCommand  = pid_apply(&global.PIDvel[2], downError, dT);
+    downCommand = pid_apply(&global.PIDvel[2], downError, dT);
 
 
     if ((vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL &&
@@ -1298,17 +1298,17 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
                     }
                     // recalculate downCommand now that i is adjusted
                     float new_downCommand = pid_apply(&global.PIDvel[2], downError, 0.0f); // we generally don't have a d controller
-                    neutralThrustEst.algo_erro_check   = (new_downCommand + neutralThrustEst.correction) - downCommand;
+                    neutralThrustEst.algo_erro_check         = (new_downCommand + neutralThrustEst.correction) - downCommand;
                     downCommand = new_downCommand;
-                    neutralThrustEst.start_sampling    = false;
-                    neutralThrustEst.have_correction   = true;
+                    neutralThrustEst.start_sampling          = false;
+                    neutralThrustEst.have_correction         = true;
 
                     // Write a new adjustment value
-                    adjustments.NeutralThrustOffset    = neutralThrustEst.correction;
-                    adjustments.NeutralThrustAlgoError = neutralThrustEst.algo_erro_check;
+                    adjustments.NeutralThrustOffset          = neutralThrustEst.correction;
+                    adjustments.NeutralThrustAlgoError       = neutralThrustEst.algo_erro_check;
                     adjustments.NeutralThrustOffsetUnchecked = neutralThrustEst.average;
-                    adjustments.NeutralThrustAccumulator =  iterm;
-                    adjustments.NeutralThrustILimit = global.PIDvel[2].iLim;
+                    adjustments.NeutralThrustAccumulator     = iterm;
+                    adjustments.NeutralThrustILimit          = global.PIDvel[2].iLim;
                     AdjustmentsSet(&adjustments);
                 }
             } else {

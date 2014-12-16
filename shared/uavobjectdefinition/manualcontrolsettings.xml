@@ -16,6 +16,8 @@
 	       elementnames="Roll,Pitch,Yaw,Collective,Accessory0,Accessory1,Accessory2"/>
 
         <field name="Deadband" units="%" type="float" elements="1" defaultvalue="0.02"/>
+	<!-- Note the following deadband is used in AssistedControl.  Use of deadband with AssistedControl is not optional and will have a hardcoded minimum. -->
+        <field name="DeadbandAssistedControl" units="%" type="float" elements="1" defaultvalue="0.08" description="Stick deadband used for AssistedControl"/>
 
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->

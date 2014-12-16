@@ -47,8 +47,6 @@ void AutoUpdatePage::autoUpdate()
 
 void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
 {
-    QString msg;
-
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         disableButtons();
@@ -65,6 +63,7 @@ void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
         ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::JUMP_TO_BL:
+        disableButtons();
         ui->levellinProgressBar->setValue(value.toInt());
         ui->levellinProgressBar->setMaximum(5);
         ui->statusLabel->setText(tr("Board going into bootloader mode. Please wait."));
@@ -81,7 +80,7 @@ void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
         ui->statusLabel->setText(tr("Uploading description."));
         break;
     case uploader::BOOTING:
-        ui->statusLabel->setText(tr("Booting the board%. Please wait").arg(value.toString()));
+        ui->statusLabel->setText(tr("Booting the board%1. Please wait").arg(value.toString()));
         break;
     case uploader::SUCCESS:
         enableButtons(true);

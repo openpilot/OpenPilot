@@ -738,7 +738,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     TelemetryManager *telemetryManager = pluginManager->getObject<TelemetryManager>();
     Q_ASSERT(telemetryManager);
 
-    if(!telemetryManager->isConnected()) {
+    if (!telemetryManager->isConnected()) {
         progressUpdate(BOOTING, erase ? tr(" and erasing settings") : QVariant());
         ResultEventLoop eventLoop;
 

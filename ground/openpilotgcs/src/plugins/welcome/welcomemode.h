@@ -45,7 +45,7 @@ namespace Welcome {
 struct WelcomeModePrivate;
 
 class WELCOME_EXPORT WelcomeMode : public Core::IMode {
-    Q_OBJECT Q_PROPERTY(QString versionString READ versionString)
+    Q_OBJECT Q_PROPERTY(QString versionString READ versionString CONSTANT)
     Q_PROPERTY(QString newVersionText READ newVersionText NOTIFY newVersionTextChanged)
 
 public:

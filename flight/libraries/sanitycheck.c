@@ -45,12 +45,6 @@
 #define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
 
 
-/****************************
-* Current checks:
-* 1. If a flight mode switch allows autotune and autotune module not running
-* 2. If airframe is a multirotor and either manual is available or a stabilization mode uses "none"
-****************************/
-
 // ! Check a stabilization mode switch position for safety
 static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol);
 
@@ -127,9 +121,6 @@ int32_t configuration_check()
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
             ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol));
             break;
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
-            break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
             // Revo supports PathPlanner and that must be OK or we are not sane
@@ -141,9 +132,10 @@ int32_t configuration_check()
         }
         // intentionally no break as this also needs pathfollower
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOFPV:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOLOS:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIONSEW:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_COURSELOCK:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_HOMELEASH:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ABSOLUTEPOSITION:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:

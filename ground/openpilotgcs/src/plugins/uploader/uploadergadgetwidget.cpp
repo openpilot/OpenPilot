@@ -639,6 +639,9 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
             emit autoUpdateFailed();
             return false;
         }
+
+        disconnect(this, SIGNAL(bootloaderSuccess()), &eventLoop, SLOT(success()));
+        disconnect(this, SIGNAL(bootloaderFailed()), &eventLoop, SLOT(fail()));
     }
 
     if (dfu) {
@@ -646,7 +649,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         dfu = NULL;
     }
 
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    Core::ConnectionManager *connectionManager = Core::ICore::instance()->connectionManager();
     dfu = new DFUObject(DFU_DEBUG, false, QString());
     dfu->AbortOperation();
     emit progressUpdate(JUMP_TO_BL, QVariant());
@@ -655,7 +658,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         (dfu->numberOfDevices != 1) || dfu->numberOfDevices > 5) {
         delete dfu;
         dfu = NULL;
-        cm->resumePolling();
+        connectionManager->resumePolling();
         emit progressUpdate(FAILURE, QVariant());
         emit autoUpdateFailed();
         return false;
@@ -725,7 +728,31 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         emit autoUpdateFailed();
         return false;
     }
+
     commonSystemBoot(false, erase);
+
+    // Wait for board to connect to GCS again after boot and erase
+    // For older board like CC3D this can take some time
+    ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pluginManager);
+    TelemetryManager *telemetryManager = pluginManager->getObject<TelemetryManager>();
+    Q_ASSERT(telemetryManager);
+
+    if(!telemetryManager->isConnected()) {
+        progressUpdate(BOOTING, erase ? tr(" and erasing settings") : QVariant());
+        ResultEventLoop eventLoop;
+
+        connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
+
+        if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
+            emit progressUpdate(FAILURE, QVariant());
+            emit autoUpdateFailed();
+            return false;
+        }
+
+        disconnect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
+    }
+
     emit progressUpdate(SUCCESS, QVariant());
     emit autoUpdateSuccess();
     return true;
@@ -956,7 +983,7 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::ProgressStep status, QVari
         m_config->autoUpdateProgressBar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
         break;
     case uploader::JUMP_TO_BL:
-        m_config->autoUpdateLabel->setText(tr("Bringing the board into boot loader mode."));
+        m_config->autoUpdateLabel->setText(tr("Bringing the board into boot loader mode. Please wait."));
         m_config->autoUpdateProgressBar->setFormat(tr("Step %1").arg(value.toInt()));
         m_config->autoUpdateProgressBar->setMaximum(5);
         m_config->autoUpdateProgressBar->setValue(value.toInt());
@@ -974,7 +1001,7 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::ProgressStep status, QVari
         m_config->autoUpdateLabel->setText(tr("Uploading description of the new firmware to the board."));
         break;
     case uploader::BOOTING:
-        m_config->autoUpdateLabel->setText(tr("Rebooting the board."));
+        m_config->autoUpdateLabel->setText(tr("Rebooting the board%1. Please wait.").arg(value.toString()));
         break;
     case uploader::SUCCESS:
         m_config->autoUpdateProgressBar->setValue(m_config->autoUpdateProgressBar->maximum());

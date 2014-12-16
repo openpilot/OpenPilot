@@ -67,7 +67,7 @@ void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
     case uploader::JUMP_TO_BL:
         ui->levellinProgressBar->setValue(value.toInt());
         ui->levellinProgressBar->setMaximum(5);
-        ui->statusLabel->setText(tr("Board going into bootloader mode."));
+        ui->statusLabel->setText(tr("Board going into bootloader mode. Please wait."));
         break;
     case uploader::LOADING_FW:
         ui->statusLabel->setText(tr("Loading firmware."));
@@ -81,7 +81,7 @@ void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
         ui->statusLabel->setText(tr("Uploading description."));
         break;
     case uploader::BOOTING:
-        ui->statusLabel->setText(tr("Booting the board."));
+        ui->statusLabel->setText(tr("Booting the board%. Please wait").arg(value.toString()));
         break;
     case uploader::SUCCESS:
         enableButtons(true);

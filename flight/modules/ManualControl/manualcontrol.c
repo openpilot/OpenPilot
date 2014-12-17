@@ -250,8 +250,23 @@ static void manualControlTask(void)
                     handler  = &handler_PATHFOLLOWER;
                     // retain thrust cmd for later comparison with actual in braking
                     thrustAtBrakeStart = cmd.Thrust;
-                    thrustLo = 0.95f * thrustAtBrakeStart;
-                    thrustHi = 1.05f * thrustAtBrakeStart;
+
+                    // calculate hi and low value of +-8% as a mini-deadband
+                    // for use in auto-override in brake sequence
+                    thrustLo = 0.92f * thrustAtBrakeStart;
+                    thrustHi = 1.08f * thrustAtBrakeStart;
+
+                    // The purpose for auto throttle assist is to go from a mid to high thrust range to a
+                    // neutral vertical-holding/maintaining ~50% thrust range.  It is not designed/intended
+                    // to go from near zero to 50%...we don't want an auto-takeoff feature here!
+                    // Also for rapid decents a user might have a bit of forward stick and low throttle
+                    // then stick-off for auto-braking...but if below the vtol min of 20% it will not
+                    // kick in...the flyer needs to manually manage throttle to slow down decent,
+                    // and the next time they put in a bit of stick, revert to priimary, and then
+                    // sticks-off it will brake and hold with auto-thrust
+                    if (thrustAtBrakeStart < vtolPathFollowerSettings.ThrustLimits.Min) {
+                        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
+                    }
                 } else {
                     // stick input so stay in primary mode control state
                     // newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
@@ -268,8 +283,10 @@ static void manualControlTask(void)
                     // no stick input, stay in brake mode
                     newAssistedThrottleState = pathfollowerthrustmode;
                     handler = &handler_PATHFOLLOWER;
-                    // if user adjusts thrust in which case revert to manual
-                    if (cmd.Thrust < thrustLo || cmd.Thrust > thrustHi) {
+
+                    // if auto thrust and user adjusts thrust outside of a deadband in which case revert to manual
+                    if ((newAssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO) &&
+                	(cmd.Thrust < thrustLo || cmd.Thrust > thrustHi)) {
                         newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
                     }
                 }

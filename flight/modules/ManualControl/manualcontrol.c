@@ -200,6 +200,19 @@ static void manualControlTask(void)
         newMode = modeSettings.FlightModePosition[position];
     }
 
+    // if a mode change occurs we default the assist mode and states here
+    // to avoid having to add it to all of the below modes that are
+    // otherwise unrelated
+    if (newMode != flightStatus.FlightMode) {
+	// set assist mode to none to avoid an assisted flight mode position
+	// carrying over and impacting a newly selected non-assisted flight mode pos
+	newFlightModeAssist      = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
+	// The following are eqivalent to none effectively. Code should always
+	// check the flightmodeassist state.
+	newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+	newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+    }
+
     // Depending on the mode update the Stabilization or Actuator objects
     const controlHandler *handler = &handler_MANUAL;
     switch (newMode) {

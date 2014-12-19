@@ -320,9 +320,9 @@ void ConfigGroundVehicleWidget::initMixerCurves(QString frameType)
     } else {
         // no, init a straight curve
         if (frameType == "GroundVehicleDifferential") {
-        m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 0.8, -0.8);
+            m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 0.8, -0.8);
         } else {
-        m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 1.0);
+            m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 1.0);
         }
     }
 }

@@ -14,10 +14,12 @@
 
 # qmake project file for building the qwt libraries
 
-# QWT_ROOT = $${PWD}/..
-# include( $${QWT_ROOT}/qwtconfig.pri )
+QWT_ROOT = $${PWD}/..
+include( $${QWT_ROOT}/qwtconfig.pri )
 # include( $${QWT_ROOT}/qwtbuild.pri )
 # include( $${QWT_ROOT}/qwtfunctions.pri )
+
+include(../../../openpilotgcslibrary.pri)
 
 # QWT_OUT_ROOT = $${OUT_PWD}/..
 
@@ -25,11 +27,9 @@ TEMPLATE          = lib
 # TARGET            = $$qwtLibraryTarget(qwt)
 TARGET            = Qwt
 QT                += printsupport
-# DESTDIR           = $${QWT_OUT_ROOT}/lib
 DEFINES           += QWT_LIBRARY
 
-include(../../../openpilotgcslibrary.pri)
-include( ../qwtconfig.pri )
+# DESTDIR           = $${QWT_OUT_ROOT}/lib
 
 contains(QWT_CONFIG, QwtDll) {
 

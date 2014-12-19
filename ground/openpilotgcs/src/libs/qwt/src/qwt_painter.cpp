@@ -84,7 +84,8 @@ static inline void qwtDrawPolyline( QPainter *painter,
 
     if ( doSplit )
     {
-        const int splitSize = 20;
+        const int splitSize = 6;
+
         for ( int i = 0; i < pointCount; i += splitSize )
         {
             const int n = qMin( splitSize + 1, pointCount - i );
@@ -92,7 +93,9 @@ static inline void qwtDrawPolyline( QPainter *painter,
         }
     }
     else
+    {
         painter->drawPolyline( points, pointCount );
+    }
 }
 
 static inline QSize qwtScreenResolution()
@@ -1096,6 +1099,8 @@ void QwtPainter::drawColorBar( QPainter *painter,
      */
 
     QPixmap pixmap( devRect.size() );
+    pixmap.fill( Qt::transparent );
+
     QPainter pmPainter( &pixmap );
     pmPainter.translate( -devRect.x(), -devRect.y() );
 
@@ -1127,7 +1132,7 @@ void QwtPainter::drawColorBar( QPainter *painter,
             const double value = sMap.invTransform( y );
 
             if ( colorMap.format() == QwtColorMap::RGB )
-                c.setRgb( colorMap.rgb( interval, value ) );
+                c.setRgba( colorMap.rgb( interval, value ) );
             else
                 c = colorTable[colorMap.colorIndex( interval, value )];
 

@@ -23,6 +23,12 @@
 #include <qtconcurrentrun.h>
 #endif
 
+#define DEBUG_RENDER 0
+
+#if DEBUG_RENDER
+#include <QElapsedTimer>
+#endif
+
 class QwtPlotSpectrogram::PrivateData
 {
 public:
@@ -416,6 +422,11 @@ QImage QwtPlotSpectrogram::renderImage(
 
     d_data->data->initRaster( area, image.size() );
 
+#if DEBUG_RENDER
+    QElapsedTimer time;
+    time.start();
+#endif
+
 #if QT_VERSION >= 0x040400 && !defined(QT_NO_QFUTURE)
     uint numThreads = renderThreadCount();
 
@@ -449,6 +460,11 @@ QImage QwtPlotSpectrogram::renderImage(
 #else // QT_VERSION < 0x040400
     const QRect tile( 0, 0, image.width(), image.height() );
     renderTile( xMap, yMap, tile, &image );
+#endif
+
+#if DEBUG_RENDER
+    const qint64 elapsed = time.elapsed();
+    qDebug() << "renderImage" << imageSize << elapsed;
 #endif
 
     d_data->data->discardRaster();

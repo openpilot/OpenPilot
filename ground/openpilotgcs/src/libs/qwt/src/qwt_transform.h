@@ -107,8 +107,13 @@ public:
 
     virtual QwtTransform *copy() const;
 
+#if QT_VERSION >= 0x050400
+    static const double LogMin;
+    static const double LogMax;
+#else
     QT_STATIC_CONST double LogMin;
     QT_STATIC_CONST double LogMax;
+#endif
 };
 
 /*!

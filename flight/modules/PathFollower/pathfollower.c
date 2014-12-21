@@ -111,6 +111,8 @@ struct NeutralThrustEstimation {
     float    average;
     float    correction;
     float    algo_erro_check;
+    float    min;
+    float    max;
     bool     start_sampling;
     bool     have_correction;
 };
@@ -349,6 +351,8 @@ static void resetGlobals()
     neutralThrustEst.have_correction = false;
     neutralThrustEst.average    = 0.0f;
     neutralThrustEst.correction = 0.0f;
+    neutralThrustEst.min = 0.0f;
+    neutralThrustEst.max = 0.0f;
 
     pathStatus.path_time = 0.0f;
 }
@@ -519,6 +523,8 @@ static uint8_t updateAutoPilotVtol()
             PathSummarySet(&pathSummary);
 
             plan_setup_assistedcontrol(true); // braking timeout true
+            // having re-entered hold allow reassessment of neutral thrust
+            neutralThrustEst.have_correction = false;
         }
     }
 
@@ -1257,68 +1263,74 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
     // if auto thrust and we have not run a correction calc, and downCommand is greater than Min which is a quick way to
     // exclude the situation where we are grounded and zero/low thrust.
-    if (!manual_thrust && neutralThrustEst.have_correction != true && downCommand > vtolPathFollowerSettings.ThrustLimits.Min) {
+    if (!manual_thrust && neutralThrustEst.have_correction != true) {
         // reassess the correction value for this position hold period if not already done
 
-        // Assess if position hold state running
+        // Assess if position hold state running.  This can be normal position hold or
+        // another mode with assist-hold active.
         bool ph_active =
             ((flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD &&
               flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) ||
              (flightStatus.FlightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE &&
               flightStatus.AssistedControlState == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD));
 
-        bool stable = (fabsf(velocityDesired.Down) < 0.2f && fabsf(velocityState.Down) < 0.3f && fabsf(downError) < 1.0f);
+        bool stable = (fabsf(pathStatus.correction_direction_down) < 0.5f && fabsf(velocityDesired.Down) < 0.2f && fabsf(velocityState.Down) < 0.2f && fabsf(downError) < 0.1f);
 
         if (ph_active && stable) {
             if (neutralThrustEst.start_sampling) {
                 neutralThrustEst.count++;
-                neutralThrustEst.sum += downCommand;
 
-                if (neutralThrustEst.count >= 60) {
-                    // 3 seconds have past
+                // delay count for 2 seconds into hold allowing for stablisation
+                if (neutralThrustEst.count > 40) {
+		  neutralThrustEst.sum += global.PIDvel[2].iAccumulator;
+		  if (global.PIDvel[2].iAccumulator < neutralThrustEst.min) {
+		      neutralThrustEst.min = global.PIDvel[2].iAccumulator;
+		  }
+		  if (global.PIDvel[2].iAccumulator > neutralThrustEst.max) {
+		      neutralThrustEst.max = global.PIDvel[2].iAccumulator;
+		  }
+                }
+
+                if (neutralThrustEst.count >= 160) {
+                    // 6 seconds have past
                     // lets take an average
-                    neutralThrustEst.average = neutralThrustEst.sum / 60.0f;
+                    neutralThrustEst.average = neutralThrustEst.sum / 120.0f;
+                    neutralThrustEst.correction =  neutralThrustEst.average/1000.0f;
 
-                    // Let the size of the correction to something reasonable.  The largest
-                    float checked_average = neutralThrustEst.average;
-                    if (checked_average > 0.2f) {
-                        checked_average = 0.2f;
-                    } else if (checked_average < -0.2f) {
-                        checked_average = -0.2f;
-                    }
+                    // calculate current offset from neutral
+                    float current_neutral_thrust_offset = adjustments.NeutralThrustOffset + downCommand;
 
-                    // We always limit the correction to the size of the current i term
-                    float iterm = global.PIDvel[2].iAccumulator / 1000.0f;
-                    if (fabsf(checked_average) > fabsf(iterm)) {
-                        neutralThrustEst.correction   = iterm;
-                        global.PIDvel[2].iAccumulator = 0.0f;
-                    } else {
-                        neutralThrustEst.correction    = checked_average;
-                        global.PIDvel[2].iAccumulator -= neutralThrustEst.correction * 1000.0f;
-                    }
-                    // recalculate downCommand now that i is adjusted
-                    float new_downCommand = pid_apply(&global.PIDvel[2], downError, 0.0f); // we generally don't have a d controller
-                    neutralThrustEst.algo_erro_check         = (new_downCommand + neutralThrustEst.correction) - downCommand;
-                    downCommand = new_downCommand;
+                    // add the average remaining i value to the
+                    adjustments.NeutralThrustOffset += neutralThrustEst.correction;
+
+                    global.PIDvel[2].iAccumulator -= neutralThrustEst.average;
+
+                    downCommand = pid_apply(&global.PIDvel[2], downError, 0.0f); // intentionally set dT to zero as same time increment
+                    float new_neutral_thrust_offset = adjustments.NeutralThrustOffset + downCommand;
+                    neutralThrustEst.algo_erro_check = new_neutral_thrust_offset - current_neutral_thrust_offset;
+
                     neutralThrustEst.start_sampling          = false;
                     neutralThrustEst.have_correction         = true;
 
                     // Write a new adjustment value
-                    adjustments.NeutralThrustOffset          = neutralThrustEst.correction;
-                    adjustments.NeutralThrustAlgoError       = neutralThrustEst.algo_erro_check;
-                    adjustments.NeutralThrustOffsetUnchecked = neutralThrustEst.average;
-                    adjustments.NeutralThrustAccumulator     = iterm;
-                    adjustments.NeutralThrustILimit          = global.PIDvel[2].iLim;
+                    // adjustments.NeutralThrustOffset  was incrementall adjusted above
+                    adjustments.NeutralThrustAlgoError = neutralThrustEst.algo_erro_check;  // should be zero
+                    adjustments.NeutralThrustCorrection = neutralThrustEst.correction; // the i term thrust correction value applied
+                    adjustments.NeutralThrustAccumulator = global.PIDvel[2].iAccumulator; // the actual iaccumulator value after correction
+                    adjustments.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
                     AdjustmentsSet(&adjustments);
                 }
+
             } else {
                 // start a tick count
                 neutralThrustEst.start_sampling = true;
                 neutralThrustEst.count = 0;
                 neutralThrustEst.sum = 0.0f;
+                neutralThrustEst.max = 0.0f;
+                neutralThrustEst.min = 0.0f;
             }
         } else {
-            // reset sampling as we did't get 3 continuous seconds
+            // reset sampling as we did't get 6 continuous seconds
             neutralThrustEst.start_sampling = false;
         }
     } // else we already have a correction for this PH run

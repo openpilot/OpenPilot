@@ -31,6 +31,7 @@
 
 #ifndef PIOS_MPU6000_H
 #define PIOS_MPU6000_H
+#include <pios_sensors.h>
 
 /* MPU6000 Addresses */
 #define PIOS_MPU6000_SMPLRT_DIV_REG           0X19
@@ -131,18 +132,6 @@ enum pios_mpu6000_orientation { // clockwise rotation from board forward
     PIOS_MPU6000_TOP_270DEG = 0x03
 };
 
-struct pios_mpu6000_data {
-    int16_t gyro_x;
-    int16_t gyro_y;
-    int16_t gyro_z;
-#if defined(PIOS_MPU6000_ACCEL)
-    int16_t accel_x;
-    int16_t accel_y;
-    int16_t accel_z;
-#endif /* PIOS_MPU6000_ACCEL */
-    int16_t temperature;
-};
-
 struct pios_mpu6000_cfg {
     const struct pios_exti_cfg *exti_cfg; /* Pointer to the EXTI configuration */
 
@@ -167,14 +156,11 @@ struct pios_mpu6000_cfg {
 /* Public Functions */
 extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg *new_cfg);
 extern int32_t PIOS_MPU6000_ConfigureRanges(enum pios_mpu6000_range gyroRange, enum pios_mpu6000_accel_range accelRange, enum pios_mpu6000_filter filterSetting);
-extern xQueueHandle PIOS_MPU6000_GetQueue();
-extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data *buffer);
 extern int32_t PIOS_MPU6000_ReadID();
-extern int32_t PIOS_MPU6000_Test();
-extern float PIOS_MPU6000_GetScale();
-extern float PIOS_MPU6000_GetAccelScale();
+extern void PIOS_MPU6000_Register();
 extern bool PIOS_MPU6000_IRQHandler(void);
 
+extern PIOS_SENSORS_Driver PIOS_MPU6000_Driver;
 #endif /* PIOS_MPU6000_H */
 
 /**

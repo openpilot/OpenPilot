@@ -206,7 +206,7 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
     .orientation    = PIOS_MPU6000_TOP_180DEG,
     .fast_prescaler = PIOS_SPI_PRESCALER_4,
     .std_prescaler  = PIOS_SPI_PRESCALER_64,
-    .max_downsample = 16,
+    .max_downsample = 20,
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
@@ -924,6 +924,7 @@ void PIOS_Board_Init(void)
 
 #if defined(PIOS_INCLUDE_HMC5X83)
     onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_pressure_adapter_id, 0);
+    PIOS_HMC5x83_Register(onboard_mag);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)
@@ -933,6 +934,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_MPU6000)
     PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
     PIOS_MPU6000_CONFIG_Configure();
+    PIOS_MPU6000_Register();
 #endif
 
 #ifdef PIOS_INCLUDE_WS2811

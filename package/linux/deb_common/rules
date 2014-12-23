@@ -47,7 +47,7 @@ ifdef PACKAGE_DIR
 else
 	$(error PACKAGE_DIR not defined! $(PACKAGE_DIR))
 endif
-	ln -s /usr/local/OpenPilot/bin/openpilotgcs `pwd`/debian/openpilot/usr/bin/openpilot-gcs
+	ln -s /usr/local/OpenPilot/bin/openpilotgcs `pwd`/debian/openpilot/usr/bin/openpilotgcs
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/sounds/sounds
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/pfd/pfd
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/models/models

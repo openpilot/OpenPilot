@@ -34,6 +34,10 @@
 #ifndef PIOS_H
 #define PIOS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <pios_helpers.h>
 #include <pios_math.h>
 #include <pios_constants.h>
@@ -360,4 +364,10 @@
 /* #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 */
 
 #endif /* USE_SIM_POSIX */
+
+
+#ifdef __cplusplus
+} // closing brace for extern "C"
+#endif
+
 #endif /* PIOS_H */

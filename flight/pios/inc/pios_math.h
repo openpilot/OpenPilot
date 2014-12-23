@@ -73,7 +73,7 @@
 #define DEG2RAD_D(deg)          ((deg) * (M_PI_D / 180.0d))
 
 // helper macros for LPFs
-#define LPF_ALPHA(dt,fc) (dt / (dt + 1.0f / (2.0f * M_PI_F * fc)))
+#define LPF_ALPHA(dt, fc)       (dt / (dt + 1.0f / (2.0f * M_PI_F * fc)))
 
 // Useful math macros
 #define MAX(a, b)               ((a) > (b) ? (a) : (b))

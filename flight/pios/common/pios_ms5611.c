@@ -29,9 +29,8 @@
  */
 
 #include "pios.h"
-
 #ifdef PIOS_INCLUDE_MS5611
-
+#include <pios_ms5611.h>
 #define POW2(x) (1 << x)
 
 // TODO: Clean this up.  Getting around old constant.

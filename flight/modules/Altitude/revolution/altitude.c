@@ -42,7 +42,9 @@
 #include "barosensor.h" // object that will be updated by the module
 #include "revosettings.h"
 #include <mathmisc.h>
+#include <pios_ms5611.h>
 #if defined(PIOS_INCLUDE_HCSR04)
+#include <pios_hcsr04.h>
 #include "sonaraltitude.h" // object that will be updated by the module
 #endif
 #include "taskinfo.h"

@@ -30,7 +30,7 @@
  */
 
 #include "pios.h"
-
+#include <pios_mpu6000.h>
 #ifdef PIOS_INCLUDE_MPU6000
 
 #include <pios_constants.h>

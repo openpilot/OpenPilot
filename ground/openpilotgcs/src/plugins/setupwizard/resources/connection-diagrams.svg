@@ -36,7 +36,7 @@
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer53"
+     inkscape:current-layer="layer52"
      fit-margin-top="15"
      fit-margin-left="15"
      fit-margin-right="15"
@@ -28685,10 +28685,10 @@
     <g
        inkscape:groupmode="layer"
        id="layer52"
-       inkscape:label="apm-current-sensor"
-       style="display:none">
+       inkscape:label="full-power-sensor"
+       style="display:inline">
       <g
-         id="apm-current-sensor">
+         id="full-power-sensor">
         <g
            style="opacity:0.45488724"
            id="g28883">
@@ -30038,7 +30038,9 @@
     <g
        inkscape:groupmode="layer"
        id="layer53"
-       inkscape:label="basic-voltage-sensor">
+       inkscape:label="basic-voltage-sensor"
+       sodipodi:insensitive="true"
+       style="display:none">
       <g
          id="basic-voltage-sensor">
         <g

@@ -215,6 +215,18 @@ void ConnectionDiagram::setupGraphicsScene()
             break;
         }
 
+        switch (m_configSource->getPowerSensorType()) {
+        case VehicleConfigurationSource::POWERSENSOR_DISABLED:
+            break;
+        case VehicleConfigurationSource::POWERSENSOR_VOLTAGE:
+            elementsToShow << "basic-voltage-sensor";
+            break;
+        case VehicleConfigurationSource::POWERSENSOR_FULL:
+            elementsToShow << "full-power-sensor";
+            break;
+        default:
+            break;
+        }
         setupGraphicsSceneItems(elementsToShow);
         fitInView();
         qDebug() << "Scene complete";

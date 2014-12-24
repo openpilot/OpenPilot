@@ -1660,11 +1660,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.87415765"
-     inkscape:cx="-227.94157"
-     inkscape:cy="1530.4635"
+     inkscape:zoom="0.90424605"
+     inkscape:cx="-119.03602"
+     inkscape:cy="1500.4247"
      inkscape:document-units="px"
-     inkscape:current-layer="layer11"
+     inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:snap-bbox="true"
      inkscape:object-paths="true"
@@ -1727,7 +1727,7 @@
      inkscape:label="3DR-Current-sensor"
      style="display:inline">
     <g
-       id="apm-power-sensor">
+       id="full-power-sensor">
       <g
          id="apm-current-sensor">
         <path

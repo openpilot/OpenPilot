@@ -469,13 +469,10 @@ QString SetupWizard::getSummaryText()
         summary.append("<b>").append(tr("Power Sensor type: ")).append("</b>");
         switch (getPowerSensorType()) {
         case POWERSENSOR_VOLTAGE:
-            summary.append(tr("Basic voltage sensor"));
+            summary.append(tr("Basic voltage sensor (V)"));
             break;
-        case POWERSENSOR_APM:
-            summary.append(tr("3DR Power sensor"));
-            break;
-        case POWERSENSOR_GENERIC:
-            summary.append(tr("Generic power sensor"));
+        case POWERSENSOR_FULL:
+            summary.append(tr("Full power sensor (V/A)"));
             break;
         default:
             summary.append(tr("None"));

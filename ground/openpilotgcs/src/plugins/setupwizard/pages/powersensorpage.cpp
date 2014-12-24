@@ -59,25 +59,17 @@ void PowerSensorPage::setupSelection(Selection *selection)
 
     selection->addItem(tr("Voltage sensor"),
                        tr("Select this option for a basic sensor with only Voltage monitoring.\n"
-                          "This is a simple voltage divider done with two resistors"),
+                          "This is a simple voltage divider with two resistors,"
+                          "Sensor calibration will be done later in Wizard."),
                        "basic-voltage-sensor",
                        SetupWizard::POWERSENSOR_VOLTAGE);
-/*
-    selection->addItem(tr("APM sensor"),
-                       tr("Select this option to use the APM sensor.\n"
-                          "Voltage factor : 10\n"
-                          "Current factor : 18 (to be adjusted)\n"
-                          "    "),
-                       "apm-power-sensor",
-                       SetupWizard::POWERSENSOR_APM);
-*/
 
-    selection->addItem(tr("Generic Sensor"),
-                       tr("Select this option for a generic power sensor.\n"
-                          ""),
-                       //"generic-power-sensor",
-                       "apm-power-sensor",
-                       SetupWizard::POWERSENSOR_GENERIC);
+    selection->addItem(tr("Voltage/Current Sensor"),
+                       tr("Select this option for a fully power sensor.\n"
+                          "Allow Voltage and Current monitoring, calibration will be done "
+                          "later in wizard."),
+                       "full-power-sensor",
+                       SetupWizard::POWERSENSOR_FULL);
 
 
 }

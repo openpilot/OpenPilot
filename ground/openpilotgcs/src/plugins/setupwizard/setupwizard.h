@@ -116,6 +116,15 @@ public:
         return m_gpsType;
     }
 
+    void setPowerSensorType(SetupWizard::POWERSENSOR_TYPE setting)
+    {
+        m_powersensorType = setting;
+    }
+    SetupWizard::POWERSENSOR_TYPE getPowerSensorType() const
+    {
+        return m_powersensorType;
+    }
+
     void setRadioSetting(SetupWizard::RADIO_SETTING setting)
     {
         m_radioSetting = setting;
@@ -185,7 +194,7 @@ private slots:
     void pageChanged(int currId);
 private:
     enum { PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-           PAGE_AIRSPEED, PAGE_GPS, PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_ESC, PAGE_SERVO,
+           PAGE_AIRSPEED, PAGE_GPS, PAGE_POWERSENSOR, PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_ESC, PAGE_SERVO,
            PAGE_BIAS_CALIBRATION, PAGE_ESC_CALIBRATION, PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
            PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_AIRFRAME_INITIAL_TUNING,
            PAGE_REBOOT, PAGE_END, PAGE_UPDATE };
@@ -201,6 +210,7 @@ private:
     SERVO_TYPE m_servoType;
     AIRSPEED_TYPE m_airspeedType;
     GPS_TYPE m_gpsType;
+    POWERSENSOR_TYPE m_powersensorType;
     RADIO_SETTING m_radioSetting;
 
     QJsonObject *m_vehicleTemplate;

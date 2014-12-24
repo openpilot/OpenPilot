@@ -34,6 +34,7 @@
 #include "pages/fixedwingpage.h"
 #include "pages/airspeedpage.h"
 #include "pages/gpspage.h"
+#include "pages/powersensorpage.h"
 #include "pages/helipage.h"
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
@@ -58,7 +59,7 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
     m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN),
     m_escType(ESC_UNKNOWN), m_servoType(SERVO_UNKNOWN),
-    m_airspeedType(AIRSPEED_DISABLED), m_gpsType(GPS_DISABLED),
+    m_airspeedType(AIRSPEED_DISABLED), m_gpsType(GPS_DISABLED), m_powersensorType(POWERSENSOR_DISABLED),
     m_vehicleTemplate(NULL), m_calibrationPerformed(false),
     m_restartNeeded(false), m_connectionManager(NULL)
 {
@@ -196,13 +197,27 @@ int SetupWizard::nextId() const
             if (getGpsType() != GPS_DISABLED) {
                 return PAGE_AIRSPEED;
             } else {
+                return PAGE_POWERSENSOR;
+            }
+        default:
+            if (getControllerType() == CONTROLLER_REVO) {
+                return PAGE_POWERSENSOR;
+            } else {
                 return PAGE_SUMMARY;
             }
+        }
+
+    case PAGE_AIRSPEED:
+        switch (getControllerType()) {
+        case CONTROLLER_REVO:
+        //case CONTROLLER_NANO:
+            return PAGE_POWERSENSOR;
+
         default:
             return PAGE_SUMMARY;
         }
 
-    case PAGE_AIRSPEED:
+    case PAGE_POWERSENSOR:
         return PAGE_SUMMARY;
 
     case PAGE_SUMMARY:
@@ -447,6 +462,25 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Unknown"));
         }
     }
+
+    // Show Power Sensor Type
+    if (getControllerType() == CONTROLLER_REVO ){
+        summary.append("<br>");
+        summary.append("<b>").append(tr("Power Sensor type: ")).append("</b>");
+        switch (getPowerSensorType()) {
+        case POWERSENSOR_VOLTAGE:
+            summary.append(tr("Basic voltage sensor"));
+            break;
+        case POWERSENSOR_APM:
+            summary.append(tr("3DR Power sensor"));
+            break;
+        case POWERSENSOR_GENERIC:
+            summary.append(tr("Generic power sensor"));
+            break;
+        default:
+            summary.append(tr("None"));
+        }
+    }
     return summary;
 }
 
@@ -460,6 +494,7 @@ void SetupWizard::createPages()
     setPage(PAGE_FIXEDWING, new FixedWingPage(this));
     setPage(PAGE_AIRSPEED, new AirSpeedPage(this));
     setPage(PAGE_GPS, new GpsPage(this));
+    setPage(PAGE_POWERSENSOR, new PowerSensorPage(this));
     setPage(PAGE_HELI, new HeliPage(this));
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));

@@ -21,6 +21,7 @@ HEADERS += setupwizardplugin.h \
     pages/fixedwingpage.h \
     pages/airspeedpage.h \
     pages/gpspage.h \
+    pages/powersensorpage.h \
     pages/helipage.h \
     pages/surfacepage.h \
     pages/abstractwizardpage.h \
@@ -55,6 +56,7 @@ SOURCES += setupwizardplugin.cpp \
     pages/fixedwingpage.cpp \
     pages/airspeedpage.cpp \
     pages/gpspage.cpp \
+    pages/powersensorpage.cpp \
     pages/helipage.cpp \
     pages/surfacepage.cpp \
     pages/abstractwizardpage.cpp \

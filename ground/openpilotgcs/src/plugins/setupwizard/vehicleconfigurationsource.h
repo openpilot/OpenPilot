@@ -68,6 +68,7 @@ public:
     enum INPUT_TYPE { INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSM, INPUT_UNKNOWN };
     enum AIRSPEED_TYPE { AIRSPEED_ESTIMATE, AIRSPEED_EAGLETREE, AIRSPEED_MS4525, AIRSPEED_DISABLED };
     enum GPS_TYPE { GPS_PLATINUM, GPS_UBX, GPS_NMEA, GPS_DISABLED };
+    enum POWERSENSOR_TYPE { POWERSENSOR_VOLTAGE, POWERSENSOR_APM, POWERSENSOR_GENERIC, POWERSENSOR_DISABLED };
     enum RADIO_SETTING { RADIO_TELEMETRY, RADIO_DISABLED };
 
     virtual VehicleConfigurationSource::CONTROLLER_TYPE getControllerType() const  = 0;
@@ -78,6 +79,7 @@ public:
     virtual VehicleConfigurationSource::SERVO_TYPE getServoType() const = 0;
     virtual VehicleConfigurationSource::AIRSPEED_TYPE getAirspeedType() const = 0;
     virtual VehicleConfigurationSource::GPS_TYPE getGpsType() const     = 0;
+    virtual VehicleConfigurationSource::POWERSENSOR_TYPE getPowerSensorType() const     = 0;
     virtual VehicleConfigurationSource::RADIO_SETTING getRadioSetting() const = 0;
     virtual QJsonObject *getVehicleTemplate() const  = 0;
 

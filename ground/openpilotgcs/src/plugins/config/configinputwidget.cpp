@@ -534,7 +534,7 @@ void ConfigInputWidget::wzNext()
         manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
             manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
             ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
-              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.02);
+              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
         if ((abs(manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE] -
                  manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE]) < 100) ||
             (abs(manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE] -
@@ -1547,7 +1547,11 @@ void ConfigInputWidget::updateCalibration()
             (reverse[i] && manualSettingsData.ChannelMax[i] > manualCommandData.Channel[i])) {
             manualSettingsData.ChannelMax[i] = manualCommandData.Channel[i];
         }
-        manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+        if (i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE || i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE) {
+            adjustSpecialNeutrals();
+        } else {
+            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+        }
     }
 
     manualSettingsObj->setData(manualSettingsData);
@@ -1575,9 +1579,9 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             reverse[i] = manualSettingsData.ChannelMax[i] < manualSettingsData.ChannelMin[i];
-            manualSettingsData.ChannelMin[i]     = manualCommandData.Channel[i];
-            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
-            manualSettingsData.ChannelMax[i]     = manualCommandData.Channel[i];
+            manualSettingsData.ChannelMin[i] = manualCommandData.Channel[i];
+            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i]; 
+            manualSettingsData.ChannelMax[i] = manualCommandData.Channel[i];    
         }
 
         fastMdataSingle(manualCommandObj, &manualControlMdata);
@@ -1592,22 +1596,31 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         restoreMdataSingle(manualCommandObj, &manualControlMdata);
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
-            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+            if (i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE || i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE) {
+                adjustSpecialNeutrals();
+            } else {
+                manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+            }
         }
-
-        // Force flight mode neutral to middle
-        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] =
-            (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] +
-             manualSettingsData.ChannelMin[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE]) / 2;
-
-        // Force throttle to be near min
-        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
-            manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
-            ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
-              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.02);
 
         manualSettingsObj->setData(manualSettingsData);
 
         disconnect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     }
+}
+
+void ConfigInputWidget::adjustSpecialNeutrals()
+{
+    // FlightMode and Throttle need special neutral settings
+    //
+    // Force flight mode neutral to middle
+    manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] =
+        (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] +
+         manualSettingsData.ChannelMin[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE]) / 2;
+
+    // Force throttle to be near min, add 4% from total range to avoid arming issues
+    manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
+        manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
+        ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
+          manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
 }

@@ -188,6 +188,7 @@ private slots:
     void updatePositionSlider();
     void invertControls();
     void simpleCalibration(bool state);
+    void adjustSpecialNeutrals();
     void updateCalibration();
 
 protected:

@@ -96,6 +96,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
         InputChannelForm *form = new InputChannelForm(index, this);
         form->setName(name);
+ 
         form->moveTo(*(ui->channelLayout));
 
         // The order of the following binding calls is important. Since the values will be populated
@@ -104,7 +105,9 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         // will not be set correctly.
         addWidgetBinding("ManualControlSettings", "ChannelNumber", form->ui->channelNumber, index);
         addWidgetBinding("ManualControlSettings", "ChannelGroups", form->ui->channelGroup, index);
-        addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->channelNeutral, index);
+        // Slider position based on real time Rcinput (allow monitoring)
+        addWidgetBinding("ManualControlCommand", "Channel", form->ui->channelNeutral, index);
+        // Neutral value stored on board (SpinBox)
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->neutralValue, index);
         addWidgetBinding("ManualControlSettings", "ChannelMax", form->ui->channelMax, index);
         addWidgetBinding("ManualControlSettings", "ChannelMin", form->ui->channelMin, index);
@@ -1567,8 +1570,9 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         ui->runCalibration->setText(tr("Stop Manual Calibration"));
 
         QMessageBox msgBox;
-        msgBox.setText(tr("<p align='center'>Arming Settings are now set to 'Always Disarmed' for your safety.\n"
-                          "<b>Stop Manual Calibration</b> when done</p>"));
+        msgBox.setText(tr("<p>Arming Settings are now set to 'Always Disarmed' for your safety.</p>"
+                          "<p>Be sure your receiver is powered with an external source and Transmitter is on.</p>"
+                          "<p align='center'><b>Stop Manual Calibration</b> when done</p>"));
         msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the manual calibration is finished."));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
@@ -1631,3 +1635,11 @@ void ConfigInputWidget::adjustSpecialNeutrals()
         ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
           manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
 }
+
+bool ConfigInputWidget::shouldObjectBeSaved(UAVObject *object)
+{
+    // ManualControlCommand no need to be saved
+    return dynamic_cast<ManualControlCommand *>(object) == 0;
+
+}
+

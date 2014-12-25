@@ -66,6 +66,8 @@ public:
     }
     void enableControls(bool enable);
 
+    bool shouldObjectBeSaved(UAVObject *object);
+
 private:
     bool growing;
     bool reverse[ManualControlSettings::CHANNELNEUTRAL_NUMELEM];

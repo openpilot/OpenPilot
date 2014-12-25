@@ -1562,11 +1562,14 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 {
     if (enable) {
         ui->configurationWizard->setEnabled(false);
+        ui->saveRCInputToRAM->setEnabled(false);
+        ui->saveRCInputToSD->setEnabled(false);
         ui->runCalibration->setText(tr("Stop Manual Calibration"));
 
         QMessageBox msgBox;
-        msgBox.setText(tr("Arming Settings are now set to 'Always Disarmed' for your safety."));
-        msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the wizard is finished."));
+        msgBox.setText(tr("<p align='center'>Arming Settings are now set to 'Always Disarmed' for your safety.\n"
+                          "<b>Stop Manual Calibration</b> when done</p>"));
+        msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the manual calibration is finished."));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();
@@ -1590,6 +1593,8 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         connect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     } else {
         ui->configurationWizard->setEnabled(true);
+        ui->saveRCInputToRAM->setEnabled(true);
+        ui->saveRCInputToSD->setEnabled(true);
         ui->runCalibration->setText(tr("Start Manual Calibration"));
 
         manualCommandData  = manualCommandObj->getData();

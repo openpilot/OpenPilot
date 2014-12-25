@@ -160,7 +160,7 @@ extern int32_t PIOS_MPU6000_ReadID();
 extern void PIOS_MPU6000_Register();
 extern bool PIOS_MPU6000_IRQHandler(void);
 
-extern PIOS_SENSORS_Driver PIOS_MPU6000_Driver;
+extern const PIOS_SENSORS_Driver PIOS_MPU6000_Driver;
 #endif /* PIOS_MPU6000_H */
 
 /**

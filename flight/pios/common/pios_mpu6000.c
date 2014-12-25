@@ -48,7 +48,7 @@ void PIOS_MPU6000_driver_Reset(uintptr_t context);
 void PIOS_MPU6000_driver_get_scale(float *scales, uint8_t size, uintptr_t context);
 QueueHandle_t PIOS_MPU6000_driver_get_queue(uintptr_t context);
 
-PIOS_SENSORS_Driver PIOS_MPU6000_Driver = {
+const PIOS_SENSORS_Driver PIOS_MPU6000_Driver = {
     .test      = PIOS_MPU6000_driver_Test,
     .poll      = NULL,
     .fetch     = NULL,

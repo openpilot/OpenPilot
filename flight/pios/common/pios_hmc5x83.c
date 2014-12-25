@@ -57,7 +57,7 @@ void PIOS_HMC5x83_driver_get_scale(float *scales, uint8_t size, uintptr_t contex
 void PIOS_HMC5x83_driver_fetch(void *, uint8_t size, uintptr_t context);
 bool PIOS_HMC5x83_driver_poll(uintptr_t context);
 
-PIOS_SENSORS_Driver PIOS_HMC5x83_Driver = {
+const PIOS_SENSORS_Driver PIOS_HMC5x83_Driver = {
     .test      = PIOS_HMC5x83_driver_Test,
     .poll      = PIOS_HMC5x83_driver_poll,
     .fetch     = PIOS_HMC5x83_driver_fetch,

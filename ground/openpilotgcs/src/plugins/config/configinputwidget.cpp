@@ -96,7 +96,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
         InputChannelForm *form = new InputChannelForm(index, this);
         form->setName(name);
- 
+
         form->moveTo(*(ui->channelLayout));
 
         // The order of the following binding calls is important. Since the values will be populated
@@ -1587,9 +1587,9 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             reverse[i] = manualSettingsData.ChannelMax[i] < manualSettingsData.ChannelMin[i];
-            manualSettingsData.ChannelMin[i] = manualCommandData.Channel[i];
-            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i]; 
-            manualSettingsData.ChannelMax[i] = manualCommandData.Channel[i];    
+            manualSettingsData.ChannelMin[i]     = manualCommandData.Channel[i];
+            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+            manualSettingsData.ChannelMax[i]     = manualCommandData.Channel[i];
         }
 
         fastMdataSingle(manualCommandObj, &manualControlMdata);
@@ -1640,6 +1640,4 @@ bool ConfigInputWidget::shouldObjectBeSaved(UAVObject *object)
 {
     // ManualControlCommand no need to be saved
     return dynamic_cast<ManualControlCommand *>(object) == 0;
-
 }
-

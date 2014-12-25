@@ -7,7 +7,7 @@ MyListWidget {
 Utils--StyledBar {
     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(200, 200, 200, 255));
 }
-/*
+
 QSlider::groove:horizontal {
     border: 1px solid rgb(196, 196, 196);
     background: white;
@@ -15,7 +15,6 @@ QSlider::groove:horizontal {
     border-radius: 2px;
     margin 10px 10px;
 }
-*/
 
 QSlider::add-page:horizontal {
     background: #fff;

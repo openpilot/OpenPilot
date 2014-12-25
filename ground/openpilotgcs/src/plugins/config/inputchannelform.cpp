@@ -58,15 +58,6 @@ void InputChannelForm::minMaxUpdated()
 void InputChannelForm::neutralUpdated()
 {
     int neutralValue = ui->neutralValue->value();
-    int min   = ui->channelMin->value();
-    int max   = ui->channelMax->value();
-
-    int tickSpacing = abs((max-min) / 2);
-    if (ui->channelName->text() == "FlightMode") {
-        tickSpacing = abs((max-min) / 5);
-    }
-    ui->channelNeutral->setTickPosition(QSlider::TicksBothSides);
-    ui->channelNeutral->setTickInterval(tickSpacing);
 
     if (ui->channelRev->isChecked()) {
         if (neutralValue > ui->channelMin->value()) {

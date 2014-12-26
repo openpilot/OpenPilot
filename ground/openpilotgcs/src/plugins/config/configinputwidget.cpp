@@ -1549,7 +1549,7 @@ void ConfigInputWidget::updatePositionSlider()
                     "QSlider::add-page:horizontal { background: none; border: none; }"
                     "QSlider::sub-page:horizontal { background: none; border: none; }"
                     "QSlider::handle:horizontal { background: rgba(196, 196, 196, 255); width: 10px; height: 28px; "
-                    "margin: -4px -4px; border-radius: 3px; border: 1px solid #777; }");
+                    "margin: -4px -2px; border-radius: 3px; border: 1px solid #777; }");
                 count++;
             } else {
                 count++;

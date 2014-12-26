@@ -1536,6 +1536,26 @@ void ConfigInputWidget::updatePositionSlider()
     default:
         break;
     }
+
+    QString fmNumber = QString().setNum(manualSettingsDataPriv.FlightModeNumber);
+    int count = 0;
+    foreach(QSlider * sp, findChildren<QSlider *>()) {
+        // Find FlightMode slider and apply stylesheet
+        if (sp->objectName() == "channelNeutral") {
+            if (count == 4) {
+                sp->setStyleSheet(
+                    "QSlider::groove:horizontal {border: 2px solid rgb(196, 196, 196); height: 20px; margin 9px 9px; border-radius: 4px; "
+                    "border-image:url(:/configgadget/images/flightmode_bg" + fmNumber + ".png); }"
+                    "QSlider::add-page:horizontal { background: none; border: none; }"
+                    "QSlider::sub-page:horizontal { background: none; border: none; }"
+                    "QSlider::handle:horizontal { background: rgba(196, 196, 196, 255); width: 10px; height: 28px; "
+                    "margin: -4px -4px; border-radius: 3px; border: 1px solid #777; }");
+                count++;
+            } else {
+                count++;
+            }
+        }
+    }
 }
 
 void ConfigInputWidget::updateCalibration()

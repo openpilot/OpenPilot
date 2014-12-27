@@ -103,6 +103,12 @@ typedef union {
 #define PIOS_INSTRUMENT_MODULE
 #include <pios_instrumentation_helper.h>
 
+PERF_DEFINE_COUNTER(counterAccelSamples);
+PERF_DEFINE_COUNTER(counterAccelPeriod);
+PERF_DEFINE_COUNTER(counterMagPeriod);
+PERF_DEFINE_COUNTER(counterBaroPeriod);
+PERF_DEFINE_COUNTER(counterSensorPeriod);
+
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
@@ -209,6 +215,13 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
     AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
     settingsUpdatedCb(NULL);
 
+    // Performance counters
+    PERF_INIT_COUNTER(counterAccelSamples, 0x53000001);
+    PERF_INIT_COUNTER(counterAccelPeriod, 0x53000002);
+    PERF_INIT_COUNTER(counterMagPeriod, 0x53000003);
+    PERF_INIT_COUNTER(counterBaroPeriod, 0x53000004);
+    PERF_INIT_COUNTER(counterSensorPeriod, 0x53000005);
+
     // Test sensors
     bool sensors_test = true;
     uint8_t count     = 0;
@@ -271,7 +284,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                 }
             }
         }
-
+        PERF_MEASURE_PERIOD(counterSensorPeriod);
         RELOAD_WDG();
         vTaskDelayUntil(&lastSysTime, sensor_period_ticks);
     }
@@ -317,8 +330,11 @@ static void processSamples(sensor_fetch_context *sensor_context, const PIOS_SENS
         temperature = (float)sensor_context->temperature * inv_count * 0.01f;
         if (sensor->type == PIOS_SENSORS_TYPE_3AXIS_MAG) {
             handleMag(samples, temperature);
+            PERF_MEASURE_PERIOD(counterMagPeriod);
             return;
         } else {
+            PERF_TRACK_VALUE(counterAccelSamples, sensor_context->count);
+            PERF_MEASURE_PERIOD(counterAccelPeriod);
             handleAccel(samples, temperature);
         }
     }
@@ -338,6 +354,7 @@ static void processSamples(sensor_fetch_context *sensor_context, const PIOS_SENS
     }
 
     if (sensor->type == PIOS_SENSORS_TYPE_1AXIS_BARO) {
+        PERF_MEASURE_PERIOD(counterBaroPeriod);
         PIOS_Assert(0); // not yet implemented
     }
 }

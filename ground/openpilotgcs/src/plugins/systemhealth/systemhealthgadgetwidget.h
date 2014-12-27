@@ -58,12 +58,15 @@ private slots:
     void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
     void onAutopilotConnect();
     void onAutopilotDisconnect();
+    void onLogReplayStart();
+    void onLogReplayStop();
 
 private:
     QSvgRenderer *m_renderer;
     QGraphicsSvgItem *background;
     QGraphicsSvgItem *foreground;
     QGraphicsSvgItem *nolink;
+    QGraphicsSvgItem *logreplay;
     QStringList *missingElements;
     // Simple flag to skip rendering if the
     bool fgenabled; // layer does not exist.

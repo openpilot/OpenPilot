@@ -50,6 +50,7 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
     background = new QGraphicsSvgItem();
     foreground = new QGraphicsSvgItem();
     nolink     = new QGraphicsSvgItem();
+    logreplay = new QGraphicsSvgItem();
     missingElements = new QStringList();
     paint();
 
@@ -82,6 +83,22 @@ void SystemHealthGadgetWidget::onAutopilotConnect()
 void SystemHealthGadgetWidget::onAutopilotDisconnect()
 {
     nolink->setVisible(true);
+}
+
+/**
+ * Hide the "Log Replay" overlay
+ */
+void SystemHealthGadgetWidget::onLogReplayStart()
+{
+    logreplay->setVisible(false);
+}
+
+/**
+ * Show the "Log Replay" overlay
+ */
+void SystemHealthGadgetWidget::onLogReplayStop()
+{
+    logreplay->setVisible(true);
 }
 
 void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
@@ -167,6 +184,11 @@ void SystemHealthGadgetWidget::setSystemFile(QString dfn)
                 nolink->setElementId("nolink");
                 nolink->setZValue(100);
             }
+            if (m_renderer->elementExists("logreplay")) {
+                nolink->setSharedRenderer(m_renderer);
+                nolink->setElementId("logreplay");
+                nolink->setZValue(110);
+            }
 
             QGraphicsScene *l_scene = scene();
             l_scene->setSceneRect(background->boundingRect());
@@ -193,6 +215,7 @@ void SystemHealthGadgetWidget::paint()
     l_scene->addItem(background);
     l_scene->addItem(foreground);
     l_scene->addItem(nolink);
+    l_scene->addItem(logreplay);
     update();
 }
 

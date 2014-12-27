@@ -12,6 +12,7 @@ InputChannelForm::InputChannelForm(const int index, QWidget *parent) :
     connect(ui->channelMin, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
     connect(ui->channelMax, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
     connect(ui->neutralValue, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated()));
+    connect(ui->channelNeutral, SIGNAL(valueChanged(int)), this, SLOT(updateTooltip()));
     connect(ui->channelGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(groupUpdated()));
     connect(ui->channelRev, SIGNAL(toggled(bool)), this, SLOT(reversedUpdated()));
 
@@ -53,6 +54,14 @@ void InputChannelForm::minMaxUpdated()
     ui->channelRev->setChecked(reverse);
     ui->channelNeutral->setInvertedAppearance(reverse);
     ui->channelNeutral->setInvertedControls(reverse);
+
+    updateNeutralMark();
+}
+
+void InputChannelForm::updateTooltip()
+{
+    int currentValue = ui->channelNeutral->value();
+    ui->channelNeutral->setToolTip(QString::number(currentValue));
 }
 
 void InputChannelForm::neutralUpdated()
@@ -72,6 +81,30 @@ void InputChannelForm::neutralUpdated()
             ui->channelMax->setValue(neutralValue);
         }
     }
+
+    updateNeutralMark();
+}
+
+void InputChannelForm::updateNeutralMark()
+{
+    // Add a small neutral red mark on groove background
+    int neutral  = ui->neutralValue->value();
+    int min      = ui->channelMin->value();
+    int max      = ui->channelMax->value();
+
+    float range  = max - min;
+    float offset = neutral - min;
+    float neutralPosition = offset / range;
+
+    ui->channelNeutral->setStyleSheet(
+        "QSlider::groove:horizontal { border: 1px solid rgb(196, 196, 196); height: 6px; border-radius: 2px; margin 10px 10px; "
+        "background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:" + QString::number(neutralPosition - 0.01) + " transparent, stop:"
+        + QString::number(neutralPosition) + " red, stop:" + QString::number(neutralPosition + 0.01) + " transparent); }"
+        "QSlider::add-page:horizontal { background: rgba(255,255,255,180); border: 1px solid #777; margin: 0px 2px; border-radius: 4px; }"
+        "QSlider::sub-page:horizontal { background: rgba(78,147,246,180); border: 1px solid #777; margin: 0px 2px; border-radius: 4px; }"
+        "QSlider::handle:horizontal { background: rgba(196,196,196,180); width: 18px; height: 28px; margin: -2px 0px; border-radius: 3px; "
+        "border: 1px solid #777; }"
+        );
 }
 
 void InputChannelForm::reversedUpdated()

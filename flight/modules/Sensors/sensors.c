@@ -264,7 +264,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                 }
             } else {
                 if (PIOS_SENSORS_Poll(sensor)) {
-                    PIOS_SENSOR_Fetch(sensor, (void *)&source_data, MAX_SENSORS_PER_INSTANCE);
+                    PIOS_SENSOR_Fetch(sensor, (void *)source_data, MAX_SENSORS_PER_INSTANCE);
                     accumulateSamples(&sensor_context, source_data);
                     processSamples(&sensor_context, sensor);
                     clearContext(&sensor_context);

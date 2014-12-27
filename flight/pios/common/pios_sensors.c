@@ -39,6 +39,7 @@ PIOS_SENSORS_Instance *PIOS_SENSORS_Register(const PIOS_SENSORS_Driver *driver, 
     instance->driver  = driver;
     instance->type    = type;
     instance->context = context;
+    instance->next    = NULL;
     LL_APPEND(sensor_list, instance);
     return instance;
 }

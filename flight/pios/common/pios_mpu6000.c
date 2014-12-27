@@ -634,8 +634,8 @@ void PIOS_MPU6000_driver_Reset(__attribute__((unused)) uintptr_t context)
 void PIOS_MPU6000_driver_get_scale(float *scales, uint8_t size, __attribute__((unused)) uintptr_t contet)
 {
     PIOS_Assert(size >= 2);
-    scales[0] = PIOS_MPU6000_GetScale();
-    scales[1] = PIOS_MPU6000_GetAccelScale();
+    scales[0] = PIOS_MPU6000_GetAccelScale();
+    scales[1] = PIOS_MPU6000_GetScale();
 }
 
 QueueHandle_t PIOS_MPU6000_driver_get_queue(__attribute__((unused)) uintptr_t context)

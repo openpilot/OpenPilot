@@ -141,9 +141,22 @@ void ConnectionDiagram::setupGraphicsScene()
                 break;
             default:
                 break;
-            }
-        case VehicleConfigurationSource::VEHICLE_HELI:
+            }   
         case VehicleConfigurationSource::VEHICLE_SURFACE:
+            switch (m_configSource->getVehicleSubType()) {
+            case VehicleConfigurationSource::GROUNDVEHICLE_CAR:
+                elementsToShow << "car";
+                break;
+            case VehicleConfigurationSource::GROUNDVEHICLE_DIFFERENTIAL:
+                elementsToShow << "tank";
+                break;
+            case VehicleConfigurationSource::GROUNDVEHICLE_MOTORCYCLE:
+                elementsToShow << "motorbike";
+                break;
+            default:
+                break;
+            }
+        case VehicleConfigurationSource::VEHICLE_HELI: 
         default:
             break;
         }

@@ -331,7 +331,7 @@ void QwtThermo::layoutThermo( bool update_geometry )
             scaleDraw()->move( from, tRect.bottom() + bw );
         }
 
-        scaleDraw()->setLength( to - from );
+        scaleDraw()->setLength( qMax( to - from, 0 ) );
     }
     else // Qt::Vertical
     {
@@ -364,7 +364,7 @@ void QwtThermo::layoutThermo( bool update_geometry )
             scaleDraw()->move( tRect.left() - bw, from );
         }
 
-        scaleDraw()->setLength( to - from );
+        scaleDraw()->setLength( qMax( to - from, 0 ) );
     }
 
     if ( update_geometry )

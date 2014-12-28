@@ -32,6 +32,7 @@ macx {
 } else:linux-* {
     QMAKE_RPATHDIR = \'\$$ORIGIN\'
     QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_LIBRARY_PATH, $$DESTDIR)
+    QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_QT_LIBRARY_PATH, $$DESTDIR)
     include(rpath.pri)
 }
 

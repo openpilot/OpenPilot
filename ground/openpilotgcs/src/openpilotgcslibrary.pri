@@ -18,7 +18,7 @@ macx {
         target.files = $$DESTDIR/$${TARGET}.dll
     } else {
         QMAKE_RPATHDIR = \'\$$ORIGIN\'
-        QMAKE_RPATHDIR += \'\$$ORIGIN\'/../qt5
+        QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_QT_LIBRARY_PATH, $$GCS_LIBRARY_PATH)
         include(rpath.pri)
 
         target.path = /$$GCS_LIBRARY_BASENAME/openpilotgcs

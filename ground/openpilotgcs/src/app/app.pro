@@ -30,8 +30,8 @@ win32 {
 } else {
     target.path  = /bin
     INSTALLS    += target
-    QMAKE_RPATHDIR = \'\$$ORIGIN\'/../$$GCS_LIBRARY_BASENAME/openpilotgcs
-    QMAKE_RPATHDIR += \'\$$ORIGIN\'/../$$GCS_LIBRARY_BASENAME/qt5
+    QMAKE_RPATHDIR = \'\$$ORIGIN\'/$$relative_path($$GCS_LIBRARY_PATH, $$GCS_APP_PATH)
+    QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_QT_LIBRARY_PATH, $$GCS_APP_PATH)
     include(../rpath.pri)
 }
 

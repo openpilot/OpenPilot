@@ -31,7 +31,7 @@ macx {
         QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/$${PROVIDER}/
 } else:linux-* {
     QMAKE_RPATHDIR = \'\$$ORIGIN\'
-    QMAKE_RPATHDIR += \'\$$ORIGIN\'/../..
+    QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_LIBRARY_PATH, $$DESTDIR)
     include(rpath.pri)
 }
 

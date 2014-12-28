@@ -26,6 +26,11 @@
         <file>html/Stabilization-Warning.html</file>
         <file>html/Stack-Critical.html</file>
         <file>html/Telemetry-Error.html</file>
+        <file>html/SystemConfiguration-Critical.html</file>
+        <file>html/PathPlan-Warning.html</file>
+        <file>html/Magnetometer-Critical.html</file>
+        <file>html/Magnetometer-Warning.html</file>
+        <file>html/Stabilization-Critical.html</file>
     </qresource>
     <qresource prefix="/systemhealth" lang="fr">
         <file alias="html/Actuator-Critical.html">html/fr/Actuator-Critical.html</file>
@@ -54,6 +59,11 @@
         <file alias="html/Stabilization-Warning.html">html/fr/Stabilization-Warning.html</file>
         <file alias="html/Stack-Critical.html">html/fr/Stack-Critical.html</file>
         <file alias="html/Telemetry-Error.html">html/fr/Telemetry-Error.html</file>
+        <file alias="html/SystemConfiguration-Critical.html">html/fr/SystemConfiguration-Critical.html</file>
+        <file alias="html/PathPlan-Warning.html">html/fr/PathPlan-Warning.html</file>
+        <file alias="html/Magnetometer-Warning.html">html/fr/Magnetometer-Warning.html</file>
+        <file alias="html/Magnetometer-Critical.html">html/fr/Magnetometer-Critical.html</file>
+        <file alias="html/Stabilization-Critical.html">html/fr/Stabilization-Critical.html</file>
 </qresource>
 
 </RCC>

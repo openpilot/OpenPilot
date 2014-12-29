@@ -8,7 +8,7 @@
 
 AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::AutoUpdatePage)
+    ui(new Ui::AutoUpdatePage), m_isUpdating(false)
 {
     ui->setupUi(this);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -23,6 +23,11 @@ AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
 AutoUpdatePage::~AutoUpdatePage()
 {
     delete ui;
+}
+
+bool AutoUpdatePage::isComplete() const
+{
+    return !m_isUpdating;
 }
 
 void AutoUpdatePage::enableButtons(bool enable = false)
@@ -42,6 +47,7 @@ void AutoUpdatePage::autoUpdate()
     Q_ASSERT(pm);
     UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
     Q_ASSERT(uploader);
+    m_isUpdating = true;
     uploader->autoUpdate(ui->eraseSettings->isChecked());
 }
 
@@ -83,10 +89,12 @@ void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
         ui->statusLabel->setText(tr("Booting the board%1. Please wait").arg(value.toString()));
         break;
     case uploader::SUCCESS:
+        m_isUpdating = false;
         enableButtons(true);
         ui->statusLabel->setText(tr("Board updated, please press 'Next' to continue."));
         break;
     case uploader::FAILURE:
+        m_isUpdating = false;
         enableButtons(true);
         QString msg = value.toString();
         if (msg.isEmpty()) {

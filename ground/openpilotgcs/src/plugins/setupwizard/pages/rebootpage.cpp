@@ -30,7 +30,7 @@
 
 RebootPage::RebootPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::RebootPage), m_toggl(false)
+    ui(new Ui::RebootPage), m_toggl(false), m_isRebooting(false)
 {
     ui->setupUi(this);
     ui->yellowLabel->setVisible(false);
@@ -63,7 +63,7 @@ void RebootPage::initializePage()
 
 bool RebootPage::validatePage()
 {
-    return true;
+    return !m_isRebooting;
 }
 
 void RebootPage::toggleLabel()
@@ -89,6 +89,7 @@ void RebootPage::reboot()
     QApplication::processEvents();
     connect(m_uploader, SIGNAL(progressUpdate(uploader::ProgressStep, QVariant)), this, SLOT(progressUpdate(uploader::ProgressStep, QVariant)));
     ui->messageLabel->setText(tr("Reboot in progress..."));
+    m_isRebooting = true;
     m_uploader->reboot();
 }
 
@@ -104,8 +105,15 @@ void RebootPage::progressUpdate(uploader::ProgressStep progress, QVariant messag
         } else {
             ui->messageLabel->setText(tr("<font color='green'>Reboot complete!</font>"));
         }
+        m_isRebooting= false;
         enableButtons(true);
     } else {
         ui->rebootProgress->setValue(ui->rebootProgress->value() + 1);
     }
+}
+
+
+bool RebootPage::isComplete() const
+{
+    return !m_isRebooting;
 }

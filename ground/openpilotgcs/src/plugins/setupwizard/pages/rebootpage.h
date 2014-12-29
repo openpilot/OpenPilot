@@ -46,6 +46,7 @@ public:
 
     void initializePage();
     bool validatePage();
+    bool isComplete() const;
 
     void enableButtons(bool enable);
 private:
@@ -53,6 +54,7 @@ private:
     QTimer m_timer;
     bool m_toggl;
     UploaderGadgetFactory *m_uploader;
+    bool m_isRebooting;
 
 private slots:
     void toggleLabel();

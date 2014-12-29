@@ -44,6 +44,7 @@ class AutoUpdatePage : public AbstractWizardPage {
 public:
     explicit AutoUpdatePage(SetupWizard *wizard, QWidget *parent = 0);
     ~AutoUpdatePage();
+    bool isComplete() const;
 
 private slots:
     void updateStatus(uploader::ProgressStep, QVariant);
@@ -56,6 +57,7 @@ private slots:
 
 private:
     Ui::AutoUpdatePage *ui;
+    bool m_isUpdating;
 };
 
 #endif // AUTOUPDATEPAGE_H

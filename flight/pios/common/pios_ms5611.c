@@ -36,9 +36,33 @@
 // TODO: Clean this up.  Getting around old constant.
 #define PIOS_MS5611_OVERSAMPLING oversampling
 
+// Option to change the interleave between Temp and Pressure conversions
+// Undef for normal operation
+// #define PIOS_MS5611_SLOW_TEMP_RATE 20
+#ifndef PIOS_MS5611_SLOW_TEMP_RATE
+#define PIOS_MS5611_SLOW_TEMP_RATE 1
+#endif
+
+/* Local Types */
+typedef struct {
+    uint16_t C[6];
+} MS5611CalibDataTypeDef;
+
+typedef enum {
+    MS5611_CONVERSION_TYPE_None = 0,
+    MS5611_CONVERSION_TYPE_PressureConv,
+    MS5611_CONVERSION_TYPE_TemperatureConv
+} ConversionTypeTypeDef;
+
+typedef enum {
+    MS5611_FSM_INIT = 0,
+    MS5611_FSM_TEMPERATURE,
+    MS5611_FSM_PRESSURE,
+    MS5611_FSM_CALCULATE,
+} MS5611_FSM_State;
 
 /* Glocal Variables */
-ConversionTypeTypeDef CurrentRead;
+ConversionTypeTypeDef CurrentRead = MS5611_CONVERSION_TYPE_None;
 
 /* Local Variables */
 MS5611CalibDataTypeDef CalibData;
@@ -49,8 +73,14 @@ static uint32_t RawPressure;
 static int64_t Pressure;
 static int64_t Temperature;
 static int32_t lastConversionStart;
+
+static uint32_t conversionDelayMs;
+static uint32_t conversionDelayUs;
+
 static int32_t PIOS_MS5611_Read(uint8_t address, uint8_t *buffer, uint8_t len);
 static int32_t PIOS_MS5611_WriteCommand(uint8_t command);
+static uint32_t PIOS_MS5611_GetDelay();
+static uint32_t PIOS_MS5611_GetDelayUs();
 
 // Second order temperature compensation. Temperature offset
 static int64_t compensation_t2;
@@ -59,17 +89,36 @@ static int64_t compensation_t2;
 static uint32_t oversampling;
 static const struct pios_ms5611_cfg *dev_cfg;
 static int32_t i2c_id;
+static PIOS_SENSORS_1Axis_SensorsWithTemp results;
 
+// sensor driver interface
+bool PIOS_MS5611_driver_Test(uintptr_t context);
+void PIOS_MS5611_driver_Reset(uintptr_t context);
+void PIOS_MS5611_driver_get_scale(float *scales, uint8_t size, uintptr_t context);
+void PIOS_MS5611_driver_fetch(void *, uint8_t size, uintptr_t context);
+bool PIOS_MS5611_driver_poll(uintptr_t context);
 
+const PIOS_SENSORS_Driver PIOS_MS5611_Driver = {
+    .test      = PIOS_MS5611_driver_Test,
+    .poll      = PIOS_MS5611_driver_poll,
+    .fetch     = PIOS_MS5611_driver_fetch,
+    .reset     = PIOS_MS5611_driver_Reset,
+    .get_queue = NULL,
+    .get_scale = PIOS_MS5611_driver_get_scale,
+    .is_polled = true,
+};
 /**
  * Initialise the MS5611 sensor
  */
 int32_t ms5611_read_flag;
 void PIOS_MS5611_Init(const struct pios_ms5611_cfg *cfg, int32_t i2c_device)
 {
-    i2c_id  = i2c_device;
+    i2c_id = i2c_device;
 
     oversampling = cfg->oversampling;
+    conversionDelayMs = PIOS_MS5611_GetDelay();
+    conversionDelayUs = PIOS_MS5611_GetDelayUs();
+
     dev_cfg = cfg; // Store cfg before enabling interrupt
 
     PIOS_MS5611_WriteCommand(MS5611_RESET);
@@ -79,10 +128,10 @@ void PIOS_MS5611_Init(const struct pios_ms5611_cfg *cfg, int32_t i2c_device)
 
     // reset temperature compensation values
     compensation_t2 = 0;
-
     /* Calibration parameters */
     for (int i = 0; i < 6; i++) {
-        PIOS_MS5611_Read(MS5611_CALIB_ADDR + i * 2, data, 2);
+        while (PIOS_MS5611_Read(MS5611_CALIB_ADDR + i * 2, data, 2)) {}
+        ;
         CalibData.C[i] = (data[0] << 8) | data[1];
     }
 }
@@ -95,11 +144,11 @@ void PIOS_MS5611_Init(const struct pios_ms5611_cfg *cfg, int32_t i2c_device)
 int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
 {
     /* Start the conversion */
-    if (Type == TemperatureConv) {
+    if (Type == MS5611_CONVERSION_TYPE_TemperatureConv) {
         while (PIOS_MS5611_WriteCommand(MS5611_TEMP_ADDR + oversampling) != 0) {
             continue;
         }
-    } else if (Type == PressureConv) {
+    } else if (Type == MS5611_CONVERSION_TYPE_PressureConv) {
         while (PIOS_MS5611_WriteCommand(MS5611_PRES_ADDR + oversampling) != 0) {
             continue;
         }
@@ -113,7 +162,7 @@ int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
 /**
  * @brief Return the delay for the current osr
  */
-int32_t PIOS_MS5611_GetDelay()
+static uint32_t PIOS_MS5611_GetDelay()
 {
     switch (oversampling) {
     case MS5611_OSR_256:
@@ -140,7 +189,7 @@ int32_t PIOS_MS5611_GetDelay()
 /**
  * @brief Return the delay for the current osr in uS
  */
-uint32_t PIOS_MS5611_GetDelayUs()
+static uint32_t PIOS_MS5611_GetDelayUs()
 {
     switch (oversampling) {
     case MS5611_OSR_256:
@@ -166,7 +215,7 @@ uint32_t PIOS_MS5611_GetDelayUs()
 
 /**
  * Read the ADC conversion value (once ADC conversion has completed)
- * \return 0 if successfully read the ADC, -1 if failed
+ * \return 0 if successfully read the ADC, -1 if conversion time has not elapsed, -2 if failure occurred
  */
 int32_t PIOS_MS5611_ReadADC(void)
 {
@@ -176,16 +225,19 @@ int32_t PIOS_MS5611_ReadADC(void)
     Data[1] = 0;
     Data[2] = 0;
 
-    while (PIOS_MS5611_GetDelayUs() > PIOS_DELAY_DiffuS(lastConversionStart)) {
-        vTaskDelay(0);
+    if (CurrentRead == MS5611_CONVERSION_TYPE_None) {
+        return -2;
+    }
+    if (conversionDelayUs > PIOS_DELAY_DiffuS(lastConversionStart)) {
+        return -1;
     }
     static int64_t deltaTemp;
 
     /* Read and store the 16bit result */
-    if (CurrentRead == TemperatureConv) {
+    if (CurrentRead == MS5611_CONVERSION_TYPE_TemperatureConv) {
         /* Read the temperature conversion */
         if (PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3) != 0) {
-            return -1;
+            return -2;
         }
 
         RawTemperature = (Data[0] << 16) | (Data[1] << 8) | Data[2];
@@ -204,7 +256,7 @@ int32_t PIOS_MS5611_ReadADC(void)
 
         /* Read the pressure conversion */
         if (PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3) != 0) {
-            return -1;
+            return -2;
         }
         // check if temperature is less than 20°C
         if (Temperature < 2000) {
@@ -247,7 +299,7 @@ int32_t PIOS_MS5611_ReadADC(void)
 /**
  * Return the most recently computed temperature in kPa
  */
-float PIOS_MS5611_GetTemperature(void)
+static float PIOS_MS5611_GetTemperature(void)
 {
     // Apply the second order low and very low temperature compensation offset
     return ((float)(Temperature - compensation_t2)) / 100.0f;
@@ -256,7 +308,7 @@ float PIOS_MS5611_GetTemperature(void)
 /**
  * Return the most recently computed pressure in kPa
  */
-float PIOS_MS5611_GetPressure(void)
+static float PIOS_MS5611_GetPressure(void)
 {
     return ((float)Pressure) / 1000.0f;
 }
@@ -269,7 +321,7 @@ float PIOS_MS5611_GetPressure(void)
  * \return 0 if operation was successful
  * \return -1 if error during I2C transfer
  */
-int32_t PIOS_MS5611_Read(uint8_t address, uint8_t *buffer, uint8_t len)
+static int32_t PIOS_MS5611_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 {
     const struct pios_i2c_txn txn_list[] = {
         {
@@ -299,7 +351,7 @@ int32_t PIOS_MS5611_Read(uint8_t address, uint8_t *buffer, uint8_t len)
  * \return 0 if operation was successful
  * \return -1 if error during I2C transfer
  */
-int32_t PIOS_MS5611_WriteCommand(uint8_t command)
+static int32_t PIOS_MS5611_WriteCommand(uint8_t command)
 {
     const struct pios_i2c_txn txn_list[] = {
         {
@@ -325,16 +377,16 @@ int32_t PIOS_MS5611_Test()
     int32_t cur_value = 0;
 
     cur_value = Temperature;
-    PIOS_MS5611_StartADC(TemperatureConv);
-    PIOS_DELAY_WaitmS(5);
+    PIOS_MS5611_StartADC(MS5611_CONVERSION_TYPE_TemperatureConv);
+    PIOS_DELAY_WaitmS(10);
     PIOS_MS5611_ReadADC();
     if (cur_value == Temperature) {
         return -1;
     }
 
     cur_value = Pressure;
-    PIOS_MS5611_StartADC(PressureConv);
-    PIOS_DELAY_WaitmS(26);
+    PIOS_MS5611_StartADC(MS5611_CONVERSION_TYPE_PressureConv);
+    PIOS_DELAY_WaitmS(10);
     PIOS_MS5611_ReadADC();
     if (cur_value == Pressure) {
         return -1;
@@ -342,6 +394,79 @@ int32_t PIOS_MS5611_Test()
 
     return 0;
 }
+
+
+/* PIOS sensor driver implementation */
+void PIOS_MS5611_Register()
+{
+    PIOS_SENSORS_Register(&PIOS_MS5611_Driver, PIOS_SENSORS_TYPE_1AXIS_BARO, 0);
+}
+
+bool PIOS_MS5611_driver_Test(__attribute__((unused)) uintptr_t context)
+{
+    return true; // !PIOS_MS5611_Test();
+}
+
+void PIOS_MS5611_driver_Reset(__attribute__((unused)) uintptr_t context) {}
+
+void PIOS_MS5611_driver_get_scale(float *scales, uint8_t size, __attribute__((unused))  uintptr_t context)
+{
+    PIOS_Assert(size > 0);
+    scales[0] = 1;
+}
+
+void PIOS_MS5611_driver_fetch(void *data, __attribute__((unused)) uint8_t size, __attribute__((unused)) uintptr_t context)
+{
+    PIOS_Assert(data);
+    memcpy(data, (void *)&results, sizeof(PIOS_SENSORS_1Axis_SensorsWithTemp));
+}
+
+bool PIOS_MS5611_driver_poll(__attribute__((unused)) uintptr_t context)
+{
+    static uint8_t temp_press_interleave_count = 1;
+    static MS5611_FSM_State next_state = MS5611_FSM_INIT;
+
+    int32_t conversionResult = PIOS_MS5611_ReadADC();
+
+    if (__builtin_expect(conversionResult == -1, 1)) {
+        return false; // wait for conversion to complete
+    } else if (__builtin_expect(conversionResult == -2, 0)) {
+        temp_press_interleave_count = 1;
+        next_state = MS5611_FSM_INIT;
+    }
+    switch (next_state) {
+    case MS5611_FSM_INIT:
+    case MS5611_FSM_TEMPERATURE:
+        PIOS_MS5611_StartADC(MS5611_CONVERSION_TYPE_TemperatureConv);
+        next_state = MS5611_FSM_PRESSURE;
+        return false;
+
+    case MS5611_FSM_PRESSURE:
+        PIOS_MS5611_StartADC(MS5611_CONVERSION_TYPE_PressureConv);
+        next_state = MS5611_FSM_CALCULATE;
+        return false;
+
+    case MS5611_FSM_CALCULATE:
+        temp_press_interleave_count--;
+        if (temp_press_interleave_count == 0) {
+            PIOS_MS5611_StartADC(MS5611_CONVERSION_TYPE_TemperatureConv);
+            next_state = MS5611_FSM_PRESSURE;
+        } else {
+            PIOS_MS5611_StartADC(MS5611_CONVERSION_TYPE_PressureConv);
+            next_state = MS5611_FSM_CALCULATE;
+        }
+
+        results.temperature = PIOS_MS5611_GetTemperature();
+        results.sample = PIOS_MS5611_GetPressure();
+        return true;
+
+    default:
+        // it should not be there
+        PIOS_Assert(0);
+    }
+    return false;
+}
+
 
 #endif /* PIOS_INCLUDE_MS5611 */
 

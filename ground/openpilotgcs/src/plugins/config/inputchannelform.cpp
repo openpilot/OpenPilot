@@ -61,6 +61,7 @@ void InputChannelForm::minMaxUpdated()
 void InputChannelForm::updateTooltip()
 {
     int currentValue = ui->channelNeutral->value();
+
     ui->channelNeutral->setToolTip(QString::number(currentValue));
 }
 

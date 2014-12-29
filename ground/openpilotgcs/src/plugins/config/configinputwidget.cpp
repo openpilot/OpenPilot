@@ -412,6 +412,9 @@ void ConfigInputWidget::goToWizard()
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
 
+    // Now reset channel settings
+    resetChannelSettings();
+
     // Use faster input update rate.
     fastMdata();
 
@@ -1660,4 +1663,15 @@ bool ConfigInputWidget::shouldObjectBeSaved(UAVObject *object)
 {
     // ManualControlCommand no need to be saved
     return dynamic_cast<ManualControlCommand *>(object) == 0;
+}
+
+void ConfigInputWidget::resetChannelSettings()
+{
+    manualSettingsData = manualSettingsObj->getData();
+    // Clear all channel data : Channel Type (PPM,PWM..) and Number
+    for (unsigned int channel = 0; channel < 9; channel++) {
+        manualSettingsData.ChannelGroups[channel] = ManualControlSettings::CHANNELGROUPS_NONE;
+        manualSettingsData.ChannelNumber[channel] = 0;
+        manualSettingsObj->setData(manualSettingsData);
+    }
 }

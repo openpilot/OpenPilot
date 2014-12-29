@@ -192,6 +192,7 @@ private slots:
     void simpleCalibration(bool state);
     void adjustSpecialNeutrals();
     void updateCalibration();
+    void resetChannelSettings();
 
 protected:
     void resizeEvent(QResizeEvent *event);

@@ -34,11 +34,11 @@
 #define POW2(x) (1 << x)
 
 // TODO: Clean this up.  Getting around old constant.
-#define PIOS_MS5611_OVERSAMPLING oversampling
+#define PIOS_MS5611_OVERSAMPLING   oversampling
 
 // Option to change the interleave between Temp and Pressure conversions
 // Undef for normal operation
-// #define PIOS_MS5611_SLOW_TEMP_RATE 20
+#define PIOS_MS5611_SLOW_TEMP_RATE 20
 #ifndef PIOS_MS5611_SLOW_TEMP_RATE
 #define PIOS_MS5611_SLOW_TEMP_RATE 1
 #endif
@@ -448,7 +448,8 @@ bool PIOS_MS5611_driver_poll(__attribute__((unused)) uintptr_t context)
 
     case MS5611_FSM_CALCULATE:
         temp_press_interleave_count--;
-        if (temp_press_interleave_count == 0) {
+        if (!temp_press_interleave_count) {
+            temp_press_interleave_count = PIOS_MS5611_SLOW_TEMP_RATE;
             PIOS_MS5611_StartADC(MS5611_CONVERSION_TYPE_TemperatureConv);
             next_state = MS5611_FSM_PRESSURE;
         } else {

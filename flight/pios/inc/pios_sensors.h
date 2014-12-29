@@ -143,6 +143,12 @@ static inline void PIOS_SENSOR_Fetch(const PIOS_SENSORS_Instance *sensor, void *
     sensor->driver->fetch(samples, size, sensor->context);
 }
 
+static inline void PIOS_SENSOR_Reset(const PIOS_SENSORS_Instance *sensor)
+{
+    PIOS_Assert(sensor);
+    sensor->driver->reset(sensor->context);
+}
+
 /**
  * retrieve the sensor queue
  * @param sensor

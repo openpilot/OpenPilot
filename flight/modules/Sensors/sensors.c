@@ -68,6 +68,7 @@
 #include <CoordinateConversions.h>
 #include <pios_board_info.h>
 #include <string.h>
+
 // Private constants
 #define STACK_SIZE_BYTES         1000
 #define TASK_PRIORITY            (tskIDLE_PRIORITY + 3)
@@ -123,6 +124,7 @@ PERF_DEFINE_COUNTER(counterAccelPeriod);
 PERF_DEFINE_COUNTER(counterMagPeriod);
 PERF_DEFINE_COUNTER(counterBaroPeriod);
 PERF_DEFINE_COUNTER(counterSensorPeriod);
+PERF_DEFINE_COUNTER(counterSensorResets);
 
 // Private functions
 static void SensorsTask(void *parameters);
@@ -202,6 +204,7 @@ int32_t SensorsInitialize(void)
     RevoCalibrationConnectCallback(&settingsUpdatedCb);
     AttitudeSettingsConnectCallback(&settingsUpdatedCb);
     AccelGyroSettingsConnectCallback(&settingsUpdatedCb);
+
     return 0;
 }
 
@@ -250,6 +253,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
     PERF_INIT_COUNTER(counterMagPeriod, 0x53000003);
     PERF_INIT_COUNTER(counterBaroPeriod, 0x53000004);
     PERF_INIT_COUNTER(counterSensorPeriod, 0x53000005);
+    PERF_INIT_COUNTER(counterSensorResets, 0x53000006);
 
     // Test sensors
     bool sensors_test = true;
@@ -270,7 +274,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 
     // Main task loop
     lastSysTime = xTaskGetTickCount();
-
+    uint32_t reset_counter = 0;
 
     while (1) {
         // TODO: add timeouts to the sensor reads and set an error if the fail
@@ -302,6 +306,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                     processSamples3d(&sensor_context, sensor);
                     clearContext(&sensor_context);
                 } else if (is_primary) {
+                    PIOS_SENSOR_Reset(sensor);
+                    reset_counter++;
+                    PERF_TRACK_VALUE(counterSensorResets, reset_counter);
                     error = true;
                 }
             } else {

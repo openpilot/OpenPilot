@@ -38,7 +38,7 @@ RebootPage::RebootPage(SetupWizard *wizard, QWidget *parent) :
     connect(ui->rebootButton, SIGNAL(clicked()), this, SLOT(reboot()));
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
-    m_uploader    = pm->getObject<UploaderGadgetFactory>();
+    m_uploader = pm->getObject<UploaderGadgetFactory>();
     Q_ASSERT(m_uploader);
 }
 
@@ -87,7 +87,7 @@ void RebootPage::reboot()
     enableButtons(false);
     ui->rebootProgress->setValue(0);
     QApplication::processEvents();
-    connect(m_uploader, SIGNAL(progressUpdate(uploader::ProgressStep,QVariant)), this, SLOT(progressUpdate(uploader::ProgressStep,QVariant)));
+    connect(m_uploader, SIGNAL(progressUpdate(uploader::ProgressStep, QVariant)), this, SLOT(progressUpdate(uploader::ProgressStep, QVariant)));
     ui->messageLabel->setText(tr("Reboot in progress..."));
     m_uploader->reboot();
 }
@@ -96,7 +96,7 @@ void RebootPage::progressUpdate(uploader::ProgressStep progress, QVariant messag
 {
     Q_UNUSED(message);
     if (progress == uploader::SUCCESS || progress == uploader::FAILURE) {
-        disconnect(m_uploader, SIGNAL(progressUpdate(uploader::ProgressStep,QVariant)), this, SLOT(progressUpdate(uploader::ProgressStep,QVariant)));
+        disconnect(m_uploader, SIGNAL(progressUpdate(uploader::ProgressStep, QVariant)), this, SLOT(progressUpdate(uploader::ProgressStep, QVariant)));
         if (progress == uploader::FAILURE) {
             ui->messageLabel->setText(tr("<font color='red'>Software reboot failed!</font><p> Please perform a manual reboot by power cycling the board. "
                                          "To power cycle the controller remove all batteries and the USB cable for at least 30 seconds. "

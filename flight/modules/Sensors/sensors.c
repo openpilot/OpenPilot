@@ -49,15 +49,22 @@
 #include <openpilot.h>
 #include <pios_sensors.h>
 #include <homelocation.h>
+
 #include <magsensor.h>
 #include <accelsensor.h>
 #include <gyrosensor.h>
+#include <barosensor.h>
+#include <flightstatus.h>
+
 #include <attitudesettings.h>
 #include <revocalibration.h>
 #include <accelgyrosettings.h>
-#include <flightstatus.h>
+#include <revosettings.h>
+
+#include <mathmisc.h>
 #include <taskinfo.h>
 #include <pios_math.h>
+#include <pios_constants.h>
 #include <CoordinateConversions.h>
 #include <pios_board_info.h>
 #include <string.h>
@@ -74,18 +81,26 @@
 #define REGISTER_WDG()
 #endif
 
-static const uint32_t sensor_period_ms    = ((uint32_t)1000.0f / PIOS_SENSOR_RATE);
-static const uint32_t sensor_period_ticks = ((uint32_t)1000.0f / PIOS_SENSOR_RATE) / portTICK_RATE_MS;
+static const TickType_t sensor_period_ticks = ((uint32_t)1000.0f / PIOS_SENSOR_RATE) / portTICK_RATE_MS;
 
 // Interval in number of sample to recalculate temp bias
-#define TEMP_CALIB_INTERVAL 30
+#define TEMP_CALIB_INTERVAL      30
 
 // LPF
-#define TEMP_DT             (1.0f / PIOS_SENSOR_RATE)
-#define TEMP_LPF_FC         5.0f
-static const float temp_alpha = LPF_ALPHA(TEMP_DT, TEMP_LPF_FC);
+#define TEMP_DT_GYRO_ACCEL       (1.0f / PIOS_SENSOR_RATE)
+#define TEMP_LPF_FC_GYRO_ACCEL   5.0f
+static const float temp_alpha_gyro_accel = LPF_ALPHA(TEMP_DT_GYRO_ACCEL, TEMP_LPF_FC_GYRO_ACCEL);
 
-#define ZERO_ROT_ANGLE      0.00001f
+// Interval in number of sample to recalculate temp bias
+#define BARO_TEMP_CALIB_INTERVAL 10
+
+// LPF
+#define TEMP_DT_BARO             (1.0f / 120.0f)
+#define TEMP_LPF_FC_BARO         5.0f
+static const float temp_alpha_baro = TEMP_DT_BARO / (TEMP_DT_BARO + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC_BARO));
+
+
+#define ZERO_ROT_ANGLE           0.00001f
 // Private types
 typedef struct {
     // used to accumulate all samples in a task iteration
@@ -114,15 +129,19 @@ static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
 
 static void accumulateSamples(sensor_fetch_context *sensor_context, sensor_data *sample);
-static void processSamples(sensor_fetch_context *sensor_context, const PIOS_SENSORS_Instance *sensor);
+static void processSamples3d(sensor_fetch_context *sensor_context, const PIOS_SENSORS_Instance *sensor);
+static void processSamples1d(PIOS_SENSORS_1Axis_SensorsWithTemp *sample, const PIOS_SENSORS_Instance *sensor);
+
 static void clearContext(sensor_fetch_context *sensor_context);
 
 static void handleAccel(float *samples, float temperature);
 static void handleGyro(float *samples, float temperature);
 static void handleMag(float *samples, float temperature);
+static void handleBaro(float sample, float temperature);
 
 static void updateAccelTempBias(float temperature);
 static void updateGyroTempBias(float temperature);
+static void updateBaroTempBias(float temperature);
 
 // Private variables
 static sensor_data *source_data;
@@ -137,7 +156,7 @@ static float mag_transform[3][3] = {
     { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
 };
 
-// Variables used to handle temperature bias
+// Variables used to handle accel/gyro temperature bias
 static volatile bool gyro_temp_calibrated  = false;
 static volatile bool accel_temp_calibrated = false;
 
@@ -151,6 +170,14 @@ static uint8_t gyro_temp_calibration_count  = 0;
 static float R[3][3] = {
     { 0 }
 };
+// Variables used to handle baro temperature bias
+static RevoSettingsBaroTempCorrectionPolynomialData baroCorrection;
+static RevoSettingsBaroTempCorrectionExtentData baroCorrectionExtent;
+static volatile bool baro_temp_correction_enabled;
+static float baro_temp_bias   = 0;
+static float baro_temperature = NAN;
+static uint8_t baro_temp_calibration_count = 0;
+
 static int8_t rotate = 0;
 
 /**
@@ -163,15 +190,17 @@ int32_t SensorsInitialize(void)
     GyroSensorInitialize();
     AccelSensorInitialize();
     MagSensorInitialize();
+    BaroSensorInitialize();
     RevoCalibrationInitialize();
+    RevoSettingsInitialize();
     AttitudeSettingsInitialize();
     AccelGyroSettingsInitialize();
 
     rotate = 0;
 
+    RevoSettingsConnectCallback(&settingsUpdatedCb);
     RevoCalibrationConnectCallback(&settingsUpdatedCb);
     AttitudeSettingsConnectCallback(&settingsUpdatedCb);
-
     AccelGyroSettingsConnectCallback(&settingsUpdatedCb);
     return 0;
 }
@@ -260,7 +289,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         clearContext(&sensor_context);
         LL_FOREACH((PIOS_SENSORS_Instance *)sensors_list, sensor) {
             // we will wait on the sensor that's marked as primary( that means the sensor with higher sample rate)
-            bool is_primary = (sensor->type && PIOS_SENSORS_TYPE_3AXIS_ACCEL);
+            bool is_primary = (sensor->type & PIOS_SENSORS_TYPE_3AXIS_ACCEL);
 
             if (!sensor->driver->is_polled) {
                 const QueueHandle_t queue = PIOS_SENSORS_GetQueue(sensor);
@@ -270,7 +299,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                     accumulateSamples(&sensor_context, source_data);
                 }
                 if (sensor_context.count) {
-                    processSamples(&sensor_context, sensor);
+                    processSamples3d(&sensor_context, sensor);
                     clearContext(&sensor_context);
                 } else if (is_primary) {
                     error = true;
@@ -278,8 +307,12 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             } else {
                 if (PIOS_SENSORS_Poll(sensor)) {
                     PIOS_SENSOR_Fetch(sensor, (void *)source_data, MAX_SENSORS_PER_INSTANCE);
-                    accumulateSamples(&sensor_context, source_data);
-                    processSamples(&sensor_context, sensor);
+                    if (sensor->type & PIOS_SENSORS_TYPE_3D) {
+                        accumulateSamples(&sensor_context, source_data);
+                        processSamples3d(&sensor_context, sensor);
+                    } else {
+                        processSamples1d(&source_data->sensorSample1Axis, sensor);
+                    }
                     clearContext(&sensor_context);
                 }
             }
@@ -313,7 +346,7 @@ static void accumulateSamples(sensor_fetch_context *sensor_context, sensor_data 
     sensor_context->count++;
 }
 
-static void processSamples(sensor_fetch_context *sensor_context, const PIOS_SENSORS_Instance *sensor)
+static void processSamples3d(sensor_fetch_context *sensor_context, const PIOS_SENSORS_Instance *sensor)
 {
     float samples[3];
     float temperature;
@@ -321,7 +354,7 @@ static void processSamples(sensor_fetch_context *sensor_context, const PIOS_SENS
 
     PIOS_SENSORS_GetScales(sensor, scales, MAX_SENSORS_PER_INSTANCE);
     float inv_count = 1.0f / (float)sensor_context->count;
-    if ((sensor->type && PIOS_SENSORS_TYPE_3AXIS_ACCEL) ||
+    if ((sensor->type & PIOS_SENSORS_TYPE_3AXIS_ACCEL) ||
         (sensor->type == PIOS_SENSORS_TYPE_3AXIS_MAG)) {
         float t = inv_count * scales[0];
         samples[0]  = ((float)sensor_context->accum[0].x * t);
@@ -339,7 +372,7 @@ static void processSamples(sensor_fetch_context *sensor_context, const PIOS_SENS
         }
     }
 
-    if (sensor->type && PIOS_SENSORS_TYPE_3AXIS_GYRO) {
+    if (sensor->type & PIOS_SENSORS_TYPE_3AXIS_GYRO) {
         uint8_t index = 0;
         if (sensor->type == PIOS_SENSORS_TYPE_3AXIS_GYRO_ACCEL) {
             index = 1;
@@ -352,14 +385,22 @@ static void processSamples(sensor_fetch_context *sensor_context, const PIOS_SENS
         handleGyro(samples, temperature);
         return;
     }
+}
 
-    if (sensor->type == PIOS_SENSORS_TYPE_1AXIS_BARO) {
+static void processSamples1d(PIOS_SENSORS_1Axis_SensorsWithTemp *sample, const PIOS_SENSORS_Instance *sensor)
+{
+    switch (sensor->type) {
+    case PIOS_SENSORS_TYPE_1AXIS_BARO:
         PERF_MEASURE_PERIOD(counterBaroPeriod);
-        PIOS_Assert(0); // not yet implemented
+        handleBaro(sample->sample, sample->temperature);
+        return;
+
+    default:
+        PIOS_Assert(0);
     }
 }
 
-void handleAccel(float *samples, float temperature)
+static void handleAccel(float *samples, float temperature)
 {
     AccelSensorData accelSensorData;
 
@@ -372,10 +413,11 @@ void handleAccel(float *samples, float temperature)
     accelSensorData.x = samples[0];
     accelSensorData.y = samples[1];
     accelSensorData.z = samples[2];
-
+    accelSensorData.temperature = temperature;
     AccelSensorSet(&accelSensorData);
 }
-void handleGyro(float *samples, float temperature)
+
+static void handleGyro(float *samples, float temperature)
 {
     GyroSensorData gyroSensorData;
 
@@ -393,7 +435,7 @@ void handleGyro(float *samples, float temperature)
     GyroSensorSet(&gyroSensorData);
 }
 
-void handleMag(float *samples, float temperature)
+static void handleMag(float *samples, float temperature)
 {
     MagSensorData mag;
     float mags[3] = { (float)samples[1] - mag_bias[0],
@@ -410,12 +452,29 @@ void handleMag(float *samples, float temperature)
     MagSensorSet(&mag);
 }
 
+static void handleBaro(float sample, float temperature)
+{
+    updateBaroTempBias(temperature);
+    sample -= baro_temp_bias;
+
+    float altitude = 44330.0f * (1.0f - powf((sample) / PIOS_CONST_MKS_STD_ATMOSPHERE_F, (1.0f / 5.255f)));
+
+    if (!isnan(altitude)) {
+        BaroSensorData data;
+        data.Altitude    = altitude;
+        data.Temperature = temperature;
+        data.Pressure    = sample;
+        // Update the BasoSensor UAVObject
+        BaroSensorSet(&data);
+    }
+}
+
 static void updateAccelTempBias(float temperature)
 {
     if (isnan(accel_temperature)) {
         accel_temperature = temperature;
     }
-    accel_temperature = temp_alpha * (temperature - accel_temperature) + accel_temperature;
+    accel_temperature = temp_alpha_gyro_accel * (temperature - accel_temperature) + accel_temperature;
 
     if ((accel_temp_calibrated) && !accel_temp_calibration_count) {
         accel_temp_calibration_count = TEMP_CALIB_INTERVAL;
@@ -428,13 +487,14 @@ static void updateAccelTempBias(float temperature)
     }
     accel_temp_calibration_count--;
 }
+
 static void updateGyroTempBias(float temperature)
 {
     if (isnan(gyro_temperature)) {
         gyro_temperature = temperature;
     }
 
-    gyro_temperature = temp_alpha * (temperature - gyro_temperature) + gyro_temperature;
+    gyro_temperature = temp_alpha_gyro_accel * (temperature - gyro_temperature) + gyro_temperature;
 
     if (gyro_temp_calibrated && !gyro_temp_calibration_count) {
         gyro_temp_calibration_count = TEMP_CALIB_INTERVAL;
@@ -449,6 +509,22 @@ static void updateGyroTempBias(float temperature)
     gyro_temp_calibration_count--;
 }
 
+static void updateBaroTempBias(float temperature)
+{
+    baro_temperature = temp_alpha_baro * (temperature - baro_temperature) + baro_temperature;
+    baro_temp_calibration_count--;
+    if (isnan(baro_temperature)) {
+        baro_temperature = temperature;
+    }
+
+    if (baro_temp_correction_enabled && !baro_temp_calibration_count) {
+        baro_temp_calibration_count = BARO_TEMP_CALIB_INTERVAL;
+        // pressure bias = A + B*t + C*t^2 + D * t^3
+        // in case the temperature is outside of the calibrated range, uses the nearest extremes
+        float ctemp = boundf(baro_temperature, baroCorrectionExtent.max, baroCorrectionExtent.min);
+        baro_temp_bias = baroCorrection.a + ((baroCorrection.d * ctemp + baroCorrection.c) * ctemp + baroCorrection.b) * ctemp;
+    }
+}
 /**
  * Locally cache some variables from the AtttitudeSettings object
  */
@@ -502,6 +578,11 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         Quaternion2R(rotationQuat, R);
     }
     matrix_mult_3x3f((float(*)[3])RevoCalibrationmag_transformToArray(cal.mag_transform), R, mag_transform);
+
+    RevoSettingsBaroTempCorrectionPolynomialGet(&baroCorrection);
+    RevoSettingsBaroTempCorrectionExtentGet(&baroCorrectionExtent);
+    baro_temp_correction_enabled = !(baroCorrectionExtent.max - baroCorrectionExtent.min < 0.1f ||
+                                     (baroCorrection.a < 1e-9f && baroCorrection.b < 1e-9f && baroCorrection.c < 1e-9f && baroCorrection.d < 1e-9f));
 }
 /**
  * @}

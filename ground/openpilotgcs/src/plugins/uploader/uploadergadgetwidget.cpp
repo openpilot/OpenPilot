@@ -548,6 +548,47 @@ void UploaderGadgetWidget::systemEraseBoot()
     }
 }
 
+void UploaderGadgetWidget::systemReboot()
+{
+    ResultEventLoop eventLoop;
+
+    connect(this, SIGNAL(bootloaderSuccess()), &eventLoop, SLOT(success()));
+    connect(this, SIGNAL(bootloaderFailed()), &eventLoop, SLOT(fail()));
+
+    goToBootloader();
+
+    if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
+        emit progressUpdate(FAILURE, QVariant());
+        return;
+    }
+
+    disconnect(this, SIGNAL(bootloaderSuccess()), &eventLoop, SLOT(success()));
+    disconnect(this, SIGNAL(bootloaderFailed()), &eventLoop, SLOT(fail()));
+
+    commonSystemBoot(false, false);
+
+    ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pluginManager);
+    TelemetryManager *telemetryManager = pluginManager->getObject<TelemetryManager>();
+    Q_ASSERT(telemetryManager);
+
+    if (!telemetryManager->isConnected()) {
+        progressUpdate(BOOTING, QVariant());
+        ResultEventLoop eventLoop;
+
+        connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
+
+        if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
+            emit progressUpdate(FAILURE, QVariant());
+            return;
+        }
+
+        disconnect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
+    }
+
+    emit progressUpdate(SUCCESS, QVariant());
+}
+
 /**
  * Tells the system to boot (from Bootloader state)
  * @param[in] safeboot Indicates whether the firmware should use the stock HWSettings

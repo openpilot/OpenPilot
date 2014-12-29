@@ -27,10 +27,6 @@
 
 #include "rebootpage.h"
 #include "ui_rebootpage.h"
-#include <extensionsystem/pluginmanager.h>
-#include <uavobjectutil/uavobjectutilmanager.h>
-#include <extensionsystem/pluginmanager.h>
-#include "uploader/uploadergadgetfactory.h"
 
 RebootPage::RebootPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
@@ -39,11 +35,11 @@ RebootPage::RebootPage(SetupWizard *wizard, QWidget *parent) :
     ui->setupUi(this);
     ui->yellowLabel->setVisible(false);
     ui->redLabel->setVisible(true);
+    connect(ui->rebootButton, SIGNAL(clicked()), this, SLOT(reboot()));
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
-    UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
-    Q_ASSERT(uploader);
-    connect(ui->rebootButton, SIGNAL(clicked()), uploader, SIGNAL(reboot()));
+    m_uploader    = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(m_uploader);
 }
 
 RebootPage::~RebootPage()
@@ -55,6 +51,8 @@ RebootPage::~RebootPage()
 
 void RebootPage::initializePage()
 {
+    ui->messageLabel->setText("");
+    ui->rebootProgress->setValue(0);
     if (!m_timer.isActive()) {
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(toggleLabel()));
         m_timer.setInterval(500);
@@ -73,4 +71,41 @@ void RebootPage::toggleLabel()
     m_toggl = !m_toggl;
     ui->yellowLabel->setVisible(m_toggl);
     ui->redLabel->setVisible(!m_toggl);
+}
+
+void RebootPage::enableButtons(bool enable)
+{
+    getWizard()->button(QWizard::NextButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
+    getWizard()->button(QWizard::BackButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CustomButton1)->setEnabled(enable);
+    ui->rebootButton->setEnabled(enable);
+}
+
+void RebootPage::reboot()
+{
+    enableButtons(false);
+    ui->rebootProgress->setValue(0);
+    QApplication::processEvents();
+    connect(m_uploader, SIGNAL(progressUpdate(uploader::ProgressStep,QVariant)), this, SLOT(progressUpdate(uploader::ProgressStep,QVariant)));
+    ui->messageLabel->setText(tr("Reboot in progress..."));
+    m_uploader->reboot();
+}
+
+void RebootPage::progressUpdate(uploader::ProgressStep progress, QVariant message)
+{
+    Q_UNUSED(message);
+    if (progress == uploader::SUCCESS || progress == uploader::FAILURE) {
+        disconnect(m_uploader, SIGNAL(progressUpdate(uploader::ProgressStep,QVariant)), this, SLOT(progressUpdate(uploader::ProgressStep,QVariant)));
+        if (progress == uploader::FAILURE) {
+            ui->messageLabel->setText(tr("<font color='red'>Software reboot failed!</font><p> Please perform a manual reboot by power cycling the board. "
+                                         "To power cycle the controller remove all batteries and the USB cable for at least 30 seconds. "
+                                         "After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds. Then press Next."));
+        } else {
+            ui->messageLabel->setText(tr("<font color='green'>Reboot complete!</font>"));
+        }
+        enableButtons(true);
+    } else {
+        ui->rebootProgress->setValue(ui->rebootProgress->value() + 1);
+    }
 }

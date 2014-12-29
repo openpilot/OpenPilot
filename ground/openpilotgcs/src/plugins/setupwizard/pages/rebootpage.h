@@ -29,6 +29,9 @@
 #define REBOOTPAGE_H
 
 #include "abstractwizardpage.h"
+#include <extensionsystem/pluginmanager.h>
+#include <extensionsystem/pluginmanager.h>
+#include "uploader/uploadergadgetfactory.h"
 
 namespace Ui {
 class RebootPage;
@@ -44,13 +47,17 @@ public:
     void initializePage();
     bool validatePage();
 
+    void enableButtons(bool enable);
 private:
     Ui::RebootPage *ui;
     QTimer m_timer;
     bool m_toggl;
+    UploaderGadgetFactory *m_uploader;
 
 private slots:
     void toggleLabel();
+    void reboot();
+    void progressUpdate(uploader::ProgressStep progress, QVariant message);
 };
 
 #endif // REBOOTPAGE_H

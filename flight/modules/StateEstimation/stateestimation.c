@@ -382,7 +382,7 @@ static void StateEstimationCb(void)
             if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == FILTER_INIT_FORCE) {
                 const filterPipeline *newFilterChain;
                 switch (revoSettings.FusionAlgorithm) {
-                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
+                case REVOSETTINGS_FUSIONALGORITHM_BASICCOMPLEMENTARY:
                     newFilterChain = cfQueue;
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
@@ -394,7 +394,7 @@ static void StateEstimationCb(void)
                 case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
                     newFilterChain = ekf13iQueue;
                     break;
-                case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
+                case REVOSETTINGS_FUSIONALGORITHM_GPSNAVIGATIONINS13:
                     newFilterChain = ekf13Queue;
                     break;
                 default:

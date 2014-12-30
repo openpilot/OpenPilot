@@ -68,19 +68,11 @@ bool TelemetryPlugin::initialize(const QStringList & args, QString *errMsg)
 
     // TODO not so good... g is probalby leaked...
     MonitorWidget *w = mf->createMonitorWidget(NULL);
-    w->setMaximumWidth(180);
-
-    //
-    // setAlignment(Qt::AlignCenter);
+    w->setMaximumWidth(195);
 
     // no border
     w->setFrameStyle(QFrame::NoFrame);
     w->setWindowFlags(Qt::FramelessWindowHint);
-
-    // set svg background translucent
-    w->setStyleSheet("background:transparent;");
-    // set widget background translucent
-    w->setAttribute(Qt::WA_TranslucentBackground);
 
     w->setBackgroundBrush(Qt::NoBrush);
 

@@ -46,18 +46,20 @@ public:
     void initializePage();
 
 private slots:
-    void startStopButtonClicked();
+    void startButtonClicked();
+    void stopButtonClicked();
     void securityCheckBoxesToggled();
     void enableButtons(bool enable);
     void resetAllSecurityCheckboxes();
 
 private:
-    static const int LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 1000;
+    static const int LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 1050;
+    static const int OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 900;
     static const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 1900;
     Ui::EscCalibrationPage *ui;
     bool m_isCalibrating;
-
-    QList<OutputCalibrationUtil *> m_outputs;
+    OutputCalibrationUtil m_outputUtil;
+    QList<quint16> m_outputChannels;
 };
 
 #endif // ESCCALIBRATIONPAGE_H

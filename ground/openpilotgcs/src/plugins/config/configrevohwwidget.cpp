@@ -65,6 +65,8 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidgetBinding("HwSettings", "GPSSpeed", m_ui->cbMainGPSSpeed);
     addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_ui->cbMainComSpeed);
 
+    addWidgetBinding("HwSettings", "TelemetrySpeed", m_ui->cbRcvrTelemSpeed);
+
     // Add Gps protocol configuration
     addWidgetBinding("GPSSettings", "DataProtocol", m_ui->cbMainGPSProtocol);
     addWidgetBinding("GPSSettings", "DataProtocol", m_ui->cbFlexiGPSProtocol);
@@ -95,6 +97,7 @@ void ConfigRevoHWWidget::setupCustomCombos()
 
     connect(m_ui->cbFlexi, SIGNAL(currentIndexChanged(int)), this, SLOT(flexiPortChanged(int)));
     connect(m_ui->cbMain, SIGNAL(currentIndexChanged(int)), this, SLOT(mainPortChanged(int)));
+    connect(m_ui->cbRcvr, SIGNAL(currentIndexChanged(int)), this, SLOT(rcvrPortChanged(int)));
 }
 
 void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
@@ -105,6 +108,7 @@ void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
     usbVCPPortChanged(0);
     mainPortChanged(0);
     flexiPortChanged(0);
+    rcvrPortChanged(0);
     m_refreshing = false;
 }
 
@@ -196,6 +200,10 @@ void ConfigRevoHWWidget::flexiPortChanged(int index)
         if (m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_TELEMETRY) {
             m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
         }
+        if (m_ui->cbRcvr->currentIndex() == HwSettings::RM_RCVRPORT_PPMTELEMETRY
+            || m_ui->cbRcvr->currentIndex() == HwSettings::RM_RCVRPORT_TELEMETRY) {
+            m_ui->cbRcvr->setCurrentIndex(HwSettings::RM_RCVRPORT_DISABLED);
+        }
         break;
     case HwSettings::RM_FLEXIPORT_GPS:
         // Add Gps protocol configuration
@@ -247,6 +255,10 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
         if (m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
             m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
         }
+        if (m_ui->cbRcvr->currentIndex() == HwSettings::RM_RCVRPORT_PPMTELEMETRY
+            || m_ui->cbRcvr->currentIndex() == HwSettings::RM_RCVRPORT_TELEMETRY) {
+            m_ui->cbRcvr->setCurrentIndex(HwSettings::RM_RCVRPORT_DISABLED);
+        }
         break;
     case HwSettings::RM_MAINPORT_GPS:
         // Add Gps protocol configuration
@@ -275,6 +287,30 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
         break;
     default:
         m_ui->lblMainSpeed->setVisible(false);
+        break;
+    }
+}
+
+void ConfigRevoHWWidget::rcvrPortChanged(int index)
+{
+    Q_UNUSED(index);
+
+    switch (m_ui->cbRcvr->currentIndex()) {
+    case HwSettings::RM_RCVRPORT_TELEMETRY:
+    case HwSettings::RM_RCVRPORT_PPMTELEMETRY:
+        m_ui->lblRcvrSpeed->setVisible(true);
+        m_ui->cbRcvrTelemSpeed->setVisible(true);
+
+        if (m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
+            m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+        }
+        if (m_ui->cbMain->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
+            m_ui->cbMain->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+        }
+        break;
+    default:
+        m_ui->lblRcvrSpeed->setVisible(false);
+        m_ui->cbRcvrTelemSpeed->setVisible(false);
         break;
     }
 }

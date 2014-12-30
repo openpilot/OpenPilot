@@ -109,9 +109,6 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
                 elementsToShow << "quad-p";
                 break;
-            case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
-                elementsToShow << "quad-h";
-                break;
             case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
                 elementsToShow << "hexa";
                 break;
@@ -139,11 +136,27 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::FIXED_WING_ELEVON:
                 elementsToShow << "elevon";
                 break;
+            case VehicleConfigurationSource::FIXED_WING_VTAIL:
+                elementsToShow << "vtail";
+                break;
+            default:
+                break;
+            }   
+        case VehicleConfigurationSource::VEHICLE_SURFACE:
+            switch (m_configSource->getVehicleSubType()) {
+            case VehicleConfigurationSource::GROUNDVEHICLE_CAR:
+                elementsToShow << "car";
+                break;
+            case VehicleConfigurationSource::GROUNDVEHICLE_DIFFERENTIAL:
+                elementsToShow << "tank";
+                break;
+            case VehicleConfigurationSource::GROUNDVEHICLE_MOTORCYCLE:
+                elementsToShow << "motorbike";
+                break;
             default:
                 break;
             }
-        case VehicleConfigurationSource::VEHICLE_HELI:
-        case VehicleConfigurationSource::VEHICLE_SURFACE:
+        case VehicleConfigurationSource::VEHICLE_HELI: 
         default:
             break;
         }
@@ -162,9 +175,7 @@ void ConnectionDiagram::setupGraphicsScene()
         case VehicleConfigurationSource::INPUT_SBUS:
             elementsToShow << QString("%1sbus").arg(prefix);
             break;
-        case VehicleConfigurationSource::INPUT_DSMX10:
-        case VehicleConfigurationSource::INPUT_DSMX11:
-        case VehicleConfigurationSource::INPUT_DSM2:
+        case VehicleConfigurationSource::INPUT_DSM:
             elementsToShow << QString("%1satellite").arg(prefix);
             break;
         default:

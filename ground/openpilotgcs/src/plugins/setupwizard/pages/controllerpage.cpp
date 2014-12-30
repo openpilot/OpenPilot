@@ -80,6 +80,9 @@ bool ControllerPage::isComplete() const
 bool ControllerPage::validatePage()
 {
     getWizard()->setControllerType((SetupWizard::CONTROLLER_TYPE)ui->boardTypeCombo->itemData(ui->boardTypeCombo->currentIndex()).toInt());
+    if (getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC || getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC3D) {
+        getWizard()->setGpsType(SetupWizard::GPS_DISABLED);
+    }
     return true;
 }
 

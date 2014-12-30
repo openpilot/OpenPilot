@@ -1,3 +1,181 @@
+--- RELEASE-14.10 ---
+This release mainly focuses on flight performance, especially aimed at mini multirotors and adds support for the OpenPilot Platinum GPS (V9).
+This version supports the CopterControl, CC3D, Atom and the Revolution Flight controllers as well as the OPLink Modems.
+
+Some key addition in this release:
+- A brand new Acro+ flight mode, a Rate mode "on steroids";
+- Support for latest OpenPilot Platinum GPS (V9) and its integrated magnetometer;
+- Throttle PID Scaling: automatically scale PIDs based on throttle; 
+- On board Expo support;
+- Several additions to the Setup Wizard such as Fixed wing support, GPS selection, TriCopter servo speed selection and ESC calibration;
+- First implementation of Cloud Config, Cloud Config in this release is the first version of the future community based distributed system for sharing vehicle settings; 
+- Redesigned PFD artwork and addition of multifunctional slide out panels;
+- Support for additional Flexi-IO serial port for Revolution;
+- External (ws281x compatible) status LED support;
+- Considerable flight performance improvements.  
+
+The full list of features, improvements and bugfixes in this release is accessible here:
+
+http://progress.openpilot.org/browse/OP/fixforversion/10920
+
+NOTE: If you were using OPLink at power levels lower than 100mW, please redo a range test after upgrading to 14.10.
+
+** Improvement
+    * [OP-838] - Adding servo update rate to vehicle setup wizard for tricopters.
+    * [OP-1088] - Redesign the OPLink GUI in the GCS
+    * [OP-1134] - Custom vehicle should show settings from last mixer preset
+    * [OP-1156] - Unify path followers into a single module with submodules
+    * [OP-1317] - Improvement of IMU wind estimation
+    * [OP-1319] - Fix minor spelling mistakes in fw code
+    * [OP-1324] - Fix build when python isn't python2
+    * [OP-1338] - copydata.pro uses specific icu so version when it doesn't need to?
+    * [OP-1370] - Add optional UBX GPS self configuration
+    * [OP-1379] - Create a notification module that allows for some Naza like led signalling and more
+    * [OP-1395] - Several enhancements/fixes to flight side log
+    * [OP-1397] - Add Responsiveness to TxPID
+    * [OP-1404] - Add support for UBlox PVT sentence
+    * [OP-1405] - Add support for 25qXXX series of flash memories
+    * [OP-1406] - Add support for an aux magnetometer
+    * [OP-1423] - Populate TxPID Min/Max fields with the current values from the Stabilization page
+    * [OP-1429] - Optimize GPSSatellites UAVO
+    * [OP-1438] - Change VSI to Arc on the PFD
+    * [OP-1440] - Timing on WS2812 to support all models
+    * [OP-1447] - Make it easier to adjust the slider on the Output Calibration Setup Wizard page
+    * [OP-1451] - Change udev rules from using plugdev group to uaccess/udev-acl
+    * [OP-1452] - Usability fixes to ComUsbBridge
+    * [OP-1453] - Check if new version of OP Software suite is available, notify if so 
+    * [OP-1457] - Hide feed forward tab when in config plugin for Fixed wings
+    * [OP-1458] - Remove delays and other quirks from TX Wizard
+    * [OP-1462] - Find better default EKF settings
+    * [OP-1465] - update stm32flash to support new targets 
+    * [OP-1472] - Make connection diagram button more visible
+    * [OP-1474] - Scaling back PIDs at high / full throttle with Multis.
+    * [OP-1482] - TPS graph needs labels, also scale should not be -100% to +100%, suggest 50% as max
+    * [OP-1489] - Hide ILimit stuff
+    * [OP-1491] - Create H Quad type in artwork and add to wizard
+    * [OP-1493] - Make the discoveryf4bare target more usable from GCS
+    * [OP-1504] - Add a SystemSetting field to be used to name the vehicle.
+    * [OP-1507] - Optimize GPS module cpu utilization
+    * [OP-1508] - SBus Connection Diagram - Vehicle Setup Wizard
+    * [OP-1512] - Add ESC calibration to wizard
+    * [OP-1515] - Gyro Fifo handling for CC3D
+    * [OP-1516] - Create Acro+
+    * [OP-1520] - Remove "Attitude" as a selection for Yaw (safety Issue)
+    * [OP-1521] - Responsiveness scale
+    * [OP-1524] - Render chars/strings in the Uavobrowser
+    * [OP-1528] - Enable Telemetry on Flexi-IO (receiver) port on Revo platform
+    * [OP-1534] - Add expo and acro insanity factor to TxPID
+    * [OP-1535] - MPU handling optimization
+    * [OP-1538] - UAVO Browser - embedded descriptions
+    * [OP-1543] - Make GPS plugin look sexy
+    * [OP-1545] - Add visual feedback to ESC calibration screen on Wizard
+    * [OP-1546] - Cloud config uses "none" for the defaults, can this be changed to Generic <airframe type>?
+    * [OP-1548] - Remove, the Comp + amg and comp+mag+GPS modes
+    * [OP-1552] - Rename Radio Setup Wizard in tools menu
+    * [OP-1554] - Allows for enum values in plot showing them as labels
+    * [OP-1556] - Improve ESC calibration.
+    * [OP-1559] - GPS setup wizard should not say "Main Port"
+    * [OP-1566] - Add stop button to ESC calibration in Wizard
+    * [OP-1571] - Cloud config enhancements.
+    * [OP-1580] - Upgrade Qwt libs to 6.1.1
+    * [OP-1582] - Change TX Wizard button to show skip / next on aux channels
+    * [OP-1588] - Makes sure all Relay tuning is removed, UAVOs still exist for example
+    * [OP-1589] - Save mixer with cloud config
+    * [OP-1590] - Copy Bank function for multiple stabilization banks
+    * [OP-1624] - Make Aux Mag default if selected via Wizard
+    * [OP-1625] - Satellite dsm2/dsmX channel resolution autodetection.
+    * [OP-1627] - Clean up PiOS DSM post Matt fix
+    * [OP-1635] - Remove Quah H frome wizard to avoid confusion with Quad X
+
+** New Feature
+    * [OP-1222] - Add support for Fixed Wing configuration in Vehicle Setup Wizard
+    * [OP-1275] - Create a PiOS F0 target
+    * [OP-1403] - Add generic I2C/SPI HMC5x83 mag driver
+    * [OP-1434] - Support for GPSV9
+    * [OP-1476] - Serial bootloader and support tools for F0
+    * [OP-1477] - V9 firmware
+
+** Task
+    * [OP-1093] - Investigate Font issues on non-Windows platforms
+    * [OP-1337] - French translations updates (14.10)
+    * [OP-1398] - Qt 5.3.1 upgrade
+    * [OP-1468] - Change default PIDs for Atom 
+    * [OP-1544] - Change defaults for GPSSettings.UbxAutoConfig to "Configure"
+    * [OP-1632] - Add CloudConfigs to install 
+
+** Sub task
+    * [OP-790] - Add labels to Custom Mode Vehicle type channels
+    * [OP-1399] - Qt 5.3.1 upgrade (Windows)
+    * [OP-1400] - Qt 5.3.1 upgrade (Linux)
+    * [OP-1401] - Qt 5.3.1 upgrade (Mac)
+    * [OP-1435] - Add Up Time, Arm Status and flight mode to PFD 
+    * [OP-1439] - Add minor vignette / gradient to PFD
+    * [OP-1525] - GUI for Acro+
+    * [OP-1577] - Fixed Wing Wizard Images truncated and missing information
+    * [OP-1592] - "Cloud config" fails on cc3d 
+    * [OP-1605] - Normalize fixed wing mixers and mixing slider jitter while saving
+
+** Bug
+    * [OP-609] - Input wizard is too sensitive for some people, seems to create bugs
+    * [OP-868] - Text in Barographs is beyond image in Horizontal, Too tight spacing in Vertical
+    * [OP-922] - compiling firmware with DEBUG=YES fails in multiple places
+    * [OP-1077] - GCS corrupts flight log files (*.opl)
+    * [OP-1140] - Weak Leveling code appears to be wrong
+    * [OP-1186] - Clean up GCS configuration UI...
+    * [OP-1305] - Subpar CC3D and REVO performance on Mini H frames
+    * [OP-1349] - GCS Neutral Spinboxes in Input and Output are incorrectly affected by and affect Min and Max
+    * [OP-1362] - Translation : 'make ts' errors
+    * [OP-1422] - Vehicle Setup Wizard (Tricopter) and Vehicle Mixer Settings Frame type dropdown (Tricopter) do not give the same Pitch mixer settings
+    * [OP-1425] - A small typo
+    * [OP-1433] - Change the order of the TxPID PID Options
+    * [OP-1445] - GCS bugs down in RC Input and Manual Calibration
+    * [OP-1455] - No output from "Test outputs" until sliders are moved
+    * [OP-1459] - Workaround white-box bug in GCS on OSX
+    * [OP-1460] - ICU libraries need to be copied, like they used to be.
+    * [OP-1461] - copyqt logic flawed on linux
+    * [OP-1463] - New copyqt logic might break if user has alternate OPENPILOT_TOOLS_DIR defined
+    * [OP-1473] - Incorrect Handling of EOF bytes for Futaba R7008SB
+    * [OP-1478] - Qt Creator build fails on windows
+    * [OP-1481] - UAVTalk transacted sends limit the number of waypoints that can sent over a slow link
+    * [OP-1483] - Switching from ReturnToBase into PathFollower mode doesn't work reliably
+    * [OP-1484] - Yaw rate Ki slider on basic stabilization page out of range
+    * [OP-1485] - board target revoproto is broken
+    * [OP-1488] - Typo in uavobject.java.template
+    * [OP-1494] - First exit from Stabilization page brings up warning, although no changes made
+    * [OP-1499] - UBXAutoConfig not Auto Configuring
+    * [OP-1506] - Wrong display in altitude / speed + refactoring PFD
+    * [OP-1510] - Don't force operating at 100mW
+    * [OP-1513] - Filter every temperature measurement used for temperature calibration
+    * [OP-1517] - Setup Wizard  - sets SBus and GPS to main port
+    * [OP-1522] - Improve Robustness of OPLink radio
+    * [OP-1526] - Reverse all motors not working?
+    * [OP-1532] - OPLINKMINI and Revo do not communicate correctly
+    * [OP-1536] - The Revo ComBridge outputs garbage at the end of transmissions
+    * [OP-1537] - OPLink unreliable at high data rates
+    * [OP-1539] - AcroInsanityFactor limit parsing error
+    * [OP-1540] - Fix GPS v9 reported sha1sum
+    * [OP-1542] - Welcome Screen does not show latest available Update
+    * [OP-1549] - Maps no longer working
+    * [OP-1553] - OPlink does not work as non coordinator
+    * [OP-1562] - Welcome plugin warnings
+    * [OP-1563] - GCS crashes when doing a manual TX input calibration
+    * [OP-1564] - Incorrect display of Thrust mode in PFD Module
+    * [OP-1565] - Motors will not stop after 2nd time of using set neutral in wizard
+    * [OP-1567] - Fix bugs in Wizard
+    * [OP-1568] - Black tooltip over Telemetry monitor
+    * [OP-1570] - The Vehicle gadget defaults as a quad x with + mixes 100 100 50
+    * [OP-1572] - Wrong frame type displayed in PFD gadget
+    * [OP-1573] - Revo disarms in PATHPLANNER flight modes if throttle is low.
+    * [OP-1574] - Missing ESC throttle range calibration screen when 50Hz rate is selected
+    * [OP-1584] - High RAM usage on CC
+    * [OP-1586] - Test outputs can fail to stop motors in some cases
+    * [OP-1601] - Still not enough ram on CC for gps to be usable
+    * [OP-1603] - Fixed Wing (elevon) : Wizard and Config mixer differs
+    * [OP-1604] - Radio wizard crashes
+    * [OP-1618] - High CPU load caused by radio module driver
+    * [OP-1633] - Wizard enables serial ports on Revo
+    * [OP-1634] - Cloudconfigs use wrong path in install
+
 --- RELEASE-14.06.01 --- 
 This is the first maintenance release for 14.06.
 This mainly fixes a bug causing flips when switching to Weaklevel flight mode.

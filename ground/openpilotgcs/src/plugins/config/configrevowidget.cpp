@@ -186,7 +186,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // home location
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
 
-    addWidgetBinding("RevoSettings", "FusionAlgorithm", m_ui->FusionAlgorithm);
+    addWidgetBinding("RevoSettings", "FusionAlgorithm", m_ui->FusionAlgorithm, 0, 1, true);
 
     addWidgetBinding("AttitudeSettings", "BoardRotation", m_ui->rollRotation, AttitudeSettings::BOARDROTATION_ROLL);
     addWidgetBinding("AttitudeSettings", "BoardRotation", m_ui->pitchRotation, AttitudeSettings::BOARDROTATION_PITCH);
@@ -194,10 +194,12 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     addWidgetBinding("AttitudeSettings", "AccelTau", m_ui->accelTau);
 
     populateWidgets();
-    refreshWidgetsValues();
     enableAllCalibrations();
 
+    updateEnableControls();
+
     forceConnectedState();
+    refreshWidgetsValues();
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()

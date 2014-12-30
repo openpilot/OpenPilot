@@ -29,12 +29,13 @@
 #define TELEMETRYMANAGER_H
 
 #include "uavtalk_global.h"
-#include "telemetrymonitor.h"
-#include "telemetry.h"
 #include "uavtalk.h"
 #include "uavobjectmanager.h"
 #include <QIODevice>
 #include <QObject>
+
+class Telemetry;
+class TelemetryMonitor;
 
 class UAVTALK_EXPORT TelemetryManager : public QObject {
     Q_OBJECT
@@ -62,13 +63,13 @@ private slots:
     void onStop();
 
 private:
-    UAVObjectManager *objMngr;
-    UAVTalk *utalk;
-    Telemetry *telemetry;
-    TelemetryMonitor *telemetryMon;
-    QIODevice *device;
-    bool autopilotConnected;
-    QThread readerThread;
+    UAVObjectManager *m_uavobjectManager;
+    UAVTalk *m_uavTalk;
+    Telemetry *m_telemetry;
+    TelemetryMonitor *m_telemetryMonitor;
+    QIODevice *m_telemetryDevice;
+    bool m_isAutopilotConnected;
+    QThread m_telemetryReaderThread;
 };
 
 
@@ -77,7 +78,7 @@ class IODeviceReader : public QObject {
 public:
     IODeviceReader(UAVTalk *uavTalk);
 
-    UAVTalk *uavTalk;
+    UAVTalk *m_uavTalk;
 
 public slots:
     void read();

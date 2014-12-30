@@ -214,6 +214,15 @@ void armHandler(bool newinit)
         break;
 
     case ARM_STATE_DISARMING_TIMEOUT:
+    {
+        // we should never reach the disarming timeout if the pathfollower is engaged - reset timeout
+        FlightStatusControlChainData cc;
+        FlightStatusControlChainGet(&cc);
+        if (cc.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            armedDisarmStart = sysTime;
+        }
+    }
+
         // We get here when armed while throttle low, even when the arming timeout is not enabled
         if ((settings.ArmedTimeout != 0) && (timeDifferenceMs(armedDisarmStart, sysTime) > settings.ArmedTimeout)) {
             armState = ARM_STATE_DISARMED;

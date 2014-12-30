@@ -58,19 +58,36 @@
 #include <accelgyrosettings.h>
 #include <flightstatus.h>
 #include <taskinfo.h>
-
+#include <pios_math.h>
 #include <CoordinateConversions.h>
 
 #include <pios_board_info.h>
 
 // Private constants
-#define STACK_SIZE_BYTES 1000
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 3)
-#define SENSOR_PERIOD    2
+#define STACK_SIZE_BYTES    1000
+#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
 
-#define ZERO_ROT_ANGLE   0.00001f
+static const uint32_t sensor_period_ms = ((uint32_t)1000.0f / PIOS_SENSOR_RATE);
+
+// Interval in number of sample to recalculate temp bias
+#define TEMP_CALIB_INTERVAL 30
+
+// LPF
+#define TEMP_DT             (1.0f / PIOS_SENSOR_RATE)
+#define TEMP_LPF_FC         5.0f
+static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC));
+
+#define ZERO_ROT_ANGLE      0.00001f
 // Private types
+#define PIOS_INSTRUMENT_MODULE
+#include <pios_instrumentation_helper.h>
 
+PERF_DEFINE_COUNTER(counterGyroSamples);
+PERF_DEFINE_COUNTER(counterSensorPeriod);
+
+// Counters:
+// - 0x53000001 Sensor fetch rate(period)
+// - 0x53000002 number of gyro samples read for each loop
 
 // Private functions
 static void SensorsTask(void *parameters);
@@ -95,6 +112,13 @@ static float mag_transform[3][3] = {
 // temp coefficient to calculate gyro bias
 static volatile bool gyro_temp_calibrated  = false;
 static volatile bool accel_temp_calibrated = false;
+
+static float accel_temperature  = NAN;
+static float gyro_temperature   = NAN;
+static float accel_temp_bias[3] = { 0 };
+static float gyro_temp_bias[3] = { 0 };
+static uint8_t temp_calibration_count = 0;
+
 
 static float R[3][3] = {
     { 0 }
@@ -219,7 +243,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             vTaskDelay(10);
         }
     }
-
+    PERF_INIT_COUNTER(counterGyroSamples, 0x53000001);
+    PERF_INIT_COUNTER(counterSensorPeriod, 0x53000002);
     // Main task loop
     lastSysTime = xTaskGetTickCount();
     bool error = false;
@@ -234,7 +259,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
             lastSysTime = xTaskGetTickCount();
-            vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+            vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_RATE_MS);
             AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
             error = false;
         } else {
@@ -263,7 +288,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 
                 count = 0;
                 while ((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error) {
-                    error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+                    error = ((xTaskGetTickCount() - lastSysTime) > sensor_period_ms) ? true : error;
                 }
                 if (error) {
                     // Unfortunately if the BMA180 ever misses getting read, then it will not
@@ -332,6 +357,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                     accel_samples++;
                 }
 
+                PERF_MEASURE_PERIOD(counterSensorPeriod);
+                PERF_TRACK_VALUE(counterGyroSamples, gyro_samples);
+
                 if (gyro_samples == 0) {
                     PIOS_MPU6000_ReadGyros(&mpu6000_data);
                     error = true;
@@ -350,24 +378,43 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             PIOS_DEBUG_Assert(0);
         }
 
+        if (isnan(accel_temperature)) {
+            accel_temperature = accelSensorData.temperature;
+            gyro_temperature  = gyroSensorData.temperature;
+        }
+
+        accel_temperature = temp_alpha * (accelSensorData.temperature - accel_temperature) + accel_temperature;
+        gyro_temperature  = temp_alpha * (gyroSensorData.temperature - gyro_temperature) + gyro_temperature;
+
+        if ((accel_temp_calibrated || gyro_temp_calibrated) && !temp_calibration_count) {
+            temp_calibration_count = TEMP_CALIB_INTERVAL;
+            if (accel_temp_calibrated) {
+                float ctemp = boundf(accel_temperature, agcal.temp_calibrated_extent.max, agcal.temp_calibrated_extent.min);
+                accel_temp_bias[0] = agcal.accel_temp_coeff.X * ctemp;
+                accel_temp_bias[1] = agcal.accel_temp_coeff.Y * ctemp;
+                accel_temp_bias[2] = agcal.accel_temp_coeff.Z * ctemp;
+            }
+
+            if (gyro_temp_calibrated) {
+                float ctemp = boundf(gyro_temperature, agcal.temp_calibrated_extent.max, agcal.temp_calibrated_extent.min);
+
+                gyro_temp_bias[0] = (agcal.gyro_temp_coeff.X + agcal.gyro_temp_coeff.X2 * ctemp) * ctemp;
+                gyro_temp_bias[1] = (agcal.gyro_temp_coeff.Y + agcal.gyro_temp_coeff.Y2 * ctemp) * ctemp;
+                gyro_temp_bias[2] = (agcal.gyro_temp_coeff.Z + agcal.gyro_temp_coeff.Z2 * ctemp) * ctemp;
+            }
+        }
+        temp_calibration_count--;
         // Scale the accels
         float accels[3] = { (float)accel_accum[0] / accel_samples,
                             (float)accel_accum[1] / accel_samples,
                             (float)accel_accum[2] / accel_samples };
 
 
-        float accels_out[3] = { accels[0] * accel_scaling * agcal.accel_scale.X - agcal.accel_bias.X,
-                                accels[1] * accel_scaling * agcal.accel_scale.Y - agcal.accel_bias.Y,
-                                accels[2] * accel_scaling * agcal.accel_scale.Z - agcal.accel_bias.Z };
+        float accels_out[3] = { accels[0] * accel_scaling * agcal.accel_scale.X - agcal.accel_bias.X - accel_temp_bias[0],
+                                accels[1] * accel_scaling * agcal.accel_scale.Y - agcal.accel_bias.Y - accel_temp_bias[1],
+                                accels[2] * accel_scaling * agcal.accel_scale.Z - agcal.accel_bias.Z - accel_temp_bias[2] };
 
-        if (accel_temp_calibrated) {
-            float ctemp = accelSensorData.temperature > agcal.temp_calibrated_extent.max ? agcal.temp_calibrated_extent.max :
-                          (accelSensorData.temperature < agcal.temp_calibrated_extent.min ? agcal.temp_calibrated_extent.min
-                           : accelSensorData.temperature);
-            accels_out[0] -= agcal.accel_temp_coeff.X * ctemp;
-            accels_out[1] -= agcal.accel_temp_coeff.Y * ctemp;
-            accels_out[2] -= agcal.accel_temp_coeff.Z * ctemp;
-        }
+
         if (rotate) {
             rot_mult(R, accels_out, accels);
             accelSensorData.x = accels[0];
@@ -385,18 +432,10 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                            (float)gyro_accum[1] / gyro_samples,
                            (float)gyro_accum[2] / gyro_samples };
 
-        float gyros_out[3] = { gyros[0] * gyro_scaling * agcal.gyro_scale.X - agcal.gyro_bias.X,
-                               gyros[1] * gyro_scaling * agcal.gyro_scale.Y - agcal.gyro_bias.Y,
-                               gyros[2] * gyro_scaling * agcal.gyro_scale.Z - agcal.gyro_bias.Z };
+        float gyros_out[3] = { gyros[0] * gyro_scaling * agcal.gyro_scale.X - agcal.gyro_bias.X - gyro_temp_bias[0],
+                               gyros[1] * gyro_scaling * agcal.gyro_scale.Y - agcal.gyro_bias.Y - gyro_temp_bias[1],
+                               gyros[2] * gyro_scaling * agcal.gyro_scale.Z - agcal.gyro_bias.Z - gyro_temp_bias[2] };
 
-        if (gyro_temp_calibrated) {
-            float ctemp = gyroSensorData.temperature > agcal.temp_calibrated_extent.max ? agcal.temp_calibrated_extent.max :
-                          (gyroSensorData.temperature < agcal.temp_calibrated_extent.min ? agcal.temp_calibrated_extent.min
-                           : gyroSensorData.temperature);
-            gyros_out[0] -= (agcal.gyro_temp_coeff.X + agcal.gyro_temp_coeff.X2 * ctemp) * ctemp;
-            gyros_out[1] -= (agcal.gyro_temp_coeff.Y + agcal.gyro_temp_coeff.Y2 * ctemp) * ctemp;
-            gyros_out[2] -= (agcal.gyro_temp_coeff.Z + agcal.gyro_temp_coeff.Z2 * ctemp) * ctemp;
-        }
         if (rotate) {
             rot_mult(R, gyros_out, gyros);
             gyroSensorData.x = gyros[0];
@@ -437,8 +476,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
-
-        lastSysTime = xTaskGetTickCount();
+        vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_RATE_MS);
     }
 }
 

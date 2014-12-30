@@ -6,7 +6,7 @@
         <field name="MaxPDOP" units="" type="float" elements="1" defaultvalue="3.5"/>
         <!-- Ubx self configuration. Enable to allow the flight board to auto configure ubx GPS options,
             store does AutoConfig and save GPS settings (i.e. to prevent issues if gps is power cycled)  -->
-        <field name="UbxAutoConfig" units="" type="enum" elements="1" options="Disabled,Configure,ConfigureAndStore" defaultvalue="Disabled"/>
+        <field name="UbxAutoConfig" units="" type="enum" elements="1" options="Disabled,Configure,ConfigureAndStore" defaultvalue="Configure"/>
         <!-- Ubx position update rate, -1 for auto -->
         <field name="UbxRate" units="Hz" type="int8" elements="1" defaultvalue="5" />
         <!-- Ubx dynamic model, see UBX datasheet for more details -->

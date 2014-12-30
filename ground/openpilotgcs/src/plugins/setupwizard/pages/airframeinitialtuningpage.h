@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       airframestabfixedwingpage.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       airframeinitialtuningpage.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup AirframeStabFixedwingPage
+ * @addtogroup AirframeInitialTuningPage
  * @{
  * @brief
  *****************************************************************************/
@@ -63,6 +63,7 @@ private:
     QString getTemplateKey(QJsonObject *templ);
     void updatePhoto(QJsonObject *templ);
     void updateDescription(QJsonObject *templ);
+    bool airframeIsCompatible(int vehicleType, int vehicleSubType);
 };
 
 Q_DECLARE_METATYPE(QJsonObject *)

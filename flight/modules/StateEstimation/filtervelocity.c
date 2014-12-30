@@ -40,7 +40,7 @@
 #define DT_ALPHA       1e-3f
 #define DT_MIN         1e-6f
 #define DT_MAX         1.0f
-#define DT_INIT        (1.0f / 666.0f) // initialize with 666 Hz (default sensor update rate on revo)
+#define DT_INIT        (1.0f / PIOS_SENSOR_RATE) // initialize with board sensor rate
 
 // Private types
 struct data {

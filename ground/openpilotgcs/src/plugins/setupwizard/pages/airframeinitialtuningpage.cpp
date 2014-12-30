@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       airframestabfixedwingpage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       airframeinitialtuningpage.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup AirframeStabFixedwingPage
+ * @addtogroup AirframeInitialTuningPage
  * @{
  * @brief
  *****************************************************************************/
@@ -31,6 +31,7 @@
 #include <QJsonArray>
 #include <QDir>
 #include "vehicletemplateexportdialog.h"
+#include "utils/pathutils.h"
 
 AirframeInitialTuningPage::AirframeInitialTuningPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
@@ -101,11 +102,11 @@ void AirframeInitialTuningPage::updatePhoto(QJsonObject *templ)
     if (m_photoItem != NULL) {
         ui->templateImage->scene()->removeItem(m_photoItem);
     }
-    if (templ != NULL) {
+    if (templ != NULL && !templ->value("photo").isUndefined()) {
         QByteArray imageData = QByteArray::fromBase64(templ->value("photo").toString().toLatin1());
         photo.loadFromData(imageData, "PNG");
     } else {
-        photo.load(":/core/images/opie_90x120.gif");
+        photo.load(":/core/images/openpilot_logo_500.png");
     }
     m_photoItem = ui->templateImage->scene()->addPixmap(photo);
     ui->templateImage->setSceneRect(ui->templateImage->scene()->itemsBoundingRect());
@@ -118,7 +119,7 @@ void AirframeInitialTuningPage::updateDescription(QJsonObject *templ)
         QString description;
         description.append("<b>").append(tr("Name of Vehicle: ")).append("</b>").append(templ->value("name").toString()).append("<br>");
         description.append("<b>").append(tr("Name of Owner: ")).append("</b>").append(templ->value("owner").toString());
-        if (templ->value("nick") != "") {
+        if (templ->value("nick") != QStringLiteral("")) {
             description.append(" (").append(templ->value("nick").toString()).append(")");
         }
         description.append("<br>");
@@ -133,7 +134,12 @@ void AirframeInitialTuningPage::updateDescription(QJsonObject *templ)
         description.append("<b>").append(tr("Comments: ")).append("</b>").append(templ->value("comment").toString());
         ui->templateDescription->setText(description);
     } else {
-        ui->templateDescription->setText(tr("No vehicle selected!"));
+        ui->templateDescription->setText(tr("This option will use the current tuning settings saved on the controller, if your controller "
+                                            "is currently unconfigured, then the OpenPilot firmware defaults will be used.\n\n"
+                                            "It is suggested that if this is a first time configuration of your controller, rather than "
+                                            "use this option, instead select a tuning set that matches your own airframe as close as "
+                                            "possible from the list above or if you are not able to fine one, then select the generic item "
+                                            "from the list."));
     }
 }
 
@@ -146,6 +152,23 @@ void AirframeInitialTuningPage::templateSelectionChanged()
     }
 }
 
+bool AirframeInitialTuningPage::airframeIsCompatible(int vehicleType, int vehicleSubType)
+{
+    if (vehicleType != getWizard()->getVehicleType()) {
+        return false;
+    }
+
+    int wizSubType = getWizard()->getVehicleSubType();
+    switch (vehicleType) {
+    case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
+    {
+        return wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
+    }
+    default:
+        return vehicleSubType == wizSubType;
+    }
+}
+
 void AirframeInitialTuningPage::loadValidFiles()
 {
     ui->templateList->clear();
@@ -154,7 +177,7 @@ void AirframeInitialTuningPage::loadValidFiles()
     }
     m_templates.clear();
 
-    QDir templateDir(QString("%1/%2/").arg(VehicleTemplateExportDialog::EXPORT_BASE_NAME).arg(m_dir));
+    QDir templateDir(QString("%1/%2/").arg(Utils::PathUtils().InsertDataPath("%%DATAPATH%%cloudconfig")).arg(m_dir));
     QStringList names;
     names << "*.optmpl";
     templateDir.setNameFilters(names);
@@ -165,14 +188,19 @@ void AirframeInitialTuningPage::loadValidFiles()
 
         if (file.open(QFile::ReadOnly)) {
             QByteArray jsonData = file.readAll();
-            QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData);
-            QJsonObject json    = templateDoc.object();
-            if (json["type"].toInt() == getWizard()->getVehicleType() &&
-                json["subtype"].toInt() == getWizard()->getVehicleSubType()) {
-                QString uuid = json["uuid"].toString();
-                if (!m_templates.contains(uuid)) {
-                    m_templates[json["uuid"].toString()] = new QJsonObject(json);
+            QJsonParseError error;
+            QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData, &error);
+            if (error.error == QJsonParseError::NoError) {
+                QJsonObject json = templateDoc.object();
+                if (airframeIsCompatible(json["type"].toInt(), json["subtype"].toInt())) {
+                    QString uuid = json["uuid"].toString();
+                    if (!m_templates.contains(uuid)) {
+                        m_templates[json["uuid"].toString()] = new QJsonObject(json);
+                    }
                 }
+            } else {
+                qDebug() << "Error parsing json file: "
+                         << fileName << ". Error was:" << error.errorString();
             }
         }
         file.close();
@@ -181,16 +209,21 @@ void AirframeInitialTuningPage::loadValidFiles()
 
 void AirframeInitialTuningPage::setupTemplateList()
 {
-    QListWidgetItem *item = new QListWidgetItem(tr("None"), ui->templateList);
+    QListWidgetItem *item;
 
-    item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
     foreach(QString templ, m_templates.keys()) {
         QJsonObject *json = m_templates[templ];
 
         item = new QListWidgetItem(json->value("name").toString(), ui->templateList);
         item->setData(Qt::UserRole + 1, QVariant::fromValue(json));
     }
+    ui->templateList->sortItems(Qt::AscendingOrder);
+
+    item = new QListWidgetItem(tr("Current Tuning"));
+    item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
+    ui->templateList->insertItem(0, item);
     ui->templateList->setCurrentRow(0);
+    // TODO Add generics to top under item Current tuning
 }
 
 QString AirframeInitialTuningPage::getTemplateKey(QJsonObject *templ)

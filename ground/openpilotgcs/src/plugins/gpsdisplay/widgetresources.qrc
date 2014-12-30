@@ -3,5 +3,6 @@
         <file>images/gpsEarth.svg</file>
         <file>images/flatEarth.png</file>
         <file>images/marker.svg</file>
+        <file>font/digital-7.ttf</file>
     </qresource>
 </RCC>

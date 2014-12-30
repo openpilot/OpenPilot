@@ -366,7 +366,7 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Start Configuration Wizard</string>
+                 <string>Start Transmitter Setup Wizard</string>
                 </property>
                 <property name="checkable">
                  <bool>false</bool>
@@ -1228,7 +1228,7 @@ margin:1px;
 font:bold;</string>
                 </property>
                 <property name="text">
-                 <string>PID Bank</string>
+                 <string>Settings Bank</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>

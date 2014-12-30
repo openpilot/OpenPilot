@@ -75,7 +75,7 @@
 // ------------------------
 // TELEMETRY
 // ------------------------
-#define TELEM_QUEUE_SIZE         20
+#define TELEM_QUEUE_SIZE         10
 
 // ------------------------
 // PIOS_LED

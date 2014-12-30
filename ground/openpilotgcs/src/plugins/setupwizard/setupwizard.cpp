@@ -56,9 +56,11 @@
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
-    m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
-    m_servoType(SERVO_UNKNOWN), m_vehicleTemplate(NULL),
-    m_calibrationPerformed(false), m_restartNeeded(false), m_connectionManager(0)
+    m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN),
+    m_escType(ESC_UNKNOWN), m_servoType(SERVO_UNKNOWN),
+    m_airspeedType(AIRSPEED_DISABLED), m_gpsType(GPS_DISABLED),
+    m_vehicleTemplate(NULL), m_calibrationPerformed(false),
+    m_restartNeeded(false), m_connectionManager(NULL)
 {
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
@@ -66,8 +68,8 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
         m_actuatorSettings << actuatorChannelSettings();
     }
     setWizardStyle(QWizard::ModernStyle);
-    setMinimumSize(600, 600);
-    resize(600, 600);
+    setMinimumSize(780, 600);
+    resize(780, 600);
     createPages();
 }
 
@@ -129,7 +131,12 @@ int SetupWizard::nextId() const
         return PAGE_ESC;
 
     case PAGE_FIXEDWING:
-        return PAGE_SERVO;
+    case PAGE_SURFACE:
+        if (getVehicleSubType() == GROUNDVEHICLE_DIFFERENTIAL) {
+            return PAGE_ESC;
+        } else {
+            return PAGE_SERVO;
+        }
 
     case PAGE_INPUT:
         if (isRestartNeeded()) {
@@ -168,7 +175,7 @@ int SetupWizard::nextId() const
     }
 
     case PAGE_BIAS_CALIBRATION:
-        if (getVehicleType() == VEHICLE_MULTI && getEscType() == ESC_RAPID) {
+        if (getVehicleType() == VEHICLE_MULTI) {
             return PAGE_ESC_CALIBRATION;
         } else {
             return PAGE_OUTPUT_CALIBRATION;
@@ -275,9 +282,6 @@ QString SetupWizard::getSummaryText()
         case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
             summary.append(tr("Quadcopter +"));
             break;
-        case SetupWizard::MULTI_ROTOR_QUAD_H:
-            summary.append(tr("Quadcopter H"));
-            break;
         case SetupWizard::MULTI_ROTOR_HEXA:
             summary.append(tr("Hexacopter"));
             break;
@@ -334,6 +338,24 @@ QString SetupWizard::getSummaryText()
         break;
     case VEHICLE_SURFACE:
         summary.append(tr("Surface vehicle"));
+
+        summary.append("<br>");
+        summary.append("<b>").append(tr("Vehicle sub type: ")).append("</b>");
+        switch (getVehicleSubType()) {
+        case SetupWizard::GROUNDVEHICLE_CAR:
+            summary.append(tr("Car"));
+            break;
+        case SetupWizard::GROUNDVEHICLE_DIFFERENTIAL:
+            summary.append(tr("Tank"));
+            break;
+        case SetupWizard::GROUNDVEHICLE_MOTORCYCLE:
+            summary.append(tr("Motorcycle"));
+            break;
+        default:
+            summary.append(tr("Unknown"));
+            break;
+        }
+
         break;
     default:
         summary.append(tr("Unknown"));
@@ -351,14 +373,8 @@ QString SetupWizard::getSummaryText()
     case INPUT_SBUS:
         summary.append(tr("Futaba S.Bus"));
         break;
-    case INPUT_DSM2:
-        summary.append(tr("Spektrum satellite (DSM2)"));
-        break;
-    case INPUT_DSMX10:
-        summary.append(tr("Spektrum satellite (DSMX10BIT)"));
-        break;
-    case INPUT_DSMX11:
-        summary.append(tr("Spektrum satellite (DSMX11BIT)"));
+    case INPUT_DSM:
+        summary.append(tr("Spektrum Satellite"));
         break;
     default:
         summary.append(tr("Unknown"));
@@ -368,17 +384,18 @@ QString SetupWizard::getSummaryText()
     summary.append("<b>").append(tr("Speed Controller (ESC) type: ")).append("</b>");
     switch (getEscType()) {
     case ESC_STANDARD:
-        summary.append(tr("Standard ESC (50 Hz)"));
+        summary.append(tr("Standard ESC (%1 Hz)").arg(VehicleConfigurationHelper::LEGACY_ESC_FREQUENCY));
         break;
     case ESC_RAPID:
-        summary.append(tr("Rapid ESC (500 Hz)"));
+        summary.append(tr("Rapid ESC (%1 Hz)").arg(VehicleConfigurationHelper::RAPID_ESC_FREQUENCY));
         break;
     default:
         summary.append(tr("Unknown"));
     }
 
     // If Tricopter show tail servo speed
-    if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING) {
+    if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING
+        || getVehicleSubType() == GROUNDVEHICLE_MOTORCYCLE || getVehicleSubType() == GROUNDVEHICLE_CAR) {
         summary.append("<br>");
         summary.append("<b>").append(tr("Servo type: ")).append("</b>");
         switch (getServoType()) {

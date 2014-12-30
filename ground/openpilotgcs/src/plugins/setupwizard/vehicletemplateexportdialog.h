@@ -66,9 +66,9 @@ private:
     VehicleConfigurationSource::VEHICLE_SUB_TYPE m_subType;
     QPixmap m_image;
 
+    QString fixFilenameString(QString input, int truncate = 100);
     QString getTypeDirectory();
     QString setupVehicleType();
-    QString fixFilenameString(QString input, int truncate = 100);
 };
 
 #endif // VEHICLETEMPLATEEXPORTDIALOG_H

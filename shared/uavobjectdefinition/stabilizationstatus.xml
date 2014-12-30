@@ -11,7 +11,7 @@
 			<elementname>Thrust</elementname>
 		</elementnames>
 	</field>
-	<field name="InnerLoop" units="" type="enum" options="Direct,VirtualFlyBar,RelayTuning,AxisLock,Rate,CruiseControl">
+	<field name="InnerLoop" units="" type="enum" options="Direct,VirtualFlyBar,Acro+,AxisLock,Rate,CruiseControl">
 		<elementnames>
 			<elementname>Roll</elementname>
 			<elementname>Pitch</elementname>

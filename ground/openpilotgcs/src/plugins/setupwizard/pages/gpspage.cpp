@@ -65,20 +65,18 @@ void GpsPage::setupSelection(Selection *selection)
 
     selection->addItem(tr("OpenPilot Platinum"),
                        tr("Select this option to use the OpenPilot Platinum GPS with integrated Magnetometer "
-                          "and Microcontroller connected to the Main Port of your controller.\n\n"
+                          "and Microcontroller.\n\n"
                           "Note: for the OpenPilot v8 GPS please select the U-Blox option."),
                        "OPGPS-v9",
                        SetupWizard::GPS_PLATINUM);
 
     selection->addItem(tr("U-Blox Based"),
-                       tr("Select this option for the OpenPilot V8 GPS or generic U-Blox chipset GPSs connected"
-                          "to the Main Port of your controller."),
+                       tr("Select this option for the OpenPilot V8 GPS or generic U-Blox chipset based GPS."),
                        "OPGPS-v8-ublox",
                        SetupWizard::GPS_UBX);
 
     selection->addItem(tr("NMEA Based"),
-                       tr("Select this option for a generic NMEA based GPS connected to the Main Port of your"
-                          "controller."),
+                       tr("Select this option for a generic NMEA based GPS."),
                        "generic-nmea",
                        SetupWizard::GPS_NMEA);
 }

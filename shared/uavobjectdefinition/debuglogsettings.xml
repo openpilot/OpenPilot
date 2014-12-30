@@ -1,7 +1,10 @@
 <xml>
     <object name="DebugLogSettings" singleinstance="true" settings="true" category="System">
         <description>Configure On Board Logging Facilities</description>
-        <field name="LoggingEnabled" units="" type="enum" elements="1" options="Disabled,OnlyWhenArmed,Always" defaultvalue="Disabled" />
+
+        <field name="LoggingEnabled" units="" type="enum" elements="1" options="Disabled,OnlyWhenArmed,Always" defaultvalue="Disabled">
+            <description>If set to OnlyWhenArmed logs will only be saved when craft is armed. Disabled turns logging off, and Always will always log.</description>
+        </field>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

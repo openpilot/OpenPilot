@@ -30,7 +30,7 @@
 #include <QDebug>
 #include <QtWidgets>
 
-UAVObjectField::UAVObjectField(const QString & name, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString &limits)
+UAVObjectField::UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString &limits)
 {
     QStringList elementNames;
 
@@ -39,18 +39,19 @@ UAVObjectField::UAVObjectField(const QString & name, const QString & units, Fiel
         elementNames.append(QString("%1").arg(n));
     }
     // Initialize
-    constructorInitialize(name, units, type, elementNames, options, limits);
+    constructorInitialize(name, description, units, type, elementNames, options, limits);
 }
 
-UAVObjectField::UAVObjectField(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
+UAVObjectField::UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
 {
-    constructorInitialize(name, units, type, elementNames, options, limits);
+    constructorInitialize(name, description, units, type, elementNames, options, limits);
 }
 
-void UAVObjectField::constructorInitialize(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
+void UAVObjectField::constructorInitialize(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
 {
     // Copy params
     this->name         = name;
+    this->description  = description;
     this->units        = units;
     this->type         = type;
     this->options      = options;
@@ -458,9 +459,63 @@ bool UAVObjectField::isWithinLimits(QVariant var, quint32 index, int board)
             default:
                 return true;
             }
+        default:
+            return true;
         }
     }
     return true;
+}
+
+QString UAVObjectField::getLimitsAsString(quint32 index, int board)
+{
+    QString limitString;
+
+    if (elementLimits.keys().contains(index)) {
+        foreach(LimitStruct struc, elementLimits.value(index)) {
+            if ((struc.board != board) && board != 0 && struc.board != 0) {
+                continue;
+            }
+            switch (struc.type) {
+            case EQUAL:
+            {
+                limitString.append(tr("one of")).append(" [");
+                bool first = true;
+                foreach(QVariant var, struc.values) {
+                    if (!first) {
+                        limitString.append(", ");
+                    }
+                    limitString.append(var.toString());
+                    first = false;
+                }
+                return limitString.append("]");
+            }
+            case NOT_EQUAL:
+            {
+                limitString.append(tr("none of")).append(" [");
+                bool first = true;
+                foreach(QVariant var, struc.values) {
+                    if (!first) {
+                        limitString.append(", ");
+                    }
+                    limitString.append(var.toString());
+                    first = false;
+                }
+                return limitString.append("]");
+            }
+            case BIGGER: return limitString.append(QString("%1 %2").arg(tr("more than"), struc.values.at(0).toString()));
+
+            case BETWEEN: return limitString.append(QString("%1 %2 %3 %4")
+                                                    .arg(tr("between"), struc.values.at(0).toString(),
+                                                         tr(" and "), struc.values.at(1).toString()));
+
+            case SMALLER: return limitString.append(QString("%1 %2").arg(tr("less than"), struc.values.at(0).toString()));
+
+            default:
+                break;
+            }
+        }
+    }
+    return limitString;
 }
 
 QVariant UAVObjectField::getMaxLimit(quint32 index, int board)
@@ -478,20 +533,14 @@ QVariant UAVObjectField::getMaxLimit(quint32 index, int board)
         case BIGGER:
             return QVariant();
 
-            break;
-            break;
         case BETWEEN:
             return struc.values.at(1);
 
-            break;
         case SMALLER:
             return struc.values.at(0);
 
-            break;
         default:
             return QVariant();
-
-            break;
         }
     }
     return QVariant();
@@ -511,20 +560,14 @@ QVariant UAVObjectField::getMinLimit(quint32 index, int board)
         case SMALLER:
             return QVariant();
 
-            break;
-            break;
         case BETWEEN:
             return struc.values.at(0);
 
-            break;
         case BIGGER:
             return struc.values.at(0);
 
-            break;
         default:
             return QVariant();
-
-            break;
         }
     }
     return QVariant();
@@ -607,6 +650,11 @@ void UAVObjectField::clear()
 QString UAVObjectField::getName()
 {
     return name;
+}
+
+QString UAVObjectField::getDescription()
+{
+    return description;
 }
 
 QString UAVObjectField::getUnits()

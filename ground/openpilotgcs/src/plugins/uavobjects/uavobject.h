@@ -142,6 +142,9 @@ public:
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
 
+    bool isKnown() const;
+    void setIsKnown(bool isKnown);
+
     virtual bool isSettingsObject();
     virtual bool isDataObject();
     virtual bool isMetaDataObject();
@@ -178,9 +181,7 @@ signals:
     void updateRequested(UAVObject *obj, bool all = false);
     void transactionCompleted(UAVObject *obj, bool success);
     void newInstance(UAVObject *obj);
-
-private slots:
-    void fieldUpdated(UAVObjectField *field);
+    void isKnownChanged(UAVObject *obj, bool isKnown);
 
 protected:
     quint32 objID;
@@ -197,6 +198,12 @@ protected:
     void initializeFields(QList<UAVObjectField *> & fields, quint8 *data, quint32 numBytes);
     void setDescription(const QString & description);
     void setCategory(const QString & category);
+
+private:
+    bool m_isKnown;
+
+private slots:
+    void fieldUpdated(UAVObjectField *field);
 };
 
 #endif // UAVOBJECT_H

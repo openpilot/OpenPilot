@@ -32,6 +32,7 @@
 
 const QString OutputCalibrationPage::MULTI_SVG_FILE     = QString(":/setupwizard/resources/multirotor-shapes.svg");
 const QString OutputCalibrationPage::FIXEDWING_SVG_FILE = QString(":/setupwizard/resources/fixedwing-shapes-wizard.svg");
+const QString OutputCalibrationPage::GROUND_SVG_FILE    = QString(":/setupwizard/resources/ground-shapes-wizard.svg");
 
 OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent), ui(new Ui::OutputCalibrationPage), m_vehicleBoundsItem(0),
@@ -131,14 +132,6 @@ void OutputCalibrationPage::setupVehicle()
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
         setupActuatorMinMaxAndNeutral(0, 3, 4);
         break;
-    case SetupWizard::MULTI_ROTOR_QUAD_H:
-        loadSVGFile(MULTI_SVG_FILE);
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
-        m_vehicleElementIds << "quad-h" << "quad-h-frame" << "quad-h-m1" << "quad-h-m2" << "quad-h-m3" << "quad-h-m4";
-        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
-        m_channelIndex << 0 << 0 << 1 << 2 << 3;
-        setupActuatorMinMaxAndNeutral(0, 3, 4);
-        break;
     case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
@@ -213,6 +206,53 @@ void OutputCalibrationPage::setupVehicle()
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
+    case SetupWizard::FIXED_WING_VTAIL:
+        loadSVGFile(FIXEDWING_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2;
+        m_vehicleElementIds << "vtail" << "vtail-frame" << "vtail-motor" << "vtail-ail-left" << "vtail-ail-right" << "vtail-rudder-left" << "vtail-rudder-right";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
+        m_channelIndex << 0 << 2 << 0 << 5 << 3 << 1;
+
+        setupActuatorMinMaxAndNeutral(2, 2, 5);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+
+    // Ground vehicles
+    case SetupWizard::GROUNDVEHICLE_CAR:
+        loadSVGFile(GROUND_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 2;
+        m_vehicleElementIds << "car" << "car-frame" << "car-motor" << "car-steering";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2;
+        m_channelIndex << 0 << 1 << 0;
+
+        setupActuatorMinMaxAndNeutral(0, 1, 2);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+    case SetupWizard::GROUNDVEHICLE_DIFFERENTIAL:
+        loadSVGFile(GROUND_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 1;
+        m_vehicleElementIds << "tank" << "tank-frame" << "tank-left-motor" << "tank-right-motor";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2;
+        m_channelIndex << 0 << 0 << 1;
+
+        setupActuatorMinMaxAndNeutral(0, 1, 2);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+    case SetupWizard::GROUNDVEHICLE_MOTORCYCLE:
+        loadSVGFile(GROUND_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 2;
+        m_vehicleElementIds << "motorbike" << "motorbike-frame" << "motorbike-motor" << "motorbike-steering";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2;
+        m_channelIndex << 0 << 1 << 0;
+
+        setupActuatorMinMaxAndNeutral(0, 1, 2);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+
     default:
         break;
     }
@@ -274,7 +314,6 @@ void OutputCalibrationPage::setupVehicleHighlightedPart()
 void OutputCalibrationPage::setWizardPage()
 {
     qDebug() << "Wizard index: " << m_currentWizardIndex;
-    m_calibrationUtil->stopChannelOutput();
 
     QApplication::processEvents();
 
@@ -376,7 +415,7 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
     ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
     ui->motorNeutralSlider->setEnabled(checked);
     quint16 channel   = getCurrentChannel();
-    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
+    quint16 safeValue = m_actuatorSettings[channel].channelMin;
     onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, safeValue, ui->motorNeutralSlider);
 }
 
@@ -386,6 +425,7 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
         if (checkAlarms()) {
             enableButtons(false);
             enableServoSliders(true);
+            OutputCalibrationUtil::startOutputCalibration();
             m_calibrationUtil->startChannelOutput(channel, safeValue);
             slider->setValue(value);
             m_calibrationUtil->setChannelOutputValue(value);
@@ -394,6 +434,7 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
         }
     } else {
         m_calibrationUtil->stopChannelOutput();
+        OutputCalibrationUtil::stopOutputCalibration();
         enableServoSliders(false);
         enableButtons(true);
     }

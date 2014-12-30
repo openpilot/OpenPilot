@@ -473,8 +473,8 @@ void SixPointCalibrationModel::compute()
     revoCalibrationData.MagBiasNullingRate = memento.revoCalibrationData.MagBiasNullingRate;;
 
     // Check the mag calibration is good
-    bool good_calibration     = true;
-    bool good_aux_calibration = true;
+    bool good_calibration = true;
+    // bool good_aux_calibration = true;
     if (calibratingMag) {
         good_calibration &= !IS_NAN(revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0]);
         good_calibration &= !IS_NAN(revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C1]);
@@ -581,7 +581,7 @@ void SixPointCalibrationModel::save()
     if (calibratingMag) {
         RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
 
-        for (int i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {
+        for (uint i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {
             revoCalibrationData.mag_transform[i] = result.revoCalibrationData.mag_transform[i];
         }
         for (int i = 0; i < 3; i++) {
@@ -592,7 +592,7 @@ void SixPointCalibrationModel::save()
         if (calibratingAuxMag) {
             AuxMagSettings::DataFields auxCalibrationData = auxMagSettings->getData();
             // Note that Revo/AuxMag MAG_TRANSFORM_RxCx are interchangeable, an assertion at initialization enforces the structs are equal
-            for (int i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {
+            for (uint i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {
                 auxCalibrationData.mag_transform[i] = result.auxMagSettingsData.mag_transform[i];
             }
             for (int i = 0; i < 3; i++) {

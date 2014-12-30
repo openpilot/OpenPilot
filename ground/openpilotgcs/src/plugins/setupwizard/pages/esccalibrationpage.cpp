@@ -35,12 +35,21 @@
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
 
+#include <QThread>
+
 EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
     ui(new Ui::EscCalibrationPage), m_isCalibrating(false)
 {
     ui->setupUi(this);
-    connect(ui->startStopButton, SIGNAL(clicked()), this, SLOT(startStopButtonClicked()));
+
+    ui->outputHigh->setEnabled(false);
+    ui->outputLow->setEnabled(true);
+    ui->outputLevel->setEnabled(true);
+    ui->outputLevel->setText(QString(tr("%1 µs")).arg(OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
+
+    connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+    connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
 
     connect(ui->securityCheckBox1, SIGNAL(toggled(bool)), this, SLOT(securityCheckBoxesToggled()));
     connect(ui->securityCheckBox2, SIGNAL(toggled(bool)), this, SLOT(securityCheckBoxesToggled()));
@@ -76,50 +85,81 @@ void EscCalibrationPage::resetAllSecurityCheckboxes()
     ui->securityCheckBox3->setChecked(false);
 }
 
-void EscCalibrationPage::startStopButtonClicked()
+void EscCalibrationPage::startButtonClicked()
 {
     if (!m_isCalibrating) {
         m_isCalibrating = true;
-        ui->startStopButton->setEnabled(false);
+        ui->startButton->setEnabled(false);
         enableButtons(false);
+        ui->outputHigh->setEnabled(true);
+        ui->outputLow->setEnabled(false);
+        ui->nonconnectedLabel->setEnabled(false);
+        ui->connectedLabel->setEnabled(true);
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *uavoManager = pm->getObject<UAVObjectManager>();
         Q_ASSERT(uavoManager);
         MixerSettings *mSettings = MixerSettings::GetInstance(uavoManager);
         Q_ASSERT(mSettings);
         QString mixerTypePattern = "Mixer%1Type";
+
+        OutputCalibrationUtil::startOutputCalibration();
         for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
             UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
             Q_ASSERT(field);
             if (field->getValue().toString() == field->getOptions().at(VehicleConfigurationHelper::MIXER_TYPE_MOTOR)) {
-                OutputCalibrationUtil *output = new OutputCalibrationUtil();
-                output->startChannelOutput(i, LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
-                output->setChannelOutputValue(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
-                m_outputs << output;
+                m_outputChannels << i;
             }
         }
-        ui->startStopButton->setText(tr("Stop"));
-        ui->startStopButton->setEnabled(true);
-    } else {
-        m_isCalibrating = false;
-        ui->startStopButton->setEnabled(false);
-        foreach(OutputCalibrationUtil * output, m_outputs) {
-            output->stopChannelOutput();
-            delete output;
+        m_outputUtil.startChannelOutput(m_outputChannels, OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+        QThread::msleep(100);
+        m_outputUtil.setChannelOutputValue(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+
+        ui->stopButton->setEnabled(true);
+    }
+}
+
+void EscCalibrationPage::stopButtonClicked()
+{
+    if (m_isCalibrating) {
+        ui->stopButton->setEnabled(false);
+        ui->outputHigh->setEnabled(false);
+
+        // Set to low pwm out
+        m_outputUtil.setChannelOutputValue(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
+        QApplication::processEvents();
+        QThread::msleep(2000);
+
+        // Ramp down to off pwm out
+        for (int i = LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS; i >= OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS; i -= 10) {
+            m_outputUtil.setChannelOutputValue(i);
+            ui->outputLevel->setText(QString(tr("%1 µs")).arg(i));
+            QApplication::processEvents();
+            QThread::msleep(200);
         }
-        m_outputs.clear();
+
+        // Stop output
+        m_outputUtil.stopChannelOutput();
+        OutputCalibrationUtil::stopOutputCalibration();
+
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
+        ui->outputHigh->setEnabled(false);
+        ui->outputLow->setEnabled(true);
+        ui->nonconnectedLabel->setEnabled(true);
+        ui->connectedLabel->setEnabled(false);
+        m_outputChannels.clear();
         m_isCalibrating = false;
         resetAllSecurityCheckboxes();
-        ui->startStopButton->setText(tr("Start"));
         enableButtons(true);
     }
 }
 
 void EscCalibrationPage::securityCheckBoxesToggled()
 {
-    ui->startStopButton->setEnabled(ui->securityCheckBox1->isChecked() &&
-                                    ui->securityCheckBox2->isChecked() &&
-                                    ui->securityCheckBox3->isChecked());
+    ui->startButton->setEnabled(ui->securityCheckBox1->isChecked() &&
+                                ui->securityCheckBox2->isChecked() &&
+                                ui->securityCheckBox3->isChecked());
 }
 
 

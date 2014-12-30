@@ -116,9 +116,6 @@ private:
     AccessoryDesired *accessoryDesiredObj0;
     AccessoryDesired *accessoryDesiredObj1;
     AccessoryDesired *accessoryDesiredObj2;
-    AccessoryDesired::DataFields accessoryDesiredData0;
-    AccessoryDesired::DataFields accessoryDesiredData1;
-    AccessoryDesired::DataFields accessoryDesiredData2;
 
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
@@ -170,6 +167,9 @@ private:
 
     void wzNextDelayedStart();
     void wzNextDelayedCancel();
+
+    AccessoryDesired *getAccessoryDesiredInstance(int instance);
+    float getAccessoryDesiredValue(int instance);
 
 private slots:
     void wzNext();

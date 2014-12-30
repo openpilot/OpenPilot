@@ -66,7 +66,6 @@ public:
         goToWizard();
     }
     void enableControls(bool enable);
-
     bool shouldObjectBeSaved(UAVObject *object);
 
 private:

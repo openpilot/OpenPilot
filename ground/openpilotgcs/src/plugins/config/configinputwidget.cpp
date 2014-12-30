@@ -1681,7 +1681,7 @@ void ConfigInputWidget::adjustSpecialNeutrals()
 bool ConfigInputWidget::shouldObjectBeSaved(UAVObject *object)
 {
     // ManualControlCommand no need to be saved
-    return dynamic_cast<ManualControlCommand *>(object) == 0;
+    return dynamic_cast<ManualControlCommand *>(object) == NULL;
 }
 
 void ConfigInputWidget::resetChannelSettings()

@@ -39,6 +39,7 @@
 #include <QRadioButton>
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "actuatorsettings.h"
 #include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>
@@ -123,6 +124,10 @@ private:
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
 
+    ActuatorSettings *actuatorSettingsObj;
+    ActuatorSettings::DataFields actuatorSettingsData;
+    ActuatorSettings::DataFields previousActuatorSettingsData;
+
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
     FlightModeSettings::DataFields previousFlightModeSettingsData;
@@ -193,6 +198,7 @@ private slots:
     void adjustSpecialNeutrals();
     void updateCalibration();
     void resetChannelSettings();
+    void resetActuatorSettings();
 
 protected:
     void resizeEvent(QResizeEvent *event);

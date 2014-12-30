@@ -71,6 +71,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     accessoryDesiredObj0  = AccessoryDesired::GetInstance(getObjectManager(), 0);
     accessoryDesiredObj1  = AccessoryDesired::GetInstance(getObjectManager(), 1);
     accessoryDesiredObj2  = AccessoryDesired::GetInstance(getObjectManager(), 2);
+    actuatorSettingsObj   = ActuatorSettings::GetInstance(getObjectManager());
 
     // Only instance 0 is present if the board is not connected.
     // The other instances are populated lazily.
@@ -411,9 +412,13 @@ void ConfigInputWidget::goToWizard()
     previousFlightModeSettingsData = flightModeSettingsData;
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
+    // Stash actuatorSettings
+    actuatorSettingsData           = actuatorSettingsObj->getData();
+    previousActuatorSettingsData   = actuatorSettingsData;
 
-    // Now reset channel settings
+    // Now reset channel and actuator settings (disable outputs)
     resetChannelSettings();
+    resetActuatorSettings();
 
     // Use faster input update rate.
     fastMdata();
@@ -453,6 +458,7 @@ void ConfigInputWidget::wzCancel()
     // Load settings back from beginning of wizard
     manualSettingsObj->setData(previousManualSettingsData);
     flightModeSettingsObj->setData(previousFlightModeSettingsData);
+    actuatorSettingsObj->setData(previousActuatorSettingsData);
 }
 
 void ConfigInputWidget::registerControlActivity()
@@ -533,6 +539,9 @@ void ConfigInputWidget::wzNext()
 
         // Restore original input update rate.
         restoreMdata();
+
+        // Load actuator settings back from beginning of wizard
+        actuatorSettingsObj->setData(previousActuatorSettingsData);
 
         // Leave setting the throttle neutral until the final Next press,
         // else the throttle scaling causes the graphical stick movement to not
@@ -1617,6 +1626,13 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         fastMdataSingle(manualCommandObj, &manualControlMdata);
 
+        // Stash actuatorSettings
+        actuatorSettingsData = actuatorSettingsObj->getData();
+        previousActuatorSettingsData = actuatorSettingsData;
+
+        // Disable all actuators
+        resetActuatorSettings();
+
         connect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     } else {
         ui->configurationWizard->setEnabled(true);
@@ -1638,6 +1654,9 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         }
 
         manualSettingsObj->setData(manualSettingsData);
+
+        // Load actuator settings back from beginning of manual calibration
+        actuatorSettingsObj->setData(previousActuatorSettingsData);
 
         disconnect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     }
@@ -1673,5 +1692,18 @@ void ConfigInputWidget::resetChannelSettings()
         manualSettingsData.ChannelGroups[channel] = ManualControlSettings::CHANNELGROUPS_NONE;
         manualSettingsData.ChannelNumber[channel] = 0;
         manualSettingsObj->setData(manualSettingsData);
+    }
+}
+
+void ConfigInputWidget::resetActuatorSettings()
+{
+    actuatorSettingsData = actuatorSettingsObj->getData();
+    // Clear all output data : Min, max, neutral = 1500
+    // 1500 = servo middle, can be applied to all outputs because board is 'Alwaysdisarmed'
+    for (unsigned int output = 0; output < 12; output++) {
+        actuatorSettingsData.ChannelMax[output]     = 1500;
+        actuatorSettingsData.ChannelMin[output]     = 1500;
+        actuatorSettingsData.ChannelNeutral[output] = 1500;
+        actuatorSettingsObj->setData(actuatorSettingsData);
     }
 }

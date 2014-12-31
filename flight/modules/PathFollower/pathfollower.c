@@ -492,12 +492,16 @@ static uint8_t updateAutoPilotVtol()
     // Brake mode end condition checks
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         bool exit_brake = false;
+        VelocityStateData velocityState;
         if (pathStatus.path_time > pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT]) { // enter hold on timeout
             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_TIMEOUT;
             exit_brake = true;
-        } else if (pathStatus.fractional_progress > 0.90f) { // enter hold if achieved 90% reduction in start velocity
-            pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
-            exit_brake = true;
+        } else if (pathStatus.fractional_progress > 0.95f) {
+            VelocityStateGet(&velocityState);
+            if (fabsf(velocityState.East) < 0.2f && fabsf(velocityState.North) < 0.2f ) {
+        	pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
+        	exit_brake = true;
+            }
         }
 
         if (exit_brake) {
@@ -512,8 +516,6 @@ static uint8_t updateAutoPilotVtol()
             pathSummary.brake_distance_offset = sqrtf(north_offset * north_offset + east_offset * east_offset + down_offset * down_offset);
             pathSummary.time_remaining = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] - pathStatus.path_time;
             pathSummary.fractional_progress   = pathStatus.fractional_progress;
-            VelocityStateData velocityState;
-            VelocityStateGet(&velocityState);
             float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
             cur_velocity = sqrtf(cur_velocity);
             pathSummary.decelrate = (pathDesired.StartingVelocity - cur_velocity) / pathStatus.path_time;
@@ -1297,28 +1299,20 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
                     neutralThrustEst.average = neutralThrustEst.sum / 120.0f;
                     neutralThrustEst.correction =  neutralThrustEst.average/1000.0f;
 
-                    // calculate current offset from neutral
-                    float current_neutral_thrust_offset = adjustments.NeutralThrustOffset + downCommand;
-
-                    // add the average remaining i value to the
-                    adjustments.NeutralThrustOffset += neutralThrustEst.correction;
-
                     global.PIDvel[2].iAccumulator -= neutralThrustEst.average;
-
-                    downCommand = pid_apply(&global.PIDvel[2], downError, 0.0f); // intentionally set dT to zero as same time increment
-                    float new_neutral_thrust_offset = adjustments.NeutralThrustOffset + downCommand;
-                    neutralThrustEst.algo_erro_check = new_neutral_thrust_offset - current_neutral_thrust_offset;
 
                     neutralThrustEst.start_sampling          = false;
                     neutralThrustEst.have_correction         = true;
 
                     // Write a new adjustment value
-                    // adjustments.NeutralThrustOffset  was incrementall adjusted above
-                    adjustments.NeutralThrustAlgoError = neutralThrustEst.algo_erro_check;  // should be zero
-                    adjustments.NeutralThrustCorrection = neutralThrustEst.correction; // the i term thrust correction value applied
-                    adjustments.NeutralThrustAccumulator = global.PIDvel[2].iAccumulator; // the actual iaccumulator value after correction
-                    adjustments.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
-                    AdjustmentsSet(&adjustments);
+                    // adjustments.NeutralThrustOffset  was incremental adjusted above
+                    AdjustmentsData new_adjustments;
+                    // add the average remaining i value to the
+                    new_adjustments.NeutralThrustOffset = adjustments.NeutralThrustOffset + neutralThrustEst.correction;
+                    new_adjustments.NeutralThrustCorrection = neutralThrustEst.correction; // the i term thrust correction value applied
+                    new_adjustments.NeutralThrustAccumulator = global.PIDvel[2].iAccumulator; // the actual iaccumulator value after correction
+                    new_adjustments.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
+                    AdjustmentsSet(&new_adjustments);
                 }
 
             } else {

@@ -518,8 +518,8 @@ void plan_run_AutoCruise()
  *        timeout_occurred = true: Revert to position hold
  */
 #define ASSISTEDCONTROL_BRAKERATE_MINIMUM  0.2f   // m/s2
-#define ASSISTEDCONTROL_TIMETOSTOP_MINIMUM 0.5f // seconds
-#define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 6.0f // seconds
+#define ASSISTEDCONTROL_TIMETOSTOP_MINIMUM 0.2f // seconds
+#define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 9.0f // seconds
 #define ASSISTEDCONTROL_DELAY_TO_BRAKE     1.0f      // seconds
 #define ASSISTEDCONTROL_TIMEOUT_MULTIPLIER 2.0f      // actual deceleration rate can be 50% of desired...timeouts need to cater for this
 void plan_setup_assistedcontrol(uint8_t timeout_occurred)
@@ -534,18 +534,6 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if (timeout_occurred) {
-        // Expected to be in brake mode first
-        if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE) {
-            // keep original desired end location....pos hold will complete this.
-            // keep original start location
-            // retain original start and end velocity...which is not used in this mode anyway
-            // change mode to hold position
-            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-            // keep original starting velocity. Not used except useful for debugging
-            // change assisted mode to hold.
-            assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
-        } else {
-            // this is unexpected..
             pathDesired.End.North        = positionState.North;
             pathDesired.End.East         = positionState.East;
             pathDesired.End.Down         = positionState.Down;
@@ -555,10 +543,8 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
             pathDesired.StartingVelocity = 0.0f;
             pathDesired.EndingVelocity   = 0.0f;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-            // keep original starting velocity. Not used except useful for debugging
-            // change assisted mode to hold.
             assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
-        }
+       // }
     } else {
         VelocityStateData velocityState;
         VelocityStateGet(&velocityState);

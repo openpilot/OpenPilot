@@ -3,7 +3,6 @@
         <description>Automatically calculated adjustments to parameters used into auto flight modes. Can come from @ref PathFollower </description>
 
 	<field name="NeutralThrustOffset" units="" type="float" elements="1" defaultvalue="0"/>
-	<field name="NeutralThrustAlgoError" units="" type="float" elements="1" defaultvalue="0"/>
 	<field name="NeutralThrustCorrection" units="" type="float" elements="1" defaultvalue="0"/>
 	<field name="NeutralThrustAccumulator" units="" type="float" elements="1" defaultvalue="0"/>
 	<field name="NeutralThrustRange" units="" type="float" elements="1" defaultvalue="0"/>

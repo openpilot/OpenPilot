@@ -5,14 +5,14 @@
 
 cache()
 
-#check Qt version
+# check Qt version
 QT_VERSION = $$[QT_VERSION]
 QT_VERSION = $$split(QT_VERSION, ".")
 QT_VER_MAJ = $$member(QT_VERSION, 0)
 QT_VER_MIN = $$member(QT_VERSION, 1)
  
-lessThan(QT_VER_MAJ, 5) | lessThan(QT_VER_MIN, 1) {
-   error(OpenPilot GCS requires Qt 5.1.0 or newer but Qt $$[QT_VERSION] was detected.)
+lessThan(QT_VER_MAJ, 5) | lessThan(QT_VER_MIN, 4) {
+   error(OpenPilot GCS requires Qt 5.4.0 or newer but Qt $$[QT_VERSION] was detected.)
 }
 
 macx {

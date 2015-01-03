@@ -81,7 +81,7 @@ $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),de
 
 # Make sure this isn't being run as root unless installing (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
-    ifeq ($(filter install install_qt,$(MAKECMDGOALS)),)
+    ifeq ($(filter install install_qt all_clean,$(MAKECMDGOALS)),)
         $(error You should not be running this as root)
     endif
 endif

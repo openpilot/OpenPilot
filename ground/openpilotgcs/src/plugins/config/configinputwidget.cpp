@@ -1556,7 +1556,7 @@ void ConfigInputWidget::updatePositionSlider()
         if (sp->objectName() == "channelNeutral") {
             if (count == 4) {
                 sp->setStyleSheet(
-                    "QSlider::groove:horizontal {border: 2px solid rgb(196, 196, 196); height: 12px; margin 9px 9px; border-radius: 4px; "
+                    "QSlider::groove:horizontal {border: 2px solid rgb(196, 196, 196); height: 12px; border-radius: 4px; "
                     "border-image:url(:/configgadget/images/flightmode_bg" + fmNumber + ".png); }"
                     "QSlider::add-page:horizontal { background: none; border: none; }"
                     "QSlider::sub-page:horizontal { background: none; border: none; }"

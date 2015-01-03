@@ -13,7 +13,6 @@ QSlider::groove:horizontal {
     background: white;
     height: 6px;
     border-radius: 2px;
-    margin 10px 10px;
 }
 
 QSlider::add-page:horizontal {

@@ -111,8 +111,7 @@ macx {
         GCS_APP_TARGET   = openpilotgcs
         copyqt = $$copydata
     } else {
-        GCS_APP_WRAPPER  = openpilotgcs
-        GCS_APP_TARGET   = openpilotgcs.bin
+        GCS_APP_TARGET   = openpilotgcs
         GCS_QT_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5
         GCS_QT_PLUGINS_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/plugins
         GCS_QT_QML_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/qml

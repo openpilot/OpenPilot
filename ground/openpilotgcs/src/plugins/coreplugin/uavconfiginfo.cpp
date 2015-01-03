@@ -194,7 +194,7 @@ bool UAVConfigInfo::askToAbort(int compat, QString message)
         return true;
 
     default:
-        msgBox.setText("INTERNAL ERROR: " + message + tr(" Unknown compatibility level: " + compat));
+        msgBox.setText("INTERNAL ERROR: " + message + tr(" Unknown compatibility level: %1").arg(compat));
     }
     if (result == QMessageBox::Ok) {
         return false;

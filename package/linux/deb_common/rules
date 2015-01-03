@@ -38,12 +38,6 @@ install:
 	cp -arp package/linux/openpilot.desktop debian/openpilot/usr/share/applications
 	cp -arp package/linux/openpilot.png     debian/openpilot/usr/share/pixmaps
 	ln -s /usr/local/OpenPilot/bin/openpilotgcs `pwd`/debian/openpilot/usr/bin/openpilotgcs
-	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/sounds/sounds
-	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/pfd/pfd
-	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/models/models
-	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/mapicons/mapicons
-	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/dials/dials
-	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/diagrams/diagrams
 # Removing leaked files from the dist
 	find debian/openpilot -name Makefile -exec rm -f {} \;
 

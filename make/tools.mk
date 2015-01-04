@@ -301,8 +301,6 @@ endef
 #
 ##############################
 
-
-
 define TOOL_INSTALL_TEMPLATE
 
 .PHONY: $(addprefix $(1)_, install clean distclean)
@@ -365,9 +363,6 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(DL_DIR)/$(5) --dump-binary-data -o  $(1)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.2ThirdPartySoftware_Listing.7z" | grep -v Extracting
-	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.win32_mingw491/5.4.0-1qt5_essentials.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.win32_mingw491/5.4.0-1i686-4.9.1-release-posix-dwarf-rt_v3-rev2-runtime.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.win32_mingw491/5.4.0-1icu_53_1_mingw_builds_4_9_1_posix_dwarf_32.7z" | grep -v Extracting
@@ -432,9 +427,6 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(DL_DIR)/$(5) --dump-binary-data -o  $(1)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
-	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-1qt5_essentials.7z" | grep -v Extracting
 	$(V1) if [ -f "$(1)/qt.54.$(6)/5.4.0-1icu_53_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-1icu_53_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
 	$(V1) if [ -f "$(1)/qt.54.$(6)/5.4.0-1icu_53_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-1icu_53_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
@@ -466,7 +458,6 @@ qt_sdk_distclean:
 	$(V1) [ ! -f "$(DL_DIR)/$(5).md5" ] || $(RM) "$(DL_DIR)/$(5).md5"
 
 endef
-
 
 ##############################
 #
@@ -545,13 +536,19 @@ endef
 # ARM SDK
 #
 ##############################
+
 ifeq ($(UNAME), Windows)
-#unfortunately zip package for this release is missing root directory, so adding / at the end of the path 
+
+# unfortunately zip package for this release is missing root directory, so adding / at the end of the path
 # so that template interpret last part as directory and use the full path
 $(eval $(call TOOL_INSTALL_TEMPLATE,arm_sdk,$(ARM_SDK_DIR)/,$(ARM_SDK_URL),$(ARM_SDK_MD5_URL),$(notdir $(ARM_SDK_URL))))
+
 else
+
 $(eval $(call TOOL_INSTALL_TEMPLATE,arm_sdk,$(ARM_SDK_DIR),$(ARM_SDK_URL),$(ARM_SDK_MD5_URL),$(notdir $(ARM_SDK_URL))))
+
 endif
+
 ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
 else

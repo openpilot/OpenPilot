@@ -1377,12 +1377,9 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
                                eastCommand * cosf(DEG2RAD(attitudeState.Yaw)),
                                -maxPitch, maxPitch);
 
+    ManualControlCommandData manualControl;
+    ManualControlCommandGet(&manualControl);
 
-    if (manual_thrust) {
-        ManualControlCommandData manualControl;
-        ManualControlCommandGet(&manualControl);
-        stabDesired.Thrust = manualControl.Thrust;
-    }
 
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
@@ -1391,11 +1388,48 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         stabDesired.Yaw = yaw_direction;
     } else {
         stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
-        ManualControlCommandData manualControl;
-        ManualControlCommandGet(&manualControl);
         stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
     }
+
+    // initialise thrust mode to cruise control
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL;
+
+    // when flight mode assist is active but in manual-thrust mode, the thrust mode must be set to the same as per the primary mode.
+    if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST) {
+
+	 FlightModeSettingsData settings;
+	 FlightModeSettingsGet(&settings);
+	 uint8_t *stab_settings = 0;
+
+	 switch (flightStatus.FlightMode) {
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+	        stab_settings = FlightModeSettingsStabilization1SettingsToArray(settings.Stabilization1Settings);
+	        break;
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+	        stab_settings = FlightModeSettingsStabilization2SettingsToArray(settings.Stabilization2Settings);
+	        break;
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+	        stab_settings = FlightModeSettingsStabilization3SettingsToArray(settings.Stabilization3Settings);
+	        break;
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+	        stab_settings = FlightModeSettingsStabilization4SettingsToArray(settings.Stabilization4Settings);
+	        break;
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+	        stab_settings = FlightModeSettingsStabilization5SettingsToArray(settings.Stabilization5Settings);
+	        break;
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+	        stab_settings = FlightModeSettingsStabilization6SettingsToArray(settings.Stabilization6Settings);
+	        break;
+	    }
+	 if (stab_settings) {
+	     stabDesired.StabilizationMode.Thrust = stab_settings[3];
+	 }
+	 stabDesired.Thrust = manualControl.Thrust;
+
+    } else if (manual_thrust) {
+	 stabDesired.Thrust = manualControl.Thrust;
+    }
+
     StabilizationDesiredSet(&stabDesired);
 
     return result;

@@ -255,6 +255,7 @@ void SystemHealthGadgetWidget::showAlarmDescriptionForItemId(const QString itemI
 
     if (alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream textStream(&alarmDescription);
+        textStream.setCodec("UTF-8");
         QWhatsThis::showText(location, textStream.readAll());
     }
 }
@@ -278,6 +279,7 @@ void SystemHealthGadgetWidget::showAllAlarmDescriptions(const QPoint & location)
                     QFile alarmDescription(":/systemhealth/html/" + elementId + ".html");
                     if (alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)) {
                         QTextStream textStream(&alarmDescription);
+                        textStream.setCodec("UTF-8");
                         alarmsText.append(textStream.readAll());
                     }
                 }

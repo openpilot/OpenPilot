@@ -204,9 +204,9 @@ Item {
                 text: ["MANUAL","STAB 1","STAB 2", "STAB 3", "STAB 4", "STAB 5", "STAB 6", "POS HOLD", "COURSELOCK",
                        "POS ROAM", "HOME LEASH", "ABS POS", "RTB", "LAND", "PATHPLAN", "POI", "AUTOCRUISE"][FlightStatus.FlightMode]
                 font {
-                    family: pt_bold_narrow.name
-                    pixelSize: Math.floor(parent.height * 0.8)
-                    weight: Font.Bold
+                    family: pt_bold.name
+                    pixelSize: Math.floor(parent.height * 0.74)
+                    weight: Font.DemiBold
                 }
             }
         }

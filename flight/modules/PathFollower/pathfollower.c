@@ -1391,44 +1391,49 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
     }
 
-    // initialise thrust mode to cruise control
+    // default thrust mode to cruise control
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL;
 
-    // when flight mode assist is active but in manual-thrust mode, the thrust mode must be set to the same as per the primary mode.
-    if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSISTMANUALTHRUST) {
+    // when flight mode assist is active but in primary-thrust mode, the thrust mode must be set to the same as per the primary mode.
+    if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST) {
 
 	 FlightModeSettingsData settings;
 	 FlightModeSettingsGet(&settings);
-	 uint8_t *stab_settings = 0;
+	 FlightModeSettingsStabilization1SettingsOptions thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
 
 	 switch (flightStatus.FlightMode) {
-	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-	        stab_settings = FlightModeSettingsStabilization1SettingsToArray(settings.Stabilization1Settings);
-	        break;
-	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-	        stab_settings = FlightModeSettingsStabilization2SettingsToArray(settings.Stabilization2Settings);
-	        break;
-	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-	        stab_settings = FlightModeSettingsStabilization3SettingsToArray(settings.Stabilization3Settings);
-	        break;
-	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
-	        stab_settings = FlightModeSettingsStabilization4SettingsToArray(settings.Stabilization4Settings);
-	        break;
-	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
-	        stab_settings = FlightModeSettingsStabilization5SettingsToArray(settings.Stabilization5Settings);
-	        break;
-	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-	        stab_settings = FlightModeSettingsStabilization6SettingsToArray(settings.Stabilization6Settings);
-	        break;
-	    }
-	 if (stab_settings) {
-	     stabDesired.StabilizationMode.Thrust = stab_settings[3];
+	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+	     thrustMode = settings.Stabilization1Settings.Thrust;
+	     break;
+	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+	     thrustMode = settings.Stabilization2Settings.Thrust;
+	     break;
+	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+	     thrustMode = settings.Stabilization3Settings.Thrust;
+	     break;
+	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+	     thrustMode = settings.Stabilization4Settings.Thrust;
+	     break;
+	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+	     thrustMode = settings.Stabilization5Settings.Thrust;
+	     break;
+	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+	     thrustMode = settings.Stabilization6Settings.Thrust;
+	     break;
+	   case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+	     // we hard code the "GPS Assisted" PostionHold to use alt-vario which
+	     // is a more appropriate throttle mode.  "GPSAssist" adds braking
+	     // and a better throttle management to the standard Position Hold.
+	     thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
+	     break;
 	 }
+	 stabDesired.StabilizationMode.Thrust = thrustMode;
 	 stabDesired.Thrust = manualControl.Thrust;
 
     } else if (manual_thrust) {
 	 stabDesired.Thrust = manualControl.Thrust;
     }
+    // else thrust is set by the PID controller
 
     StabilizationDesiredSet(&stabDesired);
 

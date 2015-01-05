@@ -237,17 +237,6 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
                 return false;
             }
         }
-
-        if (gpsassisted == STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_GPSASSIST) {
-            // altitude alt vario/hold is not supported with gpsassist auto thrust which uses
-            // position hold/pathfollower altitude maintaining PID control
-            if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
-        	|| modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO) {
-        	return false;
-            }
-
-        }
-
     }
 
 

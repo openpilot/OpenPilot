@@ -168,6 +168,8 @@ void ConfigCustomWidget::registerWidgets(ConfigTaskWidget &parent)
     parent.addWidget(m_aircraft->customThrottle1Curve);
     parent.addWidget(m_aircraft->customThrottle2Curve->getCurveWidget());
     parent.addWidget(m_aircraft->customThrottle2Curve);
+    parent.addWidgetBinding("MixerSettings", "Curve2Source", m_aircraft->curve2SourceCombo);
+    parent.addWidget(m_aircraft->curve2SourceCombo);
 }
 
 void ConfigCustomWidget::resetActuators(GUIConfigDataUnion *configData)

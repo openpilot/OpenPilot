@@ -26,7 +26,7 @@
  */
 
 #ifndef QMLVIEWGADGET_H_
-#define QMLVIEWQMLGADGET_H_
+#define QMLVIEWGADGET_H_
 
 #include <coreplugin/iuavgadget.h>
 #include "qmlviewgadgetwidget.h"
@@ -62,4 +62,4 @@ private:
 };
 
 
-#endif // QMLVIEWQMLGADGET_H_
+#endif // QMLVIEWGADGET_H_

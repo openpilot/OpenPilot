@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPAMP_GADGETFACTORY_H_
+#ifndef OPMAP_GADGETFACTORY_H_
 #define OPMAP_GADGETFACTORY_H_
 
 #include <coreplugin/iuavgadgetfactory.h>
@@ -49,4 +49,4 @@ public:
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 
-#endif // ifndef OPAMP_GADGETFACTORY_H_
+#endif // ifndef OPMAP_GADGETFACTORY_H_

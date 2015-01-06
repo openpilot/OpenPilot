@@ -71,6 +71,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     accessoryDesiredObj0  = AccessoryDesired::GetInstance(getObjectManager(), 0);
     accessoryDesiredObj1  = AccessoryDesired::GetInstance(getObjectManager(), 1);
     accessoryDesiredObj2  = AccessoryDesired::GetInstance(getObjectManager(), 2);
+    actuatorSettingsObj   = ActuatorSettings::GetInstance(getObjectManager());
 
     // Only instance 0 is present if the board is not connected.
     // The other instances are populated lazily.
@@ -96,6 +97,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
         InputChannelForm *form = new InputChannelForm(index, this);
         form->setName(name);
+
         form->moveTo(*(ui->channelLayout));
 
         // The order of the following binding calls is important. Since the values will be populated
@@ -104,7 +106,9 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         // will not be set correctly.
         addWidgetBinding("ManualControlSettings", "ChannelNumber", form->ui->channelNumber, index);
         addWidgetBinding("ManualControlSettings", "ChannelGroups", form->ui->channelGroup, index);
-        addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->channelNeutral, index);
+        // Slider position based on real time Rcinput (allow monitoring)
+        addWidgetBinding("ManualControlCommand", "Channel", form->ui->channelNeutral, index);
+        // Neutral value stored on board (SpinBox)
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->neutralValue, index);
         addWidgetBinding("ManualControlSettings", "ChannelMax", form->ui->channelMax, index);
         addWidgetBinding("ManualControlSettings", "ChannelMin", form->ui->channelMin, index);
@@ -409,6 +413,13 @@ void ConfigInputWidget::goToWizard()
     previousFlightModeSettingsData = flightModeSettingsData;
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
+    // Stash actuatorSettings
+    actuatorSettingsData           = actuatorSettingsObj->getData();
+    previousActuatorSettingsData   = actuatorSettingsData;
+
+    // Now reset channel and actuator settings (disable outputs)
+    resetChannelSettings();
+    resetActuatorSettings();
 
     // Use faster input update rate.
     fastMdata();
@@ -448,6 +459,7 @@ void ConfigInputWidget::wzCancel()
     // Load settings back from beginning of wizard
     manualSettingsObj->setData(previousManualSettingsData);
     flightModeSettingsObj->setData(previousFlightModeSettingsData);
+    actuatorSettingsObj->setData(previousActuatorSettingsData);
 }
 
 void ConfigInputWidget::registerControlActivity()
@@ -529,13 +541,16 @@ void ConfigInputWidget::wzNext()
         // Restore original input update rate.
         restoreMdata();
 
+        // Load actuator settings back from beginning of wizard
+        actuatorSettingsObj->setData(previousActuatorSettingsData);
+
         // Leave setting the throttle neutral until the final Next press,
         // else the throttle scaling causes the graphical stick movement to not
         // match the tx stick
         manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
             manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
             ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
-              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.02);
+              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
         if ((abs(manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE] -
                  manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE]) < 100) ||
             (abs(manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE] -
@@ -1546,6 +1561,26 @@ void ConfigInputWidget::updatePositionSlider()
     default:
         break;
     }
+
+    QString fmNumber = QString().setNum(manualSettingsDataPriv.FlightModeNumber);
+    int count = 0;
+    foreach(QSlider * sp, findChildren<QSlider *>()) {
+        // Find FlightMode slider and apply stylesheet
+        if (sp->objectName() == "channelNeutral") {
+            if (count == 4) {
+                sp->setStyleSheet(
+                    "QSlider::groove:horizontal {border: 2px solid rgb(196, 196, 196); height: 12px; border-radius: 4px; "
+                    "border-image:url(:/configgadget/images/flightmode_bg" + fmNumber + ".png); }"
+                    "QSlider::add-page:horizontal { background: none; border: none; }"
+                    "QSlider::sub-page:horizontal { background: none; border: none; }"
+                    "QSlider::handle:horizontal { background: rgba(196, 196, 196, 255); width: 10px; height: 28px; "
+                    "margin: -3px -2px; border-radius: 3px; border: 1px solid #777; }");
+                count++;
+            } else {
+                count++;
+            }
+        }
+    }
 }
 
 void ConfigInputWidget::updateCalibration()
@@ -1560,7 +1595,11 @@ void ConfigInputWidget::updateCalibration()
             (reverse[i] && manualSettingsData.ChannelMax[i] > manualCommandData.Channel[i])) {
             manualSettingsData.ChannelMax[i] = manualCommandData.Channel[i];
         }
-        manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+        if (i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE || i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE) {
+            adjustSpecialNeutrals();
+        } else {
+            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+        }
     }
 
     manualSettingsObj->setData(manualSettingsData);
@@ -1571,10 +1610,15 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 {
     if (enable) {
         ui->configurationWizard->setEnabled(false);
+        ui->saveRCInputToRAM->setEnabled(false);
+        ui->saveRCInputToSD->setEnabled(false);
+        ui->runCalibration->setText(tr("Stop Manual Calibration"));
 
         QMessageBox msgBox;
-        msgBox.setText(tr("Arming Settings are now set to 'Always Disarmed' for your safety."));
-        msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the wizard is finished."));
+        msgBox.setText(tr("<p>Arming Settings are now set to 'Always Disarmed' for your safety.</p>"
+                          "<p>Be sure your receiver is powered with an external source and Transmitter is on.</p>"
+                          "<p align='center'><b>Stop Manual Calibration</b> when done</p>"));
+        msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the manual calibration is finished."));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();
@@ -1595,9 +1639,19 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         fastMdataSingle(manualCommandObj, &manualControlMdata);
 
+        // Stash actuatorSettings
+        actuatorSettingsData = actuatorSettingsObj->getData();
+        previousActuatorSettingsData = actuatorSettingsData;
+
+        // Disable all actuators
+        resetActuatorSettings();
+
         connect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     } else {
         ui->configurationWizard->setEnabled(true);
+        ui->saveRCInputToRAM->setEnabled(true);
+        ui->saveRCInputToSD->setEnabled(true);
+        ui->runCalibration->setText(tr("Start Manual Calibration"));
 
         manualCommandData  = manualCommandObj->getData();
         manualSettingsData = manualSettingsObj->getData();
@@ -1605,22 +1659,64 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         restoreMdataSingle(manualCommandObj, &manualControlMdata);
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
-            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+            if (i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE || i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE) {
+                adjustSpecialNeutrals();
+            } else {
+                manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+            }
         }
-
-        // Force flight mode neutral to middle
-        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] =
-            (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] +
-             manualSettingsData.ChannelMin[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE]) / 2;
-
-        // Force throttle to be near min
-        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
-            manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
-            ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
-              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.02);
 
         manualSettingsObj->setData(manualSettingsData);
 
+        // Load actuator settings back from beginning of manual calibration
+        actuatorSettingsObj->setData(previousActuatorSettingsData);
+
         disconnect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
+    }
+}
+
+void ConfigInputWidget::adjustSpecialNeutrals()
+{
+    // FlightMode and Throttle need special neutral settings
+    //
+    // Force flight mode neutral to middle
+    manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] =
+        (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] +
+         manualSettingsData.ChannelMin[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE]) / 2;
+
+    // Force throttle to be near min, add 4% from total range to avoid arming issues
+    manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
+        manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
+        ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
+          manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
+}
+
+bool ConfigInputWidget::shouldObjectBeSaved(UAVObject *object)
+{
+    // ManualControlCommand no need to be saved
+    return dynamic_cast<ManualControlCommand *>(object) == NULL;
+}
+
+void ConfigInputWidget::resetChannelSettings()
+{
+    manualSettingsData = manualSettingsObj->getData();
+    // Clear all channel data : Channel Type (PPM,PWM..) and Number
+    for (unsigned int channel = 0; channel < 9; channel++) {
+        manualSettingsData.ChannelGroups[channel] = ManualControlSettings::CHANNELGROUPS_NONE;
+        manualSettingsData.ChannelNumber[channel] = 0;
+        manualSettingsObj->setData(manualSettingsData);
+    }
+}
+
+void ConfigInputWidget::resetActuatorSettings()
+{
+    actuatorSettingsData = actuatorSettingsObj->getData();
+    // Clear all output data : Min, max, neutral = 1500
+    // 1500 = servo middle, can be applied to all outputs because board is 'Alwaysdisarmed'
+    for (unsigned int output = 0; output < 12; output++) {
+        actuatorSettingsData.ChannelMax[output]     = 1500;
+        actuatorSettingsData.ChannelMin[output]     = 1500;
+        actuatorSettingsData.ChannelNeutral[output] = 1500;
+        actuatorSettingsObj->setData(actuatorSettingsData);
     }
 }

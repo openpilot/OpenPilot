@@ -39,6 +39,7 @@
 #include <QRadioButton>
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "actuatorsettings.h"
 #include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>
@@ -65,6 +66,7 @@ public:
         goToWizard();
     }
     void enableControls(bool enable);
+    bool shouldObjectBeSaved(UAVObject *object);
 
 private:
     bool growing;
@@ -120,6 +122,10 @@ private:
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
+
+    ActuatorSettings *actuatorSettingsObj;
+    ActuatorSettings::DataFields actuatorSettingsData;
+    ActuatorSettings::DataFields previousActuatorSettingsData;
 
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
@@ -188,7 +194,10 @@ private slots:
     void updatePositionSlider();
     void invertControls();
     void simpleCalibration(bool state);
+    void adjustSpecialNeutrals();
     void updateCalibration();
+    void resetChannelSettings();
+    void resetActuatorSettings();
 
 protected:
     void resizeEvent(QResizeEvent *event);

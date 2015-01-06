@@ -31,9 +31,9 @@ GCS_LIBRARY_PATH
                   libQt5DBus.so.5 \
                   libQt5QuickParticles.so.5 \
                   libqgsttools_p.so.1 \
-                  libicui18n.so.52 \
-                  libicuuc.so.52 \
-                  libicudata.so.52
+                  libicui18n.so.53 \
+                  libicuuc.so.53 \
+                  libicudata.so.53
 
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_LIBRARY_PATH\") $$addNewline()
         for(lib, QT_LIBS) {
@@ -142,9 +142,9 @@ GCS_LIBRARY_PATH
                   Qt5MultimediaWidgets$${DS}.dll \
                   Qt5Quick$${DS}.dll \
                   Qt5Qml$${DS}.dll \
-                  icuin52.dll \
-                  icudt52.dll \
-                  icuuc52.dll
+                  icuin53.dll \
+                  icudt53.dll \
+                  icuuc53.dll
         # it is more robust to take the following DLLs from Qt rather than from MinGW
         QT_DLLS += libgcc_s_dw2-1.dll \
                    libstdc++-6.dll \

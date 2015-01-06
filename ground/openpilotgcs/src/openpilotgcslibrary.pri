@@ -12,7 +12,7 @@ contains(QT_CONFIG, reduce_exports):CONFIG += hGCS_symbols
 
 macx {
     QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
-} else
+} else {
     win32 {
         target.path = /bin
         target.files = $$DESTDIR/$${TARGET}.dll

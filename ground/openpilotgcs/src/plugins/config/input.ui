@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>800</height>
+    <width>1250</width>
+    <height>755</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="RCInput">
       <attribute name="title">
@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1250</width>
-            <height>700</height>
+            <width>1220</width>
+            <height>655</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -231,6 +231,29 @@
                       </property>
                       <property name="singleStep">
                        <double>0.100000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="labelAssistedControlDeadband">
+                      <property name="text">
+                       <string>Assisted Control stick deadband </string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QDoubleSpinBox" name="assistedControlDeadband">
+                      <property name="toolTip">
+                       <string>Assisted Control stick deadband in percents of full range (2-12) for use with GPSAssist. This can not be disabled.</string>
+                      </property>
+                      <property name="decimals">
+                       <number>1</number>
+                      </property>
+                      <property name="minimum">
+                       <double>2.000000000000000</double>
+                      </property>
+                      <property name="maximum">
+                       <double>12.000000000000000</double>
                       </property>
                      </widget>
                     </item>
@@ -542,8 +565,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1250</width>
-            <height>700</height>
+            <width>1220</width>
+            <height>655</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -2265,8 +2288,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1250</width>
-            <height>700</height>
+            <width>1220</width>
+            <height>655</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

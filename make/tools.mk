@@ -492,12 +492,12 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.4.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_essentials.7z" | grep -v Extracting
-#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6).essentials/5.3.1icu_path_patcher.sh.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_addons.7z" | grep -v Extracting
-# go to OpenPilot/tools/5.3.1/gcc_64 and call patcher.sh
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-0qt5_essentials.7z" | grep -v Extracting
+#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6).essentials/5.4.0icu_path_patcher.sh.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-0qt5_addons.7z" | grep -v Extracting
+# go to OpenPilot/tools/5.4/gcc_64 and call patcher.sh
 	@$(ECHO)
 	@$(ECHO) "Running patcher in" $$(call toprel, $(QT_SDK_PREFIX))
 	$(V1) $(CD) $(QT_SDK_PREFIX)
@@ -599,7 +599,7 @@ QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
 
 else ifeq ($(UNAME), Darwin)
 
-QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.3/$(QT_SDK_ARCH)"
+QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.4/$(QT_SDK_ARCH)"
 QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
     $(eval $(call MAC_QT_INSTALL_TEMPLATE,$(QT_BUILD_DIR),$(QT_SDK_DIR),$(QT_SDK_URL),$(QT_SDK_MD5_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_ARCH)))
 

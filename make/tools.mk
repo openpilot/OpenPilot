@@ -491,10 +491,10 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(QT_SDK_MAINTENANCE_TOOL) --dump-binary-data -i $(QT_SDK_INSTALLER_DAT) -o $(1)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.4.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-0qt5_essentials.7z" | grep -v Extracting
+	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
+	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.4.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-1qt5_essentials.7z" | grep -v Extracting
 #	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6).essentials/5.4.0icu_path_patcher.sh.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-1qt5_addons.7z" | grep -v Extracting
 	

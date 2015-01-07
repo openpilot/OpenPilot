@@ -19,8 +19,6 @@ export DH_OPTIONS=-v
 #%:
 #	dh $@ 
 
-PACKAGE_DIR	= $(shell cat build/package_dir)
-
 clean:
 	dh_testdir
 	dh_testroot
@@ -42,11 +40,6 @@ install:
 	cp -arp package/linux/openpilot_menu.png  debian/openpilot/usr/share/pixmaps
 	cp -arp package/linux/openpilot_menu.menu debian/openpilot/etc/xdg/menus/applications-merged
 	cp -arp package/linux/openpilot_menu.directory debian/openpilot/usr/share/desktop-directories
-ifdef PACKAGE_DIR
-	cp -a $(PACKAGE_DIR)/*.elf debian/openpilot/usr/local/OpenPilot/firmware/
-else
-	$(error PACKAGE_DIR not defined! $(PACKAGE_DIR))
-endif
 	ln -s /usr/local/OpenPilot/bin/openpilotgcs `pwd`/debian/openpilot/usr/bin/openpilotgcs
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/sounds/sounds
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/pfd/pfd

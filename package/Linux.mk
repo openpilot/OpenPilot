@@ -6,8 +6,6 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-FW_DIR := $(PACKAGE_DIR)/firmware
-
 # Update this number for every formal release.  The Deb packaging system relies on this to know to update a
 # package or not.  Otherwise, the user has to uninstall first.
 # Until we do that, package name does NOT include $(VERNUM) and uses $(PACKAGE_LBL) only
@@ -44,7 +42,6 @@ ALL_DEB_FILES += $(foreach f, $(DEB_MACHINE_FILES), $(DEB_BUILD_DIR)/$(f))
 package: $(ALL_DEB_FILES)
 	$(V1) echo "Building Linux package, please wait..."
 	$(V1) mkdir -p $(DEB_BUILD_DIR)
-	$(V1)$(shell echo $(FW_DIR) > $(BUILD_DIR)/package_dir)
 	$(V1)sed -i -e "$(SED_SCRIPT)" $(DEB_BUILD_DIR)/changelog
 	$(V1) cd .. && dpkg-buildpackage -b -us -uc
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(BUILD_DIR)/$(FULL_PACKAGE_NAME).deb

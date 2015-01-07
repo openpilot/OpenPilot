@@ -7,7 +7,6 @@ ifndef OPENPILOT_IS_COOL
 endif
 
 VERSION_CMD   := $(VERSION_INFO)
-FW_DIR        := $(PACKAGE_DIR)/firmware
 
 NSIS_OPTS     := /V3
 NSIS_WINX86   := $(ROOT_DIR)/package/winx86

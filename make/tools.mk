@@ -74,12 +74,12 @@ ifeq ($(UNAME), Linux)
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2/+md5
-    QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-mac-x64-clang-5.3.1.dmg
-    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-mac-x64-clang-5.3.1.dmg.md5
+    QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-mac-x64-clang-5.4.0.dmg
+    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-mac-x64-clang-5.4.0.dmg.md5
     QT_SDK_ARCH := clang_64
-    QT_SDK_MAINTENANCE_TOOL := /Volumes/qt-opensource-mac-x64-clang-5.3.1/qt-opensource-mac-x64-clang-5.3.1.app/Contents/MacOS/qt-opensource-mac-x64-clang-5.3.1
-    QT_SDK_MOUNT_DIR := /Volumes/qt-opensource-mac-x64-clang-5.3.1
-    QT_SDK_INSTALLER_DAT := /Volumes/qt-opensource-mac-x64-clang-5.3.1/qt-opensource-mac-x64-clang-5.3.1.app/Contents/Resources/installer.dat
+    QT_SDK_MAINTENANCE_TOOL := /Volumes/qt-opensource-mac-x64-clang-5.4.0/qt-opensource-mac-x64-clang-5.4.0.app/Contents/MacOS/qt-opensource-mac-x64-clang-5.4.0
+    QT_SDK_MOUNT_DIR := /Volumes/qt-opensource-mac-x64-clang-5.4.0
+    QT_SDK_INSTALLER_DAT := /Volumes/qt-opensource-mac-x64-clang-5.4.0/qt-opensource-mac-x64-clang-5.4.0.app/Contents/Resources/installer.dat
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
@@ -491,13 +491,15 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(QT_SDK_MAINTENANCE_TOOL) --dump-binary-data -i $(QT_SDK_INSTALLER_DAT) -o $(1)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_essentials.7z" | grep -v Extracting
-#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6).essentials/5.3.1icu_path_patcher.sh.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_addons.7z" | grep -v Extracting
-# go to OpenPilot/tools/5.3.1/gcc_64 and call patcher.sh
+	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
+	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.4.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	#$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-1qt5_essentials.7z" | grep -v Extracting
+#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6).essentials/5.4.0icu_path_patcher.sh.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.54.$(6)/5.4.0-1qt5_addons.7z" | grep -v Extracting
+	
+	
+# go to OpenPilot/tools/5.4/gcc_64 and call patcher.sh
 	@$(ECHO)
 	@$(ECHO) "Running patcher in" $$(call toprel, $(QT_SDK_PREFIX))
 	$(V1) $(CD) $(QT_SDK_PREFIX)
@@ -599,7 +601,7 @@ QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
 
 else ifeq ($(UNAME), Darwin)
 
-QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.3/$(QT_SDK_ARCH)"
+QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.4/$(QT_SDK_ARCH)"
 QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
     $(eval $(call MAC_QT_INSTALL_TEMPLATE,$(QT_BUILD_DIR),$(QT_SDK_DIR),$(QT_SDK_URL),$(QT_SDK_MD5_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_ARCH)))
 

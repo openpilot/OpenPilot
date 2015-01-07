@@ -812,6 +812,7 @@ endif
 package: all_fw all_ground uavobjects_matlab
 	@$(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
 	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
+	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)"
 	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################

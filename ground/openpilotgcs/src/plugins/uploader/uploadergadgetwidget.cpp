@@ -41,6 +41,7 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QDebug>
+#include "rebootdialog.h"
 
 #define DFU_DEBUG true
 
@@ -546,6 +547,12 @@ void UploaderGadgetWidget::systemEraseBoot()
         QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/display/Doc/Erase+board+settings"), QUrl::StrictMode));
         break;
     }
+}
+
+void UploaderGadgetWidget::rebootWithDialog()
+{
+    RebootDialog dialog(this);
+    dialog.exec();
 }
 
 void UploaderGadgetWidget::systemReboot()

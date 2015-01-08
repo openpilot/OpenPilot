@@ -44,7 +44,6 @@
 #include "pages/summarypage.h"
 #include "pages/savepage.h"
 #include "pages/notyetimplementedpage.h"
-#include "pages/rebootpage.h"
 #include "pages/outputcalibrationpage.h"
 #include "pages/revocalibrationpage.h"
 #include "pages/airframeinitialtuningpage.h"
@@ -141,11 +140,8 @@ int SetupWizard::nextId() const
     case PAGE_INPUT:
         if (isRestartNeeded()) {
             saveHardwareSettings();
-            return PAGE_REBOOT;
-        } else {
-            return PAGE_VEHICLES;
+            reboot();
         }
-    case PAGE_REBOOT:
         return PAGE_VEHICLES;
 
     case PAGE_ESC:
@@ -470,7 +466,6 @@ void SetupWizard::createPages()
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_SAVE, new SavePage(this));
-    setPage(PAGE_REBOOT, new RebootPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
     setPage(PAGE_AIRFRAME_INITIAL_TUNING, new AirframeInitialTuningPage(this));
     setPage(PAGE_END, new OPEndPage(this));
@@ -498,6 +493,15 @@ void SetupWizard::pageChanged(int currId)
 {
     button(QWizard::CustomButton1)->setVisible(currId != PAGE_START);
     button(QWizard::CancelButton)->setVisible(currId != PAGE_END);
+}
+
+void SetupWizard::reboot() const
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UploaderGadgetFactory *uploader = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(uploader);
+    uploader->reboot();
 }
 
 bool SetupWizard::saveHardwareSettings() const

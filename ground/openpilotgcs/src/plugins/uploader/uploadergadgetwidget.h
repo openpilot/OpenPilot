@@ -160,6 +160,7 @@ private slots:
     void systemBoot();
     void systemSafeBoot();
     void systemEraseBoot();
+    void rebootWithDialog();
     void systemReboot();
     void commonSystemBoot(bool safeboot = false, bool erase = false);
     void systemRescue();

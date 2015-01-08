@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       rebootpage.h
+ * @file       rebootdialog.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup
+ * @addtogroup [Group]
  * @{
- * @addtogroup RebootPage
+ * @addtogroup RebootDialog
  * @{
- * @brief
+ * @brief [Brief]
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,41 +25,37 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef REBOOTPAGE_H
-#define REBOOTPAGE_H
+#ifndef REBOOTDIALOG_H
+#define REBOOTDIALOG_H
 
-#include "abstractwizardpage.h"
-#include <extensionsystem/pluginmanager.h>
-#include <extensionsystem/pluginmanager.h>
-#include "uploader/uploadergadgetfactory.h"
+#include <QDialog>
+#include "uploadergadgetwidget.h"
 
 namespace Ui {
-class RebootPage;
+class RebootDialog;
 }
 
-class RebootPage : public AbstractWizardPage {
+class RebootDialog : public QDialog
+{
     Q_OBJECT
 
 public:
-    explicit RebootPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~RebootPage();
+    explicit RebootDialog(UploaderGadgetWidget *uploader, QWidget *parent = 0);
+    ~RebootDialog();
 
-    void initializePage();
-    bool validatePage();
-    bool isComplete() const;
-
-    void enableButtons(bool enable);
-private:
-    Ui::RebootPage *ui;
-    QTimer m_timer;
-    bool m_toggl;
-    UploaderGadgetFactory *m_uploader;
-    bool m_isRebooting;
+signals:
+    void reboot();
 
 private slots:
-    void toggleLabel();
-    void reboot();
+    void on_okButton_clicked();
     void progressUpdate(uploader::ProgressStep progress, QVariant message);
+
+private:
+    Ui::RebootDialog *ui;
+    UploaderGadgetWidget *m_uploader;
+
+public slots:
+    int exec();
 };
 
-#endif // REBOOTPAGE_H
+#endif // REBOOTDIALOG_H

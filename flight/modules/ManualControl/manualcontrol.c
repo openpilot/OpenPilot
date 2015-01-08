@@ -275,7 +275,7 @@ static void manualControlTask(void)
                     // Also for rapid decents a user might have a bit of forward stick and low throttle
                     // then stick-off for auto-braking...but if below the vtol min of 20% it will not
                     // kick in...the flyer needs to manually manage throttle to slow down decent,
-                    // and the next time they put in a bit of stick, revert to priimary, and then
+                    // and the next time they put in a bit of stick, revert to primary, and then
                     // sticks-off it will brake and hold with auto-thrust
                     if (thrustAtBrakeStart < vtolPathFollowerSettings.ThrustLimits.Min) {
                         newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None

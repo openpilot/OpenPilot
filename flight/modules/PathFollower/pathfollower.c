@@ -90,6 +90,20 @@
 
 #define DEADBAND_HIGH          0.10f
 #define DEADBAND_LOW           -0.10f
+
+#define BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK 0.95f
+#define BRAKE_EXIT_VELOCITY_LIMIT 0.2f
+
+#define BRAKE_RATE_MINIMUM 0.2f
+
+#define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT 0.5f
+#define NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT 0.2f
+#define NEUTRALTHRUST_PH_VEL_STATE_LIMIT 0.2f
+#define NEUTRALTHRUST_PH_VEL_ERROR_LIMIT 0.1f
+
+#define NEUTRALTHRUST_START_DELAY (2*20) // 2 seconds at rate of 20Hz (50ms update rate)
+#define NEUTRALTHRUST_END_COUNT   (NEUTRALTHRUST_START_DELAY + (4*20) )  // 4 second sample
+
 // Private types
 
 struct Globals {
@@ -496,9 +510,9 @@ static uint8_t updateAutoPilotVtol()
         if (pathStatus.path_time > pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT]) { // enter hold on timeout
             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_TIMEOUT;
             exit_brake = true;
-        } else if (pathStatus.fractional_progress > 0.95f) {
+        } else if (pathStatus.fractional_progress > BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK) {
             VelocityStateGet(&velocityState);
-            if (fabsf(velocityState.East) < 0.2f && fabsf(velocityState.North) < 0.2f ) {
+            if (fabsf(velocityState.East) < BRAKE_EXIT_VELOCITY_LIMIT && fabsf(velocityState.North) < BRAKE_EXIT_VELOCITY_LIMIT ) {
         	pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
         	exit_brake = true;
             }
@@ -731,6 +745,7 @@ static void updateBrakeVelocity(float startingVelocity, float dT, float brakeRat
     }
 }
 
+
 /**
  * Compute desired velocity from the current position and path
  */
@@ -747,15 +762,15 @@ static void updatePathVelocity(float kFF, bool limited)
 
     if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         float brakeRate = vtolPathFollowerSettings.BrakeRate;
-        if (brakeRate < 0.2f) {
-            brakeRate = 0.2f; // set a minimum to avoid a divide by zero potential below
+        if (brakeRate < BRAKE_RATE_MINIMUM) {
+            brakeRate = BRAKE_RATE_MINIMUM; // set a minimum to avoid a divide by zero potential below
         }
         updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH], pathStatus.path_time, brakeRate, velocityState.North, &velocityDesired.North);
         updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST], pathStatus.path_time, brakeRate, velocityState.East, &velocityDesired.East);
         updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN], pathStatus.path_time, brakeRate, velocityState.Down, &velocityDesired.Down);
 
-        float cur_velocity     = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
-        cur_velocity     = sqrtf(cur_velocity);
+        float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
+        cur_velocity = sqrtf(cur_velocity);
         float desired_velocity = velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East + velocityDesired.Down * velocityDesired.Down;
         desired_velocity = sqrtf(desired_velocity);
 
@@ -815,7 +830,7 @@ static void updatePathVelocity(float kFF, bool limited)
         velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
 
         // update pathstatus
-        pathStatus.error      = progress.error;
+        pathStatus.error = progress.error;
         pathStatus.fractional_progress  = progress.fractional_progress;
         pathStatus.path_direction_north = progress.path_vector[0];
         pathStatus.path_direction_east  = progress.path_vector[1];
@@ -1263,10 +1278,13 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         manual_thrust = true;
     }
 
-    // if auto thrust and we have not run a correction calc, and downCommand is greater than Min which is a quick way to
-    // exclude the situation where we are grounded and zero/low thrust.
+    // if auto thrust and we have not run a correction calc check for PH and stability to then run an assessment
+    // note that arming into this flight mode is not allowed, so assumption here is that
+    // we have not landed.  If GPSAssist+Manual/Cruise control thrust mode is used, a user overriding the
+    // altitude maintaining PID will have moved the throttle state to FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL.
+    // In manualcontrol.c the state will stay in manual throttle until the throttle command exceeds the vtol thrust min,
+    // avoiding auto-takeoffs.  Therefore no need to check that here.
     if (!manual_thrust && neutralThrustEst.have_correction != true) {
-        // reassess the correction value for this position hold period if not already done
 
         // Assess if position hold state running.  This can be normal position hold or
         // another mode with assist-hold active.
@@ -1276,14 +1294,19 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
              (flightStatus.FlightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE &&
               flightStatus.AssistedControlState == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD));
 
-        bool stable = (fabsf(pathStatus.correction_direction_down) < 0.5f && fabsf(velocityDesired.Down) < 0.2f && fabsf(velocityState.Down) < 0.2f && fabsf(downError) < 0.1f);
+
+        bool stable = (fabsf(pathStatus.correction_direction_down) < NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT &&
+            fabsf(velocityDesired.Down) < NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT &&
+            fabsf(velocityState.Down) < NEUTRALTHRUST_PH_VEL_STATE_LIMIT &&
+            fabsf(downError) < NEUTRALTHRUST_PH_VEL_ERROR_LIMIT);
 
         if (ph_active && stable) {
             if (neutralThrustEst.start_sampling) {
                 neutralThrustEst.count++;
 
+
                 // delay count for 2 seconds into hold allowing for stablisation
-                if (neutralThrustEst.count > 40) {
+                if (neutralThrustEst.count > NEUTRALTHRUST_START_DELAY) {
 		  neutralThrustEst.sum += global.PIDvel[2].iAccumulator;
 		  if (global.PIDvel[2].iAccumulator < neutralThrustEst.min) {
 		      neutralThrustEst.min = global.PIDvel[2].iAccumulator;
@@ -1293,10 +1316,10 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 		  }
                 }
 
-                if (neutralThrustEst.count >= 160) {
+                if (neutralThrustEst.count >= NEUTRALTHRUST_END_COUNT) {
                     // 6 seconds have past
                     // lets take an average
-                    neutralThrustEst.average = neutralThrustEst.sum / 120.0f;
+                    neutralThrustEst.average = neutralThrustEst.sum / (float) (NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
                     neutralThrustEst.correction =  neutralThrustEst.average/1000.0f;
 
                     global.PIDvel[2].iAccumulator -= neutralThrustEst.average;

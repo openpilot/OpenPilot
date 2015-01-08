@@ -19,7 +19,7 @@
 # These are the UAVObjects supposed to be build as part of the OpenPilot target
 # (all architectures)
 UAVOBJSRCFILENAMES =
-UAVOBJSRCFILENAMES += adjustments
+UAVOBJSRCFILENAMES += vtolselftuningstats
 UAVOBJSRCFILENAMES += accelgyrosettings
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand

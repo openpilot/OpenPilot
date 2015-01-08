@@ -37,7 +37,7 @@
 #include <sanitycheck.h>
 #include <manualcontrolsettings.h>
 #include <manualcontrolcommand.h>
-#include <adjustments.h>
+#include <vtolselftuningstats.h>
 #include <flightmodesettings.h>
 #include <flightstatus.h>
 #include <systemsettings.h>
@@ -57,6 +57,10 @@
 
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_REGULAR
 #define CBTASK_PRIORITY   CALLBACK_TASK_FLIGHTCONTROL
+
+#define ASSISTEDCONTROL_NEUTRALTHROTTLERANGE_FACTOR 0.2f
+#define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_LO 0.92f
+#define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_HI 1.08f
 
 
 // defined handlers
@@ -157,7 +161,7 @@ int32_t ManualControlInitialize()
     FlightModeSettingsInitialize();
     SystemSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    AdjustmentsInitialize();
+    VtolSelfTuningStatsInitialize();
     StabilizationSettingsInitialize();
     VtolPathFollowerSettingsInitialize();
 #endif
@@ -184,8 +188,8 @@ static void manualControlTask(void)
     ManualControlCommandData cmd;
     ManualControlCommandGet(&cmd);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    VtolPathFollowerSettingsData vtolPathFollowerSettings;
-    VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
+    VtolPathFollowerSettingsThrustLimitsData thrustLimits;
+    VtolPathFollowerSettingsThrustLimitsGet(&thrustLimits);
 #endif
 
     FlightModeSettingsData modeSettings;
@@ -237,10 +241,12 @@ static void manualControlTask(void)
             bool throttleNeutral = false;
             bool throttleNeutralOrLow = false;
             float neutralThrustOffset = 0.0f;
-            AdjustmentsNeutralThrustOffsetGet(&neutralThrustOffset);
-            float throttleRangeDelta  = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) * 0.2f;
-            float throttleNeutralLow  = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) - throttleRangeDelta;
-            float throttleNeutralHi   = (vtolPathFollowerSettings.ThrustLimits.Neutral + neutralThrustOffset) + throttleRangeDelta;
+            VtolSelfTuningStatsNeutralThrustOffsetGet(&neutralThrustOffset);
+
+
+            float throttleRangeDelta  = (thrustLimits.Neutral + neutralThrustOffset) * ASSISTEDCONTROL_NEUTRALTHROTTLERANGE_FACTOR;
+            float throttleNeutralLow  = (thrustLimits.Neutral + neutralThrustOffset) - throttleRangeDelta;
+            float throttleNeutralHi   = (thrustLimits.Neutral + neutralThrustOffset) + throttleRangeDelta;
             if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) {
                 throttleNeutral = true;
             }
@@ -266,8 +272,8 @@ static void manualControlTask(void)
 
                     // calculate hi and low value of +-8% as a mini-deadband
                     // for use in auto-override in brake sequence
-                    thrustLo = 0.92f * thrustAtBrakeStart;
-                    thrustHi = 1.08f * thrustAtBrakeStart;
+                    thrustLo = ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_LO * thrustAtBrakeStart;
+                    thrustHi = ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_HI * thrustAtBrakeStart;
 
                     // The purpose for auto throttle assist is to go from a mid to high thrust range to a
                     // neutral vertical-holding/maintaining ~50% thrust range.  It is not designed/intended
@@ -277,7 +283,7 @@ static void manualControlTask(void)
                     // kick in...the flyer needs to manually manage throttle to slow down decent,
                     // and the next time they put in a bit of stick, revert to primary, and then
                     // sticks-off it will brake and hold with auto-thrust
-                    if (thrustAtBrakeStart < vtolPathFollowerSettings.ThrustLimits.Min) {
+                    if (thrustAtBrakeStart < thrustLimits.Min) {
                         newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
                     }
                 } else {

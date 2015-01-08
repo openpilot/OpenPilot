@@ -75,7 +75,7 @@
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
 #include <stabilizationbank.h>
-#include <adjustments.h>
+#include <vtolselftuningstats.h>
 #include <pathsummary.h>
 
 
@@ -209,7 +209,7 @@ int32_t PathFollowerInitialize()
     ManualControlCommandInitialize();
     SystemSettingsInitialize();
     StabilizationBankInitialize();
-    AdjustmentsInitialize();
+    VtolSelfTuningStatsInitialize();
 
 
     // reset integrals
@@ -1219,7 +1219,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     AttitudeStateData attitudeState;
     StabilizationBankData stabSettings;
     SystemSettingsData systemSettings;
-    AdjustmentsData adjustments;
+    VtolSelfTuningStatsData vtolSelfTuningStats;
 
     float northError;
     float northCommand;
@@ -1237,7 +1237,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     VelocityDesiredGet(&velocityDesired);
     AttitudeStateGet(&attitudeState);
     StabilizationBankGet(&stabSettings);
-    AdjustmentsGet(&adjustments);
+    VtolSelfTuningStatsGet(&vtolSelfTuningStats);
 
 
     if (pathDesired.Mode != PATHDESIRED_MODE_BRAKE) {
@@ -1327,14 +1327,14 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
                     neutralThrustEst.have_correction = true;
 
                     // Write a new adjustment value
-                    // adjustments.NeutralThrustOffset  was incremental adjusted above
-                    AdjustmentsData new_adjustments;
+                    // vtolSelfTuningStats.NeutralThrustOffset  was incremental adjusted above
+                    VtolSelfTuningStatsData new_vtolSelfTuningStats;
                     // add the average remaining i value to the
-                    new_adjustments.NeutralThrustOffset      = adjustments.NeutralThrustOffset + neutralThrustEst.correction;
-                    new_adjustments.NeutralThrustCorrection  = neutralThrustEst.correction; // the i term thrust correction value applied
-                    new_adjustments.NeutralThrustAccumulator = global.PIDvel[2].iAccumulator; // the actual iaccumulator value after correction
-                    new_adjustments.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
-                    AdjustmentsSet(&new_adjustments);
+                    new_vtolSelfTuningStats.NeutralThrustOffset      = vtolSelfTuningStats.NeutralThrustOffset + neutralThrustEst.correction;
+                    new_vtolSelfTuningStats.NeutralThrustCorrection  = neutralThrustEst.correction; // the i term thrust correction value applied
+                    new_vtolSelfTuningStats.NeutralThrustAccumulator = global.PIDvel[2].iAccumulator; // the actual iaccumulator value after correction
+                    new_vtolSelfTuningStats.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
+                    VtolSelfTuningStatsSet(&new_vtolSelfTuningStats);
                 }
             } else {
                 // start a tick count
@@ -1351,7 +1351,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     } // else we already have a correction for this PH run
 
     // Generally in braking the downError will be an increased altitude.  We really will rely on cruisecontrol to backoff.
-    stabDesired.Thrust = boundf(adjustments.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
+    stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
 
 
     // DEBUG HACK: allow user to skew compass on purpose to see if emergency failsafe kicks in

@@ -24,7 +24,7 @@
 # (all architectures)
 
 UAVOBJSRCFILENAMES =
-UAVOBJSRCFILENAMES += adjustments
+UAVOBJSRCFILENAMES += vtolselftuningstats
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired

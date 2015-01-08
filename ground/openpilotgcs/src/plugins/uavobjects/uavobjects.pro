@@ -27,7 +27,7 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
-    $$UAVOBJECT_SYNTHETICS/adjustments.h \
+    $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.h \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
@@ -133,7 +133,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
-    $$UAVOBJECT_SYNTHETICS/adjustments.cpp \
+    $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.cpp \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \

@@ -27,7 +27,7 @@ DEB_PACKAGE_NAME	:= openpilot_$(VERNUM)_$(DEB_PLATFORM)
 .PHONY: package
 package:
 	$(V1) echo "Building Linux package, please wait..."
-	$(V1) cp -r $(DEB_DIR) $(DEB_BUILD_DIR)
+	$(V1) cp -rL $(DEB_DIR) $(DEB_BUILD_DIR)
 	$(V1)sed -i -e "$(SED_SCRIPT)" $(DEB_BUILD_DIR)/changelog
 	$(V1) cd .. && dpkg-buildpackage -b -us -uc
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(BUILD_DIR)/$(DEB_PACKAGE_NAME).deb

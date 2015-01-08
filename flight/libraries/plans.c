@@ -521,7 +521,7 @@ void plan_run_AutoCruise()
 #define ASSISTEDCONTROL_TIMETOSTOP_MINIMUM 0.2f // seconds
 #define ASSISTEDCONTROL_TIMETOSTOP_MAXIMUM 9.0f // seconds
 #define ASSISTEDCONTROL_DELAY_TO_BRAKE     1.0f      // seconds
-#define ASSISTEDCONTROL_TIMEOUT_MULTIPLIER 2.0f      // actual deceleration rate can be 50% of desired...timeouts need to cater for this
+#define ASSISTEDCONTROL_TIMEOUT_MULTIPLIER 2.0f // actual deceleration rate can be 50% of desired...timeouts need to cater for this
 void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 {
     PositionStateData positionState;
@@ -534,17 +534,16 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if (timeout_occurred) {
-            pathDesired.End.North        = positionState.North;
-            pathDesired.End.East         = positionState.East;
-            pathDesired.End.Down         = positionState.Down;
-            pathDesired.Start.North      = positionState.North;
-            pathDesired.Start.East       = positionState.East;
-            pathDesired.Start.Down       = positionState.Down;
-            pathDesired.StartingVelocity = 0.0f;
-            pathDesired.EndingVelocity   = 0.0f;
-            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-            assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
-       // }
+        pathDesired.End.North        = positionState.North;
+        pathDesired.End.East         = positionState.East;
+        pathDesired.End.Down         = positionState.Down;
+        pathDesired.Start.North      = positionState.North;
+        pathDesired.Start.East       = positionState.East;
+        pathDesired.Start.Down       = positionState.Down;
+        pathDesired.StartingVelocity = 0.0f;
+        pathDesired.EndingVelocity   = 0.0f;
+        pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+        assistedControlFlightMode    = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
     } else {
         VelocityStateData velocityState;
         VelocityStateGet(&velocityState);

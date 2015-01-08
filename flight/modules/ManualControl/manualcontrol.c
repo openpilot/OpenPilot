@@ -204,13 +204,13 @@ static void manualControlTask(void)
     // to avoid having to add it to all of the below modes that are
     // otherwise unrelated
     if (newMode != flightStatus.FlightMode) {
-	// set assist mode to none to avoid an assisted flight mode position
-	// carrying over and impacting a newly selected non-assisted flight mode pos
-	newFlightModeAssist      = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
-	// The following are eqivalent to none effectively. Code should always
-	// check the flightmodeassist state.
-	newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
-	newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+        // set assist mode to none to avoid an assisted flight mode position
+        // carrying over and impacting a newly selected non-assisted flight mode pos
+        newFlightModeAssist      = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
+        // The following are eqivalent to none effectively. Code should always
+        // check the flightmodeassist state.
+        newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+        newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
     }
 
     // Depending on the mode update the Stabilization or Actuator objects
@@ -260,7 +260,7 @@ static void manualControlTask(void)
                     // no stick input on roll/pitch so enter brake state
                     newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
                     newAssistedThrottleState = pathfollowerthrustmode;
-                    handler  = &handler_PATHFOLLOWER;
+                    handler = &handler_PATHFOLLOWER;
                     // retain thrust cmd for later comparison with actual in braking
                     thrustAtBrakeStart = cmd.Thrust;
 
@@ -299,7 +299,7 @@ static void manualControlTask(void)
 
                     // if auto thrust and user adjusts thrust outside of a deadband in which case revert to manual
                     if ((newAssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_AUTO) &&
-                	(cmd.Thrust < thrustLo || cmd.Thrust > thrustHi)) {
+                        (cmd.Thrust < thrustLo || cmd.Thrust > thrustHi)) {
                         newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
                     }
                 }
@@ -454,73 +454,73 @@ static void commandUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, FlightModeSettingsData *modeSettings)
 {
-  uint8_t flightModeAssistOption = STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE;
-  uint8_t isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
-  uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
+    uint8_t flightModeAssistOption = STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE;
+    uint8_t isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
+    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
 
-  StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
-  if (position < STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM) {
-      flightModeAssistOption = FlightModeAssistMap[position];
-  }
+    StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
+    if (position < STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM) {
+        flightModeAssistOption = FlightModeAssistMap[position];
+    }
 
-  switch (flightModeAssistOption) {
-    case  STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE:
-      break;
+    switch (flightModeAssistOption) {
+    case STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE:
+        break;
     case STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_GPSASSIST:
-      {
-	// default to cruise control.
-	FlightModeSettingsStabilization1SettingsOptions thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
+    {
+        // default to cruise control.
+        FlightModeSettingsStabilization1SettingsOptions thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
 
-	switch (flightMode) {
-	  case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-	    thrustMode = modeSettings->Stabilization1Settings.Thrust;
-	    break;
-	  case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-	    thrustMode = modeSettings->Stabilization2Settings.Thrust;
-	    break;
-	  case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-	    thrustMode = modeSettings->Stabilization3Settings.Thrust;
-	    break;
-	  case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
-	    thrustMode = modeSettings->Stabilization4Settings.Thrust;
-	    break;
-	  case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
-	    thrustMode = modeSettings->Stabilization5Settings.Thrust;
-	    break;
-	  case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-	    thrustMode = modeSettings->Stabilization6Settings.Thrust;
-	    break;
-	  case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-	    // we hard code the "GPS Assisted" PostionHold to use alt-vario which
-	    // is a more appropriate throttle mode.  "GPSAssist" adds braking
-	    // and a better throttle management to the standard Position Hold.
-	    thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
-	    break;
+        switch (flightMode) {
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+            thrustMode = modeSettings->Stabilization1Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+            thrustMode = modeSettings->Stabilization2Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+            thrustMode = modeSettings->Stabilization3Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+            thrustMode = modeSettings->Stabilization4Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+            thrustMode = modeSettings->Stabilization5Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+            thrustMode = modeSettings->Stabilization6Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+            // we hard code the "GPS Assisted" PostionHold to use alt-vario which
+            // is a more appropriate throttle mode.  "GPSAssist" adds braking
+            // and a better throttle management to the standard Position Hold.
+            thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
+            break;
 
-	    // other modes will use cruisecontrol as default
-	}
+            // other modes will use cruisecontrol as default
+        }
 
 
-	switch(thrustMode) {
-	  case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD:
-	  case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO:
-	    // this is only for use with stabi mods with althold/vario.
-	    isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST;
-	    break;
-	  case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL:
-	  case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL:
-	  default:
-	    // this is the default for non stabi modes also
-	    isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST;
-	    break;
-	}
-      }
-      break;
-  }
+        switch (thrustMode) {
+        case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD:
+        case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO:
+            // this is only for use with stabi mods with althold/vario.
+            isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST;
+            break;
+        case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL:
+        case FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL:
+        default:
+            // this is the default for non stabi modes also
+            isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST;
+            break;
+        }
+    }
+    break;
+    }
 
-  return isAssistedFlag;
+    return isAssistedFlag;
 }
-#endif
+#endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 
 /**
  * @}

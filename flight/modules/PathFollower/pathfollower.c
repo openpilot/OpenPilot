@@ -81,28 +81,28 @@
 
 // Private constants
 
-#define CALLBACK_PRIORITY      CALLBACK_PRIORITY_LOW
-#define CBTASK_PRIORITY        CALLBACK_TASK_FLIGHTCONTROL
+#define CALLBACK_PRIORITY                           CALLBACK_PRIORITY_LOW
+#define CBTASK_PRIORITY                             CALLBACK_TASK_FLIGHTCONTROL
 
-#define PF_IDLE_UPDATE_RATE_MS 100
+#define PF_IDLE_UPDATE_RATE_MS                      100
 
-#define STACK_SIZE_BYTES       2048
+#define STACK_SIZE_BYTES                            2048
 
-#define DEADBAND_HIGH          0.10f
-#define DEADBAND_LOW           -0.10f
+#define DEADBAND_HIGH                               0.10f
+#define DEADBAND_LOW                                -0.10f
 
 #define BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK 0.95f
-#define BRAKE_EXIT_VELOCITY_LIMIT 0.2f
+#define BRAKE_EXIT_VELOCITY_LIMIT                   0.2f
 
-#define BRAKE_RATE_MINIMUM 0.2f
+#define BRAKE_RATE_MINIMUM                          0.2f
 
-#define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT 0.5f
-#define NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT 0.2f
-#define NEUTRALTHRUST_PH_VEL_STATE_LIMIT 0.2f
-#define NEUTRALTHRUST_PH_VEL_ERROR_LIMIT 0.1f
+#define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT     0.5f
+#define NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT          0.2f
+#define NEUTRALTHRUST_PH_VEL_STATE_LIMIT            0.2f
+#define NEUTRALTHRUST_PH_VEL_ERROR_LIMIT            0.1f
 
-#define NEUTRALTHRUST_START_DELAY (2*20) // 2 seconds at rate of 20Hz (50ms update rate)
-#define NEUTRALTHRUST_END_COUNT   (NEUTRALTHRUST_START_DELAY + (4*20) )  // 4 second sample
+#define NEUTRALTHRUST_START_DELAY                   (2 * 20) // 2 seconds at rate of 20Hz (50ms update rate)
+#define NEUTRALTHRUST_END_COUNT                     (NEUTRALTHRUST_START_DELAY + (4 * 20))  // 4 second sample
 
 // Private types
 
@@ -512,9 +512,9 @@ static uint8_t updateAutoPilotVtol()
             exit_brake = true;
         } else if (pathStatus.fractional_progress > BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK) {
             VelocityStateGet(&velocityState);
-            if (fabsf(velocityState.East) < BRAKE_EXIT_VELOCITY_LIMIT && fabsf(velocityState.North) < BRAKE_EXIT_VELOCITY_LIMIT ) {
-        	pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
-        	exit_brake = true;
+            if (fabsf(velocityState.East) < BRAKE_EXIT_VELOCITY_LIMIT && fabsf(velocityState.North) < BRAKE_EXIT_VELOCITY_LIMIT) {
+                pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
+                exit_brake = true;
             }
         }
 
@@ -769,8 +769,8 @@ static void updatePathVelocity(float kFF, bool limited)
         updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST], pathStatus.path_time, brakeRate, velocityState.East, &velocityDesired.East);
         updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN], pathStatus.path_time, brakeRate, velocityState.Down, &velocityDesired.Down);
 
-        float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
-        cur_velocity = sqrtf(cur_velocity);
+        float cur_velocity     = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
+        cur_velocity     = sqrtf(cur_velocity);
         float desired_velocity = velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East + velocityDesired.Down * velocityDesired.Down;
         desired_velocity = sqrtf(desired_velocity);
 
@@ -830,7 +830,7 @@ static void updatePathVelocity(float kFF, bool limited)
         velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
 
         // update pathstatus
-        pathStatus.error = progress.error;
+        pathStatus.error      = progress.error;
         pathStatus.fractional_progress  = progress.fractional_progress;
         pathStatus.path_direction_north = progress.path_vector[0];
         pathStatus.path_direction_east  = progress.path_vector[1];
@@ -1285,7 +1285,6 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     // In manualcontrol.c the state will stay in manual throttle until the throttle command exceeds the vtol thrust min,
     // avoiding auto-takeoffs.  Therefore no need to check that here.
     if (!manual_thrust && neutralThrustEst.have_correction != true) {
-
         // Assess if position hold state running.  This can be normal position hold or
         // another mode with assist-hold active.
         bool ph_active =
@@ -1296,9 +1295,9 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
 
         bool stable = (fabsf(pathStatus.correction_direction_down) < NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT &&
-            fabsf(velocityDesired.Down) < NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT &&
-            fabsf(velocityState.Down) < NEUTRALTHRUST_PH_VEL_STATE_LIMIT &&
-            fabsf(downError) < NEUTRALTHRUST_PH_VEL_ERROR_LIMIT);
+                       fabsf(velocityDesired.Down) < NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT &&
+                       fabsf(velocityState.Down) < NEUTRALTHRUST_PH_VEL_STATE_LIMIT &&
+                       fabsf(downError) < NEUTRALTHRUST_PH_VEL_ERROR_LIMIT);
 
         if (ph_active && stable) {
             if (neutralThrustEst.start_sampling) {
@@ -1307,44 +1306,43 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
                 // delay count for 2 seconds into hold allowing for stablisation
                 if (neutralThrustEst.count > NEUTRALTHRUST_START_DELAY) {
-		  neutralThrustEst.sum += global.PIDvel[2].iAccumulator;
-		  if (global.PIDvel[2].iAccumulator < neutralThrustEst.min) {
-		      neutralThrustEst.min = global.PIDvel[2].iAccumulator;
-		  }
-		  if (global.PIDvel[2].iAccumulator > neutralThrustEst.max) {
-		      neutralThrustEst.max = global.PIDvel[2].iAccumulator;
-		  }
+                    neutralThrustEst.sum += global.PIDvel[2].iAccumulator;
+                    if (global.PIDvel[2].iAccumulator < neutralThrustEst.min) {
+                        neutralThrustEst.min = global.PIDvel[2].iAccumulator;
+                    }
+                    if (global.PIDvel[2].iAccumulator > neutralThrustEst.max) {
+                        neutralThrustEst.max = global.PIDvel[2].iAccumulator;
+                    }
                 }
 
                 if (neutralThrustEst.count >= NEUTRALTHRUST_END_COUNT) {
                     // 6 seconds have past
                     // lets take an average
-                    neutralThrustEst.average = neutralThrustEst.sum / (float) (NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
-                    neutralThrustEst.correction =  neutralThrustEst.average/1000.0f;
+                    neutralThrustEst.average         = neutralThrustEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
+                    neutralThrustEst.correction      = neutralThrustEst.average / 1000.0f;
 
-                    global.PIDvel[2].iAccumulator -= neutralThrustEst.average;
+                    global.PIDvel[2].iAccumulator   -= neutralThrustEst.average;
 
-                    neutralThrustEst.start_sampling          = false;
-                    neutralThrustEst.have_correction         = true;
+                    neutralThrustEst.start_sampling  = false;
+                    neutralThrustEst.have_correction = true;
 
                     // Write a new adjustment value
                     // adjustments.NeutralThrustOffset  was incremental adjusted above
                     AdjustmentsData new_adjustments;
                     // add the average remaining i value to the
-                    new_adjustments.NeutralThrustOffset = adjustments.NeutralThrustOffset + neutralThrustEst.correction;
-                    new_adjustments.NeutralThrustCorrection = neutralThrustEst.correction; // the i term thrust correction value applied
+                    new_adjustments.NeutralThrustOffset      = adjustments.NeutralThrustOffset + neutralThrustEst.correction;
+                    new_adjustments.NeutralThrustCorrection  = neutralThrustEst.correction; // the i term thrust correction value applied
                     new_adjustments.NeutralThrustAccumulator = global.PIDvel[2].iAccumulator; // the actual iaccumulator value after correction
                     new_adjustments.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
                     AdjustmentsSet(&new_adjustments);
                 }
-
             } else {
                 // start a tick count
                 neutralThrustEst.start_sampling = true;
                 neutralThrustEst.count = 0;
-                neutralThrustEst.sum = 0.0f;
-                neutralThrustEst.max = 0.0f;
-                neutralThrustEst.min = 0.0f;
+                neutralThrustEst.sum   = 0.0f;
+                neutralThrustEst.max   = 0.0f;
+                neutralThrustEst.min   = 0.0f;
             }
         } else {
             // reset sampling as we did't get 6 continuous seconds
@@ -1419,42 +1417,40 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
     // when flight mode assist is active but in primary-thrust mode, the thrust mode must be set to the same as per the primary mode.
     if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST) {
+        FlightModeSettingsData settings;
+        FlightModeSettingsGet(&settings);
+        FlightModeSettingsStabilization1SettingsOptions thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
 
-	 FlightModeSettingsData settings;
-	 FlightModeSettingsGet(&settings);
-	 FlightModeSettingsStabilization1SettingsOptions thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
-
-	 switch (flightStatus.FlightMode) {
-	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-	     thrustMode = settings.Stabilization1Settings.Thrust;
-	     break;
-	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-	     thrustMode = settings.Stabilization2Settings.Thrust;
-	     break;
-	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-	     thrustMode = settings.Stabilization3Settings.Thrust;
-	     break;
-	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
-	     thrustMode = settings.Stabilization4Settings.Thrust;
-	     break;
-	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
-	     thrustMode = settings.Stabilization5Settings.Thrust;
-	     break;
-	   case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-	     thrustMode = settings.Stabilization6Settings.Thrust;
-	     break;
-	   case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-	     // we hard code the "GPS Assisted" PostionHold to use alt-vario which
-	     // is a more appropriate throttle mode.  "GPSAssist" adds braking
-	     // and a better throttle management to the standard Position Hold.
-	     thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
-	     break;
-	 }
-	 stabDesired.StabilizationMode.Thrust = thrustMode;
-	 stabDesired.Thrust = manualControl.Thrust;
-
+        switch (flightStatus.FlightMode) {
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+            thrustMode = settings.Stabilization1Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+            thrustMode = settings.Stabilization2Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+            thrustMode = settings.Stabilization3Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+            thrustMode = settings.Stabilization4Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+            thrustMode = settings.Stabilization5Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+            thrustMode = settings.Stabilization6Settings.Thrust;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+            // we hard code the "GPS Assisted" PostionHold to use alt-vario which
+            // is a more appropriate throttle mode.  "GPSAssist" adds braking
+            // and a better throttle management to the standard Position Hold.
+            thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
+            break;
+        }
+        stabDesired.StabilizationMode.Thrust = thrustMode;
+        stabDesired.Thrust = manualControl.Thrust;
     } else if (manual_thrust) {
-	 stabDesired.Thrust = manualControl.Thrust;
+        stabDesired.Thrust = manualControl.Thrust;
     }
     // else thrust is set by the PID controller
 

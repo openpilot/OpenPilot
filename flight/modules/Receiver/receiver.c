@@ -382,7 +382,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
             // AssistedControl must have deadband set for pitch/roll hence
             // we default to a higher value for badly behaved TXs and also enforce a minimum value
             // for well behaved TXs
-            uint8_t assistedMode   = isAssistedFlightMode(cmd.FlightModeSwitchPosition);
+            uint8_t assistedMode = isAssistedFlightMode(cmd.FlightModeSwitchPosition);
             if (assistedMode) {
                 deadband_checked = settings.DeadbandAssistedControl;
                 if (deadband_checked < ASSISTEDCONTROL_DEADBAND_MINIMUM) {

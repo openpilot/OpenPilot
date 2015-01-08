@@ -24,6 +24,7 @@
 # (all architectures)
 
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += adjustments
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
@@ -77,6 +78,7 @@ UAVOBJSRCFILENAMES += pathaction
 UAVOBJSRCFILENAMES += pathdesired
 UAVOBJSRCFILENAMES += pathplan
 UAVOBJSRCFILENAMES += pathstatus
+UAVOBJSRCFILENAMES += pathsummary
 UAVOBJSRCFILENAMES += positionstate
 UAVOBJSRCFILENAMES += ratedesired
 UAVOBJSRCFILENAMES += revocalibration

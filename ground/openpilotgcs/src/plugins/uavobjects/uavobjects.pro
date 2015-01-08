@@ -27,6 +27,7 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/adjustments.h \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
@@ -82,6 +83,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pathplan.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
+    $$UAVOBJECT_SYNTHETICS/pathsummary.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.h \
     $$UAVOBJECT_SYNTHETICS/positionstate.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.h \
@@ -131,6 +133,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/adjustments.cpp \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
@@ -186,6 +189,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathplan.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathsummary.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.cpp \
     $$UAVOBJECT_SYNTHETICS/positionstate.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.cpp \

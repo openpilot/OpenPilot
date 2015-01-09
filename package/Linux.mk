@@ -17,12 +17,8 @@ DEB_BUILD_DIR		:= $(ROOT_DIR)/debian
 SED_DATE_STRG		= $(shell date -R)
 SED_SCRIPT		= s/<VERSION>/$(VERNUM)/;s/<DATE>/$(SED_DATE_STRG)/
 
-DEB_PLATFORM		:= amd64
-MACHINE_TYPE		:= $(shell uname -m)
-ifneq ($(MACHINE_TYPE), x86_64)
- DEB_PLATFORM		:= i386
-endif
-DEB_PACKAGE_NAME	:= openpilot_$(VERNUM)_$(DEB_PLATFORM)
+DEB_ARCH		:= $(shell dpkg --print-architecture)
+DEB_PACKAGE_NAME	:= openpilot_$(VERNUM)_$(DEB_ARCH)
 
 .PHONY: package
 package:

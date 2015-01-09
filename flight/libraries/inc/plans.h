@@ -30,6 +30,7 @@
 
 #ifndef PLANS_H_
 #define PLANS_H_
+#include <stdint.h>
 #include <pios_math.h>
 
 /** \page standard Plans
@@ -66,6 +67,16 @@ void plan_setup_land();
  * @brief execute land
  */
 void plan_run_land();
+
+/**
+ * @brief setup pathplanner/pathfollower for braking
+ */
+void plan_setup_assistedcontrol(uint8_t timeout_occurred);
+
+#define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH 0
+#define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST  1
+#define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN  2
+#define PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT                   3
 
 /**
  * @brief setup pathfollower for positionvario

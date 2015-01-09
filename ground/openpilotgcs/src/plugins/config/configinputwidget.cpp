@@ -148,6 +148,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     }
 
     addWidgetBinding("ManualControlSettings", "Deadband", ui->deadband, 0, 0.01f);
+    addWidgetBinding("ManualControlSettings", "DeadbandAssistedControl", ui->assistedControlDeadband, 0, 0.01f);
 
     connect(ui->configurationWizard, SIGNAL(clicked()), this, SLOT(goToWizard()));
     connect(ui->stackedWidget, SIGNAL(currentChanged(int)), this, SLOT(disableWizardButton(int)));
@@ -1494,26 +1495,32 @@ void ConfigInputWidget::updatePositionSlider()
     case 6:
         ui->fmsModePos6->setEnabled(true);
         ui->pidBankSs1_5->setEnabled(true);
+        ui->assistControlPos6->setEnabled(true);
     // pass through
     case 5:
         ui->fmsModePos5->setEnabled(true);
         ui->pidBankSs1_4->setEnabled(true);
+        ui->assistControlPos5->setEnabled(true);
     // pass through
     case 4:
         ui->fmsModePos4->setEnabled(true);
         ui->pidBankSs1_3->setEnabled(true);
+        ui->assistControlPos4->setEnabled(true);
     // pass through
     case 3:
         ui->fmsModePos3->setEnabled(true);
         ui->pidBankSs1_2->setEnabled(true);
+        ui->assistControlPos3->setEnabled(true);
     // pass through
     case 2:
         ui->fmsModePos2->setEnabled(true);
         ui->pidBankSs1_1->setEnabled(true);
+        ui->assistControlPos2->setEnabled(true);
     // pass through
     case 1:
         ui->fmsModePos1->setEnabled(true);
         ui->pidBankSs1_0->setEnabled(true);
+        ui->assistControlPos1->setEnabled(true);
     // pass through
     case 0:
         break;
@@ -1523,26 +1530,32 @@ void ConfigInputWidget::updatePositionSlider()
     case 0:
         ui->fmsModePos1->setEnabled(false);
         ui->pidBankSs1_0->setEnabled(false);
+        ui->assistControlPos1->setEnabled(false);
     // pass through
     case 1:
         ui->fmsModePos2->setEnabled(false);
         ui->pidBankSs1_1->setEnabled(false);
+        ui->assistControlPos2->setEnabled(false);
     // pass through
     case 2:
         ui->fmsModePos3->setEnabled(false);
         ui->pidBankSs1_2->setEnabled(false);
+        ui->assistControlPos3->setEnabled(false);
     // pass through
     case 3:
         ui->fmsModePos4->setEnabled(false);
         ui->pidBankSs1_3->setEnabled(false);
+        ui->assistControlPos4->setEnabled(false);
     // pass through
     case 4:
         ui->fmsModePos5->setEnabled(false);
         ui->pidBankSs1_4->setEnabled(false);
+        ui->assistControlPos5->setEnabled(false);
     // pass through
     case 5:
         ui->fmsModePos6->setEnabled(false);
         ui->pidBankSs1_5->setEnabled(false);
+        ui->assistControlPos6->setEnabled(false);
     // pass through
     case 6:
     default:

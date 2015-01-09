@@ -112,9 +112,10 @@ macx {
         copyqt = $$copydata
     } else {
         GCS_APP_TARGET   = openpilotgcs
-        GCS_QT_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5
-        GCS_QT_PLUGINS_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/plugins
-        GCS_QT_QML_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/qml
+        GCS_QT_BASEPATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5
+        GCS_QT_LIBRARY_PATH = $$GCS_QT_BASEPATH/lib
+        GCS_QT_PLUGINS_PATH = $$GCS_QT_BASEPATH/plugins
+        GCS_QT_QML_PATH = $$GCS_QT_BASEPATH/qml
 
         QT_INSTALL_DIR = $$clean_path($$[QT_INSTALL_LIBS]/../../../..)
         equals(QT_INSTALL_DIR, $$TOOLS_DIR) {

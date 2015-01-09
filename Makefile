@@ -81,7 +81,7 @@ $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),de
 
 # Make sure this isn't being run as root unless installing (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
-    ifeq ($(filter install install_qt all_clean,$(MAKECMDGOALS)),)
+    ifeq ($(filter install all_clean,$(MAKECMDGOALS)),)
         $(error You should not be running this as root)
     endif
 endif
@@ -946,13 +946,6 @@ install:
 	$(V1) rm $(DESTDIR)/$(datadir)/openpilotgcs/translations/Makefile
 
 
-.PHONY: install_qt
-install_qt:
-	@$(ECHO) " INSTALLING QT TO $(DESTDIR)/)"
-	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/qt5 $(DESTDIR)$(libdir)
-
-
 ##############################
 #
 # Help message, the default Makefile goal
@@ -1090,7 +1083,6 @@ help:
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
 	@$(ECHO) "     dist                 - Generate source archive for distribution"
 	@$(ECHO) "     install              - Install GCS to \"DESTDIR\" with prefix \"prefix\" (Linux only)"
-	@$(ECHO) "     install_qt           - Install QT to \"DESTDIR\" with prefix \"prefix\" (Linux only)"
 	@$(ECHO)
 	@$(ECHO) "   [Code Formatting]"
 	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code according to the project's standards"

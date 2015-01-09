@@ -22,4 +22,4 @@ override_dh_auto_test:
 	# Fails non-silently because it is run under fakeroot.
 
 override_dh_auto_install:
-	dh_auto_install -- prefix=/usr install_qt
+	dh_auto_install -- prefix=/usr

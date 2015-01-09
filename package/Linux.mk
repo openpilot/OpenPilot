@@ -6,19 +6,15 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-# Update this number for every formal release.  The Deb packaging system relies on this to know to update a
-# package or not.  Otherwise, the user has to uninstall first.
-# Until we do that, package name does NOT include $(VERNUM) and uses $(PACKAGE_LBL) only
-VERNUM			:= 0.1.0
-VERSION_FULL		:= $(VERNUM)-$(PACKAGE_LBL)
+DEB_VER			:= $(PACKAGE_LBL)-1
 DEB_DIR			:= $(ROOT_DIR)/package/linux/debian
 DEB_BUILD_DIR		:= $(ROOT_DIR)/debian
 
 SED_DATE_STRG		= $(shell date -R)
-SED_SCRIPT		= s/<VERSION>/$(VERNUM)/;s/<DATE>/$(SED_DATE_STRG)/
+SED_SCRIPT		= s/<VERSION>/$(DEB_VER)/;s/<DATE>/$(SED_DATE_STRG)/
 
 DEB_ARCH		:= $(shell dpkg --print-architecture)
-DEB_PACKAGE_NAME	:= openpilot_$(VERNUM)_$(DEB_ARCH)
+DEB_PACKAGE_NAME	:= openpilot_$(DEB_VER)_$(DEB_ARCH)
 
 .PHONY: package
 package:

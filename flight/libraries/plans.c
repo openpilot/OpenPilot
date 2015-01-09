@@ -40,6 +40,7 @@
 #include <manualcontrolcommand.h>
 #include <attitudestate.h>
 #include <vtolpathfollowersettings.h>
+#include <stabilizationbank.h>
 #include <sin_lookup.h>
 
 #define UPDATE_EXPECTED 0.02f
@@ -87,6 +88,7 @@ void plan_initialize()
     ManualControlCommandInitialize();
     VelocityStateInitialize();
     VtolPathFollowerSettingsInitialize();
+    StabilizationBankInitialize();
 }
 
 /**
@@ -418,7 +420,7 @@ static void plan_run_PositionVario(vario_type type)
     }
 }
 
-static void plan_run_VelocityRoam()
+void plan_run_VelocityRoam()
 {
     float alpha;
     PathDesiredData pathDesired;
@@ -477,7 +479,7 @@ static void plan_run_VelocityRoam()
         VtolPathFollowerSettingsVerticalVelMaxGet(&verticalVelMax);
         float velocity_north = rotated[0] * horizontalVelMax;
         float velociy_east = rotated[1] * horizontalVelMax;
-        float velocity_down = 0.0f;  overridden by altvario
+        float velocity_down = 0.0f; // overridden by altvario
 
         float velocity = velocity_north * velocity_north + velociy_east * velociy_east;
         velocity = sqrtf(velocity);

@@ -761,12 +761,23 @@ static void updatePathVelocity(float kFF, bool limited)
 
     const float dT = updatePeriod / 1000.0f;
 
-    // TODO If PATHDESIRED_MODE_VELOCITY then copy parameters into VelocityDesired.
 
     if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
-        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH], pathStatus.path_time, brakeRate, velocityState.North, &velocityDesired.North);
-        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST], pathStatus.path_time, brakeRate, velocityState.East, &velocityDesired.East);
-        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN], pathStatus.path_time, brakeRate, velocityState.Down, &velocityDesired.Down);
+        velocityDesired.North = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
+        velocityDesired.East = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
+        velocityDesired.Down = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN];
+
+        // update pathstatus
+        pathStatus.error      = 0.0f;
+        pathStatus.fractional_progress  = 0.0f;
+        pathStatus.path_direction_north = velocityDesired.North;
+        pathStatus.path_direction_east  = velocityDesired.East;
+        pathStatus.path_direction_down  = velocityDesired.Down;
+
+        pathStatus.correction_direction_north = velocityDesired.North - velocityState.North;
+        pathStatus.correction_direction_east  = velocityDesired.East - velocityState.East;
+        pathStatus.correction_direction_down  = velocityDesired.Down - velocityState.Down;
+
     }
     else if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         float brakeRate = vtolPathFollowerSettings.BrakeRate;

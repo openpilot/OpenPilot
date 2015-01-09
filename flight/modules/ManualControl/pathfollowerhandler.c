@@ -84,11 +84,6 @@ void pathFollowerHandler(bool newinit)
         	plan_setup_PositionRoam();
             } else {
         	plan_setup_VelocityRoam();
-        	if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY) {
-        	    plan_setup_assistedcontrol(false);
-        	} else {
-        	    plan_setup_positionHold();
-        	}
             }
             break;
         case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:

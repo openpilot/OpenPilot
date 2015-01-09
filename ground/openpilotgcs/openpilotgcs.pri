@@ -120,11 +120,8 @@ macx {
         equals(QT_INSTALL_DIR, $$TOOLS_DIR) {
             copyqt = 1
         } else {
-            copyqt = 0 
+            copyqt = 0
         }
-
-        FORCE_COPY_QT = $$(FORCE_COPY_QT)
-        !isEmpty(FORCE_COPY_QT):copyqt = 1 
     }
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins

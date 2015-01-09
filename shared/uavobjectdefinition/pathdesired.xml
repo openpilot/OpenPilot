@@ -12,7 +12,7 @@
 		FixedAttitude,
 		SetAccessory,
 		Land,
-		DisarmAlarm,Brake" default="0"/>
+		DisarmAlarm,Brake,Velocity" default="0"/>
 	<!-- Endpoint mode - move directly towards endpoint regardless of position -->
 	<!-- Straight Mode - move across linear path through Start towards the waypoint end, adjusting velocity - continue straight -->
 	<!-- Circle Mode - move a circular pattern around End with radius End-Start (straight line in the vertical)-->

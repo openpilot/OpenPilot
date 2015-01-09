@@ -260,6 +260,7 @@ static void pathFollowerTask(void)
     case PATHDESIRED_MODE_FLYENDPOINT:
     case PATHDESIRED_MODE_FLYVECTOR:
     case PATHDESIRED_MODE_BRAKE:
+    case PATHDESIRED_MODE_VELOCITY:
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
     case PATHDESIRED_MODE_FLYCIRCLELEFT:
     {
@@ -456,7 +457,7 @@ static uint8_t updateAutoPilotVtol()
         bool yaw_attitude = true;
         float yaw = 0.0f;
 
-        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
             yaw_attitude = false;
         } else {
             switch (vtolPathFollowerSettings.YawControl) {
@@ -480,7 +481,7 @@ static uint8_t updateAutoPilotVtol()
         result = updateVtolDesiredAttitude(yaw_attitude, yaw);
 
         if (!result) {
-            if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+            if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
                 plan_setup_assistedcontrol(true); // revert braking to position hold, user can always stick override
             } else if (vtolPathFollowerSettings.FlyawayEmergencyFallback != VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DISABLED) {
                 // switch to emergency follower if follower indicates problems
@@ -760,7 +761,14 @@ static void updatePathVelocity(float kFF, bool limited)
 
     const float dT = updatePeriod / 1000.0f;
 
-    if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+    // TODO If PATHDESIRED_MODE_VELOCITY then copy parameters into VelocityDesired.
+
+    if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
+        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH], pathStatus.path_time, brakeRate, velocityState.North, &velocityDesired.North);
+        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST], pathStatus.path_time, brakeRate, velocityState.East, &velocityDesired.East);
+        updateBrakeVelocity(pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN], pathStatus.path_time, brakeRate, velocityState.Down, &velocityDesired.Down);
+    }
+    else if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         float brakeRate = vtolPathFollowerSettings.BrakeRate;
         if (brakeRate < BRAKE_RATE_MINIMUM) {
             brakeRate = BRAKE_RATE_MINIMUM; // set a minimum to avoid a divide by zero potential below
@@ -1441,7 +1449,8 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
             thrustMode = settings.Stabilization6Settings.Thrust;
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            // we hard code the "GPS Assisted" PostionHold to use alt-vario which
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+            // we hard code the "GPS Assisted" PostionHold/Roam to use alt-vario which
             // is a more appropriate throttle mode.  "GPSAssist" adds braking
             // and a better throttle management to the standard Position Hold.
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;

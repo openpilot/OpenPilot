@@ -1,5 +1,5 @@
 openpilot (<VERSION>) unstable; urgency=low
 
-  * Initial release (testing - unstable)
+  * Release from upstream Git (testing - unstable)
 
- -- naiiawah <naiiawah@openpilot.org>  <DATE>
+ -- James Duley <james@openpilot.org>  <DATE>

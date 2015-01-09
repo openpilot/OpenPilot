@@ -96,7 +96,15 @@ macx {
     copydata = 1
     copyqt = 1
 } else {
+    GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
+    GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
+    GCS_LIBEXEC_PATH = $$GCS_APP_PATH # FIXME
+    GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
+    GCS_DATA_BASENAME = share/openpilotgcs
+    GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc
+
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
+
     win32 {
         SDL_DIR = $$(SDL_DIR)
         isEmpty(SDL_DIR):SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
@@ -112,7 +120,7 @@ macx {
         copyqt = $$copydata
     } else {
         GCS_APP_TARGET   = openpilotgcs
-        GCS_QT_BASEPATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5
+        GCS_QT_BASEPATH = $$GCS_LIBRARY_PATH/qt5
         GCS_QT_LIBRARY_PATH = $$GCS_QT_BASEPATH/lib
         GCS_QT_PLUGINS_PATH = $$GCS_QT_BASEPATH/plugins
         GCS_QT_QML_PATH = $$GCS_QT_BASEPATH/qml
@@ -124,12 +132,6 @@ macx {
             copyqt = 0
         }
     }
-    GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
-    GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
-    GCS_LIBEXEC_PATH = $$GCS_APP_PATH # FIXME
-    GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
-    GCS_DATA_BASENAME = share/openpilotgcs
-    GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc
 }
 
 

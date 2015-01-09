@@ -1715,7 +1715,7 @@ void ConfigInputWidget::resetActuatorSettings()
     // 1500 = servo middle, can be applied to all outputs because board is 'Alwaysdisarmed'
     for (unsigned int output = 0; output < 12; output++) {
         actuatorSettingsData.ChannelMax[output]     = 1500;
-        actuatorSettingsData.ChannelMin[output]     = 1500;
+        actuatorSettingsData.ChannelMin[output]     = 1000;
         actuatorSettingsData.ChannelNeutral[output] = 1500;
         actuatorSettingsObj->setData(actuatorSettingsData);
     }

@@ -50,15 +50,15 @@
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
-#define STACK_SIZE_BYTES  PIOS_MANUAL_STACK_SIZE
+#define STACK_SIZE_BYTES                               PIOS_MANUAL_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES  1152
+#define STACK_SIZE_BYTES                               1152
 #endif
 
-#define CALLBACK_PRIORITY CALLBACK_PRIORITY_REGULAR
-#define CBTASK_PRIORITY   CALLBACK_TASK_FLIGHTCONTROL
+#define CALLBACK_PRIORITY                              CALLBACK_PRIORITY_REGULAR
+#define CBTASK_PRIORITY                                CALLBACK_TASK_FLIGHTCONTROL
 
-#define ASSISTEDCONTROL_NEUTRALTHROTTLERANGE_FACTOR 0.2f
+#define ASSISTEDCONTROL_NEUTRALTHROTTLERANGE_FACTOR    0.2f
 #define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_LO 0.92f
 #define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_HI 1.08f
 
@@ -244,9 +244,9 @@ static void manualControlTask(void)
             VtolSelfTuningStatsNeutralThrustOffsetGet(&neutralThrustOffset);
 
 
-            float throttleRangeDelta  = (thrustLimits.Neutral + neutralThrustOffset) * ASSISTEDCONTROL_NEUTRALTHROTTLERANGE_FACTOR;
-            float throttleNeutralLow  = (thrustLimits.Neutral + neutralThrustOffset) - throttleRangeDelta;
-            float throttleNeutralHi   = (thrustLimits.Neutral + neutralThrustOffset) + throttleRangeDelta;
+            float throttleRangeDelta = (thrustLimits.Neutral + neutralThrustOffset) * ASSISTEDCONTROL_NEUTRALTHROTTLERANGE_FACTOR;
+            float throttleNeutralLow = (thrustLimits.Neutral + neutralThrustOffset) - throttleRangeDelta;
+            float throttleNeutralHi  = (thrustLimits.Neutral + neutralThrustOffset) + throttleRangeDelta;
             if (cmd.Thrust > throttleNeutralLow && cmd.Thrust < throttleNeutralHi) {
                 throttleNeutral = true;
             }

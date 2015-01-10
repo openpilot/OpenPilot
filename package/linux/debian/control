@@ -1,7 +1,7 @@
 Source: openpilot
 Section: unknown
 Priority: optional
-Maintainer: James Duley <jagduley@gmail.com>
+Maintainer: James Duley <james@openpilot.org>
 Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.4
 Homepage: http://www.openpilot.org

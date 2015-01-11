@@ -440,7 +440,6 @@ void plan_run_VelocityRoam()
     cmd.Pitch  = applyExpo(cmd.Pitch, stabSettings.StickExpo.Pitch);
     cmd.Yaw  = applyExpo(cmd.Yaw, stabSettings.StickExpo.Yaw);
 
-    // TODO Why here??
     FlightModeSettingsVarioControlLowPassAlphaGet(&alpha);
     vario_control_lowpass[0] = alpha * vario_control_lowpass[0] + (1.0f - alpha) * cmd.Roll;
     vario_control_lowpass[1] = alpha * vario_control_lowpass[1] + (1.0f - alpha) * cmd.Pitch;
@@ -469,10 +468,15 @@ void plan_run_VelocityRoam()
         // Calculate desired velocity in each direction
         float angle;
         AttitudeStateYawGet(&angle);
+        angle = DEG2RAD(angle);
+        float cos_angle = cosf(angle);
+        float sine_angle = sinf(angle);
         float rotated[2] = {
-            cmd.Roll * cos_lookup_deg(angle) - cmd.Pitch * sin_lookup_deg(angle),
-            cmd.Roll * sin_lookup_deg(angle) + cmd.Pitch * cos_lookup_deg(angle)
+            cmd.Pitch * cos_angle - cmd.Roll * sine_angle,
+            cmd.Pitch * sine_angle + cmd.Roll * cos_angle
         };
+        // flip pitch to have pitch down (away) point north
+        rotated[1] = -rotated[1];
         float horizontalVelMax;
         float verticalVelMax;
         VtolPathFollowerSettingsHorizontalVelMaxGet(&horizontalVelMax);

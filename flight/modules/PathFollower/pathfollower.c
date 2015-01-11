@@ -1410,12 +1410,11 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         maxPitch = vtolPathFollowerSettings.BrakeMaxPitch;
     }
 
-    stabDesired.Pitch = boundf(-northCommand * cosf(DEG2RAD(attitudeState.Yaw)) +
-                               -eastCommand * sinf(DEG2RAD(attitudeState.Yaw)),
-                               -maxPitch, maxPitch);
-    stabDesired.Roll  = boundf(-northCommand * sinf(DEG2RAD(attitudeState.Yaw)) +
-                               eastCommand * cosf(DEG2RAD(attitudeState.Yaw)),
-                               -maxPitch, maxPitch);
+    float angle_radians = DEG2RAD(attitudeState.Yaw);
+    float cos_angle = cosf(angle_radians);
+    float sine_angle = sinf(angle_radians);
+    stabDesired.Pitch = boundf(-northCommand * cos_angle - eastCommand * sine_angle, -maxPitch, maxPitch);
+    stabDesired.Roll  = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -maxPitch, maxPitch);
 
     ManualControlCommandData manualControl;
     ManualControlCommandGet(&manualControl);

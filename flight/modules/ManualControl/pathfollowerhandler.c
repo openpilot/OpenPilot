@@ -56,7 +56,9 @@ void pathFollowerHandler(bool newinit)
     }
 
     uint8_t flightMode;
+    uint8_t assistedControlFlightMode;
     FlightStatusFlightModeGet(&flightMode);
+    FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if (newinit) {
         // After not being in this mode for a while init at current height
@@ -64,9 +66,13 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
             plan_setup_returnToBase();
             break;
-
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            plan_setup_positionHold();
+            if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE) {
+                // Just initiated braking after returning from stabi control
+                plan_setup_assistedcontrol(false);
+            } else {
+                plan_setup_positionHold();
+            }
             break;
         case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
             plan_setup_CourseLock();
@@ -86,6 +92,18 @@ void pathFollowerHandler(bool newinit)
             break;
         case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
             plan_setup_AutoCruise();
+            break;
+
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+            if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE) {
+                // Just initiated braking after returning from stabi control
+                plan_setup_assistedcontrol(false);
+            }
             break;
 
         default:

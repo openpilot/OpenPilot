@@ -53,6 +53,6 @@ typedef enum {
 
 extern int32_t configuration_check();
 
-FrameType_t GetCurrentFrameType();
+extern FrameType_t GetCurrentFrameType();
 
 #endif /* SANITYCHECK_H */

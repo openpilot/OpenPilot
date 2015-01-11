@@ -47,6 +47,7 @@ static void path_circle(PathDesiredData *path, float *cur_point, struct path_sta
 void path_progress(PathDesiredData *path, float *cur_point, struct path_status *status)
 {
     switch (path->Mode) {
+    case PATHDESIRED_MODE_BRAKE: // should never get here...
     case PATHDESIRED_MODE_FLYVECTOR:
         return path_vector(path, cur_point, status, true);
 

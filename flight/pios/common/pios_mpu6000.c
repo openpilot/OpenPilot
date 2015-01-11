@@ -601,7 +601,7 @@ static bool PIOS_MPU6000_HandleData()
     queue_data->temperature = 3500 + ((float)(temp + 512)) * (1.0f / 3.4f);
 
     BaseType_t higherPriorityTaskWoken;
-    xQueueSendToBackFromISR(dev->queue, (void *)&queue_data, &higherPriorityTaskWoken);
+    xQueueSendToBackFromISR(dev->queue, (void *)queue_data, &higherPriorityTaskWoken);
     return higherPriorityTaskWoken == pdTRUE;
 }
 

@@ -132,7 +132,7 @@ extern uint8_t PIOS_HMC5x83_ReadID(pios_hmc5x83_dev_t handler, uint8_t out[4]);
 extern int32_t PIOS_HMC5x83_Test(pios_hmc5x83_dev_t handler);
 extern bool PIOS_HMC5x83_IRQHandler(pios_hmc5x83_dev_t handler);
 
-extern const PIOS_SENSORS_Driver PIOS_MPU6000_Driver;
+extern const PIOS_SENSORS_Driver PIOS_HMC5x83_Driver;
 
 #endif /* PIOS_HMC5x83_H */
 

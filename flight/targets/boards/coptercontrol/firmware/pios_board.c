@@ -36,6 +36,10 @@
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <pios_instrumentation.h>
 #endif
+#if defined(PIOS_INCLUDE_ADXL345)
+#include <pios_adxl345.h>
+#endif
+
 /*
  * Pull in the board-specific static HW definitions.
  * Including .c files is a bit ugly but this allows all of
@@ -831,7 +835,7 @@ void PIOS_Board_Init(void)
         }
         PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
         PIOS_MPU6000_CONFIG_Configure();
-        init_test = PIOS_MPU6000_Test();
+        init_test = !PIOS_MPU6000_Driver.test(0);
 #endif /* PIOS_INCLUDE_MPU6000 */
 
         break;

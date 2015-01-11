@@ -97,6 +97,11 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
     // Connect the selection changed signals.
     connect(m_oplink->PPMOnly, SIGNAL(toggled(bool)), this, SLOT(ppmOnlyChanged()));
+    connect(m_oplink->MinimumChannel, SIGNAL(valueChanged(int)), this, SLOT(minChannelChanged()));
+    connect(m_oplink->MaximumChannel, SIGNAL(valueChanged(int)), this, SLOT(maxChannelChanged()));
+
+    m_oplink->MinimumChannel->setKeyboardTracking(false);
+    m_oplink->MaximumChannel->setKeyboardTracking(false);
 
     // Request and update of the setting object.
     settingsUpdated = false;
@@ -316,6 +321,52 @@ void ConfigPipXtremeWidget::ppmOnlyChanged()
     m_oplink->PPM->setEnabled(!is_ppm_only);
     m_oplink->OneWayLink->setEnabled(!is_ppm_only);
     m_oplink->ComSpeed->setEnabled(!is_ppm_only);
+}
+
+void ConfigPipXtremeWidget::minChannelChanged()
+{
+    ChannelChanged(false);
+}
+
+void ConfigPipXtremeWidget::maxChannelChanged()
+{
+    ChannelChanged(true);
+}
+
+void ConfigPipXtremeWidget::ChannelChanged(bool isMax)
+{
+    int minChannel = m_oplink->MinimumChannel->value();
+    int maxChannel = m_oplink->MaximumChannel->value();
+
+    int minimalChannelRange = 10;
+
+    if ((maxChannel - minChannel) < minimalChannelRange) {
+        if (isMax) {
+            minChannel = maxChannel - minimalChannelRange;
+        } else {
+            maxChannel = minChannel + minimalChannelRange;
+        }
+
+        if (maxChannel > 250) {
+            maxChannel = 250;
+            minChannel = 250 - minimalChannelRange;
+        }
+
+        if (minChannel < 0) {
+            minChannel = 0;
+            maxChannel = minimalChannelRange;
+        }
+    }
+
+    m_oplink->MaximumChannel->setValue(maxChannel);
+    m_oplink->MinimumChannel->setValue(minChannel);
+
+    // Calculate and Display frequency in Mhz
+    float minFrequency = 430 + (minChannel * 0.040);
+    float maxFrequency = 430 + (maxChannel * 0.040);
+
+    m_oplink->MinFreq->setText(QString::number(minFrequency, 'f', 3) + "Mhz");
+    m_oplink->MaxFreq->setText(QString::number(maxFrequency, 'f', 3) + "Mhz");
 }
 
 /**

@@ -131,6 +131,7 @@ struct NeutralThrustEstimation {
     bool     have_correction;
 };
 static struct NeutralThrustEstimation neutralThrustEst;
+static struct NeutralThrustEstimation landedEst;
 
 
 // Private variables
@@ -261,6 +262,7 @@ static void pathFollowerTask(void)
     case PATHDESIRED_MODE_FLYVECTOR:
     case PATHDESIRED_MODE_BRAKE:
     case PATHDESIRED_MODE_VELOCITY:
+    case PATHDESIRED_MODE_LAND:
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
     case PATHDESIRED_MODE_FLYCIRCLELEFT:
     {
@@ -457,7 +459,8 @@ static uint8_t updateAutoPilotVtol()
         bool yaw_attitude = true;
         float yaw = 0.0f;
 
-        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
+        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY ||
+            pathDesired.Mode == PATHDESIRED_MODE_LAND)  {
             yaw_attitude = false;
         } else {
             switch (vtolPathFollowerSettings.YawControl) {
@@ -481,7 +484,7 @@ static uint8_t updateAutoPilotVtol()
         result = updateVtolDesiredAttitude(yaw_attitude, yaw);
 
         if (!result) {
-            if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
+            if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY || pathDesired.Mode == PATHDESIRED_MODE_LAND) {
                 plan_setup_assistedcontrol(true); // revert braking to position hold, user can always stick override
             } else if (vtolPathFollowerSettings.FlyawayEmergencyFallback != VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DISABLED) {
                 // switch to emergency follower if follower indicates problems
@@ -543,6 +546,76 @@ static uint8_t updateAutoPilotVtol()
             // having re-entered hold allow reassessment of neutral thrust
             neutralThrustEst.have_correction = false;
         }
+    }
+    else if (pathDesired.Mode == PATHDESIRED_MODE_LAND) {
+	// Are we landed?
+	bool landed = false;
+
+        VelocityStateGet(&velocityState);
+        VelocityDesiredGet(&velocityDesired);
+        if (fabsf(velocityState.Down) < 0.05f &&
+            fabsf(velocityDown.North) < 0.01f) {
+            // TODO AND CHECK THAT THURST < VTOL MIN??
+
+            if (landedEst.start_sampling) {
+                landedEst.count++;
+
+
+                // delay count for 2 seconds into hold allowing for stablisation
+                if (landedEst.count > NEUTRALTHRUST_START_DELAY) {
+                    landedEst.sum += global.PIDvel[2].iAccumulator;
+                    if (global.PIDvel[2].iAccumulator < landedEst.min) {
+                        landedEst.min = global.PIDvel[2].iAccumulator;
+                    }
+                    if (global.PIDvel[2].iAccumulator > landedEst.max) {
+                        landedEst.max = global.PIDvel[2].iAccumulator;
+                    }
+                }
+
+                if (landedEst.count >= NEUTRALTHRUST_END_COUNT) {
+                    // 6 seconds have past
+                    // lets take an average
+                    landedEst.average         = landedEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
+                    landedEst.correction      = landedEst.average / 1000.0f;
+
+                    global.PIDvel[2].iAccumulator   -= landedEst.average;
+
+                    landedEst.start_sampling  = false;
+                    landedEst.have_correction = true;
+
+
+                    landed = true;
+                }
+
+            } else {
+                // start a tick count
+                landedEst.start_sampling = true;
+                landedEst.count = 0;
+                landedEst.sum   = 0.0f;
+                landedEst.max   = 0.0f;
+                landedEst.min   = 0.0f;
+            }
+        } else {
+            // reset sampling as we did't get 6 continuous seconds
+            landedEst.start_sampling = false;
+        }
+
+       if (landed) {
+            pathSummary.brake_distance_offset = 0.0f;
+            pathSummary.time_remaining = 0.0f;
+            pathSummary.fractional_progress   = 0.0f;
+            pathSummary.decelrate = 0.0f;
+            pathSummary.brakeRateActualDesiredRatio = 0.0f;
+            pathSummary.velocityIntoHold = velocityState.Down;
+            pathSummary.UID = pathStatus.UID;
+            pathSummary.Mode = PATHSUMMMARY_MODE_LAND;
+            PathSummarySet(&pathSummary);
+
+	    // If so, disarm
+            // TODO once working.....
+            // and wind down motors??
+        }
+
     }
 
     switch (returnmode) {
@@ -762,7 +835,8 @@ static void updatePathVelocity(float kFF, bool limited)
     const float dT = updatePeriod / 1000.0f;
 
 
-    if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
+    if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY ||
+        pathDesired.Mode == PATHDESIRED_MODE_LAND) {
         velocityDesired.North = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
         velocityDesired.East = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
         velocityDesired.Down = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN];
@@ -777,6 +851,18 @@ static void updatePathVelocity(float kFF, bool limited)
         pathStatus.correction_direction_north = velocityDesired.North - velocityState.North;
         pathStatus.correction_direction_east  = velocityDesired.East - velocityState.East;
         pathStatus.correction_direction_down  = velocityDesired.Down - velocityState.Down;
+
+        if (pathDesired.Mode == PATHDESIRED_MODE_LAND &&
+            pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_OPTIONS] == PATHDESIRED_MODEPARAMETER_VELOCITY_OPTION_HORIZONTAL_PH) {
+
+            float cur[3] = { positionState.North, positionState.East, positionState.Down};
+            struct path_status progress;
+            path_progress(&pathDesired, cur, &progress);
+
+            // calculate correction
+            velocityDesired.North += pid_apply(&global.PIDposH[0], progress.correction_vector[0], dT);
+            velocityDesired.East  += pid_apply(&global.PIDposH[1], progress.correction_vector[1], dT);
+        }
 
     }
     else if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {

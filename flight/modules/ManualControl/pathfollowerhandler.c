@@ -94,7 +94,11 @@ void pathFollowerHandler(bool newinit)
             break;
 
         case FLIGHTSTATUS_FLIGHTMODE_LAND:
-            plan_setup_land();
+            if (flightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
+        	plan_setup_land();
+            } else {
+        	plan_setup_VelocityRoam();
+            }
             break;
         case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
             plan_setup_AutoCruise();
@@ -136,7 +140,11 @@ void pathFollowerHandler(bool newinit)
         plan_run_AbsolutePosition();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
-        plan_run_land();
+      if (flightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
+	  plan_run_land();
+      } else {
+	  plan_run_VelocityRoam();
+      }
         break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         plan_run_AutoCruise();

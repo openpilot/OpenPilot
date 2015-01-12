@@ -371,6 +371,7 @@ static void manualControlTask(void)
     // can be directly set here...i.e. set the flight mode assist as required.
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+    case FLIGHTSTATUS_FLIGHTMODE_LAND:
         newFlightModeAssist = isAssistedFlightMode(position, newMode, &modeSettings);
         if (newFlightModeAssist) {
             // Set the default thrust state
@@ -395,7 +396,6 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
     case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-    case FLIGHTSTATUS_FLIGHTMODE_LAND:
     case FLIGHTSTATUS_FLIGHTMODE_POI:
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         handler = &handler_PATHFOLLOWER;
@@ -495,6 +495,9 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
             // is a more appropriate throttle mode.  "GPSAssist" adds braking
             // and a better throttle management to the standard Position Hold.
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_LAND:
+            thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
             break;
 
             // other modes will use cruisecontrol as default

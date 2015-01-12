@@ -167,7 +167,7 @@ static const uint8_t channel_list[] = {
     217, 27,  87,  122, 125, 135, 148, 178, 71,  206, 57,  141, 35,  30,  246, 159, 16,  32,  15,  229, 20,  12,  223,
     150, 101, 79,  56,  102, 111, 174, 236, 137, 143, 52,  225, 64,  224, 112, 168, 243, 130, 108, 202, 123, 146, 228,
     75,  46,  153, 7,   192, 175, 151, 222, 59,  82,  90,  1,   65,  109, 44,  165, 84,  43,  36,  128, 196, 67,  80,
-    136, 86,  70,  234, 66,  185, 10,  164, 177, 116, 50,  107, 183, 215, 212, 60,  227, 133, 120, 14
+    136, 86,  70,  234, 66,  185, 10,  164, 177, 116, 50,  107, 183, 215, 212, 60,  227, 133, 120, 14, 250
 };
 
 /* Local function forwared declarations */
@@ -558,7 +558,7 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 
 /**
  * Sets the range and number of channels to use for the radio.
- * The channels are 0 to 255 divided across the 430-440 MHz range.
+ * The channels are 0 to 250 divided across the 430-440 MHz range.
  * The number of channels configured will be spread across the selected channel range.
  * The channel spacing is 10MHz / 250 = 40kHz
  *
@@ -1618,7 +1618,7 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
 {
     // Set the frequency channels to start at 430MHz
     uint32_t frequency_hz = RFM22B_NOMINAL_CARRIER_FREQUENCY;
-    // The step size is 10MHz / 250 channels = 40khz, and the step size is specified in 10khz increments.
+    // The step size is 10MHz / 250 = 40khz, and the step size is specified in 10khz increments.
     uint8_t freq_hop_step_size = 4;
 
     // holds the hbsel (1 or 2)

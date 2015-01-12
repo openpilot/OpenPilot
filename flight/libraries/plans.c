@@ -166,7 +166,6 @@ static void plan_setup_land_helper(PathDesiredData *pathDesired)
   float velocity_down;
 
   FlightModeSettingsLandingVelocityGet(&velocity_down);
-  velocity_down = -velocity_down;
 
   pathDesired->Start.North = positionState.North;
   pathDesired->Start.East  = positionState.East;
@@ -486,7 +485,6 @@ void plan_run_VelocityRoam()
 
         if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
             FlightModeSettingsLandingVelocityGet(&velocity_down);
-            velocity_down = -velocity_down;
         }
 
         float velocity = velocity_north * velocity_north + velociy_east * velociy_east;

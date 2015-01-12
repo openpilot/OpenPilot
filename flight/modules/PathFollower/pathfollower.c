@@ -564,20 +564,22 @@ static uint8_t updateAutoPilotVtol()
         VelocityDesiredGet(&velocityDesired);
         StabilizationDesiredGet(&stabDesired);
 
-        if (fabsf(velocityState.Down) < 0.05f &&
+	// Velocity of < 1.0m/s (allowing for GPS velocity drift) and thust < a Min means
+        // we are surely landed if sampled over a period of time.
+        if (velocityState.Down < 1.0f &&
             stabDesired.Thrust <= vtolPathFollowerSettings.ThrustLimits.Min ) {
+
             if (landedEst.start_sampling) {
                 landedEst.count++;
 
-
                 // delay count for 2 seconds into hold allowing for stablisation
                 if (landedEst.count > NEUTRALTHRUST_START_DELAY) {
-                    landedEst.sum += global.PIDvel[2].iAccumulator;
-                    if (global.PIDvel[2].iAccumulator < landedEst.min) {
-                        landedEst.min = global.PIDvel[2].iAccumulator;
+                    landedEst.sum += stabDesired.Thrust;
+                    if (stabDesired.Thrust < landedEst.min) {
+                        landedEst.min = stabDesired.Thrust;
                     }
-                    if (global.PIDvel[2].iAccumulator > landedEst.max) {
-                        landedEst.max = global.PIDvel[2].iAccumulator;
+                    if (stabDesired.Thrust > landedEst.max) {
+                        landedEst.max = stabDesired.Thrust;
                     }
                 }
 
@@ -585,12 +587,10 @@ static uint8_t updateAutoPilotVtol()
                     // 6 seconds have past
                     // lets take an average
                     landedEst.average         = landedEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
-                    landedEst.correction      = landedEst.average / 1000.0f;
-
                     landedEst.start_sampling  = false;
                     landedEst.have_correction = true;
 
-		    if (landedEst.correction < -0.4f) {
+		    if (landedEst.average < 1.0f && landedEst.max < 1.0f && landedEst.min > -1.0f) {
 			landed = true;
 		    }
 		    else {
@@ -617,11 +617,11 @@ static uint8_t updateAutoPilotVtol()
         }
 
        if (landed) {
-            pathSummary.brake_distance_offset = 0.0f;
+            pathSummary.brake_distance_offset = landedEst.average;
             pathSummary.time_remaining = 0.0f;
             pathSummary.fractional_progress   = 0.0f;
-            pathSummary.decelrate = 0.0f;
-            pathSummary.brakeRateActualDesiredRatio = 0.0f;
+            pathSummary.decelrate = landedEst.max;
+            pathSummary.brakeRateActualDesiredRatio = landedEst.min;
             pathSummary.velocityIntoHold = velocityState.Down;
             pathSummary.UID = pathStatus.UID;
             pathSummary.Mode = PATHSUMMARY_MODE_LAND;

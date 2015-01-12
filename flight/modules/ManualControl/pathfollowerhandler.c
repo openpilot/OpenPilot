@@ -140,9 +140,7 @@ void pathFollowerHandler(bool newinit)
         plan_run_AbsolutePosition();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
-      if (flightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
-	  plan_run_land();
-      } else {
+      if (flightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
 	  plan_run_VelocityRoam();
       }
         break;

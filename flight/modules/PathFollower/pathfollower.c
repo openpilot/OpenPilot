@@ -539,6 +539,7 @@ static uint8_t updateAutoPilotVtol()
             pathSummary.decelrate = (pathDesired.StartingVelocity - cur_velocity) / pathStatus.path_time;
             pathSummary.brakeRateActualDesiredRatio = pathSummary.decelrate / vtolPathFollowerSettings.BrakeRate;
             pathSummary.velocityIntoHold = cur_velocity;
+            pathSummary.Mode = PATHSUMMARY_MODE_BRAKE;
             pathSummary.UID = pathStatus.UID;
             PathSummarySet(&pathSummary);
 
@@ -548,15 +549,23 @@ static uint8_t updateAutoPilotVtol()
         }
     }
     else if (pathDesired.Mode == PATHDESIRED_MODE_LAND) {
+
+	uint8_t path_status = PATHSTATUS_STATUS_INPROGRESS;
+	PathStatusStatusSet(&path_status);
+
 	// Are we landed?
 	bool landed = false;
 
+        VelocityStateData velocityState;
+        VelocityDesiredData velocityDesired;
+        StabilizationDesiredData stabDesired;
+
         VelocityStateGet(&velocityState);
         VelocityDesiredGet(&velocityDesired);
-        if (fabsf(velocityState.Down) < 0.05f &&
-            fabsf(velocityDown.North) < 0.01f) {
-            // TODO AND CHECK THAT THURST < VTOL MIN??
+        StabilizationDesiredGet(&stabDesired);
 
+        if (fabsf(velocityState.Down) < 0.05f &&
+            stabDesired.Thrust <= vtolPathFollowerSettings.ThrustLimits.Min ) {
             if (landedEst.start_sampling) {
                 landedEst.count++;
 
@@ -578,13 +587,20 @@ static uint8_t updateAutoPilotVtol()
                     landedEst.average         = landedEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
                     landedEst.correction      = landedEst.average / 1000.0f;
 
-                    global.PIDvel[2].iAccumulator   -= landedEst.average;
-
                     landedEst.start_sampling  = false;
                     landedEst.have_correction = true;
 
-
-                    landed = true;
+		    if (landedEst.correction < -0.4f) {
+			landed = true;
+		    }
+		    else {
+			landedEst.start_sampling  = true;
+			landedEst.have_correction = false;
+			landedEst.count = 0;
+			landedEst.sum   = 0.0f;
+			landedEst.max   = 0.0f;
+			landedEst.min   = 0.0f;
+		    }
                 }
 
             } else {
@@ -608,7 +624,7 @@ static uint8_t updateAutoPilotVtol()
             pathSummary.brakeRateActualDesiredRatio = 0.0f;
             pathSummary.velocityIntoHold = velocityState.Down;
             pathSummary.UID = pathStatus.UID;
-            pathSummary.Mode = PATHSUMMMARY_MODE_LAND;
+            pathSummary.Mode = PATHSUMMARY_MODE_LAND;
             PathSummarySet(&pathSummary);
 
 	    // If so, disarm
@@ -853,7 +869,7 @@ static void updatePathVelocity(float kFF, bool limited)
         pathStatus.correction_direction_down  = velocityDesired.Down - velocityState.Down;
 
         if (pathDesired.Mode == PATHDESIRED_MODE_LAND &&
-            pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_OPTIONS] == PATHDESIRED_MODEPARAMETER_VELOCITY_OPTION_HORIZONTAL_PH) {
+            ((uint8_t)pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
 
             float cur[3] = { positionState.North, positionState.East, positionState.Down};
             struct path_status progress;
@@ -1456,7 +1472,11 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     } // else we already have a correction for this PH run
 
     // Generally in braking the downError will be an increased altitude.  We really will rely on cruisecontrol to backoff.
-    stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
+    if (pathDesired.Mode == PATHDESIRED_MODE_LAND) {
+	stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, -0.1f, vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings.ThrustLimits.Neutral + 0.05f);
+    } else {
+	stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
+    }
 
 
     // DEBUG HACK: allow user to skew compass on purpose to see if emergency failsafe kicks in

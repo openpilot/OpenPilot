@@ -159,62 +159,38 @@ void plan_setup_returnToBase()
     PathDesiredSet(&pathDesired);
 }
 
-static PiOSDeltatimeConfig landdT;
+static void plan_setup_land_helper(PathDesiredData *pathDesired)
+{
+  PositionStateData positionState;
+  PositionStateGet(&positionState);
+  float velocity_down;
+
+  FlightModeSettingsLandingVelocityGet(&velocity_down);
+  velocity_down = -velocity_down;
+
+  pathDesired->Start.North = positionState.North;
+  pathDesired->Start.East  = positionState.East;
+  pathDesired->Start.Down  = positionState.Down;
+  pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_NORTH] = 0.0f;
+  pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_EAST]  = 0.0f;
+  pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_DOWN]  = velocity_down;
+
+  pathDesired->End.North = positionState.North;
+  pathDesired->End.East  = positionState.East;
+  pathDesired->End.Down  = positionState.Down;
+
+  pathDesired->StartingVelocity = 0.0f;
+  pathDesired->EndingVelocity   = 0.0f;
+  pathDesired->Mode = PATHDESIRED_MODE_LAND;
+  pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH;
+}
+
 void plan_setup_land()
 {
-    float descendspeed;
-
-    plan_setup_positionHold();
-
-    FlightModeSettingsLandingVelocityGet(&descendspeed);
-    PathDesiredData pathDesired;
-    PathDesiredGet(&pathDesired);
-    pathDesired.StartingVelocity = descendspeed;
-    pathDesired.EndingVelocity   = descendspeed;
-    PathDesiredSet(&pathDesired);
-    PIOS_DELTATIME_Init(&landdT, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
+  PathDesiredData pathDesired;
+  plan_setup_land_helper(&pathDesired);
+  PathDesiredSet(&pathDesired);
 }
-
-/**
- * @brief execute land
- */
-void plan_run_land()
-{
-        PositionStateData positionState;
-        PositionStateGet(&positionState);
-
-        FlightModeSettingsLandingVelocityGet(&velocity_down);
-        velocity_down = -velocity_down;
-
-        float velocity = velocity_north * velocity_north + velociy_east * velociy_east;
-        velocity = sqrtf(velocity);
-
-        // if one stick input (pitch or roll) should we use fly by vector? set arbitrary distance of say 20m after which we
-        // expect new stick input
-        // if two stick input pilot is fighting wind manually and we use fly by velocity
-        // in reality setting velocity desired to zero will fight wind anyway.
-
-        pathDesired.Start.North = positionState.North;
-        pathDesired.Start.East  = positionState.East;
-        pathDesired.Start.Down  = positionState.Down;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH] = 0.0f;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]  = 0.0f;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]  = velocity_down;
-
-        pathDesired.End.North = positionState.North;
-        pathDesired.End.East  = positionState.East;
-        pathDesired.End.Down  = positionState.Down;
-
-        pathDesired.StartingVelocity = 0.0f;
-        pathDesired.EndingVelocity   = 0.0f;
-        pathDesired.Mode = PATHDESIRED_MODE_LAND;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_VELOCITY_OPTION_HORIZONTAL_PH;
-
-        PathDesiredSet(&pathDesired);
-        FlightStatusAssistedControlStateSet(&assistedControlFlightMode);
-    }
-}
-
 
 /**
  * @brief positionvario functionality
@@ -441,7 +417,7 @@ static void plan_run_PositionVario(vario_type type)
 
 void plan_run_VelocityRoam()
 {
-    float alpha;
+    //float alpha;
     PathDesiredData pathDesired;
     FlightStatusAssistedControlStateOptions assistedControlFlightMode;
     FlightStatusFlightModeOptions flightMode;
@@ -461,6 +437,7 @@ void plan_run_VelocityRoam()
     cmd.Pitch  = applyExpo(cmd.Pitch, stabSettings.StickExpo.Pitch);
     cmd.Yaw  = applyExpo(cmd.Yaw, stabSettings.StickExpo.Yaw);
 
+#if 0
     FlightModeSettingsVarioControlLowPassAlphaGet(&alpha);
     vario_control_lowpass[0] = alpha * vario_control_lowpass[0] + (1.0f - alpha) * cmd.Roll;
     vario_control_lowpass[1] = alpha * vario_control_lowpass[1] + (1.0f - alpha) * cmd.Pitch;
@@ -468,6 +445,7 @@ void plan_run_VelocityRoam()
     cmd.Roll = vario_control_lowpass[0];
     cmd.Pitch = vario_control_lowpass[1];
     cmd.Yaw = vario_control_lowpass[2];
+#endif
 
     bool flagRollPitchHasInput = (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f);
 
@@ -535,8 +513,11 @@ void plan_run_VelocityRoam()
         pathDesired.Mode = PATHDESIRED_MODE_VELOCITY;
         if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
             pathDesired.Mode = PATHDESIRED_MODE_LAND;
+            pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_LAND_OPTION_NONE;
         }
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_VELOCITY_OPTION_NONE;
+        else {
+            pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_UNUSED] = 0.0f;
+        }
         PathDesiredSet(&pathDesired);
         FlightStatusAssistedControlStateSet(&assistedControlFlightMode);
     }
@@ -689,12 +670,17 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 
     PositionStateGet(&positionState);
     PathDesiredData pathDesired;
-    PathDesiredGet(&pathDesired);
 
     FlightStatusAssistedControlStateOptions assistedControlFlightMode;
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
+    FlightStatusFlightModeOptions flightMode;
+    FlightStatusFlightModeGet(&flightMode);
 
     if (timeout_occurred) {
+        if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
+            plan_setup_land_helper(&pathDesired);
+        }
+        else {
         pathDesired.End.North        = positionState.North;
         pathDesired.End.East         = positionState.East;
         pathDesired.End.Down         = positionState.Down;
@@ -704,6 +690,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
         pathDesired.StartingVelocity = 0.0f;
         pathDesired.EndingVelocity   = 0.0f;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+        }
         assistedControlFlightMode    = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
     } else {
         VelocityStateData velocityState;

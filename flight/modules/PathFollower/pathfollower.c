@@ -104,6 +104,9 @@
 #define NEUTRALTHRUST_START_DELAY                   (2 * 20) // 2 seconds at rate of 20Hz (50ms update rate)
 #define NEUTRALTHRUST_END_COUNT                     (NEUTRALTHRUST_START_DELAY + (4 * 20))  // 4 second sample
 
+#define LANDED_START_DELAY                   (1 * 20) // 1 seconds at rate of 20Hz (50ms update rate)
+#define LANDED_END_COUNT                     (NEUTRALTHRUST_START_DELAY + (2 * 20))  // 2 second sample
+
 // Private types
 
 struct Globals {
@@ -419,6 +422,14 @@ static uint8_t updateAutoPilotFixedWing()
     return updateFixedDesiredAttitude();
 }
 
+static void setArmedIfChanged(uint8_t val)
+{
+    if (flightStatus.Armed != val) {
+        flightStatus.Armed = val;
+        FlightStatusSet(&flightStatus);
+    }
+}
+
 /**
  * vtol autopilot
  * use hover capable algorithm with unlimeted movement calculation. if that fails (flyaway situation due to compass failure)
@@ -564,16 +575,20 @@ static uint8_t updateAutoPilotVtol()
         VelocityDesiredGet(&velocityDesired);
         StabilizationDesiredGet(&stabDesired);
 
-	// Velocity of < 1.0m/s (allowing for GPS velocity drift) and thust < a Min means
-        // we are surely landed if sampled over a period of time.
-        if (velocityState.Down < 1.0f &&
+        ManualControlCommandData manualControlData;
+        ManualControlCommandGet(&manualControlData);
+
+	// Landed detection
+        // To avoid issues, we only start landed detection if the user has lowered
+        // throttle to a low value and the PID thrust command is actually now low
+        if (manualControlData.Thrust < vtolPathFollowerSettings.ThrustLimits.Min &&
             stabDesired.Thrust <= vtolPathFollowerSettings.ThrustLimits.Min ) {
 
             if (landedEst.start_sampling) {
                 landedEst.count++;
 
-                // delay count for 2 seconds into hold allowing for stablisation
-                if (landedEst.count > NEUTRALTHRUST_START_DELAY) {
+                // delay count for 1 seconds
+                if (landedEst.count > LANDED_START_DELAY) {
                     landedEst.sum += stabDesired.Thrust;
                     if (stabDesired.Thrust < landedEst.min) {
                         landedEst.min = stabDesired.Thrust;
@@ -583,14 +598,15 @@ static uint8_t updateAutoPilotVtol()
                     }
                 }
 
-                if (landedEst.count >= NEUTRALTHRUST_END_COUNT) {
-                    // 6 seconds have past
+                if (landedEst.count >= LANDED_END_COUNT) {
+                    // 4 seconds have past
                     // lets take an average
-                    landedEst.average         = landedEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
+                    landedEst.average         = landedEst.sum / (float)(LANDED_END_COUNT - LANDED_START_DELAY);
                     landedEst.start_sampling  = false;
                     landedEst.have_correction = true;
 
-		    if (landedEst.average < 1.0f && landedEst.max < 1.0f && landedEst.min > -1.0f) {
+		    if (landedEst.average < 0.1f &&
+			landedEst.max < vtolPathFollowerSettings.ThrustLimits.Min) {
 			landed = true;
 		    }
 		    else {
@@ -630,6 +646,7 @@ static uint8_t updateAutoPilotVtol()
 	    // If so, disarm
             // TODO once working.....
             // and wind down motors??
+            setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
         }
 
     }
@@ -1473,7 +1490,9 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
     // Generally in braking the downError will be an increased altitude.  We really will rely on cruisecontrol to backoff.
     if (pathDesired.Mode == PATHDESIRED_MODE_LAND) {
-	stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, -0.1f, vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings.ThrustLimits.Neutral + 0.05f);
+	stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral,
+	                            -0.1f,
+	                            vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings.ThrustLimits.Neutral + 0.05f);
     } else {
 	stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
     }
@@ -1571,6 +1590,11 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
             // and a better throttle management to the standard Position Hold.
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
             break;
+
+            // LAND defaults to cruisecontrol managed by pathfollowers PID and
+            // can not be overridden in GPSAssist mode. The only time we look
+            // at the actual throttle position is in the decision to confirm
+            // landed and initiate disarming automatically.
         }
         stabDesired.StabilizationMode.Thrust = thrustMode;
         stabDesired.Thrust = manualControl.Thrust;
@@ -1634,10 +1658,7 @@ static void updateVtolDesiredAttitudeEmergencyFallback()
     stabDesired.Pitch  = vtolPathFollowerSettings.EmergencyFallbackAttitude.Pitch;
 
     if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
-        // For now override thrust with manual control.  Disable at your risk, quad goes to China.
-        ManualControlCommandData manualControl;
-        ManualControlCommandGet(&manualControl);
-        stabDesired.Thrust = manualControl.Thrust;
+        stabDesired.Thrust = manualControlData.Thrust;
     }
 
     stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

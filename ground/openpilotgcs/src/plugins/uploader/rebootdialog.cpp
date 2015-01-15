@@ -28,8 +28,8 @@
 #include "rebootdialog.h"
 #include "ui_rebootdialog.h"
 
-RebootDialog::RebootDialog(UploaderGadgetWidget *uploader, QWidget *parent) :
-    QDialog(parent),
+RebootDialog::RebootDialog(UploaderGadgetWidget *uploader) :
+    QDialog(uploader),
     ui(new Ui::RebootDialog), m_uploader(uploader)
 {
     ui->setupUi(this);

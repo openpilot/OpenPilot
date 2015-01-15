@@ -40,7 +40,7 @@ class RebootDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit RebootDialog(UploaderGadgetWidget *uploader, QWidget *parent = 0);
+    explicit RebootDialog(UploaderGadgetWidget *uploader);
     ~RebootDialog();
 
 signals:

@@ -98,17 +98,17 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
     {
         switch (selectedType) {
         case VehicleConfigurationSource::INPUT_PWM:
-            return data.RM_RcvrPort != HwSettings::CC_RCVRPORT_PWM;
+            return data.RM_RcvrPort != HwSettings::RM_RCVRPORT_PWM;
 
         case VehicleConfigurationSource::INPUT_PPM:
-            return data.RM_RcvrPort != HwSettings::CC_RCVRPORT_PPM;
+            return data.RM_RcvrPort != HwSettings::RM_RCVRPORT_PPM;
 
         case VehicleConfigurationSource::INPUT_SBUS:
-            return data.RM_MainPort != HwSettings::CC_MAINPORT_SBUS;
+            return data.RM_MainPort != HwSettings::RM_MAINPORT_SBUS;
 
         case VehicleConfigurationSource::INPUT_DSM:
             // TODO: Handle all of the DSM types ?? Which is most common?
-            return data.RM_MainPort != HwSettings::CC_MAINPORT_DSM;
+            return data.RM_MainPort != HwSettings::RM_MAINPORT_DSM;
 
         default: return true;
         }

@@ -32,6 +32,8 @@ RebootDialog::RebootDialog(UploaderGadgetWidget *uploader) :
     QDialog(uploader),
     ui(new Ui::RebootDialog), m_uploader(uploader)
 {
+    setWindowFlags(((windowFlags() | Qt::CustomizeWindowHint)
+                           & ~Qt::WindowCloseButtonHint & ~Qt::WindowMinMaxButtonsHint));
     ui->setupUi(this);
     connect(this, SIGNAL(reboot()), m_uploader, SLOT(systemReboot()));
     ui->rebootProgressBar->setVisible(true);

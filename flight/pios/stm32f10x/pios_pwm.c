@@ -209,8 +209,10 @@ static void PIOS_PWM_tim_overflow_cb(__attribute__((unused)) uint32_t tim_id, ui
         /* Channel out of range */
         return;
     }
-
-    pwm_dev->us_since_update[channel] += count;
+    if (!pwm_dev->CaptureState[channel]) {
+        return;
+    }
+    pwm_dev->us_since_update[channel] = +count;
     if (pwm_dev->us_since_update[channel] >= PWM_SUPERVISOR_TIMEOUT) {
         pwm_dev->CaptureState[channel]    = 0;
         pwm_dev->RiseValue[channel]       = 0;
@@ -256,16 +258,19 @@ static void PIOS_PWM_tim_edge_cb(__attribute__((unused)) uint32_t tim_id, uint32
         TIM_ICInitStructure.TIM_Channel    = chan->timer_chan;
         TIM_ICInit(chan->timer, &TIM_ICInitStructure);
     } else {
+        uint32_t value = 0;
         /* Capture computation */
         if (pwm_dev->FallValue[chan_idx] > pwm_dev->RiseValue[chan_idx]) {
-            pwm_dev->CaptureValue[chan_idx] = (pwm_dev->FallValue[chan_idx] - pwm_dev->RiseValue[chan_idx]);
+            value = pwm_dev->us_since_update[chan_idx] + (pwm_dev->FallValue[chan_idx] - pwm_dev->RiseValue[chan_idx]);
         } else {
-            pwm_dev->CaptureValue[chan_idx] = ((chan->timer->ARR - pwm_dev->RiseValue[chan_idx]) + pwm_dev->FallValue[chan_idx]);
+            value = pwm_dev->us_since_update[chan_idx] + (pwm_dev->FallValue[chan_idx] - pwm_dev->RiseValue[chan_idx]);
         }
-
+        if (PIOS_PWM_VALID_RANGE_MAX > value && PIOS_PWM_VALID_RANGE_MIN < value) {
+            pwm_dev->CaptureValue[chan_idx] = value;
+        }
         /* Switch states */
-        pwm_dev->CaptureState[chan_idx] = 0;
-
+        pwm_dev->CaptureState[chan_idx]    = 0;
+        pwm_dev->us_since_update[chan_idx] = 0;
         /* Increase supervisor counter */
         pwm_dev->CapCounter[chan_idx]++;
 

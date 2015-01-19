@@ -1,15 +1,15 @@
 Source: openpilot
 Section: unknown
-Priority: extra
-Maintainer: naiiawah <naiiawah@openpilot.org>
-Build-Depends: debhelper (>= 7.0.50~)
-Standards-Version: 3.8.4
+Priority: optional
+Maintainer: James Duley <james@openpilot.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
 Homepage: http://www.openpilot.org
 Vcs-Git: git://git.openpilot.org/OpenPilot.git
 Vcs-Browser: http://git.openpilot.org/changelog/OpenPilot
 
 Package: openpilot
-Architecture: amd64
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: OpenPilot GCS
  OpenPilot Ground Control Station software

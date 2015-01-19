@@ -552,6 +552,7 @@ void UploaderGadgetWidget::systemEraseBoot()
 void UploaderGadgetWidget::rebootWithDialog()
 {
     RebootDialog dialog(this);
+
     dialog.exec();
 }
 
@@ -1014,6 +1015,7 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::ProgressStep status, QVari
 {
     QString msg;
     int remaining;
+
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         m_config->autoUpdateLabel->setText(tr("Waiting for all OpenPilot boards to be disconnected from USB."));

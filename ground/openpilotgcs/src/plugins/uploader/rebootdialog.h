@@ -35,8 +35,7 @@ namespace Ui {
 class RebootDialog;
 }
 
-class RebootDialog : public QDialog
-{
+class RebootDialog : public QDialog {
     Q_OBJECT
 
 public:

@@ -498,11 +498,12 @@ void SetupWizard::pageChanged(int currId)
 void SetupWizard::reboot() const
 {
     SetupWizard *wiz = const_cast<SetupWizard *>(this);
+
     wiz->setWindowFlags(wiz->windowFlags() & ~Qt::WindowStaysOnTopHint);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
-    UploaderGadgetFactory *uploader = pm->getObject<UploaderGadgetFactory>();
+    UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
     Q_ASSERT(uploader);
     uploader->reboot();
 

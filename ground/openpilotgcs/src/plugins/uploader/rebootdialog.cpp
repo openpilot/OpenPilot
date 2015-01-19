@@ -33,7 +33,7 @@ RebootDialog::RebootDialog(UploaderGadgetWidget *uploader) :
     ui(new Ui::RebootDialog), m_uploader(uploader)
 {
     setWindowFlags(((windowFlags() | Qt::CustomizeWindowHint)
-                           & ~Qt::WindowCloseButtonHint & ~Qt::WindowMinMaxButtonsHint));
+                    & ~Qt::WindowCloseButtonHint & ~Qt::WindowMinMaxButtonsHint));
     ui->setupUi(this);
     connect(this, SIGNAL(reboot()), m_uploader, SLOT(systemReboot()));
     ui->rebootProgressBar->setVisible(true);
@@ -67,9 +67,9 @@ void RebootDialog::progressUpdate(uploader::ProgressStep progress, QVariant mess
             ui->rebootProgressBar->setVisible(false);
             ui->okButton->setVisible(true);
             ui->label->setText(tr("<font color='red'>Reboot failed!</font><p> Please perform a manual reboot by power cycling the board.<br>"
-                                         "To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.<br>"
-                                         "After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds.<br>"
-                                         "Then press Ok."));
+                                  "To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.<br>"
+                                  "After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds.<br>"
+                                  "Then press Ok."));
             QDialog::exec();
         } else {
             accept();

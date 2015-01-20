@@ -4508,7 +4508,12 @@ p, li { white-space: pre-wrap; }
         <translation> Les paramètres importés ne sont pas compatibles avec ce plugin et ne seront pas importés !</translation>
     </message>
     <message>
-        <location line="-12"/>
+        <location line="+7"/>
+        <source> Unknown compatibility level: %1</source>
+        <translation> Niveau de compatibilité inconnu : %1</translation>
+    </message>
+    <message>
+        <location line="-19"/>
         <source>WARNING: </source>
         <translation>ATTENTION : </translation>
     </message>
@@ -4518,9 +4523,8 @@ p, li { white-space: pre-wrap; }
         <translation>ERREUR : </translation>
     </message>
     <message>
-        <location line="+13"/>
         <source> Unknown compatibility level: </source>
-        <translation> Niveau de compatibilité inconnu : </translation>
+        <translation type="vanished"> Niveau de compatibilité inconnu : </translation>
     </message>
 </context>
 <context>
@@ -6180,9 +6184,8 @@ p, li { white-space: pre-wrap; }
         <translation>Options de Configuration et Calibration</translation>
     </message>
     <message>
-        <location/>
         <source>Manual Calibration</source>
-        <translation>Calibration Manuelle</translation>
+        <translation type="vanished">Calibration Manuelle</translation>
     </message>
     <message>
         <location/>
@@ -6488,6 +6491,37 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Start Transmitter Setup Wizard</source>
         <translation>Démarrer l&apos;Assistant Configuration Émetteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assisted Control stick deadband </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assisted Control stick deadband in percents of full range (2-12) for use with GPSAssist. This can not be disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start Manual Calibration</source>
+        <translation type="unfinished">Démarrer Calibration Manuelle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assisted Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Assisted Control options augment the primary flight mode.  GPSAssist adds brake/hold to Stabilization and PositionHold.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:FlightModeAssistMap</source>
+        <translatorcomment>Do not translate !</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9098,7 +9132,7 @@ les données en cache</translation>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+200"/>
+        <location line="+213"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -9323,6 +9357,16 @@ Veuillez sélectionner la configuration de voilure fixe désirée ci-dessous :</
         <source>This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet supported. Setup should include only two elevons, and should explicitly not include a rudder.</source>
         <translation>Cette configuration concerne les ailes volantes, la dérive n&apos;est pas encore supportée actuellement.  La configuration s&apos;applique à deux servos d&apos;élevons, sans dérive.</translation>
     </message>
+    <message>
+        <location line="+5"/>
+        <source>Vtail</source>
+        <translation type="unfinished">Vtail</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional glider airframe using two independent aileron servos on their own channel (not connected by Y adapter) plus Vtail mixing elevator/rudder.</source>
+        <translation>Cette configuration concerne un planeur classique utilisant deux servos d&apos;ailerons indépendants ayant leur propre branchement (pas connectés avec un adaptateur en Y) plus un empenage en Vé avec mixage profondeur/direction.</translation>
+    </message>
 </context>
 <context>
     <name>HeliPage</name>
@@ -9435,17 +9479,15 @@ p, li { white-space: pre-wrap; }
         <translation>Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens antihoraire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Quadcopter H</source>
-        <translation>Quadricoptère H</translation>
+        <translation type="vanished">Quadricoptère H</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Quadcopter H, Blackout miniH</source>
-        <translation>Quadricoptère H, blackout miniH</translation>
+        <translation type="vanished">Quadricoptère H, blackout miniH</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Hexacopter</source>
         <translation>Hexacoptère</translation>
     </message>
@@ -9480,7 +9522,7 @@ p, li { white-space: pre-wrap; }
         <translation>Hexacoptère X</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location line="-33"/>
         <source>OpenPilot Multirotor Configuration</source>
         <translation>Configuration Multirotor OpenPilot</translation>
     </message>
@@ -9494,7 +9536,7 @@ Please select the type of multirotor you want to create a configuration for belo
 Veuillez sélectionner le type de multirotor désiré pour la configuration ci-dessous :</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+37"/>
         <source>Hexacopter H</source>
         <translation>Hexacoptère H</translation>
     </message>
@@ -9527,7 +9569,7 @@ Veuillez sélectionner le type de multirotor désiré pour la configuration ci-d
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+375"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+415"/>
         <location line="+90"/>
         <source>Start</source>
         <translation>Démarrer</translation>
@@ -9759,6 +9801,50 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;The Surface Vehicle section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;La partie Véhicule roulant de l&apos;Assistant de Configuration OpenPilot n&apos;est pas encore implémentée&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/surfacepage.cpp" line="+51"/>
+        <source>OpenPilot Ground Vehicle Configuration</source>
+        <translation>Configuration Véhicule Terrestre OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This part of the wizard will set up the OpenPilot controller for use with a ground vehicle utilizing servos. The wizard supports the most common types of ground vehicle, other variants can be configured by using custom configuration options in the Configuration plugin in the GCS.
+
+Please select the type of ground vehicle you want to create a configuration for below:</source>
+        <translation>Cette partie de l&apos;assistant va permettre le configuration du contrôleur OpenPilot pour fonctionner avec des véhicules terrestres utilisant plusieurs moteurs/servos. L&apos;assistant supporte les types de configurations les plus courants. D&apos;autres variantes de véhicules peuvent être configurées dans l&apos;onglet &quot;Véhicule&quot; &gt; &quot;Personnalisé&quot; du plugin de configuration de GCS.
+
+Veuillez sélectionner le type de véhicule terrestre dont vous voulez créer la configuration ci-dessous :</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Car</source>
+        <translation>Voiture</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional car with a rear motor and a front streering servo</source>
+        <translation>Cette configuration correspond à une voiture classique avec un moteur à l&apos;arrière et un servo de direction à l&apos;avant</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Tank</source>
+        <translation>Tank</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional vehicle using only two motors and differential steering</source>
+        <translation>Cette configuration correspond à une véhicule classique utilisant deux moteurs et une direction par différentiel entre ces moteurs</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Motorcycle</source>
+        <translation>Motocycle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup currently expects a motorcyle setup, using one motor and one servo for steering.</source>
+        <translation type="unfinished">Cette configuration correspond à une moto utilisant un moteur et un servo pour la direction.</translation>
     </message>
 </context>
 <context>
@@ -10453,26 +10539,25 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+380"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+385"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+1176"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1175"/>
+        <location line="+1"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+213"/>
+        <location line="+224"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
@@ -10668,9 +10753,28 @@ Bougez le manche %1.</translation>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+690"/>
+        <location line="+725"/>
+        <source>Stop Manual Calibration</source>
+        <translation>Arrêter Calibration Manuelle</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&lt;p&gt;Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.&lt;/p&gt;&lt;p&gt;Be sure your receiver is powered with an external source and Transmitter is on.&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;&lt;b&gt;Stop Manual Calibration&lt;/b&gt; when done&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.&lt;/p&gt;&lt;p&gt;Veuillez vérifier que votre récepteur est alimenté avec une source externe et que la radio Rx est allumée. &lt;p align=&apos;center&apos;&gt;&lt;b&gt;Arrêter Calibration Manuelle&lt;/b&gt; à la fin&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>You will have to reconfigure the arming settings manually when the manual calibration is finished.</source>
+        <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque la calibration manuelle sera terminée.</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Start Manual Calibration</source>
+        <translation>Démarrer Calibration Manuelle</translation>
+    </message>
+    <message>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
-        <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
+        <translation type="vanished">Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
 </context>
 <context>
@@ -10950,11 +11054,26 @@ Bougez le manche %1.</translation>
 <context>
     <name>ScopeGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+219"/>
+        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+232"/>
         <source>Click legend to show/hide scope trace.
 Double click legend or plot to show/hide legend.</source>
         <translation>Cliquer sur la légende pour afficher/cacher le tracé du graphique.
 Double clic sur la légende ou le tracé pour afficher/cacher la légende.</translation>
+    </message>
+    <message>
+        <location line="+410"/>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Copy to Clipboard</source>
+        <translation>Copier dans le Presse-papiers</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Options...</source>
+        <translation>Options...</translation>
     </message>
 </context>
 <context>
@@ -10965,7 +11084,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Assistant Configuration OpenPilot</translation>
     </message>
     <message>
-        <location line="+172"/>
+        <location line="+177"/>
         <source>Controller type: </source>
         <translation>Type de contrôleur : </translation>
     </message>
@@ -11001,18 +11120,19 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <location line="+50"/>
+        <location line="+47"/>
         <location line="+21"/>
-        <location line="+12"/>
+        <location line="+24"/>
+        <location line="+6"/>
         <location line="+19"/>
         <location line="+13"/>
-        <location line="+15"/>
+        <location line="+16"/>
         <location line="+38"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-163"/>
+        <location line="-179"/>
         <source>Vehicle type: </source>
         <translation>Type de véhicule : </translation>
     </message>
@@ -11023,12 +11143,13 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <location line="+48"/>
+        <location line="+45"/>
+        <location line="+24"/>
         <source>Vehicle sub type: </source>
         <translation>Sous-type véhicule : </translation>
     </message>
     <message>
-        <location line="-45"/>
+        <location line="-66"/>
         <source>Tricopter</source>
         <translation>Tricoptère</translation>
     </message>
@@ -11043,9 +11164,8 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Quadricoptère +</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Quadcopter H</source>
-        <translation>Quadricoptère H</translation>
+        <translation type="vanished">Quadricoptère H</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -11118,7 +11238,22 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Véhicule surface</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
+        <source>Car</source>
+        <translation>Voiture</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Tank</source>
+        <translation>Tank</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Motorcycle</source>
+        <translation>Motocycle</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Input type: </source>
         <translation>Type d&apos;entrée : </translation>
     </message>
@@ -11140,7 +11275,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+3"/>
         <source>Spektrum Satellite</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -11158,7 +11293,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Contrôleur Rapide (%1 Hz)</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>Servo type: </source>
         <translation>Type Servo : </translation>
     </message>
@@ -11258,7 +11393,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+32"/>
         <source>Writing Airspeed sensor settings</source>
-        <translation type="unfinished">Écriture paramètres capteur Vitesse Air</translation>
+        <translation>Écriture paramètres capteur Vitesse Air</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -11266,13 +11401,14 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
-        <location line="+155"/>
+        <location line="+172"/>
         <location line="+31"/>
+        <location line="+36"/>
         <source>Writing actuator settings</source>
         <translation>Écriture paramètres actionneurs</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+52"/>
         <source>Writing flight mode settings 1/2</source>
         <translation>Écriture paramètres mode de vol 1/2</translation>
     </message>
@@ -11298,7 +11434,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="+135"/>
         <source>Writing mixer settings</source>
         <translation>Écriture paramètres mixeur</translation>
     </message>
@@ -12256,39 +12392,32 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Affectations sorties</translation>
     </message>
     <message>
-        <location/>
         <source>Engine</source>
-        <translation>Moteur</translation>
+        <translation type="vanished">Moteur</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the engine</source>
-        <translation>Sélectionner le canal de sortie pour le moteur</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le moteur</translation>
     </message>
     <message>
-        <location/>
         <source>Aileron 1</source>
-        <translation>Aileron 1</translation>
+        <translation type="vanished">Aileron 1</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the first aileron (or elevon)</source>
-        <translation>Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
     </message>
     <message>
-        <location/>
         <source>Aileron 2</source>
-        <translation>Aileron 2</translation>
+        <translation type="vanished">Aileron 2</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the second aileron (or elevon)</source>
-        <translation>Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
     </message>
     <message>
-        <location/>
         <source>Motor</source>
-        <translation>Moteur</translation>
+        <translation type="vanished">Moteur</translation>
     </message>
     <message>
         <location/>
@@ -12358,6 +12487,16 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
     <message>
         <location/>
         <source>Mixer OK</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 1</source>
+        <translation>Moteur 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vehicle frame</source>
         <translation></translation>
     </message>
 </context>
@@ -14267,7 +14406,7 @@ Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des
 et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+138"/>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+172"/>
         <source>Chan %1</source>
         <translation>Canal %1</translation>
     </message>
@@ -14275,6 +14414,16 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location filename="../../../src/plugins/config/inputchannelform.ui"/>
         <source>Text</source>
         <translation type="unfinished">Texte</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel value</source>
+        <translation>Valeur canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel Value</source>
+        <translation>Valeur Canal</translation>
     </message>
 </context>
 <context>
@@ -14677,7 +14826,7 @@ It is suggested that if this is a first time configuration of your controller, r
 Il est suggéré que si cela est une première configuration de votre contrôleur, plutôt que d&apos;utiliser cette option, sélectionnez à la place un ensemble de réglages qui correspond le mieux à votre propre appareil dans la liste ci-dessus. Si vous n&apos;êtes pas en mesure d&apos;en choisir un, sélectionnez l&apos;élément générique de la liste.</translation>
     </message>
     <message>
-        <location line="+77"/>
+        <location line="+85"/>
         <source>Current Tuning</source>
         <translation>Réglages Actuels</translation>
     </message>
@@ -15011,9 +15160,8 @@ p, li { white-space: pre-wrap; }
         <translation>Multirotor - Quadricoptère X</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Multirotor - Quadrocopter H</source>
-        <translation>Multirotor - Quadricoptère H</translation>
+        <translation type="vanished">Multirotor - Quadricoptère H</translation>
     </message>
     <message>
         <location line="+5"/>

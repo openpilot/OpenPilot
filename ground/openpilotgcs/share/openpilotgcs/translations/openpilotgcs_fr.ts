@@ -4393,8 +4393,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+30"/>
         <source>http://wiki.openpilot.org/x/OQBj</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/hoBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+8"/>
@@ -5237,8 +5236,7 @@ valeur.</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/UoHWAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7113,8 +7111,7 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7650,8 +7647,7 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DAO9</source>
-        <translatorcomment>Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/d4BqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8617,8 +8613,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DACiAQ</source>
-        <translatorcomment>Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/N4DWAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9984,8 +9979,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location line="+28"/>
         <source>http://wiki.openpilot.org/display/Doc/UAV+Settings+import-export</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/IQCJAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10503,8 +10497,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+15"/>
         <source>http://wiki.openpilot.org/x/D4AUAQ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/HoBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10517,8 +10510,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+58"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10541,8 +10533,7 @@ Voulez-vous toujours continuer ?</translation>
     <message>
         <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+385"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -11670,8 +11661,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="-308"/>
         <source>http://wiki.openpilot.org/display/Doc/Erase+board+settings</source>
-        <translatorcomment>Wiki FR - Uploader</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+46"/>
@@ -11775,8 +11765,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+38"/>
         <source>http://wiki.openpilot.org/x/AoBZ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -13082,8 +13071,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/hgAGAQ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/B4BYAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13269,8 +13257,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+253"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/aoBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13283,8 +13270,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+226"/>
         <source>http://wiki.openpilot.org/x/GgDBAQ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/TYRNAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -14456,8 +14442,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+315"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>

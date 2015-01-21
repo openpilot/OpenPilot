@@ -2074,7 +2074,7 @@ const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    [HWSETTINGS_WS2811LED_OUT_FLEXIOPIN3] = {
+    [HWSETTINGS_WS2811LED_OUT_FLEXIIOPIN3] = {
         .gpio     = GPIOB,
         .gpioInit =                        {
             .GPIO_Pin   = GPIO_Pin_12,
@@ -2083,7 +2083,7 @@ const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    [HWSETTINGS_WS2811LED_OUT_FLEXIOPIN4] = {
+    [HWSETTINGS_WS2811LED_OUT_FLEXIIOPIN4] = {
         .gpio     = GPIOB,
         .gpioInit =                        {
             .GPIO_Pin   = GPIO_Pin_13,

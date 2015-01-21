@@ -6493,27 +6493,27 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Assisted Control stick deadband </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zone morte des manches - Pilotage assisté </translation>
     </message>
     <message>
         <location/>
         <source>Assisted Control stick deadband in percents of full range (2-12) for use with GPSAssist. This can not be disabled.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zone morte des manches du pilotage assisté en pourcentage du débattement maximum (2-12) pour utiliser GPSAssist. Ne peut être désactivé.</translation>
     </message>
     <message>
         <location/>
         <source>Start Manual Calibration</source>
-        <translation type="unfinished">Démarrer Calibration Manuelle</translation>
+        <translation>Démarrer Calibration Manuelle</translation>
     </message>
     <message>
         <location/>
         <source>Assisted Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pilotage Assisté</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Assisted Control options augment the primary flight mode.  GPSAssist adds brake/hold to Stabilization and PositionHold.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les options du pilotage assisté améliorent le mode de vol courant.  GPSAssist ajoute le freinage/maintien en position à la Stabilisation et PositionHold.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>

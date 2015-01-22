@@ -64,7 +64,7 @@ private slots:
     void ppmOnlyChanged();
     void minChannelChanged();
     void maxChannelChanged();
-    void ChannelChanged(bool isMax);
+    void channelChanged(bool isMax);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

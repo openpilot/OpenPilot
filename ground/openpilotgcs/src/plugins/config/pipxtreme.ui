@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
+    <width>971</width>
     <height>652</height>
    </rect>
   </property>
@@ -49,8 +49,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>835</width>
-            <height>545</height>
+            <width>949</width>
+            <height>558</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
@@ -350,54 +350,6 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="PPMOnly">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="statusTip">
-                 <string>Only PPM packets will be transmitted.</string>
-                </property>
-                <property name="text">
-                 <string>PPM Only</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QCheckBox" name="OneWayLink">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="statusTip">
-                 <string>If selected, data will only be transmitted from the coordinator to the Rx modem.</string>
-                </property>
-                <property name="text">
-                 <string>One-Way</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QCheckBox" name="PPM">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="statusTip">
-                 <string>PPM packets will be received by this modem.  Must be selected if Coordinator modem is configured for PPM.</string>
-                </property>
-                <property name="text">
-                 <string>PPM</string>
-                </property>
-               </widget>
-              </item>
               <item row="10" column="0" colspan="2">
                <widget class="QCheckBox" name="Coordinator">
                 <property name="font">
@@ -418,12 +370,12 @@
                <widget class="QLabel" name="MaxFreq">
                 <property name="maximumSize">
                  <size>
-                  <width>105</width>
+                  <width>110</width>
                   <height>16777215</height>
                  </size>
                 </property>
                 <property name="text">
-                 <string>440.000Mhz</string>
+                 <string>440.000 (MHz)</string>
                 </property>
                </widget>
               </item>
@@ -431,12 +383,63 @@
                <widget class="QLabel" name="MinFreq">
                 <property name="maximumSize">
                  <size>
-                  <width>105</width>
+                  <width>110</width>
                   <height>16777215</height>
                  </size>
                 </property>
                 <property name="text">
-                 <string>430.000Mhz</string>
+                 <string>430.000 (MHz)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QCheckBox" name="OneWayLink">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="acceptDrops">
+                 <bool>false</bool>
+                </property>
+                <property name="statusTip">
+                 <string>If selected, data will only be transmitted from the coordinator to the Rx modem.</string>
+                </property>
+                <property name="text">
+                 <string>One-Way</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="PPMOnly">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="statusTip">
+                 <string>Only PPM packets will be transmitted.</string>
+                </property>
+                <property name="text">
+                 <string>PPM Only</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="PPM">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="statusTip">
+                 <string>PPM packets will be received by this modem.  Must be selected if Coordinator modem is configured for PPM.</string>
+                </property>
+                <property name="text">
+                 <string>PPM</string>
                 </property>
                </widget>
               </item>

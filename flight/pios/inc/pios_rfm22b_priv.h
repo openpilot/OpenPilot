@@ -40,7 +40,7 @@
 // ************************************
 
 #define RFM22B_MAX_PACKET_LEN                     64
-#define RFM22B_NUM_CHANNELS                       251    // 0 (432Mhz) to 250 (440Mhz) = 251 channels
+#define RFM22B_NUM_CHANNELS                       250
 
 // ************************************
 

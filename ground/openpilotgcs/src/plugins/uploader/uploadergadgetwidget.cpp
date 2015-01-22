@@ -667,6 +667,28 @@ bool UploaderGadgetWidget::autoUpdateCapable()
 
 bool UploaderGadgetWidget::autoUpdate(bool erase)
 {
+    ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pluginManager);
+    TelemetryManager *telemetryManager = pluginManager->getObject<TelemetryManager>();
+    Q_ASSERT(telemetryManager);
+
+    if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0 &&
+               telemetryManager->connectionState() != TelemetryManager::TELEMETRY_CONNECTED) {
+        // Wait for the board to completely connect
+        ResultEventLoop eventLoop;
+        connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
+
+        qDebug() << "WAITING...";
+        if (telemetryManager->connectionState() != TelemetryManager::TELEMETRY_CONNECTED
+                && eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
+            emit progressUpdate(FAILURE, QVariant());
+            emit autoUpdateFailed();
+            return false;
+        }
+        qDebug() << "DONE WAITING...";
+
+        disconnect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
+    }
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() == 0) {
         ConnectionWaiter waiter(1, BOARD_EVENT_TIMEOUT);
         connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateConnectProgress(int)));
@@ -677,7 +699,6 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         }
     } else {
         ResultEventLoop eventLoop;
-
         connect(this, SIGNAL(bootloaderSuccess()), &eventLoop, SLOT(success()));
         connect(this, SIGNAL(bootloaderFailed()), &eventLoop, SLOT(fail()));
 
@@ -782,15 +803,9 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
 
     // Wait for board to connect to GCS again after boot and erase
     // For older board like CC3D this can take some time
-    ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
-    Q_ASSERT(pluginManager);
-    TelemetryManager *telemetryManager = pluginManager->getObject<TelemetryManager>();
-    Q_ASSERT(telemetryManager);
-
     if (!telemetryManager->isConnected()) {
         progressUpdate(BOOTING, erase ? tr(" and erasing settings") : QVariant());
         ResultEventLoop eventLoop;
-
         connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
 
         if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {

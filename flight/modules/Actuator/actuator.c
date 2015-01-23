@@ -74,8 +74,9 @@ static int8_t counter;
 static xQueueHandle queue;
 static xTaskHandle taskHandle;
 
-static float lastResult[MAX_MIX_ACTUATORS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-static float filterAccumulator[MAX_MIX_ACTUATORS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+static float lastResult[MAX_MIX_ACTUATORS] = { 0 };
+static float filterAccumulator[MAX_MIX_ACTUATORS] = { 0 };
+static uint8_t pinsMode[MAX_MIX_ACTUATORS];
 // used to inform the actuator thread that actuator update rate is changed
 static volatile bool actuator_settings_updated;
 // used to inform the actuator thread that mixer settings are changed
@@ -424,10 +425,21 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         // will be set except explicitly disabled (which will have PWM pulse = 0).
         for (int i = 0; i < MAX_MIX_ACTUATORS; i++) {
             if (command.Channel[i]) {
-                command.Channel[i] = scaleChannel(status[i],
-                                                  actuatorSettings.ChannelMax[i],
-                                                  actuatorSettings.ChannelMin[i],
-                                                  actuatorSettings.ChannelNeutral[i]);
+                uint8_t mode = pinsMode[actuatorSettings.ChannelAddr[i]];
+                switch (mode) {
+                case ACTUATORSETTINGS_BANKMODE_PWM:
+                case ACTUATORSETTINGS_BANKMODE_ONESHOT:
+                    command.Channel[i] = scaleChannel(status[i],
+                                                      actuatorSettings.ChannelMax[i],
+                                                      actuatorSettings.ChannelMin[i],
+                                                      actuatorSettings.ChannelNeutral[i]);
+                    break;
+                case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
+                    command.Channel[i] = scaleChannel(status[i],
+                                                      249,
+                                                      125,
+                                                      126);
+                }
             }
         }
 
@@ -436,7 +448,6 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         if (command.UpdateTime > command.MaxUpdateTime) {
             command.MaxUpdateTime = command.UpdateTime;
         }
-
         // Update output object
         ActuatorCommandSet(&command);
         // Update in case read only (eg. during servo configuration)
@@ -453,6 +464,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n) {
             success &= set_channel(n, command.Channel[n], &actuatorSettings);
         }
+
+        PIOS_Servo_Update();
 
         if (!success) {
             command.NumFailedUpdates++;
@@ -476,11 +489,11 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
     const Mixer_t *mixers = (Mixer_t *)&mixerSettings->Mixer1Type; // pointer to array of mixers in UAVObjects
     const Mixer_t *mixer  = &mixers[index];
 
-    float result = (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE1] / 128.0f) * curve1) +
-                   (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE2] / 128.0f) * curve2) +
-                   (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_ROLL] / 128.0f) * desired->Roll) +
-                   (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_PITCH] / 128.0f) * desired->Pitch) +
-                   (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_YAW] / 128.0f) * desired->Yaw);
+    float result = ((((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE1]) * curve1) +
+                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE2]) * curve2) +
+                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_ROLL]) * desired->Roll) +
+                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_PITCH]) * desired->Pitch) +
+                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_YAW]) * desired->Yaw)) / 128.0f;
 
     // note: no feedforward for reversable motors yet for safety reasons
     if (mixer->type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
@@ -754,18 +767,48 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
  */
 static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuatorSettings, bool force_update)
 {
-    static uint16_t prevChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM];
+    static uint16_t prevBankUpdateFreq[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM];
+    static uint8_t prevBankMode[ACTUATORSETTINGS_BANKMODE_NUMELEM];
 
     // check if the any rate setting is changed
     if (force_update ||
-        memcmp(prevChannelUpdateFreq,
-               actuatorSettings->ChannelUpdateFreq,
-               sizeof(prevChannelUpdateFreq)) != 0) {
+        (memcmp(prevBankUpdateFreq,
+                actuatorSettings->BankUpdateFreq,
+                sizeof(prevBankUpdateFreq)) != 0) ||
+        (memcmp(prevBankUpdateFreq,
+                actuatorSettings->BankMode,
+                sizeof(prevBankMode)) != 0)
+        ) {
         /* Something has changed, apply the settings to HW */
-        memcpy(prevChannelUpdateFreq,
-               actuatorSettings->ChannelUpdateFreq,
-               sizeof(prevChannelUpdateFreq));
-        PIOS_Servo_SetHz(actuatorSettings->ChannelUpdateFreq, ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
+        memcpy(prevBankUpdateFreq,
+               actuatorSettings->BankUpdateFreq,
+               sizeof(prevBankUpdateFreq));
+        memcpy(prevBankMode,
+               actuatorSettings->BankMode,
+               sizeof(prevBankMode));
+
+        uint16_t freq[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM];
+
+        for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
+            PIOS_Servo_SetBankMode(i,
+                                   actuatorSettings->BankMode[i] ==
+                                   ACTUATORSETTINGS_BANKMODE_PWM ?
+                                   PIOS_SERVO_BANK_MODE_PWM :
+                                   PIOS_SERVO_BANK_MODE_SINGLE_PULSE
+                                   );
+            if (actuatorSettings->BankMode[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
+                freq[i] = 1000000 / 250; // force a total period of 250uSec
+            } else {
+                freq[i] = actuatorSettings->BankUpdateFreq[i];
+            }
+        }
+        PIOS_Servo_SetHz(freq, ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM);
+
+        // retrieve mode from related bank
+        for (uint8_t i = 0; i < MAX_MIX_ACTUATORS; i++) {
+            uint8_t bank = PIOS_Servo_GetPinBank(i);
+            pinsMode[i] = actuatorSettings->BankMode[bank];
+        }
     }
 }
 

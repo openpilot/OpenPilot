@@ -39,6 +39,16 @@
 
 static const struct pios_servo_cfg *servo_cfg;
 
+// determine if the related timer will work in synchronous (or OneShot/OneShot125) One Pulse mode.
+static uint8_t pios_servo_bank_mode[PIOS_SERVO_BANKS] = { 0 };
+
+// timer associated to each bank
+static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
+
+// index of bank used for each pin
+static uint8_t *pios_servo_pin_bank;
+
+
 /**
  * Initialise Servos
  */
@@ -52,37 +62,130 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
 
     /* Store away the requested configuration */
     servo_cfg = cfg;
+    pios_servo_pin_bank = pios_malloc(sizeof(uint8_t) * cfg->num_channels);
 
-    /* Configure the channels to be in output compare mode */
-    for (uint8_t i = 0; i < cfg->num_channels; i++) {
-        const struct pios_tim_channel *chan = &cfg->channels[i];
+    uint8_t bank = 0;
+    for (uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
+        const struct pios_tim_channel *chan = &servo_cfg->channels[i];
+        bool new = true;
+        /* See if any previous channels use that same timer */
+        for (uint8_t j = 0; (j < i) && new; j++) {
+            new &= chan->timer != servo_cfg->channels[j].timer;
+        }
+
+        if (new) {
+            PIOS_Assert(bank < PIOS_SERVO_BANKS);
+            for (uint8_t j = i; j < servo_cfg->num_channels; j++) {
+                if (servo_cfg->channels[j].timer == chan->timer) {
+                    pios_servo_pin_bank[j] = bank;
+                }
+            }
+            pios_servo_bank_timer[i] = chan->timer;
+
+            TIM_ARRPreloadConfig(chan->timer, ENABLE);
+            TIM_CtrlPWMOutputs(chan->timer, ENABLE);
+            TIM_Cmd(chan->timer, DISABLE);
+
+            bank++;
+        }
 
         /* Set up for output compare function */
         switch (chan->timer_chan) {
         case TIM_Channel_1:
-            TIM_OC1Init(chan->timer, &cfg->tim_oc_init);
+            TIM_OC1Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+            TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         case TIM_Channel_2:
-            TIM_OC2Init(chan->timer, &cfg->tim_oc_init);
+            TIM_OC2Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+            TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         case TIM_Channel_3:
-            TIM_OC3Init(chan->timer, &cfg->tim_oc_init);
+            TIM_OC3Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+            TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         case TIM_Channel_4:
-            TIM_OC4Init(chan->timer, &cfg->tim_oc_init);
+            TIM_OC4Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+            TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         }
-
-        TIM_ARRPreloadConfig(chan->timer, ENABLE);
-        TIM_CtrlPWMOutputs(chan->timer, ENABLE);
-        TIM_Cmd(chan->timer, ENABLE);
     }
 
     return 0;
+}
+
+void PIOS_Servo_SetBankMode(uint8_t bank, uint8_t mode)
+{
+    PIOS_Assert(bank < PIOS_SERVO_BANKS);
+    pios_servo_bank_mode[bank] = mode;
+
+    for (uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
+        const struct pios_tim_channel *chan = &servo_cfg->channels[i];
+        switch (mode) {
+        case PIOS_SERVO_BANK_MODE_SINGLE_PULSE:
+            /* Set up for output compare function */
+            switch (chan->timer_chan) {
+            case TIM_Channel_1:
+                TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            case TIM_Channel_2:
+                TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            case TIM_Channel_3:
+                TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            case TIM_Channel_4:
+                TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            }
+            break;
+        case PIOS_SERVO_BANK_MODE_PWM:
+            /* Set up for output compare function */
+            switch (chan->timer_chan) {
+            case TIM_Channel_1:
+                TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            case TIM_Channel_2:
+                TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            case TIM_Channel_3:
+                TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            case TIM_Channel_4:
+                TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                break;
+            }
+            break;
+        default:
+            PIOS_Assert(false);
+        }
+    }
+    // Setup the timer accordingly
+    switch (mode) {
+    case PIOS_SERVO_BANK_MODE_SINGLE_PULSE:
+        TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Single);
+        TIM_CounterModeConfig(pios_servo_bank_timer[bank], TIM_CounterMode_Up);
+        break;
+    case PIOS_SERVO_BANK_MODE_PWM:
+        TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Repetitive);
+        TIM_Cmd(pios_servo_bank_timer[bank], ENABLE);
+        break;
+    default:
+        PIOS_Assert(false);
+    }
+}
+
+void PIOS_Servo_Update()
+{
+    for (uint8_t i = 0; (i < PIOS_SERVO_BANKS); i++) {
+        const TIM_TypeDef *timer = pios_servo_bank_timer[i];
+        if (timer) {
+            TIM_Cmd((TIM_TypeDef *)timer, ENABLE);
+        }
+    }
 }
 
 /**
@@ -92,6 +195,7 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
  */
 void PIOS_Servo_SetHz(const uint16_t *speeds, uint8_t banks)
 {
+    PIOS_Assert(banks <= PIOS_SERVO_BANKS);
     if (!servo_cfg) {
         return;
     }
@@ -99,30 +203,19 @@ void PIOS_Servo_SetHz(const uint16_t *speeds, uint8_t banks)
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = servo_cfg->tim_base_init;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
-    //
 
-    uint8_t set = 0;
-
-    for (uint8_t i = 0; (i < servo_cfg->num_channels) && (set < banks); i++) {
-        bool new = true;
-        const struct pios_tim_channel *chan = &servo_cfg->channels[i];
-
-        /* See if any previous channels use that same timer */
-        for (uint8_t j = 0; (j < i) && new; j++) {
-            new &= chan->timer != servo_cfg->channels[j].timer;
-        }
-
-        if (new) {
+    for (uint8_t i = 0; (i < PIOS_SERVO_BANKS); i++) {
+        const TIM_TypeDef *timer = pios_servo_bank_timer[i];
+        if (timer) {
             // Choose the correct prescaler value for the APB the timer is attached
-            if (chan->timer == TIM1 || chan->timer == TIM8 || chan->timer == TIM9 || chan->timer == TIM10 || chan->timer == TIM11) {
+            if (timer == TIM1 || timer == TIM8 || timer == TIM9 || timer == TIM10 || timer == TIM11) {
                 TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1;
             } else {
                 TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1;
             }
 
-            TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[set]) - 1);
-            TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
-            set++;
+            TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[i]) - 1);
+            TIM_TimeBaseInit((TIM_TypeDef *)timer, &TIM_TimeBaseStructure);
         }
     }
 }
@@ -141,19 +234,43 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
 
     /* Update the position */
     const struct pios_tim_channel *chan = &servo_cfg->channels[servo];
+
+    uint8_t bank = pios_servo_pin_bank[servo];
+    uint8_t mode = pios_servo_bank_mode[bank];
+    uint16_t val;
+    switch (mode) {
+    case PIOS_SERVO_BANK_MODE_PWM:
+        val = position;
+        break;
+    case PIOS_SERVO_BANK_MODE_SINGLE_PULSE:
+        val = chan->timer->ARR - position;
+        break;
+    default:
+        PIOS_Assert(false);
+    }
+
     switch (chan->timer_chan) {
     case TIM_Channel_1:
-        TIM_SetCompare1(chan->timer, position);
+        TIM_SetCompare1(chan->timer, val);
         break;
     case TIM_Channel_2:
-        TIM_SetCompare2(chan->timer, position);
+        TIM_SetCompare2(chan->timer, val);
         break;
     case TIM_Channel_3:
-        TIM_SetCompare3(chan->timer, position);
+        TIM_SetCompare3(chan->timer, val);
         break;
     case TIM_Channel_4:
-        TIM_SetCompare4(chan->timer, position);
+        TIM_SetCompare4(chan->timer, val);
         break;
+    }
+}
+
+uint8_t PIOS_Servo_GetPinBank(uint8_t pin)
+{
+    if (pin < servo_cfg->num_channels) {
+        return pios_servo_pin_bank[pin];
+    } else {
+        return 0;
     }
 }
 

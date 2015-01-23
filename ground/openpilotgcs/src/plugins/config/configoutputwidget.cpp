@@ -280,30 +280,30 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     ui->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
 
     // Setup output rates for all banks
-    if (ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0])) == -1) {
-        ui->cb_outputRate1->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[0]));
+    if (ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.BankUpdateFreq[0])) == -1) {
+        ui->cb_outputRate1->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[0]));
     }
-    if (ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])) == -1) {
-        ui->cb_outputRate2->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[1]));
+    if (ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.BankUpdateFreq[1])) == -1) {
+        ui->cb_outputRate2->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[1]));
     }
-    if (ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])) == -1) {
-        ui->cb_outputRate3->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]));
+    if (ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.BankUpdateFreq[2])) == -1) {
+        ui->cb_outputRate3->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[2]));
     }
-    if (ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])) == -1) {
-        ui->cb_outputRate4->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[3]));
+    if (ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.BankUpdateFreq[3])) == -1) {
+        ui->cb_outputRate4->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[3]));
     }
-    if (ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])) == -1) {
-        ui->cb_outputRate5->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[4]));
+    if (ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.BankUpdateFreq[4])) == -1) {
+        ui->cb_outputRate5->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[4]));
     }
-    if (ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])) == -1) {
-        ui->cb_outputRate6->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[5]));
+    if (ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.BankUpdateFreq[5])) == -1) {
+        ui->cb_outputRate6->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[5]));
     }
-    ui->cb_outputRate1->setCurrentIndex(ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0])));
-    ui->cb_outputRate2->setCurrentIndex(ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])));
-    ui->cb_outputRate3->setCurrentIndex(ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])));
-    ui->cb_outputRate4->setCurrentIndex(ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])));
-    ui->cb_outputRate5->setCurrentIndex(ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])));
-    ui->cb_outputRate6->setCurrentIndex(ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])));
+    ui->cb_outputRate1->setCurrentIndex(ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.BankUpdateFreq[0])));
+    ui->cb_outputRate2->setCurrentIndex(ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.BankUpdateFreq[1])));
+    ui->cb_outputRate3->setCurrentIndex(ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.BankUpdateFreq[2])));
+    ui->cb_outputRate4->setCurrentIndex(ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.BankUpdateFreq[3])));
+    ui->cb_outputRate5->setCurrentIndex(ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.BankUpdateFreq[4])));
+    ui->cb_outputRate6->setCurrentIndex(ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.BankUpdateFreq[5])));
 
     // Reset to all disabled
     ui->chBank1->setText("-");
@@ -391,12 +391,12 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
         }
 
         // Set update rates
-        actuatorSettingsData.ChannelUpdateFreq[0] = ui->cb_outputRate1->currentText().toUInt();
-        actuatorSettingsData.ChannelUpdateFreq[1] = ui->cb_outputRate2->currentText().toUInt();
-        actuatorSettingsData.ChannelUpdateFreq[2] = ui->cb_outputRate3->currentText().toUInt();
-        actuatorSettingsData.ChannelUpdateFreq[3] = ui->cb_outputRate4->currentText().toUInt();
-        actuatorSettingsData.ChannelUpdateFreq[4] = ui->cb_outputRate5->currentText().toUInt();
-        actuatorSettingsData.ChannelUpdateFreq[5] = ui->cb_outputRate6->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[0] = ui->cb_outputRate1->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[1] = ui->cb_outputRate2->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[2] = ui->cb_outputRate3->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[3] = ui->cb_outputRate4->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[4] = ui->cb_outputRate5->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[5] = ui->cb_outputRate6->currentText().toUInt();
 
         actuatorSettingsData.MotorsSpinWhileArmed = ui->spinningArmed->isChecked() ?
                                                     ActuatorSettings::MOTORSSPINWHILEARMED_TRUE :

@@ -404,32 +404,32 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
         data.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
 
-        for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
-            data.ChannelUpdateFreq[i] = LEGACY_ESC_FREQUENCY;
+        for (quint16 i = 0; i < ActuatorSettings::BANKUPDATEFREQ_NUMELEM; i++) {
+            data.BankUpdateFreq[i] = LEGACY_ESC_FREQUENCY;
         }
 
         switch (m_configSource->getVehicleSubType()) {
         case VehicleConfigurationSource::MULTI_ROTOR_TRI_Y:
             // Servo always on channel 4
-            data.ChannelUpdateFreq[0] = escFrequence;
+            data.BankUpdateFreq[0] = escFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
                 m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
-                data.ChannelUpdateFreq[1] = servoFrequence;
+                data.BankUpdateFreq[1] = servoFrequence;
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                data.ChannelUpdateFreq[1] = escFrequence;
-                data.ChannelUpdateFreq[2] = servoFrequence;
+                data.BankUpdateFreq[1] = escFrequence;
+                data.BankUpdateFreq[2] = servoFrequence;
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                data.ChannelUpdateFreq[1] = escFrequence;
-                data.ChannelUpdateFreq[2] = escFrequence;
-                data.ChannelUpdateFreq[3] = servoFrequence;
+                data.BankUpdateFreq[1] = escFrequence;
+                data.BankUpdateFreq[2] = escFrequence;
+                data.BankUpdateFreq[3] = servoFrequence;
             }
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
-            data.ChannelUpdateFreq[0] = escFrequence;
-            data.ChannelUpdateFreq[1] = escFrequence;
+            data.BankUpdateFreq[0] = escFrequence;
+            data.BankUpdateFreq[1] = escFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                data.ChannelUpdateFreq[2] = escFrequence;
+                data.BankUpdateFreq[2] = escFrequence;
             }
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
@@ -441,10 +441,10 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
-            data.ChannelUpdateFreq[0] = escFrequence;
-            data.ChannelUpdateFreq[1] = escFrequence;
-            data.ChannelUpdateFreq[2] = escFrequence;
-            data.ChannelUpdateFreq[3] = escFrequence;
+            data.BankUpdateFreq[0] = escFrequence;
+            data.BankUpdateFreq[1] = escFrequence;
+            data.BankUpdateFreq[2] = escFrequence;
+            data.BankUpdateFreq[3] = escFrequence;
             break;
         default:
             break;
@@ -467,15 +467,15 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             data.ChannelMax[i]     = actuatorSettings[i].channelMax;
         }
 
-        for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
-            data.ChannelUpdateFreq[i] = servoFrequence;
+        for (quint16 i = 0; i < ActuatorSettings::BANKUPDATEFREQ_NUMELEM; i++) {
+            data.BankUpdateFreq[i] = servoFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 if (i == 1) {
-                    data.ChannelUpdateFreq[i] = escFrequence;
+                    data.BankUpdateFreq[i] = escFrequence;
                 }
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
                 if (i == 2) {
-                    data.ChannelUpdateFreq[i] = escFrequence;
+                    data.BankUpdateFreq[i] = escFrequence;
                 }
             }
         }
@@ -503,15 +503,15 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             data.ChannelMax[i]     = actuatorSettings[i].channelMax;
         }
 
-        for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
-            data.ChannelUpdateFreq[i] = servoFrequence;
+        for (quint16 i = 0; i < ActuatorSettings::BANKUPDATEFREQ_NUMELEM; i++) {
+            data.BankUpdateFreq[i] = servoFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 if (i == 1) {
-                    data.ChannelUpdateFreq[i] = escFrequence;
+                    data.BankUpdateFreq[i] = escFrequence;
                 }
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
                 if (i == 2) {
-                    data.ChannelUpdateFreq[i] = escFrequence;
+                    data.BankUpdateFreq[i] = escFrequence;
                 }
             }
         }

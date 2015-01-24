@@ -48,6 +48,7 @@ static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
 // index of bank used for each pin
 static uint8_t *pios_servo_pin_bank;
 
+#define PIOS_SERVO_TIMER_CLOCK 1000000
 
 /**
  * Initialise Servos
@@ -80,7 +81,7 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
                     pios_servo_pin_bank[j] = bank;
                 }
             }
-            pios_servo_bank_timer[i] = chan->timer;
+            pios_servo_bank_timer[bank] = chan->timer;
 
             TIM_ARRPreloadConfig(chan->timer, ENABLE);
             TIM_CtrlPWMOutputs(chan->timer, ENABLE);
@@ -209,12 +210,12 @@ void PIOS_Servo_SetHz(const uint16_t *speeds, uint8_t banks)
         if (timer) {
             // Choose the correct prescaler value for the APB the timer is attached
             if (timer == TIM1 || timer == TIM8 || timer == TIM9 || timer == TIM10 || timer == TIM11) {
-                TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1;
+                TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / PIOS_SERVO_TIMER_CLOCK) - 1;
             } else {
-                TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1;
+                TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / PIOS_SERVO_TIMER_CLOCK) - 1;
             }
 
-            TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[i]) - 1);
+            TIM_TimeBaseStructure.TIM_Period = ((PIOS_SERVO_TIMER_CLOCK / speeds[i]) - 1);
             TIM_TimeBaseInit((TIM_TypeDef *)timer, &TIM_TimeBaseStructure);
         }
     }
@@ -243,7 +244,12 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
         val = position;
         break;
     case PIOS_SERVO_BANK_MODE_SINGLE_PULSE:
-        val = chan->timer->ARR - position;
+        // prevent overflows that causes an output to pass from max to no pulses.
+        if (position < chan->timer->ARR) {
+            val = chan->timer->ARR - position;
+        } else {
+            val = 1;
+        }
         break;
     default:
         PIOS_Assert(false);

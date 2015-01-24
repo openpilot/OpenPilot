@@ -98,9 +98,18 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidget(ui->cb_outputRate1);
     addWidget(ui->spinningArmed);
 
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode1, 0);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode2, 1);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode3, 2);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode4, 3);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode5, 4);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode6, 5);
+
     disconnect(this, SLOT(refreshWidgetsValues(UAVObject *)));
 
+    populateWidgets();
     refreshWidgetsValues();
+
     updateEnableControls();
 }
 
@@ -251,7 +260,7 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
 void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 {
     Q_UNUSED(obj);
-
+    ConfigTaskWidget::refreshWidgetsValues(obj);
     bool dirty = isDirty();
 
     // Get Actuator Settings
@@ -391,12 +400,12 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
         }
 
         // Set update rates
-        actuatorSettingsData.BankUpdateFreq[0] = ui->cb_outputRate1->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[1] = ui->cb_outputRate2->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[2] = ui->cb_outputRate3->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[3] = ui->cb_outputRate4->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[4] = ui->cb_outputRate5->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[5] = ui->cb_outputRate6->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[0]    = ui->cb_outputRate1->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[1]    = ui->cb_outputRate2->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[2]    = ui->cb_outputRate3->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[3]    = ui->cb_outputRate4->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[4]    = ui->cb_outputRate5->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[5]    = ui->cb_outputRate6->currentText().toUInt();
 
         actuatorSettingsData.MotorsSpinWhileArmed = ui->spinningArmed->isChecked() ?
                                                     ActuatorSettings::MOTORSSPINWHILEARMED_TRUE :

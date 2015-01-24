@@ -259,12 +259,13 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
  */
 void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 {
-    Q_UNUSED(obj);
-    ConfigTaskWidget::refreshWidgetsValues(obj);
     bool dirty = isDirty();
+
+    ConfigTaskWidget::refreshWidgetsValues(obj);
 
     // Get Actuator Settings
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
+
     Q_ASSERT(actuatorSettings);
     ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
@@ -383,7 +384,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
  */
 void ConfigOutputWidget::updateObjectsFromWidgets()
 {
-    emit updateObjectsFromWidgetsRequested();
+    ConfigTaskWidget::updateObjectsFromWidgets();
 
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
 

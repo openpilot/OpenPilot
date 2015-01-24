@@ -40,10 +40,10 @@
 static const struct pios_servo_cfg *servo_cfg;
 
 // determine if the related timer will work in synchronous (or OneShot/OneShot125) One Pulse mode.
-//static uint8_t pios_servo_bank_mode[PIOS_SERVO_BANKS] = { 0 };
+// static uint8_t pios_servo_bank_mode[PIOS_SERVO_BANKS] = { 0 };
 
 // timer associated to each bank
-//static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
+// static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
 
 // index of bank used for each pin
 static uint8_t *pios_servo_pin_bank;
@@ -81,7 +81,7 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
                     pios_servo_pin_bank[j] = bank;
                 }
             }
-            //pios_servo_bank_timer[i] = chan->timer;
+            // pios_servo_bank_timer[i] = chan->timer;
 
             PIOS_Assert(bank < PIOS_SERVO_BANKS);
 
@@ -94,7 +94,7 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
             TIM_ARRPreloadConfig(chan->timer, ENABLE);
             TIM_CtrlPWMOutputs(chan->timer, ENABLE);
             TIM_Cmd(chan->timer, DISABLE);
-*/
+ */
             bank++;
         }
 
@@ -191,20 +191,19 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
     }
 }
 
-void PIOS_Servo_Update(){
+void PIOS_Servo_Update()
+{
     /*
-    for (uint8_t i = 0; (i < PIOS_SERVO_BANKS); i++) {
+       for (uint8_t i = 0; (i < PIOS_SERVO_BANKS); i++) {
         const TIM_TypeDef *timer = pios_servo_bank_timer[i];
         if (timer) {
             TIM_Cmd((TIM_TypeDef *)timer, ENABLE);
         }
-    }
-    */
+       }
+     */
 }
 
-void PIOS_Servo_SetBankMode(__attribute__((unused)) uint8_t bank, __attribute__((unused)) uint8_t mode){
-
-}
+void PIOS_Servo_SetBankMode(__attribute__((unused)) uint8_t bank, __attribute__((unused)) uint8_t mode) {}
 
 uint8_t PIOS_Servo_GetPinBank(uint8_t pin)
 {

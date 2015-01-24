@@ -312,44 +312,6 @@
                 </property>
                </widget>
               </item>
-              <item row="9" column="0">
-               <widget class="QLabel" name="ChannelSetLabel">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Channel Set</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="9" column="1">
-               <widget class="QSpinBox" name="ChannelSet">
-                <property name="maximumSize">
-                 <size>
-                  <width>60</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="toolTip">
-                 <string>Sets the random sequence of channels to use for frequency hopping.</string>
-                </property>
-                <property name="maximum">
-                 <number>250</number>
-                </property>
-               </widget>
-              </item>
               <item row="10" column="0" colspan="2">
                <widget class="QCheckBox" name="Coordinator">
                 <property name="font">

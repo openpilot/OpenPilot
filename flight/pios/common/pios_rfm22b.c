@@ -74,7 +74,6 @@
 #define RFM22B_LINK_QUALITY_THRESHOLD    20
 #define RFM22B_DEFAULT_MIN_CHANNEL       0
 #define RFM22B_DEFAULT_MAX_CHANNEL       250
-#define RFM22B_DEFAULT_CHANNEL_SET       24
 #define RFM22B_PPM_ONLY_DATARATE         RFM22_datarate_9600
 
 // The maximum amount of time without activity before initiating a reset.
@@ -427,7 +426,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 
     // Initialize the channels.
     PIOS_RFM22B_SetChannelConfig(*rfm22b_id, RFM22B_DEFAULT_RX_DATARATE, RFM22B_DEFAULT_MIN_CHANNEL,
-                                 RFM22B_DEFAULT_MAX_CHANNEL, RFM22B_DEFAULT_CHANNEL_SET, false, false, false, false);
+                                 RFM22B_DEFAULT_MAX_CHANNEL, false, false, false, false);
 
     // Create the event queue
     rfm22b_dev->eventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(enum pios_radio_event));
@@ -575,7 +574,7 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
  * @param[in] ppm_mode Should this modem send/receive ppm packets?
  * @param[in] oneway Only the coordinator can send packets if true.
  */
-void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datarate, uint8_t min_chan, uint8_t max_chan, __attribute__ ((unused)) uint8_t chan_set, bool coordinator, bool oneway, bool ppm_mode, bool ppm_only)
+void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datarate, uint8_t min_chan, uint8_t max_chan, bool coordinator, bool oneway, bool ppm_mode, bool ppm_only)
 {
     struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 

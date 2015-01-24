@@ -67,7 +67,6 @@ ConfigOPLinkWidget::ConfigOPLinkWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidgetBinding("OPLinkSettings", "MaxRFPower", m_oplink->MaxRFTxPower);
     addWidgetBinding("OPLinkSettings", "MinChannel", m_oplink->MinimumChannel);
     addWidgetBinding("OPLinkSettings", "MaxChannel", m_oplink->MaximumChannel);
-    addWidgetBinding("OPLinkSettings", "ChannelSet", m_oplink->ChannelSet);
     addWidgetBinding("OPLinkSettings", "CoordID", m_oplink->CoordID);
     addWidgetBinding("OPLinkSettings", "Coordinator", m_oplink->Coordinator);
     addWidgetBinding("OPLinkSettings", "OneWay", m_oplink->OneWayLink);

@@ -425,21 +425,10 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         // will be set except explicitly disabled (which will have PWM pulse = 0).
         for (int i = 0; i < MAX_MIX_ACTUATORS; i++) {
             if (command.Channel[i]) {
-                uint8_t mode = pinsMode[actuatorSettings.ChannelAddr[i]];
-                switch (mode) {
-                case ACTUATORSETTINGS_BANKMODE_PWM:
-                case ACTUATORSETTINGS_BANKMODE_ONESHOT:
-                    command.Channel[i] = scaleChannel(status[i],
-                                                      actuatorSettings.ChannelMax[i],
-                                                      actuatorSettings.ChannelMin[i],
-                                                      actuatorSettings.ChannelNeutral[i]);
-                    break;
-                case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
-                    command.Channel[i] = scaleChannel(status[i],
-                                                      249,
-                                                      125,
-                                                      126);
-                }
+                command.Channel[i] = scaleChannel(status[i],
+                                                  actuatorSettings.ChannelMax[i],
+                                                  actuatorSettings.ChannelMin[i],
+                                                  actuatorSettings.ChannelNeutral[i]);
             }
         }
 
@@ -743,7 +732,18 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
         return true;
 
     case ACTUATORSETTINGS_CHANNELTYPE_PWM:
-        PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
+    {
+        uint8_t mode = pinsMode[actuatorSettings->ChannelAddr[mixer_channel]];
+        switch (mode) {
+        case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
+            // Quick way to remap of 1000-2000 range to 125-250
+            PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value / 8);
+            break;
+        default:
+            PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
+            break;
+        }
+    }
         return true;
 
 #if defined(PIOS_INCLUDE_I2C_ESC)
@@ -797,7 +797,7 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
                                    PIOS_SERVO_BANK_MODE_SINGLE_PULSE
                                    );
             if (actuatorSettings->BankMode[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
-                freq[i] = 1000000 / 250; // force a total period of 250uSec
+                freq[i] = 1000000 / 255; // force a total period of 255uSec
             } else {
                 freq[i] = actuatorSettings->BankUpdateFreq[i];
             }

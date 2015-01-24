@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
+    <width>971</width>
     <height>652</height>
    </rect>
   </property>
@@ -49,8 +49,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>810</width>
-            <height>575</height>
+            <width>949</width>
+            <height>558</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
@@ -72,14 +72,14 @@
               <string>Configuration</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="4" column="3">
+              <item row="4" column="4">
                <widget class="QComboBox" name="ComSpeed">
                 <property name="statusTip">
                  <string>Com speed in bps.</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="2">
+              <item row="4" column="3">
                <widget class="QLabel" name="ComSpeedLabel">
                 <property name="font">
                  <font>
@@ -95,7 +95,7 @@
                 </property>
                </widget>
               </item>
-              <item row="9" column="2">
+              <item row="9" column="3">
                <widget class="QLabel" name="VCPPortLabel">
                 <property name="font">
                  <font>
@@ -111,7 +111,7 @@
                 </property>
                </widget>
               </item>
-              <item row="7" column="3">
+              <item row="7" column="4">
                <widget class="QComboBox" name="FlexiPort">
                 <property name="maximumSize">
                  <size>
@@ -124,7 +124,7 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="2">
+              <item row="6" column="3">
                <widget class="QLabel" name="MainPortLabel">
                 <property name="font">
                  <font>
@@ -140,7 +140,7 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="3">
+              <item row="6" column="4">
                <widget class="QComboBox" name="MainPort">
                 <property name="maximumSize">
                  <size>
@@ -153,7 +153,20 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="3">
+              <item row="9" column="4">
+               <widget class="QComboBox" name="VCPPort">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Choose the function for the USB virtual com port</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
                <widget class="QComboBox" name="MaxRFTxPower">
                 <property name="maximumSize">
                  <size>
@@ -172,7 +185,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
+              <item row="0" column="3">
                <widget class="QLabel" name="MaxRFTxPowerLabel">
                 <property name="font">
                  <font>
@@ -188,20 +201,10 @@
                 </property>
                </widget>
               </item>
-              <item row="9" column="3">
-               <widget class="QComboBox" name="VCPPort">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Choose the function for the USB virtual com port</string>
-                </property>
-               </widget>
+              <item row="10" column="4">
+               <widget class="QComboBox" name="FlexiIOPort"/>
               </item>
-              <item row="10" column="2">
+              <item row="10" column="3">
                <widget class="QLabel" name="FlexiIOPortLabel">
                 <property name="font">
                  <font>
@@ -217,10 +220,29 @@
                 </property>
                </widget>
               </item>
-              <item row="10" column="3">
-               <widget class="QComboBox" name="FlexiIOPort"/>
+              <item row="6" column="1">
+               <widget class="QSpinBox" name="MaximumChannel">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Channel 0 is 430 MHz, channel 250 is 440 MHz, and the channel spacing is 40 KHz.</string>
+                </property>
+                <property name="maximum">
+                 <number>250</number>
+                </property>
+               </widget>
               </item>
-              <item row="7" column="2">
+              <item row="7" column="3">
                <widget class="QLabel" name="FlexiPortLabel">
                 <property name="font">
                  <font>
@@ -252,22 +274,6 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
-               <widget class="QSpinBox" name="MaximumChannel">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="toolTip">
-                 <string>Channel 0 is 430 MHz, channel 249 is 440 MHz, and the channel spacing is 40 KHz.</string>
-                </property>
-                <property name="maximum">
-                 <number>249</number>
-                </property>
-               </widget>
-              </item>
               <item row="7" column="0">
                <widget class="QLabel" name="MinimumChannelLabel">
                 <property name="font">
@@ -286,6 +292,12 @@
               </item>
               <item row="7" column="1">
                <widget class="QSpinBox" name="MinimumChannel">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
                   <weight>50</weight>
@@ -293,10 +305,10 @@
                  </font>
                 </property>
                 <property name="toolTip">
-                 <string>Channel 0 is 430 MHz, channel 249 is 440 MHz, and the channel spacing is 40 KHz.</string>
+                 <string>Channel 0 is 430 MHz, channel 250 is 440 MHz, and the channel spacing is 40 KHz.</string>
                 </property>
                 <property name="maximum">
-                 <number>249</number>
+                 <number>250</number>
                 </property>
                </widget>
               </item>
@@ -318,6 +330,12 @@
               </item>
               <item row="9" column="1">
                <widget class="QSpinBox" name="ChannelSet">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
                   <weight>50</weight>
@@ -328,7 +346,68 @@
                  <string>Sets the random sequence of channels to use for frequency hopping.</string>
                 </property>
                 <property name="maximum">
-                 <number>249</number>
+                 <number>250</number>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="0" colspan="2">
+               <widget class="QCheckBox" name="Coordinator">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="statusTip">
+                 <string>This modem will be a coordinator and other modems will bind to it.</string>
+                </property>
+                <property name="text">
+                 <string>Coordinator</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="2">
+               <widget class="QLabel" name="MaxFreq">
+                <property name="maximumSize">
+                 <size>
+                  <width>110</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>440.000 (MHz)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="2">
+               <widget class="QLabel" name="MinFreq">
+                <property name="maximumSize">
+                 <size>
+                  <width>110</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>430.000 (MHz)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QCheckBox" name="OneWayLink">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="acceptDrops">
+                 <bool>false</bool>
+                </property>
+                <property name="statusTip">
+                 <string>If selected, data will only be transmitted from the coordinator to the Rx modem.</string>
+                </property>
+                <property name="text">
+                 <string>One-Way</string>
                 </property>
                </widget>
               </item>
@@ -349,22 +428,6 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QCheckBox" name="OneWayLink">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="statusTip">
-                 <string>If selected, data will only be transmitted from the coordinator to the Rx modem.</string>
-                </property>
-                <property name="text">
-                 <string>One-Way</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
                <widget class="QCheckBox" name="PPM">
                 <property name="font">
                  <font>
@@ -377,22 +440,6 @@
                 </property>
                 <property name="text">
                  <string>PPM</string>
-                </property>
-               </widget>
-              </item>
-              <item row="10" column="0" colspan="2">
-               <widget class="QCheckBox" name="Coordinator">
-                <property name="font">
-                 <font>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="statusTip">
-                 <string>This modem will be a coordinator and other modems will bind to it.</string>
-                </property>
-                <property name="text">
-                 <string>Coordinator</string>
                 </property>
                </widget>
               </item>

@@ -411,7 +411,7 @@ void PIOS_Board_Init(void)
         PIOS_IAP_WriteBootCmd(2, 0);
     }
 #ifdef PIOS_INCLUDE_WDG
-    PIOS_WDG_Init();
+    //PIOS_WDG_Init();
 #endif
 
     /* Initialize the task monitor */
@@ -553,6 +553,15 @@ void PIOS_Board_Init(void)
 
     switch (hwsettings_usb_vcpport) {
     case HWSETTINGS_USB_VCPPORT_DISABLED:
+        {
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+            PIOS_Assert(tx_buffer);
+            if (PIOS_COM_Init(&pios_com_debug_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+                              NULL, 0,
+                              tx_buffer, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN)) {
+                PIOS_Assert(0);
+            }
+        }
         break;
     case HWSETTINGS_USB_VCPPORT_USBTELEMETRY:
 #if defined(PIOS_INCLUDE_COM)

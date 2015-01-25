@@ -2020,54 +2020,54 @@ void DMA2_Stream1_IRQHandler(void) __attribute__((alias("PIOS_WS2811_irq_handler
 // this will not clash with PWM in or servo output as
 // pins will be reconfigured as _OUT so the alternate function is disabled.
 const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
-    [HWSETTINGS_WS2811LED_OUT_SERVOOUT1] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT1] =   {
         .gpio     = GPIOB,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_0,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    [HWSETTINGS_WS2811LED_OUT_SERVOOUT2] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT2] =   {
         .gpio     = GPIOB,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_1,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    [HWSETTINGS_WS2811LED_OUT_SERVOOUT3] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT3] =   {
         .gpio     = GPIOA,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_3,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    [HWSETTINGS_WS2811LED_OUT_SERVOOUT4] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT4] =   {
         .gpio     = GPIOA,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_2,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    [HWSETTINGS_WS2811LED_OUT_SERVOOUT5] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT5] =   {
         .gpio     = GPIOA,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_1,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    [HWSETTINGS_WS2811LED_OUT_SERVOOUT6] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT6] =   {
         .gpio     = GPIOA,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_0,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
@@ -2076,7 +2076,7 @@ const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
     },
     [HWSETTINGS_WS2811LED_OUT_FLEXIIOPIN3] = {
         .gpio     = GPIOB,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_12,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
@@ -2085,7 +2085,7 @@ const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
     },
     [HWSETTINGS_WS2811LED_OUT_FLEXIIOPIN4] = {
         .gpio     = GPIOB,
-        .gpioInit =                        {
+        .gpioInit =                          {
             .GPIO_Pin   = GPIO_Pin_13,
             .GPIO_Speed = GPIO_Speed_25MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,

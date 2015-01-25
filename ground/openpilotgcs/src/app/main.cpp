@@ -130,6 +130,7 @@ const char *fixedOptionsC = " [OPTION]... [FILE]...\n"
                             "    -help               Display this help\n"
                             "    -version            Display application version\n"
                             "    -no-splash          Don't display splash screen\n"
+                            "    -log <file>         Log to specified file\n"
                             "    -client             Attempt to connect to already running instance\n"
                             "    -D <key>=<value>    Permanently set a user setting, e.g: -D General/OverrideLanguage=de\n"
                             "    -reset              Reset user settings to factory defaults.\n"
@@ -147,6 +148,7 @@ const QLatin1String CONFIG_OPTION("-D");
 const QLatin1String RESET_OPTION("-reset");
 const QLatin1String CONFIG_FILE_OPTION("-config-file");
 const QLatin1String EXIT_AFTER_CONFIG_OPTION("-exit-after-config");
+const QLatin1String LOG_FILE_OPTION("-log");
 
 // Helpers for displaying messages. Note that there is no console on Windows.
 void displayHelpText(QString t)
@@ -209,35 +211,6 @@ inline QString msgSendArgumentFailed()
                                        "Unable to send command line arguments to the already running instance. It appears to be not responding.");
 }
 
-void mainMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    Q_UNUSED(context);
-    QFile file(QDir::tempPath() + "/gcs.log");
-
-    if (file.open(QIODevice::Append | QIODevice::Text)) {
-        QTextStream out(&file);
-        out << QTime::currentTime().toString("hh:mm:ss.zzz ");
-
-        switch (type) {
-        case QtDebugMsg:
-            out << "DBG: ";
-            break;
-        case QtWarningMsg:
-            out << "WRN: ";
-            break;
-        case QtCriticalMsg:
-            out << "CRT: ";
-            break;
-        case QtFatalMsg:
-            out << "FTL: ";
-            break;
-        }
-
-        out << msg << '\n';
-        out.flush();
-    }
-}
-
 // Prepare a remote argument: If it is a relative file, add the current directory
 // since the the central instance might be running in a different directory.
 inline QString prepareRemoteArgument(const QString &arg)
@@ -289,14 +262,44 @@ void systemInit()
 #endif
 }
 
-void logInit()
+static QTextStream *logStream;
+
+void mainMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    qInstallMessageHandler(mainMessageOutput);
-    QFile file(QDir::tempPath() + "/gcs.log");
-    if (file.exists()) {
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            // erase old log
-        }
+    Q_UNUSED(context);
+
+    QTextStream &out = *logStream;
+
+    // logStream << QTime::currentTime().toString("hh:mm:ss.zzz ");
+
+    switch (type) {
+    case QtDebugMsg:
+        out << "DBG: ";
+        break;
+    case QtWarningMsg:
+        out << "WRN: ";
+        break;
+    case QtCriticalMsg:
+        out << "CRT: ";
+        break;
+    case QtFatalMsg:
+        out << "FTL: ";
+        break;
+    }
+
+    out << msg << '\n';
+    out.flush();
+}
+
+void logInit(QString fileName)
+{
+    QFile *file = new QFile(fileName);
+    if (file->open(QIODevice::WriteOnly | QIODevice::Text)) {
+        logStream = new QTextStream(file);
+        qInstallMessageHandler(mainMessageOutput);
+    }
+    else {
+        // TODO error popup
     }
 }
 
@@ -335,6 +338,7 @@ AppOptions options()
     appOptions.insert(HELP4_OPTION, false);
     appOptions.insert(VERSION_OPTION, false);
     appOptions.insert(NO_SPLASH_OPTION, false);
+    appOptions.insert(LOG_FILE_OPTION, true);
     appOptions.insert(CLIENT_OPTION, false);
     appOptions.insert(CONFIG_OPTION, true);
     appOptions.insert(RESET_OPTION, false);
@@ -457,10 +461,6 @@ int main(int argc, char * *argv)
     // low level init
     systemInit();
 
-#ifdef QT_NO_DEBUG
-// logInit();
-#endif
-
     // create application
     SharedTools::QtSingleApplication app(APP_NAME, argc, argv);
 
@@ -479,6 +479,11 @@ int main(int argc, char * *argv)
         displayError(errorMessage);
         printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
         return -1;
+    }
+
+    if (appOptionValues.contains(LOG_FILE_OPTION)) {
+        QString logFileName = appOptionValues.value(LOG_FILE_OPTION);
+        logInit(logFileName);
     }
 
     // load user settings

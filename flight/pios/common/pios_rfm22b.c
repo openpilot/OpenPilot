@@ -47,8 +47,8 @@
 // 6-byte (32-bit) preamble .. alternating 0's & 1's
 // 4-byte (32-bit) sync
 // 1-byte packet length (number of data bytes to follow)
-// 1 byte valid bitmask
-// 8 PPM values (0-255)
+// 1 byte PPM values LSB (bit 0)
+// 8 bytes PPM values MSBs (bit 8:1)
 // 1 byte CRC
 //
 // *****************************************************************
@@ -75,6 +75,14 @@
 #define RFM22B_DEFAULT_MAX_CHANNEL       250
 #define RFM22B_DEFAULT_CHANNEL_SET       24
 #define RFM22B_PPM_ONLY_DATARATE         RFM22_datarate_9600
+
+// PPM encoding limits
+#define RFM22B_PPM_MIN                   1
+#define RFM22B_PPM_MAX                   511
+#define RFM22B_PPM_INVALID               0
+#define RFM22B_PPM_SCALE                 2
+#define RFM22B_PPM_MIN_US                990
+#define RFM22B_PPM_MAX_US                (RFM22B_PPM_MIN_US + (RFM22B_PPM_MAX - RFM22B_PPM_MIN) * RFM22B_PPM_SCALE)
 
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT   150  // ms
@@ -1767,18 +1775,31 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
             return RADIO_EVENT_RX_MODE;
         }
 
-        // The first byte is a bitmask of valid channels.
+        // The first byte stores the LSB of each channel
         p[0] = 0;
 
         // Read the PPM input.
         for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
             int32_t val = radio_dev->ppm[i];
+
+            // Clamp and translate value, or transmit as reserved "invalid" constant
             if ((val == PIOS_RCVR_INVALID) || (val == PIOS_RCVR_TIMEOUT)) {
-                p[i + 1] = 0;
+                val = RFM22B_PPM_INVALID;
+            } else if (val > RFM22B_PPM_MAX_US) {
+                val = RFM22B_PPM_MAX;
+            } else if (val < RFM22B_PPM_MIN_US) {
+                val = RFM22B_PPM_MIN;
             } else {
-                p[0]    |= 1 << i;
-                p[i + 1] = (val < 1000) ? 0 : ((val >= 1900) ? 255 : (uint8_t)(256 * (val - 1000) / 900));
+                val = (val - RFM22B_PPM_MIN_US) / RFM22B_PPM_SCALE + RFM22B_PPM_MIN;
             }
+
+            // Store LSB
+            if (val & 1) {
+                p[0] |= (1 << i);
+            }
+
+            // Store upper 8 bits in array
+            p[i + 1] = val >> 1;
         }
 
         // The last byte is a CRC.
@@ -1921,10 +1942,11 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
 
         if (good_packet || corrected_packet) {
             for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
+                // Calculate 9-bit value taking the LSB from byte 0
+                uint32_t val = (p[i + 1] << 1) + ((p[0] >> i) & 1);
                 // Is this a valid channel?
-                if (p[0] & (1 << i)) {
-                    uint32_t val = p[i + 1];
-                    radio_dev->ppm[i] = (uint16_t)(1000 + val * 900 / 256);
+                if (val != RFM22B_PPM_INVALID) {
+                    radio_dev->ppm[i] = (uint16_t)(RFM22B_PPM_MIN_US + (val - RFM22B_PPM_MIN) * RFM22B_PPM_SCALE);
                 } else {
                     radio_dev->ppm[i] = PIOS_RCVR_INVALID;
                 }

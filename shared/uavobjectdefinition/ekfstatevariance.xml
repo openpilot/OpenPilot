@@ -16,6 +16,9 @@
 			<elementname>GyroDriftX</elementname>
 			<elementname>GyroDriftY</elementname>
 			<elementname>GyroDriftZ</elementname>
+			<elementname>AccelDriftX</elementname>
+			<elementname>AccelDriftY</elementname>
+			<elementname>AccelDriftZ</elementname>
 		</elementnames>
 	</field>
         <access gcs="readwrite" flight="readwrite"/>

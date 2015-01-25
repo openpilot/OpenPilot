@@ -258,11 +258,19 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
                                            this->ekfConfiguration.Q.GyroDriftY,
                                            this->ekfConfiguration.Q.GyroDriftZ }
                               );
+            INSSetAccelBiasVar((float[3]) { this->ekfConfiguration.Q.AccelDriftX,
+                                            this->ekfConfiguration.Q.AccelDriftY,
+                                            this->ekfConfiguration.Q.AccelDriftZ }
+                               );
             INSSetBaroVar(this->ekfConfiguration.R.BaroZ);
 
             // Initialize the gyro bias
             float gyro_bias[3] = { 0.0f, 0.0f, 0.0f };
             INSSetGyroBias(gyro_bias);
+
+            // Initialize the accel bias
+            float accel_bias[3] = { 0.0f, 0.0f, 0.0f };
+            INSSetAccelBias(accel_bias);
 
             AttitudeStateData attitudeState;
             AttitudeStateGet(&attitudeState);

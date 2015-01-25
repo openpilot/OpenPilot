@@ -88,7 +88,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/paths.c
     SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
-    SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/insgps16state.c
     SRC += $(FLIGHTLIB)/auxmagsupport.c
     SRC += $(FLIGHTLIB)/lednotification.c    
 

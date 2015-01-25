@@ -253,7 +253,7 @@ void INSSetGyroBiasVar(float gyro_bias_var[3])
 
 void INSSetAccelBiasVar(float accel_bias_var[3])
 {
-    ekf.Q[9] = accel_bias_var[0];
+    ekf.Q[9]  = accel_bias_var[0];
     ekf.Q[10] = accel_bias_var[1];
     ekf.Q[11] = accel_bias_var[2];
 }
@@ -310,9 +310,9 @@ void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
     Nav.q[1]   = ekf.X[7];
     Nav.q[2]   = ekf.X[8];
     Nav.q[3]   = ekf.X[9];
-    Nav.gyro_bias[0] = ekf.X[10];
-    Nav.gyro_bias[1] = ekf.X[11];
-    Nav.gyro_bias[2] = ekf.X[12];
+    Nav.gyro_bias[0]  = ekf.X[10];
+    Nav.gyro_bias[1]  = ekf.X[11];
+    Nav.gyro_bias[2]  = ekf.X[12];
     Nav.accel_bias[0] = ekf.X[13];
     Nav.accel_bias[1] = ekf.X[14];
     Nav.accel_bias[2] = ekf.X[15];
@@ -409,9 +409,9 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
     Nav.q[1]   = ekf.X[7];
     Nav.q[2]   = ekf.X[8];
     Nav.q[3]   = ekf.X[9];
-    Nav.gyro_bias[0] = ekf.X[10];
-    Nav.gyro_bias[1] = ekf.X[11];
-    Nav.gyro_bias[2] = ekf.X[12];
+    Nav.gyro_bias[0]  = ekf.X[10];
+    Nav.gyro_bias[1]  = ekf.X[11];
+    Nav.gyro_bias[2]  = ekf.X[12];
     Nav.accel_bias[0] = ekf.X[13];
     Nav.accel_bias[1] = ekf.X[14];
     Nav.accel_bias[2] = ekf.X[15];

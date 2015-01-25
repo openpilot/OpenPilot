@@ -5,6 +5,7 @@
 		10.0, 10.0, 10.0,
 		1.0, 1.0, 1.0,
 		0.007, 0.007, 0.007, 0.007,
+		0.000001, 0.000001, 0.000001,
 		0.000001, 0.000001, 0.000001">
 		<elementnames>
 			<elementname>PositionNorth</elementname>
@@ -20,11 +21,15 @@
 			<elementname>GyroDriftX</elementname>
 			<elementname>GyroDriftY</elementname>
 			<elementname>GyroDriftZ</elementname>
+			<elementname>AccelDriftX</elementname>
+			<elementname>AccelDriftY</elementname>
+			<elementname>AccelDriftZ</elementname>
 		</elementnames>
 	</field>
 	<field name="Q" units="1^2" type="float" defaultvalue="
 		0.01, 0.01, 0.01,
 		0.01, 0.01, 0.01,
+		0.000001, 0.000001, 0.000001,
 		0.000001, 0.000001, 0.000001">
 		<elementnames>
 			<elementname>GyroX</elementname>
@@ -36,6 +41,9 @@
 			<elementname>GyroDriftX</elementname>
 			<elementname>GyroDriftY</elementname>
 			<elementname>GyroDriftZ</elementname>
+			<elementname>AccelDriftX</elementname>
+			<elementname>AccelDriftY</elementname>
+			<elementname>AccelDriftZ</elementname>
 		</elementnames>
 	</field>
 	<field name="R" units="1^2" type="float" defaultvalue="

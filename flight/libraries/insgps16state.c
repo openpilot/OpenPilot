@@ -225,9 +225,9 @@ void INSSetGyroBias(float gyro_bias[3])
 
 void INSSetAccelBias(float accel_bias[3])
 {
-    ekf.X[13] = gyro_bias[0];
-    ekf.X[14] = gyro_bias[1];
-    ekf.X[15] = gyro_bias[2];
+    ekf.X[13] = accel_bias[0];
+    ekf.X[14] = accel_bias[1];
+    ekf.X[15] = accel_bias[2];
 }
 
 void INSSetAccelVar(float accel_var[3])
@@ -263,6 +263,11 @@ void INSSetMagVar(float scaled_mag_var[3])
     ekf.R[6] = scaled_mag_var[0];
     ekf.R[7] = scaled_mag_var[1];
     ekf.R[8] = scaled_mag_var[2];
+}
+
+void INSSetBaroVar(float baro_var)
+{
+    ekf.R[9] = baro_var;
 }
 
 void INSSetMagNorth(float B[3])
@@ -643,6 +648,7 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
 {
     float HP[NUMX], HPHR, Error;
     uint8_t i, j, k, m;
+    float Km[NUMX];
 
     for (m = 0; m < NUMV; m++) {
         if (SensorsUsed & (0x01 << m)) { // use this sensor for update
@@ -658,18 +664,18 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
             }
 
             for (k = 0; k < NUMX; k++) {
-                K[k][m] = HP[k] / HPHR; // find K = HP/HPHR
+                Km[k] = HP[k] / HPHR; // find K = HP/HPHR
             }
             for (i = 0; i < NUMX; i++) { // Find P(m)= P(m-1) + K*HP
                 for (j = i; j < NUMX; j++) {
                     P[i][j] = P[j][i] =
-                                  P[i][j] - K[i][m] * HP[j];
+                                  P[i][j] - Km[i] * HP[j];
                 }
             }
 
             Error = Z[m] - Y[m];
             for (i = 0; i < NUMX; i++) { // Find X(m)= X(m-1) + K*Error
-                X[i] = X[i] + K[i][m] * Error;
+                X[i] = X[i] + Km[i] * Error;
             }
         }
     }

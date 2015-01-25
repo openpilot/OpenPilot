@@ -617,6 +617,8 @@ static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const Mixe
     for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n) {
         set_channel(n, Channel[n], actuatorSettings);
     }
+    // Send the updated command
+    PIOS_Servo_Update();
 
     // Update output object's parts that we changed
     ActuatorCommandChannelSet(Channel);

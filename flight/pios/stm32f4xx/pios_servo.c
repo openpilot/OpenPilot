@@ -95,22 +95,18 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
         case TIM_Channel_1:
             TIM_OC1Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         case TIM_Channel_2:
             TIM_OC2Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         case TIM_Channel_3:
             TIM_OC3Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         case TIM_Channel_4:
             TIM_OC4Init(chan->timer, &servo_cfg->tim_oc_init);
             TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_Low);
             break;
         }
     }
@@ -123,61 +119,66 @@ void PIOS_Servo_SetBankMode(uint8_t bank, uint8_t mode)
     PIOS_Assert(bank < PIOS_SERVO_BANKS);
     pios_servo_bank_mode[bank] = mode;
 
-    for (uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
-        const struct pios_tim_channel *chan = &servo_cfg->channels[i];
+    if (pios_servo_bank_timer[bank]) {
+        for (uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
+            if (pios_servo_pin_bank[i] == bank) {
+                const struct pios_tim_channel *chan = &servo_cfg->channels[i];
+                switch (mode) {
+                case PIOS_SERVO_BANK_MODE_SINGLE_PULSE:
+                    /* Set up for output compare function */
+                    switch (chan->timer_chan) {
+                    case TIM_Channel_1:
+                        TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                        break;
+                    case TIM_Channel_2:
+                        TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                        break;
+                    case TIM_Channel_3:
+                        TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                        break;
+                    case TIM_Channel_4:
+                        TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_Low);
+                        break;
+                    }
+                    break;
+                case PIOS_SERVO_BANK_MODE_PWM:
+                    /* Set up for output compare function */
+                    switch (chan->timer_chan) {
+                    case TIM_Channel_1:
+                        TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_High);
+                        break;
+                    case TIM_Channel_2:
+                        TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_High);
+                        break;
+                    case TIM_Channel_3:
+                        TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_High);
+                        break;
+                    case TIM_Channel_4:
+                        TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_High);
+                        break;
+                    }
+                    break;
+                default:
+                    PIOS_Assert(false);
+                }
+            }
+        }
+        // Setup the timer accordingly
         switch (mode) {
         case PIOS_SERVO_BANK_MODE_SINGLE_PULSE:
-            /* Set up for output compare function */
-            switch (chan->timer_chan) {
-            case TIM_Channel_1:
-                TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            case TIM_Channel_2:
-                TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            case TIM_Channel_3:
-                TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            case TIM_Channel_4:
-                TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            }
+            TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Single);
+            TIM_CounterModeConfig(pios_servo_bank_timer[bank], TIM_CounterMode_Up);
             break;
         case PIOS_SERVO_BANK_MODE_PWM:
-            /* Set up for output compare function */
-            switch (chan->timer_chan) {
-            case TIM_Channel_1:
-                TIM_OC1PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            case TIM_Channel_2:
-                TIM_OC2PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            case TIM_Channel_3:
-                TIM_OC3PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            case TIM_Channel_4:
-                TIM_OC4PolarityConfig(chan->timer, TIM_OCPolarity_Low);
-                break;
-            }
+            TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Repetitive);
+            TIM_Cmd(pios_servo_bank_timer[bank], ENABLE);
             break;
         default:
             PIOS_Assert(false);
         }
     }
-    // Setup the timer accordingly
-    switch (mode) {
-    case PIOS_SERVO_BANK_MODE_SINGLE_PULSE:
-        TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Single);
-        TIM_CounterModeConfig(pios_servo_bank_timer[bank], TIM_CounterMode_Up);
-        break;
-    case PIOS_SERVO_BANK_MODE_PWM:
-        TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Repetitive);
-        TIM_Cmd(pios_servo_bank_timer[bank], ENABLE);
-        break;
-    default:
-        PIOS_Assert(false);
-    }
 }
+
 
 void PIOS_Servo_Update()
 {

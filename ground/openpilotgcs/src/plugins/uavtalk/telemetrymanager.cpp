@@ -52,7 +52,8 @@ bool TelemetryManager::isConnected() const
     return m_connectionState == TELEMETRY_CONNECTED;
 }
 
-TelemetryManager::ConnectionState TelemetryManager::connectionState() const {
+TelemetryManager::ConnectionState TelemetryManager::connectionState() const
+{
     return m_connectionState;
 }
 

@@ -47,9 +47,9 @@
 
 const int UploaderGadgetWidget::BOARD_EVENT_TIMEOUT = 20000;
 const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
-const int UploaderGadgetWidget::REBOOT_TIMEOUT  = 20000;
-const int UploaderGadgetWidget::ERASE_TIMEOUT  = 20000;
-const int UploaderGadgetWidget::BOOTLOADER_TIMEOUT  = 20000;
+const int UploaderGadgetWidget::REBOOT_TIMEOUT     = 20000;
+const int UploaderGadgetWidget::ERASE_TIMEOUT      = 20000;
+const int UploaderGadgetWidget::BOOTLOADER_TIMEOUT = 20000;
 
 TimedDialog::TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent, Qt::WindowFlags flags) :
     QProgressDialog(labelText, tr("Cancel"), 0, timeout, parent, flags), bar(new QProgressBar(this))
@@ -672,18 +672,19 @@ bool UploaderGadgetWidget::autoUpdateCapable()
 bool UploaderGadgetWidget::autoUpdate(bool erase)
 {
     ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pluginManager);
     TelemetryManager *telemetryManager = pluginManager->getObject<TelemetryManager>();
     Q_ASSERT(telemetryManager);
 
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0 &&
-               telemetryManager->connectionState() != TelemetryManager::TELEMETRY_CONNECTED) {
+        telemetryManager->connectionState() != TelemetryManager::TELEMETRY_CONNECTED) {
         // Wait for the board to completely connect
         ResultEventLoop eventLoop;
         connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
 
         if (telemetryManager->connectionState() != TelemetryManager::TELEMETRY_CONNECTED
-                && eventLoop.run(REBOOT_TIMEOUT) != 0) {
+            && eventLoop.run(REBOOT_TIMEOUT) != 0) {
             emit progressUpdate(FAILURE, QVariant(tr("Timed out while waiting for a board to be fully connected!")));
             emit autoUpdateFailed();
             return false;

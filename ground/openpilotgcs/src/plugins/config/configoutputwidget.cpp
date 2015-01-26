@@ -329,6 +329,14 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     ui->cb_outputRate5->setEnabled(false);
     ui->cb_outputRate6->setEnabled(false);
 
+
+    ui->cb_outputMode1->setEnabled(false);
+    ui->cb_outputMode2->setEnabled(false);
+    ui->cb_outputMode3->setEnabled(false);
+    ui->cb_outputMode4->setEnabled(false);
+    ui->cb_outputMode5->setEnabled(false);
+    ui->cb_outputMode6->setEnabled(false);
+
     // Get connected board model
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
@@ -348,6 +356,11 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
             ui->cb_outputRate2->setEnabled(true);
             ui->cb_outputRate3->setEnabled(true);
             ui->cb_outputRate4->setEnabled(true);
+
+            ui->cb_outputMode1->setEnabled(true);
+            ui->cb_outputMode2->setEnabled(true);
+            ui->cb_outputMode3->setEnabled(true);
+            ui->cb_outputMode4->setEnabled(true);
         } else if ((board & 0xff00) == 0x0900) {
             // Revolution family of boards 6 timer banks
             ui->chBank1->setText("1-2");
@@ -356,12 +369,20 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
             ui->chBank4->setText("5-6");
             ui->chBank5->setText("7-8");
             ui->chBank6->setText("9-10");
+
             ui->cb_outputRate1->setEnabled(true);
             ui->cb_outputRate2->setEnabled(true);
             ui->cb_outputRate3->setEnabled(true);
             ui->cb_outputRate4->setEnabled(true);
             ui->cb_outputRate5->setEnabled(true);
             ui->cb_outputRate6->setEnabled(true);
+
+            ui->cb_outputMode1->setEnabled(true);
+            ui->cb_outputMode2->setEnabled(true);
+            ui->cb_outputMode3->setEnabled(true);
+            ui->cb_outputMode4->setEnabled(true);
+            ui->cb_outputMode5->setEnabled(true);
+            ui->cb_outputMode6->setEnabled(true);
         }
     }
 

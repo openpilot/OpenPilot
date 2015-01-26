@@ -32,6 +32,12 @@
 #include <oplinkstatus.h>
 #include <QMessageBox>
 
+// Channel range and Frequency display
+static const int MAX_CHANNEL_NUM   = 250;
+static const int MIN_CHANNEL_RANGE = 10;
+static const float FIRST_FREQUENCY = 430.000;
+static const float FREQUENCY_STEP  = 0.040;
+
 ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_oplink = new Ui_OPLinkWidget();
@@ -97,6 +103,14 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
     // Connect the selection changed signals.
     connect(m_oplink->PPMOnly, SIGNAL(toggled(bool)), this, SLOT(ppmOnlyChanged()));
+    connect(m_oplink->MinimumChannel, SIGNAL(valueChanged(int)), this, SLOT(minChannelChanged()));
+    connect(m_oplink->MaximumChannel, SIGNAL(valueChanged(int)), this, SLOT(maxChannelChanged()));
+
+    m_oplink->MinimumChannel->setKeyboardTracking(false);
+    m_oplink->MaximumChannel->setKeyboardTracking(false);
+
+    m_oplink->MaximumChannel->setMaximum(MAX_CHANNEL_NUM);
+    m_oplink->MinimumChannel->setMaximum(MAX_CHANNEL_NUM - MIN_CHANNEL_RANGE);
 
     // Request and update of the setting object.
     settingsUpdated = false;
@@ -316,6 +330,50 @@ void ConfigPipXtremeWidget::ppmOnlyChanged()
     m_oplink->PPM->setEnabled(!is_ppm_only);
     m_oplink->OneWayLink->setEnabled(!is_ppm_only);
     m_oplink->ComSpeed->setEnabled(!is_ppm_only);
+}
+
+void ConfigPipXtremeWidget::minChannelChanged()
+{
+    channelChanged(false);
+}
+
+void ConfigPipXtremeWidget::maxChannelChanged()
+{
+    channelChanged(true);
+}
+
+void ConfigPipXtremeWidget::channelChanged(bool isMax)
+{
+    int minChannel = m_oplink->MinimumChannel->value();
+    int maxChannel = m_oplink->MaximumChannel->value();
+
+    if ((maxChannel - minChannel) < MIN_CHANNEL_RANGE) {
+        if (isMax) {
+            minChannel = maxChannel - MIN_CHANNEL_RANGE;
+        } else {
+            maxChannel = minChannel + MIN_CHANNEL_RANGE;
+        }
+
+        if (maxChannel > MAX_CHANNEL_NUM) {
+            maxChannel = MAX_CHANNEL_NUM;
+            minChannel = MAX_CHANNEL_NUM - MIN_CHANNEL_RANGE;
+        }
+
+        if (minChannel < 0) {
+            minChannel = 0;
+            maxChannel = MIN_CHANNEL_RANGE;
+        }
+    }
+
+    m_oplink->MaximumChannel->setValue(maxChannel);
+    m_oplink->MinimumChannel->setValue(minChannel);
+
+    // Calculate and Display frequency in MHz
+    float minFrequency = FIRST_FREQUENCY + (minChannel * FREQUENCY_STEP);
+    float maxFrequency = FIRST_FREQUENCY + (maxChannel * FREQUENCY_STEP);
+
+    m_oplink->MinFreq->setText("(" + QString::number(minFrequency, 'f', 3) + " MHz)");
+    m_oplink->MaxFreq->setText("(" + QString::number(maxFrequency, 'f', 3) + " MHz)");
 }
 
 /**

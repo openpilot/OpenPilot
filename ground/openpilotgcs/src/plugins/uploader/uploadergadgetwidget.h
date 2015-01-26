@@ -113,7 +113,9 @@ public:
 
     static const int BOARD_EVENT_TIMEOUT;
     static const int AUTOUPDATE_CLOSE_TIMEOUT;
-    static const int AUTOUPDATE_TIMEOUT;
+    static const int REBOOT_TIMEOUT;
+    static const int ERASE_TIMEOUT;
+    static const int BOOTLOADER_TIMEOUT;
 
     void log(QString str);
     bool autoUpdateCapable();

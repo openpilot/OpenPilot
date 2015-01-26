@@ -47,7 +47,9 @@
 
 const int UploaderGadgetWidget::BOARD_EVENT_TIMEOUT = 20000;
 const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
-const int UploaderGadgetWidget::AUTOUPDATE_TIMEOUT  = 60000;
+const int UploaderGadgetWidget::REBOOT_TIMEOUT  = 20000;
+const int UploaderGadgetWidget::ERASE_TIMEOUT  = 20000;
+const int UploaderGadgetWidget::BOOTLOADER_TIMEOUT  = 20000;
 
 TimedDialog::TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent, Qt::WindowFlags flags) :
     QProgressDialog(labelText, tr("Cancel"), 0, timeout, parent, flags), bar(new QProgressBar(this))
@@ -468,6 +470,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             m_config->systemElements->addTab(dw, tr("Device") + QString::number(i));
         }
 
+        QApplication::processEvents();
+
         // Need to re-enable in case we were not connected
         bootButtonsSetEnable(true);
         emit progressUpdate(JUMP_TO_BL, QVariant(5));
@@ -565,7 +569,7 @@ void UploaderGadgetWidget::systemReboot()
 
     goToBootloader();
 
-    if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
+    if (eventLoop.run(REBOOT_TIMEOUT) != 0) {
         emit progressUpdate(FAILURE, QVariant());
         return;
     }
@@ -586,7 +590,7 @@ void UploaderGadgetWidget::systemReboot()
 
         connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
 
-        if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
+        if (eventLoop.run(REBOOT_TIMEOUT) != 0) {
             emit progressUpdate(FAILURE, QVariant());
             return;
         }
@@ -678,14 +682,12 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         ResultEventLoop eventLoop;
         connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
 
-        qDebug() << "WAITING...";
         if (telemetryManager->connectionState() != TelemetryManager::TELEMETRY_CONNECTED
-                && eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
-            emit progressUpdate(FAILURE, QVariant());
+                && eventLoop.run(REBOOT_TIMEOUT) != 0) {
+            emit progressUpdate(FAILURE, QVariant(tr("Timed out while waiting for a board to be fully connected!")));
             emit autoUpdateFailed();
             return false;
         }
-        qDebug() << "DONE WAITING...";
 
         disconnect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
     }
@@ -704,8 +706,8 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
 
         goToBootloader();
 
-        if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
-            emit progressUpdate(FAILURE, QVariant());
+        if (eventLoop.run(BOOTLOADER_TIMEOUT) != 0) {
+            emit progressUpdate(FAILURE, QVariant(tr("Failed to enter bootloader mode.")));
             emit autoUpdateFailed();
             return false;
         }
@@ -729,7 +731,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         delete dfu;
         dfu = NULL;
         connectionManager->resumePolling();
-        emit progressUpdate(FAILURE, QVariant());
+        emit progressUpdate(FAILURE, QVariant(tr("Failed to enter bootloader mode.")));
         emit autoUpdateFailed();
         return false;
     }
@@ -757,20 +759,20 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         filename = "fw_discoveryf4bare";
         break;
     default:
-        emit progressUpdate(FAILURE, QVariant());
+        emit progressUpdate(FAILURE, QVariant(tr("Unknown board id '0x%1'").arg(QString::number(dfu->devices[0].ID, 16))));
         emit autoUpdateFailed();
         return false;
     }
     filename = ":/firmware/" + filename + ".opfw";
     QByteArray firmware;
     if (!QFile::exists(filename)) {
-        emit progressUpdate(FAILURE, QVariant());
+        emit progressUpdate(FAILURE, QVariant(tr("Firmware image not found.")));
         emit autoUpdateFailed();
         return false;
     }
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
-        emit progressUpdate(FAILURE, QVariant());
+        emit progressUpdate(FAILURE, QVariant(tr("Could not open firmware image for reading.")));
         emit autoUpdateFailed();
         return false;
     }
@@ -780,13 +782,13 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &eventLoop2, SLOT(quit()));
     emit progressUpdate(UPLOADING_FW, QVariant());
     if (!dfu->enterDFU(0)) {
-        emit progressUpdate(FAILURE, QVariant());
+        emit progressUpdate(FAILURE, QVariant(tr("Could not enter direct firmware upload mode.")));
         emit autoUpdateFailed();
         return false;
     }
     dfu->AbortOperation();
     if (!dfu->UploadFirmware(filename, false, 0)) {
-        emit progressUpdate(FAILURE, QVariant());
+        emit progressUpdate(FAILURE, QVariant(tr("Firmware upload failed.")));
         emit autoUpdateFailed();
         return false;
     }
@@ -794,7 +796,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     QByteArray desc = firmware.right(100);
     emit progressUpdate(UPLOADING_DESC, QVariant());
     if (dfu->UploadDescription(desc) != OP_DFU::Last_operation_Success) {
-        emit progressUpdate(FAILURE, QVariant());
+        emit progressUpdate(FAILURE, QVariant(tr("Failed to upload firmware description.")));
         emit autoUpdateFailed();
         return false;
     }
@@ -808,8 +810,8 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         ResultEventLoop eventLoop;
         connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
 
-        if (eventLoop.run(AUTOUPDATE_TIMEOUT) != 0) {
-            emit progressUpdate(FAILURE, QVariant());
+        if (eventLoop.run(REBOOT_TIMEOUT + (erase ? ERASE_TIMEOUT : 0)) != 0) {
+            emit progressUpdate(FAILURE, QVariant(tr("Timed out while booting.")));
             emit autoUpdateFailed();
             return false;
         }
@@ -1079,7 +1081,7 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::ProgressStep status, QVari
         if (msg.isEmpty()) {
             msg = tr("Something went wrong, you will have to manually upgrade the board.");
         }
-        msg += " " + tr("Press OK to finish.");
+        msg += " " + tr("Press OK to finish,  you will have to manually upgrade the board.");
         m_config->autoUpdateLabel->setText(QString("<font color='red'>%1</font>").arg(msg));
         finishAutoUpdate();
         break;

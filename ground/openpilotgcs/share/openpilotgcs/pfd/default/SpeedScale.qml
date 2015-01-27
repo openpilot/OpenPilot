@@ -49,7 +49,7 @@ Item {
                             visible: speed_scale.topNumber - index >= 0
 
                             font.pixelSize: parent.height / 3
-                            font.family: "Arial"
+                            font.family: pt_bold.name
 
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.verticalCenter: parent.top
@@ -90,7 +90,7 @@ Item {
             text: sceneItem.groundSpeed.toFixed(1)+"  "
             color: "white"
             font {
-                family: "Arial"
+                family: pt_bold.name
                 pixelSize: parent.height * 0.35
                 weight: Font.DemiBold
             }
@@ -115,7 +115,7 @@ Item {
            text: qmlWidget.speedUnit
            color: "cyan"
            font {
-                family: "Arial"
+                family: pt_bold.name
                 pixelSize: parent.height * 0.6
                 weight: Font.DemiBold
             }

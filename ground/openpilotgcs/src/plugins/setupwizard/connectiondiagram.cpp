@@ -141,7 +141,7 @@ void ConnectionDiagram::setupGraphicsScene()
                 break;
             default:
                 break;
-            }   
+            }
         case VehicleConfigurationSource::VEHICLE_SURFACE:
             switch (m_configSource->getVehicleSubType()) {
             case VehicleConfigurationSource::GROUNDVEHICLE_CAR:
@@ -156,7 +156,7 @@ void ConnectionDiagram::setupGraphicsScene()
             default:
                 break;
             }
-        case VehicleConfigurationSource::VEHICLE_HELI: 
+        case VehicleConfigurationSource::VEHICLE_HELI:
         default:
             break;
         }

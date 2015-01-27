@@ -6,8 +6,6 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-FW_DIR := $(PACKAGE_DIR)/firmware
-
 .PHONY: package
 package:
 	( \
@@ -17,6 +15,5 @@ package:
 	  PACKAGE_DIR="$(PACKAGE_DIR)" \
 	  PACKAGE_NAME="$(PACKAGE_NAME)" \
 	  PACKAGE_SEP="$(PACKAGE_SEP)" \
-	  FW_DIR="$(FW_DIR)" \
 	  "$(ROOT_DIR)/package/osx/package" \
 	)

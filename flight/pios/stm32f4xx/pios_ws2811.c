@@ -74,7 +74,7 @@ static void genericTIM_OCxPreloadConfig(TIM_TypeDef *TIMx, uint16_t TIM_OCPreloa
         },
     },
     ....
-    [HWSETTINGS_WS2811LED_OUT_FLEXIPIN4] = {
+    [HWSETTINGS_WS2811LED_OUT_FLEXIIOPIN4] = {
         .gpio     = GPIOB,
         .gpioInit =                        {
             .GPIO_Pin   = GPIO_Pin_13,

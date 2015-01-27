@@ -807,7 +807,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     // Wait for board to connect to GCS again after boot and erase
     // For older board like CC3D this can take some time
     if (!telemetryManager->isConnected()) {
-        progressUpdate(BOOTING, erase ? tr(" and erasing settings") : QVariant());
+        progressUpdate(erase ? BOOTING_AND_ERASING : BOOTING, QVariant());
         ResultEventLoop eventLoop;
         connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
 
@@ -1068,21 +1068,24 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::ProgressStep status, QVari
         m_config->autoUpdateLabel->setText(tr("Uploading description of the new firmware to the board."));
         break;
     case uploader::BOOTING:
-        m_config->autoUpdateLabel->setText(tr("Rebooting the board%1. Please wait.").arg(value.toString()));
+        m_config->autoUpdateLabel->setText(tr("Rebooting the board. Please wait."));
+        break;
+    case uploader::BOOTING_AND_ERASING:
+        m_config->autoUpdateLabel->setText(tr("Rebooting and erasing the board. Please wait."));
         break;
     case uploader::SUCCESS:
         m_config->autoUpdateProgressBar->setValue(m_config->autoUpdateProgressBar->maximum());
-        msg  = tr("Board was updated successfully.");
-        msg += " " + tr("Press OK to finish.");
+        msg = tr("Board was updated successfully. Press OK to finish.");
         m_config->autoUpdateLabel->setText(QString("<font color='green'>%1</font>").arg(msg));
         finishAutoUpdate();
         break;
     case uploader::FAILURE:
         msg = value.toString();
         if (msg.isEmpty()) {
-            msg = tr("Something went wrong, you will have to manually upgrade the board.");
+            msg = tr("Something went wrong.");
         }
-        msg += " " + tr("Press OK to finish,  you will have to manually upgrade the board.");
+        msg += tr(" Press OK to finish, you will have to manually upgrade the board.");
+
         m_config->autoUpdateLabel->setText(QString("<font color='red'>%1</font>").arg(msg));
         finishAutoUpdate();
         break;

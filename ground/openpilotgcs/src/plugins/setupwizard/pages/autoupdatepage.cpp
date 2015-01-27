@@ -86,7 +86,10 @@ void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
         ui->statusLabel->setText(tr("Uploading description."));
         break;
     case uploader::BOOTING:
-        ui->statusLabel->setText(tr("Booting the board%1. Please wait").arg(value.toString()));
+        ui->statusLabel->setText(tr("Booting the board. Please wait"));
+        break;
+    case uploader::BOOTING_AND_ERASING:
+        ui->statusLabel->setText(tr("Booting and erasing the board. Please wait"));
         break;
     case uploader::SUCCESS:
         m_isUpdating = false;
@@ -98,8 +101,9 @@ void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
         enableButtons(true);
         QString msg = value.toString();
         if (msg.isEmpty()) {
-            msg = tr("Something went wrong, you will have to manually upgrade the board using the uploader plugin.");
+            msg = tr("Something went wrong.");
         }
+        msg += tr(" You will have to manually upgrade the board using the uploader plugin.");
         ui->statusLabel->setText(QString("<font color='red'>%1</font>").arg(msg));
         break;
     }

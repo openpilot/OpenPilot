@@ -66,10 +66,10 @@ void RebootDialog::progressUpdate(uploader::ProgressStep progress, QVariant mess
         if (progress == uploader::FAILURE) {
             ui->rebootProgressBar->setVisible(false);
             ui->okButton->setVisible(true);
-            ui->label->setText(tr("<font color='red'>Reboot failed!</font><p> Please perform a manual reboot by power cycling the board.<br>"
+            ui->label->setText(tr("<font color='red'>Reboot failed!</font><p>Please perform a manual reboot by power cycling the board.<br>"
                                   "To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.<br>"
                                   "After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds.<br>"
-                                  "Then press Ok."));
+                                  "Then press Ok.</p>"));
             QDialog::exec();
         } else {
             accept();

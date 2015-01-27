@@ -249,6 +249,15 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
     actuatorCommand->setData(actuatorCommandFields);
 }
 
+void ConfigOutputWidget::setColor(QWidget *widget, const QColor color)
+{
+    QPalette p(palette());
+    QColor color2 = QColor(color);
+
+    p.setColor(QPalette::Background, color2);
+    widget->setAutoFillBackground(true);
+    widget->setPalette(p);
+}
 
 /********************************
  *  Output settings
@@ -272,6 +281,9 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     // Get channel descriptions
     QStringList ChannelDesc = ConfigVehicleTypeWidget::getChannelDescriptions();
 
+    QList<int> ChannelBanks;
+    QList<QColor> bankColors;
+    bankColors << Qt::magenta << Qt::yellow << Qt::green << Qt::cyan << Qt::red << Qt::darkCyan;
     // Initialize output forms
     QList<OutputChannelForm *> outputChannelForms = findChildren<OutputChannelForm *>();
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
@@ -315,84 +327,72 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     ui->cb_outputRate5->setCurrentIndex(ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.BankUpdateFreq[4])));
     ui->cb_outputRate6->setCurrentIndex(ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.BankUpdateFreq[5])));
 
+    QList<QLabel *> bank;
+    bank << ui->chBank1 << ui->chBank2 << ui->chBank3 << ui->chBank4 << ui->chBank5 << ui->chBank6;
+    QList<QComboBox *> outputRateCombos;
+    outputRateCombos << ui->cb_outputRate1 << ui->cb_outputRate2 << ui->cb_outputRate3 <<
+        ui->cb_outputRate4 << ui->cb_outputRate5 << ui->cb_outputRate6;
+
+    QList<QComboBox *> outputModeCombos;
+    outputModeCombos << ui->cb_outputMode1 << ui->cb_outputMode2 << ui->cb_outputMode3 <<
+        ui->cb_outputMode4 << ui->cb_outputMode5 << ui->cb_outputMode6;
     // Reset to all disabled
-    ui->chBank1->setText("-");
-    ui->chBank2->setText("-");
-    ui->chBank3->setText("-");
-    ui->chBank4->setText("-");
-    ui->chBank5->setText("-");
-    ui->chBank6->setText("-");
-    ui->cb_outputRate1->setEnabled(false);
-    ui->cb_outputRate2->setEnabled(false);
-    ui->cb_outputRate3->setEnabled(false);
-    ui->cb_outputRate4->setEnabled(false);
-    ui->cb_outputRate5->setEnabled(false);
-    ui->cb_outputRate6->setEnabled(false);
+    foreach(QLabel * label, bank) {
+        label->setText("-");
+    }
+    int i = 0;
+    foreach(QComboBox * cbo, outputRateCombos) {
+        cbo->setEnabled(false);
+        setColor(cbo, palette().color(QPalette::Background));
+    }
 
-
-    ui->cb_outputMode1->setEnabled(false);
-    ui->cb_outputMode2->setEnabled(false);
-    ui->cb_outputMode3->setEnabled(false);
-    ui->cb_outputMode4->setEnabled(false);
-    ui->cb_outputMode5->setEnabled(false);
-    ui->cb_outputMode6->setEnabled(false);
+    i = 0;
+    foreach(QComboBox * cbo, outputModeCombos) {
+        cbo->setEnabled(false);
+        setColor(cbo, palette().color(QPalette::Background));
+    }
 
     // Get connected board model
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
     UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
     Q_ASSERT(utilMngr);
+    QStringList bankLabels;
 
     if (utilMngr) {
         int board = utilMngr->getBoardModel();
         // Setup labels and combos for banks according to board type
         if ((board & 0xff00) == 0x0400) {
             // Coptercontrol family of boards 4 timer banks
-            ui->chBank1->setText("1-3");
-            ui->chBank2->setText("4");
-            ui->chBank3->setText("5,7-8");
-            ui->chBank4->setText("6,9-10");
-            ui->cb_outputRate1->setEnabled(true);
-            ui->cb_outputRate2->setEnabled(true);
-            ui->cb_outputRate3->setEnabled(true);
-            ui->cb_outputRate4->setEnabled(true);
-
-            ui->cb_outputMode1->setEnabled(true);
-            ui->cb_outputMode2->setEnabled(true);
-            ui->cb_outputMode3->setEnabled(true);
-            ui->cb_outputMode4->setEnabled(true);
+            bankLabels << "1 (1-3)" << "2 (4)" << "3 (5,7-8)" << "4 (6,9-10)";
+            ChannelBanks << 1 << 1 << 1 << 2 << 3 << 4 << 3 << 3 << 4 << 4;
         } else if ((board & 0xff00) == 0x0900) {
             // Revolution family of boards 6 timer banks
-            ui->chBank1->setText("1-2");
-            ui->chBank2->setText("3");
-            ui->chBank3->setText("4");
-            ui->chBank4->setText("5-6");
-            ui->chBank5->setText("7-8");
-            ui->chBank6->setText("9-10");
-
-            ui->cb_outputRate1->setEnabled(true);
-            ui->cb_outputRate2->setEnabled(true);
-            ui->cb_outputRate3->setEnabled(true);
-            ui->cb_outputRate4->setEnabled(true);
-            ui->cb_outputRate5->setEnabled(true);
-            ui->cb_outputRate6->setEnabled(true);
-
-            ui->cb_outputMode1->setEnabled(true);
-            ui->cb_outputMode2->setEnabled(true);
-            ui->cb_outputMode3->setEnabled(true);
-            ui->cb_outputMode4->setEnabled(true);
-            ui->cb_outputMode5->setEnabled(true);
-            ui->cb_outputMode6->setEnabled(true);
+            bankLabels << "1 (1-2)" << "2 (3)" << "3 (4)" << "4 (5-6)" << "5 (7-8)" << "6 (9-10)";
+            ChannelBanks << 1 << 1 << 2 << 3 << 4 << 4 << 5 << 5 << 6 << 6;
         }
     }
 
+    i = 0;
+    foreach(QString banklabel, bankLabels) {
+        bank[i]->setText(banklabel);
+        outputRateCombos[i]->setEnabled(true);
+        setColor(outputRateCombos[i], bankColors[i]);
+        outputModeCombos[i]->setEnabled(true);
+        setColor(outputModeCombos[i], bankColors[i]);
+        i++;
+    }
     // Get Channel ranges:
+    i = 0;
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
 
         outputChannelForm->setRange(minValue, maxValue);
-
+        if (ChannelBanks.count() > i) {
+            outputChannelForm->setBank(QString("%1:").arg(ChannelBanks.at(i)));
+            outputChannelForm->setColor(bankColors[ChannelBanks.at(i++) - 1]);
+        }
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->setNeutral(neutral);
     }

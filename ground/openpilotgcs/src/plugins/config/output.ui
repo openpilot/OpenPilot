@@ -183,7 +183,7 @@
               <item row="0" column="1">
                <widget class="QLabel" name="label_9">
                 <property name="text">
-                 <string>Channels:</string>
+                 <string>Bank(Channels):</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

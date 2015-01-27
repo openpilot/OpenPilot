@@ -82,9 +82,12 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>The source of Curve 1 will always be Throttle</string>
+            </property>
             <item>
              <property name="text">
-              <string>Thrust</string>
+              <string>Throttle</string>
              </property>
             </item>
            </widget>
@@ -173,11 +176,6 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <item>
-             <property name="text">
-              <string>Thrust</string>
-             </property>
-            </item>
            </widget>
           </item>
          </layout>

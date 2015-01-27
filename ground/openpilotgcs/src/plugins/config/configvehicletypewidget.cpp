@@ -191,9 +191,9 @@ void ConfigVehicleTypeWidget::switchAirframeType(int index)
    Note: The default behavior of ConfigTaskWidget is bypassed.
    Therefore no automatic synchronization of UAV Objects to UI is done.
  */
-void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
+void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *object)
 {
-    Q_UNUSED(o);
+    ConfigTaskWidget::refreshWidgetsValues(object);
 
     if (!allObjectsUpdated()) {
         return;
@@ -248,7 +248,6 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     m_aircraft->nameEdit->setText(name);
 
     updateFeedForwardUI();
-
     setDirty(dirty);
 }
 
@@ -306,6 +305,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 
     // call refreshWidgetsValues() to reflect actual saved values
     refreshWidgetsValues();
+    ConfigTaskWidget::updateObjectsFromWidgets();
     updateFeedForwardUI();
 }
 

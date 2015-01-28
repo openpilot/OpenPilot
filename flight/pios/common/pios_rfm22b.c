@@ -1369,7 +1369,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
         }
 
         // Wait 1ms if not.
-        PIOS_DELAY_WaitmS(1);
+        vTaskDelay(1 / portTICK_RATE_MS);
     }
 
     // ****************
@@ -1474,6 +1474,9 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     // x-nibbles rx preamble detection
     rfm22_write(rfm22b_dev, RFM22_preamble_detection_ctrl1, RX_PREAMBLE_NIBBLES << 3);
 
+    // Yield the CPU.
+    vTaskDelay(1 / portTICK_RATE_MS);
+
     // header control - using a 4 by header with broadcast of 0xffffffff
     rfm22_write(rfm22b_dev, RFM22_header_control1,
                 RFM22_header_cntl1_bcen_0 |
@@ -1522,6 +1525,9 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
     // Release the bus
     rfm22_releaseBus(rfm22b_dev);
+
+    // Yield the CPU.
+    vTaskDelay(1 / portTICK_RATE_MS);
 
     // Initialize the frequency and datarate to te default.
     rfm22_setNominalCarrierFrequency(rfm22b_dev, 0);

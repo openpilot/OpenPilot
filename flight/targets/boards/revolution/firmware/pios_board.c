@@ -379,13 +379,6 @@ void PIOS_Board_Init(void)
         PIOS_DEBUG_Assert(0);
     }
 
-#ifdef PIOS_INCLUDE_APA102
-    if (PIOS_SPI_Init(&pios_spi_apa102_id, &pios_spi_apa102_cfg)) {
-        PIOS_DEBUG_Assert(0);
-    }
-
-#endif
-
     /* Set up the SPI interface to the flash and rfm22b */
     if (PIOS_SPI_Init(&pios_spi_telem_flash_id, &pios_spi_telem_flash_cfg)) {
         PIOS_DEBUG_Assert(0);
@@ -957,6 +950,10 @@ void PIOS_Board_Init(void)
 #ifdef PIOS_INCLUDE_APA102
 #include <pios_apa102.h>
     if (enable_apa102_leds) {
+        if (PIOS_SPI_Init(&pios_spi_apa102_id, &pios_spi_apa102_cfg)) {
+            PIOS_DEBUG_Assert(0);
+        }
+
         if (PIOS_APA102_Init(pios_spi_apa102_id, 0)) {
             PIOS_Assert(0);
         }

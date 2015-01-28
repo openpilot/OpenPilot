@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios_extled.h
+ * @file       pios_ext_leds.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      External LED API
+ * @brief      External LEDs Driver
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,16 +23,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_EXTLED_H_
-#define PIOS_EXTLED_H_
+#ifndef PIOS_EXT_LEDS_H
+#define PIOS_EXT_LEDS_H
 
 #include <stdint.h>
 #include <optypes.h>
 
-struct ExtLedsBridge {
+struct pios_ext_leds_driver {
     uint8_t (*NumLeds)();
     int32_t (*SetColorRGB)(const Color_t color, uint8_t index, bool update);
     int32_t (*Update)();
 };
 
-#endif /* PIOS_EXTLED_H_ */
+/* Public Functions */
+extern uint8_t PIOS_ExtLeds_NumLeds(uint32_t ext_leds_id);
+extern int32_t PIOS_ExtLeds_SetColorRGB(uint32_t ext_leds_id, const Color_t color, uint8_t index, bool update);
+extern int32_t PIOS_ExtLeds_Update(uint32_t ext_leds_id);
+
+#endif /* PIOS_EXT_LEDS_H */

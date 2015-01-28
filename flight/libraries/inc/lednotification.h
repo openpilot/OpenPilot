@@ -31,7 +31,7 @@
 
 struct ExtLedsBridge;
 
-void LedNotificationExtLedsInit(struct ExtLedsBridge *ext_leds);
+void LedNotificationExtLedsInit(uint32_t ext_leds_id);
 
 void LedNotificationExtLedsRun();
 

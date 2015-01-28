@@ -34,7 +34,7 @@
 #include <pios_stm32.h>
 #include "FreeRTOS.h"
 #include "task.h"
-#include "extled.h"
+#include <pios_ext_leds.h>
 
 
 // framebuffer
@@ -53,6 +53,9 @@ static void genericTIM_OCxInit(TIM_TypeDef *TIMx, const TIM_OCInitTypeDef *TIM_O
 static void genericTIM_OCxPreloadConfig(TIM_TypeDef *TIMx, uint16_t TIM_OCPreload, uint8_t ch);
 
 // timer creates a 1.25 uS signal, with duty cycle controlled by frame buffer values
+
+static int32_t PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update);
+static int32_t PIOS_WS2811_Update();
 
 /* Example configuration fragment for REVOLUTION
 
@@ -303,7 +306,7 @@ void setColor(uint8_t color, ledbuf_t *buf)
  * @param led led number
  * @param update Perform an update after changing led color
  */
-int32_t PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
+static int32_t PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
 {
     if (led >= PIOS_WS2811_NUMLEDS) {
         return -1;
@@ -322,7 +325,7 @@ int32_t PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
 /**
  * trigger an update cycle if not already running
  */
-int32_t PIOS_WS2811_Update()
+static int32_t PIOS_WS2811_Update()
 {
     // does not start if framebuffer is not allocated (init has not been called yet) or a transfer is still on going
     if (!fb || (pios_ws2811_cfg->timer->CR1 & TIM_CR1_CEN)) {
@@ -346,15 +349,15 @@ static uint8_t PIOS_WS2811_NumLeds()
     return PIOS_WS2811_NUMLEDS;
 }
 
-struct ExtLedsBridge *PIOS_WS2811_Bridge()
+const struct pios_ext_leds_driver *PIOS_WS2811_Driver()
 {
-    static struct ExtLedsBridge PIOS_WS2811_ExtLedsBridge = {
+    static const struct pios_ext_leds_driver pios_ws2811_driver = {
         .NumLeds     = PIOS_WS2811_NumLeds,
         .SetColorRGB = PIOS_WS2811_setColorRGB,
         .Update      = PIOS_WS2811_Update
     };
 
-    return &PIOS_WS2811_ExtLedsBridge;
+    return &pios_ws2811_driver;
 }
 
 /**

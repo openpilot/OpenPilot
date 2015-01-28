@@ -28,7 +28,7 @@
 
 #include "pios_apa102.h"
 
-#include <extled.h>
+#include <pios_ext_leds.h>
 
 enum pios_apa102_dev_magic {
     PIOS_APA102_DEV_MAGIC = 0xcfb93755,
@@ -48,6 +48,8 @@ static struct apa102_dev *dev;
 
 // ! Private functions
 static struct apa102_dev *PIOS_APA102_alloc(void);
+static int32_t PIOS_APA102_SetColorRGB(Color_t c, uint8_t led, bool update);
+static int32_t PIOS_APA102_Update();
 static int32_t PIOS_APA102_Validate(struct apa102_dev *dev);
 static int32_t PIOS_APA102_ClaimBus();
 // static int32_t PIOS_APA102_ClaimBusISR(bool *woken);
@@ -101,7 +103,7 @@ int32_t PIOS_APA102_Init(uint32_t spi_id, uint32_t slave_num)
 
     const Color_t ledoff = Color_Blue;
     for (uint8_t i = 0; i < PIOS_APA102_NUMLEDS; i++) {
-        PIOS_APA102_setColorRGB(ledoff, i, false);
+        PIOS_APA102_SetColorRGB(ledoff, i, false);
     }
 
     return 0;
@@ -113,7 +115,7 @@ int32_t PIOS_APA102_Init(uint32_t spi_id, uint32_t slave_num)
  * @param led led number
  * @param update Perform an update after changing led color
  */
-int32_t PIOS_APA102_setColorRGB(Color_t c, uint8_t led, bool update)
+static int32_t PIOS_APA102_SetColorRGB(Color_t c, uint8_t led, bool update)
 {
     if (led >= PIOS_APA102_NUMLEDS) {
         return -1;
@@ -140,7 +142,7 @@ static void request_callback(bool arg0, uint8_t arg1)
 /**
  * trigger an update cycle if not already running
  */
-int32_t PIOS_APA102_Update()
+static int32_t PIOS_APA102_Update()
 {
     if (PIOS_APA102_ClaimBus() != 0) {
         return -1;
@@ -182,15 +184,15 @@ static uint8_t PIOS_APA102_NumLeds()
     return PIOS_APA102_NUMLEDS;
 }
 
-struct ExtLedsBridge *PIOS_APA102_Bridge()
+const struct pios_ext_leds_driver *PIOS_APA102_Driver()
 {
-    static struct ExtLedsBridge APA102ExtLedsBridge = {
+    static const struct pios_ext_leds_driver pios_apa102_driver = {
         .NumLeds     = PIOS_APA102_NumLeds,
-        .SetColorRGB = PIOS_APA102_setColorRGB,
+        .SetColorRGB = PIOS_APA102_SetColorRGB,
         .Update      = PIOS_APA102_Update
     };
 
-    return &APA102ExtLedsBridge;
+    return &pios_apa102_driver;
 }
 
 

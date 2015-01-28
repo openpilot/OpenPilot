@@ -28,14 +28,12 @@
 #include <stdint.h>
 #include <optypes.h>
 
-struct ExtLedsBridge;
+struct pios_ext_leds_driver;
 
 #define PIOS_APA102_NUMLEDS 2
 
-int32_t PIOS_APA102_setColorRGB(Color_t c, uint8_t led, bool update);
-int32_t PIOS_APA102_Update();
 int32_t PIOS_APA102_Init(uint32_t spi_id, uint32_t slave_num);
 
-struct ExtLedsBridge *PIOS_APA102_Bridge();
+const struct pios_ext_leds_driver *PIOS_APA102_Driver();
 
 #endif /* PIOS_APA102_H_ */

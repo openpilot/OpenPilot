@@ -29,8 +29,8 @@
 #include <string.h>
 #include <FreeRTOS.h>
 #include <pios.h>
+#include <pios_ext_leds.h>
 #include <pios_notify.h>
-#include <extled.h>
 
 // Private defines
 
@@ -64,14 +64,14 @@ static volatile bool led_status_initialized = false;
 
 NotifierLedStatus_t led_status[MAX_HANDLED_LED];
 
-static struct ExtLedsBridge *ext_leds = NULL;
-void LedNotificationExtLedsInit(struct ExtLedsBridge *ext_leds_bridge)
+static uint32_t ext_led = 0;
+void LedNotificationExtLedsInit(uint32_t ext_leds_id)
 {
-    ext_leds = ext_leds_bridge;
+    ext_led = ext_leds_id;
 
     memset(led_status, 0, sizeof(NotifierLedStatus_t) * MAX_HANDLED_LED);
     const uint32_t now     = GET_CURRENT_MILLIS;
-    const uint8_t num_leds = (ext_leds != NULL) ? ext_leds->NumLeds() : 1;
+    const uint8_t num_leds = PIOS_ExtLeds_NumLeds(ext_led);
     for (uint8_t l = 0; l < MAX_HANDLED_LED; l++) {
         led_status[l].led_set_start = 0;
         led_status[l].led_set_end   = num_leds - 1;
@@ -239,13 +239,9 @@ static void run_led(NotifierLedStatus_t *status)
     const Color_t color = status->step_phase_on ? activeSequence->steps[step].color : Color_Off;
 
     for (uint8_t i = status->led_set_start; i <= status->led_set_end; i++) {
-        if (ext_leds != NULL) {
-            ext_leds->SetColorRGB(color, i, false);
-        }
+        PIOS_ExtLeds_SetColorRGB(ext_led, color, i, false);
     }
-    if (ext_leds != NULL) {
-        ext_leds->Update();
-    }
+    PIOS_ExtLeds_Update(ext_led);
     advance_sequence(status);
 }
 

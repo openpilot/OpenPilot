@@ -1,12 +1,14 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_ExtLeds External LEDs Functions
+ * @brief PIOS interface for external LEDs
+ * @{
  *
- * @file       pios_ws2811.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      A driver for ws2811 rgb led controller.
- *             this is a plain PiOS port of the very clever solution
- *             implemented by Omri Iluz in the chibios driver here:
- *             https://github.com/omriiluz/WS2812B-LED-Driver-ChibiOS
+ * @file       pios_ext_leds_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      USART private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -25,16 +27,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PIOS_WS2811_H_
-#define PIOS_WS2811_H_
+#ifndef PIOS_EXT_LEDS_PRIV_H
+#define PIOS_EXT_LEDS_PRIV_H
 
 #include <stdint.h>
-#include <optypes.h>
 
 struct pios_ext_leds_driver;
 
-#define PIOS_WS2811_NUMLEDS 2
+extern int32_t PIOS_ExtLeds_Init(uint32_t *ext_leds_id, const struct pios_ext_leds_driver *driver);
 
-const struct pios_ext_leds_driver *PIOS_WS2811_Driver();
-
-#endif /* PIOS_WS2811_H_ */
+#endif /* PIOS_EXT_LEDS_PRIV_H */

@@ -36,6 +36,7 @@
 #include <oplinkreceiver.h>
 #include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
+#include <pios_ext_leds_priv.h>
 #include <pios_apa102.h>
 #include <pios_ws2811.h>
 
@@ -957,7 +958,10 @@ void PIOS_Board_Init(void)
         if (PIOS_APA102_Init(pios_spi_apa102_id, 0)) {
             PIOS_Assert(0);
         }
-        LedNotificationExtLedsInit(PIOS_APA102_Bridge());
+
+        uint32_t pios_apa102_id;
+        PIOS_ExtLeds_Init(&pios_apa102_id, PIOS_APA102_Driver());
+        LedNotificationExtLedsInit(pios_apa102_id);
     }
 #endif
 
@@ -970,7 +974,10 @@ void PIOS_Board_Init(void)
 
         if (ws2811_pin_settings != HWSETTINGS_WS2811LED_OUT_DISABLED && ws2811_pin_settings < NELEMENTS(pios_ws2811_pin_cfg)) {
             PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg[ws2811_pin_settings]);
-            LedNotificationExtLedsInit(PIOS_WS2811_Bridge());
+
+            uint32_t pios_ws2811_id;
+            PIOS_ExtLeds_Init(&pios_ws2811_id, PIOS_WS2811_Driver());
+            LedNotificationExtLedsInit(pios_ws2811_id);
         }
     }
 

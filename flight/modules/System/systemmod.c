@@ -43,7 +43,7 @@
 #include "inc/systemmod.h"
 
 #include <notification.h>
-#ifdef PIOS_INCLUDE_WS2811
+#if (defined(PIOS_INCLUDE_WS2811) || defined(PIOS_INCLUDE_APA102))
 #include <lednotification.h>
 #endif
 
@@ -637,7 +637,7 @@ static void updateSystemAlarms()
 void vApplicationIdleHook(void)
 {
     NotificationOnboardLedsRun();
-#ifdef PIOS_INCLUDE_WS2811
+#if defined(PIOS_INCLUDE_WS2811) || defined(PIOS_INCLUDE_APA102)
     LedNotificationExtLedsRun();
 #endif
 }

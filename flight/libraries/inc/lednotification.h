@@ -25,7 +25,13 @@
  */
 #ifndef LEDNOTIFICATION_H_
 #define LEDNOTIFICATION_H_
+
 #include <optypes.h>
+#include <stdbool.h>
+
+struct ExtLedsBridge;
+
+void LedNotificationExtLedsInit(struct ExtLedsBridge *ext_leds);
 
 void LedNotificationExtLedsRun();
 

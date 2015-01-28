@@ -347,6 +347,118 @@ void PIOS_OVERO_irq_handler(void)
 
 #endif /* PIOS_OVERO_SPI */
 
+#ifdef PIOS_INCLUDE_APA102
+/*
+ * SPI2 APA102 Interface
+ */
+void PIOS_SPI_apa102_irq_handler(void);
+void DMA1_Stream3_IRQHandler(void) __attribute__((alias("PIOS_SPI_apa102_irq_handler")));
+void DMA1_Stream4_IRQHandler(void) __attribute__((alias("PIOS_SPI_apa102_irq_handler")));
+static const struct pios_spi_cfg pios_spi_apa102_cfg = {
+    .regs  = SPI2,
+    .remap = GPIO_AF_SPI2,
+    .init  = {
+        .SPI_Mode              = SPI_Mode_Master,
+        .SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
+        .SPI_DataSize          = SPI_DataSize_8b,
+        .SPI_NSS                                   = SPI_NSS_Soft,
+        .SPI_FirstBit          = SPI_FirstBit_MSB,
+        .SPI_CRCPolynomial     = 7,
+        .SPI_CPOL              = SPI_CPOL_High,
+        .SPI_CPHA              = SPI_CPHA_2Edge,
+        .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16,
+    },
+    .use_crc = false,
+    .dma     = {
+        .irq                                       = {
+            .flags = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3),
+            .init  = {
+                .NVIC_IRQChannel    = DMA1_Stream4_IRQn,
+                .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+                .NVIC_IRQChannelSubPriority        = 0,
+                .NVIC_IRQChannelCmd = ENABLE,
+            },
+        },
+
+        .rx                                        = {
+            .channel = DMA1_Stream3,
+            .init    = {
+                .DMA_Channel            = DMA_Channel_0,
+                .DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+                .DMA_DIR                = DMA_DIR_PeripheralToMemory,
+                .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+                .DMA_MemoryInc          = DMA_MemoryInc_Enable,
+                .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+                .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+                .DMA_Mode               = DMA_Mode_Normal,
+                .DMA_Priority           = DMA_Priority_Medium,
+                .DMA_FIFOMode           = DMA_FIFOMode_Disable,
+                /* .DMA_FIFOThreshold */
+                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+            },
+        },
+        .tx                                        = {
+            .channel = DMA1_Stream4,
+            .init    = {
+                .DMA_Channel            = DMA_Channel_0,
+                .DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+                .DMA_DIR                = DMA_DIR_MemoryToPeripheral,
+                .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+                .DMA_MemoryInc          = DMA_MemoryInc_Enable,
+                .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+                .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+                .DMA_Mode               = DMA_Mode_Normal,
+                .DMA_Priority           = DMA_Priority_High,
+                .DMA_FIFOMode           = DMA_FIFOMode_Disable,
+                /* .DMA_FIFOThreshold */
+                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+            },
+        },
+    },
+    .sclk                                          = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_13,
+            .GPIO_Speed = GPIO_Speed_100MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+    },
+    .miso                                          = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_14,
+            .GPIO_Speed = GPIO_Speed_50MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+    },
+    .mosi                                          = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_15,
+            .GPIO_Speed = GPIO_Speed_50MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+    },
+    .slave_count                                   = 0,
+};
+
+static uint32_t pios_spi_apa102_id;
+void PIOS_SPI_apa102_irq_handler(void)
+{
+    /* Call into the generic code to handle the IRQ for this specific device */
+    PIOS_SPI_IRQ_Handler(pios_spi_apa102_id);
+}
+
+#endif /* PIOS_INCLUDE_APA102 */
+
 /*
  * SPI1 Interface
  * Used for MPU6000 gyro and accelerometer

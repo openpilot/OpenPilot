@@ -29,12 +29,14 @@
 #include <pios_board_info.h>
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
+#include <lednotification.h>
 #include <manualcontrolsettings.h>
 #include <oplinksettings.h>
 #include <oplinkstatus.h>
 #include <oplinkreceiver.h>
 #include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
+#include <pios_apa102.h>
 #include <pios_ws2811.h>
 
 
@@ -376,6 +378,13 @@ void PIOS_Board_Init(void)
     if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
         PIOS_DEBUG_Assert(0);
     }
+
+#ifdef PIOS_INCLUDE_APA102
+    if (PIOS_SPI_Init(&pios_spi_apa102_id, &pios_spi_apa102_cfg)) {
+        PIOS_DEBUG_Assert(0);
+    }
+
+#endif
 
     /* Set up the SPI interface to the flash and rfm22b */
     if (PIOS_SPI_Init(&pios_spi_telem_flash_id, &pios_spi_telem_flash_cfg)) {
@@ -826,6 +835,7 @@ void PIOS_Board_Init(void)
 #endif
 
     /* Configure the receiver port*/
+    bool enable_apa102_leds = false;
     uint8_t hwsettings_rcvrport;
     HwSettingsRM_RcvrPortGet(&hwsettings_rcvrport);
     //
@@ -842,6 +852,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
     case HWSETTINGS_RM_RCVRPORT_PPMPWM:
     case HWSETTINGS_RM_RCVRPORT_PPMTELEMETRY:
+    case HWSETTINGS_RM_RCVRPORT_PPMAPA102LEDS:
 #if defined(PIOS_INCLUDE_PPM)
         PIOS_Board_configure_ppm(&pios_ppm_cfg);
 
@@ -859,6 +870,10 @@ void PIOS_Board_Init(void)
             PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         }
 
+        if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMAPA102LEDS) {
+            enable_apa102_leds = true;
+        }
+
         break;
 #endif /* PIOS_INCLUDE_PPM */
     case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
@@ -867,6 +882,10 @@ void PIOS_Board_Init(void)
         break;
     case HWSETTINGS_RM_RCVRPORT_TELEMETRY:
         PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
+        break;
+
+    case HWSETTINGS_RM_RCVRPORT_APA102LEDS:
+        enable_apa102_leds = true;
         break;
     }
 
@@ -935,13 +954,27 @@ void PIOS_Board_Init(void)
     PIOS_MPU6000_CONFIG_Configure();
 #endif
 
+#ifdef PIOS_INCLUDE_APA102
+#include <pios_apa102.h>
+    if (enable_apa102_leds) {
+        if (PIOS_APA102_Init(pios_spi_apa102_id, 0)) {
+            PIOS_Assert(0);
+        }
+        LedNotificationExtLedsInit(PIOS_APA102_Bridge());
+    }
+#endif
+
+
 #ifdef PIOS_INCLUDE_WS2811
 #include <pios_ws2811.h>
-    HwSettingsWS2811LED_OutOptions ws2811_pin_settings;
-    HwSettingsWS2811LED_OutGet(&ws2811_pin_settings);
+    if (!enable_apa102_leds) {
+        HwSettingsWS2811LED_OutOptions ws2811_pin_settings;
+        HwSettingsWS2811LED_OutGet(&ws2811_pin_settings);
 
-    if (ws2811_pin_settings != HWSETTINGS_WS2811LED_OUT_DISABLED && ws2811_pin_settings < NELEMENTS(pios_ws2811_pin_cfg)) {
-        PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg[ws2811_pin_settings]);
+        if (ws2811_pin_settings != HWSETTINGS_WS2811LED_OUT_DISABLED && ws2811_pin_settings < NELEMENTS(pios_ws2811_pin_cfg)) {
+            PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg[ws2811_pin_settings]);
+            LedNotificationExtLedsInit(PIOS_WS2811_Bridge());
+        }
     }
 
 #endif // PIOS_INCLUDE_WS2811

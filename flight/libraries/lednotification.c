@@ -30,7 +30,7 @@
 #include <FreeRTOS.h>
 #include <pios.h>
 #include <pios_notify.h>
-#include <pios_ws2811.h>
+#include <extled.h>
 
 // Private defines
 
@@ -60,22 +60,28 @@ typedef struct {
     uint8_t  led_set_end; // last target led for this set
 } NotifierLedStatus_t;
 
-static bool led_status_initialized = false;
+static volatile bool led_status_initialized = false;
 
 NotifierLedStatus_t led_status[MAX_HANDLED_LED];
 
-static void InitExtLed()
+static struct ExtLedsBridge *ext_leds = NULL;
+void LedNotificationExtLedsInit(struct ExtLedsBridge *ext_leds_bridge)
 {
+    ext_leds = ext_leds_bridge;
+
     memset(led_status, 0, sizeof(NotifierLedStatus_t) * MAX_HANDLED_LED);
-    const uint32_t now = GET_CURRENT_MILLIS;
+    const uint32_t now     = GET_CURRENT_MILLIS;
+    const uint8_t num_leds = (ext_leds != NULL) ? ext_leds->NumLeds() : 1;
     for (uint8_t l = 0; l < MAX_HANDLED_LED; l++) {
         led_status[l].led_set_start = 0;
-        led_status[l].led_set_end   = PIOS_WS2811_NUMLEDS - 1;
+        led_status[l].led_set_end   = num_leds - 1;
         led_status[l].next_run_time = now + 500; // start within half a second
         for (uint8_t i = 0; i < MAX_BACKGROUND_NOTIFICATIONS; i++) {
             led_status[l].queued_priorities[i] = NOTIFY_PRIORITY_BACKGROUND;
         }
     }
+
+    led_status_initialized = true;
 }
 
 /**
@@ -233,9 +239,13 @@ static void run_led(NotifierLedStatus_t *status)
     const Color_t color = status->step_phase_on ? activeSequence->steps[step].color : Color_Off;
 
     for (uint8_t i = status->led_set_start; i <= status->led_set_end; i++) {
-        PIOS_WS2811_setColorRGB(color, i, false);
+        if (ext_leds != NULL) {
+            ext_leds->SetColorRGB(color, i, false);
+        }
     }
-    PIOS_WS2811_Update();
+    if (ext_leds != NULL) {
+        ext_leds->Update();
+    }
     advance_sequence(status);
 }
 
@@ -243,9 +253,9 @@ void LedNotificationExtLedsRun()
 {
     // handle incoming sequences
     if (!led_status_initialized) {
-        InitExtLed();
-        led_status_initialized = true;
+        return;
     }
+
     static ExtLedNotification_t *newNotification;
     newNotification = PIOS_NOTIFY_GetNewExtLedSequence(true);
     if (newNotification) {

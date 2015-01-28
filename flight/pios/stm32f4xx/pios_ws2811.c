@@ -34,6 +34,7 @@
 #include <pios_stm32.h>
 #include "FreeRTOS.h"
 #include "task.h"
+#include "extled.h"
 
 
 // framebuffer
@@ -302,28 +303,30 @@ void setColor(uint8_t color, ledbuf_t *buf)
  * @param led led number
  * @param update Perform an update after changing led color
  */
-void PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
+int32_t PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
 {
     if (led >= PIOS_WS2811_NUMLEDS) {
-        return;
+        return -1;
     }
     setColor(c.G, fb + (led * 24));
     setColor(c.R, fb + 8 + (led * 24));
     setColor(c.B, fb + 16 + (led * 24));
 
     if (update) {
-        PIOS_WS2811_Update();
+        return PIOS_WS2811_Update();
     }
+
+    return 0;
 }
 
 /**
  * trigger an update cycle if not already running
  */
-void PIOS_WS2811_Update()
+int32_t PIOS_WS2811_Update()
 {
     // does not start if framebuffer is not allocated (init has not been called yet) or a transfer is still on going
     if (!fb || (pios_ws2811_cfg->timer->CR1 & TIM_CR1_CEN)) {
-        return;
+        return -1;
     }
 
     // reset counters for synchronization
@@ -334,6 +337,24 @@ void PIOS_WS2811_Update()
     DMA_Cmd(pios_ws2811_cfg->streamUpdate, ENABLE);
     // Start a new cycle
     TIM_Cmd(pios_ws2811_cfg->timer, ENABLE);
+
+    return 0;
+}
+
+static uint8_t PIOS_WS2811_NumLeds()
+{
+    return PIOS_WS2811_NUMLEDS;
+}
+
+struct ExtLedsBridge *PIOS_WS2811_Bridge()
+{
+    static struct ExtLedsBridge PIOS_WS2811_ExtLedsBridge = {
+        .NumLeds     = PIOS_WS2811_NumLeds,
+        .SetColorRGB = PIOS_WS2811_setColorRGB,
+        .Update      = PIOS_WS2811_Update
+    };
+
+    return &PIOS_WS2811_ExtLedsBridge;
 }
 
 /**

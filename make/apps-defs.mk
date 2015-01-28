@@ -59,6 +59,7 @@ endif
 # Use file-extension c for "c-only"-files
 ifneq ($(PIOS_APPS_MINIMAL),YES)
 ## PIOS Hardware (Common Peripherals)
+SRC += $(PIOSCOMMON)/pios_apa102.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
 SRC += $(PIOSCOMMON)/pios_bma180.c
 SRC += $(PIOSCOMMON)/pios_bmp085.c

@@ -1,12 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios_ws2811.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      A driver for ws2811 rgb led controller.
- *             this is a plain PiOS port of the very clever solution
- *             implemented by Omri Iluz in the chibios driver here:
- *             https://github.com/omriiluz/WS2812B-LED-Driver-ChibiOS
+ * @file       pios_apa102.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      A driver for APA102 rgb led controller.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -25,19 +22,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PIOS_WS2811_H_
-#define PIOS_WS2811_H_
+#ifndef PIOS_APA102_H_
+#define PIOS_APA102_H_
 
 #include <stdint.h>
 #include <optypes.h>
 
 struct ExtLedsBridge;
 
-#define PIOS_WS2811_NUMLEDS 2
+#define PIOS_APA102_NUMLEDS 2
 
-int32_t PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update);
-int32_t PIOS_WS2811_Update();
+int32_t PIOS_APA102_setColorRGB(Color_t c, uint8_t led, bool update);
+int32_t PIOS_APA102_Update();
+int32_t PIOS_APA102_Init(uint32_t spi_id, uint32_t slave_num);
 
-struct ExtLedsBridge *PIOS_WS2811_Bridge();
+struct ExtLedsBridge *PIOS_APA102_Bridge();
 
-#endif /* PIOS_WS2811_H_ */
+#endif /* PIOS_APA102_H_ */

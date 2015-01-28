@@ -52,7 +52,8 @@ static void checkAlarm(uint8_t alarm, uint8_t *last_alarm, uint32_t *last_alm_ti
                        uint8_t warn_sequence, uint8_t error_sequence,
                        uint32_t timeBetweenNotifications);
 static AlarmStatus_t *alarmStatus;
-int32_t NotifyInitialize(void)
+
+static bool isEnabled()
 {
     uint8_t ws281xOutStatus;
 
@@ -60,7 +61,22 @@ int32_t NotifyInitialize(void)
     // Todo: Until further applications exists for WS2811 notify enabled status is tied to ws281x output configuration
     bool enabled = ws281xOutStatus != HWSETTINGS_WS2811LED_OUT_DISABLED;
 
-    if (enabled) {
+#ifdef PIOS_INCLUDE_APA102
+    uint8_t hwsettings_rcvrport;
+    HwSettingsRM_RcvrPortGet(&hwsettings_rcvrport);
+
+    if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMAPA102LEDS ||
+        hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_APA102LEDS) {
+        enabled = true;
+    }
+#endif
+
+    return enabled;
+}
+
+int32_t NotifyInitialize(void)
+{
+    if (isEnabled()) {
         alarmStatus = (AlarmStatus_t *)pios_malloc(sizeof(AlarmStatus_t) * alarmsMapSize);
         for (uint8_t i = 0; i < alarmsMapSize; i++) {
             alarmStatus[i].lastAlarm     = SYSTEMALARMS_ALARM_OK;

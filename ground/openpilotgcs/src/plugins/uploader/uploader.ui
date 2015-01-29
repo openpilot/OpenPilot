@@ -73,6 +73,25 @@
             <property name="spacing">
              <number>6</number>
             </property>
+            <item row="0" column="11">
+             <widget class="QLabel" name="boardStatus">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Running</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="3" colspan="2">
              <widget class="QPushButton" name="bootButton">
               <property name="enabled">
@@ -88,50 +107,6 @@ menu on the right.</string>
               </property>
               <property name="text">
                <string>Boot</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="5" colspan="3">
-             <widget class="QPushButton" name="eraseBootButton">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and later&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>Erase Settings</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="5" colspan="3">
-             <widget class="QPushButton" name="rescueButton">
-              <property name="toolTip">
-               <string>Start a guided procedure to manually
-recover a system which does not boot.
-
-Rescue is possible in USB mode only.</string>
-              </property>
-              <property name="text">
-               <string>Rescue</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3" colspan="2">
-             <widget class="QPushButton" name="safeBootButton">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="toolTip">
-               <string>Boots the system into safe mode (ie. default HwSettings).
-Only useful if the system is halted
-(mainboard blue LED blinking slowly, orange LED off)
-
-If telemetry is not running, select the link using the dropdown
-menu on the right.</string>
-              </property>
-              <property name="text">
-               <string>Safe Boot</string>
               </property>
              </widget>
             </item>
@@ -199,37 +174,21 @@ through serial or USB)</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="11">
-             <widget class="QLabel" name="boardStatus">
-              <property name="minimumSize">
-               <size>
-                <width>70</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Running</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2">
-             <widget class="QPushButton" name="resetButton">
+            <item row="1" column="3" colspan="2">
+             <widget class="QPushButton" name="safeBootButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="toolTip">
-               <string>Reset the system.
-(Only enabled if telemetry link is established, either
-through serial or USB)</string>
+               <string>Boots the system into safe mode (ie. default HwSettings).
+Only useful if the system is halted
+(mainboard blue LED blinking slowly, orange LED off)
+
+If telemetry is not running, select the link using the dropdown
+menu on the right.</string>
               </property>
               <property name="text">
-               <string>Reset</string>
+               <string>Safe Boot</string>
               </property>
              </widget>
             </item>
@@ -251,7 +210,7 @@ recover a system which does not boot.
 Rescue is possible in USB mode only.</string>
               </property>
               <property name="text">
-               <string>Auto Update</string>
+               <string>Upgrade</string>
               </property>
              </widget>
             </item>
@@ -268,13 +227,54 @@ Rescue is possible in USB mode only.</string>
               </property>
              </spacer>
             </item>
+            <item row="1" column="5" colspan="3">
+             <widget class="QPushButton" name="eraseBootButton">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and later&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Erase Settings</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5" colspan="3">
+             <widget class="QPushButton" name="rescueButton">
+              <property name="toolTip">
+               <string>Start a guided procedure to manually
+recover a system which does not boot.
+
+Rescue is possible in USB mode only.</string>
+              </property>
+              <property name="text">
+               <string>Rescue</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="resetButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Reset the system.
+(Only enabled if telemetry link is established, either
+through serial or USB)</string>
+              </property>
+              <property name="text">
+               <string>Reset</string>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="0">
              <widget class="QPushButton" name="autoUpdateEraseButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
               <property name="text">
-               <string>Auto Update &amp;&amp; Erase</string>
+               <string>Upgrade &amp;&amp; Erase</string>
               </property>
              </widget>
             </item>

@@ -246,8 +246,8 @@ EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
 # When building any of the "all_*" targets, tell all sub makefiles to display
 # additional details on each line of output to describe which build and target
 # that each line applies to. The same applies also to all, opfw_resource,
-# package and clean_package targets
-ifneq ($(strip $(filter all_% all opfw_resource package clean_package,$(MAKECMDGOALS))),)
+# package targets
+ifneq ($(strip $(filter all_% all opfw_resource package,$(MAKECMDGOALS))),)
     export ENABLE_MSG_EXTRA := yes
 endif
 
@@ -773,14 +773,13 @@ ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
     $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
 endif
 
-# Packaging targets: package, clean_package
-#  - removes build directory (clean_package only)
+# Packaging targets: package
 #  - builds all firmware, opfw_resource, gcs
 #  - copies firmware into a package directory
 #  - calls paltform-specific packaging script
 
 # Do some checks and define some values if package is requested
-ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
+ifneq ($(strip $(filter package,$(MAKECMDGOALS))),)
     # Define some variables
     export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
     export PACKAGE_NAME := OpenPilot
@@ -792,20 +791,7 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
     endif
 
     # Packaged GCS should depend on opfw_resource
-    ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
-    endif
-
-    # Clean the build directory if clean_package is requested
-    ifneq ($(strip $(filter clean_package,$(MAKECMDGOALS))),)
-        $(info Cleaning build directory before packaging...)
-        ifneq ($(shell $(MAKE) all_clean >/dev/null 2>&1 && $(ECHO) "clean"), clean)
-            $(error Cannot clean build directory)
-        endif
-
-        .PHONY: clean_package
-        clean_package: package
-    endif
+    $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
 endif
 
 .PHONY: package
@@ -1082,7 +1068,6 @@ help:
 	@$(ECHO) "                            Supported groups are ($(UAVOBJ_TARGETS))"
 	@$(ECHO)
 	@$(ECHO) "   [Packaging]"
-	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
 	@$(ECHO) "     dist                 - Generate source archive for distribution"

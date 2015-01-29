@@ -53,20 +53,22 @@ static int8_t counter;
 #endif
 
 // Private constants
-#define MAX_QUEUE_SIZE       2
+#define MAX_QUEUE_SIZE            2
 
 #if defined(PIOS_ACTUATOR_STACK_SIZE)
-#define STACK_SIZE_BYTES     PIOS_ACTUATOR_STACK_SIZE
+#define STACK_SIZE_BYTES          PIOS_ACTUATOR_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES     1312
+#define STACK_SIZE_BYTES          1312
 #endif
 
-#define TASK_PRIORITY        (tskIDLE_PRIORITY + 4) // device driver
-#define FAILSAFE_TIMEOUT_MS  100
-#define MAX_MIX_ACTUATORS    ACTUATORCOMMAND_CHANNEL_NUMELEM
+#define TASK_PRIORITY             (tskIDLE_PRIORITY + 4) // device driver
+#define FAILSAFE_TIMEOUT_MS       100
+#define MAX_MIX_ACTUATORS         ACTUATORCOMMAND_CHANNEL_NUMELEM
 
-#define CAMERA_BOOT_DELAY_MS 7000
+#define CAMERA_BOOT_DELAY_MS      7000
 
+#define ACTUATOR_ONESHOT125_CLOCK 8000000
+#define ACTUATOR_PWM_CLOCK        1000000
 // Private types
 
 
@@ -735,16 +737,8 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
 
     case ACTUATORSETTINGS_CHANNELTYPE_PWM:
     {
-        uint8_t mode = pinsMode[actuatorSettings->ChannelAddr[mixer_channel]];
-        switch (mode) {
-        case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
-            // Quick way to remap of 1000-2000 range to 125-250
-            PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value / 8);
-            break;
-        default:
-            PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
-            break;
-        }
+        // OneShot125 is remapped from 1000-2000 range to 125-250 due to timer running at 8MHz
+        PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
     }
         return true;
 
@@ -790,7 +784,7 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
                sizeof(prevBankMode));
 
         uint16_t freq[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM];
-
+        uint32_t clock[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM] = { 0 };
         for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
             PIOS_Servo_SetBankMode(i,
                                    actuatorSettings->BankMode[i] ==
@@ -798,13 +792,22 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
                                    PIOS_SERVO_BANK_MODE_PWM :
                                    PIOS_SERVO_BANK_MODE_SINGLE_PULSE
                                    );
-            if (actuatorSettings->BankMode[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
-                freq[i] = 1000000 / 255; // force a total period of 255uSec
-            } else {
-                freq[i] = actuatorSettings->BankUpdateFreq[i];
+            switch (actuatorSettings->BankMode[i]) {
+            case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
+                freq[i]  = 1000;
+                clock[i] = ACTUATOR_ONESHOT125_CLOCK; // Setup an 8MHz timer clock
+                break;
+            case ACTUATORSETTINGS_BANKMODE_ONESHOT:
+                freq[i]  = (PIOS_SENSOR_RATE + PIOS_SENSOR_RATE / 10); // use Sensor rate + a 10% margin to prevent missing updates.
+                clock[i] = ACTUATOR_PWM_CLOCK;
+                break;
+            default: // PWM
+                freq[i]  = actuatorSettings->BankUpdateFreq[i];
+                clock[i] = ACTUATOR_PWM_CLOCK;
+                break;
             }
         }
-        PIOS_Servo_SetHz(freq, ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM);
+        PIOS_Servo_SetHz(freq, clock, ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM);
 
         // retrieve mode from related bank
         for (uint8_t i = 0; i < MAX_MIX_ACTUATORS; i++) {

@@ -43,11 +43,12 @@ static const struct pios_servo_cfg *servo_cfg;
 // static uint8_t pios_servo_bank_mode[PIOS_SERVO_BANKS] = { 0 };
 
 // timer associated to each bank
-// static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
+static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
 
 // index of bank used for each pin
 static uint8_t *pios_servo_pin_bank;
 
+#define PIOS_SERVO_TIMER_CLOCK 1000000
 
 /**
  * Initialise Servos
@@ -81,7 +82,7 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
                     pios_servo_pin_bank[j] = bank;
                 }
             }
-            // pios_servo_bank_timer[i] = chan->timer;
+            pios_servo_bank_timer[bank] = chan->timer;
 
             PIOS_Assert(bank < PIOS_SERVO_BANKS);
 
@@ -90,11 +91,6 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
                     pios_servo_pin_bank[j] = bank;
                 }
             }
-/*
-            TIM_ARRPreloadConfig(chan->timer, ENABLE);
-            TIM_CtrlPWMOutputs(chan->timer, ENABLE);
-            TIM_Cmd(chan->timer, DISABLE);
- */
             bank++;
         }
 
@@ -129,10 +125,12 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
 /**
  * Set the servo update rate (Max 500Hz)
  * \param[in] array of rates in Hz
+ * \param[in] array of timer clocks in Hz
  * \param[in] maximum number of banks
  */
-void PIOS_Servo_SetHz(const uint16_t *speeds, uint8_t banks)
+void PIOS_Servo_SetHz(const uint16_t *speeds, const uint32_t *clock, uint8_t banks)
 {
+    PIOS_Assert(banks <= PIOS_SERVO_BANKS);
     if (!servo_cfg) {
         return;
     }
@@ -140,23 +138,18 @@ void PIOS_Servo_SetHz(const uint16_t *speeds, uint8_t banks)
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = servo_cfg->tim_base_init;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
-    TIM_TimeBaseStructure.TIM_Prescaler     = (PIOS_MASTER_CLOCK / 1000000) - 1;
 
-    uint8_t set = 0;
+    for (uint8_t i = 0; i < banks && i < PIOS_SERVO_BANKS; i++) {
+        const TIM_TypeDef *timer = pios_servo_bank_timer[i];
+        if (timer) {
+            uint32_t new_clock = PIOS_SERVO_TIMER_CLOCK;
+            if (clock[i]) {
+                new_clock = clock[i];
+            }
+            TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / new_clock) - 1;
+            TIM_TimeBaseStructure.TIM_Period    = ((new_clock / speeds[i]) - 1);
 
-    for (uint8_t i = 0; (i < servo_cfg->num_channels) && (set < banks); i++) {
-        bool new = true;
-        const struct pios_tim_channel *chan = &servo_cfg->channels[i];
-
-        /* See if any previous channels use that same timer */
-        for (uint8_t j = 0; (j < i) && new; j++) {
-            new &= chan->timer != servo_cfg->channels[j].timer;
-        }
-
-        if (new) {
-            TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[set]) - 1);
-            TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
-            set++;
+            TIM_TimeBaseInit((TIM_TypeDef *)timer, &TIM_TimeBaseStructure);
         }
     }
 }

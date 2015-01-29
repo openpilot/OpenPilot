@@ -10,8 +10,9 @@ extern "C" {
 
 #include "lednotification.c"
 
-void PIOS_WS2811_setColorRGB(__attribute__((unused)) Color_t c, __attribute__((unused)) uint8_t led, __attribute__((unused)) bool update) {}
-void PIOS_WS2811_Update() {}
+int32_t PIOS_ExtLeds_SetColorRGB(__attribute__((unused)) uint32_t id, __attribute__((unused)) Color_t c, __attribute__((unused)) uint8_t led, __attribute__((unused)) bool update) { return 0; }
+int32_t PIOS_ExtLeds_Update(__attribute__((unused)) uint32_t id) { return 0; }
+uint8_t PIOS_ExtLeds_NumLeds(__attribute__((unused)) uint32_t id) { return 0; }
 }
 
 class LedNotificationTest : public testing::Test {};

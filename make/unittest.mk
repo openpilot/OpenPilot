@@ -44,10 +44,10 @@ $(eval $(call COMPILE_CXX_TEMPLATE, $(GTEST_DIR)/src/gtest-all.cc))
 $(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(OUTDIR)/gtest-all.o))
 
 # Flags passed to the preprocessor
-CPPFLAGS += -I$(GTEST_DIR)/include
+CPPFLAGS += -I$(GTEST_DIR)/include -DGTEST_USE_OWN_TR1_TUPLE=1
 
 # Flags passed to the C++ compiler
-CXXFLAGS += -g -Wall -Wextra
+CXXFLAGS += -g -Wall -Wextra -Wno-unused-private-field
 
 # Flags passed to the C compiler
 CONLYFLAGS += -std=gnu99

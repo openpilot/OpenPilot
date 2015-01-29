@@ -135,6 +135,9 @@ all_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR))"
 	$(V1) [ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
 
+.PONY: clean
+clean: all_clean
+
 $(DL_DIR):
 	$(MKDIR) -p $@
 

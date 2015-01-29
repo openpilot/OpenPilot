@@ -294,11 +294,11 @@ void mainMessageOutput(QtMsgType type, const QMessageLogContext &context, const 
 void logInit(QString fileName)
 {
     QFile *file = new QFile(fileName);
+
     if (file->open(QIODevice::WriteOnly | QIODevice::Text)) {
         logStream = new QTextStream(file);
         qInstallMessageHandler(mainMessageOutput);
-    }
-    else {
+    } else {
         // TODO error popup
     }
 }

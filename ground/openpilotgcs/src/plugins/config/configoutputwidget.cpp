@@ -98,12 +98,12 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidget(ui->cb_outputRate1);
     addWidget(ui->spinningArmed);
 
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode1, 0);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode2, 1);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode3, 2);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode4, 3);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode5, 4);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode6, 5);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode1, 0, 0, true);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode2, 1, 0, true);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode3, 2, 0, true);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode4, 3, 0, true);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode5, 4, 0, true);
+    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode6, 5, 0, true);
 
     disconnect(this, SLOT(refreshWidgetsValues(UAVObject *)));
 

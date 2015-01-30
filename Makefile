@@ -772,7 +772,7 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
-ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
+ifneq ($(strip $(filter opfw_resource all all_fw all_flight package,$(MAKECMDGOALS))),)
     $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
 endif
 
@@ -781,25 +781,18 @@ endif
 #  - copies firmware into a package directory
 #  - calls paltform-specific packaging script
 
-# Do some checks and define some values if package is requested
-ifneq ($(strip $(filter package,$(MAKECMDGOALS))),)
-    # Define some variables
-    export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
-    export PACKAGE_NAME := OpenPilot
-    export PACKAGE_SEP  := -
-
-    # We can only package release builds
-    ifneq ($(GCS_BUILD_CONF),release)
-        $(error Packaging is currently supported for release builds only)
-    endif
-
-    # Packaged GCS should depend on opfw_resource
-    $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
-endif
+# Define some variables
+export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
+export PACKAGE_NAME := OpenPilot
+export PACKAGE_SEP  := -
 
 .PHONY: package
 package: all_fw all_ground uavobjects_matlab $(PACKAGE_DIR)
 	@$(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
+	# We can only package release builds
+ifneq ($(GCS_BUILD_CONF),release)
+	$(error Packaging is currently supported for release builds only)
+endif
 	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################

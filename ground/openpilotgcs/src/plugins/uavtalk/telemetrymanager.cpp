@@ -32,7 +32,7 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 
-TelemetryManager::TelemetryManager() : m_isAutopilotConnected(false)
+TelemetryManager::TelemetryManager() : m_connectionState(TELEMETRY_DISCONNECTED)
 {
     moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
     // Get UAVObjectManager instance
@@ -47,13 +47,21 @@ TelemetryManager::TelemetryManager() : m_isAutopilotConnected(false)
 TelemetryManager::~TelemetryManager()
 {}
 
-bool TelemetryManager::isConnected()
+bool TelemetryManager::isConnected() const
 {
-    return m_isAutopilotConnected;
+    return m_connectionState == TELEMETRY_CONNECTED;
+}
+
+TelemetryManager::ConnectionState TelemetryManager::connectionState() const
+{
+    return m_connectionState;
 }
 
 void TelemetryManager::start(QIODevice *dev)
 {
+    m_connectionState = TELEMETRY_CONNECTING;
+    emit connecting();
+
     m_telemetryDevice = dev;
     // OP-1383
     // take ownership of the device by moving it to the TelemetryManager thread (see TelemetryManager constructor)
@@ -98,6 +106,8 @@ void TelemetryManager::onStart()
 
 void TelemetryManager::stop()
 {
+    m_connectionState = TELEMETRY_DISCONNECTING;
+    emit disconnecting();
     emit myStop();
 
     if (false) {
@@ -117,13 +127,13 @@ void TelemetryManager::onStop()
 
 void TelemetryManager::onConnect()
 {
-    m_isAutopilotConnected = true;
+    m_connectionState = TELEMETRY_CONNECTED;
     emit connected();
 }
 
 void TelemetryManager::onDisconnect()
 {
-    m_isAutopilotConnected = false;
+    m_connectionState = TELEMETRY_DISCONNECTED;
     emit disconnected();
 }
 

@@ -1116,13 +1116,13 @@ stm32flash_clean:
 DFUUTIL_DIR := $(TOOLS_DIR)/dfu-util
 
 .PHONY: dfuutil_install
-dfuutil_install: DFUUTIL_URL  := http://dfu-util.gnumonks.org/releases/dfu-util-0.7.tar.gz
+dfuutil_install: DFUUTIL_URL  := http://dfu-util.sourceforge.net/releases/dfu-util-0.8.tar.gz
 dfuutil_install: DFUUTIL_FILE := $(notdir $(DFUUTIL_URL))
 dfuutil_install: | $(DL_DIR) $(TOOLS_DIR)
 dfuutil_install: dfuutil_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(DFUUTIL_URL)"
-	$(V1) $(WGET) -N -P "$(DL_DIR)" "$(DFUUTIL_URL)"
+	$(V1) $(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(DFUUTIL_FILE)" "$(DFUUTIL_URL)"
 
         # extract the source
 	$(V0) @echo " EXTRACT      $(DFUUTIL_FILE)"
@@ -1134,7 +1134,7 @@ dfuutil_install: dfuutil_clean
 	$(V0) @echo " BUILD        $(DFUUTIL_DIR)"
 	$(V1) mkdir -p "$(DFUUTIL_DIR)"
 	$(V1) ( \
-	  cd $(DL_DIR)/dfuutil-build/dfu-util-0.7 ; \
+	  cd $(DL_DIR)/dfuutil-build/dfu-util-0.8 ; \
 	  ./configure --prefix="$(DFUUTIL_DIR)" ; \
 	  $(MAKE) ; \
 	  $(MAKE) install ; \

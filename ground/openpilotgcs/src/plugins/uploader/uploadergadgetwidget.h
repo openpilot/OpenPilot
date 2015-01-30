@@ -91,6 +91,19 @@ private:
     int result;
 };
 
+class ResultEventLoop : public QEventLoop {
+    Q_OBJECT
+public:
+    int run(int millisTimout);
+
+public slots:
+    void success();
+    void fail();
+
+private:
+    QTimer m_timer;
+};
+
 class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
     Q_OBJECT
 
@@ -100,6 +113,9 @@ public:
 
     static const int BOARD_EVENT_TIMEOUT;
     static const int AUTOUPDATE_CLOSE_TIMEOUT;
+    static const int REBOOT_TIMEOUT;
+    static const int ERASE_TIMEOUT;
+    static const int BOOTLOADER_TIMEOUT;
 
     void log(QString str);
     bool autoUpdateCapable();
@@ -109,13 +125,18 @@ public slots:
     void onAutopilotDisconnect();
     void populate();
     void openHelp();
-    bool autoUpdate();
     void autoUpdateDisconnectProgress(int);
     void autoUpdateConnectProgress(int);
     void autoUpdateFlashProgress(int);
 
 signals:
-    void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
+    void progressUpdate(uploader::ProgressStep, QVariant);
+    void bootloaderFailed();
+    void bootloaderSuccess();
+    void bootFailed();
+    void bootSuccess();
+    void autoUpdateFailed();
+    void autoUpdateSuccess();
 
 private:
     Ui_UploaderWidget *m_config;
@@ -131,6 +152,7 @@ private:
     int confirmEraseSettingsMessageBox();
     int cannotHaltMessageBox();
     int cannotResetMessageBox();
+    void startAutoUpdate(bool erase);
 
 private slots:
     void onPhysicalHWConnect();
@@ -140,6 +162,8 @@ private slots:
     void systemBoot();
     void systemSafeBoot();
     void systemEraseBoot();
+    void rebootWithDialog();
+    void systemReboot();
     void commonSystemBoot(bool safeboot = false, bool erase = false);
     void systemRescue();
     void getSerialPorts();
@@ -148,9 +172,11 @@ private slots:
     void downloadStarted();
     void downloadEnded(bool succeed);
     void startAutoUpdate();
+    void startAutoUpdateErase();
+    bool autoUpdate(bool erase);
     void finishAutoUpdate();
     void closeAutoUpdate();
-    void autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value);
+    void autoUpdateStatus(uploader::ProgressStep status, QVariant value);
 };
 
 #endif // UPLOADERGADGETWIDGET_H

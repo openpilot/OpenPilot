@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       rebootpage.cpp
+ * @file       rebootdialog.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup
+ * @addtogroup [Group]
  * @{
- * @addtogroup RebootPage
+ * @addtogroup RebootDialog
  * @{
- * @brief
+ * @brief [Brief]
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,43 +25,36 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "rebootpage.h"
-#include "ui_rebootpage.h"
+#ifndef REBOOTDIALOG_H
+#define REBOOTDIALOG_H
 
-RebootPage::RebootPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
-    ui(new Ui::RebootPage), m_toggl(false)
-{
-    ui->setupUi(this);
-    ui->yellowLabel->setVisible(false);
-    ui->redLabel->setVisible(true);
+#include <QDialog>
+#include "uploadergadgetwidget.h"
+
+namespace Ui {
+class RebootDialog;
 }
 
-RebootPage::~RebootPage()
-{
-    disconnect(&m_timer, SIGNAL(timeout()), this, SLOT(toggleLabel()));
-    m_timer.stop();
-    delete ui;
-}
+class RebootDialog : public QDialog {
+    Q_OBJECT
 
-void RebootPage::initializePage()
-{
-    if (!m_timer.isActive()) {
-        connect(&m_timer, SIGNAL(timeout()), this, SLOT(toggleLabel()));
-        m_timer.setInterval(500);
-        m_timer.setSingleShot(false);
-        m_timer.start();
-    }
-}
+public:
+    explicit RebootDialog(UploaderGadgetWidget *uploader);
+    ~RebootDialog();
 
-bool RebootPage::validatePage()
-{
-    return true;
-}
+signals:
+    void reboot();
 
-void RebootPage::toggleLabel()
-{
-    m_toggl = !m_toggl;
-    ui->yellowLabel->setVisible(m_toggl);
-    ui->redLabel->setVisible(!m_toggl);
-}
+private slots:
+    void on_okButton_clicked();
+    void progressUpdate(uploader::ProgressStep progress, QVariant message);
+
+private:
+    Ui::RebootDialog *ui;
+    UploaderGadgetWidget *m_uploader;
+
+public slots:
+    int exec();
+};
+
+#endif // REBOOTDIALOG_H

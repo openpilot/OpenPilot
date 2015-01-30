@@ -25,3 +25,36 @@ package:
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(BUILD_DIR)/$(DEB_PACKAGE_NAME).deb
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).changes $(BUILD_DIR)/$(DEB_PACKAGE_NAME).changes
 	$(V1) rm -rf $(DEB_BUILD_DIR)
+
+##############################
+#
+# Install OpenPilot
+#
+##############################
+prefix  := /usr/local
+bindir  := $(prefix)/bin
+libdir  := $(prefix)/lib
+datadir := $(prefix)/share
+
+INSTALL = cp -a --no-preserve=ownership
+LN = ln
+LN_S = ln -s
+
+.PHONY: install
+install:
+	@$(ECHO) " INSTALLING GCS TO $(DESTDIR)/)"
+	$(V1) $(MKDIR) -p $(DESTDIR)$(bindir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/applications
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/pixmaps
+	$(V1) $(MKDIR) -p $(DESTDIR)$(udevdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/openpilotgcs $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/udp_test $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/openpilotgcs $(DESTDIR)$(libdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/share/openpilotgcs $(DESTDIR)$(datadir)
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps
+	$(V1) rm $(DESTDIR)/$(datadir)/openpilotgcs/translations/Makefile
+
+

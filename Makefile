@@ -150,6 +150,9 @@ $(BUILD_DIR):
 $(PACKAGE_DIR):
 	$(MKDIR) -p $@
 
+$(DIST_DIR):
+	$(MKDIR) -p $@
+
 ##############################
 #
 # UAVObjects
@@ -876,19 +879,21 @@ build-info:
 #
 ##############################
 
+DIST_VER_INFO := $(DIST_DIR)/version-info.json
+
+.PHONY: $(DIST_VER_INFO) # Because to many deps to list
+$(DIST_VER_INFO): $(DIST_DIR)
+	$(V1) $(VERSION_INFO) --jsonpath="$(DIST_DIR)"
+
 .PHONY: dist
-dist:
+dist: $(DIST_DIR) $(DIST_VER_INFO)
 	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_DIR))"
-	$(V1) $(MKDIR) -p "$(DIST_DIR)"
-	$(V1) $(VERSION_INFO) \
-		--jsonpath="$(DIST_DIR)"
 	$(eval DIST_NAME := $(call toprel, "$(DIST_DIR)/OpenPilot-$(shell git describe).tar"))
 	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \
 		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
-		$(call toprel, "$(DIST_DIR)/version-info.json")
+		$(call toprel, "$(DIST_VER_INFO)")
 	$(V1) gzip -f "$(DIST_NAME)"
-
 
 
 ##############################

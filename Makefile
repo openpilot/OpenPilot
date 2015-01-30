@@ -790,13 +790,14 @@ export PACKAGE_NAME := OpenPilot
 export PACKAGE_SEP  := -
 
 .PHONY: package
+
+include $(ROOT_DIR)/package/$(UNAME).mk
+
 package: all_fw all_ground uavobjects_matlab $(PACKAGE_DIR)
-	@$(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
-	# We can only package release builds
 ifneq ($(GCS_BUILD_CONF),release)
+	# We can only package release builds
 	$(error Packaging is currently supported for release builds only)
 endif
-	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################
 #

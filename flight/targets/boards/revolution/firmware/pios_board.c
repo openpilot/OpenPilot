@@ -774,7 +774,7 @@ void PIOS_Board_Init(void)
         PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, is_coordinator, is_oneway, ppm_mode, ppm_only);
 
         /* Set the PPM callback if we should be receiving PPM. */
-        if (ppm_mode) {
+        if (ppm_mode || (ppm_only && !is_coordinator)) {
             PIOS_RFM22B_SetPPMCallback(pios_rfm22b_id, PIOS_Board_PPM_callback);
         }
 

@@ -17,7 +17,9 @@ DEB_PACKAGE_NAME	:= openpilot_$(DEB_VER)_$(DEB_ARCH)
 
 .PHONY: package
 package: debian
-	$(V1) echo "Building Linux package, please wait..."
+	@$(ECHO) "Building Linux package, please wait..."
+	# Override clean and build because OP has already performed them.
+	$(V1) printf "override_dh_auto_clean:\noverride_dh_auto_build:\n\t#\n" >> debian/rules
 	$(V1) dpkg-buildpackage -b -us -uc
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(PACKAGE_DIR)
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).changes $(PACKAGE_DIR)

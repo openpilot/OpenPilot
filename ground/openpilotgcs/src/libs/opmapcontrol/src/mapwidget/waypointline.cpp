@@ -30,7 +30,7 @@
 
 namespace mapcontrol {
 WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem *map, QColor color, bool dashed, int width) : QGraphicsLineItem(map),
-    source(from), destination(to), my_map(map), QGraphicsLineItem(map), myColor(color), dashed(dashed), lineWidth(width)
+    source(from), destination(to), my_map(map), myColor(color), dashed(dashed), lineWidth(width)
 {
     this->setLine(to->pos().x(), to->pos().y(), from->pos().x(), from->pos().y());
     connect(from, SIGNAL(localPositionChanged(QPointF, WayPointItem *)), this, SLOT(refreshLocations()));
@@ -48,7 +48,7 @@ WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem 
 }
 
 WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color, bool dashed, int width) : QGraphicsLineItem(map),
-    source(from), destination(to), my_map(map), QGraphicsLineItem(map), myColor(color), dashed(dashed), lineWidth(width)
+    source(from), destination(to), my_map(map), myColor(color), dashed(dashed), lineWidth(width)
 {
     this->setLine(to->pos().x(), to->pos().y(), from->pos().x(), from->pos().y());
     connect(from, SIGNAL(homePositionChanged(internals::PointLatLng, float)), this, SLOT(refreshLocations()));

@@ -41,7 +41,7 @@ WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool 
 }
 
 WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color, bool dashed, int width) : QGraphicsEllipseItem(map),
-    my_center(center), my_radius(radius), my_map(map), QGraphicsEllipseItem(map), myColor(color), myClockWise(clockwise), dashed(dashed), width(width)
+    my_center(center), my_radius(radius), my_map(map), myColor(color), myClockWise(clockwise), dashed(dashed), width(width)
 {
     connect(radius, SIGNAL(homePositionChanged(internals::PointLatLng, float)), this, SLOT(refreshLocations()));
     connect(center, SIGNAL(localPositionChanged(QPointF)), this, SLOT(refreshLocations()));

@@ -99,14 +99,13 @@ void WayPointLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     arrowHead << line().pointAt(0.5) << arrowP1 << arrowP2;
     painter->drawPolygon(arrowHead);
 
-    if(dashed)
-    {
+    if (dashed) {
         QVector<qreal> dashes;
         dashes << 4 << 8;
         myPen.setDashPattern(dashes);
     }
 
-    if(lineWidth == -1) {
+    if (lineWidth == -1) {
         if (myColor == Qt::red) {
             myPen.setWidth(3);
         } else if (myColor == Qt::yellow) {
@@ -114,9 +113,8 @@ void WayPointLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         } else if (myColor == Qt::green) {
             myPen.setWidth(1);
         }
-    }
-    else {
-      myPen.setWidth(lineWidth);
+    } else {
+        myPen.setWidth(lineWidth);
     }
     painter->setPen(myPen);
     painter->drawLine(line());

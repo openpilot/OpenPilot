@@ -67,10 +67,10 @@ void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     p2 = QPointF(line.p1().x(), line.p1().y() - line.length());
     QPen myPen = pen();
     myPen.setColor(myColor);
-    if(width > 0) {
+    if (width > 0) {
         myPen.setWidth(width);
     }
-    if(dashed){
+    if (dashed) {
         QVector<qreal> dashes;
         dashes << 4 << 8;
         myPen.setDashPattern(dashes);

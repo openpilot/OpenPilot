@@ -56,8 +56,8 @@ private slots:
     void selectedWPChanged(QList<WayPointItem *>);
 private:
     overlayType overlayTranslate(int type);
-    void createOverlay(WayPointItem *from, WayPointItem *to, overlayType type, QColor color);
-    void createOverlay(WayPointItem *from, HomeItem *to, modelMapProxy::overlayType type, QColor color);
+    void createOverlay(WayPointItem *from, WayPointItem *to, overlayType type, QColor color, bool dashed = false, int width = -1);
+    void createOverlay(WayPointItem *from, HomeItem *to, modelMapProxy::overlayType type, QColor color, bool dashed = false, int width = -1);
     OPMapWidget *myMap;
     flightDataModel *model;
     void refreshOverlays();

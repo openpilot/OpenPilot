@@ -569,10 +569,10 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
  * @param[in] datarate  The desired datarate.
  * @param[in] min_chan  The minimum channel.
  * @param[in] max_chan  The maximum channel.
- * @param[in] chan_set  The "seed" for selecting a channel sequence.
  * @param[in] coordinator Is this modem an coordinator.
  * @param[in] ppm_mode Should this modem send/receive ppm packets?
  * @param[in] oneway Only the coordinator can send packets if true.
+ * @param[in] ppm_only Should this modem run in ppm only mode?
  */
 void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datarate, uint8_t min_chan, uint8_t max_chan, bool coordinator, bool oneway, bool ppm_mode, bool ppm_only)
 {
@@ -1353,7 +1353,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->packet_start_ticks = 0;
     rfm22b_dev->tx_complete_ticks  = 0;
     rfm22b_dev->rfm22b_state       = RFM22B_STATE_INITIALIZING;
-    rfm22b_dev->last_conntact  = 0;
+    rfm22b_dev->last_contact  = 0;
 
     // software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
     rfm22_write_claim(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
@@ -1967,7 +1967,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
             radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
         }
 
-        radio_dev->last_conntact = xTaskGetTickCount();
+        radio_dev->last_contact = xTaskGetTickCount();
     } else {
         ret_event = RADIO_EVENT_RX_COMPLETE;
     }
@@ -2230,7 +2230,7 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
     // Are we switching to a new channel?
     if (idx != rfm22b_dev->channel_index) {
         if (!rfm22_isCoordinator(rfm22b_dev) &&
-                pios_rfm22_time_difference_ms(rfm22b_dev->last_conntact, xTaskGetTickCount()) >=
+                pios_rfm22_time_difference_ms(rfm22b_dev->last_contact, xTaskGetTickCount()) >=
                     CONNECTED_TIMEOUT) {
 
             // Set the link state to disconnected.

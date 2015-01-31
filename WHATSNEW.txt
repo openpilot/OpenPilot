@@ -1,3 +1,73 @@
+--- RELEASE-15.01 ---
+This release mainly focuses on a new feature, GPSAssist which is a new form of assisted control for multirotors.  
+Assisted Control provides assistance functions on top of existing flight modes.  GPSAssist is the 
+first assisted control option available from OpenPilot. GPSAssist supports Attitude and Rattitude 
+flight modes and activates braking and position hold when the pitch/roll sticks are centered. Attitude/Rattitude 
+may be flown with any of the current thrust modes (manual, cruisecontrol, altvario).  GPSAssist for the PositionHold 
+flight mode also introduces a braking sequence when first entering this flight mode and introduces altvario as the thrust mode.
+
+The full list of features, improvements and bugfixes in this release is accessible here:
+
+http://progress.openpilot.org/browse/OP/fixforversion/11020
+
+Bug
+[OP-1501] - Input wizard sets neutral point for throttle too low
+[OP-1522] - Improve Robustness of OPLink radio
+[OP-1530] - Prevent using unitialize channel ids
+[OP-1537] - OPLink unreliable at high data rates
+[OP-1579] - Add LDFLAGS to Makefile sanitized variables
+[OP-1626] - Satellite dsm2/dsmX binding should depend on proper window timing.
+[OP-1638] - Transmitter setup can strip servo gears.
+[OP-1646] - QQmlExpression: Expression qrc:/welcome/qml/main.qml:125:23 depends on non-NOTIFYable properties:
+[OP-1647] - Welcome QML type error
+[OP-1653] - Qt 5.2.1 fixes
+[OP-1654] - Linux libs rpath incorrect
+[OP-1660] - RCinput manual calibration issue
+[OP-1662] - SystemHealt more verbose
+[OP-1670] - cruise control conflict with flight modes (rate & acro +)
+[OP-1680] - OPLink control limited to 1000-1896
+[OP-1681] - Fix debug build of GCS
+[OP-1682] - Overflow issue with pwm rx and CC3D
+[OP-1686] - Slave OPLM should receive PPM in PPM_only mode
+
+Improvement
+[OP-1256] - Add Erase Settings step to Vehicle Setup Wizard
+[OP-1496] - Qt5.3.2 for OSX
+[OP-1599] - rework position vario modes
+[OP-1607] - Tab scaling on Vehicle Configuration pages is affected by clicking on "Ground" vehicle.
+[OP-1611] - Add context menu to Scopes gadget.
+[OP-1620] - Add fixed-wing Vtail to setup wizard
+[OP-1622] - Update Ground config tab
+[OP-1628] - Remove need to manually reboot by unplugging USB cable
+[OP-1629] - Add erase settings check box (default checked) to wizard firmware page
+[OP-1631] - Make erase Controller config a toolbar option
+[OP-1645] - Change default arm and disarm times to be faster
+[OP-1650] - Reduce telemetry to improve OPLink
+[OP-1651] - Add GCS command line options to log to file
+[OP-1652] - Rename WS2811_LED_Out pins
+[OP-1657] - Linux bin wrapper not needed
+[OP-1663] - Move Qt inside openpilotgcs lib dir to avoid conflict
+[OP-1664] - Github pull request clang warnings
+[OP-1666] - Tidy deb package
+[OP-1667] - Remove firmware files from packages
+[OP-1668] - Add a way to select source for the 'Curve 2' in the custom mixer tab.
+[OP-1674] - Oplink setup : frequency display
+
+New Feature
+[OP-1503] - Yaffs2 file system library integration to Simposix
+[OP-1637] - AssistedControl
+[OP-1639] - Make non-git source
+[OP-1640] - Write make install rule for Linux
+[OP-1643] - Enable Ground Support in Wizard
+
+Task
+[OP-1557] - Update Qwt
+[OP-1558] - Evaluate removal of: ground/openpilotgcs/src/plugins/pathactioneditor/pathactioneditor.qrc
+[OP-1648] - Update PFD after flight mode changes
+[OP-1656] - Upgrade to Qt 5.4.0
+[OP-1684] - Fix warnings in Flight code
+
+
 --- RELEASE-14.10 ---
 This release mainly focuses on flight performance, especially aimed at mini multirotors and adds support for the OpenPilot Platinum GPS (V9).
 This version supports the CopterControl, CC3D, Atom and the Revolution Flight controllers as well as the OPLink Modems.

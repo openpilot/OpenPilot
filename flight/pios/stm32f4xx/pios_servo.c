@@ -231,11 +231,11 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
 
     /* Update the position */
     const struct pios_tim_channel *chan = &servo_cfg->channels[servo];
-    uint16_t val = position;
-    /*uint16_t margin = chan->timer->ARR / 20; // Leave 5% of period as margin to prevent overlaps
-       if (val > (chan->timer->ARR - margin)) {
+    uint16_t val    = position;
+    uint16_t margin = chan->timer->ARR / 50; // Leave 2% of period as margin to prevent overlaps
+    if (val > (chan->timer->ARR - margin)) {
         val = chan->timer->ARR - margin;
-       }*/
+    }
     switch (chan->timer_chan) {
     case TIM_Channel_1:
         TIM_SetCompare1(chan->timer, val);

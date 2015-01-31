@@ -212,7 +212,7 @@ static void PIOS_PWM_tim_overflow_cb(__attribute__((unused)) uint32_t tim_id, ui
     if (!pwm_dev->CaptureState[channel]) {
         return;
     }
-    pwm_dev->us_since_update[channel] = +count;
+    pwm_dev->us_since_update[channel] += count;
     if (pwm_dev->us_since_update[channel] >= PWM_SUPERVISOR_TIMEOUT) {
         pwm_dev->CaptureState[channel]    = 0;
         pwm_dev->RiseValue[channel]       = 0;
@@ -260,11 +260,11 @@ static void PIOS_PWM_tim_edge_cb(__attribute__((unused)) uint32_t tim_id, uint32
     } else {
         uint32_t value = 0;
         /* Capture computation */
-        if (pwm_dev->FallValue[chan_idx] > pwm_dev->RiseValue[chan_idx]) {
-            value = pwm_dev->us_since_update[chan_idx] + (pwm_dev->FallValue[chan_idx] - pwm_dev->RiseValue[chan_idx]);
-        } else {
-            value = pwm_dev->us_since_update[chan_idx] + (pwm_dev->FallValue[chan_idx] - pwm_dev->RiseValue[chan_idx]);
-        }
+        value = pwm_dev->us_since_update[chan_idx] + (pwm_dev->FallValue[chan_idx] - pwm_dev->RiseValue[chan_idx]);
+
+        // From time to time glitches happens. Most of the observed case are related to missing or spurious overflows
+        // happening when they are triggered very close each other.
+        // The following workaround prevents them to cause troubles by filtering unacceptable values
         if (PIOS_PWM_VALID_RANGE_MAX > value && PIOS_PWM_VALID_RANGE_MIN < value) {
             pwm_dev->CaptureValue[chan_idx] = value;
         }

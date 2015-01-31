@@ -18,8 +18,5 @@ override_dh_auto_clean:
 override_dh_auto_build:
 	#dh_auto_build -- all
 
-override_dh_auto_test:
-	# Fails non-silently because it is run under fakeroot.
-
 override_dh_auto_install:
 	dh_auto_install -- prefix=/usr

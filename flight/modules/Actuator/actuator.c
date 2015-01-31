@@ -53,22 +53,23 @@ static int8_t counter;
 #endif
 
 // Private constants
-#define MAX_QUEUE_SIZE            2
+#define MAX_QUEUE_SIZE                  2
 
 #if defined(PIOS_ACTUATOR_STACK_SIZE)
-#define STACK_SIZE_BYTES          PIOS_ACTUATOR_STACK_SIZE
+#define STACK_SIZE_BYTES                PIOS_ACTUATOR_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES          1312
+#define STACK_SIZE_BYTES                1312
 #endif
 
-#define TASK_PRIORITY             (tskIDLE_PRIORITY + 4) // device driver
-#define FAILSAFE_TIMEOUT_MS       100
-#define MAX_MIX_ACTUATORS         ACTUATORCOMMAND_CHANNEL_NUMELEM
+#define TASK_PRIORITY                   (tskIDLE_PRIORITY + 4) // device driver
+#define FAILSAFE_TIMEOUT_MS             100
+#define MAX_MIX_ACTUATORS               ACTUATORCOMMAND_CHANNEL_NUMELEM
 
-#define CAMERA_BOOT_DELAY_MS      7000
+#define CAMERA_BOOT_DELAY_MS            7000
 
-#define ACTUATOR_ONESHOT125_CLOCK 8000000
-#define ACTUATOR_PWM_CLOCK        1000000
+#define ACTUATOR_ONESHOT125_CLOCK       2000000
+#define ACTUATOR_ONESHOT125_PULSE_SCALE 4
+#define ACTUATOR_PWM_CLOCK              1000000
 // Private types
 
 
@@ -737,10 +738,18 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
 
     case ACTUATORSETTINGS_CHANNELTYPE_PWM:
     {
-        // OneShot125 is remapped from 1000-2000 range to 125-250 due to timer running at 8MHz
-        PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
-    }
+        uint8_t mode = pinsMode[actuatorSettings->ChannelAddr[mixer_channel]];
+        switch (mode) {
+        case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
+            // Remap 1000-2000 range to 125-250
+            PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value / ACTUATOR_ONESHOT125_PULSE_SCALE);
+            break;
+        default:
+            PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
+            break;
+        }
         return true;
+    }
 
 #if defined(PIOS_INCLUDE_I2C_ESC)
     case ACTUATORSETTINGS_CHANNELTYPE_MK:
@@ -794,7 +803,7 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
                                    );
             switch (actuatorSettings->BankMode[i]) {
             case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
-                freq[i]  = 1000;
+                freq[i]  = 100; // Value must be small enough so CCr isn't update until the PIOS_Servo_Update is triggered
                 clock[i] = ACTUATOR_ONESHOT125_CLOCK; // Setup an 8MHz timer clock
                 break;
             case ACTUATORSETTINGS_BANKMODE_ONESHOT:

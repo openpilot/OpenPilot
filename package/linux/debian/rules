@@ -11,12 +11,8 @@ export DH_OPTIONS
 %:
 	dh $@ 
 
-# Disabled because OpenPilot makefile cleans and builds.
-override_dh_auto_clean:
-	#
-
 override_dh_auto_build:
-	#dh_auto_build -- all
+	dh_auto_build -- all
 
 override_dh_auto_install:
 	dh_auto_install -- prefix=/usr

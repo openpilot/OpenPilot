@@ -252,9 +252,11 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
 void ConfigOutputWidget::setColor(QWidget *widget, const QColor color)
 {
     QPalette p(palette());
-    QColor color2 = QColor(color);
 
-    p.setColor(QPalette::Background, color2);
+    p.setColor(QPalette::Background, color);
+    p.setColor(QPalette::Base, color);
+    p.setColor(QPalette::Active, QPalette::Button, color);
+    p.setColor(QPalette::Inactive, QPalette::Button, color);
     widget->setAutoFillBackground(true);
     widget->setPalette(p);
 }
@@ -283,7 +285,13 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 
     QList<int> ChannelBanks;
     QList<QColor> bankColors;
-    bankColors << Qt::magenta << Qt::yellow << Qt::green << Qt::cyan << Qt::red << Qt::darkCyan;
+    bankColors
+        << QColor("#C6ECAE")
+        << QColor("#91E5D3")
+        << QColor("#FCEC52")
+        << QColor("#C3A8FF")
+        << QColor("#F7F7F2")
+        << QColor("#FF9F51");
     // Initialize output forms
     QList<OutputChannelForm *> outputChannelForms = findChildren<OutputChannelForm *>();
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
@@ -390,7 +398,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 
         outputChannelForm->setRange(minValue, maxValue);
         if (ChannelBanks.count() > i) {
-            outputChannelForm->setBank(QString("%1:").arg(ChannelBanks.at(i)));
+            outputChannelForm->setBank(QString("%1").arg(ChannelBanks.at(i)));
             outputChannelForm->setColor(bankColors[ChannelBanks.at(i++) - 1]);
         }
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];

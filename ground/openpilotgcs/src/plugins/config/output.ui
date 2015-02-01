@@ -282,8 +282,14 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value
 </string>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <item>
                  <property name="text">
@@ -345,8 +351,10 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
-</string>
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <item>
                  <property name="text">
@@ -430,8 +438,10 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
-</string>
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <item>
                  <property name="text">
@@ -493,8 +503,10 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
-</string>
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <item>
                  <property name="text">
@@ -566,8 +578,10 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
-</string>
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <item>
                  <property name="text">
@@ -629,8 +643,10 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
-</string>
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <item>
                  <property name="text">
@@ -742,7 +758,9 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup output mode. standard ESCs uses PWM.</string>
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.
+Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.
+When using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
               </item>
@@ -764,7 +782,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup output mode. standard ESCs uses PWM.</string>
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
               </item>
@@ -786,7 +804,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup output mode. standard ESCs uses PWM.</string>
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
               </item>
@@ -808,7 +826,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup output mode. standard ESCs uses PWM.</string>
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
               </item>
@@ -830,7 +848,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup output mode. standard ESCs uses PWM.</string>
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
               </item>
@@ -852,7 +870,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup output mode. standard ESCs uses PWM.</string>
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
               </item>

@@ -525,28 +525,38 @@ Typical value is 50% for + or X configuration on quads.</string>
        <number>9</number>
       </property>
       <item row="0" column="6" rowspan="5">
-       <layout class="QFormLayout" name="formLayout">
+       <layout class="QGridLayout" name="gridLayout_3">
         <property name="sizeConstraint">
          <enum>QLayout::SetMaximumSize</enum>
         </property>
-        <property name="fieldGrowthPolicy">
-         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-        </property>
         <property name="leftMargin">
-         <number>10</number>
+         <number>0</number>
         </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_2">
+        <item row="1" column="1">
+         <widget class="QComboBox" name="rcOutputChannelBox1">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Select output channel for Accessory0 RcInput</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="minimumSize">
+           <size>
             <width>90</width>
-            <height>16</height>
+            <height>0</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -557,7 +567,7 @@ font: bold 12px;
 margin:1px;</string>
           </property>
           <property name="text">
-           <string>RC Input</string>
+           <string>Accessory1</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -625,8 +635,37 @@ margin:1px;</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QComboBox" name="rcOutputChannelBox1">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
+          <property name="text">
+           <string>RC Input</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="rcOutputChannelBox3">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -640,30 +679,7 @@ margin:1px;</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>Select output channel for Accessory0 RcInput</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="minimumSize">
-           <size>
-            <width>90</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-          </property>
-          <property name="text">
-           <string>Accessory1</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Select output channel for Accessory2 RcInput</string>
           </property>
          </widget>
         </item>
@@ -709,22 +725,44 @@ margin:1px;</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="rcOutputChannelBox3">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>80</width>
-            <height>0</height>
-           </size>
-          </property>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_10">
           <property name="toolTip">
-           <string>Select output channel for Accessory2 RcInput</string>
+           <string>RcOutput curve</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
+          <property name="text">
+           <string>Curve</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="rcOutputCurveBox1">
+          <property name="toolTip">
+           <string>Select output curve for Accessory0 RcInput</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QComboBox" name="rcOutputCurveBox2">
+          <property name="toolTip">
+           <string>Select output curve for Accessory1 RcInput</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QComboBox" name="rcOutputCurveBox3">
+          <property name="toolTip">
+           <string>Select output curve for Accessory2 RcInput</string>
           </property>
          </widget>
         </item>

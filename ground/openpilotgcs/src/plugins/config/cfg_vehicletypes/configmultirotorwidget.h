@@ -77,7 +77,7 @@ private:
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
 
     void setYawMixLevel(int);
-
+    void updateRcCurvesUsed();
     void updateAirframe(QString multiRotorType);
     void setupEnabledControls(QString multiRotorType);
 

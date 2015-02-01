@@ -131,6 +131,13 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
 
     populateChannelComboBoxes();
 
+    QStringList mixerCurveList;
+    mixerCurveList << "Curve1" << "Curve2";
+    m_aircraft->rcOutputCurveBox1->addItems(mixerCurveList);
+    m_aircraft->rcOutputCurveBox2->addItems(mixerCurveList);
+    m_aircraft->rcOutputCurveBox3->addItems(mixerCurveList);
+
+
     // Setup the Multirotor picture in the Quad settings interface
     m_aircraft->quadShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_aircraft->quadShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -162,6 +169,7 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
 
     m_aircraft->multiThrottleCurve->setXAxisLabel(tr("Input"));
     m_aircraft->multiThrottleCurve->setYAxisLabel(tr("Output"));
+
     updateEnableControls();
 }
 
@@ -333,6 +341,9 @@ void ConfigMultiRotorWidget::registerWidgets(ConfigTaskWidget &parent)
     parent.addWidget(m_aircraft->rcOutputChannelBox1);
     parent.addWidget(m_aircraft->rcOutputChannelBox2);
     parent.addWidget(m_aircraft->rcOutputChannelBox3);
+    parent.addWidget(m_aircraft->rcOutputCurveBox1);
+    parent.addWidget(m_aircraft->rcOutputCurveBox2);
+    parent.addWidget(m_aircraft->rcOutputCurveBox3);
 }
 
 void ConfigMultiRotorWidget::resetActuators(GUIConfigDataUnion *configData)
@@ -366,16 +377,31 @@ void ConfigMultiRotorWidget::resetRcOutputs(GUIConfigDataUnion *configData)
 void ConfigMultiRotorWidget::resetMixers()
 {
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
-
     Q_ASSERT(mixer);
 
     for (int channel = 0; channel < (int)ConfigMultiRotorWidget::CHANNEL_NUMELEM; channel++) {
-        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 0);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 0);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, 0);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, 0);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 0);
+        resetMixerVector(mixer, channel);
+    }
+}
+
+void ConfigMultiRotorWidget::updateRcCurvesUsed()
+{
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    setComboCurrentIndex(m_aircraft->rcOutputCurveBox1, VehicleConfig::MIXER_THROTTLECURVE1);
+    setComboCurrentIndex(m_aircraft->rcOutputCurveBox2, VehicleConfig::MIXER_THROTTLECURVE1);
+    setComboCurrentIndex(m_aircraft->rcOutputCurveBox3, VehicleConfig::MIXER_THROTTLECURVE1);
+
+    for (int channel = 0; channel < (int)ConfigMultiRotorWidget::CHANNEL_NUMELEM; channel++) {
+        QString mixerType = getMixerType(mixer, channel);
+        if (mixerType == "Accessory0" && getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2)) {
+            setComboCurrentIndex(m_aircraft->rcOutputCurveBox1, VehicleConfig::MIXER_THROTTLECURVE2);
+        } else if (mixerType == "Accessory1" && getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2)) {
+            setComboCurrentIndex(m_aircraft->rcOutputCurveBox2, VehicleConfig::MIXER_THROTTLECURVE2);
+        } else if (mixerType == "Accessory2" && getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2)) {
+            setComboCurrentIndex(m_aircraft->rcOutputCurveBox3, VehicleConfig::MIXER_THROTTLECURVE2); 
+        }
     }
 }
 
@@ -497,6 +523,8 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
     setComboCurrentIndex(m_aircraft->rcOutputChannelBox1, multi.Accessory0);
     setComboCurrentIndex(m_aircraft->rcOutputChannelBox2, multi.Accessory1);
     setComboCurrentIndex(m_aircraft->rcOutputChannelBox3, multi.Accessory2);
+
+    updateRcCurvesUsed();
 
     // Now, read mixing values stored on board and applies values on sliders.
     m_aircraft->mrPitchMixLevel->setValue(getMixerValue(mixer, "MixerValuePitch"));
@@ -877,26 +905,41 @@ void ConfigMultiRotorWidget::setupRcOutputs(QList<QString> rcOutputList)
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
+    int curveAccessory0 = m_aircraft->rcOutputCurveBox1->currentIndex();
+    int curveAccessory1 = m_aircraft->rcOutputCurveBox2->currentIndex();
+    int curveAccessory2 = m_aircraft->rcOutputCurveBox3->currentIndex();
+    
     foreach(QString rc_output, rcOutputList) {
         int index = rcList.takeFirst()->currentIndex();
-
         if (rc_output == QString("Accessory0")) {
             configData.multi.Accessory0 = index;
             if (index) {
                 setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY0);
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+                if (curveAccessory0) {
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2 , 127);
+                } else {
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1 , 127);
+                }
             }
         } else if (rc_output == QString("Accessory1")) {
             configData.multi.Accessory1 = index;
             if (index) {
                 setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY1);
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+                if (curveAccessory1) {
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2 , 127);
+                } else {
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1 , 127);
+                }
             }
         } else if (rc_output == QString("Accessory2")) {
             configData.multi.Accessory2 = index;
             if (index) {
                 setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY2);
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+                if (curveAccessory2) {
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2 , 127);
+                } else {
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1 , 127);
+                }
             }
         }
     }

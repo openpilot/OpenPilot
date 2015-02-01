@@ -110,6 +110,17 @@ QStringList ConfigMultiRotorWidget::getChannelDescriptions()
     if (multi.TRIYaw > 0 && multi.TRIYaw <= ConfigMultiRotorWidget::CHANNEL_NUMELEM) {
         channelDesc[multi.TRIYaw - 1] = QString("Tri-Yaw");
     }
+
+    if (multi.Accessory0 > 0 && multi.Accessory0 <= ConfigMultiRotorWidget::CHANNEL_NUMELEM) {
+        channelDesc[multi.Accessory0 - 1] = QString("Accessory0");
+    }
+    if (multi.Accessory1 > 0 && multi.Accessory1 <= ConfigMultiRotorWidget::CHANNEL_NUMELEM) {
+        channelDesc[multi.Accessory1 - 1] = QString("Accessory1");
+    }
+    if (multi.Accessory2 > 0 && multi.Accessory2 <= ConfigMultiRotorWidget::CHANNEL_NUMELEM) {
+        channelDesc[multi.Accessory2 - 1] = QString("Accessory2");
+    }
+
     return channelDesc;
 }
 
@@ -319,6 +330,9 @@ void ConfigMultiRotorWidget::registerWidgets(ConfigTaskWidget &parent)
     parent.addWidget(m_aircraft->mrYawMixLevel);
     parent.addWidget(m_aircraft->triYawChannelBox);
     parent.addWidget(m_aircraft->MultirotorRevMixerCheckBox);
+    parent.addWidget(m_aircraft->rcOutputChannelBox1);
+    parent.addWidget(m_aircraft->rcOutputChannelBox2);
+    parent.addWidget(m_aircraft->rcOutputChannelBox3);
 }
 
 void ConfigMultiRotorWidget::resetActuators(GUIConfigDataUnion *configData)
@@ -340,6 +354,29 @@ void ConfigMultiRotorWidget::resetActuators(GUIConfigDataUnion *configData)
     configData->multi.VTOLMotorWSW = 0;
     configData->multi.VTOLMotorWNW = 0;
     configData->multi.VTOLMotorNNW = 0;
+}
+
+void ConfigMultiRotorWidget::resetRcOutputs(GUIConfigDataUnion *configData)
+{
+    configData->multi.Accessory0 = 0;
+    configData->multi.Accessory1 = 0;
+    configData->multi.Accessory2 = 0;
+}
+
+void ConfigMultiRotorWidget::resetMixers()
+{
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+
+    Q_ASSERT(mixer);
+
+    for (int channel = 0; channel < (int)ConfigMultiRotorWidget::CHANNEL_NUMELEM; channel++) {
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 0);
+    }
 }
 
 /**
@@ -457,6 +494,10 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->triYawChannelBox, multi.TRIYaw);
     }
 
+    setComboCurrentIndex(m_aircraft->rcOutputChannelBox1, multi.Accessory0);
+    setComboCurrentIndex(m_aircraft->rcOutputChannelBox2, multi.Accessory1);
+    setComboCurrentIndex(m_aircraft->rcOutputChannelBox3, multi.Accessory2);
+
     // Now, read mixing values stored on board and applies values on sliders.
     m_aircraft->mrPitchMixLevel->setValue(getMixerValue(mixer, "MixerValuePitch"));
     m_aircraft->mrRollMixLevel->setValue(getMixerValue(mixer, "MixerValueRoll"));
@@ -475,6 +516,13 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
 
     Q_ASSERT(mixer);
+
+    // Reset all Mixers
+    resetMixers();
+
+    QList<QString> rcOutputList;
+    rcOutputList << "Accessory0" << "Accessory1" << "Accessory2";
+    setupRcOutputs(rcOutputList);
 
     // Curve is also common to all quads:
     setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->multiThrottleCurve->getCurve());
@@ -731,7 +779,6 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 
         m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
     }
-
     return airframeType;
 }
 
@@ -815,6 +862,47 @@ void ConfigMultiRotorWidget::setupQuadMotor(int channel, double pitch, double ro
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, pitch * 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw * 127);
 }
+
+/**
+   Helper function: setup rc outputs. Takes a list of channel names in input.
+ */
+void ConfigMultiRotorWidget::setupRcOutputs(QList<QString> rcOutputList)
+{
+    QList<QComboBox *> rcList;
+    rcList << m_aircraft->rcOutputChannelBox1 << m_aircraft->rcOutputChannelBox2 << m_aircraft->rcOutputChannelBox3;
+
+    GUIConfigDataUnion configData = getConfigData();
+    resetRcOutputs(&configData);
+
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    foreach(QString rc_output, rcOutputList) {
+        int index = rcList.takeFirst()->currentIndex();
+
+        if (rc_output == QString("Accessory0")) {
+            configData.multi.Accessory0 = index;
+            if (index) {
+                setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY0);
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+            }
+        } else if (rc_output == QString("Accessory1")) {
+            configData.multi.Accessory1 = index;
+            if (index) {
+                setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY1);
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+            }
+        } else if (rc_output == QString("Accessory2")) {
+            configData.multi.Accessory2 = index;
+            if (index) {
+                setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY2);
+                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+            }
+        }
+    }
+    setConfigData(configData);
+}
+
 
 /**
    Helper function: setup motors. Takes a list of channel names in input.

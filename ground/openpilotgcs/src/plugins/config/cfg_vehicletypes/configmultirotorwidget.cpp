@@ -1188,7 +1188,7 @@ bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
 
     // Iterate through all instances of multiMotorChannelBox
     for (int i = 0; i < numMotors; i++) {
-        // Fine widgets with text "multiMotorChannelBox.x", where x is an integer
+        // Find widgets with his name "multiMotorChannelBox.x", where x is an integer
         QComboBox *combobox = this->findChild<QComboBox *>("multiMotorChannelBox" + QString::number(i + 1));
         if (combobox) {
             if (combobox->currentText() == "None") {
@@ -1209,13 +1209,13 @@ bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
                     combobox->setToolTip("");
                 }
             }
-            channelNames += combobox->currentText() == "None" ? "" : combobox->currentText();
+            channelNames += (combobox->currentText() == "None") ? "" : combobox->currentText();
         }
     }
 
     // Iterate through all instances of rcOutputChannelBox
     for (int i = 0; i < 3; i++) {
-        // Fine widgets with text "rcOutputChannelBox.x", where x is an integer
+        // Find widgets with his name "rcOutputChannelBox.x", where x is an integer
         QComboBox *combobox = this->findChild<QComboBox *>("rcOutputChannelBox" + QString::number(i + 1));
         if (combobox) {
             if (channelNames.contains(combobox->currentText(), Qt::CaseInsensitive)) {
@@ -1230,7 +1230,7 @@ bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
                     combobox->setToolTip(tr("Select output channel for Accessory%1 RcInput").arg(i));
                 }
             }
-            channelNames += combobox->currentText() == "None" ? "" : combobox->currentText();
+            channelNames += (combobox->currentText() == "None") ? "" : combobox->currentText();
         }
     }
 

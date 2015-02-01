@@ -94,6 +94,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     case SystemSettings::AIRFRAMETYPE_HEXAX:
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
     case SystemSettings::AIRFRAMETYPE_HEXA:
+    case SystemSettings::AIRFRAMETYPE_HEXAH:
         // multirotor
         channelDesc = ConfigMultiRotorWidget::getChannelDescriptions();
         break;

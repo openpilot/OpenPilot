@@ -377,6 +377,7 @@ void ConfigMultiRotorWidget::resetRcOutputs(GUIConfigDataUnion *configData)
 void ConfigMultiRotorWidget::resetMixers()
 {
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+
     Q_ASSERT(mixer);
 
     for (int channel = 0; channel < (int)ConfigMultiRotorWidget::CHANNEL_NUMELEM; channel++) {
@@ -387,6 +388,7 @@ void ConfigMultiRotorWidget::resetMixers()
 void ConfigMultiRotorWidget::updateRcCurvesUsed()
 {
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+
     Q_ASSERT(mixer);
 
     setComboCurrentIndex(m_aircraft->rcOutputCurveBox1, VehicleConfig::MIXER_THROTTLECURVE1);
@@ -400,7 +402,7 @@ void ConfigMultiRotorWidget::updateRcCurvesUsed()
         } else if (mixerType == "Accessory1" && getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2)) {
             setComboCurrentIndex(m_aircraft->rcOutputCurveBox2, VehicleConfig::MIXER_THROTTLECURVE2);
         } else if (mixerType == "Accessory2" && getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2)) {
-            setComboCurrentIndex(m_aircraft->rcOutputCurveBox3, VehicleConfig::MIXER_THROTTLECURVE2); 
+            setComboCurrentIndex(m_aircraft->rcOutputCurveBox3, VehicleConfig::MIXER_THROTTLECURVE2);
         }
     }
 }
@@ -905,20 +907,21 @@ void ConfigMultiRotorWidget::setupRcOutputs(QList<QString> rcOutputList)
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
-    int curveAccessory0 = m_aircraft->rcOutputCurveBox1->currentIndex();
-    int curveAccessory1 = m_aircraft->rcOutputCurveBox2->currentIndex();
-    int curveAccessory2 = m_aircraft->rcOutputCurveBox3->currentIndex();
-    
+    int curveAccessory0  = m_aircraft->rcOutputCurveBox1->currentIndex();
+    int curveAccessory1  = m_aircraft->rcOutputCurveBox2->currentIndex();
+    int curveAccessory2  = m_aircraft->rcOutputCurveBox3->currentIndex();
+
     foreach(QString rc_output, rcOutputList) {
         int index = rcList.takeFirst()->currentIndex();
+
         if (rc_output == QString("Accessory0")) {
             configData.multi.Accessory0 = index;
             if (index) {
                 setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY0);
                 if (curveAccessory0) {
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2 , 127);
+                    setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
                 } else {
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1 , 127);
+                    setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
                 }
             }
         } else if (rc_output == QString("Accessory1")) {
@@ -926,9 +929,9 @@ void ConfigMultiRotorWidget::setupRcOutputs(QList<QString> rcOutputList)
             if (index) {
                 setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY1);
                 if (curveAccessory1) {
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2 , 127);
+                    setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
                 } else {
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1 , 127);
+                    setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
                 }
             }
         } else if (rc_output == QString("Accessory2")) {
@@ -936,9 +939,9 @@ void ConfigMultiRotorWidget::setupRcOutputs(QList<QString> rcOutputList)
             if (index) {
                 setMixerType(mixer, index - 1, VehicleConfig::MIXERTYPE_ACCESSORY2);
                 if (curveAccessory2) {
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2 , 127);
+                    setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
                 } else {
-                setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1 , 127);
+                    setMixerVectorValue(mixer, index - 1, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
                 }
             }
         }
@@ -1183,6 +1186,7 @@ bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
 {
     // Initialize configuration error flag
     bool error = false;
+    QString channelNames = "";
 
     // Iterate through all instances of multiMotorChannelBox
     for (int i = 0; i < numMotors; i++) {
@@ -1195,9 +1199,40 @@ bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
                 pixmap.fill(QColor("red"));
                 combobox->setItemData(0, pixmap, Qt::DecorationRole); // Set color palettes
                 error = true;
+            } else if (channelNames.contains(combobox->currentText(), Qt::CaseInsensitive)) {
+                int size = combobox->style()->pixelMetric(QStyle::PM_SmallIconSize);
+                QPixmap pixmap(size, size);
+                pixmap.fill(QColor("orange"));
+                combobox->setItemData(combobox->currentIndex(), pixmap, Qt::DecorationRole); // Set color palettes
+                combobox->setToolTip(tr("Duplicate channel in motor outputs"));
             } else {
-                combobox->setItemData(0, 0, Qt::DecorationRole); // Reset color palettes
+                for (int index = 0; index < (int)ConfigMultiRotorWidget::CHANNEL_NUMELEM; index++) {
+                    combobox->setItemData(index, 0, Qt::DecorationRole); // Reset all color palettes
+                    combobox->setToolTip("");
+                }
             }
+            channelNames += combobox->currentText() == "None" ? "" : combobox->currentText();
+        }
+    }
+
+    // Iterate through all instances of rcOutputChannelBox
+    for (int i = 0; i < 3; i++) {
+        // Fine widgets with text "rcOutputChannelBox.x", where x is an integer
+        QComboBox *combobox = this->findChild<QComboBox *>("rcOutputChannelBox" + QString::number(i + 1));
+        if (combobox) {
+            if (channelNames.contains(combobox->currentText(), Qt::CaseInsensitive)) {
+                int size = combobox->style()->pixelMetric(QStyle::PM_SmallIconSize);
+                QPixmap pixmap(size, size);
+                pixmap.fill(QColor("orange"));
+                combobox->setItemData(combobox->currentIndex(), pixmap, Qt::DecorationRole); // Set color palettes
+                combobox->setToolTip(tr("Channel already used"));
+            } else {
+                for (int index = 0; index < (int)ConfigMultiRotorWidget::CHANNEL_NUMELEM; index++) {
+                    combobox->setItemData(index, 0, Qt::DecorationRole); // Reset all color palettes
+                    combobox->setToolTip(tr("Select output channel for Accessory%1 RcInput").arg(i));
+                }
+            }
+            channelNames += combobox->currentText() == "None" ? "" : combobox->currentText();
         }
     }
 

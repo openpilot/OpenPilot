@@ -542,7 +542,7 @@ Typical value is 50% for + or X configuration on quads.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
@@ -584,7 +584,7 @@ margin:1px;</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>120</width>
             <height>0</height>
            </size>
           </property>
@@ -674,7 +674,7 @@ margin:1px;</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
@@ -693,7 +693,7 @@ margin:1px;</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>

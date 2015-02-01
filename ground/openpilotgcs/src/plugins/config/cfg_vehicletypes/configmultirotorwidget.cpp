@@ -137,7 +137,6 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
     m_aircraft->rcOutputCurveBox2->addItems(mixerCurveList);
     m_aircraft->rcOutputCurveBox3->addItems(mixerCurveList);
 
-
     // Setup the Multirotor picture in the Quad settings interface
     m_aircraft->quadShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_aircraft->quadShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -948,7 +947,6 @@ void ConfigMultiRotorWidget::setupRcOutputs(QList<QString> rcOutputList)
     }
     setConfigData(configData);
 }
-
 
 /**
    Helper function: setup motors. Takes a list of channel names in input.

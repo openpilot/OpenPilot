@@ -807,7 +807,7 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
                 clock[i] = ACTUATOR_ONESHOT125_CLOCK; // Setup an 8MHz timer clock
                 break;
             case ACTUATORSETTINGS_BANKMODE_ONESHOT:
-                freq[i]  = (PIOS_SENSOR_RATE + PIOS_SENSOR_RATE / 10); // use Sensor rate + a 10% margin to prevent missing updates.
+                freq[i]  = 100;
                 clock[i] = ACTUATOR_PWM_CLOCK;
                 break;
             default: // PWM

@@ -41,7 +41,9 @@ static const struct pios_servo_cfg *servo_cfg;
 
 // determine if the related timer will work in synchronous (or OneShot/OneShot125) One Pulse mode.
 static uint8_t pios_servo_bank_mode[PIOS_SERVO_BANKS] = { 0 };
-
+// used to skip updates when pulse length is higher than update cycle
+static uint16_t pios_servo_bank_next_update[PIOS_SERVO_BANKS] = { 0 };
+static uint16_t pios_servo_bank_max_pulse[PIOS_SERVO_BANKS] = { 0 };
 // timer associated to each bank
 static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
 
@@ -49,7 +51,7 @@ static TIM_TypeDef *pios_servo_bank_timer[PIOS_SERVO_BANKS] = { 0 };
 static uint8_t *pios_servo_pin_bank;
 
 #define PIOS_SERVO_TIMER_CLOCK 1000000
-
+#define PIOS_SERVO_SAFE_MARGIN 50
 /**
  * Initialise Servos
  */
@@ -123,7 +125,6 @@ void PIOS_Servo_SetBankMode(uint8_t bank, uint8_t mode)
         for (uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
             if (pios_servo_pin_bank[i] == bank) {
                 const struct pios_tim_channel *chan = &servo_cfg->channels[i];
-
                 /* Set up for output compare function */
                 switch (chan->timer_chan) {
                 case TIM_Channel_1:
@@ -141,6 +142,11 @@ void PIOS_Servo_SetBankMode(uint8_t bank, uint8_t mode)
                 }
             }
         }
+        if (mode != PIOS_SERVO_BANK_MODE_PWM) {
+            // TIM_UpdateDisableConfig(pios_servo_bank_timer[bank], ENABLE);
+        } else {
+            // TIM_UpdateDisableConfig(pios_servo_bank_timer[bank], DISABLE);
+        }
         // Setup the timer accordingly
         TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Repetitive);
         TIM_Cmd(pios_servo_bank_timer[bank], ENABLE);
@@ -153,7 +159,12 @@ void PIOS_Servo_Update()
     for (uint8_t i = 0; (i < PIOS_SERVO_BANKS); i++) {
         const TIM_TypeDef *timer = pios_servo_bank_timer[i];
         if (timer && pios_servo_bank_mode[i] == PIOS_SERVO_BANK_MODE_SINGLE_PULSE) {
-            TIM_GenerateEvent((TIM_TypeDef *)timer, TIM_EventSource_Update);
+            // a pulse to be generated is longer than cycle period. skip this update.
+            if (TIM_GetCounter((TIM_TypeDef *)timer) > (uint32_t)(pios_servo_bank_next_update[i] + PIOS_SERVO_SAFE_MARGIN)) {
+                TIM_GenerateEvent((TIM_TypeDef *)timer, TIM_EventSource_Update);
+                pios_servo_bank_next_update[i] = pios_servo_bank_max_pulse[i];
+                pios_servo_bank_max_pulse[i]   = 0;
+            }
         }
     }
     for (uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
@@ -210,7 +221,6 @@ void PIOS_Servo_SetHz(const uint16_t *speeds, const uint32_t *clock, uint8_t ban
             } else {
                 TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / new_clock) - 1;
             }
-
             TIM_TimeBaseStructure.TIM_Period = ((new_clock / speeds[i]) - 1);
             TIM_TimeBaseInit((TIM_TypeDef *)timer, &TIM_TimeBaseStructure);
         }
@@ -229,12 +239,18 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
         return;
     }
 
+
     /* Update the position */
     const struct pios_tim_channel *chan = &servo_cfg->channels[servo];
     uint16_t val    = position;
     uint16_t margin = chan->timer->ARR / 50; // Leave 2% of period as margin to prevent overlaps
     if (val > (chan->timer->ARR - margin)) {
         val = chan->timer->ARR - margin;
+    }
+
+    uint8_t bank = pios_servo_pin_bank[servo];
+    if (pios_servo_bank_max_pulse[bank] < val) {
+        pios_servo_bank_max_pulse[bank] = val;
     }
     switch (chan->timer_chan) {
     case TIM_Channel_1:

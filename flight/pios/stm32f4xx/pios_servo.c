@@ -163,9 +163,9 @@ void PIOS_Servo_Update()
             if (TIM_GetCounter((TIM_TypeDef *)timer) > (uint32_t)(pios_servo_bank_next_update[i] + PIOS_SERVO_SAFE_MARGIN)) {
                 TIM_GenerateEvent((TIM_TypeDef *)timer, TIM_EventSource_Update);
                 pios_servo_bank_next_update[i] = pios_servo_bank_max_pulse[i];
-                pios_servo_bank_max_pulse[i]   = 0;
             }
         }
+        pios_servo_bank_max_pulse[i] = 0;
     }
     for (uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
         uint8_t bank = pios_servo_pin_bank[i];

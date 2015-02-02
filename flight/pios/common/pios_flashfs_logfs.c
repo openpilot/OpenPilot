@@ -452,8 +452,17 @@ static int32_t logfs_mount_log(struct logfs_state *logfs, uint8_t arena_id)
          * Empty slots must be in a continguous block at the
          * end of the arena.
          */
-        PIOS_Assert(slot_hdr.state == SLOT_STATE_EMPTY ||
-                    logfs->num_free_slots == 0);
+
+        if (! ( slot_hdr.state == SLOT_STATE_EMPTY ||
+                    logfs->num_free_slots == 0)) {
+            // If we are reverting from a yaffs flash filesystem
+            // install we bomb out here with slot_id of
+            // 254 and the state is the magic 0x99bbcfee
+            //if (slod_hrd.state == 0x99bbcfee) {
+        	// reformat everything!
+            logfs_erase_all_arenas(logfs);
+            PIOS_Assert(0);
+        }
 
         switch (slot_hdr.state) {
         case SLOT_STATE_EMPTY:

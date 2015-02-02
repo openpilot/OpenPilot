@@ -38,6 +38,15 @@
 
 #include <pios.h>
 
+#if 0 // use this to debug what method triggered a call to gcc malloc
+caddr_t
+_sbrk(int incr)
+{
+  incr = incr;
+  PIOS_Assert(0);
+}
+#endif
+
 static void printchar(char * *str, int c)
 {
     if (str) {

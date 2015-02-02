@@ -2697,7 +2697,7 @@ int yaffs_mkdir_reldir(struct yaffs_obj *reldir, const YCHAR *path, mode_t mode)
 
 	yaffsfs_Unlock();
 
-	kfree(alt_path);
+	if (alt_path) kfree(alt_path);
 
 	return retVal;
 }

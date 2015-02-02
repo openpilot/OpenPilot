@@ -40,11 +40,12 @@
 #include <pios_stdio.h>
 
 
-unsigned yaffs_trace_mask = 0;
-// YAFFS_TRACE_ERROR |
-// YAFFS_TRACE_BUG			 |
-// YAFFS_TRACE_ALWAYS |
-// 0;
+unsigned yaffs_trace_mask =
+	YAFFS_TRACE_ERROR |
+	YAFFS_TRACE_BUG			 |
+	YAFFS_TRACE_ALWAYS |
+	YAFFS_TRACE_MTD |
+	0;
 
 int random_seed;
 int simulate_power_failure = 0;
@@ -72,6 +73,7 @@ int yaffs_start_up(void)
 }
 
 
+
 void yaffsSigHandler(int sig)
 {
     char devicename[8];
@@ -83,8 +85,8 @@ void yaffsSigHandler(int sig)
     case SIGTERM:
     case SIGKILL:
     case SIGINT:
-
         for (fs_id = 0; fs_id < pios_flash_device_count; fs_id++) {
+
             snprintf(devicename, 6, "/dev%01u", (unsigned)fs_id);
 
             pios_umount((const char *)devicename);
@@ -164,7 +166,7 @@ int32_t PIOS_FLASHFS_Logfs_Init(
 
     // Simposix implementation uses a ram nor simulation which can be installed
     // as multiple instances
-    yaffs_nor_install_drv(devicename);
+	yaffs_nor_install_drv(devicename, cfg, driver, flash_id);
 
 
     sigset_t sigset;

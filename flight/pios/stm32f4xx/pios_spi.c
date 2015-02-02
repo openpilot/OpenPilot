@@ -696,10 +696,20 @@ static int32_t SPI_PIO_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
  */
 int32_t PIOS_SPI_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
 {
-    if (callback || len > SPI_MAX_BLOCK_PIO) {
+    static uint16_t max_pio_len = SPI_MAX_BLOCK_PIO;
+
+    if (callback != 0)
+    {
         return SPI_DMA_TransferBlock(spi_id, send_buffer, receive_buffer, len, callback);
     }
-    return SPI_PIO_TransferBlock(spi_id, send_buffer, receive_buffer, len);
+    else if ( len > max_pio_len )
+    {
+        return SPI_DMA_TransferBlock(spi_id, send_buffer, receive_buffer, len, callback);
+    }
+    else
+    {
+        return SPI_PIO_TransferBlock(spi_id, send_buffer, receive_buffer, len);
+    }
 }
 
 /**

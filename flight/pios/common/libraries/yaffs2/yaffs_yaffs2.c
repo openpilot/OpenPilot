@@ -185,7 +185,7 @@ u32 yaffs2_find_refresh_block(struct yaffs_dev *dev)
 
 	if (oldest > 0) {
 		yaffs_trace(YAFFS_TRACE_GC,
-			"GC refresh count %d selected block %d with seq_number %d",
+			"GC refresh count %lu selected block %lu with seq_number %lu",
 			dev->refresh_count, oldest, oldest_seq);
 	}
 
@@ -394,7 +394,7 @@ static int yaffs2_checkpt_obj_to_obj(struct yaffs_obj *obj,
 
 	if (obj->variant_type != cp->variant_type) {
 		yaffs_trace(YAFFS_TRACE_ERROR,
-			"Checkpoint read object %d type %d chunk %d does not match existing object type %d",
+			"Checkpoint read object %lu type %d chunk %d does not match existing object type %d",
 			cp->obj_id, cp->variant_type, cp->hdr_chunk,
 			obj->variant_type);
 		return 0;
@@ -412,7 +412,7 @@ static int yaffs2_checkpt_obj_to_obj(struct yaffs_obj *obj,
 	if (parent) {
 		if (parent->variant_type != YAFFS_OBJECT_TYPE_DIRECTORY) {
 			yaffs_trace(YAFFS_TRACE_ALWAYS,
-				"Checkpoint read object %d parent %d type %d chunk %d Parent type, %d, not directory",
+				"Checkpoint read object %lu parent %lu type %d chunk %d Parent type, %d, not directory",
 				cp->obj_id, cp->parent_id,
 				cp->variant_type, cp->hdr_chunk,
 				parent->variant_type);
@@ -532,7 +532,7 @@ static int yaffs2_rd_checkpt_tnodes(struct yaffs_obj *obj)
 	}
 
 	yaffs_trace(YAFFS_TRACE_CHECKPOINT,
-		"Checkpoint read tnodes %d records, last %d. ok %d",
+		"Checkpoint read tnodes %d records, last %lu. ok %d",
 		nread, base_chunk, ok);
 
 	return ok ? 1 : 0;
@@ -558,7 +558,7 @@ static int yaffs2_wr_checkpt_objs(struct yaffs_dev *dev)
 				cp.struct_type = sizeof(cp);
 
 				yaffs_trace(YAFFS_TRACE_CHECKPOINT,
-					"Checkpoint write object %d parent %d type %d chunk %d obj addr %p",
+					"Checkpoint write object %lu parent %lu type %d chunk %d obj addr %p",
 					cp.obj_id, cp.parent_id,
 					cp.variant_type, cp.hdr_chunk, obj);
 
@@ -602,7 +602,7 @@ static int yaffs2_rd_checkpt_objs(struct yaffs_dev *dev)
 		}
 
 		yaffs_trace(YAFFS_TRACE_CHECKPOINT,
-			"Checkpoint read object %d parent %d type %d chunk %d ",
+			"Checkpoint read object %lu parent %lu type %d chunk %d ",
 			cp.obj_id, cp.parent_id, cp.variant_type,
 			cp.hdr_chunk);
 
@@ -1420,7 +1420,7 @@ int yaffs2_scan_backwards(struct yaffs_dev *dev)
 			bi->block_state = YAFFS_BLOCK_STATE_DEAD;
 
 		yaffs_trace(YAFFS_TRACE_SCAN_DEBUG,
-			"Block scanning block %d state %d seq %d",
+			"Block scanning block %d state %d seq %lu",
 			blk, bi->block_state, seq_number);
 
 		if (bi->block_state == YAFFS_BLOCK_STATE_CHECKPOINT) {
@@ -1446,7 +1446,7 @@ int yaffs2_scan_backwards(struct yaffs_dev *dev)
 			} else {
 				/* TODO: Nasty sequence number! */
 				yaffs_trace(YAFFS_TRACE_SCAN,
-					"Block scanning block %d has bad sequence number %d",
+					"Block scanning block %d has bad sequence number %lu",
 					blk, seq_number);
 			}
 		}

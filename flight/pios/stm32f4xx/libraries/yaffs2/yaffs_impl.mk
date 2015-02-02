@@ -10,20 +10,18 @@
 #
 # Directory containing this makefile
 #
-YAFFS2_DIR			:=	$(dir $(lastword $(MAKEFILE_LIST)))
+YAFFS2_SIMPOSIX_DIR			:=	$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Compiler options 
 #
 CDEFS				+= -DCONFIG_YAFFS_DIRECT
-CDEFS				+= -DCONFIG_YAFFS_YAFFS2
 # CDEFS				+= -DCONFIG_YAFFS_DEFINES_TYPES
 CDEFS				+= -DCONFIG_YAFFS_PROVIDE_DEFS
 CDEFS				+= -DCONFIG_YAFFSFS_PROVIDE_VALUES
-CDEFS				+= -DCONFIG_YAFFS_OP
 #ARCHFLAGS			+= -DARCH_POSIX
 
 #
 # Yaffs2 device library source and includes
 #
-SRC				+=	$(sort $(wildcard $(YAFFS2_DIR)*.c))
-EXTRAINCDIRS			+=	$(YAFFS2_DIR)/inc
+SRC				+=	$(sort $(wildcard $(YAFFS2_SIMPOSIX_DIR)*.c))
+#EXTRAINCDIRS			+=	$(YAFFS2_DIR)/inc

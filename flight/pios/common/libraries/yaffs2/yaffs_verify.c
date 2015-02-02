@@ -186,7 +186,7 @@ void yaffs_verify_oh(struct yaffs_obj *obj, struct yaffs_obj_hdr *oh,
 
 	if (tags->obj_id != obj->obj_id)
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d header mismatch obj_id %d",
+			"Obj %u header mismatch obj_id %lu",
 			tags->obj_id, obj->obj_id);
 
 	/*
@@ -205,18 +205,18 @@ void yaffs_verify_oh(struct yaffs_obj *obj, struct yaffs_obj_hdr *oh,
 	    (oh->parent_obj_id != YAFFS_OBJECTID_UNLINKED ||
 	     obj->parent->obj_id != YAFFS_OBJECTID_DELETED))
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d header mismatch parent_id %d parent_obj_id %d",
+			"Obj %u header mismatch parent_id %d parent_obj_id %lu",
 			tags->obj_id, oh->parent_obj_id,
 			obj->parent->obj_id);
 
 	if (tags->obj_id > 1 && oh->name[0] == 0)	/* Null name */
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d header name is NULL",
+			"Obj %lu header name is NULL",
 			obj->obj_id);
 
 	if (tags->obj_id > 1 && ((u8) (oh->name[0])) == 0xff)	/* Junk name */
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d header name is 0xff",
+			"Obj %lu header name is 0xff",
 			obj->obj_id);
 }
 
@@ -278,7 +278,7 @@ void yaffs_verify_file(struct yaffs_obj *obj)
 						 &tags);
 			if (tags.obj_id != obj_id || tags.chunk_id != i)
 				yaffs_trace(YAFFS_TRACE_VERIFY,
-					"Object %d chunk_id %d NAND mismatch chunk %d tags (%d:%d)",
+					"Object %lu chunk_id %lu NAND mismatch chunk %lu tags (%d:%d)",
 					obj_id, i, the_chunk,
 					tags.obj_id, tags.chunk_id);
 		}
@@ -345,7 +345,7 @@ void yaffs_verify_obj(struct yaffs_obj *obj)
 
 	if (!obj->fake && (!chunk_id_ok || chunk_wrongly_deleted))
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d has chunk_id %d %s %s",
+			"Obj %lu has chunk_id %d %s %s",
 			obj->obj_id, obj->hdr_chunk,
 			chunk_id_ok ? "" : ",out of range",
 			chunk_wrongly_deleted ? ",marked as deleted" : "");
@@ -367,7 +367,7 @@ void yaffs_verify_obj(struct yaffs_obj *obj)
 	/* Verify it has a parent */
 	if (obj && !obj->fake && (!obj->parent || obj->parent->my_dev != dev)) {
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d has parent pointer %p which does not look like an object",
+			"Obj %lu has parent pointer %p which does not look like an object",
 			obj->obj_id, obj->parent);
 	}
 
@@ -375,7 +375,7 @@ void yaffs_verify_obj(struct yaffs_obj *obj)
 	if (obj->parent &&
 	    obj->parent->variant_type != YAFFS_OBJECT_TYPE_DIRECTORY) {
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d's parent is not a directory (type %d)",
+			"Obj %lu's parent is not a directory (type %d)",
 			obj->obj_id, obj->parent->variant_type);
 	}
 
@@ -398,7 +398,7 @@ void yaffs_verify_obj(struct yaffs_obj *obj)
 	case YAFFS_OBJECT_TYPE_UNKNOWN:
 	default:
 		yaffs_trace(YAFFS_TRACE_VERIFY,
-			"Obj %d has illegaltype %d",
+			"Obj %lu has illegaltype %d",
 		   obj->obj_id, obj->variant_type);
 		break;
 	}

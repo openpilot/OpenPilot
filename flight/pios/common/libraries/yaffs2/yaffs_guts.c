@@ -582,7 +582,7 @@ static int yaffs_write_new_chunk(struct yaffs_dev *dev,
 
 	if (attempts > 1) {
 		yaffs_trace(YAFFS_TRACE_ERROR,
-			"**>> yaffs write required %d attempts",
+			"**>> yaffs write required %lu attempts",
 			attempts);
 		dev->n_retried_writes += (attempts - 1);
 	}
@@ -1750,7 +1750,7 @@ static void yaffs_soft_del_file(struct yaffs_obj *obj)
 		yaffs_free_tnode(obj->my_dev, obj->variant.file_variant.top);
 		obj->variant.file_variant.top = NULL;
 		yaffs_trace(YAFFS_TRACE_TRACING,
-			"yaffs: Deleting empty file %d",
+			"yaffs: Deleting empty file %lu",
 			obj->obj_id);
 		yaffs_generic_obj_del(obj);
 	} else {
@@ -2141,7 +2141,7 @@ static void yaffs_update_parent(struct yaffs_obj *obj)
 		if (list_empty(link)) {
 			list_add(link, &dev->dirty_dirs);
 			yaffs_trace(YAFFS_TRACE_BACKGROUND,
-			  "Added object %d to dirty directories",
+			  "Added object %lu to dirty directories",
 			   obj->obj_id);
 		}
 
@@ -2167,7 +2167,7 @@ void yaffs_update_dirty_dirs(struct yaffs_dev *dev)
 		o_v = list_entry(d_s, union yaffs_obj_var, dir_variant);
 		obj = list_entry(o_v, struct yaffs_obj, variant);
 
-		yaffs_trace(YAFFS_TRACE_BACKGROUND, "Update directory %d",
+		yaffs_trace(YAFFS_TRACE_BACKGROUND, "Update directory %lu",
 			obj->obj_id);
 
 		if (obj->dirty)
@@ -2682,7 +2682,7 @@ static int yaffs_gc_block(struct yaffs_dev *dev, int block, int whole_block)
 					  object->variant.file_variant.top);
 				object->variant.file_variant.top = NULL;
 				yaffs_trace(YAFFS_TRACE_GC,
-					"yaffs: About to finally delete object %d",
+					"yaffs: About to finally delete object %lu",
 					object->obj_id);
 				yaffs_generic_obj_del(object);
 				object->my_dev->n_deleted_files--;
@@ -2715,7 +2715,7 @@ static unsigned yaffs_find_gc_block(struct yaffs_dev *dev,
 	int i;
 	int iterations;
 	unsigned selected = 0;
-	int prioritised = 0;
+	//int prioritised = 0;
 	int prioritised_exist = 0;
 	struct yaffs_block_info *bi;
 	int threshold;
@@ -2732,7 +2732,7 @@ static unsigned yaffs_find_gc_block(struct yaffs_dev *dev,
 				if (bi->block_state == YAFFS_BLOCK_STATE_FULL &&
 				    yaffs_block_ok_for_gc(dev, bi)) {
 					selected = i;
-					prioritised = 1;
+					//prioritised = 1;
 				}
 			}
 			bi++;
@@ -2840,8 +2840,8 @@ static unsigned yaffs_find_gc_block(struct yaffs_dev *dev,
 		yaffs_trace(YAFFS_TRACE_GC,
 			"GC Selected block %d with %d free, prioritised:%d",
 			selected,
-			dev->param.chunks_per_block - dev->gc_pages_in_use,
-			prioritised);
+			dev->param.chunks_per_block - dev->gc_pages_in_use);
+			//prioritised);
 
 		dev->n_gc_blocks++;
 		if (background)
@@ -2975,6 +2975,7 @@ int yaffs_bg_gc(struct yaffs_dev *dev, unsigned urgency)
 	int erased_chunks = dev->n_erased_blocks * dev->param.chunks_per_block;
 
 	yaffs_trace(YAFFS_TRACE_BACKGROUND, "Background gc %u", urgency);
+	urgency = urgency;
 
 	yaffs_check_gc(dev, 1);
 	return erased_chunks > dev->n_free_chunks / 2;
@@ -3007,6 +3008,7 @@ void yaffs_chunk_del(struct yaffs_dev *dev, int chunk_id, int mark_flash,
 	int page;
 	struct yaffs_ext_tags tags;
 	struct yaffs_block_info *bi;
+	lyn = lyn;
 
 	if (chunk_id <= 0)
 		return;
@@ -3536,7 +3538,7 @@ int yaffs_do_file_wr(struct yaffs_obj *in, const u8 *buffer, Y_LOFF_T offset,
 		    (s32)(dev->data_bytes_per_chunk + start) != offset ||
 		    (s32)start >= dev->data_bytes_per_chunk) {
 			yaffs_trace(YAFFS_TRACE_ERROR,
-				"AddrToChunk of offset %ud gives chunk %d start %d",
+				"AddrToChunk of offset %u gives chunk %d start %lu",
 				(unsigned int)offset, chunk, start);
 		}
 		chunk++;	/* File pos to chunk in file offset */
@@ -3850,7 +3852,7 @@ static int yaffs_unlink_file_if_needed(struct yaffs_obj *in)
 		    yaffs_change_obj_name(in, in->my_dev->del_dir,
 					  _Y("deleted"), 0, 0);
 		yaffs_trace(YAFFS_TRACE_TRACING,
-			"yaffs: immediate deletion of file %d",
+			"yaffs: immediate deletion of file %lu",
 			in->obj_id);
 		in->deleted = 1;
 		in->my_dev->n_deleted_files++;
@@ -3944,7 +3946,7 @@ int yaffs_del_obj(struct yaffs_obj *obj)
 	case YAFFS_OBJECT_TYPE_DIRECTORY:
 		if (!list_empty(&obj->variant.dir_variant.dirty)) {
 			yaffs_trace(YAFFS_TRACE_BACKGROUND,
-				"Remove object %d from dirty directories",
+				"Remove object %lu from dirty directories",
 				obj->obj_id);
 			list_del_init(&obj->variant.dir_variant.dirty);
 		}
@@ -4361,7 +4363,7 @@ static void yaffs_fix_hanging_objs(struct yaffs_dev *dev)
 			}
 			if (hanging) {
 				yaffs_trace(YAFFS_TRACE_SCAN,
-					"Hanging object %d moved to lost and found",
+					"Hanging object %lu moved to lost and found",
 					obj->obj_id);
 				yaffs_add_obj_to_dir(dev->lost_n_found, obj);
 			}
@@ -4386,7 +4388,7 @@ static void yaffs_del_dir_contents(struct yaffs_obj *dir)
 		if (obj->variant_type == YAFFS_OBJECT_TYPE_DIRECTORY)
 			yaffs_del_dir_contents(obj);
 		yaffs_trace(YAFFS_TRACE_SCAN,
-			"Deleting lost_found object %d",
+			"Deleting lost_found object %lu",
 			obj->obj_id);
 		yaffs_unlink_obj(obj);
 	}
@@ -4729,7 +4731,7 @@ int yaffs_guts_ll_init(struct yaffs_dev *dev)
 		) {
 		/* otherwise it is too small */
 		yaffs_trace(YAFFS_TRACE_ALWAYS,
-			"NAND geometry problems: chunk size %d, type is yaffs%s, inband_tags %d ",
+			"NAND geometry problems: chunk size %lu, type is yaffs %s, inband_tags %d ",
 			dev->param.total_bytes_per_chunk,
 			dev->param.is_yaffs2 ? "2" : "",
 			dev->param.inband_tags);

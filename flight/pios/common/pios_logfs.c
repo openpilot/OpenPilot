@@ -44,7 +44,7 @@ static void getObjectPathAndName(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    snprintf((char *)filename, OBJECTPATHNAME_LEN, "/dev%01u/logfs/%08X.o%02X", (unsigned)fs_id, prefix, suffix);
+    snprintf((char *)filename, OBJECTPATHNAME_LEN, "/dev%01u/logfs/%08X.o%02X", (unsigned)fs_id, (uint16_t)prefix, suffix);
 }
 
 /**
@@ -141,6 +141,8 @@ int32_t PIOS_FLASHFS_ObjSave(
 
     if (fd < 0) {
         pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", filename);
+	    return -2;
+    }
     } else {
         // Append object
         bytes_written = pios_write(fd, obj_data, obj_size);
@@ -151,8 +153,25 @@ int32_t PIOS_FLASHFS_ObjSave(
     }
 
     if (bytes_written != obj_size) {
+	pios_unlink(filename);
         return -7;
     }
+
+#if 1
+    uint8_t *check_obj_data = pios_malloc(obj_size);
+    if (PIOS_FLASHFS_ObjLoad(fs_id, obj_id, obj_inst_id, check_obj_data, obj_size) != 0)
+      {
+	PIOS_Assert(0);
+      }
+    else
+      {
+	  if (memcmp(check_obj_data, obj_data, obj_size) != 0)
+	      {
+	      PIOS_Assert(0);
+	      }
+      }
+    pios_free(check_obj_data);
+#endif
 
     return 0;
 }
@@ -193,6 +212,8 @@ int32_t PIOS_FLASHFS_ObjLoad(
 
     if (fd < 0) {
         pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", filename);
+	return -2;
+    }
     } else {
         // Load object
         bytes_read = pios_read(fd, (void *)obj_data, (uint32_t)obj_size);
@@ -233,10 +254,10 @@ int32_t PIOS_FLASHFS_ObjDelete(
     getObjectPathAndName(fs_id, obj_id, obj_inst_id, filename);
 
     // Delete file
-    retval = pios_unlink((char *)filename);
-    pios_trace(PIOS_TRACE_TEST, "pios_unlink(%s) retval=%d", filename, retval);
+    retval = pios_unlink((char *)filename);  // 0 for success, -1 for fail
+    pios_trace(PIOS_TRACE_TEST, "pios_unlink(%s) retval=%d" , filename, retval);
 
-    return 0;
+    return retval;
 }
 
 /**
@@ -261,9 +282,9 @@ int32_t PIOS_FLASHFS_Format(
     getDeviceName(fs_id, devicename);
 
     retval = pios_format(devicename,
-                         TRUE, // unmount flag
-                         TRUE, // force unmount flag
-                         TRUE); // remount
+		       1,  // unmount flag
+		       1,  // force unmount flag
+		       1);  // remount
 
     pios_trace(PIOS_TRACE_TEST, "pios_format (%s) retval=%d.", devicename, retval);
     return retval;
@@ -276,8 +297,8 @@ int32_t PIOS_FLASHFS_Format(
  * @retval -1 if fs_id is not a valid filesystem instance
  */
 int32_t PIOS_FLASHFS_GetStats(
-    __attribute__((unused)) uintptr_t fs_id,
-    __attribute__((unused)) struct PIOS_FLASHFS_Stats *stats)
+	__attribute__((unused)) uintptr_t fs_id, 
+	__attribute__((unused)) struct PIOS_FLASHFS_Stats *stats)
 {
     // pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_GetStats");
 
@@ -289,6 +310,9 @@ int32_t PIOS_FLASHFS_GetStats(
     // Get yaffs statistics for that device
     stats->num_free_slots   = yaffs_freespace(devicename);
     stats->num_active_slots = yaffs_totalspace(devicename) - stats->num_free_slots;
+    //TODO add in bad block count/stats
+    //TODO mount status?
+    //TODO Error conditions???
 
     // Return device usage statistics
     return 0;

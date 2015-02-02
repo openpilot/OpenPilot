@@ -107,6 +107,7 @@ pvPortMallocStack(size_t s)
 void
 vPortFree(void *p)
 {
+        if (p == NULL) return;
 	vPortEnterCritical();
 	if(IS_FAST_HEAP_POINTER(p)){
 		msheap_free(&fast_heap, p);

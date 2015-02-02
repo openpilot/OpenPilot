@@ -70,10 +70,18 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
+
+# optional yaffs
 ifeq ($(USE_YAFFS),YES)
-SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+CFLAGS += -DPIOS_YAFFS  # include OP corrections to yaffs
+CFLAGS += -DUSE_NORSIM  # call the nor simulator from the nor driver lower layer
 include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
 include $(PIOS)/posix/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
+EXTRAINCDIRS  += $(PIOS)/posix/libraries/yaffs2
+SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+SRC += $(PIOSCORECOMMON)/pios_string.c # Used for yaffs testing
+else
+SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
 endif
 
 #include $(FLIGHTLIB)/PyMite/pymite.mk
@@ -109,11 +117,6 @@ SRC += $(MATHLIB)/mathmisc.c
 SRC += $(MATHLIB)/butterworth.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
-ifeq ($(USE_YAFFS),YES)
-SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
-else
-SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
-endif
 SRC += $(PIOSCORECOMMON)/pios_trace.c
 SRC += $(PIOSCORECOMMON)/pios_debuglog.c
 SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c
@@ -168,7 +171,7 @@ CFLAGS += -Os
 endif
   
 # tracing
-# CFLAGS += -DPIOS_TRACE
+CFLAGS += -DPIOS_TRACE
  
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)

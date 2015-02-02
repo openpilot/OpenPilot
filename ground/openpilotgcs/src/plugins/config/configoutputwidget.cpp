@@ -281,9 +281,9 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
     // Get channel descriptions
-    QStringList ChannelDesc = ConfigVehicleTypeWidget::getChannelDescriptions();
+    QStringList channelDesc = ConfigVehicleTypeWidget::getChannelDescriptions();
 
-    QList<int> ChannelBanks;
+    QList<int> channelBanks;
     QList<QColor> bankColors;
     bankColors
         << QColor("#C6ECAE")
@@ -292,10 +292,11 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         << QColor("#C3A8FF")
         << QColor("#F7F7F2")
         << QColor("#FF9F51");
+
     // Initialize output forms
     QList<OutputChannelForm *> outputChannelForms = findChildren<OutputChannelForm *>();
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
-        outputChannelForm->setName(ChannelDesc[outputChannelForm->index()]);
+        outputChannelForm->setName(channelDesc[outputChannelForm->index()]);
 
         // init min,max,neutral
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
@@ -309,34 +310,9 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     // Get the SpinWhileArmed setting
     ui->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
 
-    // Setup output rates for all banks
-    if (ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.BankUpdateFreq[0])) == -1) {
-        ui->cb_outputRate1->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[0]));
-    }
-    if (ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.BankUpdateFreq[1])) == -1) {
-        ui->cb_outputRate2->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[1]));
-    }
-    if (ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.BankUpdateFreq[2])) == -1) {
-        ui->cb_outputRate3->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[2]));
-    }
-    if (ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.BankUpdateFreq[3])) == -1) {
-        ui->cb_outputRate4->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[3]));
-    }
-    if (ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.BankUpdateFreq[4])) == -1) {
-        ui->cb_outputRate5->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[4]));
-    }
-    if (ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.BankUpdateFreq[5])) == -1) {
-        ui->cb_outputRate6->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[5]));
-    }
-    ui->cb_outputRate1->setCurrentIndex(ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.BankUpdateFreq[0])));
-    ui->cb_outputRate2->setCurrentIndex(ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.BankUpdateFreq[1])));
-    ui->cb_outputRate3->setCurrentIndex(ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.BankUpdateFreq[2])));
-    ui->cb_outputRate4->setCurrentIndex(ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.BankUpdateFreq[3])));
-    ui->cb_outputRate5->setCurrentIndex(ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.BankUpdateFreq[4])));
-    ui->cb_outputRate6->setCurrentIndex(ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.BankUpdateFreq[5])));
-
     QList<QLabel *> bank;
     bank << ui->chBank1 << ui->chBank2 << ui->chBank3 << ui->chBank4 << ui->chBank5 << ui->chBank6;
+
     QList<QComboBox *> outputRateCombos;
     outputRateCombos << ui->cb_outputRate1 << ui->cb_outputRate2 << ui->cb_outputRate3 <<
         ui->cb_outputRate4 << ui->cb_outputRate5 << ui->cb_outputRate6;
@@ -344,20 +320,25 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     QList<QComboBox *> outputModeCombos;
     outputModeCombos << ui->cb_outputMode1 << ui->cb_outputMode2 << ui->cb_outputMode3 <<
         ui->cb_outputMode4 << ui->cb_outputMode5 << ui->cb_outputMode6;
-    // Reset to all disabled
-    foreach(QLabel * label, bank) {
-        label->setText("-");
-    }
-    int i = 0;
-    foreach(QComboBox * cbo, outputRateCombos) {
-        cbo->setEnabled(false);
-        setColor(cbo, palette().color(QPalette::Background));
-    }
 
-    i = 0;
-    foreach(QComboBox * cbo, outputModeCombos) {
-        cbo->setEnabled(false);
-        setColor(cbo, palette().color(QPalette::Background));
+    Q_ASSERT(outputModeCombos.count() == outputRateCombos.count());
+    Q_ASSERT(outputRateCombos.count() == bank.count());
+
+    for(int i = 0; i < outputModeCombos.count();i++){
+        // Setup output rates for all banks
+        if (outputRateCombos.at(i)->findText(QString::number(actuatorSettingsData.BankUpdateFreq[i])) == -1) {
+            outputRateCombos.at(i)->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[i]));
+        }
+        outputRateCombos.at(i)->setCurrentIndex(outputRateCombos.at(i)->findText(QString::number(actuatorSettingsData.BankUpdateFreq[i])));
+
+        // Reset to all disabled
+        bank.at(i)->setText("-");
+
+        outputRateCombos.at(i)->setEnabled(false);
+        setColor(outputRateCombos.at(i), palette().color(QPalette::Background));
+
+        outputModeCombos.at(i)->setEnabled(false);
+        setColor(outputModeCombos.at(i), palette().color(QPalette::Background));
     }
 
     // Get connected board model
@@ -373,15 +354,15 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         if ((board & 0xff00) == 0x0400) {
             // Coptercontrol family of boards 4 timer banks
             bankLabels << "1 (1-3)" << "2 (4)" << "3 (5,7-8)" << "4 (6,9-10)";
-            ChannelBanks << 1 << 1 << 1 << 2 << 3 << 4 << 3 << 3 << 4 << 4;
+            channelBanks << 1 << 1 << 1 << 2 << 3 << 4 << 3 << 3 << 4 << 4;
         } else if ((board & 0xff00) == 0x0900) {
             // Revolution family of boards 6 timer banks
             bankLabels << "1 (1-2)" << "2 (3)" << "3 (4)" << "4 (5-6)" << "5 (7-8)" << "6 (9-10)";
-            ChannelBanks << 1 << 1 << 2 << 3 << 4 << 4 << 5 << 5 << 6 << 6;
+            channelBanks << 1 << 1 << 2 << 3 << 4 << 4 << 5 << 5 << 6 << 6;
         }
     }
 
-    i = 0;
+    int i = 0;
     foreach(QString banklabel, bankLabels) {
         bank[i]->setText(banklabel);
         outputRateCombos[i]->setEnabled(true);
@@ -397,9 +378,9 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
 
         outputChannelForm->setRange(minValue, maxValue);
-        if (ChannelBanks.count() > i) {
-            outputChannelForm->setBank(QString("%1").arg(ChannelBanks.at(i)));
-            outputChannelForm->setColor(bankColors[ChannelBanks.at(i++) - 1]);
+        if (channelBanks.count() > i) {
+            outputChannelForm->setBank(QString("%1").arg(channelBanks.at(i)));
+            outputChannelForm->setColor(bankColors[channelBanks.at(i++) - 1]);
         }
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->setNeutral(neutral);

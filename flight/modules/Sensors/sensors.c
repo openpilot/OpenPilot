@@ -4,12 +4,11 @@
  * @{
  * @addtogroup Sensors
  * @brief Acquires sensor data
- * Specifically updates the the @ref GyroSensor, @ref AccelSensor, and @ref MagSensor objects
  * @{
  *
  * @file       sensors.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to handle all comms to the AHRS on a periodic basis.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      Module to handle fetch and preprocessing of sensor data
  *
  * @see        The GNU Public License (GPL) Version 3
  *

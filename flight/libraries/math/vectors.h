@@ -6,7 +6,7 @@
  * @{
  *
  * @file       vectors.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      Reuseable vector data type and functions
  *
  * @see        The GNU Public License (GPL) Version 3

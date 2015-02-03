@@ -283,6 +283,8 @@ static void stabilizationOuterloopTask()
 }
 
 
+//TODO Also if stabdesired changes do a callback.
+
 static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     // to reduce CPU utilization, outer loop is not executed on every state update

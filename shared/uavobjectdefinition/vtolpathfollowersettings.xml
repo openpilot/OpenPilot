@@ -8,7 +8,7 @@
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.25"/>
         <field name="VerticalPosP" units="" type="float" elements="1" defaultvalue="0.4"/>
         <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="8.0, 0.5, 0.0, 15"/>
-        <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1, 0.01, 0.0, 1.0"/>
+        <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.3, 0.3, 0.0, 1.0"/>
         <field name="ThrustLimits" units="" type="float" elementnames="Min,Neutral,Max" defaultvalue="0.2, 0.5, 0.9"/>
         <field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="2"/>
         <field name="ThrustControl" units="" type="enum" elements="1" options="manual,auto" defaultvalue="manual"/>

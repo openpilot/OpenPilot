@@ -71,6 +71,7 @@ void path_progress(PathDesiredData *path, float *cur_point, struct path_status *
 
         break;
     case PATHDESIRED_MODE_DRIVEENDPOINT:
+    case PATHDESIRED_MODE_LAND:
     default:
         // use the endpoint as default failsafe if called in unknown modes
         return path_endpoint(path, cur_point, status, false);

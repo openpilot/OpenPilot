@@ -64,11 +64,6 @@ void plan_setup_returnToBase();
 void plan_setup_land();
 
 /**
- * @brief execute land
- */
-void plan_run_land();
-
-/**
  * @brief setup pathplanner/pathfollower for braking
  */
 void plan_setup_assistedcontrol(uint8_t timeout_occurred);
@@ -78,11 +73,25 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred);
 #define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN  2
 #define PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT                   3
 
+#define PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH   0
+#define PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST    1
+#define PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN    2
+#define PATHDESIRED_MODEPARAMETER_VELOCITY_UNUSED                 3
+
+#define PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_NORTH       0
+#define PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_EAST        1
+#define PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_DOWN        2
+#define PATHDESIRED_MODEPARAMETER_LAND_OPTIONS                    3
+
+#define PATHDESIRED_MODEPARAMETER_LAND_OPTION_NONE                0
+#define PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH       1
+
 /**
  * @brief setup pathfollower for positionvario
  */
 void plan_setup_CourseLock();
 void plan_setup_PositionRoam();
+void plan_setup_VelocityRoam();
 void plan_setup_HomeLeash();
 void plan_setup_AbsolutePosition();
 
@@ -91,6 +100,7 @@ void plan_setup_AbsolutePosition();
  */
 void plan_run_CourseLock();
 void plan_run_PositionRoam();
+void plan_run_VelocityRoam();
 void plan_run_HomeLeash();
 void plan_run_AbsolutePosition();
 

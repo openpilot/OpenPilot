@@ -544,19 +544,8 @@ void ConfigInputWidget::wzNext()
         // Load actuator settings back from beginning of wizard
         actuatorSettingsObj->setData(previousActuatorSettingsData);
 
-        // Leave setting the throttle neutral until the final Next press,
-        // else the throttle scaling causes the graphical stick movement to not
-        // match the tx stick
-        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
-            manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
-            ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
-              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
-
-        // Force flight mode neutral to middle
-        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE] =
-            manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE] +
-            (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE] -
-             manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE]) / 2;
+        // Force flight mode neutral to middle and Throttle neutral at 4%
+        adjustSpecialNeutrals();
 
         manualSettingsObj->setData(manualSettingsData);
         // move to Arming Settings tab

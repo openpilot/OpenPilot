@@ -38,9 +38,9 @@ OPLinkWatchdog::OPLinkWatchdog() : QObject(),
     Q_ASSERT(pm);
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objManager);
-    m_oplinkStatus = OPLinkStatus::GetInstance(objManager);
-    Q_ASSERT(m_oplinkStatus);
-    connect(m_oplinkStatus, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(onOPLinkStatusUpdate()));
+    m_opLinkStatus = OPLinkStatus::GetInstance(objManager);
+    Q_ASSERT(m_opLinkStatus);
+    connect(m_opLinkStatus, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(onOPLinkStatusUpdate()));
     m_watchdog = new QTimer(this);
     connect(m_watchdog, SIGNAL(timeout()), this, SLOT(onTimeout()));
     onOPLinkStatusUpdate();
@@ -53,38 +53,38 @@ OPLinkWatchdog::~OPLinkWatchdog()
 void OPLinkWatchdog::onOPLinkStatusUpdate()
 {
     m_watchdog->stop();
-    quint8 type = m_oplinkStatus->getBoardType();
+    quint8 type = m_opLinkStatus->getBoardType();
     if (!m_isConnected) {
         switch (type) {
         case 3:
-            m_oplinkType = OPLINK_STANDALONE;
+            m_opLinkType = OPLINK_MINI;
             m_isConnected = true;
             emit connected();
-            emit standaloneConnected();
+            emit opLinkMiniConnected();
             break;
         case 9:
-            m_oplinkType = OPLINK_REVOLUTION;
+            m_opLinkType = OPLINK_REVOLUTION;
             m_isConnected = true;
             emit connected();
-            emit revolutionConnected();
+            emit opLinkRevolutionConnected();
             break;
         default:
             m_isConnected = false;
-            m_oplinkType = OPLINK_UNKNOWN;
+            m_opLinkType = OPLINK_UNKNOWN;
             return;
         }
 
-        qDebug() << "OPLink connected";
+        qDebug() << "OPLinkWatchdog - OPLink connected";
     }
-    m_watchdog->start(m_oplinkStatus->getMetadata().flightTelemetryUpdatePeriod * 3);
+    m_watchdog->start(m_opLinkStatus->getMetadata().flightTelemetryUpdatePeriod * 3);
 }
 
 void OPLinkWatchdog::onTimeout()
 {
     if (m_isConnected) {
         m_isConnected = false;
-        m_oplinkType = OPLINK_UNKNOWN;
-        qDebug() << "OPLink disconnected";
+        m_opLinkType = OPLINK_UNKNOWN;
+        qDebug() << "OPLinkWatchdog - OPLink disconnected";
         emit disconnected();
     }
 }

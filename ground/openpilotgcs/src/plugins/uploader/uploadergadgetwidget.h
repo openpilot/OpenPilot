@@ -147,7 +147,7 @@ private:
     IAPStep m_currentIAPStep;
     bool m_resetOnly;
     OPLinkWatchdog m_oplinkwatchdog;
-    bool m_autoupdateClosing;
+    bool m_autoUpdateClosing;
 
     void clearLog();
     QString getPortDevice(const QString &friendName);

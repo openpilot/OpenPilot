@@ -35,7 +35,7 @@ class OPLinkWatchdog : public QObject {
     Q_OBJECT
 public:
     enum OPLinkType {
-        OPLINK_STANDALONE,
+        OPLINK_MINI,
         OPLINK_REVOLUTION,
         OPLINK_UNKNOWN
     };
@@ -43,12 +43,12 @@ public:
     OPLinkWatchdog();
     ~OPLinkWatchdog();
     bool isConnected() const { return m_isConnected; }
-    OPLinkWatchdog::OPLinkType oplinkType() const { return m_oplinkType; }
+    OPLinkWatchdog::OPLinkType opLinkType() const { return m_opLinkType; }
 
 signals:
     void connected();
-    void standaloneConnected();
-    void revolutionConnected();
+    void opLinkMiniConnected();
+    void opLinkRevolutionConnected();
     void disconnected();
 
 private slots:
@@ -57,8 +57,8 @@ private slots:
 
 private:
     bool m_isConnected;
-    OPLinkType m_oplinkType;
+    OPLinkType m_opLinkType;
     QTimer* m_watchdog;
-    OPLinkStatus* m_oplinkStatus;
+    OPLinkStatus* m_opLinkStatus;
 };
 #endif // OPLINKWATCHDOG_H

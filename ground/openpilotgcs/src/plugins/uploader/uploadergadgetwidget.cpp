@@ -142,7 +142,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     m_currentIAPStep = IAP_STATE_READY;
     m_resetOnly   = false;
     m_dfu = NULL;
-    m_autoupdateClosing = false;
+    m_autoUpdateClosing = false;
 
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -673,8 +673,8 @@ bool UploaderGadgetWidget::autoUpdateCapable()
 bool UploaderGadgetWidget::autoUpdate(bool erase)
 {
     if (m_oplinkwatchdog.isConnected() &&
-            m_oplinkwatchdog.oplinkType() == OPLinkWatchdog::OPLINK_STANDALONE) {
-        emit progressUpdate(FAILURE, QVariant(tr("To upgrade OPLink board please disconnect it from the USB port, "
+            m_oplinkwatchdog.opLinkType() == OPLinkWatchdog::OPLINK_MINI) {
+        emit progressUpdate(FAILURE, QVariant(tr("To upgrade the OPLinkMini board please disconnect it from the USB port, "
                                                  "press the Upgrade again button and follow instructions on screen.")));
         emit autoUpdateFailed();
         return false;
@@ -1028,7 +1028,7 @@ void UploaderGadgetWidget::finishAutoUpdate()
 {
     disconnect(this, SIGNAL(progressUpdate(uploader::ProgressStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::ProgressStep, QVariant)));
     m_config->autoUpdateOkButton->setEnabled(true);
-    m_autoupdateClosing = true;
+    m_autoUpdateClosing = true;
 
     // wait a bit and "close" auto update
     QTimer::singleShot(AUTOUPDATE_CLOSE_TIMEOUT, this, SLOT(closeAutoUpdate()));
@@ -1036,12 +1036,12 @@ void UploaderGadgetWidget::finishAutoUpdate()
 
 void UploaderGadgetWidget::closeAutoUpdate()
 {
-    if (m_autoupdateClosing) {
+    if (m_autoUpdateClosing) {
         m_config->autoUpdateGroupBox->setVisible(false);
         m_config->buttonFrame->setEnabled(true);
         m_config->splitter->setEnabled(true);
     }
-    m_autoupdateClosing = false;
+    m_autoUpdateClosing = false;
 }
 
 void UploaderGadgetWidget::autoUpdateStatus(uploader::ProgressStep status, QVariant value)

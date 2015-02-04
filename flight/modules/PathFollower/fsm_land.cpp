@@ -43,7 +43,7 @@
  * http://www.openpilot.org/OpenPilot_Application_Architecture
  *
  */
-
+extern "C" {
 #include <openpilot.h>
 
 #include <callbackinfo.h>
@@ -81,8 +81,10 @@
 #include <vtolselftuningstats.h>
 #include <fsmlandstatus.h>
 #include <pathsummary.h>
+}
 
 #include <fsm_land.h>
+
 
 
 // Private constants
@@ -109,90 +111,55 @@
 
 //#define DEBUG_GROUNDIMPACT
 
-// Private types
 
-// FSM state structure
-typedef struct {
-    void (*setup)(void); // Called to initialise the state
-    void (*run)(uint8_t); // Run the event detection code for a state
-} PathFollowerFSM_LandStateHandler_T;
-
-
-// FSM instance data type
-typedef struct {
-    FSMLandStatusData fsmLandStatus;
-    PathFollowerFSM_LandState_T currentState;
-    TakeOffLocationData takeOffLocation;
-    uint32_t stateRunCount;
-    uint32_t stateTimeoutCount;
-    float    sum1;
-    float    sum2;
-    float    expectedLandPositionNorth;
-    float    expectedLandPositionEast;
-    float    thrustLimit;
-    float    boundThrustMin;
-    float    boundThrustMax;
-    uint8_t  observationCount;
-    uint8_t  observation2Count;
-    uint8_t  flZeroStabiHorizontal;
-    uint8_t  flConstrainThrust;
-    uint8_t  flLowAltitude;
-    uint8_t  flAltitudeHold;
-} FSMLandData_T;
-
-
-// Private variables
-static FSMLandData_T *mLandData       = 0;
-static VtolPathFollowerSettingsData *vtolPathFollowerSettings = 0;
-static PathDesiredData *pathDesired   = 0;
-static FlightStatusData *flightStatus = 0;
-
-// Private functions
-static void setup_inactive(void);
-static void setup_init_althold(void);
-static void run_init_althold(uint8_t);
-static void setup_wtg_for_descentrate(void);
-static void run_wtg_for_descentrate(uint8_t);
-static void setup_at_descentrate(void);
-static void run_at_descentrate(uint8_t);
-static void setup_wtg_for_groundeffect(void);
-static void run_wtg_for_groundeffect(uint8_t);
-static void setup_groundeffect(void);
-static void run_groundeffect(uint8_t);
-static void setup_thrustdown(void);
-static void run_thrustdown(uint8_t);
-static void setup_thrustoff(void);
-static void run_thrustoff(uint8_t);
-static void setup_disarmed(void);
-static void run_disarmed(uint8_t);
-static void setup_abort(void);
-static void run_abort(uint8_t);
-static void initFSM(void);
-static void setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateExitReasonOptions reason);
-static int32_t runState();
-static int32_t runAlways();
-static void updateFSMLandStatus();
-static void assessAltitude(void);
-
-static PathFollowerFSM_LandStateHandler_T sLandStateTable[LAND_STATE_SIZE] = {
-    [LAND_STATE_INACTIVE] =             { .setup = setup_inactive,             .run = 0                        },
-    [LAND_STATE_INIT_ALTHOLD]  = 	{ .setup = setup_init_althold,         .run = run_init_althold	       },
-    [LAND_STATE_WTG_FOR_DESCENTRATE]  = { .setup = setup_wtg_for_descentrate,  .run = run_wtg_for_descentrate  },
-    [LAND_STATE_AT_DESCENTRATE] =       { .setup = setup_at_descentrate,       .run = run_at_descentrate       },
-    [LAND_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = setup_wtg_for_groundeffect, .run = run_wtg_for_groundeffect },
-    [LAND_STATE_GROUNDEFFECT] =         { .setup = setup_groundeffect,         .run = run_groundeffect         },
-    [LAND_STATE_THRUSTDOWN]   =         { .setup = setup_thrustdown,           .run = run_thrustdown           },
-    [LAND_STATE_THRUSTOFF]    =         { .setup = setup_thrustoff,            .run = run_thrustoff            },
-    [LAND_STATE_DISARMED]     =         { .setup = setup_disarmed,             .run = run_disarmed             },
-    [LAND_STATE_ABORT] =                { .setup = setup_abort,                .run = run_abort                }
+#if 0
+FSMLand::PathFollowerFSM_LandStateHandler_T FSMLand::sLandStateTable[LAND_STATE_SIZE] = {
+    [LAND_STATE_INACTIVE] =             { .setup = FSMLand::setup_inactive,             .run = 0                        },
+    [LAND_STATE_INIT_ALTHOLD]  = 	{ .setup = FSMLand::setup_init_althold,         .run = FSMLand::run_init_althold	       },
+    [LAND_STATE_WTG_FOR_DESCENTRATE]  = { .setup = FSMLand::setup_wtg_for_descentrate,  .run = FSMLand::run_wtg_for_descentrate  },
+    [LAND_STATE_AT_DESCENTRATE] =       { .setup = FSMLand::setup_at_descentrate,       .run = FSMLand::run_at_descentrate       },
+    [LAND_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = FSMLand::setup_wtg_for_groundeffect, .run = FSMLand::run_wtg_for_groundeffect },
+    [LAND_STATE_GROUNDEFFECT] =         { .setup = FSMLand::setup_groundeffect,         .run = FSMLand::run_groundeffect         },
+    [LAND_STATE_THRUSTDOWN]   =         { .setup = FSMLand::setup_thrustdown,           .run = FSMLand::run_thrustdown           },
+    [LAND_STATE_THRUSTOFF]    =         { .setup = FSMLand::setup_thrustoff,            .run = FSMLand::run_thrustoff            },
+    [LAND_STATE_DISARMED]     =         { .setup = FSMLand::setup_disarmed,             .run = FSMLand::run_disarmed             },
+    [LAND_STATE_ABORT] =                { .setup = FSMLand::setup_abort,                .run = FSMLand::run_abort                }
 };
 
+#endif
+
+FSMLand::FSMLand ()
+:mLandData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
+{
+    return;
+}
+
+FSMLand::~FSMLand() {}
+
+FSMLand & FSMLand::fsmLand()
+{
+    // There can be only one instance.  Using this method as
+    // described in Effective C++ CD by Meyers.
+
+#if 0
+    FSMLand *oneOnlyClass = new FSMLand();
+    return(*oneOnlyClass);
+#else
+    static FSMLand oneOnlyClass;
+    return(oneOnlyClass);
+#endif
+}
+
+
+// Private types
+
+// Private functions
 // Public API methods
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t FSMLandInitialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
+int32_t FSMLand::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
                           PathDesiredData *ptr_pathDesired,
                           FlightStatusData *ptr_flightStatus)
 {
@@ -227,13 +194,13 @@ int32_t FSMLandInitialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSett
     return 0;
 }
 
-void FSMLandInactive(void)
+void FSMLand::Inactive(void)
 {
     memset(mLandData, sizeof(FSMLandData_T), 0);
     initFSM();
 }
 
-void FSMLandActivate()
+void FSMLand::Activate()
 {
     memset(mLandData, sizeof(FSMLandData_T), 0);
     mLandData->currentState  = LAND_STATE_INACTIVE;
@@ -260,28 +227,28 @@ void FSMLandActivate()
     }
 }
 
-PathFollowerFSM_LandState_T FSMGetCurrentState(void)
+PathFollowerFSM_LandState_T FSMLand::GetCurrentState(void)
 {
     return mLandData->currentState;
 }
 
-void FSMLandUpdate()
+void FSMLand::Update()
 {
     runState();
-    if (FSMGetCurrentState() != LAND_STATE_INACTIVE) {
+    if (GetCurrentState() != LAND_STATE_INACTIVE) {
         runAlways();
     }
 }
 
 // Callback when settings updated
-void FSMLandSettingsUpdated(void) {}
+void FSMLand::SettingsUpdated(void) {}
 
 // PathFollower implements the PID scheme and has a objective
 // set by a PathDesired object.  Based on the mode, pathfollower
 // uses FSM's as helper functions that manage state and event detection.
 // PathFollower calls into FSM methods to alter its commands.
 
-float FSMLandBoundThrust(float thrustDesired)
+float FSMLand::BoundThrust(float thrustDesired)
 {
     // We only implement min max bounding here
     // TODO This really needs to set min max into the pid method
@@ -289,7 +256,7 @@ float FSMLandBoundThrust(float thrustDesired)
     return thrustDesired;
 }
 
-void FSMLandConstrainStabiDesired(StabilizationDesiredData *stabDesired)
+void FSMLand::ConstrainStabiDesired(StabilizationDesiredData *stabDesired)
 {
     if (mLandData->flZeroStabiHorizontal && stabDesired) {
         stabDesired->Pitch = 0.0f;
@@ -305,7 +272,7 @@ void FSMLandConstrainStabiDesired(StabilizationDesiredData *stabDesired)
     }
 }
 
-void FSMLandCheckPidScalar(pid_scaler *local_scaler)
+void FSMLand::CheckPidScalar(pid_scaler *local_scaler)
 {
     if (mLandData->flLowAltitude) {
         local_scaler->p = LANDING_PID_SCALAR_P;
@@ -316,7 +283,7 @@ void FSMLandCheckPidScalar(pid_scaler *local_scaler)
 // Private Functions
 
 // Initialise the FSM
-static void initFSM(void)
+void FSMLand::initFSM(void)
 {
     if (vtolPathFollowerSettings != 0) {
         setState(LAND_STATE_INACTIVE, FSMLANDSTATUS_STATEEXITREASON_NONE);
@@ -328,7 +295,7 @@ static void initFSM(void)
 // Set the new state and perform setup for subsequent state run calls
 // This is called by state run functions on event detection that drive
 // state transitions.
-static void setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateExitReasonOptions reason)
+void FSMLand::setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateExitReasonOptions reason)
 {
     mLandData->fsmLandStatus.StateExitReason[mLandData->currentState] = reason;
 
@@ -362,14 +329,15 @@ static void setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateExi
     updateFSMLandStatus();
 }
 
+#if 1
 
 // Timeout utility function for use by state init implementations
-static void setStateTimeout(int32_t count)
+void FSMLand::setStateTimeout(int32_t count)
 {
     mLandData->stateTimeoutCount = count;
 }
 
-static void updateFSMLandStatus()
+void FSMLand::updateFSMLandStatus()
 {
     mLandData->fsmLandStatus.State = mLandData->currentState;
     if (mLandData->flLowAltitude) {
@@ -380,7 +348,7 @@ static void updateFSMLandStatus()
     FSMLandStatusSet(&mLandData->fsmLandStatus);
 }
 
-static int32_t runState(void)
+int32_t FSMLand::runState(void)
 {
     uint8_t flTimeout = false;
 
@@ -398,7 +366,7 @@ static int32_t runState(void)
     return 0;
 }
 
-float FSMLandBoundVelocityDown(float velocity_down)
+float FSMLand::BoundVelocityDown(float velocity_down)
 {
     velocity_down = boundf(velocity_down, MIN_LANDRATE, MAX_LANDRATE);
     if (mLandData->flLowAltitude) {
@@ -414,7 +382,7 @@ float FSMLandBoundVelocityDown(float velocity_down)
     }
 }
 
-static void assessAltitude(void)
+void FSMLand::assessAltitude(void)
 {
     float positionDown;
     PositionStateDownGet(&positionDown);
@@ -431,14 +399,14 @@ static void assessAltitude(void)
     }
 }
 
-static int32_t runAlways(void)
+int32_t FSMLand::runAlways(void)
 {
     void assessAltitude(void);
     return 0;
 }
 
 // FSM Setup and Run method implementation
-static void setup_inactive(void)
+void FSMLand::setup_inactive(void)
 {
     // Re-initialise local variables
     mLandData->flZeroStabiHorizontal = false;
@@ -449,12 +417,12 @@ static void setup_inactive(void)
 
 
 // State: INIT ALTHOLD
-static void setup_init_althold(void)
+void FSMLand::setup_init_althold(void)
 {
     setStateTimeout(TIMEOUT_INIT_ALTHOLD);
     // get target descent velocity
     mLandData->flZeroStabiHorizontal = false;
-    mLandData->fsmLandStatus.targetDescentRate = FSMLandBoundVelocityDown(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_DOWN]);
+    mLandData->fsmLandStatus.targetDescentRate = BoundVelocityDown(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_DOWN]);
     mLandData->flConstrainThrust     = false;
     mLandData->flAltitudeHold     = true;
     mLandData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
@@ -462,7 +430,7 @@ static void setup_init_althold(void)
 
 }
 
-static void run_init_althold(uint8_t flTimeout)
+void FSMLand::run_init_althold(uint8_t flTimeout)
 {
     if (flTimeout) {
 	mLandData->flAltitudeHold     = false;
@@ -472,7 +440,7 @@ static void run_init_althold(uint8_t flTimeout)
 
 
 // State: WAITING FOR DESCENT RATE
-static void setup_wtg_for_descentrate(void)
+void FSMLand::setup_wtg_for_descentrate(void)
 {
     setStateTimeout(TIMEOUT_WTG_FOR_DESCENTRATE);
     // get target descent velocity
@@ -485,7 +453,7 @@ static void setup_wtg_for_descentrate(void)
     mLandData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
 }
 
-static void run_wtg_for_descentrate(uint8_t flTimeout)
+void FSMLand::run_wtg_for_descentrate(uint8_t flTimeout)
 {
     // Look at current actual thrust...are we already shutdown??
     VelocityStateData velocityState;
@@ -515,7 +483,7 @@ static void run_wtg_for_descentrate(uint8_t flTimeout)
 
 
 // State: AT DESCENT RATE
-static void setup_at_descentrate(void)
+void FSMLand::setup_at_descentrate(void)
 {
     setStateTimeout(TIMEOUT_AT_DESCENTRATE);
     mLandData->flZeroStabiHorizontal = false;
@@ -529,7 +497,7 @@ static void setup_at_descentrate(void)
     mLandData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
 }
 
-static void run_at_descentrate(uint8_t flTimeout)
+void FSMLand::run_at_descentrate(uint8_t flTimeout)
 {
     VelocityStateData velocityState;
 
@@ -558,7 +526,7 @@ static void run_at_descentrate(uint8_t flTimeout)
 
 
 // State: WAITING FOR GROUND EFFECT
-static void setup_wtg_for_groundeffect(void)
+void FSMLand::setup_wtg_for_groundeffect(void)
 {
     // No timeout
     mLandData->flZeroStabiHorizontal = false;
@@ -573,7 +541,7 @@ static void setup_wtg_for_groundeffect(void)
     mLandData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
 }
 
-static void run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTimeout)
+void FSMLand::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTimeout)
 {
     // detect material downrating in thrust for 1 second.
     VelocityStateData velocityState;
@@ -636,7 +604,7 @@ static void run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTimeout)
 }
 
 
-static void setup_groundeffect(void)
+void FSMLand::setup_groundeffect(void)
 {
     setStateTimeout(TIMEOUT_GROUNDEFFECT);
     mLandData->flZeroStabiHorizontal     = true;
@@ -650,7 +618,7 @@ static void setup_groundeffect(void)
     mLandData->boundThrustMin = -0.1f;
     mLandData->boundThrustMax = mLandData->fsmLandStatus.calculatedNeutralThrust;
 }
-static void run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
+void FSMLand::run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
 {
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
@@ -684,7 +652,7 @@ static void run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
 }
 
 
-static void setup_thrustdown(void)
+void FSMLand::setup_thrustdown(void)
 {
     setStateTimeout(TIMEOUT_THRUSTDOWN);
     mLandData->flZeroStabiHorizontal = true;
@@ -697,7 +665,7 @@ static void setup_thrustdown(void)
     mLandData->boundThrustMax = mLandData->fsmLandStatus.calculatedNeutralThrust;
 }
 
-static void run_thrustdown(__attribute__((unused)) uint8_t flTimeout)
+void FSMLand::run_thrustdown(__attribute__((unused)) uint8_t flTimeout)
 {
     // reduce thrust setpoint step by step
     mLandData->thrustLimit -= mLandData->sum1;
@@ -713,7 +681,7 @@ static void run_thrustdown(__attribute__((unused)) uint8_t flTimeout)
     }
 }
 
-static void setup_thrustoff(void)
+void FSMLand::setup_thrustoff(void)
 {
     mLandData->thrustLimit = -1.0f;
     mLandData->flConstrainThrust = true;
@@ -721,13 +689,13 @@ static void setup_thrustoff(void)
     mLandData->boundThrustMax = 0.0f;
 }
 
-static void run_thrustoff(__attribute__((unused)) uint8_t flTimeout)
+void FSMLand::run_thrustoff(__attribute__((unused)) uint8_t flTimeout)
 {
     setState(LAND_STATE_DISARMED, FSMLANDSTATUS_STATEEXITREASON_NONE);
 }
 
 
-static void setup_disarmed(void)
+void FSMLand::setup_disarmed(void)
 {
     // nothing to do
     mLandData->flConstrainThrust     = false;
@@ -737,7 +705,7 @@ static void setup_disarmed(void)
     mLandData->boundThrustMax = 0.0f;
 }
 
-static void run_disarmed(__attribute__((unused)) uint8_t flTimeout)
+void FSMLand::run_disarmed(__attribute__((unused)) uint8_t flTimeout)
 {
 #ifdef DEBUG_GROUNDIMPACT
     if (mLandData->observationCount++ > 100) {
@@ -746,7 +714,7 @@ static void run_disarmed(__attribute__((unused)) uint8_t flTimeout)
 #endif
 }
 
-static void fallback_to_hold(void)
+void FSMLand::fallback_to_hold(void)
 {
     PositionStateData positionState;
 
@@ -764,7 +732,7 @@ static void fallback_to_hold(void)
 
 // abort repeatedly overwrites pathfollower's objective on a landing abort and
 // continues to do so until a flight mode change.
-static void setup_abort(void)
+void FSMLand::setup_abort(void)
 {
     mLandData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
     mLandData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
@@ -773,7 +741,9 @@ static void setup_abort(void)
     fallback_to_hold();
 }
 
-static void run_abort(__attribute__((unused)) uint8_t flTimeout)
+void FSMLand::run_abort(__attribute__((unused)) uint8_t flTimeout)
 {
     fallback_to_hold();
 }
+
+#endif

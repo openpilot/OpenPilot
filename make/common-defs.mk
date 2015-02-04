@@ -173,7 +173,7 @@ CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
 CONLYFLAGS += $(CSTANDARD) -Wunsuffixed-float-constants
 
 # CPP Flags
-CPPFLAGS += -fno-rtti -fno-exceptions
+CPPFLAGS += -fno-rtti -fno-exceptions -std=c++11 -fno-use-cxa-atexit
 
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.

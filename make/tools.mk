@@ -100,7 +100,7 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 
 # When changing PYTHON_DIR, you must also update it in ground/openpilotgcs/src/python.pri
 # When changing SDL_DIR or OPENSSL_DIR, you must also update them in ground/openpilotgcs/openpilotgcs.pri
-ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_8-2014q1
+ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_8-2014q3
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.4.0
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw491_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw491_32/opt/bin

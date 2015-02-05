@@ -45,9 +45,17 @@
 // a number of useful macros
 #define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
 
+// private types
+typedef struct SANITYCHECK_CustomHookInstance {
+    SANITYCHECK_CustomHook_function *hook;
+    struct SANITYCHECK_CustomHookInstance *next;
+    bool enabled;
+} SANITYCHECK_CustomHookInstance;
 
 // ! Check a stabilization mode switch position for safety
 static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted);
+
+SANITYCHECK_CustomHookInstance *hooks = 0;
 
 /**
  * Run a preflight check over the hardware configuration
@@ -176,6 +184,20 @@ int32_t configuration_check()
         severity = SYSTEMALARMS_ALARM_WARNING;
     }
 
+    // query sanity check hooks
+    if (severity == SYSTEMALARMS_ALARM_OK) {
+        SANITYCHECK_CustomHookInstance *instance = NULL;
+        LL_FOREACH(hooks, instance) {
+            if (instance->enabled) {
+                alarmstatus = instance->hook();
+                if (alarmstatus != SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE) {
+                    severity = SYSTEMALARMS_ALARM_WARNING;
+                    break;
+                }
+            }
+        }
+    }
+
     if (severity != SYSTEMALARMS_ALARM_OK) {
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, severity, alarmstatus, alarmsubstatus);
     } else {
@@ -270,6 +292,7 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
     // (this is checked at compile time by static constraint manualcontrol.h)
 
+
     return true;
 }
 
@@ -313,4 +336,29 @@ FrameType_t GetCurrentFrameType()
     }
     // anyway it should not reach here
     return FRAME_TYPE_CUSTOM;
+}
+
+void SANITYCHECK_AttachHook(SANITYCHECK_CustomHook_function *hook)
+{
+    PIOS_Assert(hook);
+    SANITYCHECK_CustomHookInstance *instance = (SANITYCHECK_CustomHookInstance *)pios_malloc(sizeof(SANITYCHECK_CustomHookInstance));
+    PIOS_Assert(instance);
+    instance->hook    = hook;
+    instance->next    = NULL;
+    instance->enabled = true;
+    LL_APPEND(hooks, instance);
+}
+
+void SANITYCHECK_DetachHook(SANITYCHECK_CustomHook_function *hook)
+{
+    if (!hooks) {
+        return;
+    }
+    SANITYCHECK_CustomHookInstance *instance = NULL;
+    LL_FOREACH(hooks, instance) {
+        if (instance->hook == hook) {
+            instance->enabled = false;
+            return;
+        }
+    }
 }

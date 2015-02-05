@@ -820,7 +820,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
         progressUpdate(erase ? BOOTING_AND_ERASING : BOOTING, QVariant());
         ResultEventLoop eventLoop;
         connect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
-        connect(&m_oplinkwatchdog, SIGNAL(standaloneConnected()), &eventLoop, SLOT(success()));
+        connect(&m_oplinkwatchdog, SIGNAL(opLinkMiniConnected()), &eventLoop, SLOT(success()));
 
         if (eventLoop.run(REBOOT_TIMEOUT + (erase ? ERASE_TIMEOUT : 0)) != 0) {
             emit progressUpdate(FAILURE, QVariant(tr("Timed out while booting.")));
@@ -828,7 +828,7 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
             return false;
         }
 
-        disconnect(&m_oplinkwatchdog, SIGNAL(standaloneConnected()), &eventLoop, SLOT(success()));
+        disconnect(&m_oplinkwatchdog, SIGNAL(opLinkMiniConnected()), &eventLoop, SLOT(success()));
         disconnect(telemetryManager, SIGNAL(connected()), &eventLoop, SLOT(success()));
     }
 

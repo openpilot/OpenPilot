@@ -182,7 +182,6 @@ private slots:
     void finishAutoUpdate();
     void closeAutoUpdate();
     void autoUpdateStatus(uploader::ProgressStep status, QVariant value);
-    void oplinkUpdated();
 };
 
 #endif // UPLOADERGADGETWIDGET_H

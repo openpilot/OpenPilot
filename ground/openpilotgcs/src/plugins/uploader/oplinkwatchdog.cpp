@@ -35,20 +35,20 @@ OPLinkWatchdog::OPLinkWatchdog() : QObject(),
     m_isConnected(false)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pm);
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objManager);
     m_opLinkStatus = OPLinkStatus::GetInstance(objManager);
     Q_ASSERT(m_opLinkStatus);
-    connect(m_opLinkStatus, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(onOPLinkStatusUpdate()));
-    m_watchdog = new QTimer(this);
+    connect(m_opLinkStatus, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(onOPLinkStatusUpdate()));
+    m_watchdog     = new QTimer(this);
     connect(m_watchdog, SIGNAL(timeout()), this, SLOT(onTimeout()));
     onOPLinkStatusUpdate();
 }
 
 OPLinkWatchdog::~OPLinkWatchdog()
-{
-}
+{}
 
 void OPLinkWatchdog::onOPLinkStatusUpdate()
 {
@@ -57,20 +57,20 @@ void OPLinkWatchdog::onOPLinkStatusUpdate()
     if (!m_isConnected) {
         switch (type) {
         case 3:
-            m_opLinkType = OPLINK_MINI;
+            m_opLinkType  = OPLINK_MINI;
             m_isConnected = true;
             emit connected();
             emit opLinkMiniConnected();
             break;
         case 9:
-            m_opLinkType = OPLINK_REVOLUTION;
+            m_opLinkType  = OPLINK_REVOLUTION;
             m_isConnected = true;
             emit connected();
             emit opLinkRevolutionConnected();
             break;
         default:
             m_isConnected = false;
-            m_opLinkType = OPLINK_UNKNOWN;
+            m_opLinkType  = OPLINK_UNKNOWN;
             return;
         }
 
@@ -83,7 +83,7 @@ void OPLinkWatchdog::onTimeout()
 {
     if (m_isConnected) {
         m_isConnected = false;
-        m_opLinkType = OPLINK_UNKNOWN;
+        m_opLinkType  = OPLINK_UNKNOWN;
         qDebug() << "OPLinkWatchdog - OPLink disconnected";
         emit disconnected();
     }

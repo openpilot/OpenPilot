@@ -42,8 +42,14 @@ public:
 
     OPLinkWatchdog();
     ~OPLinkWatchdog();
-    bool isConnected() const { return m_isConnected; }
-    OPLinkWatchdog::OPLinkType opLinkType() const { return m_opLinkType; }
+    bool isConnected() const
+    {
+        return m_isConnected;
+    }
+    OPLinkWatchdog::OPLinkType opLinkType() const
+    {
+        return m_opLinkType;
+    }
 
 signals:
     void connected();
@@ -58,7 +64,7 @@ private slots:
 private:
     bool m_isConnected;
     OPLinkType m_opLinkType;
-    QTimer* m_watchdog;
-    OPLinkStatus* m_opLinkStatus;
+    QTimer *m_watchdog;
+    OPLinkStatus *m_opLinkStatus;
 };
 #endif // OPLINKWATCHDOG_H

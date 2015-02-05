@@ -140,7 +140,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config    = new Ui_UploaderWidget();
     m_config->setupUi(this);
     m_currentIAPStep = IAP_STATE_READY;
-    m_resetOnly   = false;
+    m_resetOnly = false;
     m_dfu = NULL;
     m_autoUpdateClosing = false;
 
@@ -232,6 +232,7 @@ void UploaderGadgetWidget::connectSignalSlot(QWidget *widget)
 FlightStatus *UploaderGadgetWidget::getFlightStatus()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pm);
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objManager);
@@ -673,7 +674,7 @@ bool UploaderGadgetWidget::autoUpdateCapable()
 bool UploaderGadgetWidget::autoUpdate(bool erase)
 {
     if (m_oplinkwatchdog.isConnected() &&
-            m_oplinkwatchdog.opLinkType() == OPLinkWatchdog::OPLINK_MINI) {
+        m_oplinkwatchdog.opLinkType() == OPLinkWatchdog::OPLINK_MINI) {
         emit progressUpdate(FAILURE, QVariant(tr("To upgrade the OPLinkMini board please disconnect it from the USB port, "
                                                  "press the Upgrade again button and follow instructions on screen.")));
         emit autoUpdateFailed();

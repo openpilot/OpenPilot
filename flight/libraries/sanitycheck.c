@@ -341,7 +341,18 @@ FrameType_t GetCurrentFrameType()
 void SANITYCHECK_AttachHook(SANITYCHECK_CustomHook_function *hook)
 {
     PIOS_Assert(hook);
-    SANITYCHECK_CustomHookInstance *instance = (SANITYCHECK_CustomHookInstance *)pios_malloc(sizeof(SANITYCHECK_CustomHookInstance));
+    SANITYCHECK_CustomHookInstance *instance = NULL;
+
+    // Check whether there is an existing instance and enable it
+    LL_FOREACH(hooks, instance) {
+        if (instance->hook == hook) {
+            instance->enabled = true;
+            return;
+        }
+    }
+
+    // No existing instance found, attach this new one
+    instance = (SANITYCHECK_CustomHookInstance *)pios_malloc(sizeof(SANITYCHECK_CustomHookInstance));
     PIOS_Assert(instance);
     instance->hook    = hook;
     instance->next    = NULL;

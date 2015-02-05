@@ -111,22 +111,19 @@ extern "C" {
 
 //#define DEBUG_GROUNDIMPACT
 
-
-#if 0
-FSMLand::PathFollowerFSM_LandStateHandler_T FSMLand::sLandStateTable[LAND_STATE_SIZE] = {
-    [LAND_STATE_INACTIVE] =             { .setup = FSMLand::setup_inactive,             .run = 0                        },
-    [LAND_STATE_INIT_ALTHOLD]  = 	{ .setup = FSMLand::setup_init_althold,         .run = FSMLand::run_init_althold	       },
-    [LAND_STATE_WTG_FOR_DESCENTRATE]  = { .setup = FSMLand::setup_wtg_for_descentrate,  .run = FSMLand::run_wtg_for_descentrate  },
-    [LAND_STATE_AT_DESCENTRATE] =       { .setup = FSMLand::setup_at_descentrate,       .run = FSMLand::run_at_descentrate       },
-    [LAND_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = FSMLand::setup_wtg_for_groundeffect, .run = FSMLand::run_wtg_for_groundeffect },
-    [LAND_STATE_GROUNDEFFECT] =         { .setup = FSMLand::setup_groundeffect,         .run = FSMLand::run_groundeffect         },
-    [LAND_STATE_THRUSTDOWN]   =         { .setup = FSMLand::setup_thrustdown,           .run = FSMLand::run_thrustdown           },
-    [LAND_STATE_THRUSTOFF]    =         { .setup = FSMLand::setup_thrustoff,            .run = FSMLand::run_thrustoff            },
-    [LAND_STATE_DISARMED]     =         { .setup = FSMLand::setup_disarmed,             .run = FSMLand::run_disarmed             },
-    [LAND_STATE_ABORT] =                { .setup = FSMLand::setup_abort,                .run = FSMLand::run_abort                }
+FSMLand::PathFollowerFSM_LandStateHandler_T FSMLand::sLandStateTable[LAND_STATE_SIZE]  = {
+[LAND_STATE_INACTIVE] =             { .setup = &FSMLand::setup_inactive,             .run = 0                        },
+ [LAND_STATE_INIT_ALTHOLD]  = 	{ .setup = &FSMLand::setup_init_althold,         .run = &FSMLand::run_init_althold	       },
+ [LAND_STATE_WTG_FOR_DESCENTRATE]  = { .setup = &FSMLand::setup_wtg_for_descentrate,  .run = &FSMLand::run_wtg_for_descentrate  },
+ [LAND_STATE_AT_DESCENTRATE] =       { .setup = &FSMLand::setup_at_descentrate,       .run = &FSMLand::run_at_descentrate       },
+ [LAND_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = &FSMLand::setup_wtg_for_groundeffect, .run = &FSMLand::run_wtg_for_groundeffect },
+ [LAND_STATE_GROUNDEFFECT] =         { .setup = &FSMLand::setup_groundeffect,         .run = &FSMLand::run_groundeffect         },
+ [LAND_STATE_THRUSTDOWN]   =         { .setup = &FSMLand::setup_thrustdown,           .run = &FSMLand::run_thrustdown           },
+ [LAND_STATE_THRUSTOFF]    =         { .setup = &FSMLand::setup_thrustoff,            .run = &FSMLand::run_thrustoff            },
+ [LAND_STATE_DISARMED]     =         { .setup = &FSMLand::setup_disarmed,             .run = &FSMLand::run_disarmed             },
+ [LAND_STATE_ABORT] =                { .setup = &FSMLand::setup_abort,                .run = &FSMLand::run_abort                }
 };
 
-#endif
 
 FSMLand::FSMLand ()
 :mLandData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
@@ -141,13 +138,8 @@ FSMLand & FSMLand::fsmLand()
     // There can be only one instance.  Using this method as
     // described in Effective C++ CD by Meyers.
 
-#if 0
-    FSMLand *oneOnlyClass = new FSMLand();
-    return(*oneOnlyClass);
-#else
     static FSMLand oneOnlyClass;
     return(oneOnlyClass);
-#endif
 }
 
 
@@ -227,15 +219,28 @@ void FSMLand::Activate()
     }
 }
 
-PathFollowerFSM_LandState_T FSMLand::GetCurrentState(void)
+PathFollowerFSMState_T FSMLand::GetCurrentState(void)
 {
-    return mLandData->currentState;
+    switch( mLandData->currentState ) {
+      case LAND_STATE_INACTIVE:
+	return PFFSM_STATE_INACTIVE;
+	break;
+      case LAND_STATE_ABORT:
+	return PFFSM_STATE_ABORT;
+	break;
+      case LAND_STATE_DISARMED:
+	return PFFSM_STATE_DISARMED;
+	break;
+      default:
+	return PFFSM_STATE_ACTIVE;
+	break;
+    }
 }
 
 void FSMLand::Update()
 {
     runState();
-    if (GetCurrentState() != LAND_STATE_INACTIVE) {
+    if (GetCurrentState() != PFFSM_STATE_INACTIVE) {
         runAlways();
     }
 }
@@ -323,13 +328,12 @@ void FSMLand::setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateE
     mLandData->stateTimeoutCount = 0;
 
     if (sLandStateTable[mLandData->currentState].setup) {
-        sLandStateTable[mLandData->currentState].setup();
+        (this->*sLandStateTable[mLandData->currentState].setup)();
     }
 
     updateFSMLandStatus();
 }
 
-#if 1
 
 // Timeout utility function for use by state init implementations
 void FSMLand::setStateTimeout(int32_t count)
@@ -360,9 +364,8 @@ int32_t FSMLand::runState(void)
 
     // If the current state has a static function, call it
     if (sLandStateTable[mLandData->currentState].run) {
-        sLandStateTable[mLandData->currentState].run(flTimeout);
+        (this->*sLandStateTable[mLandData->currentState].run)(flTimeout);
     }
-
     return 0;
 }
 
@@ -746,4 +749,3 @@ void FSMLand::run_abort(__attribute__((unused)) uint8_t flTimeout)
     fallback_to_hold();
 }
 
-#endif

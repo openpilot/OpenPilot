@@ -34,6 +34,7 @@
 extern "C" {
 #include "fsmlandstatus.h"
 }
+#include "PathFollowerFSM.h"
 
 // Landing state machine
 typedef enum {
@@ -50,7 +51,7 @@ typedef enum {
     LAND_STATE_SIZE
 } PathFollowerFSM_LandState_T;
 
-class FSMLand {
+class FSMLand: PathFollowerFSM {
 
   public:
     int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings,
@@ -61,7 +62,7 @@ class FSMLand {
     void Update(void);
     void SettingsUpdated(void);
     float BoundThrust(float thrustDesired);
-    PathFollowerFSM_LandState_T GetCurrentState(void);
+    PathFollowerFSMState_T GetCurrentState(void);
     void ConstrainStabiDesired(StabilizationDesiredData *stabDesired);
     float BoundVelocityDown(float);
     void CheckPidScalar(pid_scaler *scaler);
@@ -98,8 +99,8 @@ class FSMLand {
 
     // FSM state structure
     typedef struct {
-        void (*setup)(void); // Called to initialise the state
-        void (*run)(uint8_t); // Run the event detection code for a state
+        void (FSMLand::*setup)(void); // Called to initialise the state
+        void (FSMLand::*run)(uint8_t); // Run the event detection code for a state
     } PathFollowerFSM_LandStateHandler_T;
 
     // Private variables
@@ -110,12 +111,12 @@ class FSMLand {
 
     void setup_inactive(void);
     void setup_init_althold(void);
-    void run_init_althold(uint8_t);
     void setup_wtg_for_descentrate(void);
-    void run_wtg_for_descentrate(uint8_t);
     void setup_at_descentrate(void);
-    void run_at_descentrate(uint8_t);
     void setup_wtg_for_groundeffect(void);
+    void run_init_althold(uint8_t);
+    void run_wtg_for_descentrate(uint8_t);
+    void run_at_descentrate(uint8_t);
     void run_wtg_for_groundeffect(uint8_t);
     void setup_groundeffect(void);
     void run_groundeffect(uint8_t);
@@ -137,21 +138,7 @@ class FSMLand {
     void setStateTimeout(int32_t count);
     void fallback_to_hold(void);
 
-    PathFollowerFSM_LandStateHandler_T sLandStateTable[LAND_STATE_SIZE];
-#if 0
-    = {
-        [LAND_STATE_INACTIVE] =             { .setup = FSMLand::setup_inactive,             .run = 0                        },
-        [LAND_STATE_INIT_ALTHOLD]  = 	{ .setup = FSMLand::setup_init_althold,         .run = FSMLand::run_init_althold	       },
-        [LAND_STATE_WTG_FOR_DESCENTRATE]  = { .setup = FSMLand::setup_wtg_for_descentrate,  .run = FSMLand::run_wtg_for_descentrate  },
-        [LAND_STATE_AT_DESCENTRATE] =       { .setup = FSMLand::setup_at_descentrate,       .run = FSMLand::run_at_descentrate       },
-        [LAND_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = FSMLand::setup_wtg_for_groundeffect, .run = FSMLand::run_wtg_for_groundeffect },
-        [LAND_STATE_GROUNDEFFECT] =         { .setup = FSMLand::setup_groundeffect,         .run = FSMLand::run_groundeffect         },
-        [LAND_STATE_THRUSTDOWN]   =         { .setup = FSMLand::setup_thrustdown,           .run = FSMLand::run_thrustdown           },
-        [LAND_STATE_THRUSTOFF]    =         { .setup = FSMLand::setup_thrustoff,            .run = FSMLand::run_thrustoff            },
-        [LAND_STATE_DISARMED]     =         { .setup = FSMLand::setup_disarmed,             .run = FSMLand::run_disarmed             },
-        [LAND_STATE_ABORT] =                { .setup = FSMLand::setup_abort,                .run = FSMLand::run_abort                }
-    };
-#endif
+    static PathFollowerFSM_LandStateHandler_T sLandStateTable[LAND_STATE_SIZE];
 
 };
 

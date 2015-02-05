@@ -124,8 +124,8 @@
 #define USB_LED_OFF
 #endif
 
-#define CONNECTED_TIMEOUT              (250 / portTICK_RATE_MS) /* ms */
-#define MAX_CHANNELS                     32
+#define CONNECTED_TIMEOUT (250 / portTICK_RATE_MS) /* ms */
+#define MAX_CHANNELS      32
 
 /* Local type definitions */
 
@@ -204,9 +204,9 @@ static void rfm22_clearLEDs();
 static uint32_t pios_rfm22_time_difference_ms(portTickType start_time, portTickType end_time);
 static struct pios_rfm22b_dev *pios_rfm22_alloc(void);
 static void rfm22_hmac_sha1(const uint8_t *data, size_t len, uint8_t key[SHA1_DIGEST_LENGTH],
-        uint8_t digest[SHA1_DIGEST_LENGTH]);
+                            uint8_t digest[SHA1_DIGEST_LENGTH]);
 static bool rfm22_gen_channels(uint32_t coordid, enum rfm22b_datarate datarate, uint8_t min,
-        uint8_t max, uint8_t channels[MAX_CHANNELS], uint8_t *clen);
+                               uint8_t max, uint8_t channels[MAX_CHANNELS], uint8_t *clen);
 
 // SPI read/write functions
 static void rfm22_assertCs(struct pios_rfm22b_dev *rfm22b_dev);
@@ -332,15 +332,15 @@ static const uint32_t data_rate[] = {
 };
 
 static const uint8_t channel_spacing[] = {
-	1, /* 9.6kbps */
-	2, /* 19.2kps */
-	2, /* 32kps */
-	2, /* 57.6kps */
-	2, /* 64kps */
-	3, /* 100kps */
-	4, /* 128kps */
-	4, /* 192kps */
-	4  /* 256kps */
+    1, /* 9.6kbps */
+    2, /* 19.2kps */
+    2, /* 32kps */
+    2, /* 57.6kps */
+    2, /* 64kps */
+    3, /* 100kps */
+    4, /* 128kps */
+    4, /* 192kps */
+    4 /* 256kps */
 };
 
 static const uint8_t reg_1C[] = { 0x01, 0x05, 0x06, 0x95, 0x95, 0x81, 0x88, 0x8B, 0x8D }; // rfm22_if_filter_bandwidth
@@ -609,7 +609,7 @@ void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datar
 
     uint8_t num_found = 0;
     rfm22_gen_channels(rfm22_destinationID(rfm22b_dev), datarate, min_chan, max_chan,
-            rfm22b_dev->channels, &num_found);
+                       rfm22b_dev->channels, &num_found);
 
     rfm22b_dev->num_channels = num_found;
 
@@ -1361,7 +1361,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->packet_start_ticks = 0;
     rfm22b_dev->tx_complete_ticks  = 0;
     rfm22b_dev->rfm22b_state       = RFM22B_STATE_INITIALIZING;
-    rfm22b_dev->last_contact  = 0;
+    rfm22b_dev->last_contact       = 0;
 
     // software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
     rfm22_write_claim(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
@@ -1984,7 +1984,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
          * If the packet is valid and destined for us we synchronize the clock.
          */
         if (!rfm22_isCoordinator(radio_dev) &&
-                radio_dev->rx_destination_id == rfm22_destinationID(radio_dev)) {
+            radio_dev->rx_destination_id == rfm22_destinationID(radio_dev)) {
             rfm22_synchronizeClock(radio_dev);
             radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
         }
@@ -2094,7 +2094,7 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->stats.rx_good      = 0;
     rfm22b_dev->stats.rx_corrected = 0;
     rfm22b_dev->stats.rx_error     = 0;
-    rfm22b_dev->stats.rx_failure    = 0;
+    rfm22b_dev->stats.rx_failure   = 0;
     for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i) {
         uint32_t val = rfm22b_dev->rx_packet_stats[i];
         for (uint8_t j = 0; j < 16; ++j) {
@@ -2192,7 +2192,7 @@ static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev)
     uint8_t offset = (uint8_t)ceil(35000.0F / data_rate[rfm22b_dev->datarate]);
 
     rfm22b_dev->time_delta = frequency_hop_cycle_time - time_delta + offset +
-        rfm22b_dev->packet_time * rfm22b_dev->channel_index;
+                             rfm22b_dev->packet_time * rfm22b_dev->channel_index;
 }
 
 /**
@@ -2252,9 +2252,8 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
     // Are we switching to a new channel?
     if (idx != rfm22b_dev->channel_index) {
         if (!rfm22_isCoordinator(rfm22b_dev) &&
-                pios_rfm22_time_difference_ms(rfm22b_dev->last_contact, xTaskGetTickCount()) >=
-                    CONNECTED_TIMEOUT) {
-
+            pios_rfm22_time_difference_ms(rfm22b_dev->last_contact, xTaskGetTickCount()) >=
+            CONNECTED_TIMEOUT) {
             // Set the link state to disconnected.
             if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
                 rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
@@ -2574,13 +2573,12 @@ static uint8_t rfm22_read(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr)
 }
 
 
-static void
-rfm22_hmac_sha1(const uint8_t *data, size_t len,
-	   uint8_t key[SHA1_DIGEST_LENGTH],
-       uint8_t digest[SHA1_DIGEST_LENGTH])
+static void rfm22_hmac_sha1(const uint8_t *data, size_t len,
+                            uint8_t key[SHA1_DIGEST_LENGTH],
+                            uint8_t digest[SHA1_DIGEST_LENGTH])
 {
-    uint8_t ipad[64] = {0};
-    uint8_t opad[64] = {0};
+    uint8_t ipad[64] = { 0 };
+    uint8_t opad[64] = { 0 };
     static SHA1_CTX *ctx;
 
     ctx = pios_malloc(sizeof(SHA1_CTX));
@@ -2606,14 +2604,13 @@ rfm22_hmac_sha1(const uint8_t *data, size_t len,
     pios_free(ctx);
 }
 
-static bool
-rfm22_gen_channels(uint32_t coordid, enum rfm22b_datarate rate, uint8_t min,
-        uint8_t max, uint8_t channels[MAX_CHANNELS], uint8_t *clen)
+static bool rfm22_gen_channels(uint32_t coordid, enum rfm22b_datarate rate, uint8_t min,
+                               uint8_t max, uint8_t channels[MAX_CHANNELS], uint8_t *clen)
 {
     uint32_t data = 0;
-    uint8_t cpos = 0;
+    uint8_t cpos  = 0;
     uint8_t chan_range = (max / channel_spacing[rate] - min / channel_spacing[rate]) + 1;
-    uint8_t key[SHA1_DIGEST_LENGTH] = {0};
+    uint8_t key[SHA1_DIGEST_LENGTH] = { 0 };
     uint8_t digest[SHA1_DIGEST_LENGTH];
     uint8_t *all_channels;
 
@@ -2632,27 +2629,27 @@ rfm22_gen_channels(uint32_t coordid, enum rfm22b_datarate rate, uint8_t min,
         uint8_t tmp;
 
         if (j == SHA1_DIGEST_LENGTH) {
-            rfm22_hmac_sha1((uint8_t *) &data, sizeof(data), key, digest);
+            rfm22_hmac_sha1((uint8_t *)&data, sizeof(data), key, digest);
             j = 0;
             data++;
         }
         rnd = digest[j];
         j++;
-        r = rnd % (chan_range - i) + i;
+        r   = rnd % (chan_range - i) + i;
         tmp = all_channels[i];
         all_channels[i] = all_channels[r];
         all_channels[r] = tmp;
     }
 
     for (int i = 0; i < chan_range && cpos < MAX_CHANNELS; i++, cpos++) {
-        channels[cpos] =all_channels[i] * channel_spacing[rate];
+        channels[cpos] = all_channels[i] * channel_spacing[rate];
     }
 
     *clen = cpos & 0xfe;
 
     pios_free(all_channels);
 
-    return (*clen > 0);
+    return *clen > 0;
 }
 
 #endif /* PIOS_INCLUDE_RFM22B */

@@ -53,7 +53,17 @@ typedef enum {
 
 class FSMLand: PathFollowerFSM {
 
+private:
+  static FSMLand *p_inst;
+  FSMLand();
+
   public:
+    static FSMLand * instance() {
+      if (!p_inst) {
+	  p_inst = new FSMLand();
+      }
+      return p_inst;
+    }
     int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings,
 			      PathDesiredData *pathDesired,
 			      FlightStatusData *flightStatus);
@@ -67,14 +77,8 @@ class FSMLand: PathFollowerFSM {
     float BoundVelocityDown(float);
     void CheckPidScalar(pid_scaler *scaler);
 
-    static FSMLand & fsmLand();
-    virtual ~FSMLand();
 
   protected:
-    FSMLand();
-
-
-
     // FSM instance data type
     typedef struct {
         FSMLandStatusData fsmLandStatus;

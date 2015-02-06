@@ -124,24 +124,14 @@ FSMLand::PathFollowerFSM_LandStateHandler_T FSMLand::sLandStateTable[LAND_STATE_
  [LAND_STATE_ABORT] =                { .setup = &FSMLand::setup_abort,                .run = &FSMLand::run_abort                }
 };
 
+FSMLand* FSMLand::p_inst = 0;
+
 
 FSMLand::FSMLand ()
 :mLandData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
 {
     return;
 }
-
-FSMLand::~FSMLand() {}
-
-FSMLand & FSMLand::fsmLand()
-{
-    // There can be only one instance.  Using this method as
-    // described in Effective C++ CD by Meyers.
-
-    static FSMLand oneOnlyClass;
-    return(oneOnlyClass);
-}
-
 
 // Private types
 

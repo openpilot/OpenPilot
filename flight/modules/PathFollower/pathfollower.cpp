@@ -221,7 +221,7 @@ int32_t PathFollowerInitialize()
     VtolSelfTuningStatsInitialize();
 
     // Initialise the autopilot mode implementations that use an FSM
-    FSMLand::fsmLand().Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
+    FSMLand::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
 
     // reset integrals
     resetGlobals();
@@ -364,7 +364,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     // set FSM mode based on requested mode
     switch (pathDesired.Mode) {
     case PATHDESIRED_MODE_LAND:
-      activePFState = (PathFollowerFSM*)&(FSMLand::fsmLand());
+      activePFState = (PathFollowerFSM *)FSMLand::instance();
       break;
     default:
       activePFState = 0;

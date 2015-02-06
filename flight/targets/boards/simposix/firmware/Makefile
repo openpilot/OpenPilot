@@ -33,8 +33,7 @@ DEBUG ?= YES
 # List of modules to include
 MODULES = ManualControl Stabilization GPS
 MODULES += PathPlanner
-MODULES += FixedWingPathFollower
-MODULES += VtolPathFollower
+MODULES += PathFollower
 MODULES += CameraStab
 MODULES += Telemetry
 MODULES += Logging
@@ -42,8 +41,10 @@ MODULES += FirmwareIAP
 MODULES += StateEstimation
 #MODULES += Sensors/simulated/Sensors
 MODULES += Airspeed
-MODULES += AltitudeHold
+#MODULES += AltitudeHold # now integrated in Stabilization
 #MODULES += OveroSync
+
+SRC += $(FLIGHTLIB)/notification.c
 
 # Paths
 OPSYSTEM = .
@@ -69,6 +70,12 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
+ifeq ($(USE_YAFFS),YES)
+SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
+include $(PIOS)/posix/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
+endif
+
 #include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -84,6 +91,7 @@ SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
+SRC += $(OPUAVOBJ)/uavobjectpersistence.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 
@@ -92,16 +100,26 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/paths.c
+SRC += $(FLIGHTLIB)/plans.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
+SRC += $(MATHLIB)/mathmisc.c
+SRC += $(MATHLIB)/butterworth.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
+ifeq ($(USE_YAFFS),YES)
+SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+else
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
+endif
+SRC += $(PIOSCORECOMMON)/pios_trace.c
 SRC += $(PIOSCORECOMMON)/pios_debuglog.c
 SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c
 SRC += $(PIOSCORECOMMON)/pios_deltatime.c
+SRC += $(PIOSCORECOMMON)/pios_notify.c
+SRC += $(PIOSCORECOMMON)/pios_mem.c
 
 ## PIOS Hardware
 include $(PIOS)/posix/library.mk
@@ -148,7 +166,10 @@ CFLAGS += -finstrument-functions -ffixed-r10
 else
 CFLAGS += -Os
 endif
-   
+  
+# tracing
+# CFLAGS += -DPIOS_TRACE
+ 
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 

@@ -29,12 +29,12 @@
  */
 
 #include "inc/manualcontrol.h"
-#include <pios_struct_helper.h>
 #include <sanitycheck.h>
 #include <manualcontrolcommand.h>
 #include <accessorydesired.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
+#include <stabilizationdesired.h>
 
 // Private constants
 #define ARMED_THRESHOLD 0.50f
@@ -214,6 +214,15 @@ void armHandler(bool newinit)
         break;
 
     case ARM_STATE_DISARMING_TIMEOUT:
+    {
+        // we should never reach the disarming timeout if the pathfollower is engaged - reset timeout
+        FlightStatusControlChainData cc;
+        FlightStatusControlChainGet(&cc);
+        if (cc.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            armedDisarmStart = sysTime;
+        }
+    }
+
         // We get here when armed while throttle low, even when the arming timeout is not enabled
         if ((settings.ArmedTimeout != 0) && (timeDifferenceMs(armedDisarmStart, sysTime) > settings.ArmedTimeout)) {
             armState = ARM_STATE_DISARMED;
@@ -258,7 +267,7 @@ static bool okToArm(void)
 
     // Check each alarm
     for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++) {
-        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[i] >= SYSTEMALARMS_ALARM_ERROR) { // found an alarm thats set
+        if (SystemAlarmsAlarmToArray(alarms.Alarm)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
             if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
             }
@@ -267,13 +276,31 @@ static bool okToArm(void)
         }
     }
 
-    uint8_t flightMode;
-    FlightStatusFlightModeGet(&flightMode);
-    switch (flightMode) {
+    StabilizationDesiredStabilizationModeData stabDesired;
+
+    FlightStatusData flightStatus;
+    FlightStatusGet(&flightStatus);
+    switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+        // Prevent arming if unsafe due to the current Thrust Mode
+        StabilizationDesiredStabilizationModeGet(&stabDesired);
+        if (stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEHOLD ||
+            stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO) {
+            return false;
+        }
+
+        // avoid assisted control with auto throttle.  As it sits waiting to launch,
+        // it will move to hold, and auto thrust will auto launch otherwise!
+        if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST) {
+            return false;
+        }
+
         return true;
 
         break;

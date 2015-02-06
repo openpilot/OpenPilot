@@ -30,11 +30,8 @@
 #include <extensionsystem/iplugin.h>
 #include <extensionsystem/pluginmanager.h>
 #include <QtPlugin>
-#include "telemetrymonitor.h"
-#include "telemetry.h"
 #include "uavtalk.h"
 #include "telemetrymanager.h"
-#include "uavobjectmanager.h"
 
 class UAVTALK_EXPORT UAVTalkPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
@@ -53,7 +50,6 @@ protected slots:
     void onDeviceDisconnect();
 
 private:
-    UAVObjectManager *objMngr;
     TelemetryManager *telMngr;
 };
 

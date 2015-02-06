@@ -19,7 +19,6 @@
 			<elementname>Airspeed</elementname>
 			<elementname>MagBaro</elementname>
 			<!-- navigation -->
-			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
@@ -31,7 +30,6 @@
 			<!-- optional -->
 			<elementname>GPS</elementname>
 			<elementname>OSDGen</elementname>
-			<elementname>Autotune</elementname>
 		</elementnames>
 	</field> 
 	<field name="Running" units="bool" type="enum">
@@ -52,11 +50,9 @@
 			<elementname>Airspeed</elementname>
 			<elementname>MagBaro</elementname>
 			<!-- navigation -->
-			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
-			<elementname>TelemetryTxPri</elementname>
 			<elementname>TelemetryRx</elementname>
 			<!-- com -->
 			<elementname>RadioRx</elementname>
@@ -65,7 +61,6 @@
 			<!-- optional -->
 			<elementname>GPS</elementname>
 			<elementname>OSDGen</elementname>
-			<elementname>Autotune</elementname>
 		</elementnames>
 		<options>
 			<option>False</option>
@@ -90,11 +85,9 @@
 			<elementname>Airspeed</elementname>
 			<elementname>MagBaro</elementname>
 			<!-- navigation -->
-			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
-			<elementname>TelemetryTxPri</elementname>
 			<elementname>TelemetryRx</elementname>
 			<!-- com -->
 			<elementname>RadioRx</elementname>
@@ -103,7 +96,6 @@
 			<!-- optional -->
 			<elementname>GPS</elementname>
 			<elementname>OSDGen</elementname>
-			<elementname>Autotune</elementname>
 		</elementnames>
 	</field> 
         <access gcs="readonly" flight="readwrite"/>

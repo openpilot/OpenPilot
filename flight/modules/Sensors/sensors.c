@@ -58,36 +58,68 @@
 #include <accelgyrosettings.h>
 #include <flightstatus.h>
 #include <taskinfo.h>
-
+#include <pios_math.h>
 #include <CoordinateConversions.h>
 
 #include <pios_board_info.h>
 
 // Private constants
-#define STACK_SIZE_BYTES 1000
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 3)
-#define SENSOR_PERIOD    2
+#define STACK_SIZE_BYTES    1000
+#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
 
+static const uint32_t sensor_period_ms = ((uint32_t)1000.0f / PIOS_SENSOR_RATE);
+
+// Interval in number of sample to recalculate temp bias
+#define TEMP_CALIB_INTERVAL 30
+
+// LPF
+#define TEMP_DT             (1.0f / PIOS_SENSOR_RATE)
+#define TEMP_LPF_FC         5.0f
+static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC));
+
+#define ZERO_ROT_ANGLE      0.00001f
 // Private types
+#define PIOS_INSTRUMENT_MODULE
+#include <pios_instrumentation_helper.h>
 
+PERF_DEFINE_COUNTER(counterGyroSamples);
+PERF_DEFINE_COUNTER(counterSensorPeriod);
+
+// Counters:
+// - 0x53000001 Sensor fetch rate(period)
+// - 0x53000002 number of gyro samples read for each loop
 
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
-// static void magOffsetEstimation(MagSensorData *mag);
 
 // Private variables
 static xTaskHandle sensorsTaskHandle;
 RevoCalibrationData cal;
 AccelGyroSettingsData agcal;
 
+#ifdef PIOS_INCLUDE_HMC5X83
+#include <pios_hmc5x83.h>
+extern pios_hmc5x83_dev_t onboard_mag;
+#endif
+
 // These values are initialized by settings but can be updated by the attitude algorithm
 
 static float mag_bias[3] = { 0, 0, 0 };
-static float mag_scale[3] = { 0, 0, 0 };
+static float mag_transform[3][3] = {
+    { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
+};
 // temp coefficient to calculate gyro bias
 static volatile bool gyro_temp_calibrated  = false;
 static volatile bool accel_temp_calibrated = false;
+
+static float accel_temperature  = NAN;
+static float gyro_temperature   = NAN;
+static float accel_temp_bias[3] = { 0 };
+static float gyro_temp_bias[3] = { 0 };
+static uint8_t temp_calibration_count = 0;
+
+
 static float R[3][3] = {
     { 0 }
 };
@@ -119,6 +151,7 @@ int32_t SensorsInitialize(void)
 
     RevoCalibrationConnectCallback(&settingsUpdatedCb);
     AttitudeSettingsConnectCallback(&settingsUpdatedCb);
+
     AccelGyroSettingsConnectCallback(&settingsUpdatedCb);
     return 0;
 }
@@ -130,7 +163,7 @@ int32_t SensorsInitialize(void)
 int32_t SensorsStart(void)
 {
     // Start main task
-    xTaskCreate(SensorsTask, (signed char *)"Sensors", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
+    xTaskCreate(SensorsTask, "Sensors", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_SENSORS);
@@ -195,8 +228,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         PIOS_DEBUG_Assert(0);
     }
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    mag_test = PIOS_HMC5883_Test();
+#if defined(PIOS_INCLUDE_HMC5X83)
+    mag_test = PIOS_HMC5x83_Test(onboard_mag);
 #else
     mag_test = 0;
 #endif
@@ -210,7 +243,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             vTaskDelay(10);
         }
     }
-
+    PERF_INIT_COUNTER(counterGyroSamples, 0x53000001);
+    PERF_INIT_COUNTER(counterSensorPeriod, 0x53000002);
     // Main task loop
     lastSysTime = xTaskGetTickCount();
     bool error = false;
@@ -225,7 +259,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
             lastSysTime = xTaskGetTickCount();
-            vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+            vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_RATE_MS);
             AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
             error = false;
         } else {
@@ -254,7 +288,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 
                 count = 0;
                 while ((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error) {
-                    error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+                    error = ((xTaskGetTickCount() - lastSysTime) > sensor_period_ms) ? true : error;
                 }
                 if (error) {
                     // Unfortunately if the BMA180 ever misses getting read, then it will not
@@ -323,6 +357,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                     accel_samples++;
                 }
 
+                PERF_MEASURE_PERIOD(counterSensorPeriod);
+                PERF_TRACK_VALUE(counterGyroSamples, gyro_samples);
+
                 if (gyro_samples == 0) {
                     PIOS_MPU6000_ReadGyros(&mpu6000_data);
                     error = true;
@@ -341,24 +378,42 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             PIOS_DEBUG_Assert(0);
         }
 
+        if (isnan(accel_temperature)) {
+            accel_temperature = accelSensorData.temperature;
+            gyro_temperature  = gyroSensorData.temperature;
+        }
+
+        accel_temperature = temp_alpha * (accelSensorData.temperature - accel_temperature) + accel_temperature;
+        gyro_temperature  = temp_alpha * (gyroSensorData.temperature - gyro_temperature) + gyro_temperature;
+
+        if ((accel_temp_calibrated || gyro_temp_calibrated) && !temp_calibration_count) {
+            temp_calibration_count = TEMP_CALIB_INTERVAL;
+            if (accel_temp_calibrated) {
+                float ctemp = boundf(accel_temperature, agcal.temp_calibrated_extent.max, agcal.temp_calibrated_extent.min);
+                accel_temp_bias[0] = agcal.accel_temp_coeff.X * ctemp;
+                accel_temp_bias[1] = agcal.accel_temp_coeff.Y * ctemp;
+                accel_temp_bias[2] = agcal.accel_temp_coeff.Z * ctemp;
+            }
+
+            if (gyro_temp_calibrated) {
+                float ctemp = boundf(gyro_temperature, agcal.temp_calibrated_extent.max, agcal.temp_calibrated_extent.min);
+
+                gyro_temp_bias[0] = (agcal.gyro_temp_coeff.X + agcal.gyro_temp_coeff.X2 * ctemp) * ctemp;
+                gyro_temp_bias[1] = (agcal.gyro_temp_coeff.Y + agcal.gyro_temp_coeff.Y2 * ctemp) * ctemp;
+                gyro_temp_bias[2] = (agcal.gyro_temp_coeff.Z + agcal.gyro_temp_coeff.Z2 * ctemp) * ctemp;
+            }
+        }
+        temp_calibration_count--;
         // Scale the accels
         float accels[3] = { (float)accel_accum[0] / accel_samples,
                             (float)accel_accum[1] / accel_samples,
                             (float)accel_accum[2] / accel_samples };
 
 
-        float accels_out[3] = { accels[0] * accel_scaling * agcal.accel_scale.X - agcal.accel_bias.X,
-                                accels[1] * accel_scaling * agcal.accel_scale.Y - agcal.accel_bias.Y,
-                                accels[2] * accel_scaling * agcal.accel_scale.Z - agcal.accel_bias.Z };
+        float accels_out[3] = { accels[0] * accel_scaling * agcal.accel_scale.X - agcal.accel_bias.X - accel_temp_bias[0],
+                                accels[1] * accel_scaling * agcal.accel_scale.Y - agcal.accel_bias.Y - accel_temp_bias[1],
+                                accels[2] * accel_scaling * agcal.accel_scale.Z - agcal.accel_bias.Z - accel_temp_bias[2] };
 
-        if (accel_temp_calibrated) {
-            float ctemp = accelSensorData.temperature > agcal.temp_calibrated_extent.max ? agcal.temp_calibrated_extent.max :
-                          (accelSensorData.temperature < agcal.temp_calibrated_extent.min ? agcal.temp_calibrated_extent.min
-                           : accelSensorData.temperature);
-            accels_out[0] -= agcal.accel_temp_coeff.X * ctemp;
-            accels_out[1] -= agcal.accel_temp_coeff.Y * ctemp;
-            accels_out[2] -= agcal.accel_temp_coeff.Z * ctemp;
-        }
 
         if (rotate) {
             rot_mult(R, accels_out, accels);
@@ -377,18 +432,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                            (float)gyro_accum[1] / gyro_samples,
                            (float)gyro_accum[2] / gyro_samples };
 
-        float gyros_out[3] = { gyros[0] * gyro_scaling * agcal.gyro_scale.X - agcal.gyro_bias.X,
-                               gyros[1] * gyro_scaling * agcal.gyro_scale.Y - agcal.gyro_bias.Y,
-                               gyros[2] * gyro_scaling * agcal.gyro_scale.Z - agcal.gyro_bias.Z };
-
-        if (gyro_temp_calibrated) {
-            float ctemp = gyroSensorData.temperature > agcal.temp_calibrated_extent.max ? agcal.temp_calibrated_extent.max :
-                          (gyroSensorData.temperature < agcal.temp_calibrated_extent.min ? agcal.temp_calibrated_extent.min
-                           : gyroSensorData.temperature);
-            gyros_out[0] -= (agcal.gyro_temp_coeff.X + agcal.gyro_temp_coeff.X2 * ctemp) * ctemp;
-            gyros_out[1] -= (agcal.gyro_temp_coeff.Y + agcal.gyro_temp_coeff.Y2 * ctemp) * ctemp;
-            gyros_out[2] -= (agcal.gyro_temp_coeff.Z + agcal.gyro_temp_coeff.Z2 * ctemp) * ctemp;
-        }
+        float gyros_out[3] = { gyros[0] * gyro_scaling * agcal.gyro_scale.X - agcal.gyro_bias.X - gyro_temp_bias[0],
+                               gyros[1] * gyro_scaling * agcal.gyro_scale.Y - agcal.gyro_bias.Y - gyro_temp_bias[1],
+                               gyros[2] * gyro_scaling * agcal.gyro_scale.Z - agcal.gyro_bias.Z - gyro_temp_bias[2] };
 
         if (rotate) {
             rot_mult(R, gyros_out, gyros);
@@ -406,36 +452,31 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
         // and make it average zero (weakly)
 
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
         MagSensorData mag;
-        if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
+        if (PIOS_HMC5x83_NewDataAvailable(onboard_mag) || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
             int16_t values[3];
-            PIOS_HMC5883_ReadMag(values);
-            float mags[3] = { (float)values[1] * mag_scale[0] - mag_bias[0],
-                              (float)values[0] * mag_scale[1] - mag_bias[1],
-                              -(float)values[2] * mag_scale[2] - mag_bias[2] };
-            if (rotate) {
-                float mag_out[3];
-                rot_mult(R, mags, mag_out);
-                mag.x = mag_out[0];
-                mag.y = mag_out[1];
-                mag.z = mag_out[2];
-            } else {
-                mag.x = mags[0];
-                mag.y = mags[1];
-                mag.z = mags[2];
-            }
+            PIOS_HMC5x83_ReadMag(onboard_mag, values);
+            float mags[3] = { (float)values[1] - mag_bias[0],
+                              (float)values[0] - mag_bias[1],
+                              -(float)values[2] - mag_bias[2] };
+
+            float mag_out[3];
+            rot_mult(mag_transform, mags, mag_out);
+
+            mag.x = mag_out[0];
+            mag.y = mag_out[1];
+            mag.z = mag_out[2];
 
             MagSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
         }
-#endif /* if defined(PIOS_INCLUDE_HMC5883) */
+#endif /* if defined(PIOS_INCLUDE_HMC5X83) */
 
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
-
-        lastSysTime = xTaskGetTickCount();
+        vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_RATE_MS);
     }
 }
 
@@ -446,12 +487,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 {
     RevoCalibrationGet(&cal);
     AccelGyroSettingsGet(&agcal);
-    mag_bias[0]  = cal.mag_bias.X;
-    mag_bias[1]  = cal.mag_bias.Y;
-    mag_bias[2]  = cal.mag_bias.Z;
-    mag_scale[0] = cal.mag_scale.X;
-    mag_scale[1] = cal.mag_scale.Y;
-    mag_scale[2] = cal.mag_scale.Z;
+    mag_bias[0] = cal.mag_bias.X;
+    mag_bias[1] = cal.mag_bias.Y;
+    mag_bias[2] = cal.mag_bias.Z;
 
     accel_temp_calibrated = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
                             (fabsf(agcal.accel_temp_coeff.X) > 1e-9f || fabsf(agcal.accel_temp_coeff.Y) > 1e-9f || fabsf(agcal.accel_temp_coeff.Z) > 1e-9f);
@@ -465,18 +503,36 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     AttitudeSettingsGet(&attitudeSettings);
 
     // Indicates not to expend cycles on rotation
-    if (attitudeSettings.BoardRotation.Roll == 0 && attitudeSettings.BoardRotation.Pitch == 0 &&
-        attitudeSettings.BoardRotation.Yaw == 0) {
+    if (fabsf(attitudeSettings.BoardRotation.Roll) < ZERO_ROT_ANGLE
+        && fabsf(attitudeSettings.BoardRotation.Pitch) < ZERO_ROT_ANGLE &&
+        fabsf(attitudeSettings.BoardRotation.Yaw) < ZERO_ROT_ANGLE) {
         rotate = 0;
     } else {
-        float rotationQuat[4];
-        const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
-                               attitudeSettings.BoardRotation.Pitch,
-                               attitudeSettings.BoardRotation.Yaw };
-        RPY2Quaternion(rpy, rotationQuat);
-        Quaternion2R(rotationQuat, R);
         rotate = 1;
     }
+
+    const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
+                           attitudeSettings.BoardRotation.Pitch,
+                           attitudeSettings.BoardRotation.Yaw };
+
+    float rotationQuat[4];
+    RPY2Quaternion(rpy, rotationQuat);
+
+    if (fabsf(attitudeSettings.BoardLevelTrim.Roll) > ZERO_ROT_ANGLE ||
+        fabsf(attitudeSettings.BoardLevelTrim.Pitch) > ZERO_ROT_ANGLE) {
+        float trimQuat[4];
+        float sumQuat[4];
+        rotate = 1;
+
+        const float trimRpy[3] = { attitudeSettings.BoardLevelTrim.Roll, attitudeSettings.BoardLevelTrim.Pitch, 0.0f };
+        RPY2Quaternion(trimRpy, trimQuat);
+
+        quat_mult(rotationQuat, trimQuat, sumQuat);
+        Quaternion2R(sumQuat, R);
+    } else {
+        Quaternion2R(rotationQuat, R);
+    }
+    matrix_mult_3x3f((float(*)[3])RevoCalibrationmag_transformToArray(cal.mag_transform), R, mag_transform);
 }
 /**
  * @}

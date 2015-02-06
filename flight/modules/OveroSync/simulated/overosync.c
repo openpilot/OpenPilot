@@ -106,7 +106,7 @@ int32_t OveroSyncInitialize(void)
  */
 int32_t OveroSyncStart(void)
 {
-    overosync = (struct overosync *)pvPortMalloc(sizeof(*overosync));
+    overosync = (struct overosync *)pios_malloc(sizeof(*overosync));
     if (overosync == NULL) {
         return -1;
     }

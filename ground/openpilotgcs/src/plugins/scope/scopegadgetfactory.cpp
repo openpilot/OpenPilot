@@ -50,7 +50,6 @@ void ScopeGadgetFactory::startPlotting()
     emit onStartPlotting();
 }
 
-
 Core::IUAVGadget *ScopeGadgetFactory::createGadget(QWidget *parent)
 {
     ScopeGadgetWidget *gadgetWidget = new ScopeGadgetWidget(parent);

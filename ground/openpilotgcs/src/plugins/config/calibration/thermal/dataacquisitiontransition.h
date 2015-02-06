@@ -29,13 +29,15 @@
 #ifndef DATAACQUISITIONTRANSITION_H
 #define DATAACQUISITIONTRANSITION_H
 
+#include "thermalcalibrationhelper.h"
+
 #include <QSignalTransition>
 #include <QEventTransition>
 
-#include "thermalcalibrationhelper.h"
 namespace OpenPilot {
 class DataAcquisitionTransition : public QSignalTransition {
     Q_OBJECT
+
 public:
     DataAcquisitionTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
         : QSignalTransition(helper, SIGNAL(collectionCompleted())),
@@ -55,8 +57,17 @@ public:
 public slots:
     void enterState()
     {
+        m_helper->setProgressMax(0);
+        m_helper->setProgress(0);
+
+        m_helper->addInstructions(tr("Please wait during samples acquisition. This can take several minutes..."), WizardModel::Prompt);
+        m_helper->addInstructions(tr("Acquisition will run until the rate of temperature change is less than %1°C/min.").arg(ThermalCalibrationHelper::TargetGradient, 4, 'f', 2));
+        m_helper->addInstructions(tr("For the calibration to be valid, the temperature span during acquisition must be greater than %1°C.").arg(ThermalCalibrationHelper::TargetTempDelta, 4, 'f', 2));
+        m_helper->addInstructions(tr("Estimating acquisition duration..."));
+
         m_helper->initAcquisition();
     }
+
 private:
     ThermalCalibrationHelper *m_helper;
 };

@@ -42,7 +42,7 @@
 
 static void com2UsbBridgeTask(void *parameters);
 static void usb2ComBridgeTask(void *parameters);
-static void updateSettings();
+static void updateSettings(UAVObjEvent *ev);
 
 // ****************
 // Private constants
@@ -78,9 +78,9 @@ static int32_t comUsbBridgeStart(void)
 {
     if (bridge_enabled) {
         // Start tasks
-        xTaskCreate(com2UsbBridgeTask, (signed char *)"Com2UsbBridge", C2U_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
+        xTaskCreate(com2UsbBridgeTask, "Com2UsbBridge", C2U_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_COM2USBBRIDGE, com2UsbBridgeTaskHandle);
-        xTaskCreate(usb2ComBridgeTask, (signed char *)"Usb2ComBridge", U2C_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
+        xTaskCreate(usb2ComBridgeTask, "Usb2ComBridge", U2C_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_USB2COMBRIDGE, usb2ComBridgeTaskHandle);
         return 0;
     }
@@ -106,8 +106,7 @@ static int32_t comUsbBridgeInitialize(void)
 
     HwSettingsOptionalModulesGet(&optionalModules);
 
-    if (usart_port && vcp_port &&
-        (optionalModules.ComUsbBridge == HWSETTINGS_OPTIONALMODULES_ENABLED)) {
+    if (usart_port && vcp_port) {
         bridge_enabled = true;
     } else {
         bridge_enabled = false;
@@ -115,12 +114,12 @@ static int32_t comUsbBridgeInitialize(void)
 #endif
 
     if (bridge_enabled) {
-        com2usb_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+        com2usb_buf = pios_malloc(BRIDGE_BUF_LEN);
         PIOS_Assert(com2usb_buf);
-        usb2com_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+        usb2com_buf = pios_malloc(BRIDGE_BUF_LEN);
         PIOS_Assert(usb2com_buf);
-
-        updateSettings();
+        HwSettingsConnectCallback(&updateSettings);
+        updateSettings(0);
     }
 
     return 0;
@@ -170,7 +169,7 @@ static void usb2ComBridgeTask(__attribute__((unused)) void *parameters)
 }
 
 
-static void updateSettings()
+static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
     if (usart_port) {
         // Retrieve settings

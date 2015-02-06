@@ -69,7 +69,7 @@ static struct pios_hcsr04_dev *PIOS_PWM_alloc(void)
 {
     struct pios_hcsr04_dev *hcsr04_dev;
 
-    hcsr04_dev = (struct pios_hcsr04_dev *)pvPortMalloc(sizeof(*hcsr04_dev));
+    hcsr04_dev = (struct pios_hcsr04_dev *)pios_malloc(sizeof(*hcsr04_dev));
     if (!hcsr04_dev) {
         return NULL;
     }

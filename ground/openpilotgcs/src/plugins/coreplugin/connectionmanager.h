@@ -83,10 +83,6 @@ public:
 
     void init();
 
-    QIODevice *getCurrentConnection()
-    {
-        return m_ioDev;
-    }
     DevListItem getCurrentDevice()
     {
         return m_connectionDevice;

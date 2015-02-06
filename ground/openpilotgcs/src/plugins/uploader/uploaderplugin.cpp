@@ -26,9 +26,10 @@
  */
 #include "uploaderplugin.h"
 #include "uploadergadgetfactory.h"
-#include <QtPlugin>
-#include <QStringList>
+
 #include <extensionsystem/pluginmanager.h>
+
+#include <QStringList>
 
 UploaderPlugin::UploaderPlugin()
 {
@@ -44,8 +45,10 @@ bool UploaderPlugin::initialize(const QStringList & args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
+
     mf = new UploaderGadgetFactory(this);
     addAutoReleasedObject(mf);
+
     return true;
 }
 

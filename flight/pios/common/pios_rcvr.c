@@ -24,7 +24,7 @@ static struct pios_rcvr_dev *PIOS_RCVR_alloc(void)
 {
     struct pios_rcvr_dev *rcvr_dev;
 
-    rcvr_dev = (struct pios_rcvr_dev *)pvPortMalloc(sizeof(*rcvr_dev));
+    rcvr_dev = (struct pios_rcvr_dev *)pios_malloc(sizeof(*rcvr_dev));
     if (!rcvr_dev) {
         return NULL;
     }

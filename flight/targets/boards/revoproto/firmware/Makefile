@@ -33,9 +33,8 @@ MODULES += Sensors
 MODULES += StateEstimation # use instead of Attitude
 MODULES += Altitude/revolution
 MODULES += Airspeed
-MODULES += AltitudeHold
+#MODULES += AltitudeHold # now integrated in Stabilization
 MODULES += Stabilization
-MODULES += VtolPathFollower
 MODULES += ManualControl
 MODULES += Receiver
 MODULES += Actuator
@@ -45,10 +44,12 @@ MODULES += CameraStab
 MODULES += Battery
 MODULES += FirmwareIAP
 MODULES += PathPlanner
-MODULES += FixedWingPathFollower
+MODULES += PathFollower
 MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
+
+SRC += $(FLIGHTLIB)/notification.c
 
 OPTMODULES += ComUsbBridge
 
@@ -72,6 +73,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/alarms.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
+    SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
 
     #ifeq ($(DEBUG), YES)
@@ -81,8 +83,10 @@ ifndef TESTAPP
 
     ## Misc library functions
     SRC += $(FLIGHTLIB)/paths.c
+    SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
 
     ## UAVObjects
     include ./UAVObjects.inc

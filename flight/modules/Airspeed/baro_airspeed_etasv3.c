@@ -40,6 +40,7 @@
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
+#include "airspeedalarm.h"
 
 #if defined(PIOS_INCLUDE_ETASV3)
 
@@ -64,11 +65,13 @@ void baro_airspeedGetETASV3(AirspeedSensorData *airspeedSensor, AirspeedSettings
     if (airspeedSensor->SensorValue == (uint16_t)-1) {
         airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         airspeedSensor->CalibratedAirspeed = 0;
+        AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
         return;
     }
 
     // only calibrate if no stored calibration is available
     if (!airspeedSettings->ZeroPoint) {
+        AirspeedAlarm(SYSTEMALARMS_ALARM_WARNING);
         // Calibrate sensor by averaging zero point value
         if (calibrationCount <= CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) {
             calibrationCount++;
@@ -93,6 +96,7 @@ void baro_airspeedGetETASV3(AirspeedSensorData *airspeedSensor, AirspeedSettings
     // Compute airspeed
     airspeedSensor->CalibratedAirspeed = airspeedSettings->Scale * sqrtf((float)abs(airspeedSensor->SensorValue - airspeedSettings->ZeroPoint));
     airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+    AirspeedAlarm(SYSTEMALARMS_ALARM_OK);
 }
 
 

@@ -11,6 +11,12 @@ function millisToTime(ms) {
     return pad(hours, 2) + ":" + pad(minutes, 2) + ":" + pad(seconds, 2)  + ":" + pad(msleft, 3);
 }
 
+
+function microsToTime(us) {
+    var ms = Math.floor(us / 1000);
+    return millisToTime(ms);
+}
+
 function pad(number, length) {
     var str = '' + number;
     while (str.length < length) {

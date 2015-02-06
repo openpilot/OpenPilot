@@ -70,7 +70,7 @@ static struct pios_oplinkrcvr_dev *PIOS_oplinkrcvr_alloc(void)
 {
     struct pios_oplinkrcvr_dev *oplinkrcvr_dev;
 
-    oplinkrcvr_dev = (struct pios_oplinkrcvr_dev *)pvPortMalloc(sizeof(*oplinkrcvr_dev));
+    oplinkrcvr_dev = (struct pios_oplinkrcvr_dev *)pios_malloc(sizeof(*oplinkrcvr_dev));
     if (!oplinkrcvr_dev) {
         return NULL;
     }

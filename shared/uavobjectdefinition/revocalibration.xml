@@ -2,7 +2,8 @@
     <object name="RevoCalibration" singleinstance="true" settings="true" category="Sensors">
         <description>Settings for the INS to control the algorithm and what is updated</description>
         <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
-        <field name="mag_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
+        <field name="mag_transform" units="gain" type="float" elementnames="r0c0,r0c1,r0c2,r1c0,r1c1,r1c2,r2c0,r2c1,r2c2"
+         defaultvalue="1,0,0,0,1,0,0,0,1"/>
         <!-- These settings are related to how the sensors are post processed -->
         <!-- TODO: reimplement, put elsewhere (later) -->
         <field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>

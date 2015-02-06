@@ -27,6 +27,7 @@
  */
 #include "wizardstate.h"
 #include "QDebug"
+
 WizardState::WizardState(QString name, QState *parent) :
     QState(parent)
 {
@@ -39,12 +40,6 @@ void WizardState::setCompletion(qint8 completion)
 {
     m_completion = completion;
     emit completionChanged();
-}
-
-void WizardState::setStepName(QString name)
-{
-    m_stepName = name;
-    emit stepNameChanged();
 }
 
 void WizardState::onEntry(QEvent *event)

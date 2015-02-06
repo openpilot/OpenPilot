@@ -8,7 +8,7 @@
 /* FreeRTOS Includes */
 #include "FreeRTOS.h"
 #endif
-
+#include "pios_mem.h"
 #ifdef PIOS_INCLUDE_FLASH
 #include <pios_flash.h>
 #include <pios_flashfs.h>

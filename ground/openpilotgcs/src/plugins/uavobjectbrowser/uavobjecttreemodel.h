@@ -62,6 +62,10 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
+    void setUnknowObjectColor(QColor color)
+    {
+        m_unknownObjectColor = color;
+    }
     void setRecentlyUpdatedColor(QColor color)
     {
         m_recentlyUpdatedColor = color;
@@ -88,8 +92,10 @@ public slots:
     void newObject(UAVObject *obj);
 
 private slots:
+    void updateHighlight(TreeItem *item);
+    void updateIsKnown(TreeItem *item);
     void highlightUpdatedObject(UAVObject *obj);
-    void updateHighlight(TreeItem *);
+    void isKnownChanged(UAVObject *object, bool isKnown);
 
 private:
     void setupModelData(UAVObjectManager *objManager);
@@ -115,6 +121,7 @@ private:
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
+    QColor m_unknownObjectColor;
     bool m_onlyHilightChangedValues;
 
     // Highlight manager to handle highlighting of tree items.

@@ -46,7 +46,7 @@ int32_t PIOS_TASK_MONITOR_Initialize(uint16_t max_tasks)
         return -1;
     }
 
-    mTaskHandles = (xTaskHandle *)pvPortMalloc(max_tasks * sizeof(xTaskHandle));
+    mTaskHandles = (xTaskHandle *)pios_malloc(max_tasks * sizeof(xTaskHandle));
     if (!mTaskHandles) {
         return -1;
     }

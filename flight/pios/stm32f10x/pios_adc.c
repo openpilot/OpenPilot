@@ -32,7 +32,6 @@
 #ifdef PIOS_INCLUDE_ADC
 
 #include <pios_adc_priv.h>
-
 // Private types
 
 enum pios_adc_dev_magic {
@@ -47,12 +46,14 @@ struct pios_adc_dev {
 #endif
     volatile int16_t *valid_data_buffer;
     volatile uint8_t adc_oversample;
+    volatile uint8_t adc_oversample_block_size;
     uint8_t  dma_block_size;
     uint16_t dma_half_buffer_size;
 #if defined(PIOS_INCLUDE_ADC)
     int16_t  fir_coeffs[PIOS_ADC_MAX_SAMPLES + 1]  __attribute__((aligned(4)));
     volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__((aligned(4))); // Double buffer that DMA just used
     float    downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__((aligned(4)));
+    uint8_t  downsampleStep; // allows to reduce the downsampling buffer by operating in two steps
 #endif
     enum pios_adc_dev_magic magic;
 };
@@ -93,7 +94,7 @@ static struct pios_adc_dev *PIOS_ADC_Allocate()
 {
     struct pios_adc_dev *adc_dev;
 
-    adc_dev = (struct pios_adc_dev *)pvPortMalloc(sizeof(*adc_dev));
+    adc_dev = (struct pios_adc_dev *)pios_malloc(sizeof(*adc_dev));
     if (!adc_dev) {
         return NULL;
     }
@@ -135,7 +136,6 @@ int32_t PIOS_ADC_Init(const struct pios_adc_cfg *cfg)
     }
 
     PIOS_ADC_Config(PIOS_ADC_MAX_OVERSAMPLING);
-
     return 0;
 }
 
@@ -145,8 +145,10 @@ int32_t PIOS_ADC_Init(const struct pios_adc_cfg *cfg)
  */
 void PIOS_ADC_Config(uint32_t oversampling)
 {
+    // Ensure oversample is an even number
+    PIOS_Assert(!(oversampling & 0x1));
     pios_adc_dev->adc_oversample = (oversampling > PIOS_ADC_MAX_OVERSAMPLING) ? PIOS_ADC_MAX_OVERSAMPLING : oversampling;
-
+    pios_adc_dev->adc_oversample_block_size = pios_adc_dev->adc_oversample / 2;
     ADC_DeInit(ADC1);
     ADC_DeInit(ADC2);
 
@@ -219,7 +221,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
 
     /* This makes sure we have an even number of transfers if using ADC2 */
     pios_adc_dev->dma_block_size = ((PIOS_ADC_NUM_CHANNELS + PIOS_ADC_USE_ADC2) >> PIOS_ADC_USE_ADC2) << PIOS_ADC_USE_ADC2;
-    pios_adc_dev->dma_half_buffer_size = pios_adc_dev->dma_block_size * pios_adc_dev->adc_oversample;
+    pios_adc_dev->dma_half_buffer_size = pios_adc_dev->dma_block_size * pios_adc_dev->adc_oversample_block_size;
 
     /* Configure DMA channel */
     DMA_InitTypeDef dma_init = pios_adc_dev->cfg->dma.rx.init;
@@ -324,23 +326,54 @@ void PIOS_ADC_SetFIRCoefficients(float *new_filter)
     }
 }
 
+
 /**
  * @brief Downsample the data for each of the channels then call
  * callback function if installed
  */
+__attribute__((optimize("O3")))
 void PIOS_ADC_downsample_data()
 {
     uint16_t chan;
     uint16_t sample;
     float *downsampled_buffer = &pios_adc_dev->downsampled_buffer[0];
+    static int32_t sum[PIOS_ADC_NUM_CHANNELS] = { 0 };
 
-    for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
-        int32_t sum = 0;
-        for (sample = 0; sample < pios_adc_dev->adc_oversample; sample++) {
-            sum += pios_adc_dev->valid_data_buffer[chan + sample * pios_adc_dev->dma_block_size] * pios_adc_dev->fir_coeffs[sample];
+    if (pios_adc_dev->downsampleStep == 0) {
+        for (uint8_t i = 0; i < PIOS_ADC_NUM_CHANNELS; i++) {
+            sum[i] = 0;
         }
-        downsampled_buffer[chan] = (float)sum / pios_adc_dev->fir_coeffs[pios_adc_dev->adc_oversample];
     }
+
+    for (sample = 0; sample < pios_adc_dev->adc_oversample_block_size; sample++) {
+        const uint16_t *buffer  = (const uint16_t *)&pios_adc_dev->valid_data_buffer[sample * pios_adc_dev->dma_block_size];
+        const uint16_t firCoeff = pios_adc_dev->fir_coeffs[sample + PIOS_ADC_NUM_CHANNELS * pios_adc_dev->downsampleStep];
+#if (PIOS_ADC_USE_TEMP_SENSOR)
+        for (chan = 1; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
+#else
+        for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
+#endif
+            sum[chan] += buffer[chan] * firCoeff;
+        }
+    }
+    // Full downsampling + fir filter is a little bit overwhelming for temp sensor.
+    if (pios_adc_dev->downsampleStep == 0) {
+        // first part of downsampling done. wait until the second block of samples is acquired
+        pios_adc_dev->downsampleStep = 1;
+        return;
+    }
+    pios_adc_dev->downsampleStep = 0;
+#if (PIOS_ADC_USE_TEMP_SENSOR)
+    for (chan = 1; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
+    #else
+    for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
+    #endif
+        downsampled_buffer[chan] = (float)sum[chan] / (pios_adc_dev->fir_coeffs[pios_adc_dev->adc_oversample]);
+    }
+
+    #if (PIOS_ADC_USE_TEMP_SENSOR)
+    downsampled_buffer[0] = pios_adc_dev->valid_data_buffer[0];
+    #endif
 
 #if defined(PIOS_INCLUDE_FREERTOS)
     if (pios_adc_dev->data_queue) {

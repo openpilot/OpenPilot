@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QtPlugin>
 #include <QStringList>
+#include <configgadgetfactory.h>
 #include <extensionsystem/pluginmanager.h>
 
 #include <coreplugin/coreconstants.h>
@@ -36,6 +37,7 @@
 #include <coreplugin/icore.h>
 #include <QKeySequence>
 #include <coreplugin/modemanager.h>
+#include "vehicletemplateexportdialog.h"
 
 SetupWizardPlugin::SetupWizardPlugin() : wizardRunning(false)
 {}
@@ -58,14 +60,29 @@ bool SetupWizardPlugin::initialize(const QStringList & args, QString *errMsg)
                                             Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+V"));
     cmd->action()->setText(tr("Vehicle Setup Wizard"));
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(showSetupWizard()));
 
     Core::ModeManager::instance()->addAction(cmd, 1);
-
     ac->menu()->addSeparator();
     ac->appendGroup("Wizard");
     ac->addAction(cmd, "Wizard");
 
-    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(showSetupWizard()));
+    cmd = am->registerAction(new QAction(this),
+                             "SetupWizardPlugin.ExportJSon",
+                             QList<int>() <<
+                             Core::Constants::C_GLOBAL_ID);
+    cmd->action()->setText(tr("Export Wizard Vehicle Template"));
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportSettings()));
+
+    Core::ModeManager::instance()->addAction(cmd, 1);
+    ac->menu()->addSeparator();
+    ac->appendGroup("Wizard");
+    ac->addAction(cmd, "Wizard");
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    ConfigGadgetFactory *configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
+    connect(configGadgetFactory, SIGNAL(onOpenVehicleConfigurationWizard()), this, SLOT(showSetupWizard()));
+
     return true;
 }
 
@@ -85,6 +102,13 @@ void SetupWizardPlugin::showSetupWizard()
         m_wiz->setWindowFlags(m_wiz->windowFlags() | Qt::WindowStaysOnTopHint);
         m_wiz->show();
     }
+}
+
+void SetupWizardPlugin::exportSettings()
+{
+    VehicleTemplateExportDialog dialog;
+
+    dialog.exec();
 }
 
 void SetupWizardPlugin::wizardTerminated()

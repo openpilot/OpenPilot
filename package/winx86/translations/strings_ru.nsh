@@ -34,6 +34,7 @@
   LangString DESC_InSecUtilities ${LANG_RUSSIAN} "Утилиты (конвертор логов для Matlab)."
   LangString DESC_InSecDrivers ${LANG_RUSSIAN} "Файлы драйверов (опциональный драйвер CDC порта)."
   LangString DESC_InSecInstallDrivers ${LANG_RUSSIAN} "Опциональный OpenPilot CDC драйвер (виртуальный USB COM порт)."
+  LangString DESC_InSecInstallOpenGL ${LANG_RUSSIAN} "Optional OpenGL32.dll for old video cards."
   LangString DESC_InSecAeroSimRC ${LANG_RUSSIAN} "Файлы плагина для симулятора AeroSimRC с примером конфигурации."
   LangString DESC_InSecShortcuts ${LANG_RUSSIAN} "Установка ярлыков для приложения."
 

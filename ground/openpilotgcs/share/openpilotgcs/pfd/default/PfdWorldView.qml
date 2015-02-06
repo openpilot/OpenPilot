@@ -12,7 +12,7 @@ Item {
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "horizon")
         width: Math.round(sceneItem.width*scaledBounds.width/2)*2
-        height: Math.round(sceneItem.height*scaledBounds.height/2)*2
+        height: Math.round(sceneItem.height*scaledBounds.height/2)*3
 
         property double pitch1DegScaledHeight: (svgRenderer.scaledElementBounds("pfd.svg", "pitch-90").y -
                                                 svgRenderer.scaledElementBounds("pfd.svg", "pitch90").y)/180.0
@@ -20,8 +20,10 @@ Item {
         property double pitch1DegHeight: sceneItem.height*pitch1DegScaledHeight
 
         gradient: Gradient {
+            GradientStop { position: 0.4000;   color: "#013163" }
             GradientStop { position: 0.4999;   color: "#0164CC" }
             GradientStop { position: 0.5001;   color: "#653300" }
+            GradientStop { position: 0.6000;   color: "#3C1E00" }
         }
 
         transform: [
@@ -41,13 +43,22 @@ Item {
 
         SvgElementImage {
             id: horizont_line
-            //elementName: "world-centerline"
-            // TODO: rename the centerline element in svg file
-            elementName: "path4731"
+            elementName: "center-line"
+
             //worldView is loaded with Loader, so background element is visible
             sceneSize: background.sceneSize
             anchors.centerIn: parent
             border: 1
+            smooth: true
+        }
+
+        SvgElementImage {
+            id: pitch_0
+            elementName: "pitch0"
+
+            sceneSize: background.sceneSize
+            anchors.centerIn: parent
+            border: 1            
             smooth: true
         }
     }

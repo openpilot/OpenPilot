@@ -73,7 +73,7 @@ static int32_t fault_initialize(void)
             break;
         case FAULTSETTINGS_ACTIVATEFAULT_INITOUTOFMEMORY:
             /* Leak all available memory */
-            while (pvPortMalloc(10)) {
+            while (pios_malloc(10)) {
                 ;
             }
             break;
@@ -126,7 +126,7 @@ static void fault_task(__attribute__((unused)) void *parameters)
         break;
     case FAULTSETTINGS_ACTIVATEFAULT_TASKOUTOFMEMORY:
         /* Leak all available memory and then sleep */
-        while (pvPortMalloc(10)) {
+        while (pios_malloc(10)) {
             ;
         }
         while (1) {

@@ -73,7 +73,7 @@ static struct bma180_dev *PIOS_BMA180_alloc(void)
 {
     struct bma180_dev *bma180_dev;
 
-    bma180_dev = (struct bma180_dev *)pvPortMalloc(sizeof(*bma180_dev));
+    bma180_dev = (struct bma180_dev *)pios_malloc(sizeof(*bma180_dev));
     if (!bma180_dev) {
         return NULL;
     }

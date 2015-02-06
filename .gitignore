@@ -24,6 +24,9 @@ core
 
 # ground
 openpilotgcs-build-desktop
+ground/openpilotgcs/.cproject
+ground/openpilotgcs/.project
+ground/openpilotgcs/.settings
 
 # Ignore some of the .pro.user files
 *.pro.user
@@ -31,6 +34,7 @@ openpilotgcs-build-desktop
 /ground/uavobjgenerator/uavobjgenerator.pro.user
 /ground/uavobjects/uavobjects.pro.user
 /ground/ground.pro.user
+/ground/openpilotgcs/src/libs/sdlgamepad.pro.user
 
 # Misc artifacts
 /ground/openpilotgcs/share/openpilotgcs/sounds/normalize.exe
@@ -58,6 +62,7 @@ openpilotgcs-build-desktop
 /.project
 /.metadata
 /.settings
+/.pydevproject
 
 # Ignore Eclipse temp folder, git plugin based?
 RemoteSystemsTempFiles

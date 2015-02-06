@@ -1,11 +1,11 @@
 TEMPLATE = lib
 TARGET = Telemetry
+DEFINES += TELEMETRY_LIBRARY
 
 QT += svg
 
-include(../../openpilotgcsplugin.pri) 
-include(../../plugins/coreplugin/coreplugin.pri) 
 include(telemetry_dependencies.pri)
+include(../../libs/version_info/version_info.pri)
 
 HEADERS += telemetry_global.h \
     telemetryplugin.h \
@@ -22,8 +22,6 @@ SOURCES += telemetryplugin.cpp \
     monitorgadgetfactory.cpp \
     monitorgadgetoptionspage.cpp
 
-DEFINES += TELEMETRY_LIBRARY
+OTHER_FILES += Telemetry.pluginspec
 
 RESOURCES += telemetry.qrc
-
-OTHER_FILES += Telemetry.pluginspec

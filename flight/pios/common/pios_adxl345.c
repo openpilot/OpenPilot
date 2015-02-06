@@ -59,7 +59,7 @@ static struct adxl345_dev *PIOS_ADXL345_alloc(void)
 {
     struct adxl345_dev *adxl345_dev;
 
-    adxl345_dev = (struct adxl345_dev *)pvPortMalloc(sizeof(*adxl345_dev));
+    adxl345_dev = (struct adxl345_dev *)pios_malloc(sizeof(*adxl345_dev));
     if (!adxl345_dev) {
         return NULL;
     }
@@ -237,7 +237,7 @@ int32_t PIOS_ADXL345_Init(uint32_t spi_id, uint32_t slave_num)
     dev->slave_num = slave_num;
 
     PIOS_ADXL345_ReleaseBus();
-    PIOS_ADXL345_SelectRate(ADXL_RATE_3200);
+    PIOS_ADXL345_SelectRate(ADXL_RATE_1600);
     PIOS_ADXL345_SetRange(ADXL_RANGE_8G);
     PIOS_ADXL345_FifoDepth(16);
     PIOS_ADXL345_SetMeasure(1);
@@ -299,6 +299,7 @@ int32_t PIOS_ADXL345_FifoElements()
     return rec[1] & 0x3f;
 }
 
+
 /**
  * @brief Read a single set of values from the x y z channels
  * @returns The number of samples remaining in the fifo
@@ -312,13 +313,11 @@ uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data *data)
     if (PIOS_ADXL345_ClaimBus() != 0) {
         return -2;
     }
-
     // To save memory use same buffer for in and out but offset by
     // a byte
-    uint8_t buf[9] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    uint8_t rec[9] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    uint8_t buf[10] = { 0 };
+    uint8_t *rec    = buf + 1;
     buf[0] = ADXL_X0_ADDR | ADXL_MULTI_BIT | ADXL_READ_BIT; // Multibyte read starting at X0
-
     if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], 9, NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
         return -3;
@@ -333,4 +332,47 @@ uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data *data)
     return rec[8] & 0x7F; // return number of remaining entries
 }
 
+/**
+ * @brief Read a single set of values from the x y z channels
+ * @returns 0 if successful
+ */
+
+int8_t PIOS_ADXL345_ReadAndAccumulateSamples(struct pios_adxl345_data *data, uint8_t samples)
+{
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    data->x = 0;
+    data->y = 0;
+    data->z = 0;
+    // To save memory use same buffer for in and out but offset by
+    // a byte
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    PIOS_Instrumentation_TimeStart(counterUpd);
+#endif
+    for (uint8_t i = 0; i < samples; i++) {
+        uint8_t buf[7] = { 0 };
+        uint8_t *rec   = &buf[1];
+        PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
+        buf[0] = ADXL_X0_ADDR | ADXL_MULTI_BIT | ADXL_READ_BIT; // Multibyte read starting at X0
+        if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], 7, NULL) < 0) {
+            PIOS_ADXL345_ReleaseBus();
+            return -3;
+        }
+        PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
+        data->x += rec[1] + (rec[2] << 8);
+        data->y += rec[3] + (rec[4] << 8);
+        data->z += rec[5] + (rec[6] << 8);
+    }
+    uint8_t r = PIOS_SPI_TransferByte(dev->spi_id, ADXL_FIFOSTATUS_ADDR | ADXL_READ_BIT);
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    PIOS_Instrumentation_TimeEnd(counterUpd);
+#endif
+    PIOS_ADXL345_ReleaseBus();
+    return r & 0x7F; // return number of remaining entries
+}
 #endif /* PIOS_INCLUDE_ADXL345 */

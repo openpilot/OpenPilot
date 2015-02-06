@@ -46,6 +46,9 @@ public:
 
     IUAVGadget *createGadget(QWidget *parent);
 
+signals:
+    void onOpenVehicleConfigurationWizard();
+
 public slots:
     void startInputWizard();
 

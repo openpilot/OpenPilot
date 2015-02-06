@@ -40,6 +40,7 @@
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
+#include "airspeedalarm.h"
 #include "taskinfo.h"
 
 #if defined(PIOS_INCLUDE_MS4525DO)
@@ -53,13 +54,9 @@
 #define CASFACTOR            760.8802669f        // sqrt(5) * speed of sound at standard
 #define TASFACTOR            0.05891022589f      // 1/sqrt(T0)
 
-#define max(x, y) ((x) >= (y) ? (x) : (y))
-
 // Private types
 
 // Private functions definitions
-static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings);
-
 
 // Private variables
 static uint16_t calibrationCount = 0;
@@ -67,55 +64,23 @@ static uint32_t filter_reg = 0; // Barry Dorr filter register
 
 void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings)
 {
-    // request measurement first
-    int8_t retVal = PIOS_MS4525DO_Request();
-
-    if (retVal != 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
-        return;
-    }
-
-    // Datasheet of MS4525DO: conversion needs 0.5 ms + 20% more when status bit used
-    // delay by one Tick or at least 2 ms
-    const portTickType xDelay = max(2 / portTICK_RATE_MS, 1);
-    vTaskDelay(xDelay);
-
-    // read the sensor
-    retVal = baro_airspeedReadMS4525DO(airspeedSensor, airspeedSettings);
-
-    switch (retVal) {
-    case  0:   AlarmsClear(SYSTEMALARMS_ALARM_AIRSPEED);
-        break;
-    case -4:
-    case -5:
-    case -7:    AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
-        break;
-    case -1:
-    case -2:
-    case -3:
-    case -6:
-    default:    AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
-    }
-}
-
-
-// Private functions
-static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings)
-{
-    // Check to see if airspeed sensor is returning airspeedSensor
     uint16_t values[2];
+
+    // Read sensor
     int8_t retVal = PIOS_MS4525DO_Read(values);
 
-    if (retVal == 0) {
-        airspeedSensor->SensorValue = values[0];
-        airspeedSensor->SensorValueTemperature = values[1];
-    } else {
+    // check for errors
+    if (retVal != 0) {
         airspeedSensor->SensorValue            = -1;
         airspeedSensor->SensorValueTemperature = -1;
         airspeedSensor->SensorConnected        = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         airspeedSensor->CalibratedAirspeed     = 0;
-        return retVal;
+        AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
+        return;
     }
+
+    airspeedSensor->SensorValue = values[0];
+    airspeedSensor->SensorValueTemperature = values[1];
 
     // only calibrate if no stored calibration is available
     if (!airspeedSettings->ZeroPoint) {
@@ -123,7 +88,8 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
         if (calibrationCount <= CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             filter_reg = (airspeedSensor->SensorValue << FILTER_SHIFT);
-            return -7;
+            AirspeedAlarm(SYSTEMALARMS_ALARM_WARNING);
+            return;
         } else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             // update filter register
@@ -136,7 +102,8 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
                 AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
                 calibrationCount = 0;
             }
-            return -7;
+            AirspeedAlarm(SYSTEMALARMS_ALARM_WARNING);
+            return;
         }
     }
 
@@ -161,10 +128,9 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
     airspeedSensor->CalibratedAirspeed = airspeedSettings->Scale * CASFACTOR * sqrtf(powf(fabsf(dP) / P0 + 1.0f, CCEXPONENT) - 1.0f);
     airspeedSensor->TrueAirspeed = airspeedSensor->CalibratedAirspeed * TASFACTOR * sqrtf(T);
     airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
-
-    return retVal;
+    // everything is fine so set ALARM_OK
+    AirspeedAlarm(SYSTEMALARMS_ALARM_OK);
 }
-
 
 #endif /* if defined(PIOS_INCLUDE_MS4525DO) */
 

@@ -1,0 +1,16 @@
+<xml>
+    <object name="AuxMagSettings" singleinstance="true" settings="true" category="Sensors">
+        <description>Settings for auxiliary magnetometer calibration</description>
+        <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
+        <field name="mag_transform" units="gain" type="float" elementnames="r0c0,r0c1,r0c2,r1c0,r1c1,r1c2,r2c0,r2c1,r2c2"
+         defaultvalue="1,0,0,0,1,0,0,0,1"/>
+        <field name="MagBiasNullingRate" units="" type="float" elements="1" defaultvalue="0"/>
+        <field name="Orientation" units="degrees" type="float" elements="1" defaultvalue="0"/>
+        <field name="Type" units="" type="enum" elements="1" options="GPSV9,Ext" defaultvalue="GPSV9"/>
+        <field name="Usage" units="" type="enum" elements="1" options="Both,OnboardOnly,AuxOnly" defaultvalue="Both"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

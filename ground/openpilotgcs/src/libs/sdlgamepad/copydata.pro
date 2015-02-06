@@ -5,7 +5,7 @@ equals(copydata, 1) {
         SDL_DLLS = \
             SDL.dll
         for(dll, SDL_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(SDL_DIR)/bin/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$${SDL_DIR}/bin/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         # add make target

@@ -45,6 +45,7 @@ public:
 
 private slots:
     void showSetupWizard();
+    void exportSettings();
     void wizardTerminated();
 
 private:

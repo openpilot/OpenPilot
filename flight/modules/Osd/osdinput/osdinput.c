@@ -75,7 +75,7 @@ enum osd_pkt_type {
 int32_t osdinputStart(void)
 {
     // Start osdinput task
-    xTaskCreate(osdinputTask, (signed char *)"OSDINPUT", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdinputTaskHandle);
+    xTaskCreate(osdinputTask, "OSDINPUT", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdinputTaskHandle);
 
     return 0;
 }
@@ -102,7 +102,7 @@ int32_t osdinputInitialize(void)
 
     oposdPort = PIOS_COM_OSD;
 
-    oposd_rx_buffer = pvPortMalloc(MAX_PACKET_LENGTH);
+    oposd_rx_buffer = pios_malloc(MAX_PACKET_LENGTH);
     PIOS_Assert(oposd_rx_buffer);
 
     return 0;

@@ -1,18 +1,19 @@
 TEMPLATE = lib
 TARGET = Config
 DEFINES += CONFIG_LIBRARY
-QT += svg
-QT += opengl
-QT += qml quick
+
+QT += svg opengl qml quick
 
 include(config_dependencies.pri)
 
 INCLUDEPATH += ../../libs/eigen
 
-OTHER_FILES += Config.pluginspec \
+OTHER_FILES += \
+    Config.pluginspec \
     calibration/WizardStepIndicator.qml
 
-HEADERS += configplugin.h \
+HEADERS += \
+    configplugin.h \
     configgadgetwidget.h \
     configgadgetfactory.h \
     configgadget.h \
@@ -22,11 +23,11 @@ HEADERS += configplugin.h \
     configvehicletypewidget.h \
     config_cc_hw_widget.h \
     configccattitudewidget.h \
-    configpipxtremewidget.h \
     configstabilizationwidget.h \
     assertions.h \
     defaultattitudewidget.h \
     defaulthwsettingswidget.h \
+    channelform.h \
     inputchannelform.h \
     configcamerastabilizationwidget.h \
     configtxpidwidget.h \
@@ -51,9 +52,15 @@ HEADERS += configplugin.h \
     calibration/thermal/boardsetuptransition.h \
     calibration/thermal/dataacquisitiontransition.h \
     calibration/thermal/settingshandlingtransitions.h \
-    calibration/thermal/compensationcalculationtransition.h
+    calibration/thermal/compensationcalculationtransition.h \
+    calibration/sixpointcalibrationmodel.h \
+    calibration/levelcalibrationmodel.h \
+    calibration/gyrobiascalibrationmodel.h \
+    calibration/calibrationuiutils.h \
+    configoplinkwidget.h
 
-SOURCES += configplugin.cpp \
+SOURCES += \
+    configplugin.cpp \
     configgadgetwidget.cpp \
     configgadgetfactory.cpp \
     configgadget.cpp \
@@ -64,9 +71,9 @@ SOURCES += configplugin.cpp \
     config_cc_hw_widget.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
-    configpipxtremewidget.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
+    channelform.cpp \
     inputchannelform.cpp \
     configcamerastabilizationwidget.cpp \
     configrevowidget.cpp \
@@ -86,9 +93,14 @@ SOURCES += configplugin.cpp \
     calibration/wizardmodel.cpp \
     calibration/thermal/thermalcalibration.cpp \
     calibration/thermal/thermalcalibrationhelper.cpp \
-    calibration/thermal/thermalcalibrationmodel.cpp
+    calibration/thermal/thermalcalibrationmodel.cpp \
+    calibration/sixpointcalibrationmodel.cpp \
+    calibration/levelcalibrationmodel.cpp \
+    calibration/gyrobiascalibrationmodel.cpp \
+    configoplinkwidget.cpp
 
-FORMS += airframe.ui \
+FORMS += \
+    airframe.ui \
     airframe_ccpm.ui \
     airframe_fixedwing.ui \
     airframe_ground.ui \
@@ -106,8 +118,8 @@ FORMS += airframe.ui \
     outputchannelform.ui \
     revosensors.ui \
     txpid.ui \
-    pipxtreme.ui \
     mixercurve.ui \
-    configrevohwwidget.ui
+    configrevohwwidget.ui \
+    oplink.ui
 
 RESOURCES += configgadget.qrc

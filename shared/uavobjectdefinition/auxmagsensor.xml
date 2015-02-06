@@ -1,0 +1,13 @@
+<xml>
+    <object name="AuxMagSensor" singleinstance="true" settings="false" category="Sensors">
+        <description>Calibrated sensor data from aux 3 axis magnetometer in MilliGauss.</description>
+		<field name="x" units="mGa" type="float" elements="1"/>
+		<field name="y" units="mGa" type="float" elements="1"/>
+        <field name="z" units="mGa" type="float" elements="1"/>
+        <field name="Status" units="" type="enum" elements="1" options="None,Ok" defaultvalue="None"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

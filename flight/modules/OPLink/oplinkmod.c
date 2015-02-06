@@ -80,7 +80,7 @@ int32_t OPLinkModStart(void)
     stackOverflow = false;
     mallocFailed  = false;
     // Create oplink system task
-    xTaskCreate(systemTask, (signed char *)"OPLink", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
+    xTaskCreate(systemTask, "OPLink", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
     // Register task
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
 
@@ -158,7 +158,6 @@ static void systemTask(__attribute__((unused)) void *parameters)
             oplinkStatus.RxMissed = radio_stats.rx_missed;
             oplinkStatus.RxFailure     = radio_stats.rx_failure;
             oplinkStatus.TxDropped     = radio_stats.tx_dropped;
-            oplinkStatus.TxResent = radio_stats.tx_resent;
             oplinkStatus.TxFailure     = radio_stats.tx_failure;
             oplinkStatus.Resets      = radio_stats.resets;
             oplinkStatus.Timeouts    = radio_stats.timeouts;

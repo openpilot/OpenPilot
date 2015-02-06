@@ -80,7 +80,7 @@ $(FIELDSINIT)
 		    $(FLIGHTTELEM_ACKED) << UAVOBJ_TELEMETRY_ACKED_SHIFT |
 		    $(GCSTELEM_ACKED) << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
 		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.$(FLIGHTTELEM_UPDATEMODE)) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
-		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.$(GCSTELEM_UPDATEMODE)) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.$(GCSTELEM_UPDATEMODE)) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT |
 		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.$(LOGGING_UPDATEMODE)) << UAVOBJ_LOGGING_UPDATE_MODE_SHIFT;
     	metadata.flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
     	metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);

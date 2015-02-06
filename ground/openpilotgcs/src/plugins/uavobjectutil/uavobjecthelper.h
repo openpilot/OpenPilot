@@ -43,7 +43,10 @@ public:
     virtual ~AbstractUAVObjectHelper();
 
     enum Result { SUCCESS, FAIL, TIMEOUT };
-    Result doObjectAndWait(UAVObject *object, int timeout);
+
+    // default timeout = 3 x 250ms + 50ms safety margin = 800ms
+    // where 3 is the number of UAVTalk retries and 250ms is the UAVTalk timeout
+    Result doObjectAndWait(UAVObject *object, int timeout = 800);
 
 protected:
     virtual void doObjectAndWaitImpl() = 0;

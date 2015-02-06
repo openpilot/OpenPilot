@@ -40,7 +40,7 @@
 // ************************************
 
 #define RFM22B_MAX_PACKET_LEN                     64
-#define RFM22B_NUM_CHANNELS                       250
+#define RFM22B_NUM_CHANNELS                       251
 
 // ************************************
 
@@ -578,7 +578,7 @@ enum pios_rfm22b_rx_packet_status {
     RADIO_GOOD_RX_PACKET      = 0x00,
     RADIO_CORRECTED_RX_PACKET = 0x01,
     RADIO_ERROR_RX_PACKET     = 0x2,
-    RADIO_RESENT_TX_PACKET    = 0x3
+    RADIO_FAILURE_RX_PACKET   = 0x3
 };
 
 typedef struct {
@@ -780,7 +780,7 @@ struct pios_rfm22b_dev {
     portTickType packet_start_ticks;
     portTickType tx_complete_ticks;
     portTickType time_delta;
-    bool         on_sync_channel;
+    portTickType last_contact;
 };
 
 

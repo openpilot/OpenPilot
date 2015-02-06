@@ -41,17 +41,22 @@ Telemetry::Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMng
     mutex = new QMutex(QMutex::Recursive);
 
     // Register all objects in the list
-    QList< QList<UAVObject *> > objs = objMngr->getObjects();
-    for (int objidx = 0; objidx < objs.length(); ++objidx) {
+    foreach(QList<UAVObject *> instances, objMngr->getObjects()) {
+        foreach(UAVObject * object, instances) {
+            // make sure we 'forget' all objects before we request it from the flight side
+            object->setIsKnown(false);
+        }
         // we only need to register one instance per object type
-        registerObject(objs[objidx][0]);
+        registerObject(instances.first());
     }
 
     // Listen to new object creations
-    connect(objMngr, SIGNAL(newObject(UAVObject *)), this, SLOT(newObject(UAVObject *)));
-    connect(objMngr, SIGNAL(newInstance(UAVObject *)), this, SLOT(newInstance(UAVObject *)));
+    // connection must be direct, if not, it is not possible to create and send (or request) an object in one go
+    connect(objMngr, SIGNAL(newObject(UAVObject *)), this, SLOT(newObject(UAVObject *)), Qt::DirectConnection);
+    connect(objMngr, SIGNAL(newInstance(UAVObject *)), this, SLOT(newInstance(UAVObject *)), Qt::DirectConnection);
 
     // Listen to transaction completions
+    // these slots will be executed in the telemetry thread
     // TODO should send a status (SUCCESS, FAILED, TIMEOUT)
     connect(utalk, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
 
@@ -72,6 +77,12 @@ Telemetry::Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMng
 Telemetry::~Telemetry()
 {
     closeAllTransactions();
+    foreach(QList<UAVObject *> instances, objMngr->getObjects()) {
+        foreach(UAVObject * object, instances) {
+            // make sure we 'forget' all objects before we request it from the flight side
+            object->setIsKnown(false);
+        }
+    }
 }
 
 /**
@@ -233,10 +244,14 @@ void Telemetry::transactionCompleted(UAVObject *obj, bool success)
 
     if (transInfo) {
         if (success) {
+            // We now know tat the flight side knows of this object.
+            obj->setIsKnown(true);
+
 #ifdef VERBOSE_TELEMETRY
             qDebug() << "Telemetry - transaction successful for object" << obj->toStringBrief();
 #endif
         } else {
+            obj->setIsKnown(false);
             qWarning() << "Telemetry - !!! transaction failed for object" << obj->toStringBrief();
         }
 
@@ -568,12 +583,20 @@ void Telemetry::newObject(UAVObject *obj)
 {
     QMutexLocker locker(mutex);
 
+#ifdef VERBOSE_TELEMETRY
+    qDebug() << "Telemetry - new object" << obj->toStringBrief();
+#endif
+
     registerObject(obj);
 }
 
 void Telemetry::newInstance(UAVObject *obj)
 {
     QMutexLocker locker(mutex);
+
+#ifdef VERBOSE_TELEMETRY
+    qDebug() << "Telemetry - new object instance" << obj->toStringBrief();
+#endif
 
     registerObject(obj);
 }

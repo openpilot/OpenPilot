@@ -78,6 +78,7 @@ uint8_t *pios_uart_rx_buffer;
 uint8_t *pios_uart_tx_buffer;
 
 uintptr_t pios_uavo_settings_fs_id;
+uintptr_t pios_user_fs_id = 0;
 
 uint8_t servo_count = 0;
 
@@ -185,8 +186,8 @@ void PIOS_Board_Init(void)
         if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
             PIOS_Assert(0);
         }
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+        uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
         PIOS_Assert(rx_buffer);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
@@ -203,8 +204,8 @@ void PIOS_Board_Init(void)
         if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
             PIOS_Assert(0);
         }
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_VCP_RX_BUF_LEN);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_VCP_TX_BUF_LEN);
+        uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_VCP_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_VCP_TX_BUF_LEN);
         PIOS_Assert(rx_buffer);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_telem_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
@@ -216,8 +217,8 @@ void PIOS_Board_Init(void)
 #endif
 
     /* Allocate the uart buffers. */
-    pios_uart_rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
-    pios_uart_tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+    pios_uart_rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_RX_BUF_LEN);
+    pios_uart_tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_TX_BUF_LEN);
 
     // Configure the main port
     OPLinkSettingsData oplinkSettings;
@@ -372,8 +373,8 @@ void PIOS_Board_Init(void)
         }
 
         // Configure the radio com interface
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
+        uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
         PIOS_Assert(rx_buffer);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_rfm22b_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
@@ -437,11 +438,11 @@ void PIOS_Board_Init(void)
         }
 
         // Set the radio configuration parameters.
-        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet, is_coordinator, is_oneway, ppm_mode, ppm_only);
         PIOS_RFM22B_SetCoordinatorID(pios_rfm22b_id, oplinkSettings.CoordID);
+        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, is_coordinator, is_oneway, ppm_mode, ppm_only);
 
         /* Set the PPM callback if we should be receiving PPM. */
-        if (ppm_mode) {
+        if (ppm_mode || (ppm_only && !is_coordinator)) {
             PIOS_RFM22B_SetPPMCallback(pios_rfm22b_id, PIOS_Board_PPM_callback);
         }
 

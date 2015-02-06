@@ -259,8 +259,9 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo *info)
                              .arg(varOptionName)
                              .arg(options[m]));
             }
-            finit.append(QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::ENUM, %3, %4, QString(\"%5\")));\n")
+            finit.append(QString("    fields.append( new UAVObjectField(QString(\"%1\"), tr(\"%2\"), QString(\"%3\"), UAVObjectField::ENUM, %4, %5, QString(\"%6\")));\n")
                          .arg(info->fields[n]->name)
+                         .arg(info->fields[n]->description)
                          .arg(info->fields[n]->units)
                          .arg(varElemName)
                          .arg(varOptionName)
@@ -268,8 +269,9 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo *info)
         }
         // For all other types
         else {
-            finit.append(QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::%3, %4, QStringList(), QString(\"%5\")));\n")
+            finit.append(QString("    fields.append( new UAVObjectField(QString(\"%1\"), tr(\"%2\"), QString(\"%3\"), UAVObjectField::%4, %5, QStringList(), QString(\"%6\")));\n")
                          .arg(info->fields[n]->name)
+                         .arg(info->fields[n]->description)
                          .arg(info->fields[n]->units)
                          .arg(fieldTypeStrCPPClass[info->fields[n]->type])
                          .arg(varElemName)

@@ -45,7 +45,11 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
+    SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+
+    ## Misc library functions
+    SRC += $(FLIGHTLIB)/sha1.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/oplinkstatus.c

@@ -44,7 +44,7 @@ CoordinateConversions::CoordinateConversions()
  * @param[in] LLA Longitude latitude altitude for this location
  * @param[out] Rne[3][3] Rotation matrix
  */
-void CoordinateConversions::RneFromLLA(double LLA[3], double Rne[3][3])
+void CoordinateConversions::RneFromLLA(double LLA[3], float Rne[3][3])
 {
     float sinLat, sinLon, cosLat, cosLon;
 
@@ -134,7 +134,7 @@ int CoordinateConversions::NED2LLA_HomeECEF(double BaseECEFm[3], double NED[3], 
     // stored value is in cm, convert to m
     double BaseLLA[3];
     double ECEF[3];
-    double Rne[3][3];
+    float Rne[3][3];
 
     // Get LLA address to compute conversion matrix
     ECEF2LLA(BaseECEFm, BaseLLA);

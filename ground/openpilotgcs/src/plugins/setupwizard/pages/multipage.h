@@ -28,38 +28,19 @@
 #ifndef MULTIPAGE_H
 #define MULTIPAGE_H
 
-#include <QtSvg/QGraphicsSvgItem>
-#include <QtSvg/QSvgRenderer>
-#include <QList>
+#include "selectionpage.h"
 
-#include "abstractwizardpage.h"
-
-namespace Ui {
-class MultiPage;
-}
-
-class MultiPage : public AbstractWizardPage {
+class MultiPage : public SelectionPage {
     Q_OBJECT
 
 public:
     explicit MultiPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~MultiPage();
-
-    void initializePage();
-    bool validatePage();
+    virtual ~MultiPage();
 
 protected:
-    void resizeEvent(QResizeEvent *event);
-
-private:
-    Ui::MultiPage *ui;
-    void setupMultiTypesCombo();
-    QGraphicsSvgItem *m_multiPic;
-    void updateAvailableTypes();
-    QList<QString> m_descriptions;
-
-private slots:
-    void updateImageAndDescription();
+    void initializePage(VehicleConfigurationSource *settings);
+    bool validatePage(SelectionItem *selectedItem);
+    void setupSelection(Selection *selection);
 };
 
 #endif // MULTIPAGE_H

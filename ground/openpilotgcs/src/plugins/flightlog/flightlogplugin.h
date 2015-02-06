@@ -28,7 +28,7 @@
 
 #include <extensionsystem/iplugin.h>
 #include "flightlogmanager.h"
-#include "flightlogdialog.h"
+#include <QQuickView>
 
 class FlightLogPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
@@ -47,7 +47,7 @@ private slots:
     void LogManagementDialogClosed();
 
 private:
-    FlightLogDialog *m_logDialog;
+    QQuickView *m_logDialog;
 };
 
 #endif /* FLIGHTLOGPLUGIN_H_ */

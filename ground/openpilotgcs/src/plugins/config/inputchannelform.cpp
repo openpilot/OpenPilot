@@ -4,69 +4,37 @@
 #include "manualcontrolsettings.h"
 #include "gcsreceiver.h"
 
-InputChannelForm::InputChannelForm(QWidget *parent, bool showlegend) :
-    ConfigTaskWidget(parent),
-    ui(new Ui::InputChannelForm)
+InputChannelForm::InputChannelForm(const int index, QWidget *parent) :
+    ChannelForm(index, parent), ui(new Ui::InputChannelForm)
 {
     ui->setupUi(this);
-
-    // The first time through the loop, keep the legend. All other times, delete it.
-    if (!showlegend) {
-        layout()->removeWidget(ui->legend0);
-        layout()->removeWidget(ui->legend1);
-        layout()->removeWidget(ui->legend2);
-        layout()->removeWidget(ui->legend3);
-        layout()->removeWidget(ui->legend4);
-        layout()->removeWidget(ui->legend5);
-        layout()->removeWidget(ui->legend6);
-        layout()->removeWidget(ui->legend7);
-        delete ui->legend0;
-        delete ui->legend1;
-        delete ui->legend2;
-        delete ui->legend3;
-        delete ui->legend4;
-        delete ui->legend5;
-        delete ui->legend6;
-        delete ui->legend7;
-    }
 
     connect(ui->channelMin, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
     connect(ui->channelMax, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
     connect(ui->neutralValue, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated()));
+    connect(ui->channelNeutral, SIGNAL(valueChanged(int)), this, SLOT(updateTooltip()));
     connect(ui->channelGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(groupUpdated()));
     connect(ui->channelRev, SIGNAL(toggled(bool)), this, SLOT(reversedUpdated()));
 
-    // This is awkward but since we want the UI to be a dropdown but the field is not an enum
-    // it breaks the UAUVObject widget relation of the task gadget.  Running the data through
-    // a spin box fixes this
-    connect(ui->channelNumberDropdown, SIGNAL(currentIndexChanged(int)), this, SLOT(channelDropdownUpdated(int)));
-    connect(ui->channelNumber, SIGNAL(valueChanged(int)), this, SLOT(channelNumberUpdated(int)));
-
     disableMouseWheelEvents();
 }
-
 
 InputChannelForm::~InputChannelForm()
 {
     delete ui;
 }
 
-void InputChannelForm::setName(QString &name)
+QString InputChannelForm::name()
+{
+    return ui->channelName->text();
+}
+
+/**
+ * Set the channel assignment label.
+ */
+void InputChannelForm::setName(const QString &name)
 {
     ui->channelName->setText(name);
-    QFontMetrics metrics(ui->channelName->font());
-    int width = metrics.width(name) + 5;
-    foreach(InputChannelForm * form, parent()->findChildren<InputChannelForm *>()) {
-        if (form == this) {
-            continue;
-        }
-        if (form->ui->channelName->minimumSize().width() < width) {
-            form->ui->channelName->setMinimumSize(width, 0);
-        } else {
-            width = form->ui->channelName->minimumSize().width();
-        }
-    }
-    ui->channelName->setMinimumSize(width, 0);
 }
 
 /**
@@ -86,6 +54,15 @@ void InputChannelForm::minMaxUpdated()
     ui->channelRev->setChecked(reverse);
     ui->channelNeutral->setInvertedAppearance(reverse);
     ui->channelNeutral->setInvertedControls(reverse);
+
+    updateNeutralMark();
+}
+
+void InputChannelForm::updateTooltip()
+{
+    int currentValue = ui->channelNeutral->value();
+
+    ui->channelNeutral->setToolTip(QString::number(currentValue));
 }
 
 void InputChannelForm::neutralUpdated()
@@ -105,6 +82,30 @@ void InputChannelForm::neutralUpdated()
             ui->channelMax->setValue(neutralValue);
         }
     }
+
+    updateNeutralMark();
+}
+
+void InputChannelForm::updateNeutralMark()
+{
+    // Add a small neutral red mark on groove background
+    int neutral  = ui->neutralValue->value();
+    int min      = ui->channelMin->value();
+    int max      = ui->channelMax->value();
+
+    float range  = max - min;
+    float offset = neutral - min;
+    float neutralPosition = offset / range;
+
+    ui->channelNeutral->setStyleSheet(
+        "QSlider::groove:horizontal { border: 1px solid rgb(196, 196, 196); height: 6px; border-radius: 2px; "
+        "background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:" + QString::number(neutralPosition - 0.01) + " transparent, stop:"
+        + QString::number(neutralPosition) + " red, stop:" + QString::number(neutralPosition + 0.01) + " transparent); }"
+        "QSlider::add-page:horizontal { background: rgba(255,255,255,180); border: 1px solid #777; margin: 0px 0px 0px 2px; border-radius: 4px; }"
+        "QSlider::sub-page:horizontal { background: rgba(78,147,246,180); border: 1px solid #777; margin: 0px 2px 0px 0px; border-radius: 4px; }"
+        "QSlider::handle:horizontal { background: rgba(196,196,196,180); width: 18px; height: 28px; margin: -2px 0px; border-radius: 3px; "
+        "border: 1px solid #777; }"
+        );
 }
 
 void InputChannelForm::reversedUpdated()
@@ -136,8 +137,8 @@ void InputChannelForm::reversedUpdated()
  */
 void InputChannelForm::groupUpdated()
 {
-    ui->channelNumberDropdown->clear();
-    ui->channelNumberDropdown->addItem("Disabled");
+    ui->channelNumber->clear();
+    ui->channelNumber->addItem("Disabled");
 
     quint8 count = 0;
 
@@ -168,25 +169,6 @@ void InputChannelForm::groupUpdated()
     }
 
     for (int i = 0; i < count; i++) {
-        ui->channelNumberDropdown->addItem(QString(tr("Chan %1").arg(i + 1)));
+        ui->channelNumber->addItem(QString(tr("Chan %1").arg(i + 1)));
     }
-
-    ui->channelNumber->setMaximum(count);
-    ui->channelNumber->setMinimum(0);
-}
-
-/**
- * Update the dropdown from the hidden control
- */
-void InputChannelForm::channelDropdownUpdated(int newval)
-{
-    ui->channelNumber->setValue(newval);
-}
-
-/**
- * Update the hidden control from the dropdown
- */
-void InputChannelForm::channelNumberUpdated(int newval)
-{
-    ui->channelNumberDropdown->setCurrentIndex(newval);
 }

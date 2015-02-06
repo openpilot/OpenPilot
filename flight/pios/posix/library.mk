@@ -67,10 +67,11 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 # the device-specific pieces of the code.
 #
 ifneq ($(FREERTOS_DIR),)
-FREERTOS_PORTDIR	:=	$(PIOS_DEVLIB)/libraries/FreeRTOS/Source
+FREERTOS_PORTDIR	:=	$(FREERTOS_DIR)
 SRC					+=	$(sort $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/Posix/*.c))
-SRC					+=	$(sort $(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/*.c))
+SRC					+=	$(sort $(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/heap_3.c))
 
 EXTRAINCDIRS		+=	$(FREERTOS_PORTDIR)/portable/GCC/Posix
+
 endif
 

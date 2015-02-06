@@ -268,12 +268,12 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     float temperature  = fields[19].toFloat();
     // Get pressure (kpa)
     float pressure     = fields[20].toFloat() * INHG2KPA;
-    // Get VelocityState Down (cm/s)
-    float velocityStateDown  = -fields[21].toFloat() * FPS2CMPS;
-    // Get VelocityState East (cm/s)
-    float velocityStateEast  = fields[22].toFloat() * FPS2CMPS;
-    // Get VelocityState Down (cm/s)
-    float velocityStateNorth = fields[23].toFloat() * FPS2CMPS;
+    // Get VelocityState Down (m/s)
+    float velocityStateDown  = -fields[21].toFloat() * FPS2CMPS * 1e-2f;
+    // Get VelocityState East (m/s)
+    float velocityStateEast  = fields[22].toFloat() * FPS2CMPS * 1e-2f;
+    // Get VelocityState Down (m/s)
+    float velocityStateNorth = fields[23].toFloat() * FPS2CMPS * 1e-2f;
 
     // Get UDP packets received by FG
     int n = fields[24].toInt();
@@ -286,16 +286,15 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     Output2Hardware out;
     memset(&out, 0, sizeof(Output2Hardware));
 
+    HomeLocation::DataFields homeData = posHome->getData();
+    double HomeLLA[3] = { (double)homeData.Latitude * 1e-7, (double)homeData.Longitude * 1e-7, homeData.Altitude };
+    double HomeECEF[3];
+    float HomeRNE[3][3];
+    double LLA[3]     = { latitude, longitude, altitude_msl };
     float NED[3];
-    // convert from cm back to meters
-
-    double LLA[3] = { latitude, longitude, altitude_msl };
-    double ECEF[3];
-    double RNE[9];
-    Utils::CoordinateConversions().RneFromLLA(LLA, (double(*)[3])RNE);
-    Utils::CoordinateConversions().LLA2ECEF(LLA, ECEF);
-    Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float(*)[3])RNE, NED);
-
+    Utils::CoordinateConversions().RneFromLLA(HomeLLA, HomeRNE);
+    Utils::CoordinateConversions().LLA2ECEF(HomeLLA, HomeECEF);
+    Utils::CoordinateConversions().LLA2Base(LLA, HomeECEF, HomeRNE, NED);
 
     // Update GPS Position objects
     out.latitude    = latitude * 1e7;

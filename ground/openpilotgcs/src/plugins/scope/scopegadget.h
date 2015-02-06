@@ -55,7 +55,7 @@ public:
 
     QWidget *widget()
     {
-        return m_widget;
+        return m_wrapper;
     }
 
     QString contextHelpId() const
@@ -68,6 +68,7 @@ public:
 
 private:
     ScopeGadgetWidget *m_widget;
+    QWidget *m_wrapper;
     QList<int> m_context;
 };
 

@@ -29,16 +29,6 @@
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
 
-/**
- * glue macros for file IO
- **/
-#define FILEINFO FILE *
-#define PIOS_FOPEN_READ(filename, file)                 (file = fopen((char *)filename, "r")) == NULL
-#define PIOS_FOPEN_WRITE(filename, file)                (file = fopen((char *)filename, "w")) == NULL
-#define PIOS_FREAD(file, bufferadr, length, resultadr)  (*resultadr = fread((uint8_t *)bufferadr, 1, length, *file)) != length
-#define PIOS_FWRITE(file, bufferadr, length, resultadr) *resultadr = fwrite((uint8_t *)bufferadr, 1, length, *file)
-#define PIOS_FCLOSE(file)                               fclose(file)
-#define PIOS_FUNLINK(file)                              unlink((char *)filename)
 
 // ------------------------
 // Timers and Channels Used

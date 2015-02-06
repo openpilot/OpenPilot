@@ -31,7 +31,6 @@
 #include <stdbool.h>
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
-#include "pios_com_msg.h"
 #include <pios_board_info.h>
 // programmable devices
 Device devicesTable[10];
@@ -71,7 +70,12 @@ DFUTransfer downType = 0;
 /* Extern variables ----------------------------------------------------------*/
 extern DFUStates DeviceState;
 extern uint8_t JumpToApp;
+extern int32_t platform_senddata(const uint8_t *msg, uint16_t msg_len);
 /* Private function prototypes -----------------------------------------------*/
+static uint32_t baseOfAdressType(uint8_t type);
+static uint8_t isBiggerThanAvailable(uint8_t type, uint32_t size);
+static void OPDfuIni(uint8_t discover);
+bool flash_read(uint8_t *buffer, uint32_t adr, DFUProgType type);
 /* Private functions ---------------------------------------------------------*/
 void sendData(uint8_t *buf, uint16_t size);
 uint32_t CalcFirmCRC(void);
@@ -109,35 +113,40 @@ void DataDownload(__attribute__((unused)) DownloadAction action)
         sendData(SendBuffer + 1, 63);
     }
 }
+
+static uint32_t unpack_uint32(uint8_t *buffer)
+{
+    uint32_t ret = buffer[0] << 24;
+
+    ret += buffer[1] << 16;
+    ret += buffer[2] << 8;
+    ret += buffer[3];
+    return ret;
+}
+
+static void pack_uint32(uint32_t value, uint8_t *buffer)
+{
+    buffer[0] = value >> 24;
+    buffer[1] = value >> 16;
+    buffer[2] = value >> 8;
+    buffer[3] = value;
+}
+
+
 void processComand(uint8_t *xReceive_Buffer)
 {
-    Command = xReceive_Buffer[COMMAND];
-#ifdef DEBUG_SSP
-    char str[63] = { 0 };
-    sprintf(str, "Received COMMAND:%d|", Command);
-    PIOS_COM_SendString(PIOS_COM_TELEM_USB, str);
-#endif
+    Command     = xReceive_Buffer[COMMAND];
     EchoReqFlag = (Command >> 7);
     EchoAnsFlag = (Command >> 6) & 0x01;
     StartFlag   = (Command >> 5) & 0x01;
-    Count  = xReceive_Buffer[COUNT] << 24;
-    Count += xReceive_Buffer[COUNT + 1] << 16;
-    Count += xReceive_Buffer[COUNT + 2] << 8;
-    Count += xReceive_Buffer[COUNT + 3];
-
-    Data   = xReceive_Buffer[DATA] << 24;
-    Data  += xReceive_Buffer[DATA + 1] << 16;
-    Data  += xReceive_Buffer[DATA + 2] << 8;
-    Data  += xReceive_Buffer[DATA + 3];
-    Data0  = xReceive_Buffer[DATA];
-    Data1  = xReceive_Buffer[DATA + 1];
-    Data2  = xReceive_Buffer[DATA + 2];
-    Data3  = xReceive_Buffer[DATA + 3];
+    Count = unpack_uint32(&xReceive_Buffer[COUNT]);
+    Data  = unpack_uint32(&xReceive_Buffer[DATA]);
+    Data0 = xReceive_Buffer[DATA];
+    Data1 = xReceive_Buffer[DATA + 1];
+    Data2 = xReceive_Buffer[DATA + 2];
+    Data3 = xReceive_Buffer[DATA + 3];
     for (uint32_t i = 0; i < 3; i++) {
-        Opt[i] = xReceive_Buffer[DATA + 4 * (i + 1)] << 24 |
-                 xReceive_Buffer[DATA + 4 * (i + 1) + 1] << 16 |
-                 xReceive_Buffer[DATA + 4 * (i + 1) + 2] << 8 |
-                 xReceive_Buffer[DATA + 4 * (i + 1) + 3];
+        Opt[i] = unpack_uint32(&xReceive_Buffer[DATA + 4 * (i + 1)]);
     }
 
     Command = Command & 0b00011111;
@@ -182,10 +191,7 @@ void processComand(uint8_t *xReceive_Buffer)
                 TransferType     = Data0;
                 SizeOfTransfer   = Count;
                 Next_Packet      = 1;
-                Expected_CRC     = Data2 << 24;
-                Expected_CRC    += Data3 << 16;
-                Expected_CRC    += xReceive_Buffer[DATA + 4] << 8;
-                Expected_CRC    += xReceive_Buffer[DATA + 5];
+                Expected_CRC     = unpack_uint32(&xReceive_Buffer[DATA + 2]);
                 SizeOfLastPacket = Data1;
 
                 if (isBiggerThanAvailable(TransferType, (SizeOfTransfer - 1)
@@ -229,10 +235,7 @@ void processComand(uint8_t *xReceive_Buffer)
                     case Self_flash:
                         for (uint8_t x = 0; x < numberOfWords; ++x) {
                             offset = 4 * x;
-                            Data   = xReceive_Buffer[DATA + offset] << 24;
-                            Data  += xReceive_Buffer[DATA + 1 + offset] << 16;
-                            Data  += xReceive_Buffer[DATA + 2 + offset] << 8;
-                            Data  += xReceive_Buffer[DATA + 3 + offset];
+                            Data   = unpack_uint32(&xReceive_Buffer[DATA + offset]);
                             aux    = baseOfAdressType(TransferType) + (uint32_t)(
                                 Count * 14 * 4 + x * 4);
                             result = 0;
@@ -286,18 +289,12 @@ void processComand(uint8_t *xReceive_Buffer)
             Buffer[8] = WRFlags >> 8;
             Buffer[9] = WRFlags;
         } else {
-            Buffer[2]  = devicesTable[Data0 - 1].sizeOfCode >> 24;
-            Buffer[3]  = devicesTable[Data0 - 1].sizeOfCode >> 16;
-            Buffer[4]  = devicesTable[Data0 - 1].sizeOfCode >> 8;
-            Buffer[5]  = devicesTable[Data0 - 1].sizeOfCode;
+            pack_uint32(devicesTable[Data0 - 1].sizeOfCode, &Buffer[2]);
             Buffer[6]  = Data0;
             Buffer[7]  = devicesTable[Data0 - 1].BL_Version;
             Buffer[8]  = devicesTable[Data0 - 1].sizeOfDescription;
             Buffer[9]  = devicesTable[Data0 - 1].devID;
-            Buffer[10] = devicesTable[Data0 - 1].FW_Crc >> 24;
-            Buffer[11] = devicesTable[Data0 - 1].FW_Crc >> 16;
-            Buffer[12] = devicesTable[Data0 - 1].FW_Crc >> 8;
-            Buffer[13] = devicesTable[Data0 - 1].FW_Crc;
+            pack_uint32(devicesTable[Data0 - 1].FW_Crc, &Buffer[10]);
             Buffer[14] = devicesTable[Data0 - 1].devID >> 8;
             Buffer[15] = devicesTable[Data0 - 1].devID;
         }
@@ -341,14 +338,7 @@ void processComand(uint8_t *xReceive_Buffer)
         }
         break;
     case Download_Req:
-#ifdef DEBUG_SSP
-        sprintf(str, "COMMAND:DOWNLOAD_REQ 1 Status=%d|", DeviceState);
-        PIOS_COM_SendString(PIOS_COM_TELEM_USB, str);
-#endif
         if (DeviceState == DFUidle) {
-#ifdef DEBUG_SSP
-            PIOS_COM_SendString(PIOS_COM_TELEM_USB, "COMMAND:DOWNLOAD_REQ 1|");
-#endif
             downType = Data0;
             downPacketTotal = Count;
             downSizeOfLastPacket = Data1;
@@ -370,10 +360,7 @@ void processComand(uint8_t *xReceive_Buffer)
         Buffer[0] = 0x01;
         Buffer[1] = Status_Rep;
         if (DeviceState == wrong_packet_received) {
-            Buffer[2] = Aditionals >> 24;
-            Buffer[3] = Aditionals >> 16;
-            Buffer[4] = Aditionals >> 8;
-            Buffer[5] = Aditionals;
+            pack_uint32(Aditionals, &Buffer[2]);
         } else {
             Buffer[2] = 0;
             Buffer[3] = ((uint16_t)Aditionals) >> 8;
@@ -469,7 +456,7 @@ uint32_t CalcFirmCRC()
 }
 void sendData(uint8_t *buf, uint16_t size)
 {
-    PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, buf, size);
+    platform_senddata(buf, size);
 }
 
 bool flash_read(uint8_t *buffer, uint32_t adr, DFUProgType type)

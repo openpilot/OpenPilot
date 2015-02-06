@@ -40,7 +40,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// I don't want this dependency, but currently using pvPortMalloc
 #include "openpilot.h"
 
 #include <stdio.h>
@@ -52,7 +51,7 @@
 #include "WorldMagModel.h"
 #include "WMMInternal.h"
 
-#define MALLOC(x) pvPortMalloc(x)
+#define MALLOC(x) pios_malloc(x)
 #define FREE(x)   vPortFree(x)
 // #define MALLOC(x) malloc(x)
 // #define FREE(x) free(x)

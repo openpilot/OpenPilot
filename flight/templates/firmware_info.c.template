@@ -26,7 +26,7 @@
  */
 
 #include <stdint.h>
-
+#include <pios_board_info.h>
 /**
  * We have 100 bytes for the whole description.
  *
@@ -41,18 +41,6 @@
  *  20 bytes: free for now.
  *
  */
-
-struct __attribute__((packed)) fw_version_info {
-    uint8_t magic[4];
-    uint32_t commit_hash_prefix;
-    uint32_t timestamp;
-    uint8_t board_type;
-    uint8_t board_revision;
-    uint8_t commit_tag_name[26];
-    uint8_t sha1sum[20];
-    uint8_t uavosha1[20];
-    uint8_t pad[20];
-};
 
 #if (defined(__MACH__) && defined(__APPLE__))
 const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__((__section__("__TEXT,.fw_version_blob"))) = {

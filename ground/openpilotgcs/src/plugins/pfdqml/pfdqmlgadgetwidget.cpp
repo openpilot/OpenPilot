@@ -62,7 +62,22 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "GCSTelemetryStats" <<
         "SystemAlarms" <<
         "NedAccel" <<
-        "FlightBatteryState";
+        "FlightBatteryState" <<
+        "ActuatorDesired" <<
+        "TakeOffLocation" <<
+        "PathPlan" <<
+        "WaypointActive" <<
+        "OPLinkStatus" <<
+        "FlightStatus" <<
+        "SystemStats" <<
+        "StabilizationDesired" <<
+        "VtolPathFollowerSettings" <<
+        "HwSettings" <<
+        "ManualControlCommand" <<
+        "SystemSettings" <<
+        "RevoSettings" <<
+        "MagState" <<
+        "FlightBatterySettings";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

@@ -80,6 +80,9 @@ bool ControllerPage::isComplete() const
 bool ControllerPage::validatePage()
 {
     getWizard()->setControllerType((SetupWizard::CONTROLLER_TYPE)ui->boardTypeCombo->itemData(ui->boardTypeCombo->currentIndex()).toInt());
+    if (getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC || getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC3D) {
+        getWizard()->setGpsType(SetupWizard::GPS_DISABLED);
+    }
     return true;
 }
 
@@ -107,6 +110,9 @@ SetupWizard::CONTROLLER_TYPE ControllerPage::getControllerType()
     case 0x0903:
         return SetupWizard::CONTROLLER_REVO;
 
+    case 0x0904:
+        return SetupWizard::CONTROLLER_DISCOVERYF4;
+
     default:
         return SetupWizard::CONTROLLER_UNKNOWN;
     }
@@ -127,6 +133,7 @@ void ControllerPage::setupBoardTypes()
     ui->boardTypeCombo->addItem(tr("OpenPilot CopterControl 3D"), SetupWizard::CONTROLLER_CC3D);
     ui->boardTypeCombo->addItem(tr("OpenPilot Revolution"), SetupWizard::CONTROLLER_REVO);
     ui->boardTypeCombo->addItem(tr("OpenPilot OPLink Radio Modem"), SetupWizard::CONTROLLER_OPLINK);
+    ui->boardTypeCombo->addItem(tr("OpenPilot DiscoveryF4"), SetupWizard::CONTROLLER_DISCOVERYF4);
 }
 
 void ControllerPage::setControllerType(SetupWizard::CONTROLLER_TYPE type)

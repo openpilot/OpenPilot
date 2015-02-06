@@ -43,6 +43,42 @@
 
 #include <pios_i2c_priv.h>
 
+enum i2c_adapter_state {
+    I2C_STATE_FSM_FAULT = 0, /* Must be zero so undefined transitions land here */
+
+    I2C_STATE_BUS_ERROR,
+
+    I2C_STATE_STOPPED,
+    I2C_STATE_STOPPING,
+    I2C_STATE_STARTING,
+
+    I2C_STATE_R_MORE_TXN_ADDR,
+    I2C_STATE_R_MORE_TXN_PRE_ONE,
+    I2C_STATE_R_MORE_TXN_PRE_FIRST,
+    I2C_STATE_R_MORE_TXN_PRE_MIDDLE,
+    I2C_STATE_R_MORE_TXN_PRE_LAST,
+    I2C_STATE_R_MORE_TXN_POST_LAST,
+
+    I2C_STATE_R_LAST_TXN_ADDR,
+    I2C_STATE_R_LAST_TXN_PRE_ONE,
+    I2C_STATE_R_LAST_TXN_PRE_FIRST,
+    I2C_STATE_R_LAST_TXN_PRE_MIDDLE,
+    I2C_STATE_R_LAST_TXN_PRE_LAST,
+    I2C_STATE_R_LAST_TXN_POST_LAST,
+
+    I2C_STATE_W_MORE_TXN_ADDR,
+    I2C_STATE_W_MORE_TXN_MIDDLE,
+    I2C_STATE_W_MORE_TXN_LAST,
+
+    I2C_STATE_W_LAST_TXN_ADDR,
+    I2C_STATE_W_LAST_TXN_MIDDLE,
+    I2C_STATE_W_LAST_TXN_LAST,
+
+    I2C_STATE_NACK,
+
+    I2C_STATE_NUM_STATES /* Must be last */
+};
+
 // #define I2C_HALT_ON_ERRORS
 
 enum i2c_adapter_event {
@@ -754,6 +790,11 @@ static void i2c_adapter_reset_bus(struct pios_i2c_adapter *i2c_adapter)
     /* Initialize the I2C block */
     I2C_Init(i2c_adapter->cfg->regs, (I2C_InitTypeDef *)&(i2c_adapter->cfg->init));
 
+    // for delays during transfer timeouts
+    // one tick correspond to transmission of 1 byte i.e. 9 clock ticks
+    i2c_adapter->transfer_delay_uS = 9000000 / (((I2C_InitTypeDef *)&(i2c_adapter->cfg->init))->I2C_ClockSpeed);
+
+
     if (i2c_adapter->cfg->regs->SR2 & I2C_FLAG_BUSY) {
         /* Reset the I2C block */
         I2C_SoftwareResetCmd(i2c_adapter->cfg->regs, ENABLE);
@@ -761,7 +802,6 @@ static void i2c_adapter_reset_bus(struct pios_i2c_adapter *i2c_adapter)
     }
 }
 
-#include <pios_i2c_priv.h>
 
 /* Return true if the FSM is in a terminal state */
 static bool i2c_adapter_fsm_terminated(struct pios_i2c_adapter *i2c_adapter)
@@ -789,9 +829,18 @@ static bool i2c_adapter_callback_handler(struct pios_i2c_adapter *i2c_adapter)
     xSemaphoreGive(i2c_adapter->sem_ready);
 #endif /* USE_FREERTOS */
 
+    /* transfer_timeout_ticks is set by PIOS_I2C_Transfer_Callback */
     /* Spin waiting for the transfer to finish */
     while (!i2c_adapter_fsm_terminated(i2c_adapter)) {
-        ;
+        // sleep 1 byte, as FSM can't be faster
+        // FIXME: clock stretching could make problems, but citing NPX: alsmost no slave device implements clock stretching
+        // three times the expected time should cover clock delay
+        PIOS_DELAY_WaituS(i2c_adapter->transfer_delay_uS);
+
+        i2c_adapter->transfer_timeout_ticks--;
+        if (i2c_adapter->transfer_timeout_ticks == 0) {
+            break;
+        }
     }
 
     if (i2c_adapter_wait_for_stopped(i2c_adapter)) {
@@ -890,7 +939,7 @@ static struct pios_i2c_dev *PIOS_I2C_alloc(void)
 {
     struct pios_i2c_dev *i2c_adapter;
 
-    i2c_adapter = (struct pios_i2c_adapter *)malloc(sizeof(*i2c_adapter));
+    i2c_adapter = (struct pios_i2c_adapter *)pios_malloc(sizeof(*i2c_adapter));
     if (!i2c_adapter) {
         return NULL;
     }
@@ -957,6 +1006,7 @@ int32_t PIOS_I2C_Init(uint32_t *i2c_id, const struct pios_i2c_adapter_cfg *cfg)
     NVIC_Init((NVIC_InitTypeDef *)&(i2c_adapter->cfg->event.init));
     NVIC_Init((NVIC_InitTypeDef *)&(i2c_adapter->cfg->error.init));
 
+
     /* No error */
     return 0;
 
@@ -968,9 +1018,9 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    PIOS_Assert(valid)
+    if (!PIOS_I2C_validate(i2c_adapter)) {
+        return -1;
+    }
 
     PIOS_DEBUG_Assert(txn_list);
     PIOS_DEBUG_Assert(num_txns);
@@ -1002,12 +1052,20 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 
 #ifdef USE_FREERTOS
     /* Make sure the done/ready semaphore is consumed before we start */
-    semaphore_success     &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
+    semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 #endif
+
+    // Estimate bytes of transmission. Per txns: 1 adress byte + length
+    i2c_adapter->transfer_timeout_ticks = num_txns;
+    for (uint32_t i = 0; i < num_txns; i++) {
+        i2c_adapter->transfer_timeout_ticks += txn_list[i].len;
+    }
+    // timeout if it takes eight times the expected time
+    i2c_adapter->transfer_timeout_ticks <<= 3;
 
     i2c_adapter->callback  = NULL;
     i2c_adapter->bus_error = false;
-    i2c_adapter->nack      = false;
+    i2c_adapter->nack = false;
     i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_START);
 
     /* Wait for the transfer to complete */
@@ -1018,7 +1076,15 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 
     /* Spin waiting for the transfer to finish */
     while (!i2c_adapter_fsm_terminated(i2c_adapter)) {
-        ;
+        /* sleep 9 clock ticks (1 byte), because FSM can't be faster than one byte
+           FIXME: clock stretching could make problems, but citing NPX: alsmost no slave device implements clock stretching
+           three times the expected time should cover clock delay */
+        PIOS_DELAY_WaituS(i2c_adapter->transfer_delay_uS);
+
+        i2c_adapter->transfer_timeout_ticks--;
+        if (i2c_adapter->transfer_timeout_ticks == 0) {
+            break;
+        }
     }
 
     if (i2c_adapter_wait_for_stopped(i2c_adapter)) {
@@ -1049,9 +1115,10 @@ int32_t PIOS_I2C_Transfer_Callback(uint32_t i2c_id, const struct pios_i2c_txn tx
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
+    if (!PIOS_I2C_validate(i2c_adapter)) {
+        return -1;
+    }
 
-    PIOS_Assert(valid)
     PIOS_Assert(callback);
 
     PIOS_DEBUG_Assert(txn_list);
@@ -1081,8 +1148,17 @@ int32_t PIOS_I2C_Transfer_Callback(uint32_t i2c_id, const struct pios_i2c_txn tx
 
 #ifdef USE_FREERTOS
     /* Make sure the done/ready semaphore is consumed before we start */
-    semaphore_success     &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
+    semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 #endif
+
+    // used in the i2c_adapter_callback_handler function
+    // Estimate bytes of transmission. Per txns: 1 adress byte + length
+    i2c_adapter->transfer_timeout_ticks = num_txns;
+    for (uint32_t i = 0; i < num_txns; i++) {
+        i2c_adapter->transfer_timeout_ticks += txn_list[i].len;
+    }
+    // timeout if it takes eight times the expected time
+    i2c_adapter->transfer_timeout_ticks <<= 3;
 
     i2c_adapter->callback  = callback;
     i2c_adapter->bus_error = false;
@@ -1095,9 +1171,9 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    PIOS_Assert(valid)
+    if (!PIOS_I2C_validate(i2c_adapter)) {
+        return;
+    }
 
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
@@ -1205,9 +1281,9 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
         /* Ignore this event and wait for TRANSMITTED in case we can't keep up */
         goto skip_event;
         break;
-    case 0x30084: /* Occurs between byte tranmistted and master mode selected */
-    case 0x30000: /* Need to throw away this spurious event */
-    case 0x30403 & EVENT_MASK: /* Detected this after got a NACK, probably stop bit */
+    case 0x30084: /* BUSY + MSL + TXE + BFT Occurs between byte transmitted and master mode selected */
+    case 0x30000: /* BUSY + MSL Need to throw away this spurious event */
+    case 0x30403 & EVENT_MASK: /* BUSY + MSL + SB + ADDR Detected this after got a NACK, probably stop bit */
         goto skip_event;
         break;
     default:
@@ -1228,16 +1304,15 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
+    if (!PIOS_I2C_validate(i2c_adapter)) {
+        return;
+    }
 
-    PIOS_Assert(valid)
-
-#if defined(PIOS_I2C_DIAGNOSTICS)
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
+#if defined(PIOS_I2C_DIAGNOSTICS)
     i2c_erirq_history[i2c_erirq_history_pointer] = event;
     i2c_erirq_history_pointer = (i2c_erirq_history_pointer + 1) % 5;
-
 #endif
 
     if (event & I2C_FLAG_AF) {

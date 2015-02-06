@@ -51,6 +51,10 @@ public:
             return QString("Revolution");
 
             break;
+        case 0x0904:
+            return QString("DiscoveryF4");
+
+            break;
         default:
             return QString("");
 

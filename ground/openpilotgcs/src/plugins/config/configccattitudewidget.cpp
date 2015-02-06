@@ -38,13 +38,12 @@
 #include "gyrostate.h"
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
-
+#include <calibration/calibrationutils.h>
 ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
     ui(new Ui_ccattitude)
 {
     ui->setupUi(this);
-    forceConnectedState(); // dynamic widgets don't recieve the connected signal
     connect(ui->zeroBias, SIGNAL(clicked()), this, SLOT(startAccelCalibration()));
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -67,7 +66,9 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     addWidgetBinding("AttitudeSettings", "BoardRotation", ui->pitchBias, AttitudeSettings::BOARDROTATION_PITCH);
     addWidgetBinding("AttitudeSettings", "BoardRotation", ui->yawBias, AttitudeSettings::BOARDROTATION_YAW);
     addWidget(ui->zeroBias);
+    populateWidgets();
     refreshWidgetsValues();
+    forceConnectedState();
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
@@ -113,13 +114,13 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject *obj)
         disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
         disconnect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
 
-        float x_bias = listMean(x_accum);
-        float y_bias = listMean(y_accum);
-        float z_bias = (listMean(z_accum) + 9.81);
+        float x_bias = OpenPilot::CalibrationUtils::listMean(x_accum);
+        float y_bias = OpenPilot::CalibrationUtils::listMean(y_accum);
+        float z_bias = OpenPilot::CalibrationUtils::listMean(z_accum) + 9.81;
 
-        float x_gyro_bias = listMean(x_gyro_accum);
-        float y_gyro_bias = listMean(y_gyro_accum);
-        float z_gyro_bias = listMean(z_gyro_accum);
+        float x_gyro_bias = OpenPilot::CalibrationUtils::listMean(x_gyro_accum);
+        float y_gyro_bias = OpenPilot::CalibrationUtils::listMean(y_gyro_accum);
+        float z_gyro_bias = OpenPilot::CalibrationUtils::listMean(z_gyro_accum);
         accelState->setMetadata(initialAccelStateMdata);
         gyroState->setMetadata(initialGyroStateMdata);
 
@@ -213,7 +214,7 @@ void ConfigCCAttitudeWidget::startAccelCalibration()
 
 void ConfigCCAttitudeWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/44Cf"), QUrl::StrictMode));
 }
 
 void ConfigCCAttitudeWidget::setAccelFiltering(bool active)

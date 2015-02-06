@@ -2,9 +2,9 @@
     <object name="DebugLogEntry" singleinstance="true" settings="false" category="System">
         <description>Log Entry in Flash</description>
 	<field name="Flight" units="" type="uint16" elements="1" />
-	<field name="FlightTime" units="ms" type="uint32" elements="1" />
+	<field name="FlightTime" units="us" type="uint32" elements="1" />
 	<field name="Entry" units="" type="uint16" elements="1" />
-	<field name="Type" units="" type="enum" elements="1" options="Empty, Text, UAVObject" />
+	<field name="Type" units="" type="enum" elements="1" options="Empty, Text, UAVObject, MultipleUAVObjects" />
         <field name="ObjectID" units="" type="uint32" elements="1"/>
         <field name="InstanceID" units="" type="uint16" elements="1"/>
 	<field name="Size" units="" type="uint16" elements="1" />

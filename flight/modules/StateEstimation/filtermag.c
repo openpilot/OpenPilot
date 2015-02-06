@@ -33,9 +33,12 @@
 #include "inc/stateestimation.h"
 #include <attitudestate.h>
 #include <revocalibration.h>
+#include <revosettings.h>
+#include <systemalarms.h>
 #include <homelocation.h>
-
+#include <auxmagsettings.h>
 #include <CoordinateConversions.h>
+#include <mathmisc.h>
 
 // Private constants
 //
@@ -43,9 +46,15 @@
 
 // Private types
 struct data {
-    HomeLocationData    homeLocation;
     RevoCalibrationData revoCalibration;
-    float magBias[3];
+    RevoSettingsData    revoSettings;
+    AuxMagSettingsUsageOptions auxMagUsage;
+    uint8_t warningcount;
+    uint8_t errorcount;
+    float   homeLocationBe[3];
+    float   magBe;
+    float   invMagBe;
+    float   magBias[3];
 };
 
 // Private variables
@@ -53,15 +62,16 @@ struct data {
 // Private functions
 
 static int32_t init(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
+static bool checkMagValidity(struct data *this, float error, bool setAlarms);
 static void magOffsetEstimation(struct data *this, float mag[3]);
-
+static float getMagError(struct data *this, float mag[3]);
 
 int32_t filterMagInitialize(stateFilter *handle)
 {
     handle->init      = &init;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     HomeLocationInitialize();
     return STACK_REQUIRED;
 }
@@ -70,23 +80,127 @@ static int32_t init(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 
-    this->magBias[0] = this->magBias[1] = this->magBias[2] = 0.0f;
-    HomeLocationGet(&this->homeLocation);
+    this->magBias[0]   = this->magBias[1] = this->magBias[2] = 0.0f;
+    this->warningcount = this->errorcount = 0;
+    HomeLocationBeGet(this->homeLocationBe);
+    // magBe holds the magnetic vector length (expected)
+    this->magBe    = vector_lengthf(this->homeLocationBe, 3);
+    this->invMagBe = 1.0f / this->magBe;
     RevoCalibrationGet(&this->revoCalibration);
+    RevoSettingsGet(&this->revoSettings);
+    AuxMagSettingsUsageGet(&this->auxMagUsage);
     return 0;
 }
 
-static int32_t filter(stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
-    struct data *this = (struct data *)self->localdata;
+    struct data *this   = (struct data *)self->localdata;
+    float auxMagError;
+    float boardMagError;
+    float temp_mag[3]   = { 0 };
+    uint8_t temp_status = MAGSTATUS_INVALID;
+    uint8_t magSamples  = 0;
 
-    if (IS_SET(state->updated, SENSORUPDATES_mag)) {
-        if (this->revoCalibration.MagBiasNullingRate > 0) {
-            magOffsetEstimation(this, state->mag);
+    // Uses the external mag when available
+    if ((this->auxMagUsage != AUXMAGSETTINGS_USAGE_ONBOARDONLY) &&
+        IS_SET(state->updated, SENSORUPDATES_auxMag)) {
+        auxMagError = getMagError(this, state->auxMag);
+        // Handles alarms only if it will rely on aux mag only
+        bool auxMagValid = checkMagValidity(this, auxMagError, (this->auxMagUsage == AUXMAGSETTINGS_USAGE_AUXONLY));
+        // if we are going to use Aux only, force the update even if mag is invalid
+        if (auxMagValid || (this->auxMagUsage == AUXMAGSETTINGS_USAGE_AUXONLY)) {
+            temp_mag[0] = state->auxMag[0];
+            temp_mag[1] = state->auxMag[1];
+            temp_mag[2] = state->auxMag[2];
+            temp_status = MAGSTATUS_AUX;
+            magSamples++;
         }
     }
 
-    return 0;
+    if ((this->auxMagUsage != AUXMAGSETTINGS_USAGE_AUXONLY) &&
+        IS_SET(state->updated, SENSORUPDATES_boardMag)) {
+        // TODO:mag Offset estimation works with onboard mag only right now.
+        if (this->revoCalibration.MagBiasNullingRate > 0) {
+            magOffsetEstimation(this, state->boardMag);
+        }
+        boardMagError = getMagError(this, state->boardMag);
+        // sets warning only if no mag data are available (aux is invalid or missing)
+        bool boardMagValid = checkMagValidity(this, boardMagError, (temp_status == MAGSTATUS_INVALID));
+        // force it to be set to board mag value if no data has been feed to temp_mag yet.
+        // this works also as a failsafe in case aux mag stops feeding data.
+        if (boardMagValid || (temp_status == MAGSTATUS_INVALID)) {
+            temp_mag[0] += state->boardMag[0];
+            temp_mag[1] += state->boardMag[1];
+            temp_mag[2] += state->boardMag[2];
+            temp_status  = MAGSTATUS_OK;
+            magSamples++;
+        }
+    }
+
+    if (magSamples > 1) {
+        temp_mag[0] *= 0.5f;
+        temp_mag[1] *= 0.5f;
+        temp_mag[2] *= 0.5f;
+    }
+
+    if (temp_status != MAGSTATUS_INVALID) {
+        state->mag[0]   = temp_mag[0];
+        state->mag[1]   = temp_mag[1];
+        state->mag[2]   = temp_mag[2];
+        state->updated |= SENSORUPDATES_mag;
+    }
+    state->magStatus = temp_status;
+    return FILTERRESULT_OK;
+}
+
+/**
+ * check validity of magnetometers
+ */
+static bool checkMagValidity(struct data *this, float error, bool setAlarms)
+{
+    #define ALARM_THRESHOLD 5
+
+    // set errors
+    if (error < this->revoSettings.MagnetometerMaxDeviation.Warning) {
+        this->warningcount = 0;
+        this->errorcount   = 0;
+        AlarmsClear(SYSTEMALARMS_ALARM_MAGNETOMETER);
+        return true;
+    }
+
+    if (error < this->revoSettings.MagnetometerMaxDeviation.Error) {
+        this->errorcount = 0;
+        if (this->warningcount > ALARM_THRESHOLD) {
+            if (setAlarms) {
+                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
+            }
+            return false;
+        } else {
+            this->warningcount++;
+            return true;
+        }
+    }
+
+    if (this->errorcount > ALARM_THRESHOLD) {
+        if (setAlarms) {
+            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_CRITICAL);
+        }
+        return false;
+    } else {
+        this->errorcount++;
+    }
+    // still in "grace period"
+    return true;
+}
+
+static float getMagError(struct data *this, float mag[3])
+{
+    // vector norm
+    float magnitude = vector_lengthf(mag, 3);
+    // absolute value of relative error against Be
+    float error     = fabsf(magnitude - this->magBe) * this->invMagBe;
+
+    return error;
 }
 
 /**
@@ -94,7 +208,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
  * Magmeter Offset Cancellation: Theory and Implementation,
  * revisited William Premerlani, October 14, 2011
  */
-static void magOffsetEstimation(struct data *this, float mag[3])
+void magOffsetEstimation(struct data *this, float mag[3])
 {
 #if 0
     // Constants, to possibly go into a UAVO
@@ -137,8 +251,8 @@ static void magOffsetEstimation(struct data *this, float mag[3])
     }
 #else // if 0
 
-    const float Rxy  = sqrtf(this->homeLocation.Be[0] * this->homeLocation.Be[0] + this->homeLocation.Be[1] * this->homeLocation.Be[1]);
-    const float Rz   = this->homeLocation.Be[2];
+    const float Rxy  = sqrtf(this->homeLocationBe[0] * this->homeLocationBe[0] + this->homeLocationBe[1] * this->homeLocationBe[1]);
+    const float Rz   = this->homeLocationBe[2];
 
     const float rate = this->revoCalibration.MagBiasNullingRate;
     float Rot[3][3];
@@ -184,7 +298,6 @@ static void magOffsetEstimation(struct data *this, float mag[3])
 
 #endif // if 0
 }
-
 
 /**
  * @}

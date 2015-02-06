@@ -47,6 +47,7 @@ export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DI
 export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
+export DIST_DIR    := $(ROOT_DIR)/build/dist
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -65,18 +66,24 @@ $(if $(filter-out undefined,$(origin $(1))),
 )
 endef
 
-# These specific variables can influence gcc in unexpected (and undesirable) ways
+# These specific variables can influence compilation in unexpected (and undesirable) ways
+# gcc flags
 SANITIZE_GCC_VARS := TMPDIR GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH
-SANITIZE_GCC_VARS += CFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# preprocessor flags
+SANITIZE_GCC_VARS += CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# make flags
+SANITIZE_GCC_VARS += CFLAGS CXXFLAGS CPPFLAGS LDFLAGS LDLIBS
 $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowed)))
 
 # These specific variables used to be valid but now they make no sense
 SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER CLEAN_BUILD
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
-# Make sure this isn't being run as root (no whoami on Windows, but that is ok here)
+# Make sure this isn't being run as root unless installing (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
-    $(error You should not be running this as root)
+    ifeq ($(filter install all_clean,$(MAKECMDGOALS)),)
+        $(error You should not be running this as root)
+    endif
 endif
 
 # Decide on a verbosity level based on the V= parameter
@@ -197,7 +204,7 @@ export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix
+ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare gpsplatinum
 
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
@@ -206,6 +213,8 @@ revolution_short       := 'revo'
 osd_short              := 'osd '
 revoproto_short        := 'revp'
 simposix_short         := 'posx'
+discoveryf4bare_short  := 'df4b'
+gpsplatinum_short      := 'gps9 '
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
@@ -222,7 +231,7 @@ EF_BOARDS  := $(ALL_BOARDS)
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.
 BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+BU_BOARDS  := $(filter-out simposix gpsplatinum, $(BU_BOARDS))
 EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # Generate the targets for whatever boards are left in each list
@@ -437,7 +446,7 @@ sim_osx_%: uavobjects_flight
 ##############################
 
 .PHONY: all_ground
-all_ground: openpilotgcs
+all_ground: openpilotgcs uploader
 
 # Convenience target for the GCS
 .PHONY: gcs gcs_clean
@@ -476,6 +485,40 @@ openpilotgcs_make:
 openpilotgcs_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF))"
 	$(V1) [ ! -d "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)"
+
+################################
+#
+# Serial Uploader tool
+#
+################################
+
+.NOTPARALLEL:
+.PHONY: uploader
+uploader: uploader_qmake uploader_make
+
+.PHONY: uploader_qmake
+uploader_qmake:
+ifeq ($(QMAKE_SKIP),)
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
+	) 
+else
+	@$(ECHO) "skipping qmake"
+endif
+
+.PHONY: uploader_make
+uploader_make:
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)/$(MAKE_DIR) && \
+	    $(MAKE) -w ; \
+	)
+
+.PHONY: uploader_clean
+uploader_clean:
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF))"
+	$(V1) [ ! -d "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)"
+
 
 ################################
 #
@@ -637,7 +680,7 @@ uavo-collections_clean:
 #
 ##############################
 
-ALL_UNITTESTS := logfs
+ALL_UNITTESTS := logfs math lednotification
 
 # Build the directory for the unit tests
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests
@@ -697,7 +740,8 @@ endif
 ##############################
 
 # Firmware files to package
-PACKAGE_FW_TARGETS  := $(filter-out fw_simposix, $(FW_TARGETS))
+PACKAGE_FW_EXCLUDE  := fw_simposix $(if $(PACKAGE_FW_INCLUDE_DISCOVERYF4BARE),,fw_discoveryf4bare)
+PACKAGE_FW_TARGETS  := $(filter-out $(PACKAGE_FW_EXCLUDE), $(FW_TARGETS))
 PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
@@ -746,7 +790,7 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
 
     # Packaged GCS should depend on opfw_resource
     ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs: $(OPFW_RESOURCE))
+        $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
     endif
 
     # Clean the build directory if clean_package is requested
@@ -761,24 +805,11 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
     endif
 endif
 
-# Copy file template. Empty line before the endef is required, do not remove
-# $(1) = copy file name without extension
-# $(2) = source file extension
-# $(3) = destination file extension
-define COPY_FW_FILES
-	$(V1) $(CP) "$(BUILD_DIR)/$(1)/$(1)$(2)" "$(PACKAGE_DIR)/firmware/$(1)$(PACKAGE_SEP)$(PACKAGE_LBL)$(3)"
-
-endef
-
-# Build and copy package files into the package directory
-# and call platform-specific packaging script
 .PHONY: package
 package: all_fw all_ground uavobjects_matlab
 	@$(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
 	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
-	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)/firmware"
-	$(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.opfw,.opfw))
-	$(foreach fw_targ, $(PACKAGE_ELF_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.elf,.elf))
+	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)"
 	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################
@@ -858,6 +889,66 @@ build-info:
 
 ##############################
 #
+# Source for distribution
+#
+##############################
+
+.PHONY: dist
+dist:
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_DIR))"
+	$(V1) $(MKDIR) -p "$(DIST_DIR)"
+	$(V1) $(VERSION_INFO) \
+		--jsonpath="$(DIST_DIR)"
+	$(eval DIST_NAME := $(call toprel, "$(DIST_DIR)/OpenPilot-$(shell git describe).tar"))
+	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
+	$(V1) tar --append --file="$(DIST_NAME)" \
+		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
+		$(call toprel, "$(DIST_DIR)/version-info.json")
+	$(V1) gzip -f "$(DIST_NAME)"
+
+
+
+##############################
+#
+# Install OpenPilot
+#
+##############################
+prefix  := /usr/local
+bindir  := $(prefix)/bin
+libdir  := $(prefix)/lib
+datadir := $(prefix)/share
+
+INSTALL = cp -a --no-preserve=ownership
+LN = ln
+LN_S = ln -s
+
+ifeq ($(MAKECMDGOALS), install)
+        ifneq ($(UNAME), Linux)
+            $(error install only supported for Linux)
+        endif
+endif
+
+
+.PHONY: install
+install:
+	@$(ECHO) " INSTALLING GCS TO $(DESTDIR)/)"
+	$(V1) $(MKDIR) -p $(DESTDIR)$(bindir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/applications
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/pixmaps
+	$(V1) $(MKDIR) -p $(DESTDIR)$(udevdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/openpilotgcs $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/udp_test $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/openpilotgcs $(DESTDIR)$(libdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/share/openpilotgcs $(DESTDIR)$(datadir)
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps
+	$(V1) rm $(DESTDIR)/$(datadir)/openpilotgcs/translations/Makefile
+
+
+##############################
+#
 # Help message, the default Makefile goal
 #
 ##############################
@@ -880,6 +971,7 @@ help:
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
 	@$(ECHO) "     sdl_install          - Install the SDL library (Windows only)"
+	@$(ECHO) "     mesawin_install      - Install the OpenGL32 DLL (Windows only)"
 	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"
@@ -967,6 +1059,14 @@ help:
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)
+	@$(ECHO) "   [Uploader Tool]"
+	@$(ECHO) "     uploader             - Build the serial uploader tool (debug|release)"
+	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
+	@$(ECHO) "                            Example: make uploader QMAKE_SKIP=1"
+	@$(ECHO) "     uploader_clean       - Remove the serial uploader tool (debug|release)"
+	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
+	@$(ECHO)
+	@$(ECHO)
 	@$(ECHO) "   [AndroidGCS]"
 	@$(ECHO) "     androidgcs           - Build the Android Ground Control System (GCS) application"
 	@$(ECHO) "     androidgcs_install   - Use ADB to install the Android GCS application"
@@ -983,6 +1083,8 @@ help:
 	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
+	@$(ECHO) "     dist                 - Generate source archive for distribution"
+	@$(ECHO) "     install              - Install GCS to \"DESTDIR\" with prefix \"prefix\" (Linux only)"
 	@$(ECHO)
 	@$(ECHO) "   [Code Formatting]"
 	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code according to the project's standards"

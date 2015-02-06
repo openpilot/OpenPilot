@@ -131,8 +131,9 @@ Item {
                     id: middleRow
                     anchors.left: parent.left
                     anchors.leftMargin: 25
-                    property string prefix: ""
+
                     Text {
+                        property string prefix: ""
                         width: container.width - anchors.leftMargin - icon.width - 24 - 8
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         textFormat: Text.RichText
@@ -140,37 +141,37 @@ Item {
                         text: {
                             switch(action) {
                             case "commented":
-                            case "comment": parent.prefix = qsTr("Commented on "); break;
+                            case "comment": prefix = qsTr("Commented on "); break;
                             case "post":
-                            case "created": parent.prefix = qsTr("Created "); break;
-                            case "create-and-start": parent.prefix = qsTr("Created and started "); break;
-                            case "complete": parent.prefix = qsTr("Completed "); break;
+                            case "created": prefix = qsTr("Created "); break;
+                            case "create-and-start": prefix = qsTr("Created and started "); break;
+                            case "complete": prefix = qsTr("Completed "); break;
                             case "close":
-                            case "closed": parent.prefix = qsTr("Closed "); break;
-                            case "abandon": parent.prefix = qsTr("Abandoned "); break;
-                            case "commit": parent.prefix = qsTr("Committed "); break;
-                            case "resolved": parent.prefix = qsTr("Resolved "); break;
-                            case "start": parent.prefix = qsTr("Started "); break;
-                            case "started": parent.prefix = qsTr("Started working on "); break;
-                            case "stopped": parent.prefix = qsTr("Stopped working on "); break;
-                            case "Code Review": parent.prefix = qsTr("Requested code review on "); break;
-                            case "Testing": parent.prefix = qsTr("Requested testing of "); break;
-                            case "": parent.prefix = qsTr("Updated "); break;
-                            default: parent.prefix = action.substr(0, 1).toUpperCase() + action.substr(1) + " " ; break;
+                            case "closed": prefix = qsTr("Closed "); break;
+                            case "abandon": prefix = qsTr("Abandoned "); break;
+                            case "commit": prefix = qsTr("Committed "); break;
+                            case "resolved": prefix = qsTr("Resolved "); break;
+                            case "start": prefix = qsTr("Started "); break;
+                            case "started": prefix = qsTr("Started working on "); break;
+                            case "stopped": prefix = qsTr("Stopped working on "); break;
+                            case "Code Review": prefix = qsTr("Requested code review on "); break;
+                            case "Testing": prefix = qsTr("Requested testing of "); break;
+                            case "": prefix = qsTr("Updated "); break;
+                            default: prefix = action.substr(0, 1).toUpperCase() + action.substr(1) + " " ; break;
                             }
-                            parent.prefix = "<font color='#224d81'>" + parent.prefix + "</font>"
+                            prefix = "<font color='#224d81'>" + prefix + "</font>"
                             if(action == "commented" || action == "comment" || (action == "" && actionSummary == "")) {
                                 if(actionTargetTitle != actionTargetSummary) {
-                                    parent.prefix + actionTargetTitle + ": " + actionTargetSummary
+                                    prefix + actionTargetTitle + ": " + actionTargetSummary
                                 } else {
-                                    parent.prefix + actionTargetTitle
+                                    prefix + actionTargetTitle
                                 }
                             }
                             else {
                                 if(actionSummary == "") {
-                                    parent.prefix + actionTitle
+                                    prefix + actionTitle
                                 } else {
-                                    parent.prefix + actionTitle + ": " + actionSummary
+                                    prefix + actionTitle + ": " + actionSummary
                                 }
                             }
                         }

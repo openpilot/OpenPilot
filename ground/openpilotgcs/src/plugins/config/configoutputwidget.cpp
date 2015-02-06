@@ -48,7 +48,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent), wasItMe(false)
+ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     ui = new Ui_OutputWidget();
     ui->setupUi(this);
@@ -76,10 +76,12 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     // NOTE: we have channel indices from 0 to 9, but the convention for OP is Channel 1 to Channel 10.
     // Register for ActuatorSettings changes:
     for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        OutputChannelForm *form = new OutputChannelForm(i, this, i == 0);
+        OutputChannelForm *form = new OutputChannelForm(i, this);
+        form->moveTo(*(ui->channelLayout));
+
         connect(ui->channelOutTest, SIGNAL(toggled(bool)), form, SLOT(enableChannelTest(bool)));
         connect(form, SIGNAL(channelChanged(int, int)), this, SLOT(sendChannelTest(int, int)));
-        ui->channelLayout->addWidget(form);
+
         addWidget(form->ui.actuatorMin);
         addWidget(form->ui.actuatorNeutral);
         addWidget(form->ui.actuatorMax);
@@ -97,13 +99,6 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidget(ui->spinningArmed);
 
     disconnect(this, SLOT(refreshWidgetsValues(UAVObject *)));
-
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVObject *obj = objManager->getObject(QString("ActuatorCommand"));
-    if (UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE) {
-        this->setEnabled(false);
-    }
-    connect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(disableIfNotMe(UAVObject *)));
 
     refreshWidgetsValues();
     updateEnableControls();
@@ -125,6 +120,17 @@ void ConfigOutputWidget::enableControls(bool enable)
 }
 
 /**
+   Force update all channels with the values in the OutputChannelForms.
+ */
+void ConfigOutputWidget::sendAllChannelTests()
+{
+    for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
+        OutputChannelForm *form = getOutputChannelForm(i);
+        sendChannelTest(i, form->neutral());
+    }
+}
+
+/**
    Toggles the channel testing mode by making the GCS take over
    the ActuatorCommand objects
  */
@@ -135,7 +141,8 @@ void ConfigOutputWidget::runChannelTests(bool state)
 
     if (state && systemAlarms.Alarm[SystemAlarms::ALARM_ACTUATOR] != SystemAlarms::ALARM_OK) {
         QMessageBox mbox;
-        mbox.setText(QString(tr("The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.")));
+        mbox.setText(QString(tr("The actuator module is in an error state. This can also occur because there are no inputs. "
+                                "Please fix these before testing outputs.")));
         mbox.setStandardButtons(QMessageBox::Ok);
         mbox.exec();
 
@@ -149,7 +156,8 @@ void ConfigOutputWidget::runChannelTests(bool state)
     // Confirm this is definitely what they want
     if (state) {
         QMessageBox mbox;
-        mbox.setText(QString(tr("This option will start your motors by the amount selected on the sliders regardless of transmitter. It is recommended to remove any blades from motors. Are you sure you want to do this?")));
+        mbox.setText(QString(tr("This option will start your motors by the amount selected on the sliders regardless of transmitter."
+                                "It is recommended to remove any blades from motors. Are you sure you want to do this?")));
         mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         int retval = mbox.exec();
         if (retval != QMessageBox::Yes) {
@@ -163,7 +171,6 @@ void ConfigOutputWidget::runChannelTests(bool state)
     ActuatorCommand *obj = ActuatorCommand::GetInstance(getObjectManager());
     UAVObject::Metadata mdata = obj->getMetadata();
     if (state) {
-        wasItMe = true;
         accInitialData = mdata;
         UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
         UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
@@ -171,11 +178,15 @@ void ConfigOutputWidget::runChannelTests(bool state)
         UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
     } else {
-        wasItMe = false;
-        mdata   = accInitialData; // Restore metadata
+        mdata = accInitialData; // Restore metadata
     }
     obj->setMetadata(mdata);
     obj->updated();
+
+    // Setup the correct initial channel values when the channel testing mode is turned on.
+    if (state) {
+        sendAllChannelTests();
+    }
 }
 
 OutputChannelForm *ConfigOutputWidget::getOutputChannelForm(const int index) const
@@ -194,7 +205,7 @@ OutputChannelForm *ConfigOutputWidget::getOutputChannelForm(const int index) con
 /**
  * Set the label for a channel output assignement
  */
-void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
+void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString &str)
 {
     // FIXME: use signal/ slot approach
     UAVObjectField *field = obj->getField(str);
@@ -204,7 +215,7 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
     OutputChannelForm *outputChannelForm = getOutputChannelForm(index);
 
     if (outputChannelForm) {
-        outputChannelForm->setAssignment(str);
+        outputChannelForm->setName(str);
     }
 }
 
@@ -254,15 +265,15 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     // Initialize output forms
     QList<OutputChannelForm *> outputChannelForms = findChildren<OutputChannelForm *>();
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
-        outputChannelForm->setAssignment(ChannelDesc[outputChannelForm->index()]);
+        outputChannelForm->setName(ChannelDesc[outputChannelForm->index()]);
 
         // init min,max,neutral
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
-        outputChannelForm->minmax(minValue, maxValue);
+        outputChannelForm->setRange(minValue, maxValue);
 
         int neutral  = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
-        outputChannelForm->neutral(neutral);
+        outputChannelForm->setNeutral(neutral);
     }
 
     // Get the SpinWhileArmed setting
@@ -349,10 +360,10 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
 
-        outputChannelForm->minmax(minValue, maxValue);
+        outputChannelForm->setRange(minValue, maxValue);
 
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
-        outputChannelForm->neutral(neutral);
+        outputChannelForm->setNeutral(neutral);
     }
 
     setDirty(dirty);
@@ -398,21 +409,10 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
 
 void ConfigOutputWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/WIGf", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/WIGf"), QUrl::StrictMode));
 }
 
 void ConfigOutputWidget::stopTests()
 {
     ui->channelOutTest->setChecked(false);
-}
-
-void ConfigOutputWidget::disableIfNotMe(UAVObject *obj)
-{
-    if (UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE) {
-        if (!wasItMe) {
-            this->setEnabled(false);
-        }
-    } else {
-        this->setEnabled(true);
-    }
 }

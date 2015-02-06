@@ -1,7 +1,7 @@
-﻿#
+#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2013.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2014.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,7 +57,6 @@
 ; !define PACKAGE_LBL "${DATE}-${TAG_OR_HASH8}"
 ; !define PACKAGE_DIR "..\..\build\package-$${PACKAGE_LBL}"
 ; !define OUT_FILE "OpenPilotGCS-$${PACKAGE_LBL}-install.exe"
-; !define FIRMWARE_DIR "firmware-$${PACKAGE_LBL}"
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
 ; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"
@@ -72,7 +71,7 @@
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
-  VIAddVersionKey "LegalCopyright" "© 2010-2013 The OpenPilot Team"
+  VIAddVersionKey "LegalCopyright" "© 2010-2014 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
 ;--------------------------------
@@ -93,7 +92,7 @@
 ;--------------------------------
 ; Branding
 
-  BrandingText "© 2010-2013 The OpenPilot Team, http://www.openpilot.org"
+  BrandingText "© 2010-2014 The OpenPilot Team, http://www.openpilot.org"
 
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
@@ -193,10 +192,10 @@ SectionEnd
 
 ; Copy GCS resources
 Section "-Resources" InSecResources
+  SetOutPath "$INSTDIR\share\openpilotgcs\cloudconfig"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\cloudconfig\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\default_configurations"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\default_configurations\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\stylesheets"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\stylesheets\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\dials"
@@ -207,6 +206,8 @@ Section "-Resources" InSecResources
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\models\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\pfd"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\pfd\*"
+  SetOutPath "$INSTDIR\share\openpilotgcs\stylesheets"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\stylesheets\*"
 SectionEnd
 
 ; Copy Notify plugin sound files
@@ -221,12 +222,6 @@ Section "-Localization" InSecLocalization
   SetOutPath "$INSTDIR\share\openpilotgcs\translations"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\openpilotgcs_*.qm"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\qt_*.qm"
-SectionEnd
-
-; Copy firmware files
-Section /o "-Firmware" InSecFirmware
-  SetOutPath "$INSTDIR\firmware"
-  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 ; Copy utility files
@@ -251,6 +246,12 @@ Section "CDC driver" InSecInstallDrivers
     File "/oname=dpinst.exe" "${NSIS_DATA_TREE}\redist\dpinst_x86.exe"
   ${EndIf}
   ExecWait '"$PLUGINSDIR\dpinst.exe" /lm /path "$INSTDIR\drivers"'
+SectionEnd
+
+; Copy Opengl32.dll if needed (disabled by default)
+Section /o "Mesa OpenGL driver" InSecInstallOpenGL
+  SetOutPath "$INSTDIR\bin"
+  File /r "${GCS_BUILD_TREE}\bin\opengl32_32\opengl32.dll"
 SectionEnd
 
 ; AeroSimRC plugin files
@@ -295,7 +296,7 @@ Section ; create uninstall info
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayIcon" '"$INSTDIR\bin\openpilotgcs.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "Publisher" "OpenPilot Team"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Italian Stallion"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Mini Me"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "URLInfoAbout" "http://www.openpilot.org"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "HelpLink" "http://wiki.openpilot.org"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "EstimatedSize" 100600
@@ -319,6 +320,7 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecUtilities} $(DESC_InSecUtilities)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecDrivers} $(DESC_InSecDrivers)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecInstallDrivers} $(DESC_InSecInstallDrivers)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecInstallOpenGL} $(DESC_InSecInstallOpenGL)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecAeroSimRC} $(DESC_InSecAeroSimRC)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecShortcuts} $(DESC_InSecShortcuts)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END

@@ -4,7 +4,11 @@
         <field name="Armed" units="" type="enum" elements="1" options="Disarmed,Arming,Armed" defaultvalue="Disarmed"/>
 
 	<!-- Note these enumerated values should be the same as ManualControlSettings -->
-        <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,AltitudeVario,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner,POI"/>
+        <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,PositionHold,CourseLock,PositionRoam,HomeLeash,AbsolutePosition,ReturnToBase,Land,PathPlanner,POI,AutoCruise"/>
+        <!-- the options for FlightModeAssist needs to match the StablizationSettings' assist options -->
+        <field name="FlightModeAssist" units="" type="enum" elements="1" options="None,GPSAssist_PrimaryThrust,GPSAssist"/>
+        <field name="AssistedControlState" units="" type="enum" elements="1" options="Primary,Brake,Hold" defaultvalue="Primary"/>
+        <field name="AssistedThrottleState" units="" type="enum" elements="1" options="Manual,Auto,AutoOverride" defaultvalue="Manual"/>
 
 	<field name="ControlChain" units="bool" type="enum" options="false,true">
 		<elementnames>

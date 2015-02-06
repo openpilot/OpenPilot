@@ -39,6 +39,7 @@
 #include <QRadioButton>
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "actuatorsettings.h"
 #include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>
@@ -65,6 +66,7 @@ public:
         goToWizard();
     }
     void enableControls(bool enable);
+    bool shouldObjectBeSaved(UAVObject *object);
 
 private:
     bool growing;
@@ -82,6 +84,10 @@ private:
         {
             return (group == rhs.group) && (number == rhs.number);
         }
+        bool operator !=(const channelsStruct & rhs)  const
+        {
+            return !operator==(rhs);
+        }
         int group;
         int number;
         int channelIndex;
@@ -92,24 +98,35 @@ private:
     QEventLoop *loop;
     bool skipflag;
 
+    // Variables to support delayed transitions when detecting input controls.
+    QTimer nextDelayedTimer;
+    int nextDelayedTick;
+    int nextDelayedLatestActivityTick;
+
     int currentChannelNum;
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
 
+    UAVObject::Metadata manualControlMdata;
     ManualControlCommand *manualCommandObj;
     ManualControlCommand::DataFields manualCommandData;
+
     FlightStatus *flightStatusObj;
     FlightStatus::DataFields flightStatusData;
+
+    UAVObject::Metadata accessoryDesiredMdata0;
     AccessoryDesired *accessoryDesiredObj0;
     AccessoryDesired *accessoryDesiredObj1;
     AccessoryDesired *accessoryDesiredObj2;
-    AccessoryDesired::DataFields accessoryDesiredData0;
-    AccessoryDesired::DataFields accessoryDesiredData1;
-    AccessoryDesired::DataFields accessoryDesiredData2;
-    UAVObject::Metadata manualControlMdata;
+
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
+
+    ActuatorSettings *actuatorSettingsObj;
+    ActuatorSettings::DataFields actuatorSettingsData;
+    ActuatorSettings::DataFields previousActuatorSettingsData;
+
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
     FlightModeSettings::DataFields previousFlightModeSettingsData;
@@ -152,8 +169,17 @@ private:
     void wizardSetUpStep(enum wizardSteps);
     void wizardTearDownStep(enum wizardSteps);
 
+    void registerControlActivity();
+
+    void wzNextDelayedStart();
+    void wzNextDelayedCancel();
+
+    AccessoryDesired *getAccessoryDesiredInstance(int instance);
+    float getAccessoryDesiredValue(int instance);
+
 private slots:
     void wzNext();
+    void wzNextDelayed();
     void wzBack();
     void wzCancel();
     void goToWizard();
@@ -168,7 +194,10 @@ private slots:
     void updatePositionSlider();
     void invertControls();
     void simpleCalibration(bool state);
+    void adjustSpecialNeutrals();
     void updateCalibration();
+    void resetChannelSettings();
+    void resetActuatorSettings();
 
 protected:
     void resizeEvent(QResizeEvent *event);

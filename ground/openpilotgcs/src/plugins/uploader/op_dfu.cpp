@@ -299,7 +299,7 @@ OP_DFU::Status DFUObject::UploadDescription(QVariant desc)
     cout << "Starting uploading description\n";
     QByteArray array;
 
-    if (desc.type() == QMetaType::QString) {
+    if (desc.type() == QVariant::String) {
         QString description = desc.toString();
         if (description.length() % 4 != 0) {
             int pad = description.length() / 4;
@@ -310,7 +310,7 @@ OP_DFU::Status DFUObject::UploadDescription(QVariant desc)
             description.append(padding);
         }
         array = description.toLatin1();
-    } else if (desc.type() == QMetaType::QByteArray) {
+    } else if (desc.type() == QVariant::ByteArray) {
         array = desc.toByteArray();
     }
 
@@ -1003,7 +1003,7 @@ quint32 DFUObject::CRCFromQBArray(QByteArray array, quint32 Size)
     quint32 pad = Size - array.length();
 
     array.append(QByteArray(pad, 255));
-    quint32 t[Size / 4];
+    quint32 *t  = new quint32[Size / 4];
     for (int x = 0; x < array.length() / 4; x++) {
         quint32 aux = 0;
         aux  = (char)array[x * 4 + 3] & 0xFF;
@@ -1015,7 +1015,11 @@ quint32 DFUObject::CRCFromQBArray(QByteArray array, quint32 Size)
         aux += (char)array[x * 4 + 0] & 0xFF;
         t[x] = aux;
     }
-    return DFUObject::CRC32WideFast(0xFFFFFFFF, Size / 4, (quint32 *)t);
+    quint32 ret = DFUObject::CRC32WideFast(0xFFFFFFFF, Size / 4, t);
+
+    delete[] t;
+
+    return ret;
 }
 
 

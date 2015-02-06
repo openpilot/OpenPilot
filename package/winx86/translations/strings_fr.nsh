@@ -34,6 +34,7 @@
   LangString DESC_InSecUtilities ${LANG_FRENCH} "OpenPilot utilities (Matlab log parser)."
   LangString DESC_InSecDrivers ${LANG_FRENCH} "OpenPilot hardware driver files (optional OpenPilot CDC driver)."
   LangString DESC_InSecInstallDrivers ${LANG_FRENCH} "Optional OpenPilot CDC driver (virtual USB COM port)."
+  LangString DESC_InSecInstallOpenGL ${LANG_FRENCH} "Optional OpenGL32.dll for old video cards."
   LangString DESC_InSecAeroSimRC ${LANG_FRENCH} "AeroSimRC plugin files with sample configuration."
   LangString DESC_InSecShortcuts ${LANG_FRENCH} "Installer les raccourcis dans le menu démarrer."
 

@@ -31,7 +31,7 @@
 #define configMAX_PRIORITIES                         ((unsigned portBASE_TYPE)5)
 #define configMINIMAL_STACK_SIZE                     ((unsigned short)48)
 #define configTOTAL_HEAP_SIZE                        ((size_t)(53 * 256))
-#define configMAX_TASK_NAME_LEN                      (16)
+#define configMAX_TASK_NAME_LEN                      (6)
 #define configUSE_TRACE_FACILITY                     0
 #define configUSE_16_BIT_TICKS                       0
 #define configIDLE_SHOULD_YIELD                      0
@@ -39,7 +39,7 @@
 #define configUSE_RECURSIVE_MUTEXES                  1
 #define configUSE_COUNTING_SEMAPHORES                0
 #define configUSE_ALTERNATIVE_API                    0
-#define configQUEUE_REGISTRY_SIZE                    10
+#define configQUEUE_REGISTRY_SIZE                    0
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES                        0
@@ -55,7 +55,7 @@
 #define INCLUDE_vTaskSuspend                         1
 #define INCLUDE_vTaskDelayUntil                      1
 #define INCLUDE_vTaskDelay                           1
-#define INCLUDE_xTaskGetSchedulerState               1
+#define INCLUDE_xTaskGetSchedulerState               0
 #define INCLUDE_xTaskGetCurrentTaskHandle            1
 #define INCLUDE_uxTaskGetStackHighWaterMark          1
 

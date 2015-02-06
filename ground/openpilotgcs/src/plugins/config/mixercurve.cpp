@@ -75,6 +75,7 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
 {
     m_curveType = curveType;
 
+    m_mixerUI->buttonGroup->show();
     m_mixerUI->CurveMin->setMaximum(1.0);
     m_mixerUI->CurveMax->setMaximum(1.0);
 
@@ -95,6 +96,8 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         m_mixerUI->CurveMax->setMinimum(-1.0);
         break;
     }
+    default:
+        break;
     }
 
     m_spinDelegate->setRange(m_mixerUI->CurveMin->minimum(), m_mixerUI->CurveMax->maximum());
@@ -291,6 +294,16 @@ double MixerCurve::getMax()
 double MixerCurve::setRange(double min, double max)
 {
     return m_curve->setRange(min, max);
+}
+
+void MixerCurve::setXAxisLabel(QString label)
+{
+    m_curve->setXAxisLabel(label);
+}
+
+void MixerCurve::setYAxisLabel(QString label)
+{
+    m_curve->setYAxisLabel(label);
 }
 
 double MixerCurve::getCurveMin()

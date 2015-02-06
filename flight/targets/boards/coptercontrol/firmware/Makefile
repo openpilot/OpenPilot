@@ -48,8 +48,12 @@ OPTMODULES += Osd/osdoutput
 #OPTMODULES += Altitude
 #OPTMODULES += Fault
 
+SRC += $(FLIGHTLIB)/notification.c
+
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
+
+
 
 # Erase flash firmware should be buildable from command line
 ifeq ($(ERASE_FLASH), YES)
@@ -68,10 +72,12 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/coptercontrol.c
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(FLIGHTLIB)/alarms.c
+    SRC += $(FLIGHTLIB)/instrumentation.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
+    SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-
+    
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
@@ -87,6 +93,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank1.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank2.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank3.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationstatus.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationbank.c
     SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
     SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
@@ -111,16 +118,13 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
-    SRC += $(OPUAVSYNTHDIR)/relaytuningsettings.c
-    SRC += $(OPUAVSYNTHDIR)/relaytuning.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
     SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
-    SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
-    SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
+    SRC += $(OPUAVSYNTHDIR)/perfcounter.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

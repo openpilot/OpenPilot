@@ -41,6 +41,15 @@
 extern char	_sheap;
 extern char	_eheap;
 
+#ifdef PIOS_TARGET_PROVIDES_FAST_HEAP
+extern char _sfastheap;
+extern char _efastheap;
+#define IS_FAST_HEAP_POINTER(x) (((void *)&_sfastheap < (void *)(x)) && ((void *)&_efastheap > (void *)(x)))
+#else
+#define IS_FAST_HEAP_POINTER(x) (false)
+#endif
+
+
 #if defined(PIOS_INCLUDE_FREERTOS)
 /*
  * Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
@@ -52,62 +61,85 @@ extern char	_eheap;
 # include "task.h"
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
+heap_handle_t sram_heap;
+#if PIOS_TARGET_PROVIDES_FAST_HEAP
+heap_handle_t fast_heap;
+#else
+#define fast_heap sram_heap
+#endif
+
 /*
  * Optional callback for allocation failures.
  */
 extern void vApplicationMallocFailedHook(void) __attribute__((weak));
 
 void *
-pvPortMalloc(size_t s)
+pios_general_malloc(size_t s, bool use_fast_heap)
 {
 	void *p;
 
 	vPortEnterCritical();
-	p = msheap_alloc(s);
+	if(use_fast_heap){
+		p = msheap_alloc(&fast_heap, s);
+	} else {
+		p = msheap_alloc(&sram_heap, s);
+	}
 	vPortExitCritical();
 
-	if (p == NULL && &vApplicationMallocFailedHook != NULL)
+	if (p == NULL && &vApplicationMallocFailedHook != NULL) {
 		vApplicationMallocFailedHook();
-
+	}
 	return p;
+}
+
+void *
+pvPortMalloc(size_t s)
+{
+	return pios_general_malloc(s, true);
+}
+
+void *
+pvPortMallocStack(size_t s)
+{
+	return pios_general_malloc(s, false);
 }
 
 void
 vPortFree(void *p)
 {
 	vPortEnterCritical();
-	msheap_free(p);
+	if(IS_FAST_HEAP_POINTER(p)){
+		msheap_free(&fast_heap, p);
+	} else {
+		msheap_free(&sram_heap, p);
+	}
 	vPortExitCritical();
 }
 
 size_t
 xPortGetFreeHeapSize(void)
 {
-	return msheap_free_space();
+
+#ifdef PIOS_TARGET_PROVIDES_FAST_HEAP
+    return msheap_free_space(&sram_heap) + msheap_free_space(&fast_heap);
+#else
+    return msheap_free_space(&sram_heap);
+#endif
 }
 
 void
 vPortInitialiseBlocks(void)
 {
-	msheap_init(&_sheap, &_eheap);
+	msheap_init(&sram_heap, &_sheap, &_eheap);
+#if PIOS_TARGET_PROVIDES_FAST_HEAP
+	msheap_init(&fast_heap, &_sfastheap, &_efastheap);
+#endif
 }
 
 void
 xPortIncreaseHeapSize(size_t bytes)
 {
-	msheap_extend(bytes);
-}
-
-void *
-malloc(size_t size)
-{
-	return pvPortMalloc(size);
-}
-
-void
-free(void *p)
-{
-	return vPortFree(p);
+	msheap_extend(&sram_heap, bytes);
 }
 
 #else /* !PIOS_INCLUDE_FREERTOS */
@@ -118,17 +150,17 @@ malloc(size_t size)
 //	static 
 
 	if (!heap_init_done) {
-		msheap_init(&_sheap, &_eheap);
+		msheap_init(sram_heap, &_sheap, &_eheap);
 		heap_init_done = 1;
 	}
 
-	return msheap_alloc(size);
+	return msheap_alloc(sram_heap, size);
 }
 
 void
 free(void *p)
 {
-	return msheap_free(p);
+	return msheap_free(sram_heap, p);
 }
 
 #endif /* PIOS_INCLUDE_FREERTOS */

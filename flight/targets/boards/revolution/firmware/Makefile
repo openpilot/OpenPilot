@@ -33,9 +33,8 @@ MODULES += Sensors
 MODULES += StateEstimation # use instead of Attitude
 MODULES += Altitude/revolution
 MODULES += Airspeed
-MODULES += AltitudeHold
+#MODULES += AltitudeHold # now integrated in Stabilization
 MODULES += Stabilization
-MODULES += VtolPathFollower
 MODULES += ManualControl
 MODULES += Receiver
 MODULES += Actuator
@@ -46,12 +45,15 @@ MODULES += Battery
 MODULES += FirmwareIAP
 MODULES += Radio
 MODULES += PathPlanner
-MODULES += FixedWingPathFollower
+MODULES += PathFollower
 MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
+MODULES += Notify
 
 OPTMODULES += ComUsbBridge
+
+SRC += $(FLIGHTLIB)/notification.c
 
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
@@ -71,8 +73,10 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/revolution.c
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(FLIGHTLIB)/alarms.c
+    SRC += $(FLIGHTLIB)/instrumentation.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
+    SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
 
     #ifeq ($(DEBUG), YES)
@@ -82,8 +86,12 @@ ifndef TESTAPP
 
     ## Misc library functions
     SRC += $(FLIGHTLIB)/paths.c
+    SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
+    SRC += $(FLIGHTLIB)/lednotification.c    
+    SRC += $(FLIGHTLIB)/sha1.c
 
     ## UAVObjects
     include ./UAVObjects.inc
@@ -96,7 +104,9 @@ endif
 
 # Optional component libraries
 include $(FLIGHTLIB)/rscode/library.mk
+
 #include $(FLIGHTLIB)/PyMite/pymite.mk
+
 
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

@@ -41,6 +41,7 @@ public:
     explicit VehiclePage(SetupWizard *wizard, QWidget *parent = 0);
     ~VehiclePage();
     bool validatePage();
+    void initializePage();
 
 private:
     Ui::VehiclePage *ui;

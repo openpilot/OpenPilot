@@ -51,9 +51,10 @@ class SerialEnumerationThread : public QThread {
     Q_OBJECT
 public:
     SerialEnumerationThread(SerialConnection *serial);
-    virtual ~SerialEnumerationThread();
 
     virtual void run();
+
+    void stop();
 
 signals:
     void enumerationChanged();
@@ -105,6 +106,8 @@ private:
     bool enablePolling;
     SerialPluginConfiguration *m_config;
     SerialPluginOptionsPage *m_optionspage;
+
+    QList<QSerialPortInfo> availablePorts();
 
 protected slots:
     void onEnumerationChanged();

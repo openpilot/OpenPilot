@@ -176,6 +176,7 @@ static void FirmwareIAPCallback(UAVObjEvent *ev)
         case IAP_STATE_STEP_2:
             if (data.Command == IAP_CMD_STEP_3) {
                 if (delta > iap_time_3_low_end && delta < iap_time_3_high_end) {
+#ifndef PIOS_APPS_MINIMAL
                     FlightStatusData flightStatus;
                     FlightStatusGet(&flightStatus);
 
@@ -184,7 +185,7 @@ static void FirmwareIAPCallback(UAVObjEvent *ev)
                         iap_state = IAP_STATE_READY;
                         break;
                     }
-
+#endif
                     // we've met the three sequence of command numbers
                     // we've met the time requirements.
                     PIOS_IAP_SetRequest1();
@@ -193,7 +194,7 @@ static void FirmwareIAPCallback(UAVObjEvent *ev)
                     /* Note: Cant just wait timeout value, because first time is randomized */
                     reset_count = 0;
                     lastResetSysTime = xTaskGetTickCount();
-                    UAVObjEvent *event = pvPortMalloc(sizeof(UAVObjEvent));
+                    UAVObjEvent *event = pios_malloc(sizeof(UAVObjEvent));
                     memset(event, 0, sizeof(UAVObjEvent));
                     EventPeriodicCallbackCreate(event, resetTask, 100);
                     iap_state = IAP_STATE_RESETTING;

@@ -30,7 +30,8 @@ HEADERS += uploadergadget.h \
     SSP/common.h \
     runningdevicewidget.h \
     uploader_global.h \
-    enums.h
+    enums.h \
+    rebootdialog.h
 
 SOURCES += uploadergadget.cpp \
     uploadergadgetconfiguration.cpp \
@@ -44,17 +45,18 @@ SOURCES += uploadergadget.cpp \
     SSP/port.cpp \
     SSP/qssp.cpp \
     SSP/qsspt.cpp \
-    runningdevicewidget.cpp
+    runningdevicewidget.cpp \
+    rebootdialog.cpp
 
-OTHER_FILES += Uploader.pluginspec \
+OTHER_FILES += Uploader.pluginspec
 
 FORMS += \
     uploader.ui \
     devicewidget.ui \
-    runningdevicewidget.ui
+    runningdevicewidget.ui \
+    rebootdialog.ui
 
-RESOURCES += \
-    uploader.qrc
+RESOURCES += uploader.qrc
 
 exists( ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc ) {
     RESOURCES += ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc

@@ -40,6 +40,7 @@
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
+#include "airspeedalarm.h"
 
 #if defined(PIOS_INCLUDE_MPXV)
 
@@ -63,7 +64,7 @@ void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsDa
     // Ensure that the ADC pin is properly configured
     if (airspeedADCPin < 0) {
         airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-
+        AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
         return;
     }
     if (sensor.type == PIOS_MPXV_UNKNOWN) {
@@ -76,6 +77,7 @@ void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsDa
             break;
         default:
             airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
             return;
         }
     }
@@ -83,6 +85,7 @@ void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsDa
     airspeedSensor->SensorValue = PIOS_MPXV_Measure(&sensor);
 
     if (!airspeedSettings->ZeroPoint) {
+        AirspeedAlarm(SYSTEMALARMS_ALARM_WARNING);
         // Calibrate sensor by averaging zero point value
         if (calibrationCount < CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) { // First let sensor warm up and stabilize.
             calibrationCount++;
@@ -107,6 +110,7 @@ void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsDa
 
     airspeedSensor->CalibratedAirspeed = PIOS_MPXV_CalcAirspeed(&sensor, airspeedSensor->SensorValue) * (alpha) + airspeedSensor->CalibratedAirspeed * (1.0f - alpha);
     airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+    AirspeedAlarm(SYSTEMALARMS_ALARM_OK);
 }
 
 #endif /* if defined(PIOS_INCLUDE_MPXV) */

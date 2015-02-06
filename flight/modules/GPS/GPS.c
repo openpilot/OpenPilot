@@ -91,7 +91,7 @@ void updateGpsSettings(UAVObjEvent *ev);
 #else
 #if defined(PIOS_GPS_MINIMAL)
         #define GPS_READ_BUFFER    32
-        #define STACK_SIZE_BYTES   500
+        #define STACK_SIZE_BYTES   580
 #else
         #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL

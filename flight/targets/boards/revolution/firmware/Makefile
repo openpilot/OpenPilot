@@ -24,6 +24,9 @@ endif
 include ../board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
+# REVO C++ support 
+USE_CXX = YES
+
 # ARM DSP library
 USE_DSP_LIB ?= NO
 

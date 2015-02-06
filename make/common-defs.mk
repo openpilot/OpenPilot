@@ -24,7 +24,7 @@ endif
 DEBUG                ?= NO
 
 # Set to YES to compile C++ implemented features
-USE_CXX              ?= YES
+USE_CXX              ?= NO
 
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS    ?= NO

@@ -51,26 +51,25 @@ typedef enum {
     LAND_STATE_SIZE
 } PathFollowerFSM_LandState_T;
 
-class FSMLand: PathFollowerFSM {
-
+class FSMLand : PathFollowerFSM {
 private:
-  static FSMLand *p_inst;
-  FSMLand();
+    static FSMLand *p_inst;
+    FSMLand();
 
-  public:
-    static FSMLand * instance() {
-      if (!p_inst) {
-	  p_inst = new FSMLand();
-      }
-      return p_inst;
+public:
+    static FSMLand *instance()
+    {
+        if (!p_inst) {
+            p_inst = new FSMLand();
+        }
+        return p_inst;
     }
     int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings,
-			      PathDesiredData *pathDesired,
-			      FlightStatusData *flightStatus);
+                       PathDesiredData *pathDesired,
+                       FlightStatusData *flightStatus);
     void Inactive(void);
     void Activate(void);
     void Update(void);
-    void SettingsUpdated(void);
     float BoundThrust(float thrustDesired);
     PathFollowerFSMState_T GetCurrentState(void);
     void ConstrainStabiDesired(StabilizationDesiredData *stabDesired);
@@ -78,10 +77,11 @@ private:
     void CheckPidScalar(pid_scaler *scaler);
 
 
-  protected:
+protected:
+
     // FSM instance data type
     typedef struct {
-        FSMLandStatusData fsmLandStatus;
+        FSMLandStatusData   fsmLandStatus;
         PathFollowerFSM_LandState_T currentState;
         TakeOffLocationData takeOffLocation;
         uint32_t stateRunCount;
@@ -103,8 +103,8 @@ private:
 
     // FSM state structure
     typedef struct {
-        void (FSMLand::*setup)(void); // Called to initialise the state
-        void (FSMLand::*run)(uint8_t); // Run the event detection code for a state
+        void(FSMLand::*setup) (void); // Called to initialise the state
+        void(FSMLand::*run) (uint8_t); // Run the event detection code for a state
     } PathFollowerFSM_LandStateHandler_T;
 
     // Private variables
@@ -143,7 +143,6 @@ private:
     void fallback_to_hold(void);
 
     static PathFollowerFSM_LandStateHandler_T sLandStateTable[LAND_STATE_SIZE];
-
 };
 
 #endif // FSM_LAND_H

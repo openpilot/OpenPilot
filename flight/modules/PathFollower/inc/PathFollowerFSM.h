@@ -35,24 +35,35 @@ typedef enum {
     PFFSM_STATE_INACTIVE = 0, // Inactive state is the initialised state on startup
     PFFSM_STATE_ACTIVE,
     PFFSM_STATE_DISARMED,
-    PFFSM_STATE_ABORT         // Abort on error
+    PFFSM_STATE_ABORT // Abort on error
 } PathFollowerFSMState_T;
 
 class PathFollowerFSM {
-
-  public:
-    //PathFollowerFSM() {};
+public:
+    // PathFollowerFSM() {};
     virtual void Inactive(void) {}
     virtual void Activate(void) {}
     virtual void Update(void) {}
     virtual void SettingsUpdated(void) {}
-    virtual float BoundThrust(float thrustDesired) { return thrustDesired; }
-    virtual PathFollowerFSMState_T GetCurrentState(void) { return PFFSM_STATE_INACTIVE; }
+    virtual float BoundThrust(float thrustDesired)
+    {
+        return thrustDesired;
+    }
+    virtual PathFollowerFSMState_T GetCurrentState(void)
+    {
+        return PFFSM_STATE_INACTIVE;
+    }
     virtual void ConstrainStabiDesired(__attribute__((unused)) StabilizationDesiredData *stabDesired) {}
-    virtual float BoundVelocityDown(float velocity) { return velocity; }
+    virtual float BoundVelocityDown(float velocity)
+    {
+        return velocity;
+    }
     virtual void CheckPidScalar(__attribute__((unused)) pid_scaler *scaler) {}
-    //virtual ~PathFollowerFSM();
-
+    virtual void GetYaw(bool &yaw_attitude, float &yaw_direction)
+    {
+        yaw_attitude = false; yaw_direction = 0.0f;
+    }
+    // virtual ~PathFollowerFSM();
 };
 
 #endif // PATHFOLLOWERFSM_H

@@ -107,23 +107,20 @@ extern "C" {
 #define NEUTRALTHRUST_START_DELAY                   (2 * 20) // 2 seconds at rate of 20Hz (50ms update rate)
 #define NEUTRALTHRUST_END_COUNT                     (NEUTRALTHRUST_START_DELAY + (4 * 20))  // 4 second sample
 
-#define LANDED_START_DELAY                          (1 * 20) // 1 seconds at rate of 20Hz (50ms update rate)
-#define LANDED_END_COUNT                            (NEUTRALTHRUST_START_DELAY + (2 * 20))  // 2 second sample
-
 // Private types
 
 struct Globals {
-    struct pid PIDposH[2];
-    struct pid PIDposV;
-    struct pid PIDvel[3]; // North, East, Down
-    struct pid BrakePIDvel[2]; // North, East
-    struct pid PIDcourse;
-    struct pid PIDspeed;
-    struct pid PIDpower;
+    struct pid  PIDposH[2];
+    struct pid  PIDposV;
+    struct pid  PIDvel[3]; // North, East, Down
+    struct pid  BrakePIDvel[2]; // North, East
+    struct pid  PIDcourse;
+    struct pid  PIDspeed;
+    struct pid  PIDpower;
     float poiRadius;
     float vtolEmergencyFallback;
     FrameType_t frameType;
-    bool  vtolEmergencyFallbackSwitch;
+    bool vtolEmergencyFallbackSwitch;
 };
 
 struct NeutralThrustEstimation {
@@ -154,7 +151,7 @@ static PathSummaryData pathSummary;
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
 
-static PathFollowerFSM *activePFState = 0;
+static PathFollowerFSM *activePFState   = 0;
 
 
 // Private functions
@@ -307,6 +304,7 @@ static void pathFollowerTask(void)
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     uint8_t previousMode = pathDesired.Mode;
+
     FixedWingPathFollowerSettingsGet(&fixedWingPathFollowerSettings);
     VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
     PathDesiredGet(&pathDesired);
@@ -314,35 +312,34 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     global.frameType = GetCurrentFrameType();
 
     if (global.frameType == FRAME_TYPE_CUSTOM || global.frameType == FRAME_TYPE_GROUND) {
-	switch (vtolPathFollowerSettings.TreatCustomCraftAs) {
-	  case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
-	    global.frameType = FRAME_TYPE_FIXED_WING;
-	    break;
-	  case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
-	    global.frameType = FRAME_TYPE_MULTIROTOR;
-	    break;
-	}
+        switch (vtolPathFollowerSettings.TreatCustomCraftAs) {
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
+            global.frameType = FRAME_TYPE_FIXED_WING;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
+            global.frameType = FRAME_TYPE_MULTIROTOR;
+            break;
+        }
     }
     switch (global.frameType) {
-      case FRAME_TYPE_MULTIROTOR:
-      case FRAME_TYPE_HELI:
-	updatePeriod = vtolPathFollowerSettings.UpdatePeriod;
-	break;
-      case FRAME_TYPE_FIXED_WING:
-      default:
-	updatePeriod = fixedWingPathFollowerSettings.UpdatePeriod;
-	break;
+    case FRAME_TYPE_MULTIROTOR:
+    case FRAME_TYPE_HELI:
+        updatePeriod = vtolPathFollowerSettings.UpdatePeriod;
+        break;
+    case FRAME_TYPE_FIXED_WING:
+    default:
+        updatePeriod = fixedWingPathFollowerSettings.UpdatePeriod;
+        break;
     }
 
     if (global.frameType == FRAME_TYPE_FIXED_WING) {
-	pid_configure(&global.PIDposH[0], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-	pid_configure(&global.PIDposH[1], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-	pid_configure(&global.PIDposV, fixedWingPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
-    }
-    else {
+        pid_configure(&global.PIDposH[0], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposH[1], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposV, fixedWingPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
+    } else {
         pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
         pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-	pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
     }
 
     pid_configure(&global.PIDcourse, fixedWingPathFollowerSettings.CoursePI.Kp, fixedWingPathFollowerSettings.CoursePI.Ki, 0.0f, fixedWingPathFollowerSettings.CoursePI.ILimit);
@@ -358,27 +355,25 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // FSM inactivate previous mode on new mode
     if (activePFState && previousMode != pathDesired.Mode) {
-          activePFState->Inactive();
+        activePFState->Inactive();
     }
 
     // set FSM mode based on requested mode
     switch (pathDesired.Mode) {
     case PATHDESIRED_MODE_LAND:
-      activePFState = (PathFollowerFSM *)FSMLand::instance();
-      break;
+        activePFState = (PathFollowerFSM *)FSMLand::instance();
+        break;
     default:
-      activePFState = 0;
-      break;
+        activePFState = 0;
+        break;
     }
 
     if (activePFState) {
-	activePFState->SettingsUpdated();
-	if (previousMode != pathDesired.Mode) {
-	    activePFState->Activate();
-	}
-
+        activePFState->SettingsUpdated();
+        if (previousMode != pathDesired.Mode) {
+            activePFState->Activate();
+        }
     }
-
 }
 
 
@@ -440,8 +435,8 @@ static void resetGlobals()
     pathStatus.path_time = 0.0f;
 
     if (activePFState) {
-	activePFState->Inactive();
-	activePFState = 0;
+        activePFState->Inactive();
+        activePFState = 0;
     }
 }
 
@@ -451,11 +446,13 @@ static uint8_t updateAutoPilotByFrameType()
     case FRAME_TYPE_MULTIROTOR:
     case FRAME_TYPE_HELI:
         return updateAutoPilotVtol();
+
         break;
 
     case FRAME_TYPE_FIXED_WING:
     default:
         return updateAutoPilotFixedWing();
+
         break;
     }
 }
@@ -515,9 +512,9 @@ static uint8_t updateAutoPilotVtol()
         bool yaw_attitude = true;
         float yaw = 0.0f;
 
-	// TODO Make this FSM specific
-        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY ||
-            pathDesired.Mode == PATHDESIRED_MODE_LAND) {
+        if (activePFState) {
+            activePFState->GetYaw(yaw_attitude, yaw);
+        } else if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
             yaw_attitude = false;
         } else {
             switch (vtolPathFollowerSettings.YawControl) {
@@ -608,7 +605,7 @@ static uint8_t updateAutoPilotVtol()
     }
 
     if (activePFState) {
-	activePFState->Update();
+        activePFState->Update();
         if (activePFState->GetCurrentState() == PFFSM_STATE_DISARMED) {
             setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
         }
@@ -833,13 +830,13 @@ static void updatePathVelocity(float kFF, bool limited)
 
     if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY ||
         pathDesired.Mode == PATHDESIRED_MODE_LAND) {
-	// TODO Make this FSM generic
+        // TODO Make this FSM generic
         velocityDesired.North = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
         velocityDesired.East  = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
         velocityDesired.Down  = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN];
 
 
-	// TODO Make FSM generic in that it is able to add in a horizontal position hold or not
+        // TODO Make FSM generic in that it is able to add in a horizontal position hold or not
         if (pathDesired.Mode == PATHDESIRED_MODE_LAND) {
             velocityDesired.Down = activePFState->BoundVelocityDown(velocityDesired.Down);
 
@@ -864,7 +861,6 @@ static void updatePathVelocity(float kFF, bool limited)
         pathStatus.correction_direction_north = velocityDesired.North - velocityState.North;
         pathStatus.correction_direction_east  = velocityDesired.East - velocityState.East;
         pathStatus.correction_direction_down  = velocityDesired.Down - velocityState.Down;
-
     } else if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         float brakeRate = vtolPathFollowerSettings.BrakeRate;
         if (brakeRate < BRAKE_RATE_MINIMUM) {
@@ -1385,7 +1381,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     // downCommand = pid_apply(&global.PIDvel[2], downError, dT);
     pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
     if (activePFState) {
-	activePFState->CheckPidScalar(&local_scaler);
+        activePFState->CheckPidScalar(&local_scaler);
     }
     if (pathDesired.Mode == PATHDESIRED_MODE_LAND) {
         manual_thrust = false;
@@ -1582,7 +1578,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     // else thrust is set by the PID controller
 
     if (activePFState) {
-	activePFState->ConstrainStabiDesired(&stabDesired);
+        activePFState->ConstrainStabiDesired(&stabDesired);
     }
     StabilizationDesiredSet(&stabDesired);
 

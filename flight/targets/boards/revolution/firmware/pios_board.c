@@ -253,8 +253,10 @@ uint32_t pios_com_vcp_id       = 0;
 uint32_t pios_rfm22b_id        = 0;
 #endif
 
-uintptr_t pios_uavo_settings_fs_id;
-uintptr_t pios_user_fs_id;
+uintptr_t pios_uavo_settings_fs_id = 0;
+uintptr_t pios_user_fs_id = 0;
+uintptr_t pios_external_flash_fs_id = 0;
+
 
 /*
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -325,6 +327,7 @@ static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pwm_cfg)
     pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
 }
 
+#ifndef PIOS_ENABLE_DEBUG_PINS
 static void PIOS_Board_configure_ppm(const struct pios_ppm_cfg *ppm_cfg)
 {
     uint32_t pios_ppm_id;
@@ -337,6 +340,7 @@ static void PIOS_Board_configure_ppm(const struct pios_ppm_cfg *ppm_cfg)
     }
     pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
 }
+#endif
 
 static void PIOS_Board_PPM_callback(const int16_t *channels)
 {
@@ -390,10 +394,17 @@ void PIOS_Board_Init(void)
     if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_telem_flash_id, 1)) {
         PIOS_DEBUG_Assert(0);
     }
+    PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
+    for (int i=0;i<6;i++)
+        PIOS_DEBUG_PinLow(i);
 
-    if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_external_system_cfg, &pios_jedec_flash_driver, flash_id)) {
-        PIOS_DEBUG_Assert(0);
+    if (PIOS_FLASHFS_Init(&pios_external_flash_fs_id, &pios_jedec_flash_driver, flash_id)) {
+            PIOS_DEBUG_Assert(0);
     }
+    /* Settings and log are on the same file system */
+    pios_uavo_settings_fs_id = pios_external_flash_fs_id;
+    pios_user_fs_id = pios_external_flash_fs_id;
+
 #endif /* if defined(PIOS_INCLUDE_FLASH) */
 
 #if defined(PIOS_INCLUDE_RTC)
@@ -405,7 +416,10 @@ void PIOS_Board_Init(void)
     if (PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
         PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
         PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
-        PIOS_FLASHFS_Format(pios_uavo_settings_fs_id);
+#if defined(PIOS_INCLUDE_FLASH)
+        // Mathieu TODO: Also format if could not mount file system or unknown file system
+        PIOS_FLASHFS_Format(pios_external_flash_fs_id);
+#endif
         PIOS_IAP_WriteBootCmd(0, 0);
         PIOS_IAP_WriteBootCmd(1, 0);
         PIOS_IAP_WriteBootCmd(2, 0);
@@ -500,12 +514,6 @@ void PIOS_Board_Init(void)
         break;
     } /* hwsettings_rm_flexiport */
 
-    /* Moved this here to allow binding on flexiport */
-#if defined(PIOS_INCLUDE_FLASH)
-    if (PIOS_FLASHFS_Logfs_Init(&pios_user_fs_id, &flashfs_external_user_cfg, &pios_jedec_flash_driver, flash_id)) {
-        PIOS_DEBUG_Assert(0);
-    }
-#endif /* if defined(PIOS_INCLUDE_FLASH) */
 
 #if defined(PIOS_INCLUDE_USB)
     /* Initialize board specific USB data */
@@ -818,7 +826,7 @@ void PIOS_Board_Init(void)
     OPLinkStatusSet(&oplinkStatus);
 #endif /* PIOS_INCLUDE_RFM22B */
 
-#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_PWM)
+#if (defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_PWM)) && !defined(PIOS_ENABLE_DEBUG_PINS)
 
     const struct pios_servo_cfg *pios_servo_cfg;
     // default to servo outputs only
@@ -863,7 +871,9 @@ void PIOS_Board_Init(void)
 #endif /* PIOS_INCLUDE_PPM */
     case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
         // configure only the servo outputs
+#ifndef PIOS_ENABLE_DEBUG_PINS
         pios_servo_cfg = &pios_servo_cfg_out_in;
+#endif
         break;
     case HWSETTINGS_RM_RCVRPORT_TELEMETRY:
         PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
@@ -899,7 +909,7 @@ void PIOS_Board_Init(void)
     // pios_servo_cfg points to the correct configuration based on input port settings
     PIOS_Servo_Init(pios_servo_cfg);
 #else
-    PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
+    //PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif
 
     // Disable GPIO_A8 Pullup to prevent wrong results on battery voltage readout

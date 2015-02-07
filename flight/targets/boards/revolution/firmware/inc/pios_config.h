@@ -69,7 +69,9 @@
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
+#ifndef PIOS_ENABLE_DEBUG_PINS
 #define PIOS_INCLUDE_WDG
+#endif
 
 /* PIOS USB functions */
 #define PIOS_INCLUDE_USB
@@ -99,7 +101,9 @@
 
 /* PIOS receiver drivers */
 #define PIOS_INCLUDE_PWM
+#ifndef PIOS_ENABLE_DEBUG_PINS
 #define PIOS_INCLUDE_PPM
+#endif
 /* #define PIOS_INCLUDE_PPM_FLEXI */
 #define PIOS_INCLUDE_DSM
 #define PIOS_INCLUDE_SBUS
@@ -119,6 +123,7 @@
 /* #define PIOS_INCLUDE_SDCARD */
 /* #define LOG_FILENAME "startup.log" */
 #define PIOS_INCLUDE_FLASH
+#define PIOS_INCLUDE_FLASH_SPIFFS
 #define PIOS_INCLUDE_FLASH_INTERNAL
 #define PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
 #define FLASH_FREERTOS

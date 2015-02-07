@@ -105,24 +105,21 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 # When changing SDL_DIR or OPENSSL_DIR, you must also update them in ground/openpilotgcs/openpilotgcs.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_8-2014q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.4.0
-MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw491_32
-PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw491_32/opt/bin
-NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
-SDL_DIR         := $(TOOLS_DIR)/SDL-1.2.15
-OPENSSL_DIR     := $(TOOLS_DIR)/openssl-1.0.1e-win32
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
-#GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk-x86-2013.6/0.10/x86
-GSTREAMER_SDK_DIR :=  /opt/gstreamer-sdk
 
-ifeq ($(UNAME), Windows)
+ifeq ($(UNAME), Linux)
+    GSTREAMER_SDK_DIR :=  /usr
+else ifeq ($(UNAME), Darwin)
+else ifeq ($(UNAME), Windows)
     MINGW_DIR   := $(QT_SDK_DIR)/Tools/$(QT_SDK_ARCH)
     PYTHON_DIR  := $(QT_SDK_DIR)/Tools/$(QT_SDK_ARCH)/opt/bin
     NSIS_DIR    := $(TOOLS_DIR)/nsis-2.46-unicode
     SDL_DIR     := $(TOOLS_DIR)/SDL-1.2.15
     OPENSSL_DIR := $(TOOLS_DIR)/openssl-1.0.1e-win32
     MESAWIN_DIR := $(TOOLS_DIR)/mesawin
+    GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk-x86-2013.6/0.10/x86
 endif
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
@@ -780,20 +777,16 @@ ifeq ($(UNAME), Windows)
 
 $(eval $(call TOOL_INSTALL_TEMPLATE,gstreamer,$(GSTREAMER_SDK_DIR),$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL))))
 
-else # Linux or Mac
-
-all_sdk_version: gstreamer_version
-
 endif
 
 ifeq ($(shell [ -d "$(GSTREAMER_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export GSTREAMER_SDK_DIR
-    export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-0.10
+    export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-1.0
     export PATH := $(GSTREAMER_SDK_DIR/bin):$(PATH)
 else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(GSTREAMER_SDK_DIR)) not found (make gstreamer_install), using system PATH)
-    export GSTREAMER := gst-launch-0.10
+    export GSTREAMER := gst-launch-1.0
 endif
 
 .PHONY: gstreamer_version

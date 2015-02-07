@@ -30,6 +30,16 @@
 
 extern uintptr_t pios_uavo_settings_fs_id;
 
+/* This is for testing right now: Need to find a better unique name generator with module as a prefix */
+static void UAVObjFilename(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *filename)
+{
+    uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
+                                                         // skip least sig nibble since that is used for meta object id
+    uint8_t suffix  = obj_inst_id & 0xff;
+
+    snprintf((char *)filename, FLASHFS_FILENAME_LEN, "/dev%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
+}
+
 /**
  * Save the data of the specified object to the file system (SD card).
  * If the object contains multiple instances, all of them will be saved.
@@ -42,30 +52,43 @@ extern uintptr_t pios_uavo_settings_fs_id;
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 {
     PIOS_Assert(obj_handle);
+    uint8_t *obj_data;
+    int16_t fh;
+    char filename[FLASHFS_FILENAME_LEN];
 
     if (UAVObjIsMetaobject(obj_handle)) {
-        if (instId != 0) {
-            return -1;
-        }
 
-        if (PIOS_FLASHFS_ObjSave(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, (uint8_t *)MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) != 0) {
+        if (instId != 0)
             return -1;
-        }
+
+        obj_data = (uint8_t*)MetaDataPtr((struct UAVOMeta *)obj_handle);
+
     } else {
         InstanceHandle instEntry = getInstance((struct UAVOData *)obj_handle, instId);
 
-        if (instEntry == NULL) {
+        if (instEntry == NULL)
             return -1;
-        }
 
-        if (InstanceData(instEntry) == NULL) {
+        if (InstanceData(instEntry) == NULL)
             return -1;
-        }
 
-        if (PIOS_FLASHFS_ObjSave(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) != 0) {
-            return -1;
-        }
+        obj_data = InstanceData(instEntry);
+
     }
+
+    UAVObjFilename(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+
+    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
+
+    if (fh < 0)
+        return -1;
+
+    if (PIOS_FLASHFS_Write(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle)) != 0)
+        return -1;
+
+    if (PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh) != PIOS_FLASHFS_OK)
+        return -1;
+
     return 0;
 }
 
@@ -80,34 +103,43 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
  */
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 {
+    uint8_t *obj_data;
+    int16_t fh;
+    char filename[FLASHFS_FILENAME_LEN];
+
     PIOS_Assert(obj_handle);
 
     if (UAVObjIsMetaobject(obj_handle)) {
-        if (instId != 0) {
-            return -1;
-        }
 
-        // Fire event on success
-        if (PIOS_FLASHFS_ObjLoad(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, (uint8_t *)MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) == 0) {
-            sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
-        } else {
+        if (instId != 0)
             return -1;
-        }
+
+        obj_data = (uint8_t *)MetaDataPtr((struct UAVOMeta *)obj_handle);
+
     } else {
+
         InstanceHandle instEntry = getInstance((struct UAVOData *)obj_handle, instId);
 
-        if (instEntry == NULL) {
+        if (instEntry == NULL)
             return -1;
-        }
 
-        // Fire event on success
-        if (PIOS_FLASHFS_ObjLoad(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) == 0) {
-            sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
-        } else {
-            return -1;
-        }
+        obj_data = InstanceData(instEntry);
     }
 
+    UAVObjFilename(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+
+    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_RDONLY);
+
+    if (fh < 0)
+        return -1;
+
+    if (PIOS_FLASHFS_Read(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle)) != 0)
+	    return -1;
+
+    if (PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh) != PIOS_FLASHFS_OK)
+	    return -1;
+
+    sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
 
     return 0;
 }
@@ -120,7 +152,13 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
  */
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 {
+    char filename[FLASHFS_FILENAME_LEN];
+
     PIOS_Assert(obj_handle);
-    PIOS_FLASHFS_ObjDelete(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId);
+
+    UAVObjFilename(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+
+    PIOS_FLASHFS_Remove(pios_uavo_settings_fs_id, filename);
+
     return 0;
 }

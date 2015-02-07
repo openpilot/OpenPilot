@@ -69,11 +69,26 @@ static uint32_t used_buffer_space = 0;
 /* Private Function Prototypes */
 static void enqueue_data(uint32_t objid, uint16_t instid, size_t size, uint8_t *data);
 static bool write_current_buffer();
+
+/* This is for testing right now: Need to find a better unique name generator with module as a prefix */
+static void PIOS_DEBUGLOG_Filename(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *filename)
+{
+    uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
+                                                         // skip least sig nibble since that is used for meta object id
+    uint8_t suffix  = obj_inst_id & 0xff;
+
+    snprintf((char *)filename, FLASHFS_FILENAME_LEN, "/dev%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
+}
+
+
 /**
  * @brief Initialize the log facility
  */
 void PIOS_DEBUGLOG_Initialize()
 {
+    int16_t fh;
+	char filename[FLASHFS_FILENAME_LEN];
+
 #if defined(PIOS_INCLUDE_FREERTOS)
     if (!mutex) {
         mutex  = xSemaphoreCreateRecursiveMutex();
@@ -91,9 +106,17 @@ void PIOS_DEBUGLOG_Initialize()
     fails_count = 0;
     used_buffer_space = 0;
     log_is_full = false;
-    while (PIOS_FLASHFS_ObjLoad(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
+
+    /* Check number of file in the file system */
+    PIOS_DEBUGLOG_Filename(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
+
+    while ((fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_RDONLY)) >= 0)
+    {
+        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
         flightnum++;
+        PIOS_DEBUGLOG_Filename(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
     }
+
     mutexunlock();
 }
 
@@ -139,6 +162,9 @@ void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8
  */
 void PIOS_DEBUGLOG_Printf(char *format, ...)
 {
+    int16_t fh;
+    char filename[FLASHFS_FILENAME_LEN];
+
     if (!logging_enabled || !buffer || log_is_full) {
         return;
     }
@@ -162,9 +188,22 @@ void PIOS_DEBUGLOG_Printf(char *format, ...)
     buffer->InstanceID = 0;
     buffer->Size       = strlen((const char *)buffer->Data);
 
-    if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
-        lognum++;
-    }
+    PIOS_DEBUGLOG_Filename(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
+
+    fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
+
+    if (fh < 0)
+        goto done;
+
+    if (PIOS_FLASHFS_Write(pios_user_fs_id, fh, (uint8_t *)buffer, sizeof(DebugLogEntryData)) != 0)
+        goto done;
+
+    if (PIOS_FLASHFS_Close(pios_user_fs_id, fh) != PIOS_FLASHFS_OK)
+        goto done;
+
+    lognum++;
+
+done:
     mutexunlock();
 }
 
@@ -183,8 +222,25 @@ void PIOS_DEBUGLOG_Printf(char *format, ...)
  */
 int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, uint16_t inst)
 {
+    int16_t fh;
+    char filename[FLASHFS_FILENAME_LEN];
+
     PIOS_Assert(mybuffer);
-    return PIOS_FLASHFS_ObjLoad(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), inst, (uint8_t *)mybuffer, sizeof(DebugLogEntryData));
+
+    PIOS_DEBUGLOG_Filename(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), inst, filename);
+
+    fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_RDONLY);
+
+    if (fh < 0)
+        return -1;
+
+    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, sizeof(DebugLogEntryData)) != 0)
+        return -1;
+
+    if (PIOS_FLASHFS_Close(pios_user_fs_id, fh) != PIOS_FLASHFS_OK)
+        return -1;
+
+    return 0;
 }
 
 /**
@@ -202,13 +258,14 @@ void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint1
     if (entry) {
         *entry = lognum;
     }
-    struct PIOS_FLASHFS_Stats stats = { 0, 0 };
+
+    struct PIOS_FLASHFS_Stats stats;
     PIOS_FLASHFS_GetStats(pios_user_fs_id, &stats);
     if (free) {
-        *free = stats.num_free_slots;
+        *free = stats.block_free;
     }
     if (used) {
-        *used = stats.num_active_slots;
+        *used = stats.block_used;
     }
 }
 
@@ -218,7 +275,10 @@ void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint1
 void PIOS_DEBUGLOG_Format(void)
 {
     mutexlock();
+#if !defined(PIOS_INCLUDE_FLASH_SPIFFS)
+    // Mathieu TODO: do a rm log* here.
     PIOS_FLASHFS_Format(pios_user_fs_id);
+#endif
     lognum      = 0;
     flightnum   = 0;
     log_is_full = false;
@@ -227,6 +287,7 @@ void PIOS_DEBUGLOG_Format(void)
     mutexunlock();
 }
 
+// Mathieu TODO: We don't need this anymore, use file system cache as a buffer.
 void enqueue_data(uint32_t objid, uint16_t instid, size_t size, uint8_t *data)
 {
     DebugLogEntryData *entry;
@@ -268,17 +329,33 @@ void enqueue_data(uint32_t objid, uint16_t instid, size_t size, uint8_t *data)
 
 bool write_current_buffer()
 {
+    int16_t fh;
+    char filename[FLASHFS_FILENAME_LEN];
+
+    PIOS_DEBUGLOG_Filename(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
+
+    fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
+
+    if (fh < 0)
+        goto err;
+
+    if (PIOS_FLASHFS_Write(pios_user_fs_id, fh, (uint8_t *)buffer, sizeof(DebugLogEntryData)) != 0)
+        goto err;
+
+    if (PIOS_FLASHFS_Close(pios_user_fs_id, fh) != PIOS_FLASHFS_OK)
+        goto err;
+
     // not enough space, write the block and start a new one
-    if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
-        lognum++;
-        fails_count = 0;
-        used_buffer_space = 0;
-    } else {
-        if (fails_count++ > MAX_CONSECUTIVE_FAILS_COUNT) {
-            log_is_full = true;
-        }
-        return false;
-    }
+	lognum++;
+	fails_count = 0;
+	used_buffer_space = 0;
+	goto done;
+err:
+	if (fails_count++ > MAX_CONSECUTIVE_FAILS_COUNT) {
+		log_is_full = true;
+	}
+    return false;
+done:
     return true;
 }
 /**

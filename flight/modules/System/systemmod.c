@@ -59,6 +59,7 @@
 #include <hwsettings.h>
 #include <pios_flashfs.h>
 #include <pios_notify.h>
+#include <flashfsstats.h>
 
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <instrumentation.h>
@@ -87,7 +88,7 @@
 #if defined(PIOS_SYSTEM_STACK_SIZE)
 #define STACK_SIZE_BYTES        PIOS_SYSTEM_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES        1024
+#define STACK_SIZE_BYTES        2048
 #endif
 
 #define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
@@ -118,8 +119,7 @@ static void updateI2Cstats();
 static void updateWDGstats();
 #endif
 
-extern uintptr_t pios_uavo_settings_fs_id;
-extern uintptr_t pios_user_fs_id;
+extern uintptr_t pios_external_flash_fs_id;
 
 /**
  * Create the module task.
@@ -147,6 +147,7 @@ int32_t SystemModInitialize(void)
     // Must registers objects here for system thread because ObjectManager started in OpenPilotInit
     SystemSettingsInitialize();
     SystemStatsInitialize();
+    FlashFsStatsInitialize();
     FlightStatusInitialize();
     ObjectPersistenceInitialize();
 #ifdef DIAG_TASKS
@@ -523,9 +524,11 @@ static uint16_t GetFreeIrqStackSize(void)
 static void updateStats()
 {
     SystemStatsData stats;
+    FlashFsStatsData flashfs;
 
     // Get stats and update
     SystemStatsGet(&stats);
+    FlashFsStatsGet(&flashfs);
     stats.FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
     // POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
@@ -540,15 +543,13 @@ static void updateStats()
     stats.IRQStackRemaining = GetFreeIrqStackSize();
 
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
-    if (pios_uavo_settings_fs_id) {
-        PIOS_FLASHFS_GetStats(pios_uavo_settings_fs_id, &fsStats);
-        stats.SysSlotsFree   = fsStats.num_free_slots;
-        stats.SysSlotsActive = fsStats.num_active_slots;
-    }
-    if (pios_user_fs_id) {
-        PIOS_FLASHFS_GetStats(pios_user_fs_id, &fsStats);
-        stats.UsrSlotsFree   = fsStats.num_free_slots;
-        stats.UsrSlotsActive = fsStats.num_active_slots;
+    if (pios_external_flash_fs_id) {
+            PIOS_FLASHFS_GetStats(pios_external_flash_fs_id, &fsStats);
+            flashfs.BlockFree   = fsStats.block_free;
+            flashfs.BlockUsed = fsStats.block_used;
+            flashfs.CacheHits = fsStats.cache_hits;
+            flashfs.CacheMisses = fsStats.cache_misses;
+            flashfs.Gc = fsStats.gc;
     }
 #endif
     stats.CPULoad = 100 - PIOS_TASK_MONITOR_GetIdlePercentage();
@@ -558,6 +559,7 @@ static void updateStats()
     stats.CPUTemp = PIOS_CONVERT_VOLT_TO_CPU_TEMP(temp_voltage);;
 #endif
     SystemStatsSet(&stats);
+    FlashFsStatsSet(&flashfs);
 }
 
 /**

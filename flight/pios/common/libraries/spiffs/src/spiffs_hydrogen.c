@@ -85,7 +85,7 @@ s32_t SPIFFS_mount(spiffs *fs, spiffs_config *config, u8_t *work,
 void SPIFFS_unmount(spiffs *fs) {
   if (!SPIFFS_CHECK_MOUNT(fs)) return;
   SPIFFS_LOCK(fs);
-  int i;
+  unsigned int i;
   spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
   for (i = 0; i < fs->fd_count; i++) {
     spiffs_fd *cur_fd = &fds[i];
@@ -104,7 +104,7 @@ s32_t SPIFFS_errno(spiffs *fs) {
   return fs->errno;
 }
 
-s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode) {
+s32_t SPIFFS_creat(spiffs *fs, const char *path, __attribute__((unused)) spiffs_mode mode) {
   SPIFFS_API_CHECK_MOUNT(fs);
   SPIFFS_LOCK(fs);
   spiffs_obj_id obj_id;
@@ -249,11 +249,11 @@ s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
   return len;
 }
 
-static s32_t spiffs_hydro_write(spiffs *fs, spiffs_fd *fd, void *buf, u32_t offset, s32_t len) {
+static s32_t spiffs_hydro_write(__attribute__((unused)) spiffs *fs, spiffs_fd *fd, void *buf, u32_t offset, s32_t len) {
   s32_t res = SPIFFS_OK;
   s32_t remaining = len;
-  if (fd->size != SPIFFS_UNDEFINED_LEN && offset < fd->size) {
-    s32_t m_len = MIN(fd->size - offset, len);
+  if ((int)fd->size != SPIFFS_UNDEFINED_LEN && offset < fd->size) {
+    s32_t m_len = MIN(fd->size - offset, (u32_t)len);
     res = spiffs_object_modify(fd, offset, (u8_t *)buf, m_len);
     SPIFFS_CHECK_RES(res);
     remaining -= m_len;
@@ -293,7 +293,7 @@ s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
   }
 #endif
   if (fd->flags & SPIFFS_APPEND) {
-    if (fd->size == SPIFFS_UNDEFINED_LEN) {
+    if ((int)fd->size == SPIFFS_UNDEFINED_LEN) {
       offset = 0;
     } else {
       offset = fd->size;
@@ -404,11 +404,11 @@ s32_t SPIFFS_lseek(spiffs *fs, spiffs_file fh, s32_t offs, int whence) {
     offs = fd->fdoffset+offs;
     break;
   case SPIFFS_SEEK_END:
-    offs = (fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size) + offs;
+    offs = ((int)fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size) + offs;
     break;
   }
 
-  if (offs > fd->size) {
+  if (offs > (s32_t)fd->size) {
     res = SPIFFS_ERR_END_OF_OBJECT;
   }
   SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
@@ -505,7 +505,7 @@ static s32_t spiffs_stat_pix(spiffs *fs, spiffs_page_ix pix, spiffs_file fh, spi
 
   s->obj_id = obj_id;
   s->type = objix_hdr.type;
-  s->size = objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
+  s->size = (int)objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
   strncpy((char *)s->name, (char *)objix_hdr.name, SPIFFS_OBJ_NAME_LEN);
 
   return res;
@@ -609,7 +609,7 @@ void SPIFFS_close(spiffs *fs, spiffs_file fh) {
   SPIFFS_UNLOCK(fs);
 }
 
-spiffs_DIR *SPIFFS_opendir(spiffs *fs, const char *name, spiffs_DIR *d) {
+spiffs_DIR *SPIFFS_opendir(spiffs *fs, __attribute__((unused)) const char *name, spiffs_DIR *d) {
   if (!SPIFFS_CHECK_MOUNT(fs)) {
     fs->errno = SPIFFS_ERR_NOT_MOUNTED;
     return 0;
@@ -625,7 +625,7 @@ static s32_t spiffs_read_dir_v(
     spiffs_obj_id obj_id,
     spiffs_block_ix bix,
     int ix_entry,
-    u32_t user_data,
+	__attribute__((unused)) u32_t user_data,
     void *user_p) {
   s32_t res;
   spiffs_page_object_ix_header objix_hdr;
@@ -646,7 +646,7 @@ static s32_t spiffs_read_dir_v(
     e->obj_id = obj_id;
     strcpy((char *)e->name, (char *)objix_hdr.name);
     e->type = objix_hdr.type;
-    e->size = objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
+    e->size = (int)objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
     e->pix = pix;
     return SPIFFS_OK;
   }

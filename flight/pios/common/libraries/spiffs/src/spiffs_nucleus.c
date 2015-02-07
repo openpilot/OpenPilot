@@ -1,7 +1,7 @@
 #include "spiffs.h"
 #include "spiffs_nucleus.h"
 
-static s32_t spiffs_page_data_check(spiffs *fs, spiffs_fd *fd, spiffs_page_ix pix, spiffs_span_ix spix) {
+static s32_t spiffs_page_data_check(__attribute__((unused)) spiffs *fs, __attribute__((unused)) spiffs_fd *fd, spiffs_page_ix pix, __attribute__((unused)) spiffs_span_ix spix) {
   s32_t res = SPIFFS_OK;
   if (pix == (spiffs_page_ix)-1) {
     // referring to page 0xffff...., bad object index
@@ -29,7 +29,7 @@ static s32_t spiffs_page_data_check(spiffs *fs, spiffs_fd *fd, spiffs_page_ix pi
   return res;
 }
 
-static s32_t spiffs_page_index_check(spiffs *fs, spiffs_fd *fd, spiffs_page_ix pix, spiffs_span_ix spix) {
+static s32_t spiffs_page_index_check(__attribute__((unused)) spiffs *fs, __attribute__((unused)) spiffs_fd *fd, spiffs_page_ix pix, __attribute__((unused)) spiffs_span_ix spix) {
   s32_t res = SPIFFS_OK;
   if (pix == (spiffs_page_ix)-1) {
     // referring to page 0xffff...., bad object index
@@ -133,7 +133,7 @@ s32_t spiffs_obj_lu_find_entry_visitor(
   u32_t cur_block_addr = starting_block * SPIFFS_CFG_LOG_BLOCK_SZ(fs);
 
   spiffs_obj_id *obj_lu_buf = (spiffs_obj_id *)fs->lu_work;
-  int cur_entry = starting_lu_entry;
+  unsigned int cur_entry = starting_lu_entry;
   u32_t entries_per_page = (SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id));
 
   // wrap initial
@@ -150,10 +150,10 @@ s32_t spiffs_obj_lu_find_entry_visitor(
 
   // check each block
   while (res == SPIFFS_OK && entry_count > 0) {
-    int obj_lookup_page = cur_entry / entries_per_page;
+    unsigned int obj_lookup_page = cur_entry / entries_per_page;
     // check each object lookup page
     while (res == SPIFFS_OK && obj_lookup_page < SPIFFS_OBJ_LOOKUP_PAGES(fs)) {
-      int entry_offset = obj_lookup_page * entries_per_page;
+      unsigned int entry_offset = obj_lookup_page * entries_per_page;
       res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_READ,
           0, cur_block_addr + SPIFFS_PAGE_TO_PADDR(fs, obj_lookup_page), SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->lu_work);
       // check each entry
@@ -217,10 +217,10 @@ s32_t spiffs_obj_lu_find_entry_visitor(
 static s32_t spiffs_obj_lu_scan_v(
     spiffs *fs,
     spiffs_obj_id obj_id,
-    spiffs_block_ix bix,
+	__attribute__((unused)) spiffs_block_ix bix,
     int ix_entry,
-    u32_t user_data,
-    void *user_p) {
+	__attribute__((unused)) u32_t user_data,
+	__attribute__((unused)) void *user_p) {
   if (obj_id == SPIFFS_OBJ_ID_FREE) {
     if (ix_entry == 0) {
       fs->free_blocks++;
@@ -708,7 +708,7 @@ s32_t spiffs_object_update_index_hdr(
 
 void spiffs_cb_object_event(
     spiffs *fs,
-    spiffs_fd *fd,
+	__attribute__((unused)) spiffs_fd *fd,
     int ev,
     spiffs_obj_id obj_id,
     spiffs_span_ix spix,
@@ -716,7 +716,7 @@ void spiffs_cb_object_event(
     u32_t new_size) {
   // update index caches in all file descriptors
   obj_id &= ~SPIFFS_OBJ_ID_IX_FLAG;
-  int i;
+  unsigned int i;
   spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
   for (i = 0; i < fs->fd_count; i++) {
     spiffs_fd *cur_fd = &fds[i];
@@ -768,7 +768,7 @@ s32_t spiffs_object_open_by_page(
     spiffs_page_ix pix,
     spiffs_fd *fd,
     spiffs_flags flags,
-    spiffs_mode mode) {
+	__attribute__((unused)) spiffs_mode mode) {
   s32_t res = SPIFFS_OK;
   spiffs_page_object_ix_header oix_hdr;
   spiffs_obj_id obj_id;
@@ -1236,7 +1236,7 @@ static s32_t spiffs_object_find_object_index_header_by_name_v(
     spiffs_obj_id obj_id,
     spiffs_block_ix bix,
     int ix_entry,
-    u32_t user_data,
+	__attribute__((unused)) u32_t user_data,
     void *user_p) {
   s32_t res;
   spiffs_page_object_ix_header objix_hdr;
@@ -1307,7 +1307,7 @@ s32_t spiffs_object_truncate(
 
   spiffs_page_ix objix_pix = fd->objix_hdr_pix;
   spiffs_span_ix data_spix = (fd->size > 0 ? fd->size-1 : 0) / SPIFFS_DATA_PAGE_SIZE(fs);
-  u32_t cur_size = fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size ;
+  u32_t cur_size = (s32_t)fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size ;
   spiffs_span_ix cur_objix_spix = 0;
   spiffs_span_ix prev_objix_spix = (spiffs_span_ix)-1;
   spiffs_page_object_ix_header *objix_hdr = (spiffs_page_object_ix_header *)fs->work;
@@ -1586,8 +1586,8 @@ typedef struct {
   u32_t compaction;
 } spiffs_free_obj_id_state;
 
-static s32_t spiffs_obj_lu_find_free_obj_id_bitmap_v(spiffs *fs, spiffs_obj_id id, spiffs_block_ix bix, int ix_entry,
-    u32_t user_data, void *user_p) {
+static s32_t spiffs_obj_lu_find_free_obj_id_bitmap_v(spiffs *fs, spiffs_obj_id id, __attribute__((unused)) spiffs_block_ix bix, __attribute__((unused)) int ix_entry,
+    u32_t user_data, __attribute__((unused)) void *user_p) {
   if (id != SPIFFS_OBJ_ID_FREE && id != SPIFFS_OBJ_ID_DELETED) {
     spiffs_obj_id min_obj_id = user_data;
     id &= ~SPIFFS_OBJ_ID_IX_FLAG;
@@ -1601,7 +1601,7 @@ static s32_t spiffs_obj_lu_find_free_obj_id_bitmap_v(spiffs *fs, spiffs_obj_id i
 }
 
 static s32_t spiffs_obj_lu_find_free_obj_id_compact_v(spiffs *fs, spiffs_obj_id id, spiffs_block_ix bix, int ix_entry,
-    u32_t user_data, void *user_p) {
+		__attribute__((unused)) u32_t user_data, void *user_p) {
   if (id != SPIFFS_OBJ_ID_FREE && id != SPIFFS_OBJ_ID_DELETED && (id & SPIFFS_OBJ_ID_IX_FLAG)) {
     s32_t res;
     spiffs_free_obj_id_state *state = (spiffs_free_obj_id_state *)user_p;
@@ -1668,7 +1668,7 @@ s32_t spiffs_obj_lu_find_free_obj_id(spiffs *fs, spiffs_obj_id *obj_id) {
       // not possible to represent all ids in range in a bitmap, compact and count
       if (state.compaction != 0) {
         // select element in compacted table, decrease range and recompact
-        int i, min_i = 0;
+        unsigned int i, min_i = 0;
         u8_t *map = (u8_t *)fs->work;
         u8_t min_count = 0xff;
 
@@ -1721,7 +1721,7 @@ s32_t spiffs_obj_lu_find_free_obj_id(spiffs *fs, spiffs_obj_id *obj_id) {
 }
 
 s32_t spiffs_fd_find_new(spiffs *fs, spiffs_fd **fd) {
-  int i;
+  unsigned int i;
   spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
   for (i = 0; i < fs->fd_count; i++) {
     spiffs_fd *cur_fd = &fds[i];
@@ -1735,7 +1735,7 @@ s32_t spiffs_fd_find_new(spiffs *fs, spiffs_fd **fd) {
 }
 
 s32_t spiffs_fd_return(spiffs *fs, spiffs_file f) {
-  if (f <= 0 || f > fs->fd_count) {
+  if (f <= 0 || (u32_t)f > fs->fd_count) {
     return SPIFFS_ERR_BAD_DESCRIPTOR;
   }
   spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
@@ -1748,7 +1748,7 @@ s32_t spiffs_fd_return(spiffs *fs, spiffs_file f) {
 }
 
 s32_t spiffs_fd_get(spiffs *fs, spiffs_file f, spiffs_fd **fd) {
-  if (f <= 0 || f > fs->fd_count) {
+  if (f <= 0 || (u32_t)f > fs->fd_count) {
     return SPIFFS_ERR_BAD_DESCRIPTOR;
   }
   spiffs_fd *fds = (spiffs_fd *)fs->fd_space;

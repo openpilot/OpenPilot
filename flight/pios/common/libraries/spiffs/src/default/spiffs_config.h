@@ -11,11 +11,19 @@
 // ----------- 8< ------------
 // Following includes are for the linux test build of spiffs
 // These may/should/must be removed/altered/replaced in your target
-#include "params_test.h"
+//#include "params_test.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+// ----------- >8 ------------
+
+// ----------- 8< ------------
+// Following has been added by OpenPilot
+#include <openpilot.h>
+extern xSemaphoreHandle flashfs_mutex;
+#define SPIFFS_LOCK(unused)   xSemaphoreTakeRecursive(flashfs_mutex, portMAX_DELAY)
+#define SPIFFS_UNLOCK(unused) xSemaphoreGiveRecursive(flashfs_mutex)
 // ----------- >8 ------------
 
 // compile time switches
@@ -64,7 +72,7 @@
 // Always check header of each accessed page to ensure consistent state.
 // If enabled it will increase number of reads, will increase flash.
 #ifndef SPIFFS_PAGE_CHECK
-#define SPIFFS_PAGE_CHECK               1
+#define SPIFFS_PAGE_CHECK               0
 #endif
 
 // Define maximum number of gc runs to perform to reach desired free pages.
@@ -108,7 +116,7 @@
 // Lower value generates more read/writes. No meaning having it bigger
 // than logical page size.
 #ifndef SPIFFS_COPY_BUFFER_STACK
-#define SPIFFS_COPY_BUFFER_STACK        (64)
+#define SPIFFS_COPY_BUFFER_STACK        (256)
 #endif
 
 // SPIFFS_LOCK and SPIFFS_UNLOCK protects spiffs from reentrancy on api level
@@ -128,7 +136,7 @@
 // on the target. This will reduce calculations, flash and memory accesses.
 // Parts of configuration must be defined below instead of at time of mount.
 #ifndef SPIFFS_SINGLETON
-#define SPIFFS_SINGLETON 0
+#define SPIFFS_SINGLETON 1
 #endif
 
 #if SPIFFS_SINGLETON
@@ -155,7 +163,7 @@
 // in the api. This function will visualize all filesystem using given printf
 // function.
 #ifndef SPIFFS_TEST_VISUALISATION
-#define SPIFFS_TEST_VISUALISATION         1
+#define SPIFFS_TEST_VISUALISATION         0
 #endif
 #if SPIFFS_TEST_VISUALISATION
 #ifndef spiffs_printf
@@ -178,6 +186,13 @@
 #define SPIFFS_TEST_VIS_DATA_STR(id)      "d"
 #endif
 #endif
+
+typedef signed int s32_t;
+typedef unsigned int u32_t;
+typedef signed short s16_t;
+typedef unsigned short u16_t;
+typedef signed char s8_t;
+typedef unsigned char u8_t;
 
 // Types depending on configuration such as the amount of flash bytes
 // given to spiffs file system in total (spiffs_file_system_size),

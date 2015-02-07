@@ -52,11 +52,11 @@ typedef u16_t spiffs_mode;
 typedef u8_t spiffs_obj_type;
 
 /* spi read call function type */
-typedef s32_t (*spiffs_read)(u32_t addr, u32_t size, u8_t *dst);
+typedef s32_t (*spiffs_read)(void *fs, u32_t addr, u32_t size, u8_t *dst);
 /* spi write call function type */
-typedef s32_t (*spiffs_write)(u32_t addr, u32_t size, u8_t *src);
+typedef s32_t (*spiffs_write)(void *fs, u32_t addr, u32_t size, u8_t *src);
 /* spi erase call function type */
-typedef s32_t (*spiffs_erase)(u32_t addr, u32_t size);
+typedef s32_t (*spiffs_erase)(void *fs, u32_t addr, u32_t size);
 
 /* file system check callback report operation */
 typedef enum {
@@ -136,6 +136,10 @@ typedef struct {
   spiffs_write hal_write_f;
   // physical erase function
   spiffs_erase hal_erase_f;
+  // flash_id
+  void *fs_id;
+  // buffer
+  u8_t *buffer;
 #if SPIFFS_SINGLETON == 0
   // physical size of the spi flash
   u32_t phys_size;

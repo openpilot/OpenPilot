@@ -135,6 +135,9 @@ all_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR))"
 	$(V1) [ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
 
+.PONY: clean
+clean: all_clean
+
 $(DL_DIR):
 	$(MKDIR) -p $@
 
@@ -142,6 +145,12 @@ $(TOOLS_DIR):
 	$(MKDIR) -p $@
 
 $(BUILD_DIR):
+	$(MKDIR) -p $@
+
+$(PACKAGE_DIR):
+	$(MKDIR) -p $@
+
+$(DIST_DIR):
 	$(MKDIR) -p $@
 
 ##############################
@@ -243,8 +252,8 @@ EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
 # When building any of the "all_*" targets, tell all sub makefiles to display
 # additional details on each line of output to describe which build and target
 # that each line applies to. The same applies also to all, opfw_resource,
-# package and clean_package targets
-ifneq ($(strip $(filter all_% all opfw_resource package clean_package,$(MAKECMDGOALS))),)
+# package targets
+ifneq ($(strip $(filter all_% all opfw_resource package,$(MAKECMDGOALS))),)
     export ENABLE_MSG_EXTRA := yes
 endif
 
@@ -766,51 +775,29 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
-ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
+ifneq ($(strip $(filter opfw_resource all all_fw all_flight package,$(MAKECMDGOALS))),)
     $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
 endif
 
-# Packaging targets: package, clean_package
-#  - removes build directory (clean_package only)
+# Packaging targets: package
 #  - builds all firmware, opfw_resource, gcs
 #  - copies firmware into a package directory
 #  - calls paltform-specific packaging script
 
-# Do some checks and define some values if package is requested
-ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-    # Define some variables
-    export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
-    export PACKAGE_NAME := OpenPilot
-    export PACKAGE_SEP  := -
-
-    # We can only package release builds
-    ifneq ($(GCS_BUILD_CONF),release)
-        $(error Packaging is currently supported for release builds only)
-    endif
-
-    # Packaged GCS should depend on opfw_resource
-    ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
-    endif
-
-    # Clean the build directory if clean_package is requested
-    ifneq ($(strip $(filter clean_package,$(MAKECMDGOALS))),)
-        $(info Cleaning build directory before packaging...)
-        ifneq ($(shell $(MAKE) all_clean >/dev/null 2>&1 && $(ECHO) "clean"), clean)
-            $(error Cannot clean build directory)
-        endif
-
-        .PHONY: clean_package
-        clean_package: package
-    endif
-endif
+# Define some variables
+export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
+export PACKAGE_NAME := OpenPilot
+export PACKAGE_SEP  := -
 
 .PHONY: package
-package: all_fw all_ground uavobjects_matlab
-	@$(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
-	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
-	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)"
-	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
+
+include $(ROOT_DIR)/package/$(UNAME).mk
+
+package: all_fw all_ground uavobjects_matlab $(PACKAGE_DIR)
+ifneq ($(GCS_BUILD_CONF),release)
+	# We can only package release builds
+	$(error Packaging is currently supported for release builds only)
+endif
 
 ##############################
 #
@@ -893,58 +880,21 @@ build-info:
 #
 ##############################
 
+DIST_VER_INFO := $(DIST_DIR)/version-info.json
+
+.PHONY: $(DIST_VER_INFO) # Because to many deps to list
+$(DIST_VER_INFO): $(DIST_DIR)
+	$(V1) $(VERSION_INFO) --jsonpath="$(DIST_DIR)"
+
 .PHONY: dist
-dist:
+dist: $(DIST_DIR) $(DIST_VER_INFO)
 	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_DIR))"
-	$(V1) $(MKDIR) -p "$(DIST_DIR)"
-	$(V1) $(VERSION_INFO) \
-		--jsonpath="$(DIST_DIR)"
 	$(eval DIST_NAME := $(call toprel, "$(DIST_DIR)/OpenPilot-$(shell git describe).tar"))
 	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \
 		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
-		$(call toprel, "$(DIST_DIR)/version-info.json")
+		$(call toprel, "$(DIST_VER_INFO)")
 	$(V1) gzip -f "$(DIST_NAME)"
-
-
-
-##############################
-#
-# Install OpenPilot
-#
-##############################
-prefix  := /usr/local
-bindir  := $(prefix)/bin
-libdir  := $(prefix)/lib
-datadir := $(prefix)/share
-
-INSTALL = cp -a --no-preserve=ownership
-LN = ln
-LN_S = ln -s
-
-ifeq ($(MAKECMDGOALS), install)
-        ifneq ($(UNAME), Linux)
-            $(error install only supported for Linux)
-        endif
-endif
-
-
-.PHONY: install
-install:
-	@$(ECHO) " INSTALLING GCS TO $(DESTDIR)/)"
-	$(V1) $(MKDIR) -p $(DESTDIR)$(bindir)
-	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
-	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)
-	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/applications
-	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/pixmaps
-	$(V1) $(MKDIR) -p $(DESTDIR)$(udevdir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/openpilotgcs $(DESTDIR)$(bindir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/udp_test $(DESTDIR)$(bindir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/openpilotgcs $(DESTDIR)$(libdir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/share/openpilotgcs $(DESTDIR)$(datadir)
-	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications
-	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps
-	$(V1) rm $(DESTDIR)/$(datadir)/openpilotgcs/translations/Makefile
 
 
 ##############################
@@ -1079,7 +1029,6 @@ help:
 	@$(ECHO) "                            Supported groups are ($(UAVOBJ_TARGETS))"
 	@$(ECHO)
 	@$(ECHO) "   [Packaging]"
-	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
 	@$(ECHO) "     dist                 - Generate source archive for distribution"

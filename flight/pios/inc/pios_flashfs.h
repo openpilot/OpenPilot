@@ -28,18 +28,52 @@
 #define PIOS_FLASHFS_H
 
 #include <stdint.h>
+#include <spiffs.h>
 
 struct PIOS_FLASHFS_Stats {
-    uint16_t num_free_slots; /* slots in free state */
-    uint16_t num_active_slots; /* slots in active state */
+    uint16_t block_free;
+    uint16_t block_used;
+    uint16_t cache_hits;
+    uint16_t cache_misses;
+    uint16_t gc;
 };
+
+/* any write will be appended to the end of the file */
+#define PIOS_FLASHFS_APPEND SPIFFS_APPEND
+/* if the file exists, it will be truncated */
+#define PIOS_FLASHFS_TRUNC SPIFFS_TRUNC
+/* if file does not exists, it will be created */
+#define PIOS_FLASHFS_CREAT SPIFFS_CREAT
+/* open as read only */
+#define PIOS_FLASHFS_RDONLY SPIFFS_RDONLY
+/* open as write only */
+#define PIOS_FLASHFS_WRONLY SPIFFS_WRONLY
+/* open as read and write*/
+#define PIOS_FLASHFS_RDWR SPIFFS_RDWR
+/* Write not cached (directly to spi flash) */
+#define PIOS_FLASHFS_WRTHROUGH SPIFFS_DIRECT
+
+/* Errors */
+#define PIOS_FLASHFS_OK 0
+#define PIOS_FLASHFS_ERROR_FS_INVALID -1
+#define PIOS_FLASHFS_ERROR_OPEN_FILE -2
+#define PIOS_FLASHFS_ERROR_WRITE_FILE -3
+#define PIOS_FLASHFS_ERROR_READ_FILE -4
+#define PIOS_FLASHFS_ERROR_FS_MOUNT -5
+#define PIOS_FLASHFS_ERROR_FS_ALLOC -6
+#define PIOS_FLASHFS_ERROR_REMOVE_FILE -7
 
 // define logfs subdirectory of a yaffs flash device
 #define PIOS_LOGFS_DIR "logfs"
 
+#define FLASHFS_FILENAME_LEN 26
+
 int32_t PIOS_FLASHFS_Format(uintptr_t fs_id);
-int32_t PIOS_FLASHFS_ObjSave(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t *obj_data, uint16_t obj_size);
-int32_t PIOS_FLASHFS_ObjLoad(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t *obj_data, uint16_t obj_size);
-int32_t PIOS_FLASHFS_ObjDelete(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id);
+int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int32_t file_id);
+int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, const char *path, uint16_t flags);
+int32_t PIOS_FLASHFS_Write(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size);
+int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size);
+int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path);
 int32_t PIOS_FLASHFS_GetStats(uintptr_t fs_id, struct PIOS_FLASHFS_Stats *stats);
+
 #endif /* PIOS_FLASHFS_H */

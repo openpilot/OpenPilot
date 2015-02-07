@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include "pios_flash.h" /* struct pios_flash_driver */
 
+
 struct flashfs_logfs_cfg {
     uint32_t fs_magic;
     uint32_t total_fs_size; /* Total size of all generations of the filesystem */
@@ -41,7 +42,9 @@ struct flashfs_logfs_cfg {
     uint32_t page_size; /* Maximum flash burst write size */
 };
 
-int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t *fs_id, const struct flashfs_logfs_cfg *cfg, const struct pios_flash_driver *driver, uintptr_t flash_id);
+int32_t PIOS_FLASHFS_Init(uintptr_t *fs_id,
+						  const struct pios_flash_driver *driver,
+						  uintptr_t flash_id);
 
 int32_t PIOS_FLASHFS_Logfs_Destroy(uintptr_t fs_id);
 

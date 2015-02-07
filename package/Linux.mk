@@ -6,7 +6,7 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-DEB_VER			:= $(PACKAGE_LBL)-1
+DEB_VER			:= $(subst RELEASE-,,$(PACKAGE_LBL))-1
 DEB_DIR			:= $(ROOT_DIR)/package/linux/debian
 DEB_BUILD_DIR		:= $(ROOT_DIR)/debian
 

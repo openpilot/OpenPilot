@@ -48,13 +48,13 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ui.actuatorLink->setChecked(false);
     connect(ui.actuatorLink, SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
 
-    // Set limits    
+    // Set limits
     ui.actuatorMin->setMaximum(MAXOUTPUT_VALUE);
     ui.actuatorMax->setMaximum(MAXOUTPUT_VALUE);
     ui.actuatorValue->setMaximum(MAXOUTPUT_VALUE);
     ui.actuatorMin->setMinimum(MINOUTPUT_VALUE);
     ui.actuatorMax->setMinimum(MINOUTPUT_VALUE);
-    ui.actuatorValue->setMinimum(MINOUTPUT_VALUE);    
+    ui.actuatorValue->setMinimum(MINOUTPUT_VALUE);
 
     disableMouseWheelEvents();
 }
@@ -208,7 +208,7 @@ void OutputChannelForm::setRange(int minimum, int maximum)
  */
 void OutputChannelForm::setChannelRange()
 {
-    int oldMini = ui.actuatorNeutral->minimum();
+    int oldMini  = ui.actuatorNeutral->minimum();
     int minValue = ui.actuatorMin->value();
     int maxValue = ui.actuatorMax->value();
 
@@ -227,7 +227,7 @@ void OutputChannelForm::setChannelRange()
     }
 
     // Enable only outputs already set in mixer
-    if (name() != "-") {       
+    if (name() != "-") {
         ui.actuatorMin->setEnabled(true);
         ui.actuatorMax->setEnabled(true);
         ui.actuatorNeutral->setEnabled(true);

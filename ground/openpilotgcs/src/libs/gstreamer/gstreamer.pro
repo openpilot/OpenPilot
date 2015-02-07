@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = GST_lib
+TARGET = GCSGStreamer
 DEFINES += GST_LIB_LIBRARY
 
 QT += widgets

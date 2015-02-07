@@ -8,7 +8,7 @@ SUBDIRS = \
     aggregation \
     extensionsystem \
     glc_lib \
-    gst_lib \
+    gstreamer \
     utils \
     opmapcontrol \
     qwt \

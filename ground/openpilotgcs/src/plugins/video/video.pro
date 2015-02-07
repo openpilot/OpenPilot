@@ -3,7 +3,7 @@ TARGET = VideoGadget
 
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
-include(../../libs/gst_lib/gst_lib.pri)
+include(../../libs/gstreamer/gstreamer.pri)
 include(video_dependencies.pri)
 
 HEADERS += \

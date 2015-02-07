@@ -7,9 +7,10 @@ equals(copydata, 1) {
             gst-inspect-0.10 \
             gst-launch-0.10
 
+        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_LIBRARY_PATH/gstreamer\") $$addNewline()
         for(exe, GCS_EXES) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/bin/$$exe\") \
-                $$targetPath(\"$$GCS_APP_PATH/$$lib\") $$addNewline()
+                $$targetPath(\"$$GCS_LIBRARY_PATH/gstreamer\") $$addNewline()
         }
 
         # copy core libraries
@@ -35,7 +36,7 @@ equals(copydata, 1) {
 
         for(lib, GCS_LIBS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/lib/$$lib\") \
-                $$targetPath(\"$$GCS_LIBRARY_PATH/$$lib\") $$addNewline()
+                $$targetPath(\"$$GCS_LIBRARY_PATH/gstreamer/$$lib\") $$addNewline()
         }
 
         # copy plugin LIBS
@@ -54,10 +55,10 @@ equals(copydata, 1) {
             libgstvideoscale.so \
             libgstvideotestsrc.so 
 
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/gstreamer-0.10/$$lib\") $$addNewline()
+        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_LIBRARY_PATH/gstreamer/gstreamer-0.10/$$lib\") $$addNewline()
         for(lib, GCS_PLUGIN_LIBS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/lib/gstreamer-0.10/$$lib\") \
-                $$targetPath(\"$$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/gstreamer-0.10/$$lib\") $$addNewline()
+                $$targetPath(\"$$GCS_LIBRARY_PATH/gstreamer/gstreamer-0.10/$$lib\") $$addNewline()
         }
 
     }

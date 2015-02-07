@@ -1,0 +1,14 @@
+<xml>
+    <object name="FlashFsStats" singleinstance="true" settings="false" category="System">
+        <description>Flash filesystem status. </description>
+        <field name="BlockFree" units="64KBytes" type="uint16" elements="1"/>
+        <field name="BlockUsed" units="64KBytes" type="uint16" elements="1"/>
+        <field name="CacheHits" units="counter" type="uint16" elements="1"/>
+        <field name="CacheMisses" units="counter" type="uint16" elements="1"/>
+        <field name="Gc" units="counter" type="uint16" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

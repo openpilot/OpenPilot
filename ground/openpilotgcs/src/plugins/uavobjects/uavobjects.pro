@@ -134,7 +134,8 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/auxmagsensor.h \
     $$UAVOBJECT_SYNTHETICS/auxmagsettings.h \
     $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.h \
-    $$UAVOBJECT_SYNTHETICS/perfcounter.h
+    $$UAVOBJECT_SYNTHETICS/perfcounter.h \
+    $$UAVOBJECT_SYNTHETICS/flashfsstats.h
 
 SOURCES += \
     $$UAVOBJECT_SYNTHETICS/statusgrounddrive.cpp \
@@ -245,5 +246,6 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/auxmagsensor.cpp \
     $$UAVOBJECT_SYNTHETICS/auxmagsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.cpp \
-    $$UAVOBJECT_SYNTHETICS/perfcounter.cpp
+    $$UAVOBJECT_SYNTHETICS/perfcounter.cpp \
+    $$UAVOBJECT_SYNTHETICS/flashfsstats.cpp
 

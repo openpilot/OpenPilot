@@ -109,53 +109,6 @@ void PIOS_DEBUG_PinLow(__attribute__((unused)) uint8_t pin)
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
-
-void PIOS_DEBUG_PinValue8Bit(__attribute__((unused)) uint8_t value)
-{
-#ifdef PIOS_ENABLE_DEBUG_PINS
-    if (!debug_channels) {
-        return;
-    }
-
-#pragma message("This code is not portable and should be revised")
-    PIOS_Assert(0);
-
-    uint32_t bsrr_l = (((~value) & 0x0F) << (16 + 6)) | ((value & 0x0F) << 6);
-    uint32_t bsrr_h = (((~value) & 0xF0) << (16 + 6 - 4)) | ((value & 0xF0) << (6 - 4));
-
-    PIOS_IRQ_Disable();
-
-    /*
-     * This is sketchy since it assumes a particular ordering
-     * and bitwise layout of the channels provided to the debug code.
-     */
-    // debug_channels[0].pin.gpio->BSRR = bsrr_l;
-    // debug_channels[4].pin.gpio->BSRR = bsrr_h;
-
-    PIOS_IRQ_Enable();
-#endif // PIOS_ENABLE_DEBUG_PINS
-}
-
-void PIOS_DEBUG_PinValue4BitL(__attribute__((unused)) uint8_t value)
-{
-#ifdef PIOS_ENABLE_DEBUG_PINS
-    if (!debug_channels) {
-        return;
-    }
-
-#pragma message("This code is not portable and should be revised")
-    PIOS_Assert(0);
-
-    /*
-     * This is sketchy since it assumes a particular ordering
-     * and bitwise layout of the channels provided to the debug code.
-     */
-    uint32_t bsrr_l = ((~(value & 0x0F) << (16 + 6))) | ((value & 0x0F) << 6);
-    // debug_channels[0].pin.gpio->BSRR = bsrr_l;
-#endif // PIOS_ENABLE_DEBUG_PINS
-}
-
-
 /**
  * Report a serious error and halt
  */

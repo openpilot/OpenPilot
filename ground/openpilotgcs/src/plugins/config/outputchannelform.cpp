@@ -33,8 +33,8 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ui.setupUi(this);
 
     // The convention for OP is Channel 1 to Channel 10.
-    ui.actuatorNumber->setText(QString("%1:").arg(index + 1));
-
+    ui.actuatorNumber->setText(QString("%1").arg(index + 1));
+    setBank("-");
     // Register for ActuatorSettings changes:
     connect(ui.actuatorMin, SIGNAL(editingFinished()), this, SLOT(setChannelRange()));
     connect(ui.actuatorMax, SIGNAL(editingFinished()), this, SLOT(setChannelRange()));
@@ -58,12 +58,36 @@ QString OutputChannelForm::name()
     return ui.actuatorName->text();
 }
 
+QString OutputChannelForm::bank()
+{
+    return ui.actuatorBankNumber->text();
+}
+
 /**
  * Set the channel assignment label.
  */
 void OutputChannelForm::setName(const QString &name)
 {
     ui.actuatorName->setText(name);
+}
+
+void OutputChannelForm::setColor(const QColor &color)
+{
+    QString stylesheet = ui.actuatorNumberFrame->styleSheet();
+
+    stylesheet = stylesheet.split("background-color").first();
+    stylesheet.append(
+        QString("background-color: rgb(%1, %2, %3)")
+        .arg(color.red()).arg(color.green()).arg(color.blue()));
+    ui.actuatorNumberFrame->setStyleSheet(stylesheet);
+}
+
+/**
+ * Set the channel bank label.
+ */
+void OutputChannelForm::setBank(const QString &bank)
+{
+    ui.actuatorBankNumber->setText(bank);
 }
 
 /**

@@ -37,6 +37,8 @@
 #include <QWidget>
 #include <QList>
 
+#include "systemalarms.h"
+
 class Ui_OutputWidget;
 class OutputChannelForm;
 
@@ -50,11 +52,12 @@ public:
 protected:
     void enableControls(bool enable);
 
+    void setWarning(QString message);
 private:
     Ui_OutputWidget *ui;
 
     QList<QSlider> sliders;
-
+    QPixmap warningPic;
     void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
     void assignOutputChannel(UAVDataObject *obj, QString &str);
@@ -69,7 +72,9 @@ private:
 
     UAVObject::Metadata accInitialData;
 
+    SystemAlarms *systemAlarmsObj;
 private slots:
+    void updateWarnings(UAVObject *);
     void stopTests();
     virtual void refreshWidgetsValues(UAVObject *obj = NULL);
     void updateObjectsFromWidgets();

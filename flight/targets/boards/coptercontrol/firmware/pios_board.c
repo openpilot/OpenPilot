@@ -713,7 +713,7 @@ void PIOS_Board_Init(void)
     HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
 
     switch (hwsettings_rcvrport) {
-    case HWSETTINGS_CC_RCVRPORT_DISABLED:
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
 #if defined(PIOS_INCLUDE_HCSR04)
         {
             uint32_t pios_hcsr04_id;
@@ -721,7 +721,7 @@ void PIOS_Board_Init(void)
         }
 #endif
         break;
-    case HWSETTINGS_CC_RCVRPORT_PWM:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
 #if defined(PIOS_INCLUDE_PWM)
         {
             uint32_t pios_pwm_id;
@@ -735,8 +735,8 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PWM */
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPM:
-    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
 #if defined(PIOS_INCLUDE_PPM)
         {
             uint32_t pios_ppm_id;
@@ -750,7 +750,7 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PPM */
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPMPWM:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
         /* This is a combination of PPM and PWM inputs */
 #if defined(PIOS_INCLUDE_PPM)
         {
@@ -795,14 +795,14 @@ void PIOS_Board_Init(void)
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
     switch (hwsettings_rcvrport) {
-    case HWSETTINGS_CC_RCVRPORT_DISABLED:
-    case HWSETTINGS_CC_RCVRPORT_PWM:
-    case HWSETTINGS_CC_RCVRPORT_PPM:
-    case HWSETTINGS_CC_RCVRPORT_PPMPWM:
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
         PIOS_Servo_Init(&pios_servo_cfg);
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
-    case HWSETTINGS_CC_RCVRPORT_OUTPUTS:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
         PIOS_Servo_Init(&pios_servo_rcvr_cfg);
         break;
     }

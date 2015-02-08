@@ -139,7 +139,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
     case VehicleConfigurationSource::CONTROLLER_CC:
     case VehicleConfigurationSource::CONTROLLER_CC3D:
         // Reset all ports
-        data.CC_RcvrPort  = HwSettings::CC_RCVRPORT_DISABLED;
+        data.CC_RcvrPort  = HwSettings::CC_RCVRPORT_DISABLEDONESHOT;
 
         // Default mainport to be active telemetry link
         data.CC_MainPort  = HwSettings::CC_MAINPORT_TELEMETRY;
@@ -147,10 +147,10 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DISABLED;
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
-            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PWM;
+            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PWMNOONESHOT;
             break;
         case VehicleConfigurationSource::INPUT_PPM:
-            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM;
+            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPMNOONESHOT;
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
             // We have to set teletry on flexport since s.bus needs the mainport.

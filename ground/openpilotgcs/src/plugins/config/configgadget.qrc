@@ -1,5 +1,13 @@
 <RCC>
     <qresource prefix="/configgadget">
+        <file>images/oplm-ppm-bi-off.png</file>
+        <file>images/oplm-ppm-bi-on.png</file>
+        <file>images/oplm-ppm-oneway-off.png</file>
+        <file>images/oplm-ppm-oneway-on.png</file>
+        <file>images/oplm-telemetry-off.png</file>
+        <file>images/oplm-telemetry-on.png</file>
+        <file>images/oplm-telemetry-ppm-off.png</file>
+        <file>images/oplm-telemetry-ppm-on.png</file>
         <file>images/flightmode_bg1.png</file>
         <file>images/flightmode_bg2.png</file>
         <file>images/flightmode_bg3.png</file>

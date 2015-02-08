@@ -38,7 +38,7 @@ INCLUDEPATH += \
     $(GSTREAMER_SDK_DIR)/lib/i386-linux-gnu/glib-2.0/include
 
 LIBS += -L$(GSTREAMER_SDK_DIR)/lib
-LIBS += -lgobject-2.0 -lglib-2.0 -lgstreamer-1.0
+LIBS += -lgobject-2.0 -lglib-2.0 -lgstreamer-1.0 -lgstvideo-1.0
 
 include(copydata.pro)
 

@@ -458,13 +458,12 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
     // and as such is not necessarily called on the QT event handling thread
     switch (GST_MESSAGE_TYPE(message)) {
     case GST_MESSAGE_ELEMENT:
-        if (gst_message_has_name(message, "prepare-xwindow-id")) {
+        if (gst_is_video_overlay_prepare_window_handle_message(message)) {
             qDebug()
-                    << QString("Element %0 prepare window with window #%1").arg(GST_OBJECT_NAME(message->src)).arg(
+                    << QString("VideoWidget - element %0 prepare window with window #%1").arg(GST_OBJECT_NAME(message->src)).arg(
                             (gulong) wId);
             // prepare-xwindow-id must be handled synchronously in order to have gstreamer use our window
             GstVideoOverlay *gst_video_overlay = GST_VIDEO_OVERLAY(GST_MESSAGE_SRC(message));
-            //imagesink.set_property("force-aspect-ratio", True)
             gst_video_overlay_set_window_handle(gst_video_overlay, (gulong) wId);
             // and now post event asynchronously
             Overlay *overlay = new GstOverlayImpl(gst_video_overlay);

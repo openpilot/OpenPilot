@@ -72,7 +72,7 @@ static GstBusSyncReply gst_bus_sync_handler(GstBus *, GstMessage *, BusSyncHandl
 VideoWidget::VideoWidget(QWidget *parent) :
         QWidget(parent), pipeline(NULL), overlay(NULL)
 {
-    qDebug() << QString("creating (%0) - #%1").arg((long) QThread::currentThreadId()).arg("VideoWidget");
+    qDebug() << QString("VideoWidget - creating (%0) - #%1").arg((long) QThread::currentThreadId()).arg("VideoWidget");
 
     // initialize gstreamer
     gst::init(NULL, NULL);
@@ -87,7 +87,7 @@ VideoWidget::VideoWidget(QWidget *parent) :
     setPalette(pal);
 
     WId wid = winId();
-    qDebug() << QString("video winId : %0").arg((gulong) wid);
+    qDebug() << QString("VideoWidget - video winId : %0").arg((gulong) wid);
     handler = new BusSyncHandler(this, wid);
 
     // init widget state (see setOverlay() for more information)
@@ -100,7 +100,7 @@ VideoWidget::VideoWidget(QWidget *parent) :
     lastError = "";
     reset = false;
 
-    qDebug() << QString("created video widget winId : %0").arg((gulong) wid);
+    qDebug() << QString("VideoWidget - created video widget winId : %0").arg((gulong) wid);
 }
 
 VideoWidget::~VideoWidget()
@@ -119,13 +119,13 @@ bool VideoWidget::isPlaying()
 
 void VideoWidget::setPipelineDesc(QString pipelineDesc)
 {
-    qDebug() << QString("Setting pipeline desc to : %0").arg(pipelineDesc);
+    qDebug() << QString("VideoWidget - setting pipeline desc to : %0").arg(pipelineDesc);
     this->pipelineDesc = pipelineDesc;
 }
 
 void VideoWidget::start()
 {
-    qDebug() << QString("starting pipeline desc to : %0").arg(pipelineDesc);
+    qDebug() << QString("VideoWidget - starting pipeline : %0").arg(pipelineDesc);
     init();
     gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
     repaint();
@@ -152,13 +152,13 @@ void VideoWidget::stop()
 void VideoWidget::init()
 {
     if (reset) {
-        qDebug() << QString("reseting pipeline (%0)").arg((long) QThread::currentThreadId());
+        qDebug() << QString("VideoWidget - reseting pipeline (%0)").arg((long) QThread::currentThreadId());
         dispose();
     }
 
     if (pipeline) {
-        // if pipeline is aleardy created, reset some state and return
-        qDebug() << QString("reseting pipeline state (%0)").arg((long) QThread::currentThreadId());
+        // if pipeline is already created, reset some state and return
+        qDebug() << QString("VideoWidget - reseting pipeline state (%0)").arg((long) QThread::currentThreadId());
         lastError = "";
         reset = false;
         return;
@@ -169,7 +169,7 @@ void VideoWidget::init()
     reset = false;
 
     // create pipeline
-    qDebug() << QString("initializing pipeline (%0)").arg((long) QThread::currentThreadId());
+    qDebug() << QString("VideoWidget - initializing pipeline (%0)").arg((long) QThread::currentThreadId());
     pipeline = createPipelineFromDesc(pipelineDesc.toStdString().c_str(), lastError);
     if (!pipeline) {
         return;
@@ -187,7 +187,7 @@ void VideoWidget::dispose()
     if (!pipeline) {
         return;
     }
-    qDebug() << QString("disposing pipeline (%0)").arg((long) QThread::currentThreadId());
+    qDebug() << QString("VideoWidget - disposing pipeline (%0)").arg((long) QThread::currentThreadId());
 
     //GstElement *element = GST_ELEMENT(pipeline);
     //pipeline = NULL;
@@ -344,13 +344,13 @@ bool VideoWidget::event(QEvent *event)
 {
     if (event->type() == PipelineEvent::PrepareWindowId) {
         PrepareWindowIdEvent *pe = static_cast<PrepareWindowIdEvent *>(event);
-        qDebug() << QString("got event (%0) : PrepareWindowId").arg((long) QThread::currentThreadId());
+        qDebug() << QString("VideoWidget - got event (%0) : PrepareWindowId").arg((long) QThread::currentThreadId());
         setOverlay(pe->getOverlay());
         return true;
     } else if (event->type() == PipelineEvent::StateChange) {
         StateChangedEvent *sce = static_cast<StateChangedEvent *>(event);
         qDebug()
-                << QString("Pipeline %0 changed state from %1 to %2").arg(sce->src).arg(name(sce->getOldState())).arg(
+                << QString("VideoWidget - pipeline %0 changed state from %1 to %2").arg(sce->src).arg(name(sce->getOldState())).arg(
                         name(sce->getNewState()));
         //StateChangedEvent::State oldState = cvt(old_state);
         //Pipeline::State newState = cvt(new_state);
@@ -359,13 +359,13 @@ bool VideoWidget::event(QEvent *event)
     } else if (event->type() == PipelineEvent::Qos) {
         QosEvent *qe = static_cast<QosEvent *>(event);
         qDebug()
-                << QString("Element %0 sent qos event:\n%1\n%2\n%3").arg(qe->src).arg(qe->getData().timestamps()).arg(
+                << QString("VideoWidget - element %0 sent qos event:\n%1\n%2\n%3").arg(qe->src).arg(qe->getData().timestamps()).arg(
                         qe->getData().values()).arg(qe->getData().stats());
         return true;
     } else if (event->type() == PipelineEvent::Error) {
         ErrorEvent *ee = static_cast<ErrorEvent *>(event);
         qDebug()
-                << QString("Element %0 sent error event:\n%1\n%2").arg(ee->src).arg(ee->getMessage()).arg(
+                << QString("VideoWidget - element %0 sent error event:\n%1\n%2").arg(ee->src).arg(ee->getMessage()).arg(
                         ee->getDebug());
         if (lastError.isEmpty()) {
             // remember first error only (usually the most useful)
@@ -425,7 +425,7 @@ void VideoWidget::setOverlay(Overlay *overlay)
 
 static GstElement *createPipelineFromDesc(const char *desc, QString &lastError)
 {
-    qDebug() << QString("creating pipeline : %0").arg(desc);
+    qDebug() << QString("VideoWidget - creating pipeline : %0").arg(desc);
     GError *error = NULL;
     GstElement *pipeline = gst_parse_launch_full(desc, NULL, GST_PARSE_FLAG_FATAL_ERRORS, &error);
     if (!pipeline) {
@@ -454,7 +454,7 @@ static GstElement *createPipelineFromDesc(const char *desc, QString &lastError)
 
 bool BusSyncHandler::handleMessage(GstMessage *message)
 {
-    // this method is called by gstreamer as callback
+    // this method is called by gstreamer as a callback
     // and as such is not necessarily called on the QT event handling thread
     switch (GST_MESSAGE_TYPE(message)) {
     case GST_MESSAGE_ELEMENT:
@@ -475,7 +475,7 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         if (GST_IS_PIPELINE(message->src)) {
             GstState old_state, new_state, pending_state;
             gst_message_parse_state_changed(message, &old_state, &new_state, &pending_state);
-            // qDebug() << QString("Element %0 changed state from %1 to %2").arg(GST_OBJECT_NAME(message->src)).arg(gst_element_state_get_name(old_state)).arg(gst_element_state_get_name(new_state));
+            // qDebug() << QString("VideoWidget - element %0 changed state from %1 to %2").arg(GST_OBJECT_NAME(message->src)).arg(gst_element_state_get_name(old_state)).arg(gst_element_state_get_name(new_state));
             QString name = GST_OBJECT_NAME(message->src);
             Pipeline::State oldState = cvt(old_state);
             Pipeline::State newState = cvt(new_state);
@@ -520,7 +520,7 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
 static GstBusSyncReply gst_bus_sync_handler(GstBus *bus, GstMessage *message, BusSyncHandler *handler)
 {
     qDebug()
-            << QString("bus_sync_handler (%0) : %1 : %2 (%3)").arg((long) QThread::currentThreadId()).arg(
+            << QString("VideoWidget - bus_sync_handler (%0) : %1 : %2 (%3)").arg((long) QThread::currentThreadId()).arg(
                     GST_OBJECT_NAME(message->src)).arg(GST_MESSAGE_TYPE_NAME(message)).arg(
                     message != NULL ? GST_OBJECT_NAME(message) : "null");
 

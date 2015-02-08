@@ -32,6 +32,8 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 #include <taskinfo.h>
+#include <sanitycheck.h>
+#include <actuatorsettings.h>
 
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <pios_instrumentation.h>
@@ -51,6 +53,8 @@
  * NOTE: No slot in this map for NONE.
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
+static SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook();
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN     32
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN     12
@@ -841,8 +845,43 @@ void PIOS_Board_Init(void)
 
     /* Make sure we have at least one telemetry link configured or else fail initialization */
     PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
+
+    // Attach the board config check hook
+    SANITYCHECK_AttachHook(&CopterControlConfigHook);
 }
 
+SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook()
+{
+    // inhibit usage of oneshot for non supported RECEIVER port modes
+    uint8_t recmode;
+
+    HwSettingsCC_RcvrPortGet(&recmode);
+    switch ((HwSettingsCC_RcvrPortOptions)recmode) {
+    // Those modes allows oneshot usage
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
+        return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
+
+    // inhibit oneshot for the following modes
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
+    {
+        uint8_t modes[ACTUATORSETTINGS_BANKMODE_NUMELEM];
+        ActuatorSettingsBankModeGet(modes);
+        for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
+            if (modes[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT ||
+                modes[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
+                return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;;
+            }
+        }
+        return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
+    }
+    }
+    return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;;
+}
 /**
  * @}
  */

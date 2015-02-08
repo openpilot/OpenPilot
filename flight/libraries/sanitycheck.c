@@ -178,24 +178,24 @@ int32_t configuration_check()
         }
     }
 
-    uint8_t checks_disabled;
-    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
-    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
-        severity = SYSTEMALARMS_ALARM_WARNING;
-    }
-
     // query sanity check hooks
-    if (severity == SYSTEMALARMS_ALARM_OK) {
+    if (severity < SYSTEMALARMS_ALARM_CRITICAL) {
         SANITYCHECK_CustomHookInstance *instance = NULL;
         LL_FOREACH(hooks, instance) {
             if (instance->enabled) {
                 alarmstatus = instance->hook();
                 if (alarmstatus != SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE) {
-                    severity = SYSTEMALARMS_ALARM_WARNING;
+                    severity = SYSTEMALARMS_ALARM_CRITICAL;
                     break;
                 }
             }
         }
+    }
+
+    uint8_t checks_disabled;
+    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
+    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
+        severity = SYSTEMALARMS_ALARM_WARNING;
     }
 
     if (severity != SYSTEMALARMS_ALARM_OK) {

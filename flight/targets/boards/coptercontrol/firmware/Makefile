@@ -30,6 +30,12 @@ USE_DSP_LIB ?= NO
 # Set to YES to build a FW version that will erase data flash memory
 ERASE_FLASH ?= NO
 
+# Set to yes to include Gcsreceiver module
+GCSRECEIVER ?= NO
+
+# Enable Diag tasks ?
+DIAG_TASKS ?= NO
+
 # List of mandatory modules to include
 MODULES += Attitude
 MODULES += Stabilization
@@ -103,7 +109,6 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gyrostate.c
     SRC += $(OPUAVSYNTHDIR)/attitudestate.c
     SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
-    SRC += $(OPUAVSYNTHDIR)/i2cstats.c
     SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
     SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
     SRC += $(OPUAVSYNTHDIR)/flightmodesettings.c
@@ -117,13 +122,22 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gpssettings.c
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
-    SRC += $(OPUAVSYNTHDIR)/taskinfo.c
-    SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
-    SRC += $(OPUAVSYNTHDIR)/perfcounter.c
+    # Command line option for Gcsreceiver module
+    ifeq ($(GCSRECEIVER), YES)
+        SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
+    endif
+    # Enable Diag tasks and UAVOs needed
+    ifeq ($(DIAG_TASKS), YES)
+        CDEFS += -DDIAG_TASKS
+        SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+        SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
+        SRC += $(OPUAVSYNTHDIR)/perfcounter.c
+        SRC += $(OPUAVSYNTHDIR)/i2cstats.c
+    endif
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

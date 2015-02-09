@@ -137,7 +137,7 @@ static void ControlUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         uint8_t armed;
         FlightStatusArmedGet(&armed);
         if (armed == FLIGHTSTATUS_ARMED_DISARMED) {
-            PIOS_DEBUGLOG_Format();
+            PIOS_DEBUGLOG_DeleteAll();
         }
     }
     StatusUpdatedCb(ev);

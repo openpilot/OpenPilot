@@ -87,7 +87,7 @@ void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint1
 /**
  * @brief Format entire flash memory!!!
  */
-void PIOS_DEBUGLOG_Format(void);
+void PIOS_DEBUGLOG_DeleteAll(void);
 
 #endif // ifndef PIOS_DEBUGLOG_H
 

@@ -417,7 +417,7 @@ void PIOS_Board_Init(void)
         PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
         PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
 #if defined(PIOS_INCLUDE_FLASH)
-        // Mathieu TODO: Also format if could not mount file system or unknown file system
+        // Format (chip erase): All content of external flash will be destroyed including file system info
         PIOS_FLASHFS_Format(pios_external_flash_fs_id);
 #endif
         PIOS_IAP_WriteBootCmd(0, 0);

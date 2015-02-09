@@ -712,8 +712,7 @@ int32_t UAVObjLoadSettings()
     // Check if this is a settings object
     if (UAVObjIsSettings(obj)) {
         // Load object
-        if (UAVObjLoad((UAVObjHandle)obj, 0) ==
-            -1) {
+        if (UAVObjLoad((UAVObjHandle)obj, 0) == -1) {
             goto unlock_exit;
         }
     }

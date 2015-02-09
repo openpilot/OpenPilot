@@ -27,18 +27,27 @@
 #include "openpilot.h"
 #include "pios_struct_helper.h"
 #include "inc/uavobjectprivate.h"
+#include <flashfsstats.h>
 
 extern uintptr_t pios_uavo_settings_fs_id;
 
-/* This is for testing right now: Need to find a better unique name generator with module as a prefix */
-static void UAVObjFilename(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *filename)
+/* Generate file name */
+static void UAVObjFilenameCreate(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *filename)
 {
     uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    snprintf((char *)filename, FLASHFS_FILENAME_LEN, "/dev%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
+    snprintf((char *)filename, FLASHFS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
 }
+
+
+/* Get prefix of all uavObj files */
+static void UAVObjPrefixGet(uintptr_t fs_id, char *devicename)
+{
+    snprintf((char *)devicename, FLASHFS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u", (unsigned)fs_id);
+}
+
 
 /**
  * Save the data of the specified object to the file system (SD card).
@@ -55,6 +64,9 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
     uint8_t *obj_data;
     int16_t fh;
     char filename[FLASHFS_FILENAME_LEN];
+    FlashFsStatsData flashfs;
+
+    FlashFsStatsGet(&flashfs);
 
     if (UAVObjIsMetaobject(obj_handle)) {
 
@@ -76,10 +88,17 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 
     }
 
-    UAVObjFilename(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+    UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
 
-    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
-
+    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_WRONLY);
+    if (fh >= 0) {
+        if (flashfs.UAVobj)
+            flashfs.UAVobj--;
+    }
+    else
+    {
+        fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
+    }
     if (fh < 0)
         return -1;
 
@@ -88,6 +107,9 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 
     if (PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh) != PIOS_FLASHFS_OK)
         return -1;
+
+    flashfs.UAVobj++;
+	FlashFsStatsSet(&flashfs);
 
     return 0;
 }
@@ -126,7 +148,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
         obj_data = InstanceData(instEntry);
     }
 
-    UAVObjFilename(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+    UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
 
     fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_RDONLY);
 
@@ -153,12 +175,39 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 {
     char filename[FLASHFS_FILENAME_LEN];
+    FlashFsStatsData flashfs;
 
     PIOS_Assert(obj_handle);
 
-    UAVObjFilename(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+    UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
 
     PIOS_FLASHFS_Remove(pios_uavo_settings_fs_id, filename);
 
+    FlashFsStatsGet(&flashfs);
+    if (flashfs.UAVobj)
+        flashfs.UAVobj--;
+	FlashFsStatsSet(&flashfs);
+    return 0;
+}
+
+
+/**
+ * Delete all object from the file system.
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjDeleteAll()
+{
+    char filename[FLASHFS_FILENAME_LEN];
+    FlashFsStatsData flashfs;
+
+    UAVObjPrefixGet(pios_uavo_settings_fs_id, filename);
+
+    // Delete settings files from external flash (rm settings*)
+    if (PIOS_FLASHFS_Find(pios_uavo_settings_fs_id, filename, UAVO_PREFIX_SIZE, PIOS_FLASHFS_REMOVE) < 0)
+		return -1;
+
+    FlashFsStatsGet(&flashfs);
+    flashfs.UAVobj = 0;
+	FlashFsStatsSet(&flashfs);
     return 0;
 }

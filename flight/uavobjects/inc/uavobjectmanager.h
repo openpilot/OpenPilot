@@ -202,6 +202,7 @@ uint8_t UAVObjUpdateCRC(UAVObjHandle obj_handle, uint16_t instId, uint8_t crc);
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId);
+int32_t UAVObjDeleteAll();
 int32_t UAVObjSaveSettings();
 int32_t UAVObjLoadSettings();
 int32_t UAVObjDeleteSettings();

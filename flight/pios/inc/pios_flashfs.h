@@ -52,6 +52,8 @@ struct PIOS_FLASHFS_Stats {
 #define PIOS_FLASHFS_RDWR SPIFFS_RDWR
 /* Write not cached (directly to spi flash) */
 #define PIOS_FLASHFS_WRTHROUGH SPIFFS_DIRECT
+/* Remove matching file */
+#define PIOS_FLASHFS_REMOVE 1
 
 /* Errors */
 #define PIOS_FLASHFS_OK 0
@@ -62,6 +64,7 @@ struct PIOS_FLASHFS_Stats {
 #define PIOS_FLASHFS_ERROR_FS_MOUNT -5
 #define PIOS_FLASHFS_ERROR_FS_ALLOC -6
 #define PIOS_FLASHFS_ERROR_REMOVE_FILE -7
+#define PIOS_FLASHFS_ERROR_PREFIX_SIZE -8
 
 // define logfs subdirectory of a yaffs flash device
 #define PIOS_LOGFS_DIR "logfs"
@@ -75,5 +78,5 @@ int32_t PIOS_FLASHFS_Write(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t
 int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size);
 int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path);
 int32_t PIOS_FLASHFS_GetStats(uintptr_t fs_id, struct PIOS_FLASHFS_Stats *stats);
-
+int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags);
 #endif /* PIOS_FLASHFS_H */

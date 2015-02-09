@@ -37,6 +37,8 @@
 
 // Macros
 #define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
+#define UAVO_PREFIX_SIZE 5
+#define UAVO_PREFIX_STRING "UAV"
 
 // Mach-o: dummy segment to calculate ASLR offset in sim_osx
 #if (defined(__MACH__) && defined(__APPLE__))

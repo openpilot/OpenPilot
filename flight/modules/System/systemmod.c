@@ -380,7 +380,8 @@ static void objectUpdatedCb(UAVObjEvent *ev)
             }
         } else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_FULLERASE) {
 #if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
-            retval = PIOS_FLASHFS_Format(0);
+            // Delete obj from external flash
+            retval = UAVObjDeleteAll();
 #else
             retval = -1;
 #endif

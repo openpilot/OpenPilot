@@ -383,8 +383,7 @@ out_exit:
 /**
  * @brief Delete one instance of an object from the filesystem
  * @param[in] fs_id The filesystem to use for this action
- * @param[in] obj UAVObject ID of the object to delete
- * @param[in] obj_inst_id The instance of the object to delete
+ * @param[in] path name of the file to delete
  */
 int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path)
 {
@@ -403,6 +402,47 @@ int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path)
 
 	PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_DELETE);
     return rc;
+}
+
+
+/**
+ * @brief Helper function: 'find / -name "prefix*" | wc -l'
+ * @param[in] fs_id The filesystem to use for this action
+ * @param[in] path string to use for the search
+ * @param[in] size number of bytes to use as a prefix for the search
+ * @param[in] flags the flags for the open command, can be combinations of REMOVE
+ */
+int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags)
+{
+	int32_t filecount = 0;
+	int16_t file_id;
+
+    struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
+
+    if (!PIOS_FLASHFS_Validate(flashfs))
+        return PIOS_FLASHFS_ERROR_FS_INVALID;
+
+    if (prefix_size > FLASHFS_FILENAME_LEN)
+        return PIOS_FLASHFS_ERROR_PREFIX_SIZE;
+
+	spiffs_DIR d;
+	struct spiffs_dirent e;
+	struct spiffs_dirent *pe = &e;
+
+	SPIFFS_opendir(&flashfs->fs, "/", &d);
+
+	while ((pe = SPIFFS_readdir(&d, pe)))
+		if (strncmp(path, (char*)pe->name, prefix_size) == 0) {
+			if (flags & PIOS_FLASHFS_REMOVE) {
+				file_id = SPIFFS_open_by_dirent(&flashfs->fs, pe, SPIFFS_RDWR, 0);
+				SPIFFS_fremove(&flashfs->fs, file_id);
+			}
+			filecount++;
+		}
+
+	SPIFFS_closedir(&d);
+
+    return filecount;
 }
 
 

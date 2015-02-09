@@ -127,7 +127,7 @@ FSMLand *FSMLand::p_inst = 0;
 
 
 FSMLand::FSMLand()
-: mLandData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
+    : mLandData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
 {}
 
 // Private types
@@ -216,8 +216,9 @@ void FSMLand::Activate()
     }
 }
 
-void FSMLand::Abort(void) {
-        setState(LAND_STATE_ABORT, FSMLANDSTATUS_STATEEXITREASON_NONE);
+void FSMLand::Abort(void)
+{
+    setState(LAND_STATE_ABORT, FSMLANDSTATUS_STATEEXITREASON_NONE);
 }
 
 PathFollowerFSMState_T FSMLand::GetCurrentState(void)
@@ -740,6 +741,3 @@ void FSMLand::run_abort(__attribute__((unused)) uint8_t flTimeout)
 {
     fallback_to_hold();
 }
-
-
-

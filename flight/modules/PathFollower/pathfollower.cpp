@@ -151,7 +151,7 @@ static PathSummaryData pathSummary;
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
 
-static PathFollowerControlLanding *activeController   = 0;
+static PathFollowerControlLanding *activeController = 0;
 
 
 // Private functions
@@ -258,9 +258,9 @@ static void pathFollowerTask(void)
     pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
 
     if (activeController) {
-	activeController->UpdateAutoPilot();
-	PIOS_CALLBACKSCHEDULER_Schedule(pathFollowerCBInfo, updatePeriod, CALLBACK_UPDATEMODE_SOONER);
-	return;
+        activeController->UpdateAutoPilot();
+        PIOS_CALLBACKSCHEDULER_Schedule(pathFollowerCBInfo, updatePeriod, CALLBACK_UPDATEMODE_SOONER);
+        return;
     }
 
     if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POI) { // TODO Hack from vtolpathfollower, move into manualcontrol!
@@ -308,8 +308,10 @@ static void pathFollowerTask(void)
     PIOS_CALLBACKSCHEDULER_Schedule(pathFollowerCBInfo, updatePeriod, CALLBACK_UPDATEMODE_SOONER);
 }
 
-static void pathFollowerObjectiveUpdatedCb(__attribute__((unused)) UAVObjEvent *ev) {
+static void pathFollowerObjectiveUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
     uint8_t previousMode = pathDesired.Mode;
+
     PathDesiredGet(&pathDesired);
 
     // FSM inactivate previous mode on new mode
@@ -332,9 +334,7 @@ static void pathFollowerObjectiveUpdatedCb(__attribute__((unused)) UAVObjEvent *
             activeController->Activate();
         }
     }
-
 }
-
 
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
@@ -389,7 +389,6 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     if (activeController) {
         activeController->SettingsUpdated();
     }
-
 }
 
 
@@ -462,11 +461,13 @@ static uint8_t updateAutoPilotByFrameType()
     case FRAME_TYPE_MULTIROTOR:
     case FRAME_TYPE_HELI:
         return updateAutoPilotVtol();
+
         break;
 
     case FRAME_TYPE_FIXED_WING:
     default:
         return updateAutoPilotFixedWing();
+
         break;
     }
 }
@@ -825,7 +826,7 @@ static void updatePathVelocity(float kFF, bool limited)
     const float dT = updatePeriod / 1000.0f;
 
 
-    if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY ) {
+    if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
         // TODO Make this FSM generic
         velocityDesired.North = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
         velocityDesired.East  = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];

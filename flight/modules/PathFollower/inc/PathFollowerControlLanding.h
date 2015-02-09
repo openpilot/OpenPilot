@@ -31,10 +31,10 @@
 #ifndef PATHFOLLOWERCONTROLLANDING_H
 #define PATHFOLLOWERCONTROLLANDING_H
 #include "PathFollowerControl.h"
-//forward decl
+// forward decl
 class PathFollowerFSM;
-class PathFollowerControlLanding: PathFollowerControl {
-  private:
+class PathFollowerControlLanding : PathFollowerControl {
+private:
     static PathFollowerControlLanding *p_inst;
     PathFollowerControlLanding();
 
@@ -43,16 +43,16 @@ public:
     static PathFollowerControlLanding *instance()
     {
         if (!p_inst) {
-              p_inst = new PathFollowerControlLanding();
+            p_inst = new PathFollowerControlLanding();
         }
         return p_inst;
     }
 
     int32_t Initialize(PathFollowerFSM *fsm_ptr,
                        VtolPathFollowerSettingsData *vtolPathFollowerSettings,
-                           PathDesiredData *pathDesired,
-                           FlightStatusData *flightStatus,
-                           PathStatusData *pathStatus);
+                       PathDesiredData *pathDesired,
+                       FlightStatusData *flightStatus,
+                       PathStatusData *pathStatus);
 
 
     void Activate(void);
@@ -71,8 +71,8 @@ private:
     FlightStatusData *flightStatus;
     PathStatusData *pathStatus;
 
-    struct pid  PIDvel[3]; // North, East, Down
-    struct pid  PIDposH[2];
+    struct pid PIDvel[3]; // North, East, Down
+    struct pid PIDposH[2];
 };
 
 #endif // PATHFOLLOWERCONTROLLANDING_H

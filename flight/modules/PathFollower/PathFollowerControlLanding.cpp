@@ -94,30 +94,40 @@ extern "C" {
 PathFollowerControlLanding *PathFollowerControlLanding::p_inst = 0;
 
 PathFollowerControlLanding::PathFollowerControlLanding()
-: fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0)
-{}
+    : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0)
+{
+    pid_zero(&PIDposH[0]);
+    pid_zero(&PIDposH[1]);
+    pid_zero(&PIDvel[0]);
+    pid_zero(&PIDvel[1]);
+    pid_zero(&PIDvel[2]);
+}
 
 // Private types
 
 // Private functions
 // Public API methods
-void PathFollowerControlLanding::Activate(void) {
-  fsm->Activate();
+void PathFollowerControlLanding::Activate(void)
+{
+    fsm->Activate();
 }
-void PathFollowerControlLanding::Deactivate(void) {
+void PathFollowerControlLanding::Deactivate(void)
+{
+    pid_zero(&PIDposH[0]);
+    pid_zero(&PIDposH[1]);
     pid_zero(&PIDvel[0]);
     pid_zero(&PIDvel[1]);
     pid_zero(&PIDvel[2]);
     fsm->Inactive();
-
 }
-void PathFollowerControlLanding::SettingsUpdated(void) {
-   pid_configure(&PIDvel[0], vtolPathFollowerSettings->HorizontalVelPID.Kp, vtolPathFollowerSettings->HorizontalVelPID.Ki, vtolPathFollowerSettings->HorizontalVelPID.Kd, vtolPathFollowerSettings->HorizontalVelPID.ILimit);
-   pid_configure(&PIDvel[1], vtolPathFollowerSettings->HorizontalVelPID.Kp, vtolPathFollowerSettings->HorizontalVelPID.Ki, vtolPathFollowerSettings->HorizontalVelPID.Kd, vtolPathFollowerSettings->HorizontalVelPID.ILimit);
-   pid_configure(&PIDvel[2], vtolPathFollowerSettings->VerticalVelPID.Kp, vtolPathFollowerSettings->VerticalVelPID.Ki, vtolPathFollowerSettings->VerticalVelPID.Kd, vtolPathFollowerSettings->VerticalVelPID.ILimit);
-   pid_configure(&PIDposH[0], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-   pid_configure(&PIDposH[1], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-   fsm->SettingsUpdated();
+void PathFollowerControlLanding::SettingsUpdated(void)
+{
+    pid_configure(&PIDvel[0], vtolPathFollowerSettings->HorizontalVelPID.Kp, vtolPathFollowerSettings->HorizontalVelPID.Ki, vtolPathFollowerSettings->HorizontalVelPID.Kd, vtolPathFollowerSettings->HorizontalVelPID.ILimit);
+    pid_configure(&PIDvel[1], vtolPathFollowerSettings->HorizontalVelPID.Kp, vtolPathFollowerSettings->HorizontalVelPID.Ki, vtolPathFollowerSettings->HorizontalVelPID.Kd, vtolPathFollowerSettings->HorizontalVelPID.ILimit);
+    pid_configure(&PIDvel[2], vtolPathFollowerSettings->VerticalVelPID.Kp, vtolPathFollowerSettings->VerticalVelPID.Ki, vtolPathFollowerSettings->VerticalVelPID.Kd, vtolPathFollowerSettings->VerticalVelPID.ILimit);
+    pid_configure(&PIDposH[0], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    pid_configure(&PIDposH[1], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    fsm->SettingsUpdated();
 }
 
 /**
@@ -126,9 +136,9 @@ void PathFollowerControlLanding::SettingsUpdated(void) {
  */
 int32_t PathFollowerControlLanding::Initialize(PathFollowerFSM *fsm_ptr,
                                                VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                            PathDesiredData *ptr_pathDesired,
-                            FlightStatusData *ptr_flightStatus,
-                            PathStatusData *ptr_pathStatus)
+                                               PathDesiredData *ptr_pathDesired,
+                                               FlightStatusData *ptr_flightStatus,
+                                               PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     PIOS_Assert(ptr_pathDesired);
@@ -155,58 +165,59 @@ int32_t PathFollowerControlLanding::Initialize(PathFollowerFSM *fsm_ptr,
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;
     flightStatus = ptr_flightStatus;
-    pathStatus = ptr_pathStatus;
+    pathStatus   = ptr_pathStatus;
 
     return 0;
 }
 
 
-void PathFollowerControlLanding::UpdateVelocityDesired() {
-  PositionStateData positionState;
+void PathFollowerControlLanding::UpdateVelocityDesired()
+{
+    PositionStateData positionState;
 
-  PositionStateGet(&positionState);
-  VelocityStateData velocityState;
-  VelocityStateGet(&velocityState);
-  VelocityDesiredData velocityDesired;
+    PositionStateGet(&positionState);
+    VelocityStateData velocityState;
+    VelocityStateGet(&velocityState);
+    VelocityDesiredData velocityDesired;
 
-  const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
+    const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
 
-  velocityDesired.North = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
-  velocityDesired.East  = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
-  velocityDesired.Down  = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN];
-
-
-  velocityDesired.Down = fsm->BoundVelocityDown(velocityDesired.Down);
-
-  if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
-	  float cur[3] = { positionState.North, positionState.East, positionState.Down };
-	  struct path_status progress;
-	  path_progress(pathDesired, cur, &progress);
-
-	  // calculate correction
-	  velocityDesired.North += pid_apply(&PIDposH[0], progress.correction_vector[0], dT);
-	  velocityDesired.East  += pid_apply(&PIDposH[1], progress.correction_vector[1], dT);
-  }
-
-  // update pathstatus
-  pathStatus->error = 0.0f;
-  pathStatus->fractional_progress  = 0.0f;
-  pathStatus->path_direction_north = velocityDesired.North;
-  pathStatus->path_direction_east  = velocityDesired.East;
-  pathStatus->path_direction_down  = velocityDesired.Down;
-
-  pathStatus->correction_direction_north = velocityDesired.North - velocityState.North;
-  pathStatus->correction_direction_east  = velocityDesired.East - velocityState.East;
-  pathStatus->correction_direction_down  = velocityDesired.Down - velocityState.Down;
+    velocityDesired.North = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
+    velocityDesired.East  = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
+    velocityDesired.Down  = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN];
 
 
-  VelocityDesiredSet(&velocityDesired);
+    velocityDesired.Down  = fsm->BoundVelocityDown(velocityDesired.Down);
 
+    if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
+        float cur[3] = { positionState.North, positionState.East, positionState.Down };
+        struct path_status progress;
+        path_progress(pathDesired, cur, &progress);
+
+        // calculate correction
+        velocityDesired.North += pid_apply(&PIDposH[0], progress.correction_vector[0], dT);
+        velocityDesired.East  += pid_apply(&PIDposH[1], progress.correction_vector[1], dT);
+    }
+
+    // update pathstatus
+    pathStatus->error = 0.0f;
+    pathStatus->fractional_progress  = 0.0f;
+    pathStatus->path_direction_north = velocityDesired.North;
+    pathStatus->path_direction_east  = velocityDesired.East;
+    pathStatus->path_direction_down  = velocityDesired.Down;
+
+    pathStatus->correction_direction_north = velocityDesired.North - velocityState.North;
+    pathStatus->correction_direction_east  = velocityDesired.East - velocityState.East;
+    pathStatus->correction_direction_down  = velocityDesired.Down - velocityState.Down;
+
+
+    VelocityDesiredSet(&velocityDesired);
 }
 
-int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction) {
-    const float dT     = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
-    uint8_t result     = 1;
+int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
+{
+    const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
+    uint8_t result = 1;
 
     VelocityDesiredData velocityDesired;
     VelocityStateData velocityState;
@@ -235,27 +246,27 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
 
 
-        // scale velocity if it is above configured maximum
-        // for braking, we can not help it if initial velocity was greater
-        float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
-        if (velH > vtolPathFollowerSettings->HorizontalVelMax) {
-            velocityDesired.North *= vtolPathFollowerSettings->HorizontalVelMax / velH;
-            velocityDesired.East  *= vtolPathFollowerSettings->HorizontalVelMax / velH;
-        }
-        if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings->VerticalVelMax) {
-            velocityDesired.Down *= vtolPathFollowerSettings->VerticalVelMax / fabsf(velocityDesired.Down);
-        }
+    // scale velocity if it is above configured maximum
+    // for braking, we can not help it if initial velocity was greater
+    float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
+    if (velH > vtolPathFollowerSettings->HorizontalVelMax) {
+        velocityDesired.North *= vtolPathFollowerSettings->HorizontalVelMax / velH;
+        velocityDesired.East  *= vtolPathFollowerSettings->HorizontalVelMax / velH;
+    }
+    if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings->VerticalVelMax) {
+        velocityDesired.Down *= vtolPathFollowerSettings->VerticalVelMax / fabsf(velocityDesired.Down);
+    }
 
     // calculate the velocity errors between desired and actual
-    northError = velocityDesired.North - velocityState.North;
-    eastError  = velocityDesired.East - velocityState.East;
-    downError  = velocityDesired.Down - velocityState.Down;
+    northError   = velocityDesired.North - velocityState.North;
+    eastError    = velocityDesired.East - velocityState.East;
+    downError    = velocityDesired.Down - velocityState.Down;
 
     // Must flip this sign
-    downError  = -downError;
+    downError    = -downError;
 
-        northCommand = pid_apply(&PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings->VelocityFeedforward;
-        eastCommand  = pid_apply(&PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings->VelocityFeedforward;
+    northCommand = pid_apply(&PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings->VelocityFeedforward;
+    eastCommand  = pid_apply(&PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings->VelocityFeedforward;
 
     pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
     fsm->CheckPidScalar(&local_scaler);
@@ -268,7 +279,7 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
     // craft should move similarly for 5 deg roll versus 5 deg pitch
 
-    float maxPitch = vtolPathFollowerSettings->MaxRollPitch;
+    float maxPitch      = vtolPathFollowerSettings->MaxRollPitch;
 
     float angle_radians = DEG2RAD(attitudeState.Yaw);
     float cos_angle     = cosf(angle_radians);
@@ -302,28 +313,27 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
 
 void PathFollowerControlLanding::UpdateAutoPilot()
 {
-        UpdateVelocityDesired();
+    fsm->Update();
+    UpdateVelocityDesired();
 
-        // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
-        bool yaw_attitude = true;
-        float yaw = 0.0f;
+    // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
+    bool yaw_attitude = true;
+    float yaw = 0.0f;
 
-        fsm->GetYaw(yaw_attitude, yaw);
+    fsm->GetYaw(yaw_attitude, yaw);
 
-        int8_t result = UpdateStabilizationDesired(yaw_attitude, yaw);
+    int8_t result = UpdateStabilizationDesired(yaw_attitude, yaw);
 
-        if (!result) {
-        	fsm->Abort();
-        }
+    if (!result) {
+        fsm->Abort();
+    }
 
-        fsm->Update();
-        if (fsm->GetCurrentState() == PFFSM_STATE_DISARMED) {
-            setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
-        }
+    if (fsm->GetCurrentState() == PFFSM_STATE_DISARMED) {
+        setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
+    }
 
 
     PathStatusSet(pathStatus);
-
 }
 
 void PathFollowerControlLanding::setArmedIfChanged(uint8_t val)
@@ -333,5 +343,3 @@ void PathFollowerControlLanding::setArmedIfChanged(uint8_t val)
         FlightStatusSet(flightStatus);
     }
 }
-
-

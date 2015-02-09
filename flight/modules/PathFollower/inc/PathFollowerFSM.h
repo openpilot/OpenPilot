@@ -63,6 +63,10 @@ public:
     {
         yaw_attitude = false; yaw_direction = 0.0f;
     }
+    virtual void Abort(void) {}
+    virtual uint8_t ManualThrust(void) {return false; }
+    virtual uint8_t PositionHoldState(void) { return false; }
+
     // virtual ~PathFollowerFSM();
 };
 

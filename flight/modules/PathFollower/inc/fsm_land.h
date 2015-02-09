@@ -75,7 +75,7 @@ public:
     void ConstrainStabiDesired(StabilizationDesiredData *stabDesired);
     float BoundVelocityDown(float);
     void CheckPidScalar(pid_scaler *scaler);
-
+    void Abort(void);
 
 protected:
 

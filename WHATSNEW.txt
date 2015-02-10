@@ -1,4 +1,4 @@
---- RELEASE-15.01 ---
+--- RELEASE-15.01 --- Look Ma, No hands ---
 This release mainly focuses on a new feature, GPSAssist which is a new form of assisted control for multirotors.  
 Assisted Control provides assistance functions on top of existing flight modes.  GPSAssist is the 
 first assisted control option available from OpenPilot. GPSAssist supports Attitude and Rattitude 
@@ -8,7 +8,7 @@ flight mode also introduces a braking sequence when first entering this flight m
 
 The full list of features, improvements and bugfixes in this release is accessible here:
 
-http://progress.openpilot.org/browse/OP/fixforversion/11020
+http://progress.openpilot.org/issues/?filter=12062
 
 
 ** Bug

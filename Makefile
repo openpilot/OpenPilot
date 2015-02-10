@@ -787,9 +787,13 @@ endif
 #  - calls paltform-specific packaging script
 
 # Define some variables
-export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
-export PACKAGE_NAME := OpenPilot
-export PACKAGE_SEP  := -
+PACKAGE_LBL       := $(shell $(VERSION_INFO) --format=\$${LABEL})
+PACKAGE_NAME      := OpenPilot
+PACKAGE_SEP       := -
+PACKAGE_FULL_NAME := $(PACKAGE_NAME)$(PACKAGE_SEP)$(PACKAGE_LBL)
+
+# Source distribution is never dirty because it uses git archive
+DIST_NAME := $(DIST_DIR)/$(subst dirty-,,$(PACKAGE_FULL_NAME)).tar
 
 .PHONY: package
 
@@ -890,8 +894,7 @@ $(DIST_VER_INFO): $(DIST_DIR)
 
 .PHONY: dist
 dist: $(DIST_DIR) $(DIST_VER_INFO)
-	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_DIR))"
-	$(eval DIST_NAME := $(call toprel, "$(DIST_DIR)/OpenPilot-$(shell git describe).tar"))
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_NAME).gz)"
 	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \
 		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \

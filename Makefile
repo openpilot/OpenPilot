@@ -892,8 +892,8 @@ DIST_VER_INFO := $(DIST_DIR)/version-info.json
 $(DIST_VER_INFO): $(DIST_DIR)
 	$(V1) $(VERSION_INFO) --jsonpath="$(DIST_DIR)"
 
-.PHONY: dist
-dist: $(DIST_DIR) $(DIST_VER_INFO)
+
+$(DIST_NAME).gz: $(DIST_DIR) $(DIST_VER_INFO)
 	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_NAME).gz)"
 	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \
@@ -901,6 +901,8 @@ dist: $(DIST_DIR) $(DIST_VER_INFO)
 		$(call toprel, "$(DIST_VER_INFO)")
 	$(V1) gzip -f "$(DIST_NAME)"
 
+.PHONY: dist
+dist: $(DIST_NAME).gz
 
 ##############################
 #

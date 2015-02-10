@@ -31,6 +31,7 @@
 #ifndef PATHFOLLOWERCONTROLLANDING_H
 #define PATHFOLLOWERCONTROLLANDING_H
 #include "PathFollowerControl.h"
+#include "PIDControlThrust.h"
 // forward decl
 class PathFollowerFSM;
 class PathFollowerControlLanding : PathFollowerControl {
@@ -70,8 +71,9 @@ private:
     PathDesiredData *pathDesired;
     FlightStatusData *flightStatus;
     PathStatusData *pathStatus;
+    PIDControlThrust controlThrust;
 
-    struct pid PIDvel[3]; // North, East, Down
+    struct pid PIDvel[2]; // North, East
     struct pid PIDposH[2];
 };
 

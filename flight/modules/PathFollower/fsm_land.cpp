@@ -282,9 +282,17 @@ int32_t FSMLand::runAlways(void)
 
 float FSMLand::BoundThrust(float thrustDesired)
 {
-    // We only implement min max bounding here
-    // TODO This really needs to set min max into the pid method
     thrustDesired = boundf(thrustDesired, mLandData->boundThrustMin, mLandData->boundThrustMax);
+
+
+    if (mLandData->flConstrainThrust) {
+         if (thrustDesired > mLandData->thrustLimit) {
+             thrustDesired = mLandData->thrustLimit;
+         } else {
+             mLandData->thrustLimit = thrustDesired;
+         }
+     }
+
     return thrustDesired;
 }
 
@@ -295,16 +303,9 @@ void FSMLand::ConstrainStabiDesired(StabilizationDesiredData *stabDesired)
         stabDesired->Roll  = 0.0f;
         stabDesired->Yaw   = 0.0f;
     }
-    if (mLandData->flConstrainThrust) {
-        if (stabDesired->Thrust > mLandData->thrustLimit) {
-            stabDesired->Thrust = mLandData->thrustLimit;
-        } else {
-            mLandData->thrustLimit = stabDesired->Thrust;
-        }
-    }
 }
 
-void FSMLand::CheckPidScalar(pid_scaler *local_scaler)
+void FSMLand::CheckPidScaler(pid_scaler *local_scaler)
 {
     if (mLandData->flLowAltitude) {
         local_scaler->p = LANDING_PID_SCALAR_P;

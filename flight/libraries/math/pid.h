@@ -44,7 +44,7 @@ struct pid {
     float lastDer;
 };
 
-typedef struct pid_scaler {
+typedef struct pid_scaler_s {
     float p;
     float i;
     float d;

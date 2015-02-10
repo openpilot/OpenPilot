@@ -58,7 +58,7 @@ public:
     {
         return velocity;
     }
-    virtual void CheckPidScalar(__attribute__((unused)) pid_scaler *scaler) {}
+    virtual void CheckPidScaler(__attribute__((unused)) pid_scaler *scaler) {}
     virtual void GetYaw(bool &yaw_attitude, float &yaw_direction)
     {
         yaw_attitude = false; yaw_direction = 0.0f;

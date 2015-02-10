@@ -74,7 +74,7 @@ public:
     PathFollowerFSMState_T GetCurrentState(void);
     void ConstrainStabiDesired(StabilizationDesiredData *stabDesired);
     float BoundVelocityDown(float);
-    void CheckPidScalar(pid_scaler *scaler);
+    void CheckPidScaler(pid_scaler *scaler);
     void Abort(void);
 
 protected:

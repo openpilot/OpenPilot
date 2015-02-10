@@ -324,7 +324,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     Q_ASSERT(outputModeCombos.count() == outputRateCombos.count());
     Q_ASSERT(outputRateCombos.count() == bank.count());
 
-    for(int i = 0; i < outputModeCombos.count();i++){
+    for (int i = 0; i < outputModeCombos.count(); i++) {
         // Setup output rates for all banks
         if (outputRateCombos.at(i)->findText(QString::number(actuatorSettingsData.BankUpdateFreq[i])) == -1) {
             outputRateCombos.at(i)->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[i]));

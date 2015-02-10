@@ -27,8 +27,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>794</width>
-        <height>505</height>
+        <width>778</width>
+        <height>615</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -310,6 +310,9 @@ through serial or USB)</string>
            <widget class="QLabel" name="autoUpdateLabel">
             <property name="text">
              <string>Progress</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

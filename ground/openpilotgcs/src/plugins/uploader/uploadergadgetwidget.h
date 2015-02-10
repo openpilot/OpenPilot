@@ -35,12 +35,15 @@
 #include "op_dfu.h"
 
 #include <QProgressDialog>
+#include "oplinkwatchdog.h"
 
 using namespace OP_DFU;
 using namespace uploader;
 
 class FlightStatus;
 class UAVObject;
+class OPLinkStatus;
+class OPLinkWatchdog;
 
 class TimedDialog : public QProgressDialog {
     Q_OBJECT
@@ -140,9 +143,11 @@ signals:
 
 private:
     Ui_UploaderWidget *m_config;
-    DFUObject *dfu;
-    IAPStep currentStep;
-    bool resetOnly;
+    DFUObject *m_dfu;
+    IAPStep m_currentIAPStep;
+    bool m_resetOnly;
+    OPLinkWatchdog m_oplinkwatchdog;
+    bool m_autoUpdateClosing;
 
     void clearLog();
     QString getPortDevice(const QString &friendName);

@@ -799,7 +799,7 @@ DIST_NAME := $(DIST_DIR)/$(subst dirty-,,$(PACKAGE_FULL_NAME)).tar
 
 include $(ROOT_DIR)/package/$(UNAME).mk
 
-package: all_fw all_ground uavobjects_matlab $(PACKAGE_DIR)
+package: all_fw all_ground uavobjects_matlab | $(PACKAGE_DIR)
 ifneq ($(GCS_BUILD_CONF),release)
 	# We can only package release builds
 	$(error Packaging is currently supported for release builds only)
@@ -889,11 +889,11 @@ build-info:
 DIST_VER_INFO := $(DIST_DIR)/version-info.json
 
 .PHONY: $(DIST_VER_INFO) # Because to many deps to list
-$(DIST_VER_INFO): $(DIST_DIR)
+$(DIST_VER_INFO): | $(DIST_DIR)
 	$(V1) $(VERSION_INFO) --jsonpath="$(DIST_DIR)"
 
 
-$(DIST_NAME).gz: $(DIST_DIR) $(DIST_VER_INFO)
+$(DIST_NAME).gz: $(DIST_VER_INFO) | $(DIST_DIR)
 	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_NAME).gz)"
 	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \

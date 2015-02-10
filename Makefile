@@ -47,6 +47,7 @@ export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DI
 export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
+export DIST_DIR    := $(ROOT_DIR)/build/dist
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -65,18 +66,24 @@ $(if $(filter-out undefined,$(origin $(1))),
 )
 endef
 
-# These specific variables can influence gcc in unexpected (and undesirable) ways
+# These specific variables can influence compilation in unexpected (and undesirable) ways
+# gcc flags
 SANITIZE_GCC_VARS := TMPDIR GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH
-SANITIZE_GCC_VARS += CFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# preprocessor flags
+SANITIZE_GCC_VARS += CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+# make flags
+SANITIZE_GCC_VARS += CFLAGS CXXFLAGS CPPFLAGS LDFLAGS LDLIBS
 $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowed)))
 
 # These specific variables used to be valid but now they make no sense
 SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER CLEAN_BUILD
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
-# Make sure this isn't being run as root (no whoami on Windows, but that is ok here)
+# Make sure this isn't being run as root unless installing (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
-    $(error You should not be running this as root)
+    ifeq ($(filter install all_clean,$(MAKECMDGOALS)),)
+        $(error You should not be running this as root)
+    endif
 endif
 
 # Decide on a verbosity level based on the V= parameter
@@ -776,9 +783,6 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
     export PACKAGE_NAME := OpenPilot
     export PACKAGE_SEP  := -
 
-    # Copy the Qt libraries regardless whether the building machine needs them to run GCS
-    export FORCE_COPY_QT := true
-
     # We can only package release builds
     ifneq ($(GCS_BUILD_CONF),release)
         $(error Packaging is currently supported for release builds only)
@@ -801,24 +805,11 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
     endif
 endif
 
-# Copy file template. Empty line before the endef is required, do not remove
-# $(1) = copy file name without extension
-# $(2) = source file extension
-# $(3) = destination file extension
-define COPY_FW_FILES
-	$(V1) $(CP) "$(BUILD_DIR)/$(1)/$(1)$(2)" "$(PACKAGE_DIR)/firmware/$(1)$(PACKAGE_SEP)$(PACKAGE_LBL)$(3)"
-
-endef
-
-# Build and copy package files into the package directory
-# and call platform-specific packaging script
 .PHONY: package
 package: all_fw all_ground uavobjects_matlab
 	@$(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
 	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
-	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)/firmware"
-	$(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.opfw,.opfw))
-	$(foreach fw_targ, $(PACKAGE_ELF_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.elf,.elf))
+	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)"
 	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################
@@ -895,6 +886,66 @@ build-info:
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
 		--template="make/templates/$@.txt" \
 		--outfile="$(BUILD_DIR)/$@.txt"
+
+##############################
+#
+# Source for distribution
+#
+##############################
+
+.PHONY: dist
+dist:
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_DIR))"
+	$(V1) $(MKDIR) -p "$(DIST_DIR)"
+	$(V1) $(VERSION_INFO) \
+		--jsonpath="$(DIST_DIR)"
+	$(eval DIST_NAME := $(call toprel, "$(DIST_DIR)/OpenPilot-$(shell git describe).tar"))
+	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
+	$(V1) tar --append --file="$(DIST_NAME)" \
+		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
+		$(call toprel, "$(DIST_DIR)/version-info.json")
+	$(V1) gzip -f "$(DIST_NAME)"
+
+
+
+##############################
+#
+# Install OpenPilot
+#
+##############################
+prefix  := /usr/local
+bindir  := $(prefix)/bin
+libdir  := $(prefix)/lib
+datadir := $(prefix)/share
+
+INSTALL = cp -a --no-preserve=ownership
+LN = ln
+LN_S = ln -s
+
+ifeq ($(MAKECMDGOALS), install)
+        ifneq ($(UNAME), Linux)
+            $(error install only supported for Linux)
+        endif
+endif
+
+
+.PHONY: install
+install:
+	@$(ECHO) " INSTALLING GCS TO $(DESTDIR)/)"
+	$(V1) $(MKDIR) -p $(DESTDIR)$(bindir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(libdir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/applications
+	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/pixmaps
+	$(V1) $(MKDIR) -p $(DESTDIR)$(udevdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/openpilotgcs $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/udp_test $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/openpilotgcs $(DESTDIR)$(libdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/share/openpilotgcs $(DESTDIR)$(datadir)
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications
+	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps
+	$(V1) rm $(DESTDIR)/$(datadir)/openpilotgcs/translations/Makefile
+
 
 ##############################
 #
@@ -1031,6 +1082,8 @@ help:
 	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
+	@$(ECHO) "     dist                 - Generate source archive for distribution"
+	@$(ECHO) "     install              - Install GCS to \"DESTDIR\" with prefix \"prefix\" (Linux only)"
 	@$(ECHO)
 	@$(ECHO) "   [Code Formatting]"
 	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code according to the project's standards"

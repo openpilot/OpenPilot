@@ -8,7 +8,7 @@
 
 AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::AutoUpdatePage)
+    ui(new Ui::AutoUpdatePage), m_isUpdating(false)
 {
     ui->setupUi(this);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -16,13 +16,18 @@ AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
     Q_ASSERT(uploader);
     connect(ui->startUpdate, SIGNAL(clicked()), this, SLOT(disableButtons()));
-    connect(ui->startUpdate, SIGNAL(clicked()), uploader, SIGNAL(autoUpdate()));
-    connect(uploader, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(updateStatus(uploader::AutoUpdateStep, QVariant)));
+    connect(ui->startUpdate, SIGNAL(clicked()), this, SLOT(autoUpdate()));
+    connect(uploader, SIGNAL(progressUpdate(uploader::ProgressStep, QVariant)), this, SLOT(updateStatus(uploader::ProgressStep, QVariant)));
 }
 
 AutoUpdatePage::~AutoUpdatePage()
 {
     delete ui;
+}
+
+bool AutoUpdatePage::isComplete() const
+{
+    return !m_isUpdating;
 }
 
 void AutoUpdatePage::enableButtons(bool enable = false)
@@ -35,10 +40,19 @@ void AutoUpdatePage::enableButtons(bool enable = false)
     QApplication::processEvents();
 }
 
-void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant value)
+void AutoUpdatePage::autoUpdate()
 {
-    QString msg;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
+    Q_ASSERT(pm);
+    UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(uploader);
+    m_isUpdating = true;
+    uploader->autoUpdate(ui->eraseSettings->isChecked());
+}
+
+void AutoUpdatePage::updateStatus(uploader::ProgressStep status, QVariant value)
+{
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         disableButtons();
@@ -48,16 +62,6 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::WAITING_CONNECT:
-        // Note:
-        // the following commented out lines were probably added to fix an issue when uploader opened a popup requesting
-        // user to disconnect all boards
-        // Side effect is that the wizard dialog flickers
-        // the uploader was changed to avoid popups alltogether and that fix is not need anymore
-        // same commented fix can be found in FAILURE case and they are kept for future ref.
-        // getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
-        // getWizard()->setWindowIcon(qApp->windowIcon());
-        // getWizard()->show();
-        // End of Note
         disableButtons();
         ui->statusLabel->setText(tr("Please connect the board to the USB port (don't use external supply)."));
         // TODO get rid of magic number 20s (should use UploaderGadgetWidget::BOARD_EVENT_TIMEOUT)
@@ -65,8 +69,10 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::JUMP_TO_BL:
-        ui->levellinProgressBar->setValue(0);
-        ui->statusLabel->setText(tr("Board going into bootloader mode."));
+        disableButtons();
+        ui->levellinProgressBar->setValue(value.toInt());
+        ui->levellinProgressBar->setMaximum(5);
+        ui->statusLabel->setText(tr("Board going into bootloader mode. Please wait."));
         break;
     case uploader::LOADING_FW:
         ui->statusLabel->setText(tr("Loading firmware."));
@@ -80,20 +86,24 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->statusLabel->setText(tr("Uploading description."));
         break;
     case uploader::BOOTING:
-        ui->statusLabel->setText(tr("Booting the board."));
+        ui->statusLabel->setText(tr("Booting the board. Please wait"));
+        break;
+    case uploader::BOOTING_AND_ERASING:
+        ui->statusLabel->setText(tr("Booting and erasing the board. Please wait"));
         break;
     case uploader::SUCCESS:
+        m_isUpdating = false;
         enableButtons(true);
         ui->statusLabel->setText(tr("Board updated, please press 'Next' to continue."));
         break;
     case uploader::FAILURE:
-        // getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
-        // getWizard()->setWindowIcon(qApp->windowIcon());
+        m_isUpdating = false;
         enableButtons(true);
         QString msg = value.toString();
         if (msg.isEmpty()) {
-            msg = tr("Something went wrong, you will have to manually upgrade the board using the uploader plugin.");
+            msg = tr("Something went wrong.");
         }
+        msg += tr(" You will have to manually upgrade the board using the uploader plugin.");
         ui->statusLabel->setText(QString("<font color='red'>%1</font>").arg(msg));
         break;
     }

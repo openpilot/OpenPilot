@@ -558,7 +558,7 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 
 /**
  * Sets the range and number of channels to use for the radio.
- * The channels are 0 to 255 divided across the 430-440 MHz range.
+ * The channels are 0 to 250 divided across the 430-440 MHz range.
  * The number of channels configured will be spread across the selected channel range.
  * The channel spacing is 10MHz / 250 = 40kHz
  *
@@ -1618,7 +1618,7 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
 {
     // Set the frequency channels to start at 430MHz
     uint32_t frequency_hz = RFM22B_NOMINAL_CARRIER_FREQUENCY;
-    // The step size is 10MHz / 250 channels = 40khz, and the step size is specified in 10khz increments.
+    // The step size is 10MHz / 250 = 40khz, and the step size is specified in 10khz increments.
     uint8_t freq_hop_step_size = 4;
 
     // holds the hbsel (1 or 2)

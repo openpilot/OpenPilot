@@ -14,6 +14,8 @@ from string import Template
 import optparse
 import hashlib
 import sys
+import os.path
+import json
 
 class Repo:
     """A simple git repository HEAD commit info class
@@ -90,6 +92,23 @@ class Repo:
         if self._rc:
             self._dirty = True
 
+    def _load_json(self):
+        """Loads the repo data from version-info.json"""
+        json_path = os.path.join(self._path, 'version-info.json')
+        if os.path.isfile(json_path):
+            with open(json_path) as json_file:
+               json_data = json.load(json_file)
+
+            self._hash = json_data['hash']
+            self._origin = json_data['origin']
+            self._time = json_data['time']
+            self._tag = json_data['tag']
+            self._branch = json_data['branch']
+            self._dirty = json_data['dirty']
+
+            return True
+        return False
+
     def __init__(self, path = "."):
         """Initialize object instance and read repo info"""
         self._path = path
@@ -101,6 +120,8 @@ class Repo:
             self._get_tag()
             self._get_branch()
             self._get_dirty()
+        elif self._load_json():
+            pass
         else:
             self._hash = None
             self._origin = None
@@ -191,6 +212,21 @@ class Repo:
         print "dirty:      ", self.dirty('yes', 'no')
         print "label:      ", self.label()
         print "revision:   ", self.revision()
+
+    def save_to_json(self, path):
+        """Saves the repo data to version-info.json"""
+
+        json_data = dict()
+        json_data['hash'] = self._hash
+        json_data['origin'] = self._origin
+        json_data['time'] = self._time
+        json_data['tag'] = self._tag
+        json_data['branch'] = self._branch
+        json_data['dirty'] = self._dirty
+
+        json_path = os.path.join(path, 'version-info.json')
+        with open(json_path, 'w') as json_file:
+           json.dump(json_data, json_file)
 
 def file_from_template(tpl_name, out_name, dict):
     """Create or update file from template using dictionary
@@ -387,6 +423,8 @@ string given.
                         help='board revision, for example, 0x01');
     parser.add_option('--uavodir', default = "",
                         help='uav object definition directory');
+    parser.add_option('--jsonpath',
+                        help='path to save version info');
     (args, positional_args) = parser.parse_args()
 
     # Process arguments.  No advanced error handling is here.
@@ -437,6 +475,9 @@ string given.
 
     if args.outfile != None:
         file_from_template(args.template, args.outfile, dictionary)
+
+    if args.jsonpath != None:
+        r.save_to_json(args.jsonpath)
 
     return 0
 

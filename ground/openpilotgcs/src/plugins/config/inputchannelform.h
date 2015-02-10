@@ -23,6 +23,8 @@ public:
     virtual void setName(const QString &name);
 
 private slots:
+    void updateNeutralMark();
+    void updateTooltip();
     void minMaxUpdated();
     void neutralUpdated();
     void reversedUpdated();

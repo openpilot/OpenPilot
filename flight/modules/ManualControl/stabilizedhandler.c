@@ -93,6 +93,7 @@ void stabilizedHandler(bool newinit)
     uint8_t *stab_settings;
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
+
     switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
         stab_settings = FlightModeSettingsStabilization1SettingsToArray(settings.Stabilization1Settings);
@@ -163,8 +164,8 @@ void stabilizedHandler(bool newinit)
             0; // this is an invalid mode
     }
 
-    stabilization.Thrust = cmd.Thrust;
     stabilization.StabilizationMode.Thrust = stab_settings[3];
+    stabilization.Thrust = cmd.Thrust;
     StabilizationDesiredSet(&stabilization);
 }
 

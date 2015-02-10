@@ -93,6 +93,23 @@ void PlotData::updatePlotData()
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
 }
 
+void PlotData::clear()
+{
+    m_meanSum = 0.0f;
+    m_correctionSum   = 0.0f;
+    m_correctionCount = 0;
+    m_xDataEntries.clear();
+    m_yDataEntries.clear();
+    while (!m_enumMarkerList.isEmpty()) {
+        QwtPlotMarker *marker = m_enumMarkerList.takeFirst();
+        marker->detach();
+        delete marker;
+    }
+    if (wantsInitialData()) {
+        append(m_object);
+    }
+}
+
 bool PlotData::hasData() const
 {
     if (!m_isEnumPlot) {
@@ -184,6 +201,10 @@ QwtPlotMarker *PlotData::createMarker(QString value)
 
 bool SequentialPlotData::append(UAVObject *obj)
 {
+    if (obj == NULL) {
+        obj = m_object;
+    }
+
     if (m_object == obj && m_field) {
         if (!m_isEnumPlot) {
             double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
@@ -224,6 +245,10 @@ bool SequentialPlotData::append(UAVObject *obj)
 
 bool ChronoPlotData::append(UAVObject *obj)
 {
+    if (obj == NULL) {
+        obj = m_object;
+    }
+
     if (m_object == obj && m_field) {
         // Get the field of interest
         // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME

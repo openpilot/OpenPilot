@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # the following environment variables must be set
-: ${ROOT_DIR?} ${BUILD_DIR?} ${PACKAGE_LBL?} ${PACKAGE_DIR?} ${FW_DIR?} ${PACKAGE_NAME?} ${PACKAGE_SEP?}
+: ${ROOT_DIR?} ${BUILD_DIR?} ${PACKAGE_LBL?} ${PACKAGE_DIR?} ${PACKAGE_NAME?} ${PACKAGE_SEP?}
 
 # more variables
 APP_PATH="${BUILD_DIR}/openpilotgcs_release/bin/OpenPilot GCS.app"
@@ -39,7 +39,6 @@ fi
 # packaging goes here
 cp -a "${APP_PATH}" "/Volumes/${mountvolume}"
 
-#ls "${FW_DIR}" | xargs -n 1 -I {} cp "${FW_DIR}/{}" "/Volumes/${VOL_NAME}/Firmware"
 cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${mountvolume}/Utilities"
 cp "${ROOT_DIR}/WHATSNEW.txt" "/Volumes/${mountvolume}"
 cp "${ROOT_DIR}/README.txt" "/Volumes/${mountvolume}/Docs"

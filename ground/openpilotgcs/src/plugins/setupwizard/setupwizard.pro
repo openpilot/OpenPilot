@@ -31,7 +31,6 @@ HEADERS += setupwizardplugin.h \
     connectiondiagram.h \
     pages/outputcalibrationpage.h \
     outputcalibrationutil.h \
-    pages/rebootpage.h \
     pages/savepage.h \
     pages/autoupdatepage.h \
     pages/revocalibrationpage.h \
@@ -65,7 +64,6 @@ SOURCES += setupwizardplugin.cpp \
     connectiondiagram.cpp \
     pages/outputcalibrationpage.cpp \
     outputcalibrationutil.cpp \
-    pages/rebootpage.cpp \
     pages/savepage.cpp \
     pages/autoupdatepage.cpp \
     pages/revocalibrationpage.cpp \
@@ -92,7 +90,6 @@ FORMS += \
     pages/summarypage.ui \
     connectiondiagram.ui \
     pages/outputcalibrationpage.ui \
-    pages/rebootpage.ui \
     pages/savepage.ui \
     pages/autoupdatepage.ui \
     pages/revocalibrationpage.ui \

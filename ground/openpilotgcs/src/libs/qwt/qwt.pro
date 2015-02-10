@@ -15,30 +15,30 @@
 include( qwtconfig.pri )
 
 TEMPLATE = subdirs
+CONFIG   += ordered
 
 # disable all warnings (no need for warnings as qwt sources are imported)
 CONFIG += warn_off
-CONFIG += ordered
-SUBDIRS = src
 
-# SUBDIRS = \
-#    src \
+SUBDIRS = \
+    src \
 #    textengines \
 #    doc
 
-#contains(QWT_CONFIG, QwtDesigner ) {
-#    SUBDIRS += designer
-#}
+contains(QWT_CONFIG, QwtDesigner ) {
+    SUBDIRS += designer 
+}
 
-#contains(QWT_CONFIG, QwtExamples ) {
-#    SUBDIRS += examples
-#}
+contains(QWT_CONFIG, QwtExamples ) {
+    SUBDIRS += examples 
+}
 
-#contains(QWT_CONFIG, QwtPlayground ) {
-#    SUBDIRS += playground
-#}
+contains(QWT_CONFIG, QwtPlayground ) {
+    SUBDIRS += playground 
+}
+ 
+# qwtspec.files  = qwtconfig.pri qwtfunctions.pri qwt.prf
+# qwtspec.path  = $${QWT_INSTALL_FEATURES}
 
-#qwtspec.files  = qwtconfig.pri qwtfunctions.pri qwt.prf
-#qwtspec.path  = $${QWT_INSTALL_FEATURES}
+# INSTALLS += qwtspec
 
-#INSTALLS += qwtspec

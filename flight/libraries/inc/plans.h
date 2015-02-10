@@ -30,6 +30,7 @@
 
 #ifndef PLANS_H_
 #define PLANS_H_
+#include <stdint.h>
 #include <pios_math.h>
 
 /** \page standard Plans
@@ -68,18 +69,30 @@ void plan_setup_land();
 void plan_run_land();
 
 /**
+ * @brief setup pathplanner/pathfollower for braking
+ */
+void plan_setup_assistedcontrol(uint8_t timeout_occurred);
+
+#define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH 0
+#define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST  1
+#define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN  2
+#define PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT                   3
+
+/**
  * @brief setup pathfollower for positionvario
  */
-void plan_setup_PositionVarioFPV();
-void plan_setup_PositionVarioLOS();
-void plan_setup_PositionVarioNSEW();
+void plan_setup_CourseLock();
+void plan_setup_PositionRoam();
+void plan_setup_HomeLeash();
+void plan_setup_AbsolutePosition();
 
 /**
  * @brief run for positionvario
  */
-void plan_run_PositionVarioFPV();
-void plan_run_PositionVarioLOS();
-void plan_run_PositionVarioNSEW();
+void plan_run_CourseLock();
+void plan_run_PositionRoam();
+void plan_run_HomeLeash();
+void plan_run_AbsolutePosition();
 
 /**
  * @brief setup pathplanner/pathfollower for AutoCruise

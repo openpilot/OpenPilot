@@ -119,7 +119,7 @@ void AirframeInitialTuningPage::updateDescription(QJsonObject *templ)
         QString description;
         description.append("<b>").append(tr("Name of Vehicle: ")).append("</b>").append(templ->value("name").toString()).append("<br>");
         description.append("<b>").append(tr("Name of Owner: ")).append("</b>").append(templ->value("owner").toString());
-        if (templ->value("nick") != "") {
+        if (templ->value("nick") != QStringLiteral("")) {
             description.append(" (").append(templ->value("nick").toString()).append(")");
         }
         description.append("<br>");
@@ -210,6 +210,7 @@ void AirframeInitialTuningPage::loadValidFiles()
 void AirframeInitialTuningPage::setupTemplateList()
 {
     QListWidgetItem *item;
+
     foreach(QString templ, m_templates.keys()) {
         QJsonObject *json = m_templates[templ];
 
@@ -222,7 +223,7 @@ void AirframeInitialTuningPage::setupTemplateList()
     item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
     ui->templateList->insertItem(0, item);
     ui->templateList->setCurrentRow(0);
-    //TODO Add generics to top under item Current tuning
+    // TODO Add generics to top under item Current tuning
 }
 
 QString AirframeInitialTuningPage::getTemplateKey(QJsonObject *templ)

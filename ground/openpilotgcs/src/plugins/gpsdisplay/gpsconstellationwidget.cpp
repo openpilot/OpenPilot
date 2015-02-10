@@ -62,7 +62,7 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
     scene->setSceneRect(world->boundingRect());
     setScene(scene);
 
-    QFontDatabase::addApplicationFont(":/gpsgadget/font/digital-7_mono.ttf");
+    QFontDatabase::addApplicationFont(":/gpsgadget/font/digital-7.ttf");
 
     // Now create 'maxSatellites' satellite icons which we will move around on the map:
     for (int i = 0; i < MAX_SATTELITES; i++) {

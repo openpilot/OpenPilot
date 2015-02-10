@@ -44,7 +44,6 @@
 #include "pages/summarypage.h"
 #include "pages/savepage.h"
 #include "pages/notyetimplementedpage.h"
-#include "pages/rebootpage.h"
 #include "pages/outputcalibrationpage.h"
 #include "pages/revocalibrationpage.h"
 #include "pages/airframeinitialtuningpage.h"
@@ -131,16 +130,18 @@ int SetupWizard::nextId() const
         return PAGE_ESC;
 
     case PAGE_FIXEDWING:
-        return PAGE_SERVO;
+    case PAGE_SURFACE:
+        if (getVehicleSubType() == GROUNDVEHICLE_DIFFERENTIAL) {
+            return PAGE_ESC;
+        } else {
+            return PAGE_SERVO;
+        }
 
     case PAGE_INPUT:
         if (isRestartNeeded()) {
             saveHardwareSettings();
-            return PAGE_REBOOT;
-        } else {
-            return PAGE_VEHICLES;
+            reboot();
         }
-    case PAGE_REBOOT:
         return PAGE_VEHICLES;
 
     case PAGE_ESC:
@@ -333,6 +334,24 @@ QString SetupWizard::getSummaryText()
         break;
     case VEHICLE_SURFACE:
         summary.append(tr("Surface vehicle"));
+
+        summary.append("<br>");
+        summary.append("<b>").append(tr("Vehicle sub type: ")).append("</b>");
+        switch (getVehicleSubType()) {
+        case SetupWizard::GROUNDVEHICLE_CAR:
+            summary.append(tr("Car"));
+            break;
+        case SetupWizard::GROUNDVEHICLE_DIFFERENTIAL:
+            summary.append(tr("Tank"));
+            break;
+        case SetupWizard::GROUNDVEHICLE_MOTORCYCLE:
+            summary.append(tr("Motorcycle"));
+            break;
+        default:
+            summary.append(tr("Unknown"));
+            break;
+        }
+
         break;
     default:
         summary.append(tr("Unknown"));
@@ -371,7 +390,8 @@ QString SetupWizard::getSummaryText()
     }
 
     // If Tricopter show tail servo speed
-    if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING) {
+    if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING
+        || getVehicleSubType() == GROUNDVEHICLE_MOTORCYCLE || getVehicleSubType() == GROUNDVEHICLE_CAR) {
         summary.append("<br>");
         summary.append("<b>").append(tr("Servo type: ")).append("</b>");
         switch (getServoType()) {
@@ -446,7 +466,6 @@ void SetupWizard::createPages()
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_SAVE, new SavePage(this));
-    setPage(PAGE_REBOOT, new RebootPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
     setPage(PAGE_AIRFRAME_INITIAL_TUNING, new AirframeInitialTuningPage(this));
     setPage(PAGE_END, new OPEndPage(this));
@@ -474,6 +493,23 @@ void SetupWizard::pageChanged(int currId)
 {
     button(QWizard::CustomButton1)->setVisible(currId != PAGE_START);
     button(QWizard::CancelButton)->setVisible(currId != PAGE_END);
+}
+
+void SetupWizard::reboot() const
+{
+    SetupWizard *wiz = const_cast<SetupWizard *>(this);
+
+    wiz->setWindowFlags(wiz->windowFlags() & ~Qt::WindowStaysOnTopHint);
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(uploader);
+    uploader->reboot();
+
+    wiz->setRestartNeeded(false);
+    wiz->setWindowFlags(wiz->windowFlags() | Qt::WindowStaysOnTopHint);
+    wiz->show();
 }
 
 bool SetupWizard::saveHardwareSettings() const

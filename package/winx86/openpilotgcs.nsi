@@ -57,7 +57,6 @@
 ; !define PACKAGE_LBL "${DATE}-${TAG_OR_HASH8}"
 ; !define PACKAGE_DIR "..\..\build\package-$${PACKAGE_LBL}"
 ; !define OUT_FILE "OpenPilotGCS-$${PACKAGE_LBL}-install.exe"
-; !define FIRMWARE_DIR "firmware-$${PACKAGE_LBL}"
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
 ; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"
@@ -223,12 +222,6 @@ Section "-Localization" InSecLocalization
   SetOutPath "$INSTDIR\share\openpilotgcs\translations"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\openpilotgcs_*.qm"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\qt_*.qm"
-SectionEnd
-
-; Copy firmware files
-Section /o "-Firmware" InSecFirmware
-  SetOutPath "$INSTDIR\firmware"
-  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 ; Copy utility files

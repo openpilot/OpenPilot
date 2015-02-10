@@ -4,7 +4,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../../../src/app/main.cpp" line="+203"/>
+        <location filename="../../../src/app/main.cpp" line="+205"/>
         <source>Failed to load core plug-in, reason is: %1</source>
         <translation>Échec du chargement du module complémentaire core, la raison est : %1</translation>
     </message>
@@ -14,7 +14,7 @@
         <translation>Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
     </message>
     <message>
-        <location line="+355"/>
+        <location line="+358"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
         <translatorcomment>[Platypus]Ajout de &quot;est&quot;</translatorcomment>
         <translation>&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
@@ -4393,8 +4393,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+30"/>
         <source>http://wiki.openpilot.org/x/OQBj</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/hoBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+8"/>
@@ -4508,7 +4507,12 @@ p, li { white-space: pre-wrap; }
         <translation> Les paramètres importés ne sont pas compatibles avec ce plugin et ne seront pas importés !</translation>
     </message>
     <message>
-        <location line="-12"/>
+        <location line="+7"/>
+        <source> Unknown compatibility level: %1</source>
+        <translation> Niveau de compatibilité inconnu : %1</translation>
+    </message>
+    <message>
+        <location line="-19"/>
         <source>WARNING: </source>
         <translation>ATTENTION : </translation>
     </message>
@@ -4518,9 +4522,8 @@ p, li { white-space: pre-wrap; }
         <translation>ERREUR : </translation>
     </message>
     <message>
-        <location line="+13"/>
         <source> Unknown compatibility level: </source>
-        <translation> Niveau de compatibilité inconnu : </translation>
+        <translation type="vanished"> Niveau de compatibilité inconnu : </translation>
     </message>
 </context>
 <context>
@@ -5233,8 +5236,7 @@ valeur.</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/UoHWAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -6180,9 +6182,8 @@ p, li { white-space: pre-wrap; }
         <translation>Options de Configuration et Calibration</translation>
     </message>
     <message>
-        <location/>
         <source>Manual Calibration</source>
-        <translation>Calibration Manuelle</translation>
+        <translation type="vanished">Calibration Manuelle</translation>
     </message>
     <message>
         <location/>
@@ -6488,6 +6489,37 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Start Transmitter Setup Wizard</source>
         <translation>Démarrer l&apos;Assistant Configuration Émetteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assisted Control stick deadband </source>
+        <translation>Zone morte des manches - Pilotage assisté </translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assisted Control stick deadband in percents of full range (2-12) for use with GPSAssist. This can not be disabled.</source>
+        <translation>Zone morte des manches du pilotage assisté en pourcentage du débattement maximum (2-12) pour utiliser GPSAssist. Ne peut être désactivé.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start Manual Calibration</source>
+        <translation>Démarrer Calibration Manuelle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assisted Control</source>
+        <translation>Pilotage Assisté</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Assisted Control options augment the primary flight mode.  GPSAssist adds brake/hold to Stabilization and PositionHold.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les options du pilotage assisté améliorent le mode de vol courant.  GPSAssist ajoute le freinage/maintien en position à la Stabilisation et PositionHold.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:FlightModeAssistMap</source>
+        <translatorcomment>Do not translate !</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7079,8 +7111,7 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7616,8 +7647,7 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DAO9</source>
-        <translatorcomment>Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/d4BqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8583,8 +8613,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DACiAQ</source>
-        <translatorcomment>Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/N4DWAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9098,7 +9127,7 @@ les données en cache</translation>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+200"/>
+        <location line="+213"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -9131,19 +9160,23 @@ les données en cache</translation>
         <translation>Prêt...</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.cpp" line="+45"/>
+        <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.cpp" line="+59"/>
         <source>Waiting for all OP boards to be disconnected.</source>
         <translation>Attente de la déconnexion de toutes les cartes OP.</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+7"/>
         <source>Please connect the board to the USB port (don&apos;t use external supply).</source>
         <translation>Veuillez connecter la carte sur le port USB (sans source d&apos;alimentation extérieure).</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Board going into bootloader mode.</source>
-        <translation>Passage de la carte en mode bootloader.</translation>
+        <translation type="vanished">Passage de la carte en mode bootloader.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Board going into bootloader mode. Please wait.</source>
+        <translation>Passage de la carte en mode bootloader. Veuillez patienter.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -9162,21 +9195,38 @@ les données en cache</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Booting the board.</source>
-        <translation>Démarrage de la carte.</translation>
+        <source>Booting the board. Please wait</source>
+        <translation>Démarrage de la carte. Veuillez patienter</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
+        <source>Booting and erasing the board. Please wait</source>
+        <translation>Démarrage et effacement de la carte. Veuillez patienter</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Something went wrong.</source>
+        <translation>Quelques chose c&apos;est mal passé.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source> You will have to manually upgrade the board using the uploader plugin.</source>
+        <translation> Vous devrez mettre à jour manuellement la carte en utilisant le plugin uploader.</translation>
+    </message>
+    <message>
+        <source>Booting the board.</source>
+        <translation type="vanished">Démarrage de la carte.</translation>
+    </message>
+    <message>
+        <location line="-9"/>
         <source>Board updated, please press &apos;Next&apos; to continue.</source>
         <translation>Carte mise à jour, cliquer sur &apos;Suivant&apos; pour continuer.</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>Something went wrong, you will have to manually upgrade the board using the uploader plugin.</source>
-        <translation>Quelque chose s&apos;est mal passé, vous devrez mettre à jour manuellement la carte en utilisant le plugin uploader.</translation>
+        <translation type="vanished">Quelque chose s&apos;est mal passé, vous devrez mettre à jour manuellement la carte en utilisant le plugin uploader.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9187,7 +9237,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;- Unplug all batteries and USB from OpenPilot&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;- Ensure your board is powered down &amp;amp; no LED&apos;s are active.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;When you are ready you can start the upgrade below by pushing the button and follow the onscreen prompts, it is critical that nothing disturbs the board while the firmware is being written.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9197,6 +9247,30 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; - Débrancher toutes les batteries et le port USB de la carte OpenPilot,&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; - Vérifier que la carte n&apos;est pas alimentée et qu&apos;aucune LED ne soit alumée.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Lorsque vous êtes prêt pour démarrer la mise à jour, appuyez sur le bouton et suivez les instructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le processus durant l&apos;écriture du firmware.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Firmware Update&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;It is necessary that your firmware and ground control software are the same version.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;When you are ready you can start the upgrade below by pushing the button. It is critical that nothing disturbs the board while the firmware is being written.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;It is recommended that you erase all settings on the board when upgrading firmware. Using saved settings for a previous version of the firmware &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;may result in undefined behaviour&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; and in worst case danger. It is possible to suppress the erase by deselecting the check box below.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Firmware Update&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Il est nécessaire que la version de firmware et la version du logiciel GCS soient identiques.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Lorsque vous êtes prêt pour démarrer la mise à jour, appuyez sur le bouton. Il est essentiel que rien ne vienne perturber le processus durant l&apos;écriture du firmware.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Il est recommandé d&apos;effacer les paramètres de carte lorsque vous mettez à jour le firmware. L&apos;utilisation de paramètres sauvegardés  depuis une ancienne version de firmware &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;peut entraîner un comportement instable&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; et au pire un danger. Il est possible de ne pas effacer les paramètres en décochant l&apos;option ci-dessous.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Erase all settings</source>
+        <translation>Effacer tous les paramètres</translation>
     </message>
 </context>
 <context>
@@ -9323,6 +9397,16 @@ Veuillez sélectionner la configuration de voilure fixe désirée ci-dessous :</
         <source>This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet supported. Setup should include only two elevons, and should explicitly not include a rudder.</source>
         <translation>Cette configuration concerne les ailes volantes, la dérive n&apos;est pas encore supportée actuellement.  La configuration s&apos;applique à deux servos d&apos;élevons, sans dérive.</translation>
     </message>
+    <message>
+        <location line="+5"/>
+        <source>Vtail</source>
+        <translation>Vtail</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional glider airframe using two independent aileron servos on their own channel (not connected by Y adapter) plus Vtail mixing elevator/rudder.</source>
+        <translation>Cette configuration concerne un planeur classique utilisant deux servos d&apos;ailerons indépendants ayant leur propre branchement (pas connectés avec un adaptateur en Y) plus un empenage en Vé avec mixage profondeur/direction.</translation>
+    </message>
 </context>
 <context>
     <name>HeliPage</name>
@@ -9435,17 +9519,15 @@ p, li { white-space: pre-wrap; }
         <translation>Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens antihoraire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Quadcopter H</source>
-        <translation>Quadricoptère H</translation>
+        <translation type="vanished">Quadricoptère H</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Quadcopter H, Blackout miniH</source>
-        <translation>Quadricoptère H, blackout miniH</translation>
+        <translation type="vanished">Quadricoptère H, blackout miniH</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Hexacopter</source>
         <translation>Hexacoptère</translation>
     </message>
@@ -9480,7 +9562,7 @@ p, li { white-space: pre-wrap; }
         <translation>Hexacoptère X</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location line="-33"/>
         <source>OpenPilot Multirotor Configuration</source>
         <translation>Configuration Multirotor OpenPilot</translation>
     </message>
@@ -9494,7 +9576,7 @@ Please select the type of multirotor you want to create a configuration for belo
 Veuillez sélectionner le type de multirotor désiré pour la configuration ci-dessous :</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+37"/>
         <source>Hexacopter H</source>
         <translation>Hexacoptère H</translation>
     </message>
@@ -9527,7 +9609,7 @@ Veuillez sélectionner le type de multirotor désiré pour la configuration ci-d
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+375"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+415"/>
         <location line="+90"/>
         <source>Start</source>
         <translation>Démarrer</translation>
@@ -9620,45 +9702,41 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RebootPage</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/rebootpage.ui"/>
         <source>WizardPage</source>
-        <translation>Page d&apos;Assistant</translation>
+        <translation type="vanished">Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:18pt; color:#ff0000;&quot;&gt;PLEASE REBOOT YOUR CONTROLLER&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ff0000;&quot;&gt;VEUILLEZ REDEMARRER VOTRE CONTRÔLEUR&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:18pt; color:#ffd500;&quot;&gt;PLEASE REBOOT YOUR CONTROLLER&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ffd500;&quot;&gt;VEUILLEZ REDEMARRER VOTRE CONTRÔLEUR&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; color:#000000;&quot;&gt;The configuration created by the wizard contains settings that require a reboot of your controller. Please power cycle the controller before continuing. To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; color:#000000;&quot;&gt;After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds. Then press next.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9759,6 +9837,50 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;The Surface Vehicle section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;La partie Véhicule roulant de l&apos;Assistant de Configuration OpenPilot n&apos;est pas encore implémentée&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/surfacepage.cpp" line="+51"/>
+        <source>OpenPilot Ground Vehicle Configuration</source>
+        <translation>Configuration Véhicule Terrestre OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This part of the wizard will set up the OpenPilot controller for use with a ground vehicle utilizing servos. The wizard supports the most common types of ground vehicle, other variants can be configured by using custom configuration options in the Configuration plugin in the GCS.
+
+Please select the type of ground vehicle you want to create a configuration for below:</source>
+        <translation>Cette partie de l&apos;assistant va permettre le configuration du contrôleur OpenPilot pour fonctionner avec des véhicules terrestres utilisant plusieurs moteurs/servos. L&apos;assistant supporte les types de configurations les plus courants. D&apos;autres variantes de véhicules peuvent être configurées dans l&apos;onglet &quot;Véhicule&quot; &gt; &quot;Personnalisé&quot; du plugin de configuration de GCS.
+
+Veuillez sélectionner le type de véhicule terrestre dont vous voulez créer la configuration ci-dessous :</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Car</source>
+        <translation>Voiture</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional car with a rear motor and a front streering servo</source>
+        <translation>Cette configuration correspond à une voiture classique avec un moteur à l&apos;arrière et un servo de direction à l&apos;avant</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Tank</source>
+        <translation>Tank</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional vehicle using only two motors and differential steering</source>
+        <translation>Cette configuration correspond à une véhicule classique utilisant deux moteurs et une direction par différentiel entre ces moteurs</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Motorcycle</source>
+        <translation>Motocycle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup currently expects a motorcyle setup, using one motor and one servo for steering.</source>
+        <translation type="unfinished">Cette configuration correspond à une moto utilisant un moteur et un servo pour la direction.</translation>
     </message>
 </context>
 <context>
@@ -9898,8 +10020,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location line="+28"/>
         <source>http://wiki.openpilot.org/display/Doc/UAV+Settings+import-export</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/IQCJAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10253,14 +10374,12 @@ automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation
         <translation>Carte Principale</translation>
     </message>
     <message>
-        <location/>
         <source>Auto Update</source>
-        <translation>Maj Auto</translation>
+        <translation type="vanished">Maj Auto</translation>
     </message>
     <message>
-        <location/>
         <source>Auto update</source>
-        <translation>Maj auto</translation>
+        <translation type="vanished">Maj auto</translation>
     </message>
     <message>
         <location/>
@@ -10273,7 +10392,6 @@ automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation
         <translation>Progression</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -10288,7 +10406,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You will get a list of devices.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can resume operations by pressing &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -10304,13 +10422,12 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous pouvez reprendre les opérations en appuyant sur &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -10325,6 +10442,66 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Erase Settings</source>
         <translation>Effacer Paramètres</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatic firmware upgrade.&lt;/p&gt;&lt;p&gt;This &lt;span style=&quot; font-weight:600; color:#e21111;&quot;&gt;will erase ALL settings&lt;/span&gt; in the board. Please&lt;br/&gt;backup settings before using this if you want to&lt;br/&gt;be able to retain them.&lt;/p&gt;&lt;p&gt;This can be done with board already connected&lt;br/&gt;or by connecting board after button is clicked.&lt;br/&gt;Running upgrade with a connected board works &lt;br/&gt;for all boards &lt;span style=&quot; font-weight:600;&quot;&gt;except OPLink&lt;/span&gt; that needs to be &lt;br/&gt;connected after the button is clicked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mise à jour automatique.&lt;/p&gt;&lt;p&gt;Ceci &lt;span style=&quot; font-weight:600; color:#e21111;&quot;&gt;va effacer TOUS les paramètres&lt;/span&gt; sur la carte. Veuillez préalablement sauvegarder les paramètres si vous voulez les garder.&lt;/p&gt;&lt;p&gt;Ceci peut être fait avec la carte déjà connectée ou en connectant la carte après avoir appuyé sur le bouton. La mise à jour de cartes déjà connectées fonctionne pour toutes les cartes &lt;span style=&quot; font-weight:600;&quot;&gt;sauf pour un OPLink&lt;/span&gt; qui a besoin d&apos;être branché après avoir cliqué sur le bouton.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Upgrade &amp;&amp; Erase</source>
+        <translation>MàJ &amp;&amp; Effacement</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatic firmware upgrade. &lt;/p&gt;&lt;p&gt;This can be done with board already connected&lt;br/&gt;or by connecting board after button is clicked.&lt;br/&gt;Running upgrade with a connected board works &lt;br/&gt;for all boards &lt;span style=&quot; font-weight:600;&quot;&gt;except OPLink&lt;/span&gt; that needs to be &lt;br/&gt;connected after the button is clicked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mise à jour automatique.&lt;/p&gt;&lt;p&gt;Ceci peut être fait avec la carte déjà connectée ou en connectant la carte après avoir appuyé sur le bouton. La mise à jour de cartes déjà connectées fonctionne pour toutes les cartes &lt;span style=&quot; font-weight:600;&quot;&gt; sauf pour un OPLink&lt;/span&gt; qui a besoin d&apos;être branché après avoir cliqué sur le bouton.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Upgrade</source>
+        <translation>Mettre à Jour</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To upgrade the firmware in your boards, press Upgrade or &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Upgrade &amp;amp; Erase and follow instructions.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;or&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;proceed as follows:&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Connect telemetry&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Once telemetry is running, press &amp;quot;Halt&amp;quot; above&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You will get a list of devices.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You can resume operations by pressing &amp;quot;Boot&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Pour mettre à jour le firmware sur vos cartes, appuyez sur Mettre à Jour ou&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MàJ &amp;amp; Effacement puis suivez les instructions.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ou&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;procédez comme suit :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Connecter la télémétrie&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Une fois que la télémétrie est en marche, appuyez sur &amp;quot;Arrêt&amp;quot; ci-dessus&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous obtiendrez une liste des périphériques.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous pourrez alors envoyer / récupérer vers / depuis chaque carte comme vous le voudrez&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous pouvez reprendre les opérations en appuyant sur &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10417,8 +10594,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+15"/>
         <source>http://wiki.openpilot.org/x/D4AUAQ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/HoBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10431,8 +10607,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+58"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10453,26 +10628,24 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+380"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+385"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+1176"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1175"/>
+        <location line="+1"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+213"/>
+        <location line="+224"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
@@ -10668,9 +10841,28 @@ Bougez le manche %1.</translation>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+690"/>
+        <location line="+725"/>
+        <source>Stop Manual Calibration</source>
+        <translation>Arrêter Calibration Manuelle</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&lt;p&gt;Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.&lt;/p&gt;&lt;p&gt;Be sure your receiver is powered with an external source and Transmitter is on.&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;&lt;b&gt;Stop Manual Calibration&lt;/b&gt; when done&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.&lt;/p&gt;&lt;p&gt;Veuillez vérifier que votre récepteur est alimenté avec une source externe et que la radio Rx est allumée. &lt;p align=&apos;center&apos;&gt;&lt;b&gt;Arrêter Calibration Manuelle&lt;/b&gt; à la fin&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>You will have to reconfigure the arming settings manually when the manual calibration is finished.</source>
+        <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque la calibration manuelle sera terminée.</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Start Manual Calibration</source>
+        <translation>Démarrer Calibration Manuelle</translation>
+    </message>
+    <message>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
-        <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
+        <translation type="vanished">Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
 </context>
 <context>
@@ -10950,22 +11142,37 @@ Bougez le manche %1.</translation>
 <context>
     <name>ScopeGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+219"/>
+        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+232"/>
         <source>Click legend to show/hide scope trace.
 Double click legend or plot to show/hide legend.</source>
         <translation>Cliquer sur la légende pour afficher/cacher le tracé du graphique.
 Double clic sur la légende ou le tracé pour afficher/cacher la légende.</translation>
     </message>
+    <message>
+        <location line="+410"/>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Copy to Clipboard</source>
+        <translation>Copier dans le Presse-papiers</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Options...</source>
+        <translation>Options...</translation>
+    </message>
 </context>
 <context>
     <name>SetupWizard</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+65"/>
+        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+64"/>
         <source>OpenPilot Setup Wizard</source>
         <translation>Assistant Configuration OpenPilot</translation>
     </message>
     <message>
-        <location line="+172"/>
+        <location line="+174"/>
         <source>Controller type: </source>
         <translation>Type de contrôleur : </translation>
     </message>
@@ -11001,18 +11208,19 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <location line="+50"/>
+        <location line="+47"/>
         <location line="+21"/>
-        <location line="+12"/>
+        <location line="+24"/>
+        <location line="+6"/>
         <location line="+19"/>
         <location line="+13"/>
-        <location line="+15"/>
+        <location line="+16"/>
         <location line="+38"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-163"/>
+        <location line="-179"/>
         <source>Vehicle type: </source>
         <translation>Type de véhicule : </translation>
     </message>
@@ -11023,12 +11231,13 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <location line="+48"/>
+        <location line="+45"/>
+        <location line="+24"/>
         <source>Vehicle sub type: </source>
         <translation>Sous-type véhicule : </translation>
     </message>
     <message>
-        <location line="-45"/>
+        <location line="-66"/>
         <source>Tricopter</source>
         <translation>Tricoptère</translation>
     </message>
@@ -11043,9 +11252,8 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Quadricoptère +</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Quadcopter H</source>
-        <translation>Quadricoptère H</translation>
+        <translation type="vanished">Quadricoptère H</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -11118,7 +11326,22 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Véhicule surface</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
+        <source>Car</source>
+        <translation>Voiture</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Tank</source>
+        <translation>Tank</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Motorcycle</source>
+        <translation>Motocycle</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Input type: </source>
         <translation>Type d&apos;entrée : </translation>
     </message>
@@ -11140,7 +11363,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+3"/>
         <source>Spektrum Satellite</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -11158,7 +11381,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Contrôleur Rapide (%1 Hz)</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>Servo type: </source>
         <translation>Type Servo : </translation>
     </message>
@@ -11258,7 +11481,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+32"/>
         <source>Writing Airspeed sensor settings</source>
-        <translation type="unfinished">Écriture paramètres capteur Vitesse Air</translation>
+        <translation>Écriture paramètres capteur Vitesse Air</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -11266,13 +11489,14 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
-        <location line="+155"/>
+        <location line="+172"/>
         <location line="+31"/>
+        <location line="+36"/>
         <source>Writing actuator settings</source>
         <translation>Écriture paramètres actionneurs</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+52"/>
         <source>Writing flight mode settings 1/2</source>
         <translation>Écriture paramètres mode de vol 1/2</translation>
     </message>
@@ -11298,7 +11522,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="+135"/>
         <source>Writing mixer settings</source>
         <translation>Écriture paramètres mixeur</translation>
     </message>
@@ -11510,54 +11734,98 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>UploaderGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+278"/>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+284"/>
         <source>Connected Device</source>
         <translation>Périphérique Connecté</translation>
     </message>
     <message>
-        <location line="+107"/>
+        <location line="+117"/>
         <source>Bootloader</source>
         <translation>Bootloader</translation>
     </message>
     <message>
         <location line="+26"/>
-        <location line="+11"/>
+        <location line="+13"/>
         <source>Bootloader?</source>
         <translation>Bootloader ?</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <location line="+383"/>
+        <location line="+30"/>
+        <location line="+474"/>
         <source>Device</source>
         <translation>Périphérique</translation>
     </message>
     <message>
-        <location line="-308"/>
+        <location line="-393"/>
         <source>http://wiki.openpilot.org/display/Doc/Erase+board+settings</source>
-        <translatorcomment>Wiki FR - Uploader</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+93"/>
         <source>Running</source>
         <translation>En cours d&apos;exécution</translation>
     </message>
     <message>
-        <location line="+43"/>
-        <location line="+164"/>
+        <location line="+245"/>
         <source>Timed out while waiting for all boards to be disconnected!</source>
         <translatorcomment>Bof</translatorcomment>
         <translation type="unfinished">Expiration du temps d&apos;attente de la déconnexion de toutes les cartes !</translation>
     </message>
     <message>
-        <location line="-155"/>
-        <location line="+170"/>
+        <location line="-190"/>
+        <location line="+205"/>
         <source>Timed out while waiting for a board to be connected!</source>
         <translatorcomment>Bof</translatorcomment>
         <translation type="unfinished">Expiration du temps dans l&apos;attente d&apos;une connexion de carte !</translation>
     </message>
     <message>
-        <location line="-23"/>
+        <location line="-216"/>
+        <source>Timed out while waiting for a board to be fully connected!</source>
+        <translation type="unfinished">Expiration du temps dans l&apos;attente d&apos;une connexion complète de carte !</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location line="+24"/>
+        <source>Failed to enter bootloader mode.</source>
+        <translation type="unfinished">Échec du passage en mode bootloader.</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Unknown board id &apos;0x%1&apos;</source>
+        <translation type="unfinished">Carte inconnue id &apos;0x%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Firmware image not found.</source>
+        <translation type="unfinished">Image firmware non trouvée.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Could not open firmware image for reading.</source>
+        <translation type="unfinished">Impossible d&apos;ouvrir l&apos;image de firmware en lecture.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Could not enter direct firmware upload mode.</source>
+        <translation type="unfinished">Impossible de passer en mode DFU.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Firmware upload failed.</source>
+        <translation type="unfinished">Échec du téléversement du firmware.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Failed to upload firmware description.</source>
+        <translation type="unfinished">Échec du téléversement de la description firmware.</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Timed out while booting.</source>
+        <translation type="unfinished">Expiration du temps d&apos;attente lors du démarrage.</translation>
+    </message>
+    <message>
+        <location line="+66"/>
         <source>Please disconnect your OpenPilot board.</source>
         <translation>Veuillez déconnecter votre carte OpenPilot.</translation>
     </message>
@@ -11580,7 +11848,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>La carte doit être connectée à un port USB !</translation>
     </message>
     <message>
-        <location line="+131"/>
+        <location line="+143"/>
         <source>Waiting for all OpenPilot boards to be disconnected from USB.</source>
         <translation>Attente de la déconnexion de toutes les cartes connectées en USB.</translation>
     </message>
@@ -11596,12 +11864,46 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Veuillez connecter la carte OpenPilot sur le port USB.</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Bringing the board into boot loader mode.</source>
-        <translation>Passage de la carte en mode bootloader.</translation>
+        <location line="+7"/>
+        <source>Bringing the board into boot loader mode. Please wait.</source>
+        <translation type="unfinished">Passage de la carte en mode bootloader. Veuillez patienter.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Step %1</source>
+        <translation type="unfinished">Étape %1</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Rebooting the board. Please wait.</source>
+        <translation type="unfinished">Redémarrage de la carte. Veuillez patienter.</translation>
     </message>
     <message>
         <location line="+3"/>
+        <source>Rebooting and erasing the board. Please wait.</source>
+        <translation type="unfinished">Redémarrage et effacement de la carte. Veuillez patienter.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Board was updated successfully. Press OK to finish.</source>
+        <translation type="unfinished">La carte a été mise à jour avec succès. Appuyez sur OK pour terminer.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Something went wrong.</source>
+        <translation type="unfinished">Quelque chose c&apos;est mal passé.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source> Press OK to finish, you will have to manually upgrade the board.</source>
+        <translation type="unfinished"> Appuyez sur OK pour terminer, vous devrez mettre à jour votre carte manuellement.</translation>
+    </message>
+    <message>
+        <source>Bringing the board into boot loader mode.</source>
+        <translation type="vanished">Passage de la carte en mode bootloader.</translation>
+    </message>
+    <message>
+        <location line="-28"/>
         <source>Preparing to upload firmware to the board.</source>
         <translation>Préparation du téléversement firmware sur la carte.</translation>
     </message>
@@ -11616,31 +11918,25 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Téléversement de la description du nouveau firmware sur la carte.</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Rebooting the board.</source>
-        <translation>Redémarrage de la carte.</translation>
+        <translation type="vanished">Redémarrage de la carte.</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Board was updated successfully.</source>
-        <translation>La carte a été mise à jour avec succès.</translation>
+        <translation type="vanished">La carte a été mise à jour avec succès.</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+9"/>
         <source>Press OK to finish.</source>
-        <translation>Appuyer sur OK pour terminer.</translation>
+        <translation type="vanished">Appuyer sur OK pour terminer.</translation>
     </message>
     <message>
-        <location line="-2"/>
         <source>Something went wrong, you will have to manually upgrade the board.</source>
-        <translation>Quelque chose s&apos;est mal passé, vous devrez mettre à jour la carte manuellement.</translation>
+        <translation type="vanished">Quelque chose s&apos;est mal passé, vous devrez mettre à jour la carte manuellement.</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+56"/>
         <source>http://wiki.openpilot.org/x/AoBZ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -11690,7 +11986,7 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau Réinitialiser pour continuer ou allumer/éteindre la carte pour forcer la réinitialisation.</translation>
     </message>
     <message>
-        <location line="-320"/>
+        <location line="-449"/>
         <source></source>
         <translation>Annuler</translation>
     </message>
@@ -12129,6 +12425,21 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <source>-</source>
         <translation>-</translation>
     </message>
+    <message>
+        <location/>
+        <source>Source:</source>
+        <translation type="unfinished">Source :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The source of Curve 1 will always be Throttle</source>
+        <translation type="unfinished">La source de la Courbe 1 est toujours Throttle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>FixedWingConfigWidget</name>
@@ -12256,39 +12567,32 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Affectations sorties</translation>
     </message>
     <message>
-        <location/>
         <source>Engine</source>
-        <translation>Moteur</translation>
+        <translation type="vanished">Moteur</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the engine</source>
-        <translation>Sélectionner le canal de sortie pour le moteur</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le moteur</translation>
     </message>
     <message>
-        <location/>
         <source>Aileron 1</source>
-        <translation>Aileron 1</translation>
+        <translation type="vanished">Aileron 1</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the first aileron (or elevon)</source>
-        <translation>Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
     </message>
     <message>
-        <location/>
         <source>Aileron 2</source>
-        <translation>Aileron 2</translation>
+        <translation type="vanished">Aileron 2</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the second aileron (or elevon)</source>
-        <translation>Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
     </message>
     <message>
-        <location/>
         <source>Motor</source>
-        <translation>Moteur</translation>
+        <translation type="vanished">Moteur</translation>
     </message>
     <message>
         <location/>
@@ -12358,6 +12662,16 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
     <message>
         <location/>
         <source>Mixer OK</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 1</source>
+        <translation>Moteur 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vehicle frame</source>
         <translation></translation>
     </message>
 </context>
@@ -12886,9 +13200,8 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation>Canal Maxi</translation>
     </message>
     <message>
-        <location/>
         <source>Channel 0 is 430 MHz, channel 249 is 440 MHz, and the channel spacing is 40 KHz.</source>
-        <translation>Canal 0 correspond à 430Mhz, canal 249 à 440Mhz, et l&apos;espacement des canaux est de 40KHz.</translation>
+        <translation type="vanished">Canal 0 correspond à 430Mhz, canal 249 à 440Mhz, et l&apos;espacement des canaux est de 40KHz.</translation>
     </message>
     <message>
         <location/>
@@ -12943,8 +13256,22 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/hgAGAQ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/B4BYAQ</translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 0 is 430 MHz, channel 250 is 440 MHz, and the channel spacing is 40 KHz.</source>
+        <translation type="unfinished">Canal 0 correspond à 430Mhz, canal 249 à 440Mhz, et l&apos;espacement des canaux est de 40KHz. {0 ?} {430 ?} {250 ?} {440 ?} {40 ?}</translation>
+    </message>
+    <message>
+        <location/>
+        <source>440.000 (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>430.000 (MHz)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13130,8 +13457,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+253"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/aoBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13144,8 +13470,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+226"/>
         <source>http://wiki.openpilot.org/x/GgDBAQ</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/TYRNAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13973,7 +14298,7 @@ Veuillez vérifier le fichier.
 <context>
     <name>ConfigPipXtremeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+140"/>
+        <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+154"/>
         <location line="+9"/>
         <location line="+9"/>
         <location line="+9"/>
@@ -14267,7 +14592,7 @@ Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des
 et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+138"/>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+172"/>
         <source>Chan %1</source>
         <translation>Canal %1</translation>
     </message>
@@ -14275,6 +14600,16 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location filename="../../../src/plugins/config/inputchannelform.ui"/>
         <source>Text</source>
         <translation type="unfinished">Texte</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel value</source>
+        <translation>Valeur canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel Value</source>
+        <translation>Valeur Canal</translation>
     </message>
 </context>
 <context>
@@ -14307,8 +14642,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+315"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
-        <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -14479,7 +14813,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>TimedDialog</name>
     <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="-658"/>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="-654"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -14677,7 +15011,7 @@ It is suggested that if this is a first time configuration of your controller, r
 Il est suggéré que si cela est une première configuration de votre contrôleur, plutôt que d&apos;utiliser cette option, sélectionnez à la place un ensemble de réglages qui correspond le mieux à votre propre appareil dans la liste ci-dessus. Si vous n&apos;êtes pas en mesure d&apos;en choisir un, sélectionnez l&apos;élément générique de la liste.</translation>
     </message>
     <message>
-        <location line="+77"/>
+        <location line="+85"/>
         <source>Current Tuning</source>
         <translation>Réglages Actuels</translation>
     </message>
@@ -15011,9 +15345,8 @@ p, li { white-space: pre-wrap; }
         <translation>Multirotor - Quadricoptère X</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Multirotor - Quadrocopter H</source>
-        <translation>Multirotor - Quadricoptère H</translation>
+        <translation type="vanished">Multirotor - Quadricoptère H</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -15422,6 +15755,29 @@ p, li { white-space: pre-wrap; }
         <location line="+15"/>
         <source>Export File Name</source>
         <translation>Nom Fichier Exporté</translation>
+    </message>
+</context>
+<context>
+    <name>RebootDialog</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/rebootdialog.ui"/>
+        <source>Reboot</source>
+        <translation type="unfinished">Redémarrage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please wait. Your controller is rebooting.&lt;br/&gt;This can take up to a minute.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Veuillez patienter. Votre contrôleur redémarre&lt;br/&gt;Cela peut prendre jusqu&apos;à une minute.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/uploader/rebootdialog.cpp" line="+69"/>
+        <source>&lt;font color=&apos;red&apos;&gt;Reboot failed!&lt;/font&gt;&lt;p&gt;Please perform a manual reboot by power cycling the board.&lt;br&gt;To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.&lt;br&gt;After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds.&lt;br&gt;Then press Ok.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;font color=&apos;red&apos;&gt;Le rédémarrage a échoué !&lt;/font&gt;&lt;p&gt;Veuillez effectuer un redémarrage manuel de la carte.&lt;br&gt;Pour redémarrer la carte contrôleur, envelez toutes les batteries ainsi que le câble USB pour au moins 30 secondes.&lt;br&gt;Après 30 secondes, connecter à nouveau la carte et attendez qu&apos;elle soit connectée, cela peut prendre quelques secondes.&lt;br&gt;Ensuite cliquez sur Ok.&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>

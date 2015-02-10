@@ -1,9 +1,16 @@
 <RCC>
     <qresource prefix="/configgadget">
+        <file>images/flightmode_bg1.png</file>
+        <file>images/flightmode_bg2.png</file>
+        <file>images/flightmode_bg3.png</file>
+        <file>images/flightmode_bg4.png</file>
+        <file>images/flightmode_bg5.png</file>
+        <file>images/flightmode_bg6.png</file>
         <file>images/help2.png</file>
         <file>images/ahrs-calib.svg</file>
         <file>images/multirotor-shapes.svg</file>
         <file>images/fixedwing-shapes.svg</file>
+        <file>images/ground-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
         <file>images/help.png</file>

@@ -113,6 +113,11 @@ private:
     void setupElevon();
     void setupDualAileron();
     void setupAileron();
+    void setupVtail();
+
+    void setupCar();
+    void setupTank();
+    void setupMotorcycle();
 
 private slots:
     void uAVOTransactionCompleted(UAVObject *object, bool success);

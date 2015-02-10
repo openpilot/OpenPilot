@@ -168,6 +168,8 @@ void ConfigCustomWidget::registerWidgets(ConfigTaskWidget &parent)
     parent.addWidget(m_aircraft->customThrottle1Curve);
     parent.addWidget(m_aircraft->customThrottle2Curve->getCurveWidget());
     parent.addWidget(m_aircraft->customThrottle2Curve);
+    parent.addWidgetBinding("MixerSettings", "Curve2Source", m_aircraft->curve2SourceCombo);
+    parent.addWidget(m_aircraft->curve2SourceCombo);
 }
 
 void ConfigCustomWidget::resetActuators(GUIConfigDataUnion *configData)
@@ -236,9 +238,11 @@ void ConfigCustomWidget::refreshWidgetsValues(QString frameType)
         m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.count(), 1.0);
     }
 
+    double Throttle2CurveMin = m_aircraft->customThrottle2Curve->getMin();
+
     if (MixerSettings * mxr = qobject_cast<MixerSettings *>(mixer)) {
         MixerSettings::DataFields mixerSettingsData = mxr->getData();
-        if (mixerSettingsData.Curve2Source == MixerSettings::CURVE2SOURCE_THROTTLE) {
+        if (mixerSettingsData.Curve2Source == MixerSettings::CURVE2SOURCE_THROTTLE && Throttle2CurveMin >= 0) {
             m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
         } else {
             m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_PITCH);

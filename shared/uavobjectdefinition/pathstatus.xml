@@ -13,6 +13,7 @@
 	<field name="correction_direction_north" units="m" type="float" elements="1"/>
 	<field name="correction_direction_east" units="m" type="float" elements="1"/>
 	<field name="correction_direction_down" units="m" type="float" elements="1"/>
+	<field name="path_time" units="s" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

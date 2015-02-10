@@ -179,7 +179,7 @@ inline QColor QwtColorMap::color(
 {
     if ( d_format == RGB )
     {
-        return QColor( rgb( interval, value ) );
+        return QColor::fromRgba( rgb( interval, value ) );
     }
     else
     {

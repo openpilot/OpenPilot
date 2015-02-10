@@ -41,15 +41,25 @@ class UAVTALK_EXPORT TelemetryManager : public QObject {
     Q_OBJECT
 
 public:
+    enum ConnectionState {
+        TELEMETRY_DISCONNECTED,
+        TELEMETRY_CONNECTED,
+        TELEMETRY_DISCONNECTING,
+        TELEMETRY_CONNECTING
+    };
+
     TelemetryManager();
     ~TelemetryManager();
 
     void start(QIODevice *dev);
     void stop();
-    bool isConnected();
+    bool isConnected() const;
+    ConnectionState connectionState() const;
 
 signals:
+    void connecting();
     void connected();
+    void disconnecting();
     void disconnected();
     void telemetryUpdated(double txRate, double rxRate);
     void myStart();
@@ -68,7 +78,7 @@ private:
     Telemetry *m_telemetry;
     TelemetryMonitor *m_telemetryMonitor;
     QIODevice *m_telemetryDevice;
-    bool m_isAutopilotConnected;
+    ConnectionState m_connectionState;
     QThread m_telemetryReaderThread;
 };
 

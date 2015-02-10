@@ -36,6 +36,7 @@
 #include <manualcontrolsettings.h>
 #include <flightmodesettings.h>
 #include <systemsettings.h>
+#include <stabilizationsettings.h>
 #include <systemalarms.h>
 #include <revosettings.h>
 #include <positionstate.h>
@@ -45,14 +46,8 @@
 #define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
 
 
-/****************************
-* Current checks:
-* 1. If a flight mode switch allows autotune and autotune module not running
-* 2. If airframe is a multirotor and either manual is available or a stabilization mode uses "none"
-****************************/
-
 // ! Check a stabilization mode switch position for safety
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol);
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted);
 
 /**
  * Run a preflight check over the hardware configuration
@@ -101,34 +96,41 @@ int32_t configuration_check()
     // modes
     uint8_t num_modes;
     uint8_t modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
+    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
     ManualControlSettingsFlightModeNumberGet(&num_modes);
+    StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
     FlightModeSettingsFlightModePositionGet(modes);
 
     for (uint32_t i = 0; i < num_modes; i++) {
+        uint8_t gps_assisted = FlightModeAssistMap[i];
+        if (gps_assisted) {
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(multirotor);
+            ADDSEVERITY(navCapableFusion);
+        }
+
         switch (modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
+            ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!multirotor);
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED4:
-            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED5:
-            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
-            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol));
-            break;
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
+            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
@@ -138,16 +140,22 @@ int32_t configuration_check()
             SystemAlarmsAlarmData alarms;
             SystemAlarmsAlarmGet(&alarms);
             ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
+            ADDSEVERITY(!gps_assisted);
         }
-        // intentionally no break as this also needs pathfollower
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOFPV:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOLOS:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIONSEW:
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(navCapableFusion);
+            break;
+
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_COURSELOCK:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_HOMELEASH:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ABSOLUTEPOSITION:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
+            ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(navCapableFusion);
             break;
@@ -183,7 +191,7 @@ int32_t configuration_check()
  * @param[in] index Which stabilization mode to check
  * @returns true or false
  */
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol)
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted)
 {
     uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
@@ -220,6 +228,17 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
             }
         }
     }
+
+    if (gpsassisted) {
+        // For multirotors verify that roll/pitch are either attitude or rattitude
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if (!(modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ATTITUDE ||
+                  modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATTITUDE)) {
+                return false;
+            }
+        }
+    }
+
 
     // coptercontrol cannot do altitude holding
     if (coptercontrol) {

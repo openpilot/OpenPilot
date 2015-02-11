@@ -448,7 +448,7 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
     if (systemAlarms.Alarm[SystemAlarms::ALARM_SYSTEMCONFIGURATION] > SystemAlarms::ALARM_WARNING) {
         switch (systemAlarms.ExtendedAlarmStatus[SystemAlarms::EXTENDEDALARMSTATUS_SYSTEMCONFIGURATION]) {
         case SystemAlarms::EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT:
-            setWarning(tr("OneShot only works with MainPort settings marked with \"+OneShot\""));
+            setWarning(tr("OneShot only works with MainPort settings marked with \"+OneShot\"\nUsing \"PPM_PIN6+OneShot\" bank 4 (output 6) must be set to PWM"));
             return;
         }
     }

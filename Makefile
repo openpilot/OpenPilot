@@ -895,9 +895,9 @@ $(DIST_VER_INFO): | $(DIST_DIR)
 
 $(DIST_NAME).gz: $(DIST_VER_INFO) | $(DIST_DIR)
 	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_NAME).gz)"
-	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
+	$(V1) git archive --prefix="$(PACKAGE_NAME)/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \
-		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
+		--transform='s,.*version-info.json,$(PACKAGE_NAME)/version-info.json,' \
 		$(call toprel, "$(DIST_VER_INFO)")
 	$(V1) gzip -f "$(DIST_NAME)"
 

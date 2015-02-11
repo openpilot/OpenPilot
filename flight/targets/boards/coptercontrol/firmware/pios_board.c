@@ -742,10 +742,15 @@ void PIOS_Board_Init(void)
         break;
     case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
 #if defined(PIOS_INCLUDE_PPM)
         {
             uint32_t pios_ppm_id;
-            PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+            if( hwsettings_rcvrport == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT){
+                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_pin6_cfg);
+            } else {
+                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+            }
 
             uint32_t pios_ppm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {

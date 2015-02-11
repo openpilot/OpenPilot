@@ -2,7 +2,7 @@ Source: openpilot
 Section: unknown
 Priority: optional
 Maintainer: James Duley <james@openpilot.org>
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 9), libudev-dev, libusb-1.0-0-dev, libsdl1.2-dev, python, gcc-arm-none-eabi (>=4.9), qt5-default, qttools5-dev-tools, libqt5svg5-dev, qtdeclarative5-dev, qtdeclarative5-controls-plugin, libqt5serialport5-dev, qtmultimedia5-dev, qtscript5-dev, libqt5opengl5-dev
 Standards-Version: 3.9.5
 Homepage: http://www.openpilot.org
 Vcs-Git: git://git.openpilot.org/OpenPilot.git

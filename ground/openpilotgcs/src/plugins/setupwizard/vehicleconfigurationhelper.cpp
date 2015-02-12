@@ -364,13 +364,20 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
     ActuatorSettings *actSettings = ActuatorSettings::GetInstance(m_uavoManager);
 
     qint16 escFrequence = LEGACY_ESC_FREQUENCY;
+    ActuatorSettings::BankModeOptions bankMode = ActuatorSettings::BANKMODE_PWM;
 
     switch (m_configSource->getEscType()) {
     case VehicleConfigurationSource::ESC_STANDARD:
         escFrequence = LEGACY_ESC_FREQUENCY;
+        bankMode = ActuatorSettings::BANKMODE_PWM;
         break;
     case VehicleConfigurationSource::ESC_RAPID:
         escFrequence = RAPID_ESC_FREQUENCY;
+        bankMode = ActuatorSettings::BANKMODE_ONESHOT;
+        break;
+    case VehicleConfigurationSource::ESC_SYNCHED:
+        escFrequence = RAPID_ESC_FREQUENCY;
+        bankMode = ActuatorSettings::BANKMODE_ONESHOT125;
         break;
     default:
         break;
@@ -406,30 +413,39 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
         for (quint16 i = 0; i < ActuatorSettings::BANKUPDATEFREQ_NUMELEM; i++) {
             data.BankUpdateFreq[i] = LEGACY_ESC_FREQUENCY;
+            data.BankMode[i]       = ActuatorSettings::BANKMODE_PWM;
         }
 
         switch (m_configSource->getVehicleSubType()) {
         case VehicleConfigurationSource::MULTI_ROTOR_TRI_Y:
             // Servo always on channel 4
             data.BankUpdateFreq[0] = escFrequence;
+            data.BankMode[0]       = bankMode;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
                 m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
                 data.BankUpdateFreq[1] = servoFrequence;
+                data.BankMode[1]       = bankMode;
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 data.BankUpdateFreq[1] = escFrequence;
+                data.BankMode[1]       = bankMode;
                 data.BankUpdateFreq[2] = servoFrequence;
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
                 data.BankUpdateFreq[1] = escFrequence;
+                data.BankMode[1]       = bankMode;
                 data.BankUpdateFreq[2] = escFrequence;
+                data.BankMode[2]       = bankMode;
                 data.BankUpdateFreq[3] = servoFrequence;
             }
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
             data.BankUpdateFreq[0] = escFrequence;
+            data.BankMode[0]       = bankMode;
             data.BankUpdateFreq[1] = escFrequence;
+            data.BankMode[1]       = bankMode;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 data.BankUpdateFreq[2] = escFrequence;
+                data.BankMode[2]       = bankMode;
             }
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
@@ -442,9 +458,13 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
             data.BankUpdateFreq[0] = escFrequence;
+            data.BankMode[0]       = bankMode;
             data.BankUpdateFreq[1] = escFrequence;
+            data.BankMode[1]       = bankMode;
             data.BankUpdateFreq[2] = escFrequence;
+            data.BankMode[2]       = bankMode;
             data.BankUpdateFreq[3] = escFrequence;
+            data.BankMode[3]       = bankMode;
             break;
         default:
             break;
@@ -469,6 +489,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
         for (quint16 i = 0; i < ActuatorSettings::BANKUPDATEFREQ_NUMELEM; i++) {
             data.BankUpdateFreq[i] = servoFrequence;
+            data.BankMode[i]       = ActuatorSettings::BANKMODE_PWM;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 if (i == 1) {
                     data.BankUpdateFreq[i] = escFrequence;
@@ -505,6 +526,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
         for (quint16 i = 0; i < ActuatorSettings::BANKUPDATEFREQ_NUMELEM; i++) {
             data.BankUpdateFreq[i] = servoFrequence;
+            data.BankMode[i] = ActuatorSettings::BANKMODE_PWM;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 if (i == 1) {
                     data.BankUpdateFreq[i] = escFrequence;

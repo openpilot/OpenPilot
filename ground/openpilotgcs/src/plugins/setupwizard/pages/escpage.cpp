@@ -44,9 +44,11 @@ EscPage::~EscPage()
 
 bool EscPage::validatePage()
 {
-    if (ui->rapidESCButton->isChecked()) {
+    if (ui->synchedESCButton->isChecked()) {
+        getWizard()->setEscType(SetupWizard::ESC_SYNCHED);
+    }else if (ui->rapidESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_RAPID);
-    } else {
+    } else if (ui->defaultESCButton->isChecked()){
         getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     }
 

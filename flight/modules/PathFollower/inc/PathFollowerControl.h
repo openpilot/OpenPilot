@@ -36,6 +36,7 @@ public:
     virtual void Deactivate(void) = 0;
     virtual void SettingsUpdated(void) = 0;
     virtual void UpdateAutoPilot(void) = 0;
+    virtual void ObjectiveUpdated(void) = 0;
 };
 
 #endif // PATHFOLLOWERCONTROL_H

@@ -32,81 +32,122 @@
 #define PIDCONTROLTHRUST_H
 extern "C" {
 #include <pid.h>
+#include <stabilizationdesired.h>
 }
 #include "PathFollowerFSM.h"
+
 class PIDControlThrust {
 public:
     PIDControlThrust()
+    : deltaTime(0), mVelocitySetpointTarget(0), mVelocityState(0), mThrustCommand(0.0f), mFSM(0), mNeutral(0.5f), mActive(false)
     {
-        Reset();
+        Deactivate();
     }
+
     ~PIDControlThrust() {}
+
     void Initialize(PathFollowerFSM *fsm)
     {
         mFSM = fsm;
     }
-    void Reset()
+
+    void Deactivate()
     {
-        pid_zero(&PID);
+      //pid_zero(&PID);
+      mActive = false;
     }
-    void UpdateParameters(float kp, float ki, float kd, float ilimit, float dT)
+
+    void Activate()
     {
-        pid_configure(&PID, kp, ki, kd, ilimit);
+      float currentThrust;
+      StabilizationDesiredThrustGet(&currentThrust);
+      float u0 = currentThrust - mNeutral;
+      pid2_transfer(&PID, u0);
+      mActive = true;
+    }
+
+    void UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax)
+    {
+        //pid_configure(&PID, kp, ki, kd, ilimit);
+        float Ti = kp/ki;
+        float Td = kd/kp;
+        float kt = (Ti + Td)/2.0f;
+        float Tf = Td/10.0f;
+        float beta = 1.0f; // 0 to 1
+        float u0 = 0.0f;
+        pid2_configure(&PID, kp, ki, kd, Tf, kt, dT, beta, u0);
         deltaTime = dT;
+        mVelocityMax = velocityMax;
     }
+
     void UpdateNeutralThrust(float neutral)
     {
+        if (mActive) {
+            // adjust neutral and achieve bumpless transfer
+            PID.I += mNeutral - neutral;
+        }
         mNeutral = neutral;
     }
-    void UpdateSetpoint(float setpoint)
+
+    void UpdateVelocitySetpoint(float setpoint)
     {
-        mSetPoint = setpoint;
+        mVelocitySetpointTarget = setpoint;
+        if (fabsf(mVelocitySetpointTarget) > mVelocityMax) {
+             // maintain sign but set to max
+             mVelocitySetpointTarget *= mVelocityMax / fabsf(mVelocitySetpointTarget);
+        }
     }
-    void UpdateState(float state)
+
+    void UpdateVelocityState(float pv)
     {
-        mState = state;
-    }
+        mVelocityState = pv;
 
-    void Update(void)
-    {
-        // TODO Add positional control for hold
+        // The FSM controls the actual descent velocity and introduces step changes as required
+        float velocitySetpointDesired = mFSM->BoundVelocityDown(mVelocitySetpointTarget);
 
-	// Velocity Error
-        float downError = mSetPoint - mState;
+        // Calculate the rate of change
+        float accelerationDesired = (velocitySetpointDesired - mVelocitySetpointCurrent)/deltaTime;
 
-        // TODO Control rate of change of setpoint? e.g. goes from zero to -0.4m/s gradually.
-        // Add rates of change for velocity setpoint
-
-        downError = -downError;
-        pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
-        mFSM->CheckPidScaler(&local_scaler);
-
-        // change following to new pid function
-        // TODO Change following to calculate accel desired
-        // TODO Add limits on the accel desired
-
-        float downCommand    = -pid_apply_setpoint(&PID, &local_scaler, mSetPoint, mState, deltaTime);
-
-        // TODO Taking into account accel desired, accel actual, calculate down command.
-
-        // Include limits on down command
-
-        mThrustCommand = mFSM->BoundThrust(mNeutral + downCommand);
+        if (fabsf(accelerationDesired) > 2.0f) {
+            accelerationDesired  *= 2.0f / accelerationDesired;
+        }
+        else  if (fabsf(accelerationDesired) < 0.1f) {
+            mVelocitySetpointCurrent = velocitySetpointDesired;
+        }
+        else {
+            mVelocitySetpointCurrent += accelerationDesired * deltaTime;
+        }
     }
 
     float GetThrustCommand(void)
     {
+        //pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
+        //mFSM->CheckPidScaler(&local_scaler);
+        //float downCommand    = -pid_apply_setpoint(&PID, &local_scaler, mVelocitySetpoint, mState, deltaTime);
+        float ulow, uhigh;
+        mFSM->BoundThrust(ulow, uhigh);
+        float downCommand    = -pid2_apply(&PID, mVelocitySetpointCurrent, mVelocityState, ulow-mNeutral, uhigh-mNeutral);
+        mThrustCommand = mNeutral + downCommand;
         return mThrustCommand;
     }
 
+    float GetVelocityDesired(void)
+    {
+        return mVelocitySetpointCurrent;
+    }
+
 private:
-    struct pid PID;
+    struct pid2 PID;
     float deltaTime;
-    float mSetPoint;
-    float mState;
+    float mVelocitySetpointTarget;
+    float mVelocitySetpointCurrent;
+    float mVelocityState;
     float mThrustCommand;
     PathFollowerFSM *mFSM;
     float mNeutral;
+    float mVelocityMax;
+    uint8_t mActive;
+
 };
 
 #endif // PIDCONTROLTHRUST_H

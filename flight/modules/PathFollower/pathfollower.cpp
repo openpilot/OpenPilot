@@ -333,6 +333,9 @@ static void pathFollowerObjectiveUpdatedCb(__attribute__((unused)) UAVObjEvent *
         if (previousMode != pathDesired.Mode) {
             activeController->Activate();
         }
+        else {
+            activeController->ObjectiveUpdated();
+        }
     }
 }
 

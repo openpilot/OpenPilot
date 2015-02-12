@@ -45,10 +45,7 @@ public:
     virtual void Activate(void) {}
     virtual void Update(void) {}
     virtual void SettingsUpdated(void) {}
-    virtual float BoundThrust(float thrustDesired)
-    {
-        return thrustDesired;
-    }
+    virtual void BoundThrust(float &ulow, float &uhigh);
     virtual PathFollowerFSMState_T GetCurrentState(void)
     {
         return PFFSM_STATE_INACTIVE;

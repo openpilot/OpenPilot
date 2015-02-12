@@ -60,6 +60,7 @@ public:
     void Deactivate(void);
     void SettingsUpdated(void);
     void UpdateAutoPilot(void);
+    void ObjectiveUpdated(void);
 
 private:
     void UpdateVelocityDesired(void);

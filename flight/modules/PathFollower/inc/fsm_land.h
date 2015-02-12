@@ -70,7 +70,7 @@ public:
     void Inactive(void);
     void Activate(void);
     void Update(void);
-    float BoundThrust(float thrustDesired);
+    void BoundThrust(float &ulow, float &uhigh);
     PathFollowerFSMState_T GetCurrentState(void);
     void ConstrainStabiDesired(StabilizationDesiredData *stabDesired);
     float BoundVelocityDown(float);

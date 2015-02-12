@@ -143,3 +143,90 @@ void pid_configure(struct pid *pid, float p, float i, float d, float iLim)
     pid->d    = d;
     pid->iLim = iLim;
 }
+
+
+/**
+ * Configure the settings for a pid2 structure
+ * @param[out] pid The PID structure to configure
+ * @param[in] kp proportional gain
+ * @param[in] ki integral gain.  Time constant Ti = kp/ki
+ * @param[in] kd derivative gain. Time constant Td = kd/kp
+ * @param[in] kt tracking gain for anti-windup. Tt = √TiTd and Tt = (Ti + Td)/2
+ * @param[in] Tf filtering time = (kd/k)/N, N is in the range of 2 to 20
+ * @param[in] beta setpoint weight on setpoint in P component.  beta=1 error feedback. beta=0 smooths out response to changes in setpoint
+ * @param[in] u0 initial output for r=y at activation to achieve bumpless transfer
+ */
+void pid2_configure(struct pid2 *pid, float kp, float ki, float kd, float Tf, float kt, float dT, float beta, float u0)
+{
+    pid->reconfigure = true;
+    pid->u0 = u0;
+    pid->kp = kp;
+    pid->beta = beta;// setpoint weight on proportional term
+
+    pid->bi=ki*dT;
+    pid->br=kt*dT;
+
+    pid->ad=Tf/(Tf+dT);
+    pid->bd=kd/(Tf+dT);
+}
+
+/**
+ * Achieve a bumpless transfer and trigger initialisation of I term
+ * @param[out] pid The PID structure to configure
+ * @param[in] u0 initial output for r=y at activation to achieve bumpless transfer
+ */
+void pid2_transfer(struct pid2 *pid, float u0)
+{
+    pid->reconfigure = true;
+    pid->u0 = u0;
+}
+
+/**
+ * pid controller with setpoint weighting, anti-windup, with a low-pass filtered derivative on the process variable
+ * See "Feedback Systems" for an explanation
+ * @param[out] pid The PID structure to configure
+ * @param[in] r setpoint
+ * @param[in] y process variable
+ * @param[in] ulow lower limit on actuator
+ * @param[in] uhigh upper limit on actuator
+ */
+float pid2_apply(
+    struct pid2 *pid,
+    const float r,
+    const float y,
+    float ulow,
+    float uhigh)
+{
+  // on reconfigure ensure bumpless transfer
+  // http://www.controlguru.com/2008/021008.html
+  if (pid->reconfigure) {
+      pid->reconfigure = false;
+
+      // initialise derivative terms
+      pid->yold = y;
+      pid->D = 0.0f;
+
+      // t=0, u=u0, y=y0, v=u
+      pid->I = pid->u0 - pid->kp * (pid->beta * r - y);
+  }
+
+  // compute proportional part
+  float P = pid->kp * (pid->beta * r - y);
+
+  // update derivative part
+  pid->D = pid->ad * pid->D - pid->bd * (y - pid->yold);
+
+  // compute temporary output
+  float v = P + pid->I + pid->D;
+
+  // simulate actuator saturation
+  float u = boundf(v, ulow, uhigh);
+
+  // update integral
+  pid->I = pid->I + pid->bi * (r - y) + pid->br * (u - v);
+
+  // update old process output
+  pid->yold = y;
+
+  return u;
+}

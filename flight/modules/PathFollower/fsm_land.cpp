@@ -210,6 +210,10 @@ void FSMLand::Activate()
 #else
         setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, FSMLANDSTATUS_STATEEXITREASON_NONE);
 #endif
+
+
+
+
     } else {
         // move to error state and callback to position hold
         setState(LAND_STATE_ABORT, FSMLANDSTATUS_STATEEXITREASON_NONE);
@@ -280,20 +284,15 @@ int32_t FSMLand::runAlways(void)
 // uses FSM's as helper functions that manage state and event detection.
 // PathFollower calls into FSM methods to alter its commands.
 
-float FSMLand::BoundThrust(float thrustDesired)
+void FSMLand::BoundThrust(float &ulow, float &uhigh)
 {
-    thrustDesired = boundf(thrustDesired, mLandData->boundThrustMin, mLandData->boundThrustMax);
+    ulow = mLandData->boundThrustMin;
+    uhigh = mLandData->boundThrustMax;
 
 
     if (mLandData->flConstrainThrust) {
-         if (thrustDesired > mLandData->thrustLimit) {
-             thrustDesired = mLandData->thrustLimit;
-         } else {
-             mLandData->thrustLimit = thrustDesired;
-         }
+	uhigh = mLandData->thrustLimit;
      }
-
-    return thrustDesired;
 }
 
 void FSMLand::ConstrainStabiDesired(StabilizationDesiredData *stabDesired)
@@ -628,8 +627,6 @@ void FSMLand::run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
         // worst case scenario is that we land and the pid brings thrust down to zero.
         return;
     }
-    // run anti-ground-effect strategy for 0.5 seconds
-    // TODO If bounce deteted....slow descent rate further...
 
     // detect broad sideways drift.  If for some reason we have a hard landing that the bounce detection misses, this will kick in
     PositionStateData positionState;
@@ -725,6 +722,8 @@ void FSMLand::fallback_to_hold(void)
     pathDesired->StartingVelocity = 0.0f;
     pathDesired->EndingVelocity   = 0.0f;
     pathDesired->Mode = PATHDESIRED_MODE_FLYENDPOINT;
+
+    PathDesiredSet(pathDesired);
 }
 
 // abort repeatedly overwrites pathfollower's objective on a landing abort and

@@ -102,9 +102,18 @@ PathFollowerControlLanding::PathFollowerControlLanding()
     pid_zero(&PIDvel[1]);
 }
 
+// Called when mode first engaged
 void PathFollowerControlLanding::Activate(void)
 {
     fsm->Activate();
+    controlThrust.Activate();
+}
+
+// Objective updated in pathdesired, e.g. same flight mode but new target velocity
+void PathFollowerControlLanding::ObjectiveUpdated(void)
+{
+    // Set the objective's target velocity
+    controlThrust.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]);
 }
 void PathFollowerControlLanding::Deactivate(void)
 {
@@ -112,9 +121,11 @@ void PathFollowerControlLanding::Deactivate(void)
     pid_zero(&PIDposH[1]);
     pid_zero(&PIDvel[0]);
     pid_zero(&PIDvel[1]);
-    controlThrust.Reset();
+    controlThrust.Deactivate();
     fsm->Inactive();
 }
+
+
 void PathFollowerControlLanding::SettingsUpdated(void)
 {
     const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
@@ -123,7 +134,7 @@ void PathFollowerControlLanding::SettingsUpdated(void)
     pid_configure(&PIDvel[1], vtolPathFollowerSettings->HorizontalVelPID.Kp, vtolPathFollowerSettings->HorizontalVelPID.Ki, vtolPathFollowerSettings->HorizontalVelPID.Kd, vtolPathFollowerSettings->HorizontalVelPID.ILimit);
     pid_configure(&PIDposH[0], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
     pid_configure(&PIDposH[1], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-    controlThrust.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp, vtolPathFollowerSettings->VerticalVelPID.Ki, vtolPathFollowerSettings->VerticalVelPID.Kd, vtolPathFollowerSettings->VerticalVelPID.ILimit, dT);
+    controlThrust.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp, vtolPathFollowerSettings->VerticalVelPID.Ki, vtolPathFollowerSettings->VerticalVelPID.Kd, vtolPathFollowerSettings->VerticalVelPID.ILimit, dT, vtolPathFollowerSettings->VerticalVelMax);
     // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
@@ -182,17 +193,9 @@ void PathFollowerControlLanding::UpdateVelocityDesired()
     // Set the objective's target velocity
     velocityDesired.North = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
     velocityDesired.East  = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
-    velocityDesired.Down  = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN];
 
-    if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings->VerticalVelMax) {
-        velocityDesired.Down *= vtolPathFollowerSettings->VerticalVelMax / fabsf(velocityDesired.Down);
-    }
-
-    // The FSM controls the actual descent velocity and introduces step changes as required
-    velocityDesired.Down = fsm->BoundVelocityDown(velocityDesired.Down);
-
-    controlThrust.UpdateSetpoint(velocityDesired.Down);
-    controlThrust.UpdateState(velocityState.Down);
+    controlThrust.UpdateVelocityState(velocityState.Down);
+    velocityDesired.Down = controlThrust.GetVelocityDesired();
 
 
     // Implement optional horizontal position hold.
@@ -265,7 +268,6 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
     northCommand = pid_apply(&PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings->VelocityFeedforward;
     eastCommand  = pid_apply(&PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings->VelocityFeedforward;
 
-    controlThrust.Update();
     stabDesired.Thrust = controlThrust.GetThrustCommand();
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the

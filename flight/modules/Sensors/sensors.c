@@ -219,6 +219,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 #endif
         break;
     case 0x02:
+    case 0x03:
 #if defined(PIOS_INCLUDE_MPU6000)
         gyro_test  = PIOS_MPU6000_Test();
         accel_test = gyro_test;
@@ -277,7 +278,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         AccelSensorData accelSensorData;
         GyroSensorData gyroSensorData;
 
-        switch (bdinfo->board_rev) {
+        uint8_t board_rev = bdinfo->board_rev;
+
+        switch (board_rev) {
         case 0x01: // L3GD20 + BMA180 board
 #if defined(PIOS_INCLUDE_BMA180)
             {

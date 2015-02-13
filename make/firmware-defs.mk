@@ -233,10 +233,10 @@ endef
 #   $2 = list of object files that make up the elf file
 define LINK_CXX_TEMPLATE
 .SECONDARY : $(1)
-.PRECIOUS : $(2)
-$(1):  $(2)
+.PRECIOUS : $(2) $(3)
+$(1):  $(2) $(3)
 	@$(ECHO) $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CXX) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
+	$(V1) $(CXX) $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$(CXXFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb

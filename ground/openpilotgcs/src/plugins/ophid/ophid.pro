@@ -38,7 +38,7 @@ macx {
             -framework IOKit
 }
 
-linux-g++ {
+linux {
     SOURCES += src/ophid_usbmon_linux.cpp
     LIBS += -lusb -ludev
 
@@ -52,24 +52,6 @@ linux-g++ {
 #   INCLUDEPATH += `pkg-config libusb-1.0 --cflags`
 
     !exists(/usr/include/libusb-1.0) {
-        error(Install libusb-1.0.0-dev using your package manager.)
+        error(Install libusb-1.0-0-dev using your package manager.)
     }
 }
-
-linux-g++-64 {
-    SOURCES += src/ophid_usbmon_linux.cpp
-    LIBS += -lusb -ludev
-
-    # hidapi library
-    ## rawhid
-    #  SOURCES += hidapi/linux/hid.c
-    ## libusb
-    SOURCES += hidapi/libusb/hid.c
-    LIBS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
-    INCLUDEPATH += /usr/include/libusb-1.0
-#   INCLUDEPATH += `pkg-config libusb-1.0 --cflags`
-    !exists(/usr/include/libusb-1.0) {
-        error(Install libusb-1.0.0-dev using your package manager.)
-    }
-}
-

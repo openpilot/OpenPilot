@@ -32,7 +32,6 @@
 #include "pios.h"
 #include "uavobjectmanager.h"
 #include "debuglogentry.h"
-#include <flashfsstats.h>
 
 // global definitions
 
@@ -50,11 +49,11 @@ static xSemaphoreHandle mutex = 0;
 #endif
 
 static bool logging_enabled = false;
-#define MAX_CONSECUTIVE_FAILS_COUNT 10
-static bool log_is_full     = false;
-static uint8_t fails_count  = 0;
-static uint16_t flightnum   = 0;
+
+static uint16_t flightnum = 0;
 static uint16_t lognum = 0;
+static int16_t fh = -1;
+static char filename[FLASHFS_FILENAME_LEN];
 static DebugLogEntryData *buffer = 0;
 #if !defined(PIOS_INCLUDE_FREERTOS)
 static DebugLogEntryData staticbuffer;
@@ -64,24 +63,18 @@ static DebugLogEntryData staticbuffer;
 #define LOG_ENTRY_HEADER_SIZE   (sizeof(DebugLogEntryData) - LOG_ENTRY_MAX_DATA_SIZE)
 // build the obj_id as a DEBUGLOGENTRY ID with least significant byte zeroed and filled with flight number
 #define LOG_GET_FLIGHT_OBJID(x) ((DEBUGLOGENTRY_OBJID & ~0xFF) | (x & 0xFF))
-
 #define PIOS_DEBUGLOG_PREFIX_STRING "dlog"
 #define PIOS_DEBUGLOG_PREFIX_SIZE 5
 
-static uint32_t used_buffer_space = 0;
-
-/* Private Function Prototypes */
-static void enqueue_data(uint32_t objid, uint16_t instid, size_t size, uint8_t *data);
-static bool write_current_buffer();
 
 /* This is for testing right now: Need to find a better unique name generator with module as a prefix */
-static void PIOS_DEBUGLOG_FilenameCreate(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *filename)
+static void PIOS_DEBUGLOG_FilenameCreate(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *tmp_filename)
 {
     uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    snprintf((char *)filename, FLASHFS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
+    snprintf((char *)tmp_filename, FLASHFS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
 }
 
 
@@ -93,12 +86,37 @@ static void PIOS_DEBUGLOG_PrefixGet(uintptr_t fs_id, char *devicename)
 
 
 /**
+ * @brief Append one log entry to the log file.
+ */
+static void PIOS_DEBUGLOG_Add(uint32_t objid, uint16_t instid, size_t size, uint8_t *data, uint8_t type)
+{
+    buffer->Flight = flightnum;
+    buffer->FlightTime = PIOS_DELAY_GetuS();
+    buffer->Entry = lognum++;
+    buffer->Type = type;
+    buffer->ObjectID = objid;
+    buffer->InstanceID = instid;
+    if (size > sizeof(buffer->Data)) {
+        size = sizeof(buffer->Data);
+    }
+    buffer->Size = size;
+
+    if (type != DEBUGLOGENTRY_TYPE_TEXT)
+        memcpy(buffer->Data, data, size);
+
+    if (fh < 0)
+        return;
+
+    PIOS_FLASHFS_Write(pios_user_fs_id, fh, (uint8_t*)buffer, (uint16_t)(LOG_ENTRY_HEADER_SIZE + size));
+}
+
+
+/**
  * @brief Initialize the log facility
  */
 void PIOS_DEBUGLOG_Initialize()
 {
-	char filename[FLASHFS_FILENAME_LEN];
-    FlashFsStatsData flashfs;
+
     int32_t rc;
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -109,15 +127,13 @@ void PIOS_DEBUGLOG_Initialize()
 #else
     buffer = &staticbuffer;
 #endif
-    if (!buffer) {
+    if (!buffer)
         return;
-    }
+
     mutexlock();
-    lognum      = 0;
-    flightnum   = 0;
-    fails_count = 0;
-    used_buffer_space = 0;
-    log_is_full = false;
+
+    lognum = 0;
+    flightnum = 0;
 
     /* Check number of file in the file system */
     PIOS_DEBUGLOG_PrefixGet(pios_user_fs_id, filename);
@@ -126,12 +142,7 @@ void PIOS_DEBUGLOG_Initialize()
     rc = PIOS_FLASHFS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, 0);
 
     if (rc > 0)
-    flightnum = (uint16_t)rc;
-
-	/* update stats */
-	FlashFsStatsGet(&flashfs);
-	flashfs.DBGlog = flightnum;
-	FlashFsStatsSet(&flashfs);
+        flightnum = (uint16_t)rc;
 
     mutexunlock();
 }
@@ -143,13 +154,33 @@ void PIOS_DEBUGLOG_Initialize()
  */
 void PIOS_DEBUGLOG_Enable(uint8_t enabled)
 {
-    // increase the flight num as soon as logging is disabled
+    mutexlock();
+
+    // Stop log.
     if (logging_enabled && !enabled) {
-        flightnum++;
-        lognum = 0;
+        // Close log file, flush cached file chunks.
+        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+
+        fh = -1;
     }
+
+    // Start log.
+    if (!logging_enabled && enabled && fh == -1) {
+        lognum = 0;
+        flightnum++;
+
+        // Create a new log file.
+        PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
+
+        fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_RDWR | PIOS_FLASHFS_TRUNC);
+    }
+
+    // Update flag.
     logging_enabled = enabled;
+
+    mutexunlock();
 }
+
 
 /**
  * @brief Write a debug log entry with a uavobject
@@ -161,15 +192,17 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
  */
 void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8_t *data)
 {
-    if (!logging_enabled || !buffer || log_is_full) {
+    if (!logging_enabled || !buffer) {
         return;
     }
     mutexlock();
 
-    enqueue_data(objid, instid, size, data);
+    PIOS_DEBUGLOG_Add(objid, instid, size, data, DEBUGLOGENTRY_TYPE_UAVOBJECT);
 
     mutexunlock();
 }
+
+
 /**
  * @brief Write a debug log entry with text
  * @param[in] format - as in printf
@@ -178,86 +211,77 @@ void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8
  */
 void PIOS_DEBUGLOG_Printf(char *format, ...)
 {
-    int16_t fh;
-    char filename[FLASHFS_FILENAME_LEN];
-
-    if (!logging_enabled || !buffer || log_is_full) {
+    if (!logging_enabled || !buffer) {
         return;
     }
 
     va_list args;
     va_start(args, format);
+
     mutexlock();
-    // flush any pending buffer before writing debug text
-    if (used_buffer_space) {
-        write_current_buffer();
-    }
-    memset(buffer->Data, 0xff, sizeof(buffer->Data));
+
+    memset(buffer->Data, 0, sizeof(buffer->Data));
     vsnprintf((char *)buffer->Data, sizeof(buffer->Data), (char *)format, args);
-    buffer->Flight     = flightnum;
 
-    buffer->FlightTime = PIOS_DELAY_GetuS();
+    /* Add a character (NULL) for string termination. */
+    PIOS_DEBUGLOG_Add(0, 0, strlen((const char *)buffer->Data) + 1, buffer->Data, DEBUGLOGENTRY_TYPE_TEXT);
 
-    buffer->Entry      = lognum;
-    buffer->Type       = DEBUGLOGENTRY_TYPE_TEXT;
-    buffer->ObjectID   = 0;
-    buffer->InstanceID = 0;
-    buffer->Size       = strlen((const char *)buffer->Data);
-
-    PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
-
-    fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
-
-    if (fh < 0)
-        goto done;
-
-    if (PIOS_FLASHFS_Write(pios_user_fs_id, fh, (uint8_t *)buffer, sizeof(DebugLogEntryData)) != 0)
-        goto done;
-
-    if (PIOS_FLASHFS_Close(pios_user_fs_id, fh) != PIOS_FLASHFS_OK)
-        goto done;
-
-    lognum++;
-
-done:
     mutexunlock();
 }
 
 
 /**
- * @brief Load one object instance from the filesystem
- * @param[out] buffer where to store the uavobject
+ * @brief Read one entry of a log.
+ * @param[out] buffer where to store the entry
  * @param[in] log entry from which flight
  * @param[in] log entry sequence number
  * @return 0 if success or error code
- * @retval -1 if fs_id is not a valid filesystem instance
- * @retval -2 if failed to start transaction
- * @retval -3 if object not found in filesystem
- * @retval -4 if object size in filesystem does not exactly match buffer size
- * @retval -5 if reading the object data from flash fails
+ * @retval -1 if the entry could not get retrieved
+
  */
 int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, uint16_t inst)
 {
-    int16_t fh;
-    char filename[FLASHFS_FILENAME_LEN];
+    int32_t rc = 0;
+	static int file_offset = 0;
 
     PIOS_Assert(mybuffer);
 
-    PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), inst, filename);
+    // TODO: This only does incremental read, no random.
+
+    // Make sure the logging is stopped.
+    PIOS_DEBUGLOG_Enable(0);
+
+    mutexlock();
+
+    PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), 0, filename);
 
     fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_RDONLY);
 
-    if (fh < 0)
-        return -1;
+    if (fh < 0) {
+       rc = -1;
+       goto end;
+    }
 
-    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, sizeof(DebugLogEntryData)) != 0)
-        return -1;
+    // Start from begining of the file
+	if (!inst)
+        file_offset = 0;
 
-    if (PIOS_FLASHFS_Close(pios_user_fs_id, fh) != PIOS_FLASHFS_OK)
-        return -1;
+    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, sizeof(DebugLogEntryData), file_offset) != 0) {
+        rc = -1;
+    }
+    else
+    {
+        // Go to next entry
+        file_offset += ((DebugLogEntryData*)mybuffer)->Size + LOG_ENTRY_HEADER_SIZE;
+    }
 
-    return 0;
+    PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+
+end:
+    mutexunlock();
+    return rc;
 }
+
 
 /**
  * @brief Retrieve run time info of logging system
@@ -266,7 +290,7 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, uint16_t inst)
  * @param[out] free slots in filesystem
  * @param[out] used slots in filesystem
  */
-void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint16_t *used)
+void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry)
 {
     if (flight) {
         *flight = flightnum;
@@ -274,16 +298,8 @@ void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint1
     if (entry) {
         *entry = lognum;
     }
-
-    struct PIOS_FLASHFS_Stats stats;
-    PIOS_FLASHFS_GetStats(pios_user_fs_id, &stats);
-    if (free) {
-        *free = stats.block_free;
-    }
-    if (used) {
-        *used = stats.block_used;
-    }
 }
+
 
 /**
  * @brief Delete all debug log from the file system.
@@ -292,100 +308,17 @@ void PIOS_DEBUGLOG_DeleteAll(void)
 {
     mutexlock();
 
-    char filename[FLASHFS_FILENAME_LEN];
-    FlashFsStatsData flashfs;
-
     PIOS_DEBUGLOG_PrefixGet(pios_user_fs_id, filename);
 
     PIOS_FLASHFS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, PIOS_FLASHFS_REMOVE);
 
-    FlashFsStatsGet(&flashfs);
-    flashfs.DBGlog = 0;
-	FlashFsStatsSet(&flashfs);
+    lognum = 0;
+    flightnum = 0;
 
-    lognum      = 0;
-    flightnum   = 0;
-    log_is_full = false;
-    fails_count = 0;
-    used_buffer_space = 0;
     mutexunlock();
 }
 
-// Mathieu TODO: We don't need this anymore, use file system cache as a buffer.
-void enqueue_data(uint32_t objid, uint16_t instid, size_t size, uint8_t *data)
-{
-    DebugLogEntryData *entry;
 
-    // start a new block
-    if (!used_buffer_space) {
-        entry = buffer;
-        memset(buffer->Data, 0xff, sizeof(buffer->Data));
-        used_buffer_space += size;
-    } else {
-        // if an instance is being filled and there is enough space, does enqueues new data.
-        if (used_buffer_space + size + LOG_ENTRY_HEADER_SIZE > LOG_ENTRY_MAX_DATA_SIZE) {
-            buffer->Type = DEBUGLOGENTRY_TYPE_MULTIPLEUAVOBJECTS;
-            if (!write_current_buffer()) {
-                return;
-            }
-            entry = buffer;
-            memset(buffer->Data, 0xff, sizeof(buffer->Data));
-            used_buffer_space += size;
-        } else {
-            entry = (DebugLogEntryData *)&buffer->Data[used_buffer_space];
-            used_buffer_space += size + LOG_ENTRY_HEADER_SIZE;
-        }
-    }
-
-    entry->Flight     = flightnum;
-    entry->FlightTime = PIOS_DELAY_GetuS();
-    entry->Entry = lognum;
-    entry->Type = DEBUGLOGENTRY_TYPE_UAVOBJECT;
-    entry->ObjectID   = objid;
-    entry->InstanceID = instid;
-    if (size > sizeof(buffer->Data)) {
-        size = sizeof(buffer->Data);
-    }
-    entry->Size = size;
-
-    memcpy(entry->Data, data, size);
-}
-
-bool write_current_buffer()
-{
-    int16_t fh;
-    char filename[FLASHFS_FILENAME_LEN];
-    FlashFsStatsData flashfs;
-
-    PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
-
-    fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
-
-    if (fh < 0)
-        goto err;
-
-    if (PIOS_FLASHFS_Write(pios_user_fs_id, fh, (uint8_t *)buffer, sizeof(DebugLogEntryData)) != 0)
-        goto err;
-
-    if (PIOS_FLASHFS_Close(pios_user_fs_id, fh) != PIOS_FLASHFS_OK)
-        goto err;
-
-    // not enough space, write the block and start a new one
-	lognum++;
-	fails_count = 0;
-	used_buffer_space = 0;
-	goto done;
-err:
-	if (fails_count++ > MAX_CONSECUTIVE_FAILS_COUNT) {
-		log_is_full = true;
-	}
-    return false;
-done:
-	FlashFsStatsGet(&flashfs);
-	flashfs.DBGlog++;
-	FlashFsStatsSet(&flashfs);
-    return true;
-}
 /**
  * @}
  * @}

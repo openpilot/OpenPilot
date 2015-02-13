@@ -551,6 +551,7 @@ static void updateStats()
             flashfs.CacheHits = fsStats.cache_hits;
             flashfs.CacheMisses = fsStats.cache_misses;
             flashfs.Gc = fsStats.gc;
+            flashfs.Saved = fsStats.saved;
     }
 #endif
     stats.CPULoad = 100 - PIOS_TASK_MONITOR_GetIdlePercentage();

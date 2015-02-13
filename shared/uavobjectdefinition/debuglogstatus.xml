@@ -3,8 +3,6 @@
         <description>Log Status Object, contains log partition status information</description>
         <field name="Flight" units="" type="uint16" elements="1" description="The current flight number (logging session)"/>
         <field name="Entry" units="" type="uint16" elements="1" description="The current log entry id"/>
-        <field name="UsedSlots" units="" type="uint16" elements="1" description="Holds the total log entries saved"/>
-        <field name="FreeSlots" units="" type="uint16" elements="1" description="The number of free log slots available"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

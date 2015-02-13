@@ -97,11 +97,6 @@ Rectangle {
                             text: "<b>" + qsTr("Flights recorded:") + "</b> " + (logStatus.Flight + 1)
                         }
                         Text {
-                            id: totalSlots
-                            text: "<b>" + qsTr("Slots used/free:") + "</b> " +
-                                  logStatus.UsedSlots + "/" + logStatus.FreeSlots
-                        }
-                        Text {
                             id: totalEntries
                             text: "<b>" + qsTr("Entries downloaded:") + "</b> " + logManager.logEntriesCount
                         }

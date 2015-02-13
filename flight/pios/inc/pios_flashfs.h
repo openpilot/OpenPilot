@@ -36,6 +36,7 @@ struct PIOS_FLASHFS_Stats {
     uint16_t cache_hits;
     uint16_t cache_misses;
     uint16_t gc;
+    uint16_t saved;
 };
 
 /* any write will be appended to the end of the file */
@@ -75,7 +76,7 @@ int32_t PIOS_FLASHFS_Format(uintptr_t fs_id);
 int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int32_t file_id);
 int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, const char *path, uint16_t flags);
 int32_t PIOS_FLASHFS_Write(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size);
-int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size);
+int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size, int32_t offset);
 int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path);
 int32_t PIOS_FLASHFS_GetStats(uintptr_t fs_id, struct PIOS_FLASHFS_Stats *stats);
 int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags);

@@ -79,10 +79,8 @@ int32_t PIOS_DEBUGLOG_Read(void *buffer, uint16_t flight, uint16_t inst);
  * @brief Retrieve run time info of logging system
  * @param[out] current flight number
  * @param[out] next entry number
- * @param[out] free slots in filesystem
- * @param[out] used slots in filesystem
  */
-void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint16_t *used);
+void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry);
 
 /**
  * @brief Format entire flash memory!!!

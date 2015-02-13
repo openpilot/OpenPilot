@@ -89,7 +89,7 @@ MODULE_INITCALL(LoggingInitialize, LoggingStart);
 
 static void StatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    PIOS_DEBUGLOG_Info(&status.Flight, &status.Entry, &status.FreeSlots, &status.UsedSlots);
+    PIOS_DEBUGLOG_Info(&status.Flight, &status.Entry);
     DebugLogStatusSet(&status);
 }
 

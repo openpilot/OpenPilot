@@ -27,7 +27,6 @@
 #include "openpilot.h"
 #include "pios_struct_helper.h"
 #include "inc/uavobjectprivate.h"
-#include <flashfsstats.h>
 
 extern uintptr_t pios_uavo_settings_fs_id;
 
@@ -60,13 +59,12 @@ static void UAVObjPrefixGet(uintptr_t fs_id, char *devicename)
  */
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 {
-    PIOS_Assert(obj_handle);
-    uint8_t *obj_data;
+    int32_t rc = 0;
     int16_t fh;
+    uint8_t *obj_data;
     char filename[FLASHFS_FILENAME_LEN];
-    FlashFsStatsData flashfs;
 
-    FlashFsStatsGet(&flashfs);
+    PIOS_Assert(obj_handle);
 
     if (UAVObjIsMetaobject(obj_handle)) {
 
@@ -90,28 +88,17 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 
     UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
 
-    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_WRONLY);
-    if (fh >= 0) {
-        if (flashfs.UAVobj)
-            flashfs.UAVobj--;
-    }
-    else
-    {
-        fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
-    }
+    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
+
     if (fh < 0)
         return -1;
 
     if (PIOS_FLASHFS_Write(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle)) != 0)
-        return -1;
+        rc = -1;
 
-    if (PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh) != PIOS_FLASHFS_OK)
-        return -1;
+    PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh);
 
-    flashfs.UAVobj++;
-	FlashFsStatsSet(&flashfs);
-
-    return 0;
+    return rc;
 }
 
 
@@ -125,6 +112,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
  */
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 {
+    int32_t rc = 0;
     uint8_t *obj_data;
     int16_t fh;
     char filename[FLASHFS_FILENAME_LEN];
@@ -155,15 +143,15 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
     if (fh < 0)
         return -1;
 
-    if (PIOS_FLASHFS_Read(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle)) != 0)
-	    return -1;
+    if (PIOS_FLASHFS_Read(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle), 0) != 0)
+	    rc = -1;
 
-    if (PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh) != PIOS_FLASHFS_OK)
-	    return -1;
+    PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh);
 
-    sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
+    if (!rc)
+        sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
 
-    return 0;
+    return rc;
 }
 
 /**
@@ -175,7 +163,6 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 {
     char filename[FLASHFS_FILENAME_LEN];
-    FlashFsStatsData flashfs;
 
     PIOS_Assert(obj_handle);
 
@@ -183,10 +170,6 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 
     PIOS_FLASHFS_Remove(pios_uavo_settings_fs_id, filename);
 
-    FlashFsStatsGet(&flashfs);
-    if (flashfs.UAVobj)
-        flashfs.UAVobj--;
-	FlashFsStatsSet(&flashfs);
     return 0;
 }
 
@@ -198,7 +181,6 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 int32_t UAVObjDeleteAll()
 {
     char filename[FLASHFS_FILENAME_LEN];
-    FlashFsStatsData flashfs;
 
     UAVObjPrefixGet(pios_uavo_settings_fs_id, filename);
 
@@ -206,8 +188,5 @@ int32_t UAVObjDeleteAll()
     if (PIOS_FLASHFS_Find(pios_uavo_settings_fs_id, filename, UAVO_PREFIX_SIZE, PIOS_FLASHFS_REMOVE) < 0)
 		return -1;
 
-    FlashFsStatsGet(&flashfs);
-    flashfs.UAVobj = 0;
-	FlashFsStatsSet(&flashfs);
     return 0;
 }

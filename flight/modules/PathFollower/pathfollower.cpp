@@ -174,6 +174,7 @@ static void updateFixedAttitude(float *attitude);
 static void updateVtolDesiredAttitudeEmergencyFallback();
 static void airspeedStateUpdatedCb(UAVObjEvent *ev);
 static void pathFollowerObjectiveUpdatedCb(UAVObjEvent *ev);
+static void flightStatusUpdatedCb(UAVObjEvent *ev);
 static bool correctCourse(float *C, float *V, float *F, float s);
 
 /**
@@ -231,6 +232,7 @@ int32_t PathFollowerInitialize()
     FixedWingPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
     VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
     PathDesiredConnectCallback(&pathFollowerObjectiveUpdatedCb);
+    FlightStatusConnectCallback(&flightStatusUpdatedCb);
     SystemSettingsConnectCallback(&SettingsUpdatedCb);
     AirspeedStateConnectCallback(&airspeedStateUpdatedCb);
 
@@ -238,6 +240,21 @@ int32_t PathFollowerInitialize()
 }
 MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
 
+
+static void pathFollowerSetActiveController(void)
+{
+    if (activeController == 0) {
+        switch (pathDesired.Mode) {
+        case PATHDESIRED_MODE_LAND:
+            activeController = (PathFollowerControlLanding *)PathFollowerControlLanding::instance();
+            activeController->Activate();
+            break;
+        default:
+            activeController = 0;
+            break;
+        }
+    }
+}
 
 /**
  * Module thread, should not return.
@@ -256,6 +273,8 @@ static void pathFollowerTask(void)
     int16_t old_uid = pathStatus.UID;
     pathStatus.UID    = pathDesired.UID;
     pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
+
+    pathFollowerSetActiveController();
 
     if (activeController) {
         activeController->UpdateAutoPilot();
@@ -308,34 +327,45 @@ static void pathFollowerTask(void)
     PIOS_CALLBACKSCHEDULER_Schedule(pathFollowerCBInfo, updatePeriod, CALLBACK_UPDATEMODE_SOONER);
 }
 
+
 static void pathFollowerObjectiveUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     uint8_t previousMode = pathDesired.Mode;
 
     PathDesiredGet(&pathDesired);
 
-    // FSM inactivate previous mode on new mode
     if (activeController && previousMode != pathDesired.Mode) {
         activeController->Deactivate();
+        activeController = 0;
     }
 
-    // set FSM mode based on requested mode
-    switch (pathDesired.Mode) {
-    case PATHDESIRED_MODE_LAND:
-        activeController = (PathFollowerControlLanding *)PathFollowerControlLanding::instance();
-        break;
-    default:
-        activeController = 0;
-        break;
-    }
+    pathFollowerSetActiveController();
 
     if (activeController) {
-        if (previousMode != pathDesired.Mode) {
-            activeController->Activate();
-        }
-        else {
-            activeController->ObjectiveUpdated();
-        }
+        activeController->ObjectiveUpdated();
+    }
+}
+
+// we use this to deactivate active controllers as the pathdesired
+// objective never gets updated with switching to a non-pathfollower flight mode
+static void flightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    if (!activeController) {
+        return;
+    }
+
+    uint8_t flightMode;
+    FlightStatusFlightModeGet(&flightMode);
+
+    // set FSM mode based on requested mode
+    switch (flightMode) {
+    case FLIGHTSTATUS_FLIGHTMODE_LAND:
+        // do nothing..should be allocated by the pathdesired objective
+        break;
+    default:
+        activeController->Deactivate();
+        activeController = 0;
+        break;
     }
 }
 
@@ -451,11 +481,6 @@ static void resetGlobals()
     neutralThrustEst.max = 0.0f;
 
     pathStatus.path_time = 0.0f;
-
-    if (activeController) {
-        activeController->Deactivate();
-        activeController = 0;
-    }
 }
 
 static uint8_t updateAutoPilotByFrameType()

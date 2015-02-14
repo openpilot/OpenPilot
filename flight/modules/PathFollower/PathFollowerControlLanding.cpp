@@ -93,16 +93,24 @@ extern "C" {
 PathFollowerControlLanding *PathFollowerControlLanding::p_inst = 0;
 
 PathFollowerControlLanding::PathFollowerControlLanding()
-    : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0)
-{
-}
+    : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0), mActive(false)
+{}
 
 // Called when mode first engaged
 void PathFollowerControlLanding::Activate(void)
 {
-    fsm->Activate();
-    controlThrust.Activate();
-    controlNE.Activate();
+    if (!mActive) {
+        mActive = true;
+        SettingsUpdated();
+        fsm->Activate();
+        controlThrust.Activate();
+        controlNE.Activate();
+    }
+}
+
+uint8_t PathFollowerControlLanding::IsActive(void)
+{
+    return mActive;
 }
 
 // Objective updated in pathdesired, e.g. same flight mode but new target velocity
@@ -116,9 +124,12 @@ void PathFollowerControlLanding::ObjectiveUpdated(void)
 }
 void PathFollowerControlLanding::Deactivate(void)
 {
-    controlThrust.Deactivate();
-    controlNE.Deactivate();
-    fsm->Inactive();
+    if (mActive) {
+        mActive = false;
+        fsm->Inactive();
+        controlThrust.Deactivate();
+        controlNE.Deactivate();
+    }
 }
 
 
@@ -126,16 +137,16 @@ void PathFollowerControlLanding::SettingsUpdated(void)
 {
     const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
 
-    controlNE.UpdateParameters( vtolPathFollowerSettings->HorizontalVelPID.Kp,
-                                vtolPathFollowerSettings->HorizontalVelPID.Ki,
-                                vtolPathFollowerSettings->HorizontalVelPID.Kd,
-                                vtolPathFollowerSettings->HorizontalVelPID.ILimit,
-                                dT,
-                                vtolPathFollowerSettings->HorizontalVelMax);
+    controlNE.UpdateParameters(vtolPathFollowerSettings->HorizontalVelPID.Kp,
+                               vtolPathFollowerSettings->HorizontalVelPID.Ki,
+                               vtolPathFollowerSettings->HorizontalVelPID.Kd,
+                               vtolPathFollowerSettings->HorizontalVelPID.ILimit,
+                               dT,
+                               vtolPathFollowerSettings->HorizontalVelMax);
 
 
-    controlNE.UpdatePositionalParameters(  vtolPathFollowerSettings->HorizontalPosP );
-    controlNE.UpdateCommandParameters( -vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
+    controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
+    controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 
     controlThrust.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp,
                                    vtolPathFollowerSettings->VerticalVelPID.Ki,
@@ -195,6 +206,7 @@ int32_t PathFollowerControlLanding::Initialize(PathFollowerFSM *fsm_ptr,
 void PathFollowerControlLanding::UpdateVelocityDesired()
 {
     VelocityStateData velocityState;
+
     VelocityStateGet(&velocityState);
     VelocityDesiredData velocityDesired;
 
@@ -203,22 +215,21 @@ void PathFollowerControlLanding::UpdateVelocityDesired()
 
     // Implement optional horizontal position hold.
     if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
-
-	// landing flight mode has stored original horizontal position in pathdesired
-	PositionStateData positionState;
-	PositionStateGet(&positionState);
+        // landing flight mode has stored original horizontal position in pathdesired
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
         controlNE.UpdatePositionState(positionState.North, positionState.East);
         controlNE.ControlPosition();
     }
 
-    velocityDesired.Down = controlThrust.GetVelocityDesired();
+    velocityDesired.Down  = controlThrust.GetVelocityDesired();
     float north, east;
-    controlNE.GetVelocityDesired(north, east);
+    controlNE.GetVelocityDesired(&north, &east);
     velocityDesired.North = north;
-    velocityDesired.East = east;
+    velocityDesired.East  = east;
 
     // update pathstatus
-    pathStatus->error = 0.0f;
+    pathStatus->error     = 0.0f;
     pathStatus->fractional_progress  = 0.0f;
     pathStatus->path_direction_north = velocityDesired.North;
     pathStatus->path_direction_east  = velocityDesired.East;
@@ -245,7 +256,7 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
     AttitudeStateGet(&attitudeState);
     StabilizationBankGet(&stabSettings);
 
-    controlNE.GetNECommand(northCommand, eastCommand);
+    controlNE.GetNECommand(&northCommand, &eastCommand);
     stabDesired.Thrust = controlThrust.GetThrustCommand();
 
     float angle_radians = DEG2RAD(attitudeState.Yaw);

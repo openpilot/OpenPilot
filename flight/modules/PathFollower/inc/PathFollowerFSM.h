@@ -31,6 +31,10 @@
 #ifndef PATHFOLLOWERFSM_H
 #define PATHFOLLOWERFSM_H
 
+extern "C" {
+#include <stabilizationdesired.h>
+}
+
 typedef enum {
     PFFSM_STATE_INACTIVE = 0, // Inactive state is the initialised state on startup
     PFFSM_STATE_ACTIVE,

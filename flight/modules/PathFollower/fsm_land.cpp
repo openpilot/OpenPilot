@@ -210,10 +210,6 @@ void FSMLand::Activate()
 #else
         setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, FSMLANDSTATUS_STATEEXITREASON_NONE);
 #endif
-
-
-
-
     } else {
         // move to error state and callback to position hold
         setState(LAND_STATE_ABORT, FSMLANDSTATUS_STATEEXITREASON_NONE);
@@ -286,13 +282,13 @@ int32_t FSMLand::runAlways(void)
 
 void FSMLand::BoundThrust(float &ulow, float &uhigh)
 {
-    ulow = mLandData->boundThrustMin;
+    ulow  = mLandData->boundThrustMin;
     uhigh = mLandData->boundThrustMax;
 
 
     if (mLandData->flConstrainThrust) {
-	uhigh = mLandData->thrustLimit;
-     }
+        uhigh = mLandData->thrustLimit;
+    }
 }
 
 void FSMLand::ConstrainStabiDesired(StabilizationDesiredData *stabDesired)

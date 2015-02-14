@@ -46,16 +46,16 @@ struct pid {
 
 // pid2 structure for a PID+setpoint weighting, anti-windup and filtered derivative control
 struct pid2 {
-    float u0;
-    float kp;
-    float bi;
-    float ad;
-    float bd;
-    float br;
-    float beta;
-    float yold;
-    float D;
-    float I;
+    float   u0;
+    float   kp;
+    float   bi;
+    float   ad;
+    float   bd;
+    float   br;
+    float   beta;
+    float   yold;
+    float   D;
+    float   I;
     uint8_t reconfigure;
 };
 
@@ -75,6 +75,6 @@ void pid_configure_derivative(float cutoff, float gamma);
 // Methods for use with pid2 structure
 void pid2_configure(struct pid2 *pid, float kp, float ki, float kd, float Tf, float kt, float dT, float beta, float u0);
 void pid2_transfer(struct pid2 *pid, float u0);
-float pid2_apply( struct pid2 *pid, const float r, const float y, float ulow, float uhigh);
+float pid2_apply(struct pid2 *pid, const float r, const float y, float ulow, float uhigh);
 
 #endif /* PID_H */

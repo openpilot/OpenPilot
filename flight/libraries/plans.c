@@ -493,7 +493,7 @@ void plan_run_VelocityRoam()
         VtolPathFollowerSettingsHorizontalVelMaxGet(&horizontalVelMax);
         VtolPathFollowerSettingsVerticalVelMaxGet(&verticalVelMax);
         float velocity_north = rotated[0] * horizontalVelMax;
-        float velocity_east   = rotated[1] * horizontalVelMax;
+        float velocity_east  = rotated[1] * horizontalVelMax;
         float velocity_down  = 0.0f;
 
         if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {

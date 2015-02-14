@@ -62,6 +62,7 @@ public:
     void SettingsUpdated(void);
     void UpdateAutoPilot(void);
     void ObjectiveUpdated(void);
+    uint8_t IsActive(void);
 
 private:
     void UpdateVelocityDesired(void);
@@ -75,8 +76,7 @@ private:
     PathStatusData *pathStatus;
     PIDControlThrust controlThrust;
     PIDControlNE controlNE;
-
-
+    uint8_t mActive;
 };
 
 #endif // PATHFOLLOWERCONTROLLANDING_H

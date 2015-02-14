@@ -159,15 +159,15 @@ void pid_configure(struct pid *pid, float p, float i, float d, float iLim)
 void pid2_configure(struct pid2 *pid, float kp, float ki, float kd, float Tf, float kt, float dT, float beta, float u0)
 {
     pid->reconfigure = true;
-    pid->u0 = u0;
-    pid->kp = kp;
-    pid->beta = beta;// setpoint weight on proportional term
+    pid->u0   = u0;
+    pid->kp   = kp;
+    pid->beta = beta; // setpoint weight on proportional term
 
-    pid->bi=ki*dT;
-    pid->br=kt*dT;
+    pid->bi   = ki * dT;
+    pid->br   = kt * dT;
 
-    pid->ad=Tf/(Tf+dT);
-    pid->bd=kd/(Tf+dT);
+    pid->ad   = Tf / (Tf + dT);
+    pid->bd   = kd / (Tf + dT);
 }
 
 /**
@@ -197,36 +197,36 @@ float pid2_apply(
     float ulow,
     float uhigh)
 {
-  // on reconfigure ensure bumpless transfer
-  // http://www.controlguru.com/2008/021008.html
-  if (pid->reconfigure) {
-      pid->reconfigure = false;
+    // on reconfigure ensure bumpless transfer
+    // http://www.controlguru.com/2008/021008.html
+    if (pid->reconfigure) {
+        pid->reconfigure = false;
 
-      // initialise derivative terms
-      pid->yold = y;
-      pid->D = 0.0f;
+        // initialise derivative terms
+        pid->yold = y;
+        pid->D    = 0.0f;
 
-      // t=0, u=u0, y=y0, v=u
-      pid->I = pid->u0 - pid->kp * (pid->beta * r - y);
-  }
+        // t=0, u=u0, y=y0, v=u
+        pid->I    = pid->u0 - pid->kp * (pid->beta * r - y);
+    }
 
-  // compute proportional part
-  float P = pid->kp * (pid->beta * r - y);
+    // compute proportional part
+    float P = pid->kp * (pid->beta * r - y);
 
-  // update derivative part
-  pid->D = pid->ad * pid->D - pid->bd * (y - pid->yold);
+    // update derivative part
+    pid->D = pid->ad * pid->D - pid->bd * (y - pid->yold);
 
-  // compute temporary output
-  float v = P + pid->I + pid->D;
+    // compute temporary output
+    float v = P + pid->I + pid->D;
 
-  // simulate actuator saturation
-  float u = boundf(v, ulow, uhigh);
+    // simulate actuator saturation
+    float u = boundf(v, ulow, uhigh);
 
-  // update integral
-  pid->I = pid->I + pid->bi * (r - y) + pid->br * (u - v);
+    // update integral
+    pid->I    = pid->I + pid->bi * (r - y) + pid->br * (u - v);
 
-  // update old process output
-  pid->yold = y;
+    // update old process output
+    pid->yold = y;
 
-  return u;
+    return u;
 }

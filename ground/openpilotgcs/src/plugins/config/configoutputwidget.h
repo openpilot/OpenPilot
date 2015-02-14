@@ -57,7 +57,6 @@ private:
     Ui_OutputWidget *ui;
 
     QList<QSlider> sliders;
-    QPixmap warningPic;
     void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
     void assignOutputChannel(UAVDataObject *obj, QString &str);
@@ -72,7 +71,6 @@ private:
 
     UAVObject::Metadata accInitialData;
 
-    SystemAlarms *systemAlarmsObj;
 private slots:
     void updateWarnings(UAVObject *);
     void stopTests();

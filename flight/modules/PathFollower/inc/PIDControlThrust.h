@@ -98,25 +98,45 @@ public:
         }
     }
 
+    void RateLimit(float &spDesired, float &spCurrent, float rateLimit)
+    {
+
+              float  velocity_delta = spDesired - spCurrent;
+              if (fabsf(velocity_delta) < 1e-6f) {
+        	  spCurrent = spDesired;
+                  return;
+              }
+
+              // Calculate the rate of change
+              float accelerationDesired = velocity_delta/deltaTime;
+
+              if (fabsf(accelerationDesired) > rateLimit) {
+                  accelerationDesired  *= rateLimit / accelerationDesired;
+              }
+
+              if (fabsf(accelerationDesired) < 0.1f) {
+        	  spCurrent = spDesired;
+              }
+              else {
+        	  spCurrent += accelerationDesired * deltaTime;
+              }
+
+    }
+
+    // Update velocity state called per dT. Also update current
+    // desired velocity
     void UpdateVelocityState(float pv)
     {
         mVelocityState = pv;
 
         // The FSM controls the actual descent velocity and introduces step changes as required
         float velocitySetpointDesired = mFSM->BoundVelocityDown(mVelocitySetpointTarget);
+        RateLimit(velocitySetpointDesired, mVelocitySetpointCurrent, 2.0f );
+    }
 
-        // Calculate the rate of change
-        float accelerationDesired = (velocitySetpointDesired - mVelocitySetpointCurrent)/deltaTime;
-
-        if (fabsf(accelerationDesired) > 2.0f) {
-            accelerationDesired  *= 2.0f / accelerationDesired;
-        }
-        else  if (fabsf(accelerationDesired) < 0.1f) {
-            mVelocitySetpointCurrent = velocitySetpointDesired;
-        }
-        else {
-            mVelocitySetpointCurrent += accelerationDesired * deltaTime;
-        }
+    float GetVelocityDesired(void)
+    {
+        return mVelocitySetpointCurrent;
     }
 
     float GetThrustCommand(void)
@@ -131,10 +151,6 @@ public:
         return mThrustCommand;
     }
 
-    float GetVelocityDesired(void)
-    {
-        return mVelocitySetpointCurrent;
-    }
 
 private:
     struct pid2 PID;

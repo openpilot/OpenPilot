@@ -484,24 +484,23 @@ void plan_run_VelocityRoam()
         float cos_angle  = cosf(angle);
         float sine_angle = sinf(angle);
         float rotated[2] = {
-            cmd.Pitch * cos_angle - cmd.Roll * sine_angle,
-            cmd.Pitch * sine_angle + cmd.Roll * cos_angle
+            -cmd.Pitch * cos_angle - cmd.Roll * sine_angle,
+            -cmd.Pitch * sine_angle + cmd.Roll * cos_angle
         };
         // flip pitch to have pitch down (away) point north
-        rotated[1] = -rotated[1];
         float horizontalVelMax;
         float verticalVelMax;
         VtolPathFollowerSettingsHorizontalVelMaxGet(&horizontalVelMax);
         VtolPathFollowerSettingsVerticalVelMaxGet(&verticalVelMax);
         float velocity_north = rotated[0] * horizontalVelMax;
-        float velociy_east   = rotated[1] * horizontalVelMax;
+        float velocity_east   = rotated[1] * horizontalVelMax;
         float velocity_down  = 0.0f;
 
         if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
             FlightModeSettingsLandingVelocityGet(&velocity_down);
         }
 
-        float velocity = velocity_north * velocity_north + velociy_east * velociy_east;
+        float velocity = velocity_north * velocity_north + velocity_east * velocity_east;
         velocity = sqrtf(velocity);
 
         // if one stick input (pitch or roll) should we use fly by vector? set arbitrary distance of say 20m after which we
@@ -513,7 +512,7 @@ void plan_run_VelocityRoam()
         pathDesired.Start.East  = positionState.East;
         pathDesired.Start.Down  = positionState.Down;
         pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH] = velocity_north;
-        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]  = velociy_east;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]  = velocity_east;
         pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]  = velocity_down;
 
         pathDesired.End.North = positionState.North;

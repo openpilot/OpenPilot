@@ -79,7 +79,6 @@ extern "C" {
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <vtolselftuningstats.h>
-#include <fsmlandstatus.h>
 #include <pathsummary.h>
 }
 
@@ -96,10 +95,6 @@ PathFollowerControlLanding *PathFollowerControlLanding::p_inst = 0;
 PathFollowerControlLanding::PathFollowerControlLanding()
     : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0)
 {
-    pid_zero(&PIDposH[0]);
-    pid_zero(&PIDposH[1]);
-    pid_zero(&PIDvel[0]);
-    pid_zero(&PIDvel[1]);
 }
 
 // Called when mode first engaged
@@ -107,6 +102,7 @@ void PathFollowerControlLanding::Activate(void)
 {
     fsm->Activate();
     controlThrust.Activate();
+    controlNE.Activate();
 }
 
 // Objective updated in pathdesired, e.g. same flight mode but new target velocity
@@ -114,14 +110,14 @@ void PathFollowerControlLanding::ObjectiveUpdated(void)
 {
     // Set the objective's target velocity
     controlThrust.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]);
+    controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH],
+                                     pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]);
+    controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
 }
 void PathFollowerControlLanding::Deactivate(void)
 {
-    pid_zero(&PIDposH[0]);
-    pid_zero(&PIDposH[1]);
-    pid_zero(&PIDvel[0]);
-    pid_zero(&PIDvel[1]);
     controlThrust.Deactivate();
+    controlNE.Deactivate();
     fsm->Inactive();
 }
 
@@ -130,11 +126,23 @@ void PathFollowerControlLanding::SettingsUpdated(void)
 {
     const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
 
-    pid_configure(&PIDvel[0], vtolPathFollowerSettings->HorizontalVelPID.Kp, vtolPathFollowerSettings->HorizontalVelPID.Ki, vtolPathFollowerSettings->HorizontalVelPID.Kd, vtolPathFollowerSettings->HorizontalVelPID.ILimit);
-    pid_configure(&PIDvel[1], vtolPathFollowerSettings->HorizontalVelPID.Kp, vtolPathFollowerSettings->HorizontalVelPID.Ki, vtolPathFollowerSettings->HorizontalVelPID.Kd, vtolPathFollowerSettings->HorizontalVelPID.ILimit);
-    pid_configure(&PIDposH[0], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-    pid_configure(&PIDposH[1], vtolPathFollowerSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-    controlThrust.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp, vtolPathFollowerSettings->VerticalVelPID.Ki, vtolPathFollowerSettings->VerticalVelPID.Kd, vtolPathFollowerSettings->VerticalVelPID.ILimit, dT, vtolPathFollowerSettings->VerticalVelMax);
+    controlNE.UpdateParameters( vtolPathFollowerSettings->HorizontalVelPID.Kp,
+                                vtolPathFollowerSettings->HorizontalVelPID.Ki,
+                                vtolPathFollowerSettings->HorizontalVelPID.Kd,
+                                vtolPathFollowerSettings->HorizontalVelPID.ILimit,
+                                dT,
+                                vtolPathFollowerSettings->HorizontalVelMax);
+
+
+    controlNE.UpdatePositionalParameters(  vtolPathFollowerSettings->HorizontalPosP );
+    controlNE.UpdateCommandParameters( -vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
+
+    controlThrust.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp,
+                                   vtolPathFollowerSettings->VerticalVelPID.Ki,
+                                   vtolPathFollowerSettings->VerticalVelPID.Kd,
+                                   vtolPathFollowerSettings->VerticalVelPID.ILimit,
+                                   dT,
+                                   vtolPathFollowerSettings->VerticalVelMax);
     // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
@@ -190,35 +198,24 @@ void PathFollowerControlLanding::UpdateVelocityDesired()
     VelocityStateGet(&velocityState);
     VelocityDesiredData velocityDesired;
 
-    // Set the objective's target velocity
-    velocityDesired.North = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
-    velocityDesired.East  = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
-
     controlThrust.UpdateVelocityState(velocityState.Down);
-    velocityDesired.Down = controlThrust.GetVelocityDesired();
-
+    controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // Implement optional horizontal position hold.
     if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
+
+	// landing flight mode has stored original horizontal position in pathdesired
 	PositionStateData positionState;
 	PositionStateGet(&positionState);
-        float cur[3] = { positionState.North, positionState.East, positionState.Down };
-        struct path_status progress;
-        path_progress(pathDesired, cur, &progress);
-
-        // calculate correction
-        const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
-        velocityDesired.North += pid_apply(&PIDposH[0], progress.correction_vector[0], dT);
-        velocityDesired.East  += pid_apply(&PIDposH[1], progress.correction_vector[1], dT);
+        controlNE.UpdatePositionState(positionState.North, positionState.East);
+        controlNE.ControlPosition();
     }
 
-    // scale velocity if it is above configured maximum
-    // for braking, we can not help it if initial velocity was greater
-    float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
-    if (velH > vtolPathFollowerSettings->HorizontalVelMax) {
-        velocityDesired.North *= vtolPathFollowerSettings->HorizontalVelMax / velH;
-        velocityDesired.East  *= vtolPathFollowerSettings->HorizontalVelMax / velH;
-    }
+    velocityDesired.Down = controlThrust.GetVelocityDesired();
+    float north, east;
+    controlNE.GetVelocityDesired(north, east);
+    velocityDesired.North = north;
+    velocityDesired.East = east;
 
     // update pathstatus
     pathStatus->error = 0.0f;
@@ -237,48 +234,24 @@ void PathFollowerControlLanding::UpdateVelocityDesired()
 
 int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
 {
-    const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
     uint8_t result = 1;
-
-    VelocityDesiredData velocityDesired;
-    VelocityStateData velocityState;
     StabilizationDesiredData stabDesired;
     AttitudeStateData attitudeState;
     StabilizationBankData stabSettings;
-    SystemSettingsData systemSettings;
-
-    float northError;
     float northCommand;
-
-    float eastError;
     float eastCommand;
 
-    SystemSettingsGet(&systemSettings);
-    VelocityStateGet(&velocityState);
-    VelocityDesiredGet(&velocityDesired);
     StabilizationDesiredGet(&stabDesired);
-    VelocityDesiredGet(&velocityDesired);
     AttitudeStateGet(&attitudeState);
     StabilizationBankGet(&stabSettings);
 
-    // calculate the velocity errors between desired and actual
-    northError   = velocityDesired.North - velocityState.North;
-    eastError    = velocityDesired.East - velocityState.East;
-
-    northCommand = pid_apply(&PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings->VelocityFeedforward;
-    eastCommand  = pid_apply(&PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings->VelocityFeedforward;
-
+    controlNE.GetNECommand(northCommand, eastCommand);
     stabDesired.Thrust = controlThrust.GetThrustCommand();
-
-    // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
-    // craft should move similarly for 5 deg roll versus 5 deg pitch
-
-    float maxPitch      = vtolPathFollowerSettings->MaxRollPitch;
 
     float angle_radians = DEG2RAD(attitudeState.Yaw);
     float cos_angle     = cosf(angle_radians);
     float sine_angle    = sinf(angle_radians);
-
+    float maxPitch = vtolPathFollowerSettings->MaxRollPitch;
     stabDesired.Pitch = boundf(-northCommand * cos_angle - eastCommand * sine_angle, -maxPitch, maxPitch);
     stabDesired.Roll  = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -maxPitch, maxPitch);
 

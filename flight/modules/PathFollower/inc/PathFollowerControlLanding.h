@@ -32,6 +32,7 @@
 #define PATHFOLLOWERCONTROLLANDING_H
 #include "PathFollowerControl.h"
 #include "PIDControlThrust.h"
+#include "PIDControlNE.h"
 // forward decl
 class PathFollowerFSM;
 class PathFollowerControlLanding : PathFollowerControl {
@@ -73,9 +74,9 @@ private:
     FlightStatusData *flightStatus;
     PathStatusData *pathStatus;
     PIDControlThrust controlThrust;
+    PIDControlNE controlNE;
 
-    struct pid PIDvel[2]; // North, East
-    struct pid PIDposH[2];
+
 };
 
 #endif // PATHFOLLOWERCONTROLLANDING_H

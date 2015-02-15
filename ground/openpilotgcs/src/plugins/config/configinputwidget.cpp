@@ -1702,8 +1702,6 @@ void ConfigInputWidget::resetActuatorSettings()
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
-    QString mixerType;
-
     // Clear all output data : Min, max, neutral at same value
     // 1000 for motors and 1500 for all others (Reversable motor included)
     for (unsigned int output = 0; output < 12; output++) {
@@ -1711,9 +1709,7 @@ void ConfigInputWidget::resetActuatorSettings()
         UAVObjectField *field = mixer->getField(mixerNumType);
         Q_ASSERT(field);
 
-        if (field) {
-            mixerType = field->getValue().toString();
-        }
+        QString mixerType = field->getValue().toString();
         if ((mixerType == "Motor") || (mixerType == "Disabled")) {
             actuatorSettingsData.ChannelMax[output]     = 1000;
             actuatorSettingsData.ChannelMin[output]     = 1000;

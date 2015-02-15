@@ -41,6 +41,7 @@ extern "C" {
 #include <paths.h>
 #include "plans.h"
 #include <stabilizationdesired.h>
+#include <pidstatus.h>
 }
 
 #include "PathFollowerFSM.h"
@@ -131,6 +132,8 @@ void PIDControlThrust::RateLimit(float *spDesired, float *spCurrent, float rateL
     }
 }
 
+
+
 // Update velocity state called per dT. Also update current
 // desired velocity
 void PIDControlThrust::UpdateVelocityState(float pv)
@@ -150,6 +153,7 @@ float PIDControlThrust::GetVelocityDesired(void)
 
 float PIDControlThrust::GetThrustCommand(void)
 {
+    PIDStatusData pidStatus;
     // pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
     // mFSM->CheckPidScaler(&local_scaler);
     // float downCommand    = -pid_apply_setpoint(&PID, &local_scaler, mVelocitySetpoint, mState, deltaTime);
@@ -157,6 +161,17 @@ float PIDControlThrust::GetThrustCommand(void)
 
     mFSM->BoundThrust(ulow, uhigh);
     float downCommand = -pid2_apply(&PID, mVelocitySetpointCurrent, mVelocityState, ulow - mNeutral, uhigh - mNeutral);
+    pidStatus.setpoint = mVelocitySetpointCurrent;
+    pidStatus.actual = mVelocityState;
+    pidStatus.error = mVelocitySetpointCurrent - mVelocityState;
+    pidStatus.setpoint = mVelocitySetpointCurrent;
+    pidStatus.ulow = ulow;
+    pidStatus.uhigh = uhigh;
+    pidStatus.command = downCommand;
+    pidStatus.P = (downCommand - PID.I - PID.D);
+    pidStatus.I = PID.I;
+    pidStatus.D = PID.D;
+    PIDStatusSet(&pidStatus);
     mThrustCommand = mNeutral + downCommand;
     return mThrustCommand;
 }

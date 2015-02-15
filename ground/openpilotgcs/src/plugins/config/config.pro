@@ -23,7 +23,6 @@ HEADERS += \
     configvehicletypewidget.h \
     config_cc_hw_widget.h \
     configccattitudewidget.h \
-    configpipxtremewidget.h \
     configstabilizationwidget.h \
     assertions.h \
     defaultattitudewidget.h \
@@ -57,7 +56,8 @@ HEADERS += \
     calibration/sixpointcalibrationmodel.h \
     calibration/levelcalibrationmodel.h \
     calibration/gyrobiascalibrationmodel.h \
-    calibration/calibrationuiutils.h
+    calibration/calibrationuiutils.h \
+    configoplinkwidget.h
 
 SOURCES += \
     configplugin.cpp \
@@ -71,7 +71,6 @@ SOURCES += \
     config_cc_hw_widget.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
-    configpipxtremewidget.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
     channelform.cpp \
@@ -97,7 +96,8 @@ SOURCES += \
     calibration/thermal/thermalcalibrationmodel.cpp \
     calibration/sixpointcalibrationmodel.cpp \
     calibration/levelcalibrationmodel.cpp \
-    calibration/gyrobiascalibrationmodel.cpp
+    calibration/gyrobiascalibrationmodel.cpp \
+    configoplinkwidget.cpp
 
 FORMS += \
     airframe.ui \
@@ -118,8 +118,8 @@ FORMS += \
     outputchannelform.ui \
     revosensors.ui \
     txpid.ui \
-    pipxtreme.ui \
     mixercurve.ui \
-    configrevohwwidget.ui
+    configrevohwwidget.ui \
+    oplink.ui
 
 RESOURCES += configgadget.qrc

@@ -29,8 +29,8 @@
 #include "homeitem.h"
 
 namespace mapcontrol {
-WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color) : QGraphicsEllipseItem(map),
-    my_center(center), my_radius(radius), my_map(map), myColor(color), myClockWise(clockwise)
+WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color, bool dashed, int width) : QGraphicsEllipseItem(map),
+    my_center(center), my_radius(radius), my_map(map), myColor(color), myClockWise(clockwise), dashed(dashed), width(width)
 {
     connect(center, SIGNAL(localPositionChanged(QPointF, WayPointItem *)), this, SLOT(refreshLocations()));
     connect(radius, SIGNAL(localPositionChanged(QPointF, WayPointItem *)), this, SLOT(refreshLocations()));
@@ -40,8 +40,8 @@ WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool 
     connect(map, SIGNAL(childSetOpacity(qreal)), this, SLOT(setOpacitySlot(qreal)));
 }
 
-WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color) : QGraphicsEllipseItem(map),
-    my_center(center), my_radius(radius), my_map(map), myColor(color), myClockWise(clockwise)
+WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color, bool dashed, int width) : QGraphicsEllipseItem(map),
+    my_center(center), my_radius(radius), my_map(map), myColor(color), myClockWise(clockwise), dashed(dashed), width(width)
 {
     connect(radius, SIGNAL(homePositionChanged(internals::PointLatLng, float)), this, SLOT(refreshLocations()));
     connect(center, SIGNAL(localPositionChanged(QPointF)), this, SLOT(refreshLocations()));
@@ -67,6 +67,14 @@ void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     p2 = QPointF(line.p1().x(), line.p1().y() - line.length());
     QPen myPen = pen();
     myPen.setColor(myColor);
+    if (width > 0) {
+        myPen.setWidth(width);
+    }
+    if (dashed) {
+        QVector<qreal> dashes;
+        dashes << 4 << 8;
+        myPen.setDashPattern(dashes);
+    }
     qreal arrowSize = 10;
     painter->setPen(myPen);
     QBrush brush    = painter->brush();

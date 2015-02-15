@@ -1551,6 +1551,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Revolution>
+      <Blackout_MiniH>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/blackout/BlackoutMiniHQuad.3DS</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Blackout_MiniH>
       <Zagi>
         <configInfo>
           <locked>false</locked>
@@ -2530,7 +2541,7 @@
             <side0>
               <classId>ModelViewGadget</classId>
               <gadget>
-                <activeConfiguration>Test Quad X</activeConfiguration>
+                <activeConfiguration>Blackout_MiniH</activeConfiguration>
               </gadget>
               <type>uavGadget</type>
             </side0>

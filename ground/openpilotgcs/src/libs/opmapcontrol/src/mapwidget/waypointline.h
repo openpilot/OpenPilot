@@ -40,8 +40,8 @@ class WayPointLine : public QObject, public QGraphicsLineItem {
     Q_OBJECT Q_INTERFACES(QGraphicsItem)
 public:
     enum { Type = UserType + 8 };
-    WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem *map, QColor color = Qt::green);
-    WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color = Qt::green);
+    WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem *map, QColor color = Qt::green, bool dashed = false, int width = -1);
+    WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color = Qt::green, bool dashed = false, int width = -1);
     int type() const;
     QPainterPath shape() const;
     void setColor(const QColor &color)
@@ -54,6 +54,8 @@ private:
     MapGraphicItem *my_map;
     QPolygonF arrowHead;
     QColor myColor;
+    bool dashed;
+    int lineWidth;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 public slots:

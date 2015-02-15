@@ -59,6 +59,8 @@ private:
 
     void assignOutputChannel(UAVDataObject *obj, QString &str);
 
+    void setColor(QWidget *widget, const QColor color);
+
     OutputChannelForm *getOutputChannelForm(const int index) const;
 
     void sendAllChannelTests();

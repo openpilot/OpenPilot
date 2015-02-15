@@ -13,7 +13,6 @@
 		<field name="MaxRFPower" units="mW" type="enum" elements="1" options="0,1.25,1.6,3.16,6.3,12.6,25,50,100" defaultvalue="0"/>
 		<field name="MinChannel" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="MaxChannel" units="" type="uint8" elements="1" defaultvalue="250"/>
-		<field name="ChannelSet" units="" type="uint8" elements="1" defaultvalue="39"/>
 
 		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>

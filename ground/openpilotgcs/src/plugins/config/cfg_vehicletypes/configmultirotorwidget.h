@@ -65,16 +65,19 @@ private:
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
+    virtual void resetRcOutputs(GUIConfigDataUnion *configData);
 
     bool setupQuad(bool pLayout);
     bool setupHexa(bool pLayout);
     bool setupOcto();
     bool setupMultiRotorMixer(double mixerFactors[8][3]);
     void setupMotors(QList<QString> motorList);
+    void setupRcOutputs(QList<QString> rcOutputList);
+    void resetMixers();
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
 
     void setYawMixLevel(int);
-
+    void updateRcCurvesUsed();
     void updateAirframe(QString multiRotorType);
     void setupEnabledControls(QString multiRotorType);
 

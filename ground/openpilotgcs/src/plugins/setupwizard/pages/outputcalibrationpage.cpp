@@ -104,7 +104,6 @@ void OutputCalibrationPage::setupActuatorMinMaxAndNeutral(int motorChannelStart,
             m_actuatorSettings[servoid].channelNeutral = 1000;
             m_actuatorSettings[servoid].channelMax     = 1000;
         }
-        qDebug() << "**** " << servoid << " ***** " << m_actuatorSettings[servoid].channelMin << " " << m_actuatorSettings[servoid].channelNeutral << " " << m_actuatorSettings[servoid].channelMax;
     }
 }
 
@@ -343,7 +342,7 @@ void OutputCalibrationPage::setWizardPage()
     if (currentChannel >= 0) {
         if (currentPageIndex == 1) {
             ui->motorNeutralSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
-            ui->motorPWMValue->setText(QString("Output value : <b>%1</b> µs").arg(m_actuatorSettings[currentChannel].channelNeutral));
+            ui->motorPWMValue->setText(QString(tr("Output value : <b>%1</b> µs")).arg(m_actuatorSettings[currentChannel].channelNeutral));
             // Reversable motor found
             if (m_actuatorSettings[currentChannel].isReversableMotor) {
                 ui->motorNeutralSlider->setMinimum(m_actuatorSettings[currentChannel].channelMin);
@@ -351,7 +350,7 @@ void OutputCalibrationPage::setWizardPage()
                 ui->motorInfo->setText(tr("<html><head/><body><p><span style=\" font-size:10pt;\">To find </span><span style=\" font-size:10pt; font-weight:600;\">the neutral rate for this reversable motor</span><span style=\" font-size:10pt;\">, press the Start button below and slide the slider to the right or left until you find the value where the motor don't start. <br/><br/>When done press button again to stop.</span></p></body></html>"));
             }
         } else if (currentPageIndex == 2) {
-            ui->servoPWMValue->setText(QString("Output value : <b>%1</b> µs").arg(m_actuatorSettings[currentChannel].channelNeutral));
+            ui->servoPWMValue->setText(QString(tr("Output value : <b>%1</b> µs")).arg(m_actuatorSettings[currentChannel].channelNeutral));
             if (m_actuatorSettings[currentChannel].channelMax < m_actuatorSettings[currentChannel].channelMin &&
                 !ui->reverseCheckbox->isChecked()) {
                 ui->reverseCheckbox->setChecked(true);
@@ -529,7 +528,7 @@ void OutputCalibrationPage::debugLogChannelValues()
 void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 {
     Q_UNUSED(value);
-    ui->motorPWMValue->setText(QString("Output value : <b>%1</b> µs").arg(value));
+    ui->motorPWMValue->setText(QString(tr("Output value : <b>%1</b> µs")).arg(value));
 
     if (ui->motorNeutralButton->isChecked()) {
         quint16 value = ui->motorNeutralSlider->value();
@@ -554,7 +553,7 @@ void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
     m_calibrationUtil->setChannelOutputValue(value);
     quint16 channel = getCurrentChannel();
     m_actuatorSettings[channel].channelNeutral = value;
-    ui->servoPWMValue->setText(QString("Output value : <b>%1</b> µs").arg(value));
+    ui->servoPWMValue->setText(QString(tr("Output value : <b>%1</b> µs")).arg(value));
 
     // Adjust min and max
     if (ui->reverseCheckbox->isChecked()) {

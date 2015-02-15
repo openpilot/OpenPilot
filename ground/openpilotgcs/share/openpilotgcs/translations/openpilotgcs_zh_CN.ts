@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.0" language="zh_CN">
 <context>
     <name>Application</name>
     <message>
         <location filename="../../../src/app/main.cpp" line="+203"/>
         <source>Failed to load core plug-in, reason is: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>无法载入插件, 原因: %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -21,7 +21,7 @@
     <message>
         <location line="+41"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot GCS - 插件载入器信息</translation>
     </message>
 </context>
 <context>
@@ -42,12 +42,12 @@
     <message>
         <location line="+10"/>
         <source>Environment</source>
-        <translation type="unfinished">环境</translation>
+        <translation>环境</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>&lt;System Language&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;系统语言&gt;</translation>
     </message>
     <message>
         <location line="+112"/>
@@ -57,17 +57,17 @@
     <message>
         <location line="+25"/>
         <source>Restart required</source>
-        <translation type="unfinished"></translation>
+        <translation>重启程序</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The language change will take effect after a restart of the OpenPilot GCS.</source>
-        <translation type="unfinished"></translation>
+        <translation>设定的语言环境将在OpenPilot GCS程序重启后生效.</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.ui"/>
         <source>General settings</source>
-        <translation type="unfinished">基本设定</translation>
+        <translation>基本设定</translation>
     </message>
     <message>
         <location/>
@@ -82,37 +82,37 @@
     <message>
         <location/>
         <source>User interface color:</source>
-        <translation type="unfinished"></translation>
+        <translation>界面颜色:</translation>
     </message>
     <message>
         <location/>
         <source>Save configuration settings on exit:</source>
-        <translation type="unfinished"></translation>
+        <translation>程序退出时保存配置信息:</translation>
     </message>
     <message>
         <location/>
         <source>Automatically connect an OpenPilot USB device:</source>
-        <translation type="unfinished"></translation>
+        <translation>通过USB自动连接OpenPilot设备:</translation>
     </message>
     <message>
         <location/>
         <source>Automatically select an OpenPilot USB device:</source>
-        <translation type="unfinished"></translation>
+        <translation>通过USB自动选择一个OpenPilot设备:</translation>
     </message>
     <message>
         <location/>
         <source>Use UDP Mirror</source>
-        <translation type="unfinished"></translation>
+        <translation>使用UDP镜像</translation>
     </message>
     <message>
         <location/>
         <source>Expert Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>专家模式</translation>
     </message>
     <message>
         <location/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation>语言:</translation>
     </message>
 </context>
 <context>
@@ -120,7 +120,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+136"/>
         <source>OpenPilot GCS</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot GCS</translation>
     </message>
     <message>
         <location line="+295"/>
@@ -150,7 +150,7 @@
     <message>
         <location line="+269"/>
         <source>&amp;Help...</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助(&amp;H)</translation>
     </message>
     <message>
         <location line="-152"/>
@@ -160,7 +160,7 @@
     <message>
         <location line="-3"/>
         <source>Save &amp;GCS Default Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>保存 &amp;GCS 默认配置</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -232,67 +232,67 @@
     <message>
         <location line="+3"/>
         <source>Ctrl+Shift+F10</source>
-        <translation type="unfinished">Ctrl+Shift+F10</translation>
+        <translation>Ctrl+Shift+F10</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Meta+Shift</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ctrl+Shift</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Split</source>
-        <translation type="unfinished">分栏</translation>
+        <translation>分栏</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+Down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Split Side by Side</source>
-        <translation type="unfinished">左右分栏</translation>
+        <translation>左右分栏</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+Right</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Close Current View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">关闭当前子窗口</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Close All Other Views</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">关闭其它所有子窗口</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Goto Next View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">跳转到下一个子窗口</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+20"/>
@@ -302,7 +302,7 @@
     <message>
         <location line="+10"/>
         <source>About &amp;OpenPilot...</source>
-        <translation type="unfinished"></translation>
+        <translation>关于 &amp;OpenPilot...</translation>
     </message>
     <message>
         <location line="+640"/>
@@ -315,7 +315,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/messageoutputwindow.cpp" line="+75"/>
         <source>General</source>
-        <translation type="unfinished">概要</translation>
+        <translation>概要</translation>
     </message>
 </context>
 <context>
@@ -361,7 +361,7 @@
     <message>
         <location line="+10"/>
         <source>Environment</source>
-        <translation type="unfinished">环境</translation>
+        <translation>环境配置</translation>
     </message>
     <message>
         <location line="+162"/>
@@ -398,7 +398,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+169"/>
         <source>Switch to %1 mode</source>
-        <translation type="unfinished">切换至%1模式 </translation>
+        <translation>切换至%1模式 </translation>
     </message>
 </context>
 <context>
@@ -487,22 +487,22 @@
     <message>
         <location filename="../../../src/libs/utils/filenamevalidatinglineedit.cpp" line="+94"/>
         <source>The name must not be empty</source>
-        <translation type="unfinished">名称不能为空</translation>
+        <translation>名称不能为空</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>The name must not contain any of the characters &apos;%1&apos;.</source>
-        <translation type="unfinished">名称不能包含 &apos;%1&apos; 中的任何一个</translation>
+        <translation>名称不能包含 &apos;%1&apos; 中的任何一个字符</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>The name must not contain &apos;%1&apos;.</source>
-        <translation type="unfinished">名称不能包含 &apos;%1&apos; </translation>
+        <translation>名称不能包含 &apos;%1&apos; </translation>
     </message>
     <message>
         <location line="+12"/>
         <source>The name must not match that of a MS Windows device. (%1).</source>
-        <translation type="unfinished">名称不能与微软视窗设备名相同. (%1).</translation>
+        <translation>名称不能与MS Windows系统设备名相同. (%1).</translation>
     </message>
 </context>
 <context>
@@ -530,37 +530,37 @@
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
         <source>Class name:</source>
-        <translation type="unfinished">类名:</translation>
+        <translation>类名:</translation>
     </message>
     <message>
         <location/>
         <source>Base class:</source>
-        <translation type="unfinished">基类:</translation>
+        <translation>基类:</translation>
     </message>
     <message>
         <location/>
         <source>Header file:</source>
-        <translation type="unfinished">头文件:</translation>
+        <translation>头文件:</translation>
     </message>
     <message>
         <location/>
         <source>Source file:</source>
-        <translation type="unfinished">源文件:</translation>
+        <translation>源文件:</translation>
     </message>
     <message>
         <location/>
         <source>Generate form:</source>
-        <translation type="unfinished">创建界面:</translation>
+        <translation>创建界面:</translation>
     </message>
     <message>
         <location/>
         <source>Form file:</source>
-        <translation type="unfinished">界面文件:</translation>
+        <translation>界面文件:</translation>
     </message>
     <message>
         <location/>
         <source>Path:</source>
-        <translation type="unfinished">路径:</translation>
+        <translation>路径:</translation>
     </message>
     <message>
         <location/>
@@ -570,7 +570,7 @@
     <message>
         <location/>
         <source>Type information:</source>
-        <translation type="unfinished">类型信息:</translation>
+        <translation>类型信息:</translation>
     </message>
     <message>
         <location/>
@@ -598,12 +598,12 @@
     <message>
         <location line="+125"/>
         <source>Choose a directory</source>
-        <translation type="unfinished">选择目录</translation>
+        <translation>选择目录</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Choose a file</source>
-        <translation type="unfinished">选择文件</translation>
+        <translation>选择文件</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -697,7 +697,7 @@
     <message>
         <location filename="../../../src/libs/utils/projectnamevalidatinglineedit.cpp" line="+48"/>
         <source>The name must not contain the &apos;.&apos;-character.</source>
-        <translation type="unfinished">名称不能包含 &apos;.&apos;</translation>
+        <translation>名称中不能包含字符 &apos;.&apos;</translation>
     </message>
 </context>
 <context>
@@ -723,7 +723,7 @@
     <message>
         <location filename="../../../src/libs/utils/filewizardpage.ui"/>
         <source>Choose the location</source>
-        <translation type="unfinished">选择位置</translation>
+        <translation>选择位置</translation>
     </message>
     <message>
         <location/>
@@ -746,12 +746,12 @@
     <message>
         <location line="+4"/>
         <source>The unsaved file %1 has been changed outside Qt Creator. Do you want to reload it and discard your changes?</source>
-        <translation type="unfinished">未保存的文件 %1 在 Qt Creator以外被改写，你想要重新载入并且丢弃现有的修改吗?</translation>
+        <translation>未保存的文件 %1 在 Qt Creator以外被改写，你想要重新载入并且丢弃现有的修改吗?</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The file %1 has changed outside Qt Creator. Do you want to reload it?</source>
-        <translation type="unfinished">文件 %1 在 Qt Creator以外被改写，你想重新载入么?</translation>
+        <translation>文件 %1 在 Qt Creator以外被改写，你想重新载入么?</translation>
     </message>
 </context>
 <context>
@@ -804,7 +804,7 @@
     <message>
         <location/>
         <source>Developer:</source>
-        <translation type="unfinished"></translation>
+        <translation>开发者:</translation>
     </message>
 </context>
 <context>
@@ -843,7 +843,7 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginview.ui"/>
         <source>State</source>
-        <translation type="unfinished">状态</translation>
+        <translation>状态</translation>
     </message>
     <message>
         <location/>
@@ -858,12 +858,12 @@
     <message>
         <location/>
         <source>Location</source>
-        <translation type="unfinished">位置</translation>
+        <translation>位置</translation>
     </message>
     <message>
         <location/>
         <source>Developer</source>
-        <translation type="unfinished"></translation>
+        <translation>开发者</translation>
     </message>
 </context>
 <context>
@@ -973,14 +973,14 @@
     <message>
         <location line="+8"/>
         <source>Cannot load plugin because dependencies are not resolved</source>
-        <translation type="unfinished">由于没有解决依赖所以无法载入插件</translation>
+        <translation>无法载入依赖关系,载入插件失败</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+30"/>
         <source>Cannot load plugin because dependency failed to load: %1(%2)
 Reason: %3</source>
-        <translation>因为无法载入依赖关系所以无法载入插件: %1(%2)
+        <translation>无法载入依赖关系,载入插件失败: %1(%2)
 原因: %3</translation>
     </message>
 </context>
@@ -1124,12 +1124,12 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.ui"/>
         <source>Options</source>
-        <translation type="unfinished">选项</translation>
+        <translation>选项</translation>
     </message>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation>0</translation>
     </message>
 </context>
 <context>
@@ -1137,62 +1137,62 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.ui"/>
         <source>Keyboard Shortcuts</source>
-        <translation type="unfinished">快捷键</translation>
+        <translation>快捷键</translation>
     </message>
     <message>
         <location/>
         <source>Filter:</source>
-        <translation type="unfinished">过滤器:</translation>
+        <translation>过滤器:</translation>
     </message>
     <message>
         <location/>
         <source>Command</source>
-        <translation type="unfinished">命令</translation>
+        <translation>命令</translation>
     </message>
     <message>
         <location/>
         <source>Label</source>
-        <translation type="unfinished">标签</translation>
+        <translation>标签</translation>
     </message>
     <message>
         <location/>
         <source>Shortcut</source>
-        <translation type="unfinished">快捷键</translation>
+        <translation>快捷键</translation>
     </message>
     <message>
         <location/>
         <source>Defaults</source>
-        <translation type="unfinished">默认</translation>
+        <translation>默认</translation>
     </message>
     <message>
         <location/>
         <source>Import...</source>
-        <translation type="unfinished">导入...</translation>
+        <translation>导入...</translation>
     </message>
     <message>
         <location/>
         <source>Export...</source>
-        <translation type="unfinished">输出...</translation>
+        <translation>输出...</translation>
     </message>
     <message>
         <location/>
         <source>Key Sequence</source>
-        <translation type="unfinished">按键顺序</translation>
+        <translation>按键顺序</translation>
     </message>
     <message>
         <location/>
         <source>Shortcut:</source>
-        <translation type="unfinished">快捷键:</translation>
+        <translation>快捷键:</translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished">重置</translation>
+        <translation>重置</translation>
     </message>
     <message>
         <location/>
         <source>Remove</source>
-        <translation type="unfinished">删除</translation>
+        <translation>删除</translation>
     </message>
 </context>
 <context>
@@ -1251,12 +1251,12 @@ Reason: %3</source>
     <message>
         <location line="+60"/>
         <source>Update Available: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>有更新版本: %1</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.h" line="+73"/>
         <source>OpenPilot GCS Version: %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot GCS 版本号: %1</translation>
     </message>
 </context>
 <context>
@@ -1264,7 +1264,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/utils/detailsbutton.cpp" line="+47"/>
         <source>Show Details</source>
-        <translation type="unfinished">显示详细信息</translation>
+        <translation>显示详细信息</translation>
     </message>
 </context>
 <context>
@@ -1357,7 +1357,7 @@ Reason: %3</source>
     <message>
         <location/>
         <source>Output</source>
-        <translation type="unfinished">输出</translation>
+        <translation>输出</translation>
     </message>
     <message>
         <location/>
@@ -1433,7 +1433,7 @@ Reason: %3</source>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Zoom</source>
-        <translation type="unfinished">缩放</translation>
+        <translation>缩放</translation>
     </message>
     <message>
         <location/>
@@ -1504,7 +1504,7 @@ Reason: %3</source>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.cpp" line="+49"/>
@@ -1625,7 +1625,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">应用</translation>
     </message>
     <message>
         <location/>

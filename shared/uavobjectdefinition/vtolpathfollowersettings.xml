@@ -23,7 +23,7 @@
         <field name="BrakeMaxPitch" units="deg" type="float" elements="1" defaultvalue="25"/>
         <field name="BrakeHorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="12.0, 0.0, 0.03, 15"/>
         <field name="BrakeVelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="0"/>
-        <field name="LandVerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.3, 0.3, 0.0, 1.0"/>
+        <field name="LandVerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.35, 3.0, 0.05, 0.9"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

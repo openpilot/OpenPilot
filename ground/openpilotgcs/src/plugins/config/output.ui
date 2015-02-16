@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>765</width>
+    <width>1096</width>
     <height>754</height>
    </rect>
   </property>
@@ -122,8 +122,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>831</width>
-            <height>659</height>
+            <width>1078</width>
+            <height>672</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -203,15 +203,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
@@ -284,15 +289,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
@@ -355,15 +365,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
@@ -426,15 +441,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
@@ -497,15 +517,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
@@ -525,15 +550,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
@@ -573,15 +603,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value
@@ -648,15 +683,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
@@ -698,15 +738,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup output mode. Use PWM or OneShot with Standard ESCs.
@@ -728,15 +773,20 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>70</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
@@ -778,7 +828,7 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -787,6 +837,11 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
                   <width>70</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
@@ -859,7 +914,7 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -868,6 +923,11 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
                   <width>70</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
@@ -1009,6 +1069,17 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
               </item>
               <item>
                <spacer name="verticalSpacer">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>

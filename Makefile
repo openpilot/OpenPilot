@@ -887,13 +887,13 @@ build-info:
 ##############################
 
 DIST_VER_INFO := $(DIST_DIR)/version-info.json
+MODIFIED_FILES := $(shell git ls-files -m)
 
-.PHONY: $(DIST_VER_INFO) # Because to many deps to list
-$(DIST_VER_INFO): | $(DIST_DIR)
+$(DIST_VER_INFO): .git/index $(MODIFIED_FILES) | $(DIST_DIR)
 	$(V1) $(VERSION_INFO) --jsonpath="$(DIST_DIR)"
 
 
-$(DIST_NAME).gz: $(DIST_VER_INFO) | $(DIST_DIR)
+$(DIST_NAME).gz: $(DIST_VER_INFO) .git/index | $(DIST_DIR)
 	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_NAME).gz)"
 	$(V1) git archive --prefix="$(PACKAGE_NAME)/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \

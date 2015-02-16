@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
- * @file       pios_flashfs_spiffs.c
- * @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
+ * @file       pios_flashfs.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @see        The GNU Public License (GPL) Version 3
  * @{
- * @addtogroup PIOS_FLASHFS Flash Filesystem Function
+ * @addtogroup PIOS_FLASHFS Flash Filesystem API Definition
  * @{
- * @brief Log Structured Filesystem for internal or external NOR Flash
+ * @brief PIOS API for internal or onboard filesystem using SPIFFS.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -61,11 +62,16 @@ xSemaphoreHandle flashfs_mutex = 0;
 #define PIOS_DEBUG_PinLow(pin)
 #endif
 
+#define PIOS_FLASHFS_OPID_CONTENT "www.openpilot.org\n"
+#define PIOS_FLASHFS_OPID_SIZE_MAX 256
+#define  PIOS_FLASHFS_OPID_FILENAME "OPID.txt"
 
 enum pios_flashfs_dev_magic {
     PIOS_FLASHFS_DEV_MAGIC = 0x94938201,
 };
 
+
+static uint32_t pios_flashfs2spiffs_lseek_flags[] = { SPIFFS_SEEK_SET, SPIFFS_SEEK_CUR, SPIFFS_SEEK_END };
 
 struct flashfs_state {
     enum pios_flashfs_dev_magic magic;
@@ -172,13 +178,96 @@ static s32_t PIOS_FLASHFS_spiffs_erase(void *fs, u32_t addr, __attribute__((unus
 
 
 /**
+ * @brief Mount the file system
+ */
+static int32_t PIOS_FLASHFS_AddIDFile(__attribute__((unused)) uintptr_t fs_id)
+{
+    int32_t rc = PIOS_FLASHFS_OK;
+    int16_t fh;
+    char buf[PIOS_FLASHFS_OPID_SIZE_MAX];
+
+    struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
+
+    /* Add id file with some info for sanity check. */
+    fh = SPIFFS_open(&flashfs->fs, PIOS_FLASHFS_OPID_FILENAME, SPIFFS_CREAT | SPIFFS_WRONLY | SPIFFS_DIRECT, 0);
+    if (fh < 0)
+    {
+        rc = PIOS_FLASHFS_ERROR_OPEN_FILE;
+    }
+    else
+    {
+        memset(buf, 0, sizeof(buf));
+        snprintf(buf, sizeof(buf) - 1, PIOS_FLASHFS_OPID_CONTENT"%s %s\n", __DATE__, __TIME__);
+        SPIFFS_write(&flashfs->fs, fh, (void *)buf, sizeof(buf));
+        SPIFFS_close(&flashfs->fs, fh);
+    }
+
+    return rc;
+}
+
+
+/**
+ * @brief Mount the file system
+ */
+static int32_t PIOS_FLASHFS_Mount(__attribute__((unused)) uintptr_t fs_id)
+{
+    int8_t rc = PIOS_FLASHFS_OK;
+
+    struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
+
+    if (!PIOS_FLASHFS_Validate(flashfs))
+        return PIOS_FLASHFS_ERROR_FS_INVALID;
+
+    memset(flashfs->spiffs_cache_buf, 0, SPIFFS_CACHE_BUF_SIZE);
+
+    if (SPIFFS_mount(&flashfs->fs,
+                        &flashfs->cfg_spiffs,
+                        flashfs->spiffs_work_buf,
+                        flashfs->spiffs_fds,
+                        SPIFFS_FDS_SIZE,
+                        flashfs->spiffs_cache_buf,
+                        SPIFFS_CACHE_BUF_SIZE,
+                        NULL) != SPIFFS_OK) {
+        rc = PIOS_FLASHFS_ERROR_FS_MOUNT;
+    }
+    else
+    {
+        flashfs->mounted  = true;
+
+
+        /* How many file available? */
+        spiffs_DIR d;
+        struct spiffs_dirent e;
+        struct spiffs_dirent *pe = &e;
+
+        SPIFFS_opendir(&flashfs->fs, "/", &d);
+
+        flashfs->files = 0;
+        while ((pe = SPIFFS_readdir(&d, pe))) {
+            spiffs_file fd = SPIFFS_open_by_dirent(&flashfs->fs, pe, SPIFFS_RDWR, 0);
+            if (fd >= 0) {
+                flashfs->files++;
+                SPIFFS_close(&flashfs->fs, fd);
+            }
+        }
+        SPIFFS_closedir(&d);
+        rc = flashfs->files;
+    }
+
+    return rc;
+}
+
+
+/**
  * @brief Initialize the file system
  */
 int32_t PIOS_FLASHFS_Init(__attribute__((unused)) uintptr_t *fs_id,
 						  const struct pios_flash_driver *driver,
 						  uintptr_t flash_id)
 {
-    int8_t rc = PIOS_FLASHFS_OK;
+    int16_t fh;
+    int16_t rc = PIOS_FLASHFS_OK;
+    spiffs_stat fstats;
 
     struct flashfs_state *flashfs = (struct flashfs_state *)*fs_id;
 
@@ -227,40 +316,27 @@ int32_t PIOS_FLASHFS_Init(__attribute__((unused)) uintptr_t *fs_id,
     	flashfs->cfg_spiffs.buffer = flashfs->spiffs_copy_buf;
     }
 
-    memset(flashfs->spiffs_cache_buf, 0, SPIFFS_CACHE_BUF_SIZE);
+    /* File system should have one file (the "ID" file) */
+    /* Currently that's the only integrity scheme available */
+    if ((PIOS_FLASHFS_Mount((uintptr_t)flashfs) < 1) ||
+        (SPIFFS_stat(&flashfs->fs, PIOS_FLASHFS_OPID_FILENAME, &fstats)) ||
+        (!fstats.size))
+    {
+        PIOS_FLASHFS_Format((uintptr_t)flashfs);
+        PIOS_FLASHFS_AddIDFile((uintptr_t)flashfs);
+    }
 
-	if (SPIFFS_mount(&flashfs->fs,
-						&flashfs->cfg_spiffs,
-						flashfs->spiffs_work_buf,
-						flashfs->spiffs_fds,
-						SPIFFS_FDS_SIZE,
-						flashfs->spiffs_cache_buf,
-						SPIFFS_CACHE_BUF_SIZE,
-						NULL) != SPIFFS_OK) {
-		rc = PIOS_FLASHFS_ERROR_FS_MOUNT;
-	}
-	else
-	{
-		flashfs->mounted  = true;
-		*fs_id = (uintptr_t)flashfs;
+    fh = SPIFFS_open(&flashfs->fs, PIOS_FLASHFS_OPID_FILENAME, SPIFFS_RDONLY, 0);
+    if (fh >= 0) {
+        /* We should probably check ID file content... */
+        SPIFFS_close(&flashfs->fs, fh);
 
-		/* how many file are stored in the file system */
-		spiffs_DIR d;
-		struct spiffs_dirent e;
-		struct spiffs_dirent *pe = &e;
-
-		SPIFFS_opendir(&flashfs->fs, "/", &d);
-
-		flashfs->files = 0;
-		while ((pe = SPIFFS_readdir(&d, pe))) {
-			spiffs_file fd = SPIFFS_open_by_dirent(&flashfs->fs, pe, SPIFFS_RDWR, 0);
-			if (fd >= 0) {
-				flashfs->files++;
-			    SPIFFS_close(&flashfs->fs, fd);
-			}
-		}
-		SPIFFS_closedir(&d);
-	}
+        *fs_id = (uintptr_t)flashfs;
+    }
+    else
+    {
+        rc = PIOS_FLASHFS_ERROR_FS_INVALID;
+    }
 
 	PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_INIT);
 
@@ -346,7 +422,7 @@ int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int32_t file_id)
 int32_t PIOS_FLASHFS_Write(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size)
 {
 	int32_t bytes_written = 0;
-    int8_t rc = PIOS_FLASHFS_OK;
+	int32_t rc = PIOS_FLASHFS_OK;
 
     struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
 
@@ -378,27 +454,58 @@ out_exit:
  */
 int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size)
 {
-	int32_t bytes_read = 0;
-    int8_t rc = PIOS_FLASHFS_OK;
+    int32_t bytes_read = 0;
+    int32_t rc = PIOS_FLASHFS_OK;
 
     struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
 
-	PIOS_DEBUG_PinHigh(PINDEBUG_SPIFFS_READ);
+    PIOS_DEBUG_PinHigh(PINDEBUG_SPIFFS_READ);
 
     if (!PIOS_FLASHFS_Validate(flashfs))
-    	return PIOS_FLASHFS_ERROR_FS_INVALID;
+        return PIOS_FLASHFS_ERROR_FS_INVALID;
 
-	bytes_read = SPIFFS_read(&flashfs->fs, (spiffs_file)fh, data, (int32_t)size);
+    bytes_read = SPIFFS_read(&flashfs->fs, (spiffs_file)fh, data, (int32_t)size);
 
-	if (bytes_read != size) {
-		rc = PIOS_FLASHFS_ERROR_READ_FILE;
+    if (bytes_read != size) {
+        rc = PIOS_FLASHFS_ERROR_READ_FILE;
 		goto out_exit;
-	}
+    }
 
 out_exit:
-	PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_READ);
+    PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_READ);
     return rc;
 }
+
+
+/**
+ * @brief Moves the read/write file offset
+ * @param[in] fs_id The filesystem to use for this action
+ * @param[in] fh File handle
+ * @param[in] how much/where to move the offset
+ * @param[in] if FLASHFS_SEEK_SET, the file offset shall be set to offset bytes
+ *            if FLASHFS_SEEK_CUR, the file offset shall be set to its current location + offset
+ *            if FLASHFS_SEEK_END, the file offset shall be set to the size of the file - offset
+ */
+int32_t PIOS_FLASHFS_Lseek(uintptr_t fs_id, uint16_t fh, int32_t offset, enum pios_flashfs_lseek_flags flag)
+{
+    int32_t rc = PIOS_FLASHFS_OK;
+
+    struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
+
+    if (!PIOS_FLASHFS_Validate(flashfs))
+        return PIOS_FLASHFS_ERROR_FS_INVALID;
+
+    rc = SPIFFS_lseek(&flashfs->fs, (spiffs_file)fh, offset, pios_flashfs2spiffs_lseek_flags[flag]);
+
+    if (rc == SPIFFS_ERR_END_OF_OBJECT)
+        return PIOS_FLASHFS_ERROR_EOF;
+
+    if (rc < 0)
+        return PIOS_FLASHFS_ERROR_READ_FILE;
+
+    return PIOS_FLASHFS_OK;
+}
+
 
 /**
  * @brief Delete one instance of an object from the filesystem
@@ -407,14 +514,13 @@ out_exit:
  */
 int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path)
 {
-    int8_t rc = PIOS_FLASHFS_OK;
-
+    int32_t rc = PIOS_FLASHFS_OK;
     struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
 
     PIOS_DEBUG_PinHigh(PINDEBUG_SPIFFS_DELETE);
 
     if (!PIOS_FLASHFS_Validate(flashfs))
-    	return PIOS_FLASHFS_ERROR_FS_INVALID;
+        return PIOS_FLASHFS_ERROR_FS_INVALID;
 
     if (SPIFFS_remove(&flashfs->fs, path) != SPIFFS_OK) {
     	rc = PIOS_FLASHFS_ERROR_REMOVE_FILE;
@@ -463,7 +569,7 @@ int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_siz
 			filecount++;
 		}
 
-	SPIFFS_closedir(&d);
+    SPIFFS_closedir(&d);
 
     return filecount;
 }
@@ -483,24 +589,26 @@ int32_t PIOS_FLASHFS_Format(uintptr_t fs_id)
     PIOS_DEBUG_PinHigh(PINDEBUG_SPIFFS_FORMAT);
 
     if (!PIOS_FLASHFS_Validate(flashfs))
-    	return PIOS_FLASHFS_ERROR_FS_INVALID;
+        return PIOS_FLASHFS_ERROR_FS_INVALID;
 
     previous_mount_status = flashfs->mounted;
 
     if (previous_mount_status)
     {
-    	SPIFFS_unmount(&flashfs->fs);
-    	flashfs->mounted = false;
+        SPIFFS_unmount(&flashfs->fs);
+        flashfs->mounted = false;
     }
 
     flashfs->driver->erase_chip(flashfs->flash_id);
 
     if (previous_mount_status)
     {
-    	rc = PIOS_FLASHFS_Init(&fs_id , NULL, 0);
+        rc = PIOS_FLASHFS_Mount((uintptr_t)flashfs);
+        PIOS_FLASHFS_AddIDFile((uintptr_t)flashfs);
     }
+
     flashfs->files = 0;
-	PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_FORMAT);
+    PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_FORMAT);
     return rc;
 }
 

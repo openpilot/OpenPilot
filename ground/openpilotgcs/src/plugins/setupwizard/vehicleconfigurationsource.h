@@ -46,9 +46,10 @@ struct actuatorChannelSettings {
     quint16 channelMin;
     quint16 channelNeutral;
     quint16 channelMax;
+    bool    isReversableMotor;
 
     // Default values
-    actuatorChannelSettings() : channelMin(1000), channelNeutral(1000), channelMax(1900) {}
+    actuatorChannelSettings() : channelMin(1000), channelNeutral(1000), channelMax(1900), isReversableMotor(false) {}
 };
 
 

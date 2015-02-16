@@ -646,7 +646,7 @@
     <message>
         <location line="+1"/>
         <source>Delete line</source>
-        <translation type="unfinished">删除行</translation>
+        <translation>删除行</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1307,37 +1307,38 @@ Reason: %3</source>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+274"/>
         <source>MainWindow</source>
-        <translation type="unfinished"></translation>
+        <translation>主窗口</translation>
     </message>
     <message>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <source>Go</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <location/>
         <source>Current File:</source>
-        <translation type="unfinished"></translation>
+        <translation>当前文件：</translation>
     </message>
     <message>
         <location/>
         <source>Current Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>当前路径：</translation>
     </message>
     <message>
         <location/>
         <source>Choose Path</source>
-        <translation type="unfinished"></translation>
+        <translation>选择路径</translation>
     </message>
     <message>
         <location/>
         <source>Created #IF statements</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>statements==声明？</translatorcomment>
+        <translation type="unfinished">创建#IF声明</translation>
     </message>
     <message>
         <location/>
         <source>Create NameSpace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">创建命名空间</translation>
     </message>
     <message>
         <location/>
@@ -1415,19 +1416,19 @@ Reason: %3</source>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>左</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Center</source>
-        <translation type="unfinished"></translation>
+        <translation>中</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>右</translation>
     </message>
     <message>
         <location/>
@@ -1463,7 +1464,7 @@ Reason: %3</source>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">其它</translation>
     </message>
     <message>
         <location/>
@@ -1489,7 +1490,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.ui"/>
         <source>MapRipper</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -1499,7 +1500,7 @@ Reason: %3</source>
     <message>
         <location/>
         <source>Downloading tile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">下载进度</translation>
     </message>
     <message>
         <location/>
@@ -1514,7 +1515,7 @@ Reason: %3</source>
     <message>
         <location line="+4"/>
         <source>Downloading tile %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>下载进度 %1 of %2</translation>
     </message>
 </context>
 <context>
@@ -1522,32 +1523,32 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/config/airframe.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Feed Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>前馈调节</translation>
     </message>
     <message>
         <location/>
         <source>Accel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation>加速时间常量</translation>
     </message>
     <message>
         <location/>
         <source>Decel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation>减速时间常量</translation>
     </message>
     <message>
         <location/>
         <source>Mixer Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>混合设置</translation>
     </message>
     <message>
         <location/>
         <source>Feed Forward Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>前馈配置</translation>
     </message>
     <message>
         <location/>
@@ -1556,7 +1557,9 @@ under the level where the motor starts to undershoot
 its target speed when decelerating.
 
 Do it after accel time is setup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">调节时请从0开始缓慢增加减速时间，直到电机转速刚好下降到低于减速的目标速度
+
+配置完加速时间后再执行此配置。</translation>
     </message>
     <message>
         <location/>
@@ -1564,7 +1567,8 @@ Do it after accel time is setup.</source>
 When tuning: Slowly raise accel time from zero to just
 under the level where the motor starts to overshoot
 its target speed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">单位：毫秒(ms)
+调节时请从0开始缓慢增加加速时间，直到电机转速刚好上升到高于目标速度。</translation>
     </message>
     <message>
         <location/>
@@ -1574,7 +1578,7 @@ its target speed.</source>
     <message>
         <location/>
         <source>Overall level of feed forward (in percentage).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">前馈整体水平（百分比）。</translation>
     </message>
     <message>
         <location/>
@@ -1610,7 +1614,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Enable FF tuning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开启前馈参数调节</translation>
     </message>
     <message>
         <location/>
@@ -1625,7 +1629,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <location/>
@@ -1635,22 +1639,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>Vehicle name</source>
-        <translation type="unfinished"></translation>
+        <translation>航模名</translation>
     </message>
     <message>
         <location/>
         <source>Enter name of vehicle. Max 20 characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>输入最多不超过20个字符的航模名称。</translation>
     </message>
     <message>
         <location/>
         <source>Vehicle Setup Wizard...</source>
-        <translation type="unfinished"></translation>
+        <translation>航模设备配置向导...</translation>
     </message>
     <message>
         <location/>
@@ -1675,27 +1679,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/coreplugin/uavgadgetoptionspage.ui"/>
         <source>Configuration</source>
-        <translation type="unfinished">配置</translation>
+        <translation>配置</translation>
     </message>
     <message>
         <location/>
         <source>Clone</source>
-        <translation type="unfinished"></translation>
+        <translation>复制</translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished">删除</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location/>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>锁定</translation>
     </message>
     <message>
         <location/>
         <source>Settings</source>
-        <translation type="unfinished">设置</translation>
+        <translation>设置</translation>
     </message>
 </context>
 <context>
@@ -1703,88 +1707,88 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+57"/>
         <source>Workspaces</source>
-        <translation type="unfinished"></translation>
+        <translation>工作区</translation>
     </message>
     <message>
         <location/>
         <source>Number of workspaces:</source>
-        <translation type="unfinished"></translation>
+        <translation>工作区数量：</translation>
     </message>
     <message>
         <location/>
         <source>Change details of workspace:</source>
-        <translation type="unfinished"></translation>
+        <translation>修改工作区详情：</translation>
     </message>
     <message>
         <location/>
         <source>Details</source>
-        <translation type="unfinished">详情</translation>
+        <translation>详情</translation>
     </message>
     <message>
         <location/>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>图标：</translation>
     </message>
     <message>
         <location/>
         <source>Name:</source>
-        <translation type="unfinished">名称:</translation>
+        <translation>名称:</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+10"/>
         <source>Environment</source>
-        <translation type="unfinished">环境</translation>
+        <translation>环境</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Images (*.png *.jpg *.bmp *.xpm)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose icon</source>
-        <translation type="unfinished"></translation>
+        <translation>选择图标</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
         <source>Placement:</source>
-        <translation type="unfinished"></translation>
+        <translation>位置：</translation>
     </message>
     <message>
         <location/>
         <source>Top</source>
-        <translation type="unfinished"></translation>
+        <translation>顶部</translation>
     </message>
     <message>
         <location/>
         <source>Bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>底部</translation>
     </message>
     <message>
         <location/>
         <source>Allow reordering:</source>
-        <translation type="unfinished"></translation>
+        <translation>重新排序：</translation>
     </message>
     <message>
         <location/>
         <source>General</source>
-        <translation type="unfinished">概要</translation>
+        <translation>概要</translation>
     </message>
     <message>
         <location/>
         <source>Restore last selected workspace on startup</source>
-        <translation type="unfinished"></translation>
+        <translation>启动时恢复上一次选择的工作区</translation>
     </message>
     <message>
         <location/>
         <source>Remember last used workspace on restart</source>
-        <translation type="unfinished"></translation>
+        <translation>重启时记住最后一次使用的工作区</translation>
     </message>
 </context>
 <context>
@@ -1792,7 +1796,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
@@ -1920,27 +1924,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/gcscontrol/gcscontrol.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>GCS Control</source>
-        <translation type="unfinished"></translation>
+        <translation>GCS控制</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>飞行模式：</translation>
     </message>
     <message>
         <location/>
         <source>UDP Control</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP控制</translation>
     </message>
     <message>
         <location/>
         <source>Arm switch (Accessory0)</source>
-        <translation type="unfinished"></translation>
+        <translation>解锁开关 (Accessory0)</translation>
     </message>
 </context>
 <context>
@@ -1948,67 +1952,67 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>模式：</translation>
     </message>
     <message>
         <location/>
         <source>Serial Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>串口连接</translation>
     </message>
     <message>
         <location/>
         <source>Data Bits:</source>
-        <translation type="unfinished"></translation>
+        <translation>数据位：</translation>
     </message>
     <message>
         <location/>
         <source>Stop Bits:</source>
-        <translation type="unfinished"></translation>
+        <translation>停止位：</translation>
     </message>
     <message>
         <location/>
         <source>Parity:</source>
-        <translation type="unfinished"></translation>
+        <translation>奇偶校验：</translation>
     </message>
     <message>
         <location/>
         <source>Timeout(ms):</source>
-        <translation type="unfinished"></translation>
+        <translation>超时(毫秒)：</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">端口:</translation>
+        <translation>端口:</translation>
     </message>
     <message>
         <location/>
         <source>Port Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>波特率：</translation>
     </message>
     <message>
         <location/>
         <source>Flow Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>流控制：</translation>
     </message>
     <message>
         <location/>
         <source>IP Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>IP连接</translation>
     </message>
     <message>
         <location/>
         <source>Host</source>
-        <translation type="unfinished">主机</translation>
+        <translation>主机</translation>
     </message>
     <message>
         <location/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>端口</translation>
     </message>
     <message>
         <location/>
@@ -2021,22 +2025,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/gpsdisplay/gpsdisplaywidget.ui"/>
         <source>Coord:</source>
-        <translation type="unfinished"></translation>
+        <translation>坐标：</translation>
     </message>
     <message>
         <location/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>未知</translation>
     </message>
     <message>
         <location/>
         <source>Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>速度：</translation>
     </message>
     <message>
         <location/>
         <source>Heading:</source>
-        <translation type="unfinished"></translation>
+        <translation>方向：</translation>
     </message>
     <message>
         <location/>
@@ -2061,33 +2065,33 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>连接</translation>
     </message>
     <message>
         <location/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>断开</translation>
     </message>
     <message>
         <location/>
         <source>GPS Data Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS数据流</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the SNR for each detected sat. Satellite number (PRN) is displayed inside the green bar (GPS) or orange bar (SBAS). Sat SNR is displayed above (in dBHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;显示检测到的每个卫星信噪比. Satellite number (PRN) is displayed inside the green bar (GPS) or orange bar (SBAS). Sat SNR is displayed above (单位dBHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Alt :</source>
-        <translation type="unfinished"></translation>
+        <translation>海拔：</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Location of GCS on the Earth&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <extracomment>Location of GCS on the Earth</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;地面站(GCS)在地球上的位置&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -2095,217 +2099,217 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitl/hitloptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Choose flight simulator:</source>
-        <translation type="unfinished"></translation>
+        <translation>选择飞行模拟器：</translation>
     </message>
     <message>
         <location/>
         <source>Path executable:</source>
-        <translation type="unfinished"></translation>
+        <translation>可执行文件路径：</translation>
     </message>
     <message>
         <location/>
         <source>Data directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>数据目录：</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/hitl/hitloptionspage.cpp" line="+64"/>
         <source>Choose flight simulator executable</source>
-        <translation type="unfinished"></translation>
+        <translation>选择飞行模拟器</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Choose flight simulator data directory</source>
-        <translation type="unfinished"></translation>
+        <translation>选择飞行模拟器数据目录</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/hitl/hitloptionspage.ui"/>
         <source>Check this box to start the simulator on the local computer</source>
-        <translation type="unfinished"></translation>
+        <translation>选中此复选框以确认在本机上启动模拟器</translation>
     </message>
     <message>
         <location/>
         <source>Start simulator on local machine</source>
-        <translation type="unfinished"></translation>
+        <translation>在本机启动模拟器</translation>
     </message>
     <message>
         <location/>
         <source>For communication with sim computer via network. Should be the IP address of one of the interfaces of the GCS computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>本机IP地址。</translation>
     </message>
     <message>
         <location/>
         <source>Only required if running simulator on remote machine. Should be the IP of the machine on which the simulator is running.</source>
-        <translation type="unfinished"></translation>
+        <translation>远端运行模拟器的电脑IP地址。</translation>
     </message>
     <message>
         <location/>
         <source>AttitudeRaw (gyro, accels)</source>
-        <translation type="unfinished"></translation>
+        <translation>原始姿态传感器（陀螺仪，加速度）数据</translation>
     </message>
     <message>
         <location/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation>毫秒</translation>
     </message>
     <message>
         <location/>
         <source>AttitudeState</source>
-        <translation type="unfinished"></translation>
+        <translation>姿态数据</translation>
     </message>
     <message>
         <location/>
         <source>use values from simulator</source>
-        <translation type="unfinished"></translation>
+        <translation>使用模拟器数据</translation>
     </message>
     <message>
         <location/>
         <source>0 - update once, or every N seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>0 - 立即刷新, 或每N秒刷新一次</translation>
     </message>
     <message>
         <location/>
         <source>m</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>IP addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>IP地址</translation>
     </message>
     <message>
         <location/>
         <source>Local host:    </source>
-        <translation type="unfinished"></translation>
+        <translation>本机地址:    </translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">端口:</translation>
+        <translation>端口:</translation>
     </message>
     <message>
         <location/>
         <source>IP port for receiving data from sim</source>
-        <translation type="unfinished"></translation>
+        <translation>接收模拟器数据的端口</translation>
     </message>
     <message>
         <location/>
         <source>Remote host:</source>
-        <translation type="unfinished"></translation>
+        <translation>远端地址：</translation>
     </message>
     <message>
         <location/>
         <source>IP port for sending data to sim</source>
-        <translation type="unfinished"></translation>
+        <translation>发送数据到模拟器的端口</translation>
     </message>
     <message>
         <location/>
         <source>Program Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>模拟器程序参数</translation>
     </message>
     <message>
         <location/>
         <source>Add noise to sensor simulation</source>
-        <translation type="unfinished"></translation>
+        <translation>给模拟器传感器加入干扰</translation>
     </message>
     <message>
         <location/>
         <source>Add noise</source>
-        <translation type="unfinished"></translation>
+        <translation>加入干扰</translation>
     </message>
     <message>
         <location/>
         <source>Initial latitude (decimal):</source>
-        <translation type="unfinished"></translation>
+        <translation>初始纬度：</translation>
     </message>
     <message>
         <location/>
         <source>Initial longitude (decimal):</source>
-        <translation type="unfinished"></translation>
+        <translation>初始经度：</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Data</source>
-        <translation type="unfinished"></translation>
+        <translation>姿态数据</translation>
     </message>
     <message>
         <location/>
         <source>Refresh rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>刷新频率：</translation>
     </message>
     <message>
         <location/>
         <source>send simulated inertial data to board</source>
-        <translation type="unfinished"></translation>
+        <translation>将模拟惯量数据发送到飞控板</translation>
     </message>
     <message>
         <location/>
         <source>calculate from simulated sensor data</source>
-        <translation type="unfinished"></translation>
+        <translation>从模拟传感器数值计算</translation>
     </message>
     <message>
         <location/>
         <source>Spatial Data</source>
-        <translation type="unfinished"></translation>
+        <translation>空间数据</translation>
     </message>
     <message>
         <location/>
         <source>Ground truth position and velocity</source>
-        <translation type="unfinished"></translation>
+        <translation>地面位置和速度</translation>
     </message>
     <message>
         <location/>
         <source>GPS data</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS数据</translation>
     </message>
     <message>
         <location/>
         <source>Other Data</source>
-        <translation type="unfinished"></translation>
+        <translation>其它数据</translation>
     </message>
     <message>
         <location/>
         <source>AirspeedState</source>
-        <translation type="unfinished"></translation>
+        <translation>飞行速度状态</translation>
     </message>
     <message>
         <location/>
         <source>BaroAltitude</source>
-        <translation type="unfinished"></translation>
+        <translation>气压海拔</translation>
     </message>
     <message>
         <location/>
         <source>Range detection:</source>
-        <translation type="unfinished"></translation>
+        <translation>检测范围：</translation>
     </message>
     <message>
         <location/>
         <source>Map transmitter commands...</source>
-        <translation type="unfinished"></translation>
+        <translation>控制器命令映射...</translation>
     </message>
     <message>
         <location/>
         <source>from hardware to simulator (via ManualCtrl)</source>
-        <translation type="unfinished"></translation>
+        <translation>从控制器到模拟器</translation>
     </message>
     <message>
         <location/>
         <source>from simulator to hardware (via GCSReceiver)</source>
-        <translation type="unfinished"></translation>
+        <translation>从模拟器到控制器</translation>
     </message>
     <message>
         <location/>
         <source>Maximum GCS to hardware output rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>GCS到控制器的最大输出频率：</translation>
     </message>
     <message>
         <location/>
         <source>Set the maximum rate at which GCS sends simulator data to the hardware</source>
-        <translation type="unfinished"></translation>
+        <translation>GCS发送模拟器数据到控制器的最大允许频率</translation>
     </message>
 </context>
 <context>
@@ -2313,42 +2317,42 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitl/hitlwidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Request update</source>
-        <translation type="unfinished"></translation>
+        <translation>请求更新</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <location/>
         <source>Send update</source>
-        <translation type="unfinished"></translation>
+        <translation>发送更新</translation>
     </message>
     <message>
         <location/>
         <source>Stop</source>
-        <translation type="unfinished">停止</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location/>
         <source>AutoPilot disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>断开自动驾驶仪</translation>
     </message>
     <message>
         <location/>
         <source> Simulator disconnected </source>
-        <translation type="unfinished"></translation>
+        <translation>断开模拟器</translation>
     </message>
     <message>
         <location/>
         <source>Clear Log</source>
-        <translation type="unfinished"></translation>
+        <translation>清空记录</translation>
     </message>
 </context>
 <context>
@@ -2356,12 +2360,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportdialog.ui"/>
         <source>Dialog</source>
-        <translation type="unfinished">对话框</translation>
+        <translation>对话框</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+9"/>
         <source>Import Export Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>导入导出配置</translation>
     </message>
 </context>
 <context>
@@ -2369,17 +2373,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Items</source>
-        <translation type="unfinished">项</translation>
+        <translation>项目</translation>
     </message>
     <message>
         <location/>
         <source>General (Workspace, Key-Bindings)</source>
-        <translation type="unfinished"></translation>
+        <translation>工作区，快捷键</translation>
     </message>
     <message>
         <location/>

@@ -37,6 +37,7 @@ public:
     virtual void SettingsUpdated(void)  = 0;
     virtual void UpdateAutoPilot(void)  = 0;
     virtual void ObjectiveUpdated(void) = 0;
+    virtual uint8_t Mode(void) = 0;
 };
 
 #endif // PATHFOLLOWERCONTROL_H

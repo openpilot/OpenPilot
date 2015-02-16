@@ -75,13 +75,19 @@ void PIDControlNE::UpdateParameters(float kp, float ki, float kd, __attribute__(
     // pid_configure(&PID, kp, ki, kd, ilimit);
     float Ti   = kp / ki;
     float Td   = kd / kp;
-    float kt   = (Ti + Td) / 2.0f;
-    float Tf   = Td / 10.0f;
+    float Tt   = (Ti + Td) / 2.0f;
+    float kt   = 1.0f / Tt;
     float beta = 1.0f; // 0 to 1
     float u0   = 0.0f;
+    float N    = 10.0f;
+    float Tf   = Td / N;
+    if (kd < 1e-6f) {
+   	// PI Controller
+   	Tf = Ti / N;
+    }
 
-    pid2_configure(&PIDvel[0], kp, ki, kd, Tf, kt, dT, beta, u0);
-    pid2_configure(&PIDvel[1], kp, ki, kd, Tf, kt, dT, beta, u0);
+    pid2_configure(&PIDvel[0], kp, ki, kd, Tf, kt, dT, beta, u0, 0.0f, 1.0f);
+    pid2_configure(&PIDvel[1], kp, ki, kd, Tf, kt, dT, beta, u0, 0.0f, 1.0f);
     deltaTime    = dT;
     mVelocityMax = velocityMax;
 }
@@ -158,8 +164,10 @@ void PIDControlNE::ControlPosition()
 
 void PIDControlNE::GetNECommand(float *northCommand, float *eastCommand)
 {
-    *northCommand = pid2_apply(&(PIDvel[0]), mVelocitySetpointCurrent[0], mVelocityState[0], mMinCommand, mMaxCommand) + mVelocitySetpointCurrent[0] * mVelocityFeedforward;
-    *eastCommand  = pid2_apply(&(PIDvel[1]), mVelocitySetpointCurrent[1], mVelocityState[1], mMinCommand, mMaxCommand) + mVelocitySetpointCurrent[1] * mVelocityFeedforward;
+    PIDvel[0].va = mVelocitySetpointCurrent[0] * mVelocityFeedforward;
+    *northCommand = pid2_apply(&(PIDvel[0]), mVelocitySetpointCurrent[0], mVelocityState[0], mMinCommand, mMaxCommand);
+    PIDvel[1].va = mVelocitySetpointCurrent[1] * mVelocityFeedforward;
+    *eastCommand  = pid2_apply(&(PIDvel[1]), mVelocitySetpointCurrent[1], mVelocityState[1], mMinCommand, mMaxCommand);
 }
 
 void PIDControlNE::GetVelocityDesired(float *north, float *east)

@@ -77,6 +77,7 @@ extern "C" {
 #include <stabilizationbank.h>
 #include <vtolselftuningstats.h>
 #include <pathsummary.h>
+#include <pidstatus.h>
 }
 
 #include "fsm_land.h"
@@ -218,6 +219,7 @@ int32_t PathFollowerInitialize()
     SystemSettingsInitialize();
     StabilizationBankInitialize();
     VtolSelfTuningStatsInitialize();
+    PIDStatusInitialize();
 
     // Initialise the autopilot mode implementations that use an FSM
     FSMLand::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
@@ -330,11 +332,9 @@ static void pathFollowerTask(void)
 
 static void pathFollowerObjectiveUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    uint8_t previousMode = pathDesired.Mode;
-
     PathDesiredGet(&pathDesired);
 
-    if (activeController && previousMode != pathDesired.Mode) {
+    if (activeController && pathDesired.Mode != activeController->Mode()) {
         activeController->Deactivate();
         activeController = 0;
     }

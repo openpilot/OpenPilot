@@ -113,6 +113,11 @@ uint8_t PathFollowerControlLanding::IsActive(void)
     return mActive;
 }
 
+uint8_t PathFollowerControlLanding::Mode(void)
+{
+  return PATHDESIRED_MODE_LAND;
+}
+
 // Objective updated in pathdesired, e.g. same flight mode but new target velocity
 void PathFollowerControlLanding::ObjectiveUpdated(void)
 {
@@ -148,10 +153,10 @@ void PathFollowerControlLanding::SettingsUpdated(void)
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 
-    controlThrust.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp,
-                                   vtolPathFollowerSettings->VerticalVelPID.Ki,
-                                   vtolPathFollowerSettings->VerticalVelPID.Kd,
-                                   vtolPathFollowerSettings->VerticalVelPID.ILimit,
+    controlThrust.UpdateParameters(vtolPathFollowerSettings->LandVerticalVelPID.Kp,
+                                   vtolPathFollowerSettings->LandVerticalVelPID.Ki,
+                                   vtolPathFollowerSettings->LandVerticalVelPID.Kd,
+                                   vtolPathFollowerSettings->LandVerticalVelPID.Beta,
                                    dT,
                                    vtolPathFollowerSettings->VerticalVelMax);
     // TODO Add trigger for this

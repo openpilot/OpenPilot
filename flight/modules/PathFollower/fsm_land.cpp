@@ -735,5 +735,4 @@ void FSMLand::setup_abort(void)
 
 void FSMLand::run_abort(__attribute__((unused)) uint8_t flTimeout)
 {
-    fallback_to_hold();
 }

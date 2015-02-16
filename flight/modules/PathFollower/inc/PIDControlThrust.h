@@ -43,7 +43,7 @@ public:
     void Initialize(PathFollowerFSM *fsm);
     void Deactivate();
     void Activate();
-    void UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax);
+    void UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax);
     void UpdateNeutralThrust(float neutral);
     void UpdateVelocitySetpoint(float setpoint);
     void RateLimit(float *spDesired, float *spCurrent, float rateLimit);

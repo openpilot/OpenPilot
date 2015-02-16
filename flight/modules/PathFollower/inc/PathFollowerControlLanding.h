@@ -63,6 +63,7 @@ public:
     void UpdateAutoPilot(void);
     void ObjectiveUpdated(void);
     uint8_t IsActive(void);
+    uint8_t Mode(void);
 
 private:
     void UpdateVelocityDesired(void);

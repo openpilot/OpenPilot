@@ -76,17 +76,21 @@ void PIDControlThrust::Activate()
     mActive = true;
 }
 
-void PIDControlThrust::UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax)
+void PIDControlThrust::UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax)
 {
     // pid_configure(&PID, kp, ki, kd, ilimit);
     float Ti   = kp / ki;
     float Td   = kd / kp;
-    float kt   = (Ti + Td) / 2.0f;
-    float Tf   = Td / 10.0f;
-    float beta = 1.0f; // 0 to 1
-    float u0   = 0.0f;
+    float Tt   = (Ti + Td) / 2.0f;
+    float kt   = 1.0f / Tt;
+    float N    = 10.0f;
+    float Tf   = Td / N;
+    if (kd < 1e-6f) {
+	// PI Controller
+	Tf = Ti / N;
+    }
 
-    pid2_configure(&PID, kp, ki, kd, Tf, kt, dT, beta, u0);
+    pid2_configure(&PID, kp, ki, kd, Tf, kt, dT, beta, mNeutral, mNeutral, -1.0f);
     deltaTime    = dT;
     mVelocityMax = velocityMax;
 }
@@ -95,7 +99,8 @@ void PIDControlThrust::UpdateNeutralThrust(float neutral)
 {
     if (mActive) {
         // adjust neutral and achieve bumpless transfer
-        PID.I += mNeutral - neutral;
+        PID.va = neutral;
+        pid2_transfer(&PID, mThrustCommand);
     }
     mNeutral = neutral;
 }
@@ -160,7 +165,7 @@ float PIDControlThrust::GetThrustCommand(void)
     float ulow, uhigh;
 
     mFSM->BoundThrust(ulow, uhigh);
-    float downCommand = -pid2_apply(&PID, mVelocitySetpointCurrent, mVelocityState, ulow - mNeutral, uhigh - mNeutral);
+    float downCommand = pid2_apply(&PID, mVelocitySetpointCurrent, mVelocityState, ulow, uhigh);
     pidStatus.setpoint = mVelocitySetpointCurrent;
     pidStatus.actual = mVelocityState;
     pidStatus.error = mVelocitySetpointCurrent - mVelocityState;
@@ -168,10 +173,10 @@ float PIDControlThrust::GetThrustCommand(void)
     pidStatus.ulow = ulow;
     pidStatus.uhigh = uhigh;
     pidStatus.command = downCommand;
-    pidStatus.P = (downCommand - PID.I - PID.D);
+    pidStatus.P = PID.P;
     pidStatus.I = PID.I;
     pidStatus.D = PID.D;
     PIDStatusSet(&pidStatus);
-    mThrustCommand = mNeutral + downCommand;
+    mThrustCommand = downCommand;
     return mThrustCommand;
 }

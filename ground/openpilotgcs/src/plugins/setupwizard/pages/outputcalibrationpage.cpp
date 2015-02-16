@@ -347,7 +347,7 @@ void OutputCalibrationPage::setWizardPage()
             if (m_actuatorSettings[currentChannel].isReversableMotor) {
                 ui->motorNeutralSlider->setMinimum(m_actuatorSettings[currentChannel].channelMin);
                 ui->motorNeutralSlider->setMaximum(m_actuatorSettings[currentChannel].channelMax);
-                ui->motorInfo->setText(tr("<html><head/><body><p><span style=\" font-size:10pt;\">To find </span><span style=\" font-size:10pt; font-weight:600;\">the neutral rate for this reversable motor</span><span style=\" font-size:10pt;\">, press the Start button below and slide the slider to the right or left until you find the value where the motor don't start. <br/><br/>When done press button again to stop.</span></p></body></html>"));
+                ui->motorInfo->setText(tr("<html><head/><body><p><span style=\" font-size:10pt;\">To find </span><span style=\" font-size:10pt; font-weight:600;\">the neutral rate for this reversable motor</span><span style=\" font-size:10pt;\">, press the Start button below and slide the slider to the right or left until you find the value where the motor doesn't start. <br/><br/>When done press button again to stop.</span></p></body></html>"));
             }
         } else if (currentPageIndex == 2) {
             ui->servoPWMValue->setText(tr("Output value : <b>%1</b> µs").arg(m_actuatorSettings[currentChannel].channelNeutral));

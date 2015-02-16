@@ -133,7 +133,7 @@ static void ControlUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
             entry->Type   = DEBUGLOGENTRY_TYPE_EMPTY;
         }
         DebugLogEntrySet(entry);
-    } else if (control.Operation == DEBUGLOGCONTROL_OPERATION_FORMATFLASH) {
+    } else if (control.Operation == DEBUGLOGCONTROL_OPERATION_DELETEALL) {
         uint8_t armed;
         FlightStatusArmedGet(&armed);
         if (armed == FLIGHTSTATUS_ARMED_DISARMED) {

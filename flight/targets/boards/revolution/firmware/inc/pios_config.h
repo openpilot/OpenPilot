@@ -69,9 +69,7 @@
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
-#ifndef PIOS_ENABLE_DEBUG_PINS
-#define PIOS_INCLUDE_WDG
-#endif
+//#define PIOS_INCLUDE_WDG
 
 /* PIOS USB functions */
 #define PIOS_INCLUDE_USB

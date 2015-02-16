@@ -163,7 +163,7 @@ void FlightLogManager::clearAllLogs()
 
     m_flightLogControl->setFlight(0);
     m_flightLogControl->setEntry(0);
-    m_flightLogControl->setOperation(DebugLogControl::OPERATION_FORMATFLASH);
+    m_flightLogControl->setOperation(DebugLogControl::OPERATION_DELETEALL);
     if (updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT) == UAVObjectUpdaterHelper::SUCCESS) {
         // Then empty locally
         clearLogList();

@@ -160,19 +160,19 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
     if (logging_enabled && !enabled) {
         // Close log file, flush cached file chunks.
         PIOS_FLASHFS_Close(pios_user_fs_id, fh);
-
-        fh = -1;
     }
 
     // Start log.
-    if (!logging_enabled && enabled && fh == -1) {
+    if (!logging_enabled && enabled) {
         lognum = 0;
         flightnum++;
+
+        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
 
         // Create a new log file.
         PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
 
-        fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_RDWR | PIOS_FLASHFS_TRUNC);
+        fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
     }
 
     // Update flag.
@@ -221,7 +221,7 @@ void PIOS_DEBUGLOG_Printf(char *format, ...)
     mutexlock();
 
     memset(buffer->Data, 0, sizeof(buffer->Data));
-    vsnprintf((char *)buffer->Data, sizeof(buffer->Data), (char *)format, args);
+    vsnprintf((char *)buffer->Data, sizeof(buffer->Data) - 1, (char *)format, args);
 
     /* Add a character (NULL) for string termination. */
     PIOS_DEBUGLOG_Add(0, 0, strlen((const char *)buffer->Data) + 1, buffer->Data, DEBUGLOGENTRY_TYPE_TEXT);
@@ -239,45 +239,46 @@ void PIOS_DEBUGLOG_Printf(char *format, ...)
  * @retval -1 if the entry could not get retrieved
 
  */
-int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, uint16_t inst)
+int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, __attribute__((unused)) uint16_t inst)
 {
     int32_t rc = 0;
-	static int file_offset = 0;
+	static uint16_t current_flight_opened = 0xFFFF;
 
     PIOS_Assert(mybuffer);
 
     // TODO: This only does incremental read, no random.
 
-    // Make sure the logging is stopped.
-    PIOS_DEBUGLOG_Enable(0);
-
     mutexlock();
 
-    PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), 0, filename);
+    if (current_flight_opened != flight)
+    {
 
-    fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_RDONLY);
 
-    if (fh < 0) {
-       rc = -1;
-       goto end;
+        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+
+        PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), 0, filename);
+
+        if ((fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_RDONLY)) < 0) {
+            mutexunlock();
+            return -1;
+        }
+
+        current_flight_opened = flight;
     }
 
-    // Start from begining of the file
-	if (!inst)
-        file_offset = 0;
-
-    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, sizeof(DebugLogEntryData), file_offset) != 0) {
+    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, LOG_ENTRY_HEADER_SIZE) != 0) {
         rc = -1;
     }
     else
     {
-        // Go to next entry
-        file_offset += ((DebugLogEntryData*)mybuffer)->Size + LOG_ENTRY_HEADER_SIZE;
+        if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)(mybuffer + LOG_ENTRY_HEADER_SIZE), ((DebugLogEntryData*)mybuffer)->Size) != 0) {
+            rc = -1;
+        }
     }
 
-    PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+    if (rc)
+        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
 
-end:
     mutexunlock();
     return rc;
 }

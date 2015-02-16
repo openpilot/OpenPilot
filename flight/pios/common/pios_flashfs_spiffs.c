@@ -376,7 +376,7 @@ out_exit:
  * @param[in] data Buffer to hold the contents of the loaded object
  * @param[in] size Size of the object to be loaded
  */
-int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size, int32_t offset)
+int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size)
 {
 	int32_t bytes_read = 0;
     int8_t rc = PIOS_FLASHFS_OK;
@@ -387,9 +387,6 @@ int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t 
 
     if (!PIOS_FLASHFS_Validate(flashfs))
     	return PIOS_FLASHFS_ERROR_FS_INVALID;
-
-    if (offset)
-        SPIFFS_lseek(&flashfs->fs, (spiffs_file)fh, offset, SPIFFS_SEEK_SET);
 
 	bytes_read = SPIFFS_read(&flashfs->fs, (spiffs_file)fh, data, (int32_t)size);
 

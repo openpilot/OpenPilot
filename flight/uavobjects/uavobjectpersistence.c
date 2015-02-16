@@ -143,7 +143,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
     if (fh < 0)
         return -1;
 
-    if (PIOS_FLASHFS_Read(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle), 0) != 0)
+    if (PIOS_FLASHFS_Read(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle)) != 0)
 	    rc = -1;
 
     PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh);

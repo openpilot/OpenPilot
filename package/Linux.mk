@@ -6,6 +6,7 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
+DEB_DIST             := unstable
 # Instead of RELEASE-15.01-RC1 debian wants 15.01~RC1
 UPSTREAM_VER         := $(subst -,~,$(subst RELEASE-,,$(PACKAGE_LBL)))
 DEB_REV              := 1
@@ -17,7 +18,7 @@ DEB_PACKAGE_NAME     := $(DEB_NAME)_$(UPSTREAM_VER)-$(DEB_REV)_$(DEB_ARCH)
 DEB_DIR              := package/linux/debian
 
 SED_DATE_STRG         = $(shell date -R)
-SED_SCRIPT            = s/<VERSION>/$(UPSTREAM_VER)-$(DEB_REV)/;s/<DATE>/$(SED_DATE_STRG)/
+SED_SCRIPT            = s/<VERSION>/$(UPSTREAM_VER)-$(DEB_REV)/;s/<DATE>/$(SED_DATE_STRG)/;s/<DIST>/$(DEB_DIST)/
 
 
 .PHONY: package

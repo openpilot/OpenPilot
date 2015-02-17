@@ -53,6 +53,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     ui->setupUi(this);
 
     ui->gvWarning->setScene(new QGraphicsScene(this));
+    ui->gvFrame->setVisible(false);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
@@ -460,8 +461,10 @@ void ConfigOutputWidget::setWarning(QString message)
     ui->gvWarning->scene()->clear();
     if (!message.isNull()) {
         warningPic.load(":/configgadget/images/error.svg");
+        ui->gvFrame->setVisible(true);
     } else {
         warningPic.load("");
+        ui->gvFrame->setVisible(false);
     }
     ui->gvWarning->scene()->addPixmap(warningPic);
     ui->gvWarning->setSceneRect(warningPic.rect());

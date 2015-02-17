@@ -77,10 +77,10 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
     {
         switch (selectedType) {
         case VehicleConfigurationSource::INPUT_PWM:
-            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PWM;
+            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PWMNOONESHOT;
 
         case VehicleConfigurationSource::INPUT_PPM:
-            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PPM;
+            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PPMNOONESHOT;
 
         case VehicleConfigurationSource::INPUT_SBUS:
             return data.CC_MainPort != HwSettings::CC_MAINPORT_SBUS;

@@ -32,7 +32,6 @@
 #include "mixersettings.h"
 #include "actuatorcommand.h"
 #include "actuatorsettings.h"
-#include "systemalarms.h"
 #include "systemsettings.h"
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 #include <extensionsystem/pluginmanager.h>
@@ -52,6 +51,8 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 {
     ui = new Ui_OutputWidget();
     ui->setupUi(this);
+
+    ui->gvWarning->setScene(new QGraphicsScene(this));
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
@@ -105,6 +106,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode5, 4, 0, true);
     addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode6, 5, 0, true);
 
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+    connect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
+
     disconnect(this, SLOT(refreshWidgetsValues(UAVObject *)));
 
     populateWidgets();
@@ -115,6 +119,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
 ConfigOutputWidget::~ConfigOutputWidget()
 {
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+
+    disconnect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
     // Do nothing
 }
 
@@ -435,4 +442,35 @@ void ConfigOutputWidget::openHelp()
 void ConfigOutputWidget::stopTests()
 {
     ui->channelOutTest->setChecked(false);
+}
+
+void ConfigOutputWidget::updateWarnings(UAVObject *)
+{
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+    SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
+
+    if (systemAlarms.Alarm[SystemAlarms::ALARM_SYSTEMCONFIGURATION] > SystemAlarms::ALARM_WARNING) {
+        switch (systemAlarms.ExtendedAlarmStatus[SystemAlarms::EXTENDEDALARMSTATUS_SYSTEMCONFIGURATION]) {
+        case SystemAlarms::EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT:
+            setWarning(tr("OneShot only works with MainPort settings marked with \"+OneShot\"\nUsing \"PPM_PIN6+OneShot\" bank 4 (output 6) must be set to PWM"));
+            return;
+        }
+    }
+    setWarning(NULL);
+}
+
+void ConfigOutputWidget::setWarning(QString message)
+{
+    QPixmap warningPic;
+
+    ui->gvWarning->scene()->clear();
+    if (!message.isNull()) {
+        warningPic.load(":/configgadget/images/error.svg");
+    } else {
+        warningPic.load("");
+    }
+    ui->gvWarning->scene()->addPixmap(warningPic);
+    ui->gvWarning->setSceneRect(warningPic.rect());
+    ui->gvWarning->fitInView(warningPic.rect(), Qt::KeepAspectRatio);
+    ui->txtWarning->setText(message);
 }

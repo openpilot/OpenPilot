@@ -32,6 +32,8 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 #include <taskinfo.h>
+#include <sanitycheck.h>
+#include <actuatorsettings.h>
 
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <pios_instrumentation.h>
@@ -51,6 +53,9 @@
  * NOTE: No slot in this map for NONE.
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
+static SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook();
+static void ActuatorSettingsUpdatedCb(UAVObjEvent *ev);
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN     32
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN     12
@@ -712,8 +717,8 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_rcvrport;
     HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
 
-    switch (hwsettings_rcvrport) {
-    case HWSETTINGS_CC_RCVRPORT_DISABLED:
+    switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
 #if defined(PIOS_INCLUDE_HCSR04)
         {
             uint32_t pios_hcsr04_id;
@@ -721,7 +726,7 @@ void PIOS_Board_Init(void)
         }
 #endif
         break;
-    case HWSETTINGS_CC_RCVRPORT_PWM:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
 #if defined(PIOS_INCLUDE_PWM)
         {
             uint32_t pios_pwm_id;
@@ -735,12 +740,17 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PWM */
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPM:
-    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
 #if defined(PIOS_INCLUDE_PPM)
         {
             uint32_t pios_ppm_id;
-            PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+            if (hwsettings_rcvrport == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT) {
+                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_pin6_cfg);
+            } else {
+                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+            }
 
             uint32_t pios_ppm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
@@ -750,7 +760,7 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PPM */
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPMPWM:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
         /* This is a combination of PPM and PWM inputs */
 #if defined(PIOS_INCLUDE_PPM)
         {
@@ -777,6 +787,8 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PWM */
         break;
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
+        break;
     }
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
@@ -794,15 +806,16 @@ void PIOS_Board_Init(void)
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
-    switch (hwsettings_rcvrport) {
-    case HWSETTINGS_CC_RCVRPORT_DISABLED:
-    case HWSETTINGS_CC_RCVRPORT_PWM:
-    case HWSETTINGS_CC_RCVRPORT_PPM:
-    case HWSETTINGS_CC_RCVRPORT_PPMPWM:
+    switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
         PIOS_Servo_Init(&pios_servo_cfg);
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
-    case HWSETTINGS_CC_RCVRPORT_OUTPUTS:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
         PIOS_Servo_Init(&pios_servo_rcvr_cfg);
         break;
     }
@@ -841,6 +854,59 @@ void PIOS_Board_Init(void)
 
     /* Make sure we have at least one telemetry link configured or else fail initialization */
     PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
+
+    // Attach the board config check hook
+    SANITYCHECK_AttachHook(&CopterControlConfigHook);
+    // trigger a config check if actuatorsettings are updated
+    ActuatorSettingsInitialize();
+    ActuatorSettingsConnectCallback(ActuatorSettingsUpdatedCb);
+}
+
+SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook()
+{
+    // inhibit usage of oneshot for non supported RECEIVER port modes
+    uint8_t recmode;
+
+    HwSettingsCC_RcvrPortGet(&recmode);
+    uint8_t flexiMode;
+    uint8_t modes[ACTUATORSETTINGS_BANKMODE_NUMELEM];
+    ActuatorSettingsBankModeGet(modes);
+    HwSettingsCC_FlexiPortGet(&flexiMode);
+
+    switch ((HwSettingsCC_RcvrPortOptions)recmode) {
+    // Those modes allows oneshot usage
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
+        if ((recmode == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT ||
+             flexiMode == HWSETTINGS_CC_FLEXIPORT_PPM) &&
+            (modes[3] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
+             modes[3] == ACTUATORSETTINGS_BANKMODE_ONESHOT125)) {
+            return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;
+        } else {
+            return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
+        }
+
+    // inhibit oneshot for the following modes
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
+        for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
+            if (modes[i] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
+                modes[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
+                return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;;
+            }
+
+            return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
+        }
+    }
+    return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;;
+}
+// trigger a configuration check if ActuatorSettings are changed.
+void ActuatorSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    configuration_check();
 }
 
 /**

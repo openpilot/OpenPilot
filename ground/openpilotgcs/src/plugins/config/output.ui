@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
+    <width>1096</width>
     <height>754</height>
    </rect>
   </property>
@@ -122,7 +122,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>680</width>
+            <width>1078</width>
             <height>672</height>
            </rect>
           </property>
@@ -160,13 +160,13 @@
               <string>Output configuration</string>
              </property>
              <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="6">
-               <widget class="QLabel" name="chBank5">
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_9">
                 <property name="text">
-                 <string>-</string>
+                 <string>Bank(Channels):</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -180,67 +180,393 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="label_9">
+              <item row="0" column="6">
+               <widget class="QLabel" name="chBank5">
                 <property name="text">
-                 <string>Bank(Channels):</string>
+                 <string>-</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+              <item row="1" column="3">
+               <widget class="QComboBox" name="cb_outputRate2">
+                <property name="enabled">
+                 <bool>false</bool>
                 </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>5</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="1" column="0">
-               <spacer name="horizontalSpacer_4">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
+                <property name="maximumSize">
                  <size>
-                  <width>5</width>
-                  <height>20</height>
+                  <width>120</width>
+                  <height>16777215</height>
                  </size>
                 </property>
-               </spacer>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="0" column="3">
                <widget class="QLabel" name="chBank2">
                 <property name="text">
-                 <string>-</string>
+                 <string/>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="5">
+               <widget class="QComboBox" name="cb_outputRate4">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="4">
+               <widget class="QComboBox" name="cb_outputRate3">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="6">
+               <widget class="QComboBox" name="cb_outputRate5">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>490</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="2" column="6">
+               <widget class="QComboBox" name="cb_outputMode5">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QComboBox" name="cb_outputMode3">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
               </item>
@@ -277,9 +603,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value
@@ -333,8 +670,8 @@
                 </item>
                </widget>
               </item>
-              <item row="1" column="3">
-               <widget class="QComboBox" name="cb_outputRate2">
+              <item row="2" column="3">
+               <widget class="QComboBox" name="cb_outputMode2">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -346,56 +683,114 @@
                 </property>
                 <property name="minimumSize">
                  <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="label">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
                   <width>0</width>
                   <height>20</height>
                  </size>
                 </property>
+                <property name="text">
+                 <string>Mode:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QComboBox" name="cb_outputMode1">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="toolTip">
-                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.
+Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.
+When using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
+               </widget>
+              </item>
+              <item row="2" column="5">
+               <widget class="QComboBox" name="cb_outputMode4">
+                <property name="enabled">
+                 <bool>false</bool>
                 </property>
-                <item>
-                 <property name="text">
-                  <string>50</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>60</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>125</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>165</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>270</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>330</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>400</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>490</string>
-                 </property>
-                </item>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="toolTip">
+                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
+                </property>
                </widget>
               </item>
               <item row="1" column="1">
@@ -420,8 +815,8 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="4">
-               <widget class="QComboBox" name="cb_outputRate3">
+              <item row="1" column="7">
+               <widget class="QComboBox" name="cb_outputRate6">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -433,74 +828,20 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
                 </property>
-                <property name="toolTip">
-                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>50</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>60</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>125</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>165</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>270</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>330</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>400</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>490</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="1" column="5">
-               <widget class="QComboBox" name="cb_outputRate4">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
+                <property name="maximumSize">
                  <size>
-                  <width>0</width>
-                  <height>20</height>
+                  <width>70</width>
+                  <height>16777215</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
@@ -560,298 +901,6 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="6">
-               <widget class="QComboBox" name="cb_outputRate5">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>50</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>60</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>125</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>165</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>270</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>330</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>400</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>490</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="1" column="7">
-               <widget class="QComboBox" name="cb_outputRate6">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>50</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>60</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>125</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>165</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>270</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>330</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>400</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>490</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <spacer name="horizontalSpacer_4">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>5</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="label">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Mode:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QComboBox" name="cb_outputMode1">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.
-Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.
-When using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="3">
-               <widget class="QComboBox" name="cb_outputMode2">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="4">
-               <widget class="QComboBox" name="cb_outputMode3">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="5">
-               <widget class="QComboBox" name="cb_outputMode4">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="6">
-               <widget class="QComboBox" name="cb_outputMode5">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="7">
                <widget class="QComboBox" name="cb_outputMode6">
                 <property name="enabled">
@@ -865,14 +914,107 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>20</height>
                  </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
                 </property>
                 <property name="toolTip">
                  <string>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</string>
                 </property>
                </widget>
+              </item>
+              <item row="0" column="0" rowspan="3">
+               <layout class="QHBoxLayout" name="_2">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QGraphicsView" name="gvWarning">
+                  <property name="minimumSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>32</width>
+                    <height>32</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background: transparent</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="renderHints">
+                   <set>QPainter::HighQualityAntialiasing</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QTextEdit" name="txtWarning">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>200</width>
+                    <height>50</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>90</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                    <weight>50</weight>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="toolTip">
+                   <string>Calibration status</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-color: transparent;</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="horizontalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::NoTextInteraction</set>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -927,6 +1069,17 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
               </item>
               <item>
                <spacer name="verticalSpacer">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>

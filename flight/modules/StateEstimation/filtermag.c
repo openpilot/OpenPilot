@@ -88,7 +88,7 @@ static int32_t init(stateFilter *self)
     this->invMagBe = 1.0f / this->magBe;
     RevoCalibrationGet(&this->revoCalibration);
     RevoSettingsGet(&this->revoSettings);
-    AuxMagSettingsUsageGet(&this->auxMagUsage);
+    AuxMagSettingsUsageGet((uint8_t*)&this->auxMagUsage);
     return 0;
 }
 

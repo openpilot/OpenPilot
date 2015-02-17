@@ -531,7 +531,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
     PathDesiredGet(&pathDesired);
 
     FlightStatusAssistedControlStateOptions assistedControlFlightMode;
-    FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
+    FlightStatusAssistedControlStateGet((uint8_t*)&assistedControlFlightMode);
 
     if (timeout_occurred) {
         pathDesired.End.North        = positionState.North;
@@ -594,6 +594,6 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
         pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] = time_to_stopped * ASSISTEDCONTROL_TIMEOUT_MULTIPLIER;
         assistedControlFlightMode    = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
     }
-    FlightStatusAssistedControlStateSet(&assistedControlFlightMode);
+    FlightStatusAssistedControlStateSet((uint8_t*)&assistedControlFlightMode);
     PathDesiredSet(&pathDesired);
 }

@@ -117,11 +117,7 @@ void OutputCalibrationPage::setupVehicle()
     m_currentWizardIndex = 0;
     m_vehicleScene->clear();
 
-    if (m_calibrationUtil) {
-        delete m_calibrationUtil;
-        m_calibrationUtil = 0;
-    }
-    m_calibrationUtil = new OutputCalibrationUtil();
+    resetOutputCalibrationUtil();
 
     switch (getWizard()->getVehicleSubType()) {
     case SetupWizard::MULTI_ROTOR_TRI_Y:
@@ -202,7 +198,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
         m_channelIndex << 0 << 2 << 0 << 5 << 1 << 3;
 
-        setupActuatorMinMaxAndNeutral(2, 2, 5);
+        setupActuatorMinMaxAndNeutral(2, 2, 6); // should be 5 instead 6 but output 5 is not used
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -465,7 +461,7 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
         m_calibrationUtil->startChannelOutput(channel, m_actuatorSettings[channel].channelNeutral);
 
         // Normal motor
-        if ((button->objectName() == "motorNeutralButton") && !m_actuatorSettings[channel].isReversableMotor) {
+        if ((button == ui->motorNeutralButton) && !m_actuatorSettings[channel].isReversableMotor) {
             m_calibrationUtil->startChannelOutput(channel, m_actuatorSettings[channel].channelMin);
         }
 
@@ -653,4 +649,13 @@ void OutputCalibrationPage::on_reverseCheckbox_toggled(bool checked)
         ui->servoCenterAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelNeutral);
         ui->servoMaxAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMax);
     }
+}
+
+void OutputCalibrationPage::resetOutputCalibrationUtil()
+{
+    if (m_calibrationUtil) {
+        delete m_calibrationUtil;
+        m_calibrationUtil = 0;
+    }
+    m_calibrationUtil = new OutputCalibrationUtil();
 }

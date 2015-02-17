@@ -44,8 +44,8 @@ EscPage::~EscPage()
 
 bool EscPage::validatePage()
 {
-    if (ui->synchedESCButton->isChecked()) {
-        getWizard()->setEscType(SetupWizard::ESC_SYNCHED);
+    if (ui->oneshotESCButton->isChecked()) {
+        getWizard()->setEscType(SetupWizard::ESC_ONESHOT);
     }else if (ui->rapidESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_RAPID);
     } else if (ui->defaultESCButton->isChecked()){
@@ -53,4 +53,14 @@ bool EscPage::validatePage()
     }
 
     return true;
+}
+
+
+void EscPage::initializePage()
+{
+    ui->oneshotESCButton->setEnabled(getWizard()->getInputType() != SetupWizard::INPUT_PWM);
+    if (ui->oneshotESCButton->isChecked() && getWizard()->getInputType() == SetupWizard::INPUT_PWM) {
+        ui->oneshotESCButton->setChecked(false);
+        ui->rapidESCButton->setChecked(true);
+    }
 }

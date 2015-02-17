@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>641</width>
     <height>400</height>
    </rect>
   </property>
@@ -140,7 +140,10 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="synchedESCButton">
+      <widget class="QToolButton" name="oneshotESCButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <pointsize>10</pointsize>
@@ -153,12 +156,12 @@ p, li { white-space: pre-wrap; }
         <string notr="true">QToolButton { border: none }</string>
        </property>
        <property name="text">
-        <string>Synched ESC</string>
+        <string>OneShot ESC</string>
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">
-         <normaloff>:/setupwizard/resources/bttn-rapid-up.png</normaloff>
-         <normalon>:/setupwizard/resources/bttn-rapid-dwn.png</normalon>:/setupwizard/resources/bttn-rapid-up.png</iconset>
+         <normaloff>:/setupwizard/resources/bttn-oneshot-up.png</normaloff>
+         <normalon>:/setupwizard/resources/bttn-oneshot-dwn.png</normalon>:/setupwizard/resources/bttn-oneshot-up.png</iconset>
        </property>
        <property name="iconSize">
         <size>

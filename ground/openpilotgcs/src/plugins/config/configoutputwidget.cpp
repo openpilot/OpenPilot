@@ -107,7 +107,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode5, 4, 0, true);
     addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode6, 5, 0, true);
 
-    systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
     connect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
 
     disconnect(this, SLOT(refreshWidgetsValues(UAVObject *)));
@@ -116,11 +116,13 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     refreshWidgetsValues();
 
     updateEnableControls();
-    setWarning("PIppo");
 }
 
 ConfigOutputWidget::~ConfigOutputWidget()
 {
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+
+    disconnect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
     // Do nothing
 }
 
@@ -151,6 +153,7 @@ void ConfigOutputWidget::sendAllChannelTests()
  */
 void ConfigOutputWidget::runChannelTests(bool state)
 {
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
     SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
 
     if (state && systemAlarms.Alarm[SystemAlarms::ALARM_ACTUATOR] != SystemAlarms::ALARM_OK) {
@@ -444,6 +447,7 @@ void ConfigOutputWidget::stopTests()
 
 void ConfigOutputWidget::updateWarnings(UAVObject *)
 {
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
     SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
 
     if (systemAlarms.Alarm[SystemAlarms::ALARM_SYSTEMCONFIGURATION] > SystemAlarms::ALARM_WARNING) {
@@ -458,6 +462,8 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
 
 void ConfigOutputWidget::setWarning(QString message)
 {
+    QPixmap warningPic;
+
     ui->gvWarning->scene()->clear();
     if (!message.isNull()) {
         warningPic.load(":/configgadget/images/error.svg");

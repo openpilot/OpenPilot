@@ -27,6 +27,9 @@
 
 #include "outputchannelform.h"
 
+#define MAXOUTPUT_VALUE 2500
+#define MINOUTPUT_VALUE 500
+
 OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ChannelForm(index, parent), ui(), m_inChannelTest(false)
 {
@@ -44,6 +47,14 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
 
     ui.actuatorLink->setChecked(false);
     connect(ui.actuatorLink, SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
+
+    // Set limits
+    ui.actuatorMin->setMaximum(MAXOUTPUT_VALUE);
+    ui.actuatorMax->setMaximum(MAXOUTPUT_VALUE);
+    ui.actuatorValue->setMaximum(MAXOUTPUT_VALUE);
+    ui.actuatorMin->setMinimum(MINOUTPUT_VALUE);
+    ui.actuatorMax->setMinimum(MINOUTPUT_VALUE);
+    ui.actuatorValue->setMinimum(MINOUTPUT_VALUE);
 
     disableMouseWheelEvents();
 }
@@ -221,11 +232,13 @@ void OutputChannelForm::setRange(int minimum, int maximum)
  */
 void OutputChannelForm::setChannelRange()
 {
-    int oldMini = ui.actuatorNeutral->minimum();
+    int oldMini  = ui.actuatorNeutral->minimum();
+    int minValue = ui.actuatorMin->value();
+    int maxValue = ui.actuatorMax->value();
 
     // int oldMaxi = ui.actuatorNeutral->maximum();
 
-    if (ui.actuatorMin->value() < ui.actuatorMax->value()) {
+    if (minValue <= maxValue) {
         ui.actuatorNeutral->setRange(ui.actuatorMin->value(), ui.actuatorMax->value());
         ui.actuatorRev->setChecked(false);
     } else {
@@ -235,6 +248,33 @@ void OutputChannelForm::setChannelRange()
 
     if (ui.actuatorNeutral->value() == oldMini) {
         ui.actuatorNeutral->setValue(ui.actuatorNeutral->minimum());
+    }
+
+    // Enable only outputs already set in mixer
+    if (name() != "-") {
+        ui.actuatorMin->setEnabled(true);
+        ui.actuatorMax->setEnabled(true);
+        ui.actuatorNeutral->setEnabled(true);
+        ui.actuatorValue->setEnabled(true);
+
+        // Enable checkboxes Rev and Link if some range
+        if (minValue != maxValue) {
+            ui.actuatorRev->setEnabled(true);
+            ui.actuatorLink->setEnabled(true);
+        } else {
+            ui.actuatorRev->setEnabled(false);
+            ui.actuatorLink->setEnabled(false);
+        }
+    } else {
+        ui.actuatorMin->setEnabled(false);
+        ui.actuatorMax->setEnabled(false);
+        ui.actuatorRev->setEnabled(false);
+        ui.actuatorLink->setEnabled(false);
+        ui.actuatorMin->setValue(1000);
+        ui.actuatorMax->setValue(1000);
+        ui.actuatorNeutral->setRange(minValue, maxValue);
+        ui.actuatorNeutral->setEnabled(false);
+        ui.actuatorValue->setEnabled(false);
     }
 
     // if (ui.actuatorNeutral->value() == oldMaxi)

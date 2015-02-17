@@ -717,7 +717,7 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_rcvrport;
     HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
 
-    switch (hwsettings_rcvrport) {
+    switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
     case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
 #if defined(PIOS_INCLUDE_HCSR04)
         {
@@ -746,7 +746,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_PPM)
         {
             uint32_t pios_ppm_id;
-            if( hwsettings_rcvrport == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT){
+            if (hwsettings_rcvrport == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT) {
                 PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_pin6_cfg);
             } else {
                 PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
@@ -787,6 +787,8 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PWM */
         break;
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
+        break;
     }
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
@@ -804,11 +806,12 @@ void PIOS_Board_Init(void)
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
-    switch (hwsettings_rcvrport) {
+    switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
     case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
         PIOS_Servo_Init(&pios_servo_cfg);
         break;
     case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
@@ -865,17 +868,20 @@ SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook()
     uint8_t recmode;
 
     HwSettingsCC_RcvrPortGet(&recmode);
+    uint8_t flexiMode;
     uint8_t modes[ACTUATORSETTINGS_BANKMODE_NUMELEM];
     ActuatorSettingsBankModeGet(modes);
+    HwSettingsCC_FlexiPortGet(&flexiMode);
+
     switch ((HwSettingsCC_RcvrPortOptions)recmode) {
     // Those modes allows oneshot usage
     case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
     case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
-        return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
-
     case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
-        if (modes[3] == ACTUATORSETTINGS_BANKMODE_ONESHOT ||
-            modes[3] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
+        if ((recmode == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT ||
+             flexiMode == HWSETTINGS_CC_FLEXIPORT_PPM) &&
+            (modes[3] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
+             modes[3] == ACTUATORSETTINGS_BANKMODE_ONESHOT125)) {
             return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;
         } else {
             return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
@@ -887,7 +893,7 @@ SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook()
     case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
         for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
-            if (modes[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT ||
+            if (modes[i] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
                 modes[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
                 return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;;
             }

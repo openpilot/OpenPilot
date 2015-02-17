@@ -232,7 +232,6 @@ void OutputChannelForm::setChannelRange()
 {
     int minValue     = ui.actuatorMin->value();
     int maxValue     = ui.actuatorMax->value();
-    int neutralValue = ui.actuatorValue->value();
 
     int oldMini = ui.actuatorNeutral->minimum();
     int oldMaxi = ui.actuatorNeutral->maximum();
@@ -311,18 +310,6 @@ void OutputChannelForm::reverseChannel(bool state)
         ui.actuatorMin->setValue(temp);
         ui.actuatorNeutral->setInvertedAppearance(state);
         return;
-    }
-
-    // Also update the channel value
-    // This is a trick to force the slider to update its value and
-    // emit the right signal itself, because our sendChannelTest(int) method
-    // relies on the object sender's identity.
-    if (ui.actuatorNeutral->value() < ui.actuatorNeutral->maximum()) {
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() + 1);
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() - 1);
-    } else {
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() - 1);
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() + 1);
     }
 }
 

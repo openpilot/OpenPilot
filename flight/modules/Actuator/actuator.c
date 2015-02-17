@@ -806,7 +806,7 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
                 freq[i]  = 100; // Value must be small enough so CCr isn't update until the PIOS_Servo_Update is triggered
                 clock[i] = ACTUATOR_ONESHOT125_CLOCK; // Setup an 8MHz timer clock
                 break;
-            case ACTUATORSETTINGS_BANKMODE_ONESHOT:
+            case ACTUATORSETTINGS_BANKMODE_PWMSYNC:
                 freq[i]  = 100;
                 clock[i] = ACTUATOR_PWM_CLOCK;
                 break;

@@ -21,7 +21,7 @@
     <message>
         <location line="+41"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
-        <translation>OpenPilot GCS - 插件载入器信息</translation>
+        <translation>OpenPilot地面站 - 插件载入器信息</translation>
     </message>
 </context>
 <context>
@@ -1137,7 +1137,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.ui"/>
         <source>Keyboard Shortcuts</source>
-        <translation>快捷键</translation>
+        <translation>键盘快捷键</translation>
     </message>
     <message>
         <location/>
@@ -1251,12 +1251,12 @@ Reason: %3</source>
     <message>
         <location line="+60"/>
         <source>Update Available: %1</source>
-        <translation>有更新版本: %1</translation>
+        <translation>最新版本: %1</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.h" line="+73"/>
         <source>OpenPilot GCS Version: %1 </source>
-        <translation>OpenPilot GCS 版本号: %1</translation>
+        <translation>OpenPilot GCS 当前版本: %1</translation>
     </message>
 </context>
 <context>
@@ -1495,12 +1495,12 @@ Reason: %3</source>
     <message>
         <location/>
         <source>Currently ripping from:</source>
-        <translation type="unfinished"></translation>
+        <translation>正在从：</translation>
     </message>
     <message>
         <location/>
         <source>Downloading tile</source>
-        <translation type="unfinished">下载进度</translation>
+        <translation>正在下载贴图</translation>
     </message>
     <message>
         <location/>
@@ -1510,7 +1510,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.cpp" line="+49"/>
         <source>Currently ripping from:%1 at Zoom level %2</source>
-        <translation type="unfinished"></translation>
+        <translation>正在从：%1 下载缩放等级为：%2 的卫星地图</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1559,7 +1559,7 @@ its target speed when decelerating.
 Do it after accel time is setup.</source>
         <translation type="unfinished">调节时请从0开始缓慢增加减速时间，直到电机转速刚好下降到低于减速的目标速度
 
-配置完加速时间后再执行此配置。</translation>
+设置好加速时间常量后再执行此设置。</translation>
     </message>
     <message>
         <location/>
@@ -1599,7 +1599,7 @@ In &apos;units per second&apos;, a sound default is 1000.</source>
     <message>
         <location/>
         <source>FeedForward </source>
-        <translation type="unfinished"></translation>
+        <translation>前馈量 </translation>
     </message>
     <message>
         <location/>
@@ -1619,12 +1619,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished"></translation>
+        <translation>点击打开wiki知识库</translation>
     </message>
     <message>
         <location/>
         <source>Send to board, but don&apos;t save permanently (flash or SD).</source>
-        <translation type="unfinished"></translation>
+        <translation>发送到控制板，但不保存到flash或SD卡</translation>
     </message>
     <message>
         <location/>
@@ -1644,17 +1644,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Vehicle name</source>
-        <translation>航模名</translation>
+        <translation>航模名字</translation>
     </message>
     <message>
         <location/>
         <source>Enter name of vehicle. Max 20 characters.</source>
-        <translation>输入最多不超过20个字符的航模名称。</translation>
+        <translation>输入最多不超过20个字符的模型名字。</translation>
     </message>
     <message>
         <location/>
         <source>Vehicle Setup Wizard...</source>
-        <translation>航模设备配置向导...</translation>
+        <translation>航模配置向导...</translation>
     </message>
     <message>
         <location/>
@@ -1671,7 +1671,19 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot;font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;配置前馈需特别注意&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;警告：前馈调节会把所有电机打开到中等油门量。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;开始调节前，请确保你已经将螺旋桨移除，并且整个机架已经被安全固定好。我们建议您佩戴好护目镜，采取必要措施保护好脸和身体。&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1713,17 +1725,17 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+57"/>
         <source>Workspaces</source>
-        <translation>工作区</translation>
+        <translation>工作区布局</translation>
     </message>
     <message>
         <location/>
         <source>Number of workspaces:</source>
-        <translation>工作区数量：</translation>
+        <translation>应用数量：</translation>
     </message>
     <message>
         <location/>
         <source>Change details of workspace:</source>
-        <translation>修改工作区详情：</translation>
+        <translation>修改应用详情：</translation>
     </message>
     <message>
         <location/>
@@ -1748,7 +1760,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+16"/>
         <source>Images (*.png *.jpg *.bmp *.xpm)</source>
-        <translation></translation>
+        <translation>图片文件 (*.png *.jpg *.bmp *.xpm)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1773,7 +1785,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Allow reordering:</source>
-        <translation>重新排序：</translation>
+        <translation>允许重新排序：</translation>
     </message>
     <message>
         <location/>
@@ -1783,12 +1795,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Restore last selected workspace on startup</source>
-        <translation>启动时恢复上一次选择的工作区</translation>
+        <translation>启动时恢复上一次选择的应用</translation>
     </message>
     <message>
         <location/>
         <source>Remember last used workspace on restart</source>
-        <translation>重启时记住最后一次使用的工作区</translation>
+        <translation>重启时记住最后一次使用的应用</translation>
     </message>
 </context>
 <context>
@@ -2144,7 +2156,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Only required if running simulator on remote machine. Should be the IP of the machine on which the simulator is running.</source>
-        <translation>远端运行模拟器的电脑IP地址。</translation>
+        <translation>远端运行模拟器的电脑IP地址，如果模拟器运行另外一台电脑上的话。</translation>
     </message>
     <message>
         <location/>
@@ -2254,7 +2266,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Spatial Data</source>
-        <translation>空间数据</translation>
+        <translation>地理数据</translation>
     </message>
     <message>
         <location/>
@@ -2388,98 +2400,98 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>All Gadgets</source>
-        <translation type="unfinished"></translation>
+        <translation>所有应用布局</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+76"/>
         <location line="+78"/>
         <source>GCS Settings file (*.xml)</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot地面站配置文件 (*.xml)</translation>
     </message>
     <message>
         <location line="-76"/>
         <source>Save GCS Settings to file...</source>
-        <translation type="unfinished"></translation>
+        <translation>保存地面站配置...</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Can&apos;t write file </source>
-        <translation type="unfinished"></translation>
+        <translation>保存文件失败 </translation>
     </message>
     <message>
         <location line="+7"/>
         <source>The settings have been exported to </source>
-        <translation type="unfinished"></translation>
+        <translation>配置已经导出到 </translation>
     </message>
     <message>
         <location line="+54"/>
         <source>Load GCS Settings from file ..</source>
-        <translation type="unfinished"></translation>
+        <translation>读取地面站配置 ..</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Can&apos;t read file </source>
-        <translation type="unfinished"></translation>
+        <translation>读取文件失败 </translation>
     </message>
     <message>
         <location line="+7"/>
         <source>The settings have been imported from </source>
-        <translation type="unfinished"></translation>
+        <translation>配置已经从 </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>. Restart the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>.导入，请重启程序。</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>http://wiki.openpilot.org/x/OQBj</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>All your settings will be deleted!</source>
-        <translation type="unfinished"></translation>
+        <translation>所有配置已经被删除！</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You must restart the GCS in order to activate the changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>所有改动将在地面站程序重启后生效。</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>插件</translation>
     </message>
     <message>
         <location/>
         <source>Export the GCS settings selected in the checkboxes above.</source>
-        <translation type="unfinished"></translation>
+        <translation>导出复选框选中的配置信息。</translation>
     </message>
     <message>
         <location/>
         <source>Export...</source>
-        <translation type="unfinished">输出...</translation>
+        <translation>导出...</translation>
     </message>
     <message>
         <location/>
         <source>Import settings from the config file, only for the items checked above.</source>
-        <translation type="unfinished"></translation>
+        <translation>导入复选框选中的配置信息。</translation>
     </message>
     <message>
         <location/>
         <source>Import...</source>
-        <translation type="unfinished">导入...</translation>
+        <translation>导入...</translation>
     </message>
     <message>
         <location/>
         <source>Resets your GCS configuration to its default configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>将地面站配置重置为默认值。</translation>
     </message>
     <message>
         <location/>
         <source>Reset Config</source>
-        <translation type="unfinished"></translation>
+        <translation>重置</translation>
     </message>
 </context>
 <context>
@@ -2487,32 +2499,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>TCP connection</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP连接</translation>
     </message>
     <message>
         <location/>
         <source>UDP connection</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP连接</translation>
     </message>
     <message>
         <location/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>端口</translation>
     </message>
     <message>
         <location/>
         <source>Host Name/Number</source>
-        <translation type="unfinished"></translation>
+        <translation>主机名字</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+57"/>
         <source>settings</source>
-        <translation type="unfinished"></translation>
+        <translation>配置</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
@@ -2618,32 +2630,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/logging/logging.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <location/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>暂停</translation>
     </message>
     <message>
         <location/>
         <source>Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>状态: </translation>
     </message>
     <message>
         <location/>
         <source>Idle</source>
-        <translation type="unfinished"></translation>
+        <translation>空闲</translation>
     </message>
     <message>
         <location/>
         <source>Playback speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>回放速度：</translation>
     </message>
 </context>
 <context>
@@ -2651,44 +2663,46 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/modelview/modelviewoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>3D model:</source>
-        <translation type="unfinished"></translation>
+        <translation>3D模型文件：</translation>
     </message>
     <message>
         <location/>
         <source>Background image:</source>
-        <translation type="unfinished"></translation>
+        <translation>背景图片：</translation>
     </message>
     <message>
         <location/>
         <source>VBO allow for performance gains for GPUs that support it (most cards).  This may cause cards with faulty drivers to crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>绝大多数显卡GPU都支持VBO以提升性能。如果遇到不支持VBO的显卡，强行启用将会造成显卡驱动崩溃。</translation>
     </message>
     <message>
         <location/>
         <source>Enable VBOs:</source>
-        <translation type="unfinished"></translation>
+        <translation>启用VBO：</translation>
     </message>
     <message>
         <location/>
         <source>Select the image that is shown in the background.</source>
-        <translation type="unfinished"></translation>
+        <translation>背景图片。</translation>
     </message>
     <message>
         <location/>
         <source>Select the 3D model file here.</source>
-        <translation type="unfinished"></translation>
+        <translation>3D模型文件。</translation>
     </message>
     <message>
         <location/>
         <source>Click to enable the use of Vertical Blanking.
 It is not enabled by default because some graphic cards do not
 support it, and crash the GCS. Enabling improves performance, though, so you can experiment at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>勾选复选框启用VBO（Vertex Buffer Object）。
+开启VBO可以显著提升3D显示性能，但某些显卡并不支持该功能，一旦开启将会造成GCS崩溃退出。
+请在开启该功能之前，确保你的显卡具备支持VBO的能力。</translation>
     </message>
 </context>
 <context>
@@ -2696,17 +2710,17 @@ support it, and crash the GCS. Enabling improves performance, though, so you can
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Sound Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>声音方案集合</translation>
     </message>
     <message>
         <location/>
         <source>Language</source>
-        <translation type="unfinished">语言</translation>
+        <translation>方案</translation>
     </message>
     <message>
         <location/>
@@ -2715,97 +2729,97 @@ support it, and crash the GCS. Enabling improves performance, though, so you can
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select the sound collection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>点击选择声音方案</translation>
     </message>
     <message>
         <location/>
         <source>Sound Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>声音通知</translation>
     </message>
     <message>
         <location/>
         <source>Enable Sounds</source>
-        <translation type="unfinished"></translation>
+        <translation>开启声音</translation>
     </message>
     <message>
         <location/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>播放</translation>
     </message>
     <message>
         <location/>
         <source>Add</source>
-        <translation type="unfinished">添加</translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location/>
         <source>Modify</source>
-        <translation type="unfinished"></translation>
+        <translation>修改</translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished">删除</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location/>
         <source>DataObject</source>
-        <translation type="unfinished"></translation>
+        <translation>事件类型</translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation>事件</translation>
     </message>
     <message>
         <location/>
         <source>Sound1:</source>
-        <translation type="unfinished"></translation>
+        <translation>声音1：</translation>
     </message>
     <message>
         <location/>
         <source>Sound2:</source>
-        <translation type="unfinished"></translation>
+        <translation>声音2：</translation>
     </message>
     <message>
         <location/>
         <source>Sound3:</source>
-        <translation type="unfinished"></translation>
+        <translation>声音3：</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+64"/>
         <source>Equal to</source>
-        <translation type="unfinished"></translation>
+        <translation>等于</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Large than</source>
-        <translation type="unfinished"></translation>
+        <translation>大于</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Lower than</source>
-        <translation type="unfinished"></translation>
+        <translation>小于</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>In range</source>
-        <translation type="unfinished"></translation>
+        <translation>在范围内</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Choose sound collection directory</source>
-        <translation type="unfinished"></translation>
+        <translation>选择声音方案集路径</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+69"/>
         <source>settings</source>
-        <translation type="unfinished"></translation>
+        <translation>设置</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Notification</source>
-        <translation type="unfinished"></translation>
+        <translation>语音通知</translation>
     </message>
 </context>
 <context>
@@ -2813,157 +2827,161 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
         <source>OpenPilot GCS Edit Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot GCS 航点编辑</translation>
     </message>
     <message>
         <location/>
         <source>Number </source>
-        <translation type="unfinished"></translation>
+        <translation>编号 </translation>
     </message>
     <message>
         <location/>
         <source>Latitude </source>
-        <translation type="unfinished"></translation>
+        <translation>纬度 </translation>
     </message>
     <message>
         <location/>
         <source>Longitude </source>
-        <translation type="unfinished"></translation>
+        <translation>经度 </translation>
     </message>
     <message>
         <location/>
         <source>Altitude </source>
-        <translation type="unfinished"></translation>
+        <translation>海拔 </translation>
     </message>
     <message>
         <location/>
         <source>meters</source>
-        <translation type="unfinished"></translation>
+        <translation>米</translation>
     </message>
     <message>
         <location/>
         <source>Description </source>
-        <translation type="unfinished"></translation>
+        <translation>描述 </translation>
     </message>
     <message>
         <location/>
         <source>Locked</source>
-        <translation type="unfinished">锁定</translation>
+        <translation>锁定</translation>
     </message>
     <message>
         <location/>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>度</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <location/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>位置</translation>
     </message>
     <message>
         <location/>
         <source>Relative to Home </source>
-        <translation type="unfinished"></translation>
+        <translation>与原点的相对位置 </translation>
     </message>
     <message>
         <location/>
         <source>Bearing </source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>方位？</translatorcomment>
+        <translation type="unfinished">方位 </translation>
     </message>
     <message>
         <location/>
         <source>Distance </source>
-        <translation type="unfinished"></translation>
+        <translation>距离 </translation>
     </message>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation>0</translation>
     </message>
     <message>
         <location/>
         <source>Velocity </source>
-        <translation type="unfinished"></translation>
+        <translation>速度 </translation>
     </message>
     <message>
         <location/>
         <source>Relative altitude </source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>不确定是高度还是海拔</translatorcomment>
+        <translation type="unfinished">相对高度 </translation>
     </message>
     <message>
         <location/>
         <source>m/s</source>
-        <translation type="unfinished"></translation>
+        <translation>米/秒</translation>
     </message>
     <message>
         <location/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>模式</translation>
     </message>
     <message>
         <location/>
         <source>param1</source>
-        <translation type="unfinished"></translation>
+        <translation>参数1</translation>
     </message>
     <message>
         <location/>
         <source>param2</source>
-        <translation type="unfinished"></translation>
+        <translation>参数2</translation>
     </message>
     <message>
         <location/>
         <source>param3</source>
-        <translation type="unfinished"></translation>
+        <translation>参数3</translation>
     </message>
     <message>
         <location/>
         <source>param4</source>
-        <translation type="unfinished"></translation>
+        <translation>参数4</translation>
     </message>
     <message>
         <location/>
         <source>End condition</source>
-        <translation type="unfinished"></translation>
+        <translation>结束条件</translation>
     </message>
     <message>
         <location/>
         <source>Condition</source>
-        <translation type="unfinished"></translation>
+        <translation>条件</translation>
     </message>
     <message>
         <location/>
         <source>Command</source>
-        <translation type="unfinished">命令</translation>
+        <translation>命令</translation>
     </message>
     <message>
         <location/>
         <source>Jump Destination</source>
+        <translatorcomment>?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Error Destination</source>
+        <translatorcomment>?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>上一页</translation>
     </message>
     <message>
         <location/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>下一页</translation>
     </message>
 </context>
 <context>
@@ -2971,17 +2989,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_overlay_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2989,17 +3007,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_statusbar_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3008,292 +3026,293 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Enter place to find</source>
-        <translation type="unfinished"></translation>
+        <translation>输入你要查找的位置</translation>
     </message>
     <message>
         <location/>
         <source>london</source>
-        <translation type="unfinished"></translation>
+        <translation>伦敦</translation>
     </message>
     <message>
         <location/>
         <source>new york</source>
-        <translation type="unfinished"></translation>
+        <translation>纽约</translation>
     </message>
     <message>
         <location/>
         <source>paris</source>
-        <translation type="unfinished"></translation>
+        <translation>巴黎</translation>
     </message>
     <message>
         <location/>
         <source>Find place</source>
-        <translation type="unfinished"></translation>
+        <translation>查找位置</translation>
     </message>
     <message>
         <location/>
         <source> Places </source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>位置还是地点？</translatorcomment>
+        <translation type="unfinished">位置 </translation>
     </message>
     <message>
         <location/>
         <source>New Item</source>
-        <translation type="unfinished"></translation>
+        <translation>新条目</translation>
     </message>
     <message>
         <location/>
         <source> Waypoints </source>
-        <translation type="unfinished"></translation>
+        <translation>航点 </translation>
     </message>
     <message>
         <location/>
         <source>New waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>新建航点</translation>
     </message>
     <message>
         <location/>
         <source>New</source>
-        <translation type="unfinished">新建</translation>
+        <translation>新建</translation>
     </message>
     <message>
         <location/>
         <source>Open waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>打开航点</translation>
     </message>
     <message>
         <location/>
         <source>Open</source>
-        <translation type="unfinished">打开</translation>
+        <translation>打开</translation>
     </message>
     <message>
         <location/>
         <source>Save waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>保存航点</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>Add a waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>添加航点</translation>
     </message>
     <message>
         <location/>
         <source>Add</source>
-        <translation type="unfinished">添加</translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Zoom in</source>
-        <translation type="unfinished"></translation>
+        <translation>放大</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Zoom level</source>
-        <translation type="unfinished"></translation>
+        <translation>缩放比例</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Zoom out</source>
-        <translation type="unfinished"></translation>
+        <translation>缩小</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Center map over home position</source>
-        <translation type="unfinished"></translation>
+        <translation>以原点为地图中心</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Center map over UAV position</source>
-        <translation type="unfinished"></translation>
+        <translation>以无人机为地图中心</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Map rotation follows UAV heading</source>
-        <translation type="unfinished"></translation>
+        <translation>始终保持无人机前进方向为正前方</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV hold position</source>
-        <translation type="unfinished"></translation>
+        <translation>无人机悬停</translation>
     </message>
     <message>
         <location/>
         <source>Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>悬停</translation>
     </message>
     <message>
         <location/>
         <source>UAV go home</source>
-        <translation type="unfinished"></translation>
+        <translation>无人机返回原点</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Home</source>
-        <translation type="unfinished">主页</translation>
+        <translation>原点</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move UAV to previous waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>无人机返回上一个航点</translation>
     </message>
     <message>
         <location/>
         <source>Previous WP</source>
-        <translation type="unfinished"></translation>
+        <translation>上一个航点</translation>
     </message>
     <message>
         <location/>
         <source>Move UAV to next waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>无人机前往下一个航点</translation>
     </message>
     <message>
         <location/>
         <source>Next WP</source>
-        <translation type="unfinished"></translation>
+        <translation>下一个航点</translation>
     </message>
     <message>
         <location/>
         <source>UAV go!</source>
-        <translation type="unfinished"></translation>
+        <translation>无人机出发！</translation>
     </message>
     <message>
         <location/>
         <source>Go</source>
-        <translation type="unfinished"></translation>
+        <translation>出发</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV position</source>
-        <translation type="unfinished"></translation>
+        <translation>无人机坐标</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelUAVPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Map position</source>
-        <translation type="unfinished"></translation>
+        <translation>地图中心点坐标</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Mouse position</source>
-        <translation type="unfinished"></translation>
+        <translation>鼠标在地图上的坐标</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMousePos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapZoom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Normal Map Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>普通地图模式</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>   Normal   </source>
-        <translation type="unfinished"></translation>
+        <translation>   普通模式   </translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Magic Waypoint Map Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>特殊航点模式</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>   Magic Waypoint   </source>
-        <translation type="unfinished"></translation>
+        <translation>  特殊航点模式  </translation>
     </message>
     <message>
         <location/>
         <source>Go To Place:</source>
-        <translation type="unfinished"></translation>
+        <translation>前往：</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Click to move the UAV to the magic waypoint position</source>
-        <translation type="unfinished"></translation>
+        <translation>无人机前往特殊航点位置</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move to WP</source>
-        <translation type="unfinished"></translation>
+        <translation>前往航点</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move the magic waypoint to the home position</source>
-        <translation type="unfinished"></translation>
+        <translation>将特殊航点移到原点位置</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Home WP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Heading</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3301,7 +3320,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_zoom_slider_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
 </context>
 <context>
@@ -3309,7 +3328,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
@@ -3786,7 +3805,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/logging/logginggadgetfactory.cpp" line="+34"/>
         <source>Logging</source>
-        <translation type="unfinished"></translation>
+        <translation>日志</translation>
     </message>
 </context>
 <context>
@@ -5370,22 +5389,22 @@ The same value is used for all axes.</source>
     <message>
         <location filename="../../../src/plugins/config/cc_hw_settings.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>HW settings</source>
-        <translation type="unfinished"></translation>
+        <translation>硬件设置</translation>
     </message>
     <message>
         <location/>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Changes on this page only take effect after board reset or power cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>所有配置信息将在控制板重启后才生效</translation>
     </message>
     <message>
         <location/>
@@ -5410,17 +5429,18 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>USB HID Port</source>
-        <translation type="unfinished"></translation>
+        <translation>USB HID 端口</translation>
     </message>
     <message>
         <location/>
         <source>MainPort</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>不用翻译，保持跟硬件板上一致</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>FlexiPort</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5430,39 +5450,40 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>RcvrPort</source>
-        <translation type="unfinished"></translation>
+        <translation>遥控接收器端口</translation>
     </message>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished"></translation>
+        <translation>点击打开wiki知识库</translation>
     </message>
     <message>
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到OpenPilot控制板，但不保存到SD卡。
+断电后配置将消失！</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <location/>
         <source>Applies and Saves all settings to SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到控制板，并保存到SD卡。</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>GPS protocol :</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS协议 :</translation>
     </message>
 </context>
 <context>
@@ -5902,22 +5923,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/input.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>RC Input</source>
-        <translation type="unfinished"></translation>
+        <translation>遥控输入</translation>
     </message>
     <message>
         <location/>
         <source>Roll/Pitch/Yaw stick deadband</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚/俯仰/方向 操纵杆死区</translation>
     </message>
     <message>
         <location/>
         <source>Stick deadband in percents of full range (0-10), zero to disable</source>
-        <translation type="unfinished"></translation>
+        <translation>死区占操纵杆全程的百分比 （0-10），0为无死区</translation>
     </message>
     <message>
         <location/>
@@ -5932,62 +5953,62 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <location/>
         <source>Calibration and Configuration Options</source>
-        <translation type="unfinished"></translation>
+        <translation>校准及设置</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode Switch Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>飞行模式设置</translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation>方向</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation>横滚</translation>
     </message>
     <message>
         <location/>
         <source>Pos. 1</source>
-        <translation type="unfinished"></translation>
+        <translation>档位 1</translation>
     </message>
     <message>
         <location/>
         <source>Pos. 2</source>
-        <translation type="unfinished"></translation>
+        <translation>档位 2</translation>
     </message>
     <message>
         <location/>
         <source>Pos. 3</source>
-        <translation type="unfinished"></translation>
+        <translation>档位 3</translation>
     </message>
     <message>
         <location/>
         <source>Pos. 4</source>
-        <translation type="unfinished"></translation>
+        <translation>档位 4</translation>
     </message>
     <message>
         <location/>
         <source>Pos. 5</source>
-        <translation type="unfinished"></translation>
+        <translation>档位 5</translation>
     </message>
     <message>
         <location/>
         <source>Pos. 6</source>
-        <translation type="unfinished"></translation>
+        <translation>档位 6</translation>
     </message>
     <message>
         <location/>
@@ -6000,7 +6021,7 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
     <message>
         <location/>
         <source>Select the stabilization mode on this position (manual/stabilized/auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>选择稳定模式（手动/稳定/自动）</translation>
     </message>
     <message>
         <location/>
@@ -6012,140 +6033,148 @@ It will be 2 or 3 for most of setups, but it also can be up to 6.
 In that case you have to configure your radio mixers so the whole range
 from min to max is split into N equal intervals, and you may set arbitrary
 channel value for each flight mode.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>最后一句待定</translatorcomment>
+        <translation type="unfinished">遥控器上所有飞行模式切换开关总数。
+默认是3个。
+对于大多数设置只需要2～3种飞行模式。
+你也可以设置6个，这样的话你可能需要将遥控器上调节旋钮的全程分成N等分。</translation>
     </message>
     <message>
         <location/>
         <source>Arming Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>解锁设置</translation>
     </message>
     <message>
         <location/>
         <source>Arm airframe using throttle off and:</source>
-        <translation type="unfinished"></translation>
+        <translation>解锁飞行器需要油门关闭和：</translation>
     </message>
     <message>
         <location/>
         <source>Indicate the control used for arming the airframe, in addition to setting the throttle to its minimum position. In other terms &quot;Throttle Off&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>配合油门关闭解锁飞行器。</translation>
     </message>
     <message>
         <location/>
         <source>Arming timeout:</source>
-        <translation type="unfinished"></translation>
+        <translation>再次锁定时间间隔：</translation>
     </message>
     <message>
         <location/>
         <source>After the time indicated here, the frame go back to disarmed state.
 Set to 0 to disable (recommended for soaring fixed wings).</source>
-        <translation type="unfinished"></translation>
+        <translation>经过这段时间间隔后，飞行器将重新被置为锁定状态。
+设置0将不会再次锁定（建议飞得又高又远的固定翼飞行器设置为0，不要锁定）。</translation>
     </message>
     <message>
         <location/>
         <source>seconds (0 to disable).</source>
-        <translation type="unfinished"></translation>
+        <translation>秒（0表示不再次锁定）。</translation>
     </message>
     <message>
         <location/>
         <source>Airframe disarm is done by throttle off and opposite of above combination.</source>
-        <translation type="unfinished"></translation>
+        <translation>油门关闭与上面相反的操作来锁定飞行器。</translation>
     </message>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished"></translation>
+        <translation>点击打开wiki知识库</translation>
     </message>
     <message>
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.
 Be sure to set the Neutral position on all sliders before sending!</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到OpenPilot控制板，但不保存到SD卡。
+并确保遥控器上所有拨杆都放置在中间位置！</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <location/>
         <source>Be sure to set the Neutral position on all sliders before sending!
 Applies and Saves all settings to SD</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到控制板，并保存到SD卡。
+并确保遥控器上所有拨杆都放置在中间位置！</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>Input Channel Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>输入通道设置</translation>
     </message>
     <message>
         <location/>
         <source>Stabilization Modes Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式设置</translation>
     </message>
     <message>
         <location/>
         <source>Thrust</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>不确定是什么概念，暂时用强推</translatorcomment>
+        <translation>强推</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 1</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式 1</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 2</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式 2</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 3</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式 3</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 4</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式 4</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 5</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式 5</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 6</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">稳定模式 6</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode Switch Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>飞行模式切换开关档位</translation>
     </message>
     <message>
         <location/>
         <source>Settings Bank</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">设置槽</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode Count</source>
-        <translation type="unfinished"></translation>
+        <translation>飞行模式数量</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;切忌不要为多轴飞行器设置 &amp;quot;手动&amp;quot; 模式！ 不要为固定翼飞行器设置 &amp;quot;姿态&amp;quot;, &amp;quot;速度控制&amp;quot; 或 &amp;quot;巡航控制&amp;quot;！&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>飞行模式</translation>
     </message>
     <message>
         <location/>
@@ -6210,32 +6239,32 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>Assisted Control stick deadband </source>
-        <translation type="unfinished"></translation>
+        <translation>辅助控制操纵杆死区</translation>
     </message>
     <message>
         <location/>
         <source>Assisted Control stick deadband in percents of full range (2-12) for use with GPSAssist. This can not be disabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>死区占操纵杆全程的百分比 （2-12）。不能关闭此设置。</translation>
     </message>
     <message>
         <location/>
         <source>Start Transmitter Setup Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>遥控器设置向导</translation>
     </message>
     <message>
         <location/>
         <source>Start Manual Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>手动校准</translation>
     </message>
     <message>
         <location/>
         <source>Assisted Control</source>
-        <translation type="unfinished"></translation>
+        <translation>辅助控制</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Assisted Control options augment the primary flight mode.  GPSAssist adds brake/hold to Stabilization and PositionHold.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;辅助控制选项可有效增强该飞行模式。  GPS辅助提供了定点/定高稳定悬停功能。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6356,101 +6385,106 @@ Applies and Saves all settings to SD</source>
     <message>
         <location filename="../../../src/plugins/config/output.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Output</source>
-        <translation type="unfinished">输出</translation>
+        <translation>电机输出</translation>
     </message>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Update rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>更新频率：</translation>
     </message>
     <message>
         <location/>
         <source>50</source>
-        <translation type="unfinished">50</translation>
+        <translation>50</translation>
     </message>
     <message>
         <location/>
         <source>60</source>
-        <translation type="unfinished">60</translation>
+        <translation>60</translation>
     </message>
     <message>
         <location/>
         <source>125</source>
-        <translation type="unfinished">125</translation>
+        <translation>125</translation>
     </message>
     <message>
         <location/>
         <source>165</source>
-        <translation type="unfinished">165</translation>
+        <translation>165</translation>
     </message>
     <message>
         <location/>
         <source>270</source>
-        <translation type="unfinished">270</translation>
+        <translation>270</translation>
     </message>
     <message>
         <location/>
         <source>330</source>
-        <translation type="unfinished">330</translation>
+        <translation>330</translation>
     </message>
     <message>
         <location/>
         <source>400</source>
-        <translation type="unfinished">400</translation>
+        <translation>400</translation>
     </message>
     <message>
         <location/>
         <source>Motors spin at neutral output when armed and throttle below zero (be careful)</source>
-        <translation type="unfinished"></translation>
+        <translation>解锁后且油门关闭时，电机中速旋转（危险）</translation>
     </message>
     <message>
         <location/>
         <source>Move the servos using the sliders. Two important things:
 - Take extra care if the output is connected to an motor controller!
 - Will only work if the RC receiver is working (failsafe)</source>
-        <translation type="unfinished"></translation>
+        <translation>拖动滑动杆来测试伺服电机转动。
+注意事项：
+- 格外注意电机输出是否连接了电调！
+- 当且仅当遥控器正常时才工作(失控保护）</translation>
     </message>
     <message>
         <location/>
         <source>Test outputs</source>
-        <translation type="unfinished"></translation>
+        <translation>输出测试</translation>
     </message>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished"></translation>
+        <translation>点击打开wiki知识库</translation>
     </message>
     <message>
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.
 Be sure to set the Neutral position on all sliders before sending!</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到OpenPilot控制板，但不保存到SD卡。
+并确保遥控器上所有拨杆都放置在中间位置！</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <location/>
         <source>Be sure to set the Neutral position on all sliders before sending!
 Applies and Saves all settings to SD</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到控制板，并保存到SD卡。
+并确保遥控器上所有拨杆都放置在中间位置！</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>500</source>
@@ -6459,55 +6493,59 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>Output Channel Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>输出通道配置</translation>
     </message>
     <message>
         <location/>
         <source>Live Testing</source>
-        <translation type="unfinished"></translation>
+        <translation>实时测试</translation>
     </message>
     <message>
         <location/>
         <source>490</source>
-        <translation type="unfinished">490</translation>
+        <translation>490</translation>
     </message>
     <message>
         <location/>
         <source>Output configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>输出配置</translation>
     </message>
     <message>
         <location/>
         <source>Bank(Channels):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">输出端口：</translation>
     </message>
     <message>
         <location/>
         <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value
 </source>
-        <translation type="unfinished"></translation>
+        <translation>设置PWM：通常多轴飞行器是490Hz。OneShot以及OneShot125则不需要配置此项</translation>
     </message>
     <message>
         <location/>
         <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</source>
-        <translation type="unfinished"></translation>
+        <translation>设置PWM：通常多轴飞行器是490Hz。OneShot以及OneShot125则不需要配置此项</translation>
     </message>
     <message>
         <location/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>模式：</translation>
     </message>
     <message>
         <location/>
         <source>Setup output mode. Use PWM or OneShot with Standard ESCs.
 Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.
 When using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
-        <translation type="unfinished"></translation>
+        <translation>标准电调配置为PWM或OneShot模式。
+类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。
+当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后再输出给电调 （例如：1000/8 = 125, 2000/8 = 250).。</translation>
     </message>
     <message>
         <location/>
         <source>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">标准电调配置为PWM或OneShot模式。
+类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。
+当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后再输出给电调 （例如：1000/8 = 125, 2000/8 = 250).。</translation>
     </message>
 </context>
 <context>

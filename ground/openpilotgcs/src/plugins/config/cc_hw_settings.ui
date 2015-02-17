@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>622</width>
-            <height>519</height>
+            <width>624</width>
+            <height>510</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -309,18 +309,14 @@
             </layout>
            </item>
            <item row="2" column="1">
-            <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0">
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
+            <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0">
+             <item row="4" column="0">
               <widget class="QComboBox" name="cbFlexi"/>
              </item>
-             <item row="1" column="4">
+             <item row="6" column="0">
+              <widget class="QComboBox" name="cbTele"/>
+             </item>
+             <item row="3" column="3">
               <widget class="QLabel" name="label_8">
                <property name="text">
                 <string>USB HID Port</string>
@@ -330,49 +326,14 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QComboBox" name="cbTele"/>
-             </item>
-             <item row="1" column="1" rowspan="5" colspan="3">
-              <widget class="QLabel" name="label_2">
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_4">
                <property name="text">
                 <string/>
                </property>
-               <property name="scaledContents">
-                <bool>true</bool>
-               </property>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QComboBox" name="cbRcvr"/>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>MainPort</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="4">
-              <widget class="QComboBox" name="cbUsbHid"/>
-             </item>
-             <item row="4" column="4">
-              <widget class="QComboBox" name="cbUsbVcp"/>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>FlexiPort</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="4">
+             <item row="5" column="3">
               <widget class="QLabel" name="label_9">
                <property name="text">
                 <string>USB VCP Port</string>
@@ -382,17 +343,40 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="label_7">
+             <item row="3" column="1" rowspan="5" colspan="2">
+              <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>RcvrPort</string>
+                <string/>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <property name="scaledContents">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
-             <item row="2" column="5">
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Main Port</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Flexi Port</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="3">
+              <widget class="QComboBox" name="cbUsbHid"/>
+             </item>
+             <item row="4" column="4">
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -404,6 +388,22 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="6" column="3">
+              <widget class="QComboBox" name="cbUsbVcp"/>
+             </item>
+             <item row="2" column="1" colspan="2" alignment="Qt::AlignLeft">
+              <widget class="QComboBox" name="cbRcvr"/>
+             </item>
+             <item row="1" column="1" colspan="2" alignment="Qt::AlignLeft">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Receiver Port</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>

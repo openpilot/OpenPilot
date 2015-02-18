@@ -452,8 +452,9 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
     if (systemAlarms.Alarm[SystemAlarms::ALARM_SYSTEMCONFIGURATION] > SystemAlarms::ALARM_WARNING) {
         switch (systemAlarms.ExtendedAlarmStatus[SystemAlarms::EXTENDEDALARMSTATUS_SYSTEMCONFIGURATION]) {
         case SystemAlarms::EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT:
-            setWarning(tr("OneShot only works with Receiver Port settings marked with '+OneShot'\n"
-                          "When using Receiver Port setting 'PPM_PIN6+OneShot' Bank 4 (output 6,9-10) must be set to PWM"));
+            setWarning(tr("OneShot only works with Receiver Port settings marked with '+OneShot'<br>"
+                          "When using Receiver Port setting 'PPM_PIN6+OneShot' "
+                          "<b><font color='#C3A8FF'>Bank 4 (output 6,9-10)</font></b> must be set to PWM"));
             return;
         }
     }

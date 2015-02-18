@@ -290,13 +290,12 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
 
     // if cruise control, ensure rate or acro are not set
     if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL) {
-
-	for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
-	    if ((modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATE ||
-		modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ACRO)) {
-		return false;
-	    }
-	}
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if ((modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATE ||
+                 modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ACRO)) {
+                return false;
+            }
+        }
     }
 
     // Warning: This assumes that certain conditions in the XML file are met.  That

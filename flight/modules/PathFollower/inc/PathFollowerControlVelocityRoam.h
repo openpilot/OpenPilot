@@ -31,10 +31,8 @@
 #ifndef PATHFOLLOWERCONTROLVELOCITYROAM_H
 #define PATHFOLLOWERCONTROLVELOCITYROAM_H
 #include "PathFollowerControl.h"
-#include "PIDControlThrust.h"
 #include "PIDControlNE.h"
-// forward decl
-class PathFollowerFSM;
+
 class PathFollowerControlVelocityRoam : PathFollowerControl {
 private:
     static PathFollowerControlVelocityRoam *p_inst;
@@ -50,10 +48,8 @@ public:
         return p_inst;
     }
 
-    int32_t Initialize(PathFollowerFSM *fsm_ptr,
-                       VtolPathFollowerSettingsData *vtolPathFollowerSettings,
+    int32_t Initialize( VtolPathFollowerSettingsData *vtolPathFollowerSettings,
                        PathDesiredData *pathDesired,
-                       FlightStatusData *flightStatus,
                        PathStatusData *pathStatus);
 
 
@@ -68,13 +64,11 @@ public:
 private:
     void UpdateVelocityDesired(void);
     int8_t UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction);
+    void fallback_to_hold(void);
 
-    // PathFollowerFSM *fsm;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
     PathDesiredData *pathDesired;
-    FlightStatusData *flightStatus;
     PathStatusData *pathStatus;
-    PIDControlThrust controlThrust;
     PIDControlNE controlNE;
     uint8_t mActive;
 };

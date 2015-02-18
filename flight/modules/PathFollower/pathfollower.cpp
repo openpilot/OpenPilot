@@ -82,6 +82,7 @@ extern "C" {
 
 #include "fsm_land.h"
 #include "PathFollowerControlLanding.h"
+#include "PathFollowerControlVelocityRoam.h"
 
 // Private constants
 
@@ -225,6 +226,8 @@ int32_t PathFollowerInitialize()
     FSMLand::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
     PathFollowerControlLanding::instance()->Initialize((PathFollowerFSM *)FSMLand::instance(),
                                                        &vtolPathFollowerSettings, &pathDesired, &flightStatus, &pathStatus);
+    PathFollowerControlVelocityRoam::instance()->Initialize(
+                                                       &vtolPathFollowerSettings, &pathDesired, &pathStatus);
 
     // reset integrals
     resetGlobals();
@@ -247,6 +250,10 @@ static void pathFollowerSetActiveController(void)
 {
     if (activeController == 0) {
         switch (pathDesired.Mode) {
+        case PATHDESIRED_MODE_VELOCITY:
+            activeController = (PathFollowerControlLanding *)PathFollowerControlVelocityRoam::instance();
+            activeController->Activate();
+            break;
         case PATHDESIRED_MODE_LAND:
             activeController = (PathFollowerControlLanding *)PathFollowerControlLanding::instance();
             activeController->Activate();
@@ -299,7 +306,6 @@ static void pathFollowerTask(void)
         }
     case PATHDESIRED_MODE_FLYENDPOINT:
     case PATHDESIRED_MODE_FLYVECTOR:
-    case PATHDESIRED_MODE_VELOCITY:
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
     case PATHDESIRED_MODE_FLYCIRCLELEFT:
     {
@@ -354,18 +360,12 @@ static void flightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         return;
     }
 
-    uint8_t flightMode;
-    FlightStatusFlightModeGet(&flightMode);
+    FlightStatusControlChainData controlChain;
+    FlightStatusControlChainGet(&controlChain);
 
-    // set FSM mode based on requested mode
-    switch (flightMode) {
-    case FLIGHTSTATUS_FLIGHTMODE_LAND:
-        // do nothing..should be allocated by the pathdesired objective
-        break;
-    default:
+    if (controlChain.PathFollower != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
         activeController->Deactivate();
         activeController = 0;
-        break;
     }
 }
 
@@ -547,7 +547,7 @@ static uint8_t updateAutoPilotVtol()
         bool yaw_attitude = true;
         float yaw = 0.0f;
 
-        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
+        if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
             yaw_attitude = false;
         } else {
             switch (vtolPathFollowerSettings.YawControl) {
@@ -572,7 +572,7 @@ static uint8_t updateAutoPilotVtol()
         result = updateVtolDesiredAttitude(yaw_attitude, yaw);
 
         if (!result) {
-            if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE || pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
+            if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
                 plan_setup_assistedcontrol(true); // revert braking to position hold, user can always stick override
             } else if (vtolPathFollowerSettings.FlyawayEmergencyFallback != VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DISABLED) {
                 // switch to emergency follower if follower indicates problems
@@ -854,23 +854,7 @@ static void updatePathVelocity(float kFF, bool limited)
     const float dT = updatePeriod / 1000.0f;
 
 
-    if (pathDesired.Mode == PATHDESIRED_MODE_VELOCITY) {
-        // TODO Make this FSM generic
-        velocityDesired.North = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH];
-        velocityDesired.East  = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST];
-        velocityDesired.Down  = pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN];
-
-        // update pathstatus
-        pathStatus.error = 0.0f;
-        pathStatus.fractional_progress  = 0.0f;
-        pathStatus.path_direction_north = velocityDesired.North;
-        pathStatus.path_direction_east  = velocityDesired.East;
-        pathStatus.path_direction_down  = velocityDesired.Down;
-
-        pathStatus.correction_direction_north = velocityDesired.North - velocityState.North;
-        pathStatus.correction_direction_east  = velocityDesired.East - velocityState.East;
-        pathStatus.correction_direction_down  = velocityDesired.Down - velocityState.Down;
-    } else if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
+    if (pathDesired.Mode == PATHDESIRED_MODE_BRAKE) {
         float brakeRate = vtolPathFollowerSettings.BrakeRate;
         if (brakeRate < BRAKE_RATE_MINIMUM) {
             brakeRate = BRAKE_RATE_MINIMUM; // set a minimum to avoid a divide by zero potential below
@@ -1554,7 +1538,6 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
             thrustMode = settings.Stabilization6Settings.Thrust;
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
             // we hard code the "GPS Assisted" PostionHold/Roam to use alt-vario which
             // is a more appropriate throttle mode.  "GPSAssist" adds braking
             // and a better throttle management to the standard Position Hold.

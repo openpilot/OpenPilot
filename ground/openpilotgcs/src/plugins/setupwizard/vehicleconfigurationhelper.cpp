@@ -150,7 +150,11 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PWMNOONESHOT;
             break;
         case VehicleConfigurationSource::INPUT_PPM:
-            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPMNOONESHOT;
+            if (m_configSource->getEscType() == VehicleConfigurationSource::ESC_ONESHOT) {
+                data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM_PIN6ONESHOT;
+            } else {
+                data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPMNOONESHOT;
+            }
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
             // We have to set teletry on flexport since s.bus needs the mainport.
@@ -373,10 +377,12 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         break;
     case VehicleConfigurationSource::ESC_RAPID:
         escFrequence = RAPID_ESC_FREQUENCY;
-        if (m_configSource->getInputType() != VehicleConfigurationSource::INPUT_PWM) {
-            bankMode = ActuatorSettings::BANKMODE_ONESHOT;
-        } else {
+        if ((m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
+             m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) &&
+                m_configSource->getInputType() == VehicleConfigurationSource::INPUT_PWM) {
             bankMode = ActuatorSettings::BANKMODE_PWM;
+        } else {
+            bankMode = ActuatorSettings::BANKMODE_PWMSYNC;
         }
         break;
     case VehicleConfigurationSource::ESC_ONESHOT:

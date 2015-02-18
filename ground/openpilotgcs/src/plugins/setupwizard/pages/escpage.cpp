@@ -58,9 +58,14 @@ bool EscPage::validatePage()
 
 void EscPage::initializePage()
 {
-    ui->oneshotESCButton->setEnabled(getWizard()->getInputType() != SetupWizard::INPUT_PWM);
-    if (ui->oneshotESCButton->isChecked() && getWizard()->getInputType() == SetupWizard::INPUT_PWM) {
-        ui->oneshotESCButton->setChecked(false);
-        ui->rapidESCButton->setChecked(true);
+    if (getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC ||
+            getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC3D) {
+        ui->oneshotESCButton->setEnabled(getWizard()->getInputType() != SetupWizard::INPUT_PWM);
+        if (ui->oneshotESCButton->isChecked() && getWizard()->getInputType() == SetupWizard::INPUT_PWM) {
+            ui->oneshotESCButton->setChecked(false);
+            ui->rapidESCButton->setChecked(true);
+        }
+    } else {
+        ui->oneshotESCButton->setEnabled(true);
     }
 }

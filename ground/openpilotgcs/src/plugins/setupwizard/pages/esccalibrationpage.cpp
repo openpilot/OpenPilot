@@ -104,6 +104,16 @@ void EscCalibrationPage::startButtonClicked()
         QString mixerTypePattern = "Mixer%1Type";
 
         OutputCalibrationUtil::startOutputCalibration();
+        // First check if any servo and set his value to 1500 (like Tricopter)
+        for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+            UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
+            Q_ASSERT(field);
+            if (field->getValue().toString() == field->getOptions().at(VehicleConfigurationHelper::MIXER_TYPE_SERVO)) {
+                m_outputUtil.startChannelOutput(i, 1500);
+                m_outputUtil.stopChannelOutput();
+            }
+        }
+        // Find motors and start Esc procedure
         for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
             UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
             Q_ASSERT(field);

@@ -54,6 +54,8 @@ OutputCalibrationPage::~OutputCalibrationPage()
         delete m_calibrationUtil;
         m_calibrationUtil = 0;
     }
+
+    OutputCalibrationUtil::stopOutputCalibration();
     delete ui;
 }
 
@@ -70,18 +72,32 @@ void OutputCalibrationPage::setupActuatorMinMaxAndNeutral(int motorChannelStart,
     // servos since a value out of range can actually destroy the
     // vehicle if unlucky.
     // Motors are not that important. REMOVE propellers always!!
+    OutputCalibrationUtil::startOutputCalibration();
 
     for (int servoid = 0; servoid < 12; servoid++) {
         if (servoid >= motorChannelStart && servoid <= motorChannelEnd) {
             // Set to motor safe values
-            m_actuatorSettings[servoid].channelMin     = 1000;
-            m_actuatorSettings[servoid].channelNeutral = 1000;
-            m_actuatorSettings[servoid].channelMax     = 1900;
+            m_actuatorSettings[servoid].channelMin        = 1000;
+            m_actuatorSettings[servoid].channelNeutral    = 1000;
+            m_actuatorSettings[servoid].channelMax        = 1900;
+            m_actuatorSettings[servoid].isReversableMotor = false;
+            // Car and Tank should use reversable Esc/motors
+            if ((getWizard()->getVehicleSubType() == SetupWizard::GROUNDVEHICLE_CAR)
+                || (getWizard()->getVehicleSubType() == SetupWizard::GROUNDVEHICLE_DIFFERENTIAL)) {
+                m_actuatorSettings[servoid].channelNeutral    = 1500;
+                m_actuatorSettings[servoid].isReversableMotor = true;
+                // Set initial output value
+                m_calibrationUtil->startChannelOutput(servoid, 1500);
+                m_calibrationUtil->stopChannelOutput();
+            }
         } else if (servoid < totalUsedChannels) {
             // Set to servo safe values
             m_actuatorSettings[servoid].channelMin     = 1500;
             m_actuatorSettings[servoid].channelNeutral = 1500;
             m_actuatorSettings[servoid].channelMax     = 1500;
+            // Set initial servo output value
+            m_calibrationUtil->startChannelOutput(servoid, 1500);
+            m_calibrationUtil->stopChannelOutput();
         } else {
             // "Disable" these channels
             m_actuatorSettings[servoid].channelMin     = 1000;
@@ -100,6 +116,8 @@ void OutputCalibrationPage::setupVehicle()
     m_channelIndex.clear();
     m_currentWizardIndex = 0;
     m_vehicleScene->clear();
+
+    resetOutputCalibrationUtil();
 
     switch (getWizard()->getVehicleSubType()) {
     case SetupWizard::MULTI_ROTOR_TRI_Y:
@@ -120,7 +138,7 @@ void OutputCalibrationPage::setupVehicle()
         // The channel number to configure for each step.
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
 
-        setupActuatorMinMaxAndNeutral(0, 2, 3);
+        setupActuatorMinMaxAndNeutral(0, 2, 4);
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -180,7 +198,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
         m_channelIndex << 0 << 2 << 0 << 5 << 1 << 3;
 
-        setupActuatorMinMaxAndNeutral(2, 2, 5);
+        setupActuatorMinMaxAndNeutral(2, 2, 6); // should be 5 instead 6 but output 5 is not used
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -213,7 +231,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
         m_channelIndex << 0 << 2 << 0 << 5 << 3 << 1;
 
-        setupActuatorMinMaxAndNeutral(2, 2, 5);
+        setupActuatorMinMaxAndNeutral(2, 2, 6); // should be 5 instead 6 but output 5 is not used
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -226,7 +244,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2;
         m_channelIndex << 0 << 1 << 0;
 
-        setupActuatorMinMaxAndNeutral(0, 1, 2);
+        setupActuatorMinMaxAndNeutral(1, 1, 2);
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -248,7 +266,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2;
         m_channelIndex << 0 << 1 << 0;
 
-        setupActuatorMinMaxAndNeutral(0, 1, 2);
+        setupActuatorMinMaxAndNeutral(1, 1, 2);
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -256,12 +274,6 @@ void OutputCalibrationPage::setupVehicle()
     default:
         break;
     }
-
-    if (m_calibrationUtil) {
-        delete m_calibrationUtil;
-        m_calibrationUtil = 0;
-    }
-    m_calibrationUtil = new OutputCalibrationUtil();
 
     setupVehicleItems();
 }
@@ -326,7 +338,15 @@ void OutputCalibrationPage::setWizardPage()
     if (currentChannel >= 0) {
         if (currentPageIndex == 1) {
             ui->motorNeutralSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
+            ui->motorPWMValue->setText(QString(tr("Output value : <b>%1</b> µs")).arg(m_actuatorSettings[currentChannel].channelNeutral));
+            // Reversable motor found
+            if (m_actuatorSettings[currentChannel].isReversableMotor) {
+                ui->motorNeutralSlider->setMinimum(m_actuatorSettings[currentChannel].channelMin);
+                ui->motorNeutralSlider->setMaximum(m_actuatorSettings[currentChannel].channelMax);
+                ui->motorInfo->setText(tr("<html><head/><body><p><span style=\" font-size:10pt;\">To find </span><span style=\" font-size:10pt; font-weight:600;\">the neutral rate for this reversable motor</span><span style=\" font-size:10pt;\">, press the Start button below and slide the slider to the right or left until you find the value where the motor doesn't start. <br/><br/>When done press button again to stop.</span></p></body></html>"));
+            }
         } else if (currentPageIndex == 2) {
+            ui->servoPWMValue->setText(tr("Output value : <b>%1</b> µs").arg(m_actuatorSettings[currentChannel].channelNeutral));
             if (m_actuatorSettings[currentChannel].channelMax < m_actuatorSettings[currentChannel].channelMin &&
                 !ui->reverseCheckbox->isChecked()) {
                 ui->reverseCheckbox->setChecked(true);
@@ -416,6 +436,11 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
     ui->motorNeutralSlider->setEnabled(checked);
     quint16 channel   = getCurrentChannel();
     quint16 safeValue = m_actuatorSettings[channel].channelMin;
+
+    if (m_actuatorSettings[channel].isReversableMotor) {
+        safeValue = m_actuatorSettings[channel].channelNeutral;
+    }
+
     onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, safeValue, ui->motorNeutralSlider);
 }
 
@@ -425,7 +450,6 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
         if (checkAlarms()) {
             enableButtons(false);
             enableServoSliders(true);
-            OutputCalibrationUtil::startOutputCalibration();
             m_calibrationUtil->startChannelOutput(channel, safeValue);
             slider->setValue(value);
             m_calibrationUtil->setChannelOutputValue(value);
@@ -433,8 +457,16 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
             button->setChecked(false);
         }
     } else {
+        // Servos and ReversableMotors
+        m_calibrationUtil->startChannelOutput(channel, m_actuatorSettings[channel].channelNeutral);
+
+        // Normal motor
+        if ((button == ui->motorNeutralButton) && !m_actuatorSettings[channel].isReversableMotor) {
+            m_calibrationUtil->startChannelOutput(channel, m_actuatorSettings[channel].channelMin);
+        }
+
         m_calibrationUtil->stopChannelOutput();
-        OutputCalibrationUtil::stopOutputCalibration();
+
         enableServoSliders(false);
         enableButtons(true);
     }
@@ -492,6 +524,8 @@ void OutputCalibrationPage::debugLogChannelValues()
 void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 {
     Q_UNUSED(value);
+    ui->motorPWMValue->setText(tr("Output value : <b>%1</b> µs").arg(value));
+
     if (ui->motorNeutralButton->isChecked()) {
         quint16 value = ui->motorNeutralSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);
@@ -515,6 +549,7 @@ void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
     m_calibrationUtil->setChannelOutputValue(value);
     quint16 channel = getCurrentChannel();
     m_actuatorSettings[channel].channelNeutral = value;
+    ui->servoPWMValue->setText(tr("Output value : <b>%1</b> µs").arg(value));
 
     // Adjust min and max
     if (ui->reverseCheckbox->isChecked()) {
@@ -614,4 +649,13 @@ void OutputCalibrationPage::on_reverseCheckbox_toggled(bool checked)
         ui->servoCenterAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelNeutral);
         ui->servoMaxAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMax);
     }
+}
+
+void OutputCalibrationPage::resetOutputCalibrationUtil()
+{
+    if (m_calibrationUtil) {
+        delete m_calibrationUtil;
+        m_calibrationUtil = 0;
+    }
+    m_calibrationUtil = new OutputCalibrationUtil();
 }

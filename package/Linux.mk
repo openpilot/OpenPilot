@@ -20,6 +20,14 @@ DEB_DIR              := package/linux/debian
 SED_DATE_STRG         = $(shell date -R)
 SED_SCRIPT            = s/<VERSION>/$(UPSTREAM_VER)-$(DEB_REV)/;s/<DATE>/$(SED_DATE_STRG)/;s/<DIST>/$(DEB_DIST)/
 
+# Ubuntu 14.04 (Trusty Tahr) has different names for the qml-modules
+TRUSTY_DEPS_SED      := s/qml-module-qtquick-controls/qtdeclarative5-controls-plugin/g; \
+	s/qml-module-qtquick-dialogs/qtdeclarative5-dialogs-plugin/g; \
+	s/qml-module-qtquick-localstorage/qtdeclarative5-localstorage-plugin/g; \
+	s/qml-module-qtquick-particles2/qtdeclarative5-particles-plugin/g; \
+	s/qml-module-qtquick2/qtdeclarative5-qtquick2-plugin/g; \
+	s/qml-module-qtquick-window2/qtdeclarative5-window-plugin/g; \
+	s/qml-module-qtquick-xmllistmodel/qtdeclarative5-xmllistmodel-plugin/g;
 
 .PHONY: package
 package: debian
@@ -35,6 +43,9 @@ debian: $(DEB_DIR)
 	$(V1) rm -rf debian
 	$(V1) cp -rL $(DEB_DIR) debian
 	$(V1) sed -i -e "$(SED_SCRIPT)" debian/changelog
+ifeq ($(DEB_DIST), trusty)
+	$(V1) sed -i -e "$(TRUSTY_DEPS_SED)" debian/control
+endif
 
 .PHONY: package_src
 package_src:  $(DEB_ORIG_SRC_NAME) $(DEB_PACKAGE_DIR)

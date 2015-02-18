@@ -52,7 +52,6 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     ui = new Ui_OutputWidget();
     ui->setupUi(this);
 
-    ui->gvWarning->setScene(new QGraphicsScene(this));
     ui->gvFrame->setVisible(false);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -453,7 +452,8 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
     if (systemAlarms.Alarm[SystemAlarms::ALARM_SYSTEMCONFIGURATION] > SystemAlarms::ALARM_WARNING) {
         switch (systemAlarms.ExtendedAlarmStatus[SystemAlarms::EXTENDEDALARMSTATUS_SYSTEMCONFIGURATION]) {
         case SystemAlarms::EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT:
-            setWarning(tr("OneShot only works with MainPort settings marked with \"+OneShot\"\nUsing \"PPM_PIN6+OneShot\" bank 4 (output 6) must be set to PWM"));
+            setWarning(tr("OneShot only works with Receiver Port settings marked with '+OneShot'\n"
+                          "When using Receiver Port setting 'PPM_PIN6+OneShot' Bank 4 (output 6,9-10) must be set to PWM"));
             return;
         }
     }
@@ -462,18 +462,7 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
 
 void ConfigOutputWidget::setWarning(QString message)
 {
-    QPixmap warningPic;
-
-    ui->gvWarning->scene()->clear();
-    if (!message.isNull()) {
-        warningPic.load(":/configgadget/images/error.svg");
-        ui->gvFrame->setVisible(true);
-    } else {
-        warningPic.load("");
-        ui->gvFrame->setVisible(false);
-    }
-    ui->gvWarning->scene()->addPixmap(warningPic);
-    ui->gvWarning->setSceneRect(warningPic.rect());
-    ui->gvWarning->fitInView(warningPic.rect(), Qt::KeepAspectRatio);
+    ui->gvFrame->setVisible(!message.isNull());
+    ui->picWarning->setPixmap(message.isNull() ? QPixmap() : QPixmap(":/configgadget/images/error.svg"));
     ui->txtWarning->setText(message);
 }

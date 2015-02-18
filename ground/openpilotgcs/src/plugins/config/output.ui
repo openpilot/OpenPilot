@@ -972,50 +972,26 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                   </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>40</width>
+                     <width>70</width>
                      <height>20</height>
                     </size>
                    </property>
                   </spacer>
                  </item>
-                 <item alignment="Qt::AlignTop">
-                  <widget class="QGraphicsView" name="gvWarning">
-                   <property name="minimumSize">
-                    <size>
-                     <width>32</width>
-                     <height>32</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>32</width>
-                     <height>32</height>
-                    </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">background: transparent</string>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::NoFrame</enum>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                   <property name="renderHints">
-                    <set>QPainter::HighQualityAntialiasing</set>
+                 <item>
+                  <widget class="QLabel" name="picWarning">
+                   <property name="text">
+                    <string/>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QLabel" name="txtWarning">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
                    <property name="text">
                     <string/>
                    </property>

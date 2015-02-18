@@ -200,7 +200,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
     // Add info at end
     if (!state && isDirty()) {
         QMessageBox mbox;
-        mbox.setText(QString(tr("You may want to save our neutral settings." )));
+        mbox.setText(QString(tr("You may want to save your neutral settings.")));
         mbox.setStandardButtons(QMessageBox::Ok);
         mbox.setIcon(QMessageBox::Information);
         mbox.exec();

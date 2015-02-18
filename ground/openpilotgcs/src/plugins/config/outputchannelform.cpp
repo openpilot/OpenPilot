@@ -56,6 +56,13 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ui.actuatorMax->setMinimum(MINOUTPUT_VALUE);
     ui.actuatorValue->setMinimum(MINOUTPUT_VALUE);
 
+    // Remove keyboard focus
+    ui.actuatorMin->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorMax->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorRev->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorLink->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorValue->setFocusPolicy(Qt::NoFocus);
+
     setChannelRange();
 
     disableMouseWheelEvents();
@@ -230,11 +237,11 @@ void OutputChannelForm::setRange(int minimum, int maximum)
  */
 void OutputChannelForm::setChannelRange()
 {
-    int minValue     = ui.actuatorMin->value();
-    int maxValue     = ui.actuatorMax->value();
+    int minValue = ui.actuatorMin->value();
+    int maxValue = ui.actuatorMax->value();
 
-    int oldMini = ui.actuatorNeutral->minimum();
-    int oldMaxi = ui.actuatorNeutral->maximum();
+    int oldMini  = ui.actuatorNeutral->minimum();
+    int oldMaxi  = ui.actuatorNeutral->maximum();
 
     m_mixerType = outputMixerType();
 
@@ -313,7 +320,6 @@ void OutputChannelForm::reverseChannel(bool state)
         setChannelRange();
         return;
     }
-
 }
 
 /**

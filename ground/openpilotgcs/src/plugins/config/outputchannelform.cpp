@@ -309,8 +309,11 @@ void OutputChannelForm::reverseChannel(bool state)
         ui.actuatorMax->setValue(ui.actuatorMin->value());
         ui.actuatorMin->setValue(temp);
         ui.actuatorNeutral->setInvertedAppearance(state);
+
+        setChannelRange();
         return;
     }
+
 }
 
 /**
@@ -327,10 +330,6 @@ void OutputChannelForm::sendChannelTest(int value)
         return;
     }
 
-    if (ui.actuatorRev->isChecked()) {
-        // the channel is reversed
-        value = ui.actuatorMin->value() - value + ui.actuatorMax->value();
-    }
     // update the label
     ui.actuatorValue->setValue(value);
 

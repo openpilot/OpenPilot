@@ -91,7 +91,12 @@ void updateGpsSettings(UAVObjEvent *ev);
 #else
 #if defined(PIOS_GPS_MINIMAL)
         #define GPS_READ_BUFFER    32
-        #define STACK_SIZE_BYTES   500
+
+#ifdef PIOS_INCLUDE_GPS_NMEA_PARSER
+        #define STACK_SIZE_BYTES   580 // NMEA
+#else
+        #define STACK_SIZE_BYTES   440 // UBX
+#endif // PIOS_INCLUDE_GPS_NMEA_PARSER
 #else
         #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL
@@ -203,9 +208,11 @@ int32_t GPSInitialize(void)
         GPSSettingsInitialize();
         GPSSettingsDataProtocolGet(&gpsProtocol);
         switch (gpsProtocol) {
+#if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
         case GPSSETTINGS_DATAPROTOCOL_NMEA:
             gps_rx_buffer = pios_malloc(NMEA_MAX_PACKET_LENGTH);
             break;
+#endif
         case GPSSETTINGS_DATAPROTOCOL_UBX:
             gps_rx_buffer = pios_malloc(sizeof(struct UBXPacket));
             break;
@@ -459,12 +466,12 @@ static void updateHwSettings()
     }
 }
 
-#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
 void AuxMagSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     load_mag_settings();
 }
-#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+
 void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
     uint8_t ubxAutoConfig;
@@ -537,7 +544,6 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
     ubx_autoconfig_set(newconfig);
 }
 #endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
-#endif /* ifdef PIOS_INCLUDE_GPS_UBX_PARSER */
 /**
  * @}
  * @}

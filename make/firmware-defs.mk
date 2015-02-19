@@ -95,7 +95,7 @@ gccversion:
 	@$(ECHO) $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O binary $< $@
 
-replace_special_chars = $(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1)))))
+replace_special_chars = $(subst ~,_,$(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1))))))
 %.bin.o: %.bin
 	@$(ECHO) $(MSG_BIN_OBJ) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \

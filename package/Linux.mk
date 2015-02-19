@@ -13,6 +13,9 @@ DEB_DIST             := unstable
 # Instead of RELEASE-15.01-RC1 debian wants 15.01~RC1
 UPSTREAM_VER         := $(subst -,~,$(subst RELEASE-,,$(PACKAGE_LBL)))
 DEB_REV              := 1
+ifeq ($(DEB_DIST), trusty)
+DEB_REV              := $(DEB_REV)$(DEB_DIST)1
+endif
 DEB_NAME             := openpilot
 DEB_ORIG_SRC         := $(PACKAGE_DIR)/$(DEB_NAME)_$(UPSTREAM_VER).orig.tar.gz
 DEB_PACKAGE_DIR      := $(PACKAGE_DIR)/$(DEB_NAME)-$(UPSTREAM_VER)
@@ -47,6 +50,7 @@ package: debian
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).changes $(PACKAGE_DIR)
 	$(V1) rm -r debian
 
+.PHONY: debian
 debian: $(DEB_DIR)
 	$(V1) rm -rf debian
 	$(V1) cp -rL $(DEB_DIR) debian

@@ -5404,27 +5404,27 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>Changes on this page only take effect after board reset or power cycle</source>
-        <translation>所有配置信息将在控制板重启后才生效</translation>
+        <translation>所有配置信息将在控制板重启才生效</translation>
     </message>
     <message>
         <location/>
         <source>Telemetry speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>管理端口速率：</translation>
     </message>
     <message>
         <location/>
         <source>GPS speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>串口GPS波特率：</translation>
     </message>
     <message>
         <location/>
         <source>ComUsbBridge speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>USB转串口端口波特率：</translation>
     </message>
     <message>
         <location/>
         <source>Select the speed here.</source>
-        <translation type="unfinished"></translation>
+        <translation>选择速率。</translation>
     </message>
     <message>
         <location/>
@@ -5445,7 +5445,7 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>USB VCP Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5933,7 +5933,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Roll/Pitch/Yaw stick deadband</source>
-        <translation type="unfinished">横滚/俯仰/方向 操纵杆死区</translation>
+        <translation>横滚/俯仰/方向 操纵杆死区</translation>
     </message>
     <message>
         <location/>
@@ -5943,12 +5943,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>上一项</translation>
     </message>
     <message>
         <location/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>下一项</translation>
     </message>
     <message>
         <location/>
@@ -6034,10 +6034,10 @@ In that case you have to configure your radio mixers so the whole range
 from min to max is split into N equal intervals, and you may set arbitrary
 channel value for each flight mode.</source>
         <translatorcomment>最后一句待定</translatorcomment>
-        <translation type="unfinished">遥控器上所有飞行模式切换开关总数。
+        <translation>遥控器上所有飞行模式切换开关总数。
 默认是3个。
 对于大多数设置只需要2～3种飞行模式。
-你也可以设置6个，这样的话你可能需要将遥控器上调节旋钮的全程分成N等分。</translation>
+你也可以设置6个，这样的话你可能需要将遥控器上调节旋钮的全程分成若干等分，并为每个区间指定对应的数字范围。</translation>
     </message>
     <message>
         <location/>
@@ -6159,7 +6159,7 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>Settings Bank</source>
-        <translation type="unfinished">设置槽</translation>
+        <translation>设置槽</translation>
     </message>
     <message>
         <location/>
@@ -6179,7 +6179,7 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;为每个飞行模式档位选择一组姿态稳定设置。.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8263,12 +8263,12 @@ only when system is armed without disabling the module.</source>
     <message>
         <location filename="../../../src/plugins/debuggadget/debug.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Save to file</source>
-        <translation type="unfinished"></translation>
+        <translation>保存到文件</translation>
     </message>
 </context>
 <context>
@@ -8495,22 +8495,22 @@ only when system is armed without disabling the module.</source>
     <message>
         <location filename="../../../src/plugins/opmap/homeeditor.ui"/>
         <source>Dialog</source>
-        <translation type="unfinished">对话框</translation>
+        <translation>对话框</translation>
     </message>
     <message>
         <location/>
         <source>Latitude:</source>
-        <translation type="unfinished"></translation>
+        <translation>纬度：</translation>
     </message>
     <message>
         <location/>
         <source>Longitude:</source>
-        <translation type="unfinished"></translation>
+        <translation>经度：</translation>
     </message>
     <message>
         <location/>
         <source>Altitude:</source>
-        <translation type="unfinished"></translation>
+        <translation>海拔：</translation>
     </message>
 </context>
 <context>
@@ -8715,32 +8715,32 @@ only when system is armed without disabling the module.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/connectiondiagram.ui"/>
         <source>Dialog</source>
-        <translation type="unfinished">对话框</translation>
+        <translation>对话框</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>Close</source>
-        <translation type="unfinished">关闭</translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/connectiondiagram.cpp" line="+41"/>
         <source>Connection Diagram</source>
-        <translation type="unfinished"></translation>
+        <translation>连接示意图</translation>
     </message>
     <message>
         <location line="+213"/>
         <source>Save File</source>
-        <translation type="unfinished"></translation>
+        <translation>保存文件</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Images (*.png *.xpm *.jpg)</source>
-        <translation type="unfinished"></translation>
+        <translation>图形文件(*.png *.xpm *.jpg)</translation>
     </message>
 </context>
 <context>
@@ -8748,77 +8748,77 @@ only when system is armed without disabling the module.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Upgrade now</source>
-        <translation type="unfinished"></translation>
+        <translation>马上升级</translation>
     </message>
     <message>
         <location/>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>升级</translation>
     </message>
     <message>
         <location/>
         <source>Ready...</source>
-        <translation type="unfinished"></translation>
+        <translation>准备就绪...</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.cpp" line="+59"/>
         <source>Waiting for all OP boards to be disconnected.</source>
-        <translation type="unfinished"></translation>
+        <translation>请断开连接着的OpenPilot控制板。</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Please connect the board to the USB port (don&apos;t use external supply).</source>
-        <translation type="unfinished"></translation>
+        <translation>请将控制板用USB线连接到电脑（断开电调上连接的电池）。</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Board going into bootloader mode. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>控制板进入bootloader模式，请稍等。</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Loading firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>正在读取固件。</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Uploading firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>烧写固件。</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Uploading description.</source>
-        <translation type="unfinished"></translation>
+        <translation>写入描述信息。</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Booting the board. Please wait</source>
-        <translation type="unfinished"></translation>
+        <translation>正在启动，请稍等</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Booting and erasing the board. Please wait</source>
-        <translation type="unfinished"></translation>
+        <translation>正在重启并清除配置，请稍等</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Something went wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>出错啦。</translation>
     </message>
     <message>
         <location line="+2"/>
         <source> You will have to manually upgrade the board using the uploader plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation>请到Firmware应用中手动更新控制板固件。</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>Board updated, please press &apos;Next&apos; to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新完毕，请点击“下一步”。</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
@@ -8830,12 +8830,21 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;It is necessary that your firmware and ground control software are the same version.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;When you are ready you can start the upgrade below by pushing the button. It is critical that nothing disturbs the board while the firmware is being written.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;It is recommended that you erase all settings on the board when upgrading firmware. Using saved settings for a previous version of the firmware &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;may result in undefined behaviour&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; and in worst case danger. It is possible to suppress the erase by deselecting the check box below.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;更新固件&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot;font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请确保固件和当前运行的控制站（GCS）版本一一对应&lt;/span&gt;。&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;当设备准备好后，点击下面Upgrade按钮开始升级，整个过程中请勿断电。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;由于继续使用旧固件系统下的设置&lt;strong&gt;可能会造成无法预料灾难性后果&lt;/strong&gt;，强烈建议更新固件的同时清除原有设置信息。&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;你可以取消勾选“清除所有设置”，保留原有配置，只升级固件。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Erase all settings</source>
-        <translation type="unfinished"></translation>
+        <translation>清除所有设置</translation>
     </message>
 </context>
 <context>
@@ -8843,58 +8852,58 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/controllerpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Connection device:</source>
-        <translation type="unfinished"></translation>
+        <translation>设备及连接类型：</translation>
     </message>
     <message>
         <location/>
         <source>Detected board type:</source>
-        <translation type="unfinished"></translation>
+        <translation>控制板型号：</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="+201"/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>连接设备</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="-70"/>
         <source>&lt;Unknown&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>未知设备</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot CopterControl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot CopterControl 3D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Revolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot OPLink Radio Modem</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot DiscoveryF4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>断开设备</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/controllerpage.ui"/>
@@ -8906,7 +8915,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To continue, the wizard needs to determine the configuration required for the type of OpenPilot controller you have. When connected, the wizard will attempt to automatically detect the type of board.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;If the board is already connected and successfully detected, the board type will already be displayed. You can &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;Disconnect&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; and select another device if you need to detect another board.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;If your board is not connected, please connect the board to a USB port on your computer and select the device from the list below. Then press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;Connect&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot控制板&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot;font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;当设备正确连接以后，程序会自动识别控制板类型，确定下一步操作。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;你可以点击“&lt;strong&gt;断开设备&lt;/strong&gt;”，在下拉菜单中选择正确的连接类型和设备。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;如果您的OpenPilot控制板尚未连接，请把它通过USB连接好，在下拉菜单中选择正确的设备型号，然后点击&lt;strong&gt;连接设备&lt;/strong&gt;。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -8927,37 +8944,38 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/inputpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>PWM - One cable per channel</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>PWM - 每个通道独立用一根线</translatorcomment>
+        <translation>PWM - One cable per channel</translation>
     </message>
     <message>
         <location/>
         <source>PWM</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>PPM - One cable for all channels</source>
-        <translation type="unfinished"></translation>
+        <translation>PPM - 所有通道共用一根线</translation>
     </message>
     <message>
         <location/>
         <source>PPM</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Futaba S-BUS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Spektrum Satellite</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8968,17 +8986,24 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Input Signal Configuration&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The OpenPilot controller supports many different types of input signals. Please select the type of input that matches your receiver configuration. If you are unsure, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Some input options require the OpenPilot controller to be rebooted before the changes can take place. If an option that requires a reboot is selected, you will be instructed to do so on the next page of this wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot遥控器输入配置&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;OpenPilot控制板支持绝大多数遥控器，请选择对应的的遥控器类型。如果你不确定是什么类型，则可以保持默认设置并继续下一步操作。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;某些遥控器类型选择后，需要OpenPilot控制板重启才能生效。当你选择了这样的遥控器类型后，点击下一步将会自动重启控制板。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>S.Bus</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>DSM Sat</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9169,28 +9194,29 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/savepage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Write configuration to controller</source>
-        <translation type="unfinished"></translation>
+        <translation>保存配置</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>Ready...</source>
-        <translation type="unfinished"></translation>
+        <translation>准备就绪...</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/savepage.cpp" line="+61"/>
         <source>An OpenPilot controller must be connected to your computer to save the configuration.
 Please connect your OpenPilot controller to your computer and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>系统未检测到任何OpenPilot设备。
+请再次确认OpenPilot控制板已经和电脑正确连接。</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/savepage.ui"/>
@@ -9290,47 +9316,48 @@ Please select the type of ground vehicle you want to create a configuration for 
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/vehiclepage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Tricopter, Quadcopter, Hexacopter</source>
-        <translation type="unfinished"></translation>
+        <translation>三轴，四周，六轴</translation>
     </message>
     <message>
         <location/>
         <source>Multirotor</source>
-        <translation type="unfinished"></translation>
+        <translation>多轴飞行器</translation>
     </message>
     <message>
         <location/>
         <source>CCPM Helicopters</source>
-        <translation type="unfinished"></translation>
+        <translation>CCPM直升机</translation>
     </message>
     <message>
         <location/>
         <source>Helicopter</source>
-        <translation type="unfinished"></translation>
+        <translation>直升机</translation>
     </message>
     <message>
         <location/>
         <source>Airplane, Sloper, Jet</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>不确定</translatorcomment>
+        <translation>普通，牵引式， 喷气式</translation>
     </message>
     <message>
         <location/>
         <source>Fixed wing</source>
-        <translation type="unfinished"></translation>
+        <translation>固定翼飞行器</translation>
     </message>
     <message>
         <location/>
         <source>Car, Boat, U-Boat</source>
-        <translation type="unfinished"></translation>
+        <translation>车， 船，潜艇</translation>
     </message>
     <message>
         <location/>
         <source>Surface</source>
-        <translation type="unfinished"></translation>
+        <translation>陆地航模</translation>
     </message>
     <message>
         <location/>
@@ -9342,7 +9369,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To continue, the wizard needs to know what type of vehicle the OpenPilot controller board is going to be used with. This step is crucial since much of the following configuration is unique per vehicle type.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Go ahead and select the type of vehicle for which you want to create a configuration.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The current version only provides functionality for Multirotors and Fixed-wing aircraft.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;航模类型选择&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请选择正确的航模类型。务必确保您的选择和实际器械一致，因为你接下来的配置将会根据不同的模型有所区别。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;目前的OpenPilot GCS版本只支持多轴飞行器和固定翼飞机。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+</translation>
     </message>
 </context>
 <context>
@@ -9600,32 +9635,32 @@ then close the dialog.</source>
     <message>
         <location filename="../../../src/plugins/uploader/runningdevicewidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Device Information</source>
-        <translation type="unfinished"></translation>
+        <translation>设备信息</translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished">TextLabel</translation>
+        <translation>TextLabel</translation>
     </message>
     <message>
         <location/>
         <source>CPU Serial:</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU序号：</translation>
     </message>
     <message>
         <location/>
         <source>Firmware Information</source>
-        <translation type="unfinished"></translation>
+        <translation>固件信息</translation>
     </message>
     <message>
         <location/>
         <source>BlRevision</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9633,7 +9668,7 @@ then close the dialog.</source>
     <message>
         <location filename="../../../src/plugins/uploader/uploader.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
@@ -9641,12 +9676,13 @@ then close the dialog.</source>
 to bootloader mode.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished"></translation>
+        <translation>终止控制板上运行着的操作系统和控制程序，返回到bootloader模式（类似PC的BIOS）
+(请确保控制板已经通过串口或USB成功连接)</translation>
     </message>
     <message>
         <location/>
         <source>Halt</source>
-        <translation type="unfinished"></translation>
+        <translation>终止系统</translation>
     </message>
     <message>
         <location/>
@@ -9656,12 +9692,16 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished"></translation>
+        <translation>启动系统。
+只有控制板处于bootloader模式（控制板上绿色LED常亮，蓝色LED慢速闪烁）才有用。
+
+从右边的下拉菜单中选择适当的连接方式。
+</translation>
     </message>
     <message>
         <location/>
         <source>Boot</source>
-        <translation type="unfinished"></translation>
+        <translation>启动系统</translation>
     </message>
     <message>
         <location/>
@@ -9671,24 +9711,25 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Safe Boot</source>
-        <translation type="unfinished"></translation>
+        <translation>安全模式</translation>
     </message>
     <message>
         <location/>
         <source>Reset the system.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished"></translation>
+        <translation>重启系统。
+（当设备通过串口或USB连接成功后才能发送该命令）</translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished">重置</translation>
+        <translation>重启系统</translation>
     </message>
     <message>
         <location/>
@@ -9696,12 +9737,13 @@ through serial or USB)</source>
 recover a system which does not boot.
 
 Rescue is possible in USB mode only.</source>
-        <translation type="unfinished"></translation>
+        <translation>手动恢复不能正确启动系统的控制板。
+只允许USB连接方式下使用此功能。</translation>
     </message>
     <message>
         <location/>
         <source>Rescue</source>
-        <translation type="unfinished"></translation>
+        <translation>系统恢复</translation>
     </message>
     <message>
         <location/>
@@ -9711,12 +9753,15 @@ method using this combo box.
 You can use this to force a communication channel when doing
 a &quot;Boot&quot; (button on the left). It is updated automatically when
 halting a running board.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果管理端口尚未连接控制板，请从下拉菜单中选择一项正确的连接方式。
+
+你也可以在重启系统过程中（点击左边“重启系统”按钮）强制指定一种连接方式。
+执行“终止系统”后，该选项会自动更新为当前连接方式。</translation>
     </message>
     <message>
         <location/>
         <source>Refresh the list of serial ports</source>
-        <translation type="unfinished"></translation>
+        <translation>刷新接口列表</translation>
     </message>
     <message>
         <location/>
@@ -9726,7 +9771,7 @@ halting a running board.</source>
     <message>
         <location/>
         <source>Running</source>
-        <translation type="unfinished">执行中</translation>
+        <translation>系统运行中</translation>
     </message>
     <message>
         <location/>
@@ -9741,17 +9786,17 @@ halting a running board.</source>
     <message>
         <location/>
         <source>Erase Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>清除设置</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <location/>
         <source>Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>进度</translation>
     </message>
     <message>
         <location/>
@@ -9761,7 +9806,7 @@ halting a running board.</source>
     <message>
         <location/>
         <source>Upgrade &amp;&amp; Erase</source>
-        <translation type="unfinished"></translation>
+        <translation>升级固件并清除设置</translation>
     </message>
     <message>
         <location/>
@@ -9771,7 +9816,7 @@ halting a running board.</source>
     <message>
         <location/>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>升级固件</translation>
     </message>
     <message>
         <location/>
@@ -10448,42 +10493,42 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+64"/>
         <source>OpenPilot Setup Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot设置向导</translation>
     </message>
     <message>
         <location line="+174"/>
         <source>Controller type: </source>
-        <translation type="unfinished"></translation>
+        <translation>控制板： </translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot CopterControl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot CopterControl 3D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot Revolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot Nano</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot OPLink Radio Modem</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot DiscoveryF4 Development Board</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10496,204 +10541,205 @@ Move the %1 stick.</source>
         <location line="+16"/>
         <location line="+38"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>未知设备</translation>
     </message>
     <message>
         <location line="-179"/>
         <source>Vehicle type: </source>
-        <translation type="unfinished"></translation>
+        <translation>航模类型： </translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Multirotor</source>
-        <translation type="unfinished"></translation>
+        <translation>多轴飞行器</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+45"/>
         <location line="+24"/>
         <source>Vehicle sub type: </source>
-        <translation type="unfinished"></translation>
+        <translation>飞行器类型： </translation>
     </message>
     <message>
         <location line="-66"/>
         <source>Tricopter</source>
-        <translation type="unfinished"></translation>
+        <translation>三轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Quadcopter X</source>
-        <translation type="unfinished"></translation>
+        <translation>X型四轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Quadcopter +</source>
-        <translation type="unfinished"></translation>
+        <translation>十字型四轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter</source>
-        <translation type="unfinished"></translation>
+        <translation>六轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter Coax (Y6)</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>同轴型六轴这样翻译是否合适？</translatorcomment>
+        <translation>同轴型六轴 （Y6）</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter H</source>
-        <translation type="unfinished"></translation>
+        <translation>H型六轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter X</source>
-        <translation type="unfinished"></translation>
+        <translation>X型六轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter</source>
-        <translation type="unfinished"></translation>
+        <translation>八轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter Coax X</source>
-        <translation type="unfinished"></translation>
+        <translation>同轴X型八轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter Coax +</source>
-        <translation type="unfinished"></translation>
+        <translation>同轴十字型八轴</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter V</source>
-        <translation type="unfinished"></translation>
+        <translation>V型八轴</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Fixed wing</source>
-        <translation type="unfinished"></translation>
+        <translation>固定翼</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Dual Aileron</source>
-        <translation type="unfinished"></translation>
+        <translation>双副翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Aileron</source>
-        <translation type="unfinished"></translation>
+        <translation>副翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Elevon</source>
-        <translation type="unfinished"></translation>
+        <translation>升降副翼</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Helicopter</source>
-        <translation type="unfinished"></translation>
+        <translation>直升机</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Surface vehicle</source>
-        <translation type="unfinished"></translation>
+        <translation>陆地航模</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Car</source>
-        <translation type="unfinished"></translation>
+        <translation>汽车</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Tank</source>
-        <translation type="unfinished"></translation>
+        <translation>坦克</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Motorcycle</source>
-        <translation type="unfinished"></translation>
+        <translation>摩托车</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Input type: </source>
-        <translation type="unfinished"></translation>
+        <translation>遥控输入类型： </translation>
     </message>
     <message>
         <location line="+3"/>
         <source>PWM (One cable per channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>PWM（每个通道独立用一根线）</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>PPM (One cable for all channels)</source>
-        <translation type="unfinished"></translation>
+        <translation>PPM（所有通道共用一根线）</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Futaba S.Bus</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Spektrum Satellite</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Standard ESC (%1 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>标准电调（%1 Hz）</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Rapid ESC (%1 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>高速电调（%1 Hz）</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>Speed Controller (ESC) type: </source>
-        <translation type="unfinished"></translation>
+        <translation>电子调速器（ESC）类型： </translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Servo type: </source>
-        <translation type="unfinished"></translation>
+        <translation>伺服舵机类型： </translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Analog Servos (50 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>模拟伺服舵机（50Hz）</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Digital Servos (333 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>数字伺服舵机（333Hz）</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>GPS type: </source>
-        <translation type="unfinished"></translation>
+        <translation>GPS类型： </translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot Platinum</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot v8 or Generic UBLOX GPS</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot v8或通用UBLOX GPS</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Generic NMEA GPS</source>
-        <translation type="unfinished"></translation>
+        <translation>通用NMEA GPS</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -10721,12 +10767,13 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+62"/>
         <source>Vehicle Setup Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>航模设置向导</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Export Wizard Vehicle Template</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>这样翻译合适吗？</translatorcomment>
+        <translation>导出模型模板</translation>
     </message>
 </context>
 <context>
@@ -10891,7 +10938,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/uavobjectwidgetutils/popupwidget.cpp" line="+21"/>
         <source>Close</source>
-        <translation type="unfinished">关闭</translation>
+        <translation>关闭</translation>
     </message>
 </context>
 <context>
@@ -14912,22 +14959,26 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
     <message>
         <location filename="../../../src/plugins/uploader/rebootdialog.ui"/>
         <source>Reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>重启</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please wait. Your controller is rebooting.&lt;br/&gt;This can take up to a minute.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;正在重启，请稍等。&lt;br/&gt;整个过程大概需要一分钟。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>确定</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/uploader/rebootdialog.cpp" line="+69"/>
         <source>&lt;font color=&apos;red&apos;&gt;Reboot failed!&lt;/font&gt;&lt;p&gt;Please perform a manual reboot by power cycling the board.&lt;br&gt;To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.&lt;br&gt;After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds.&lt;br&gt;Then press Ok.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;font color=&apos;red&apos;&gt;重启失败！&lt;/font&gt;
+&lt;p&gt;请手动执行控制板重启。&lt;br&gt;
+首先请确保断开电池和USB连接线并持续等待30秒。&lt;br&gt;
+30秒后重新插上USB连接线，等待重新连接。&lt;br&gt;
+然后点击确定。&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

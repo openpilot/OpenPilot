@@ -155,13 +155,13 @@ endif
 CDEFS += $(BOARD_CDEFS)
 
 ifeq ($(DEBUG), YES)
-    CFLAGS += -DDEBUG
+    CPPFLAGS += -DDEBUG
 else
     CFLAGS += -fdata-sections -ffunction-sections
 endif
 
 ifeq ($(USE_CXX), YES)
-    CFLAGS += -DPIOS_ENABLE_CXX
+    CPPFLAGS += -DPIOS_ENABLE_CXX
 endif
 
 
@@ -172,8 +172,12 @@ CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
 #CONLYFLAGS += -Wnested-externs
 CONLYFLAGS += $(CSTANDARD) -Wunsuffixed-float-constants
 
-# CPP Flags
-CPPFLAGS += -fno-rtti -fno-exceptions -std=c++11 -fno-use-cxa-atexit
+# C++ Flags
+# Note C++ compilation also uses CFLAGS.  CONLYFLAGS has exclusions that 
+# can not be used with C++ compiler. C++ specific compile options are
+# as set in CXXFLAGS. Note CPPFLAGS is for C pre-process and has not been
+# used correctly - longer term move CDEFS to CPPFLAGS.
+CXXFLAGS += -fno-rtti -fno-exceptions -std=c++11 -fno-use-cxa-atexit
 
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.

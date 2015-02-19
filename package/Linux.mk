@@ -29,11 +29,16 @@ TRUSTY_DEPS_SED      := s/qml-module-qtquick-controls/qtdeclarative5-controls-pl
 	s/qml-module-qtquick-window2/qtdeclarative5-window-plugin/g; \
 	s/qml-module-qtquick-xmllistmodel/qtdeclarative5-xmllistmodel-plugin/g;
 
+# Leave off Qt and ARM compiler dependencies if calling package target under the assumption that
+# OP is providing them or the user already has them installed because OP is already built.
+PACKAGE_DEPS_SED     := s/python.*/python/;s/{misc:Depends}.*/{misc:Depends}/;
+
 .PHONY: package
 package: debian
 	@$(ECHO) "Building Linux package, please wait..."
 	# Override clean and build because OP has already performed them.
 	$(V1) printf "override_dh_auto_clean:\noverride_dh_auto_build:\n\t#\n" >> debian/rules
+	$(V1) sed -i -e "$(PACKAGE_DEPS_SED)" debian/control
 	$(V1) dpkg-buildpackage -b -us -uc
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(PACKAGE_DIR)
 	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).changes $(PACKAGE_DIR)

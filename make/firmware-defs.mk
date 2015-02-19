@@ -71,6 +71,9 @@ MSG_FLASH_IMG        = $(QUOTE) FLASH_IMG $(MSG_EXTRA) $(QUOTE)
 # to the top of the source tree.
 toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 
+# Function to replace special characters like is done for the symbols.
+replace_special_chars = $(subst ~,_,$(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1))))))
+
 # Display compiler version information.
 .PHONY: gccversion
 gccversion:
@@ -95,7 +98,6 @@ gccversion:
 	@$(ECHO) $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O binary $< $@
 
-replace_special_chars = $(subst ~,_,$(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1))))))
 %.bin.o: %.bin
 	@$(ECHO) $(MSG_BIN_OBJ) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \

@@ -1896,7 +1896,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     channels[3].throttle2 = 0;
     channels[3].roll      = 0;
     channels[3].pitch     = 0;
-    channels[3].yaw       = 100;
+    channels[3].yaw       = -100;
 
     guiSettings.fixedwing.FixedWingThrottle = 3;
     guiSettings.fixedwing.FixedWingRoll1    = 1;
@@ -1948,7 +1948,7 @@ void VehicleConfigurationHelper::setupAileron()
     channels[3].throttle2 = 0;
     channels[3].roll      = 0;
     channels[3].pitch     = 0;
-    channels[3].yaw       = 100;
+    channels[3].yaw       = -100;
 
     guiSettings.fixedwing.FixedWingThrottle = 3;
     guiSettings.fixedwing.FixedWingRoll1    = 1;
@@ -1999,7 +1999,7 @@ void VehicleConfigurationHelper::setupVtail()
     channels[1].throttle2 = 0;
     channels[1].roll      = 0;
     channels[1].pitch     = 100;
-    channels[1].yaw       = 100;
+    channels[1].yaw       = -100;
 
     // Left Vtail Servo (Chan 4)
     channels[3].type      = MIXER_TYPE_SERVO;
@@ -2007,7 +2007,7 @@ void VehicleConfigurationHelper::setupVtail()
     channels[3].throttle2 = 0;
     channels[3].roll      = 0;
     channels[3].pitch     = -100;
-    channels[3].yaw       = 100;
+    channels[3].yaw       = -100;
 
     guiSettings.fixedwing.FixedWingThrottle = 3;
     guiSettings.fixedwing.FixedWingRoll1    = 1;

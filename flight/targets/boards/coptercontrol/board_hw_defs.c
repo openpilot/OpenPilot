@@ -1247,6 +1247,18 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
     .num_channels = 1,
 };
 
+const struct pios_ppm_cfg pios_ppm_pin6_cfg = {
+    .tim_ic_init         = {
+        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
+        .TIM_ICSelection = TIM_ICSelection_DirectTI,
+        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
+        .TIM_ICFilter    = 0x0,
+    },
+    /* Use only the first channel for ppm */
+    .channels     = &pios_tim_rcvrport_all_channels[5],
+    .num_channels = 1,
+};
+
 #endif /* PIOS_INCLUDE_PPM */
 
 #if defined(PIOS_INCLUDE_PPM_FLEXI)

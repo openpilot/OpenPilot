@@ -27,6 +27,9 @@
 
 #include "outputchannelform.h"
 
+#define MAXOUTPUT_VALUE 2500
+#define MINOUTPUT_VALUE 500
+
 OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ChannelForm(index, parent), ui(), m_inChannelTest(false)
 {
@@ -44,6 +47,23 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
 
     ui.actuatorLink->setChecked(false);
     connect(ui.actuatorLink, SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
+
+    // Set limits
+    ui.actuatorMin->setMaximum(MAXOUTPUT_VALUE);
+    ui.actuatorMax->setMaximum(MAXOUTPUT_VALUE);
+    ui.actuatorValue->setMaximum(MAXOUTPUT_VALUE);
+    ui.actuatorMin->setMinimum(MINOUTPUT_VALUE);
+    ui.actuatorMax->setMinimum(MINOUTPUT_VALUE);
+    ui.actuatorValue->setMinimum(MINOUTPUT_VALUE);
+
+    // Remove keyboard focus
+    ui.actuatorMin->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorMax->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorRev->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorLink->setFocusPolicy(Qt::ClickFocus);
+    ui.actuatorValue->setFocusPolicy(Qt::NoFocus);
+
+    setChannelRange();
 
     disableMouseWheelEvents();
 }
@@ -109,10 +129,11 @@ void OutputChannelForm::enableChannelTest(bool state)
     } else {
         ui.actuatorMin->setEnabled(true);
         ui.actuatorMax->setEnabled(true);
-        ui.actuatorRev->setEnabled(true);
+        if (m_mixerType != "Motor") {
+            ui.actuatorRev->setEnabled(true);
+        }
     }
 }
-
 
 /**
  * Toggles the channel linked state for use in testing mode
@@ -128,7 +149,7 @@ void OutputChannelForm::linkToggled(bool state)
     if (!parent()) {
         return;
     }
-    int min = 10000;
+    int min = MAXOUTPUT_VALUE;
     int linked_count = 0;
     QList<OutputChannelForm *> outputChannelForms = parent()->findChildren<OutputChannelForm *>();
     // set the linked channels of the parent widget to the same value
@@ -168,7 +189,7 @@ int OutputChannelForm::max() const
  */
 void OutputChannelForm::setMax(int maximum)
 {
-    setRange(ui.actuatorMin->value(), maximum);
+    setRange(ui.actuatorMax->value(), maximum);
 }
 
 int OutputChannelForm::min() const
@@ -181,7 +202,7 @@ int OutputChannelForm::min() const
  */
 void OutputChannelForm::setMin(int minimum)
 {
-    setRange(minimum, ui.actuatorMax->value());
+    setRange(minimum, ui.actuatorMin->value());
 }
 
 int OutputChannelForm::neutral() const
@@ -205,11 +226,6 @@ void OutputChannelForm::setRange(int minimum, int maximum)
     ui.actuatorMin->setValue(minimum);
     ui.actuatorMax->setValue(maximum);
     setChannelRange();
-    if (ui.actuatorMin->value() > ui.actuatorMax->value()) {
-        ui.actuatorRev->setChecked(true);
-    } else {
-        ui.actuatorRev->setChecked(false);
-    }
 }
 
 /**
@@ -221,25 +237,70 @@ void OutputChannelForm::setRange(int minimum, int maximum)
  */
 void OutputChannelForm::setChannelRange()
 {
-    int oldMini = ui.actuatorNeutral->minimum();
+    int minValue = ui.actuatorMin->value();
+    int maxValue = ui.actuatorMax->value();
 
-    // int oldMaxi = ui.actuatorNeutral->maximum();
+    int oldMini  = ui.actuatorNeutral->minimum();
+    int oldMaxi  = ui.actuatorNeutral->maximum();
 
-    if (ui.actuatorMin->value() < ui.actuatorMax->value()) {
-        ui.actuatorNeutral->setRange(ui.actuatorMin->value(), ui.actuatorMax->value());
-        ui.actuatorRev->setChecked(false);
+    m_mixerType = outputMixerType();
+
+    // Red handle for Motors
+    if ((m_mixerType == "Motor") || (m_mixerType == "ReversableMotor")) {
+        ui.actuatorNeutral->setStyleSheet("QSlider::handle:horizontal { background: rgb(255, 100, 100); width: 18px; height: 28px;"
+                                          "margin: -3px 0; border-radius: 3px; border: 1px solid #777; }");
     } else {
-        ui.actuatorNeutral->setRange(ui.actuatorMax->value(), ui.actuatorMin->value());
-        ui.actuatorRev->setChecked(true);
+        ui.actuatorNeutral->setStyleSheet("QSlider::handle:horizontal { background: rgb(196, 196, 196); width: 18px; height: 28px;"
+                                          "margin: -3px 0; border-radius: 3px; border: 1px solid #777; }");
     }
 
+    // Normal motor will be *** never *** reversed : without arming a "Min" value (like 1900) can be applied !
+    if (m_mixerType == "Motor") {
+        if (minValue >= maxValue) {
+            // Keep old values
+            ui.actuatorMin->setValue(oldMini);
+            ui.actuatorMax->setValue(oldMaxi);
+        }
+        ui.actuatorRev->setChecked(false);
+        ui.actuatorRev->setEnabled(false);
+        ui.actuatorNeutral->setInvertedAppearance(false);
+        ui.actuatorNeutral->setRange(ui.actuatorMin->value(), ui.actuatorMax->value());
+    } else {
+        // Others output (!Motor)
+        // Auto check reverse checkbox SpinBox Min/Max changes
+        ui.actuatorRev->setEnabled(true);
+        if (minValue <= maxValue) {
+            ui.actuatorRev->setChecked(false);
+            ui.actuatorNeutral->setInvertedAppearance(false);
+            ui.actuatorNeutral->setRange(minValue, maxValue);
+        } else {
+            ui.actuatorRev->setChecked(true);
+            ui.actuatorNeutral->setInvertedAppearance(true);
+            ui.actuatorNeutral->setRange(maxValue, minValue);
+        }
+    }
+    // If old neutral was Min, stay Min
     if (ui.actuatorNeutral->value() == oldMini) {
         ui.actuatorNeutral->setValue(ui.actuatorNeutral->minimum());
     }
 
-    // if (ui.actuatorNeutral->value() == oldMaxi)
-    // this can be dangerous if it happens to be controlling a motor at the time!
-    // ui.actuatorNeutral->setValue(ui.actuatorNeutral->maximum());
+    // Enable only outputs already set in mixer
+    if (m_mixerType != "Disabled") {
+        ui.actuatorMin->setEnabled(true);
+        ui.actuatorMax->setEnabled(true);
+        ui.actuatorNeutral->setEnabled(true);
+        ui.actuatorValue->setEnabled(true);
+    } else {
+        ui.actuatorMin->setEnabled(false);
+        ui.actuatorMax->setEnabled(false);
+        ui.actuatorRev->setEnabled(false);
+        ui.actuatorLink->setEnabled(false);
+        ui.actuatorMin->setValue(1000);
+        ui.actuatorMax->setValue(1000);
+        ui.actuatorNeutral->setRange(minValue, maxValue);
+        ui.actuatorNeutral->setValue(minValue);
+        ui.actuatorValue->setEnabled(false);
+    }
 }
 
 /**
@@ -247,30 +308,17 @@ void OutputChannelForm::setChannelRange()
  */
 void OutputChannelForm::reverseChannel(bool state)
 {
-    // Sanity check: if state became true, make sure the Maxvalue was higher than Minvalue
-    // the situations below can happen!
-    if (state && (ui.actuatorMax->value() < ui.actuatorMin->value())) {
-        return;
-    }
-    if (!state && (ui.actuatorMax->value() > ui.actuatorMin->value())) {
-        return;
-    }
+    // if 'state' (reverse channel requested) apply only if not already reversed
+    if ((state && (ui.actuatorMax->value() > ui.actuatorMin->value()))
+        || (!state && (ui.actuatorMax->value() < ui.actuatorMin->value()))) {
+        // Now, swap the min & max values (spin boxes)
+        int temp = ui.actuatorMax->value();
+        ui.actuatorMax->setValue(ui.actuatorMin->value());
+        ui.actuatorMin->setValue(temp);
+        ui.actuatorNeutral->setInvertedAppearance(state);
 
-    // Now, swap the min & max values (only on the spinboxes, the slider does not change!)
-    int temp = ui.actuatorMax->value();
-    ui.actuatorMax->setValue(ui.actuatorMin->value());
-    ui.actuatorMin->setValue(temp);
-
-    // Also update the channel value
-    // This is a trick to force the slider to update its value and
-    // emit the right signal itself, because our sendChannelTest(int) method
-    // relies on the object sender's identity.
-    if (ui.actuatorNeutral->value() < ui.actuatorNeutral->maximum()) {
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() + 1);
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() - 1);
-    } else {
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() - 1);
-        ui.actuatorNeutral->setValue(ui.actuatorNeutral->value() + 1);
+        setChannelRange();
+        return;
     }
 }
 
@@ -288,10 +336,6 @@ void OutputChannelForm::sendChannelTest(int value)
         return;
     }
 
-    if (ui.actuatorRev->isChecked()) {
-        // the channel is reversed
-        value = ui.actuatorMin->value() - value + ui.actuatorMax->value();
-    }
     // update the label
     ui.actuatorValue->setValue(value);
 
@@ -329,4 +373,22 @@ void OutputChannelForm::sendChannelTest(int value)
         return;
     }
     emit channelChanged(index(), value);
+}
+
+/**
+ *
+ * Returns MixerType
+ */
+QString OutputChannelForm::outputMixerType()
+{
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+
+    Q_ASSERT(mixer);
+
+    QString mixerNumType  = QString("Mixer%1Type").arg(index() + 1);
+    UAVObjectField *field = mixer->getField(mixerNumType);
+    Q_ASSERT(field);
+    QString mixerType     = field->getValue().toString();
+
+    return mixerType;
 }

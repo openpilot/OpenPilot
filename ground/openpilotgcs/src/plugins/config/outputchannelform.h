@@ -58,6 +58,7 @@ public slots:
     void setNeutral(int value);
     void setRange(int minimum, int maximum);
     void enableChannelTest(bool state);
+    QString outputMixerType();
 
 signals:
     void channelChanged(int index, int value);
@@ -65,6 +66,7 @@ signals:
 private:
     Ui::outputChannelForm ui;
     bool m_inChannelTest;
+    QString m_mixerType;
 
 private slots:
     void linkToggled(bool state);

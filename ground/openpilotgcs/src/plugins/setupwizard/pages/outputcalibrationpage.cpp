@@ -646,10 +646,10 @@ void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
     quint16 middle     = minValue + (range / 2);
     qreal arrowOpacity = 0;
     if (value < limitLow) {
-        arrowOpacity = double(middle - value) / double(middle - minValue);
+        arrowOpacity = (qreal)(middle - value) / (qreal)(middle - minValue);
         showElementMovement((ui->reverseCheckbox->isChecked() ? true : false), arrowOpacity);
     } else if (value > limitHigh) {
-        arrowOpacity = double(value - middle) / double(maxValue - middle);
+        arrowOpacity = (qreal)(value - middle) / (qreal)(maxValue - middle);
         showElementMovement((ui->reverseCheckbox->isChecked() ? false : true), arrowOpacity);
     }
 

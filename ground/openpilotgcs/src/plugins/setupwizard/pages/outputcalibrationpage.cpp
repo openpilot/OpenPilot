@@ -281,6 +281,7 @@ void OutputCalibrationPage::setupVehicle()
 void OutputCalibrationPage::setupVehicleItems()
 {
     m_vehicleItems.clear();
+    m_arrowsItems.clear();
     m_vehicleBoundsItem = new QGraphicsSvgItem();
     m_vehicleBoundsItem->setSharedRenderer(m_vehicleRenderer);
     m_vehicleBoundsItem->setElementId(m_vehicleElementIds[0]);
@@ -302,6 +303,47 @@ void OutputCalibrationPage::setupVehicleItems()
 
         m_vehicleScene->addItem(item);
         m_vehicleItems << item;
+
+        bool addArrows  = false;
+
+        if ((m_vehicleElementIds[i].contains("left")) || (m_vehicleElementIds[i].contains("right"))
+            || (m_vehicleElementIds[i].contains("elevator")) || (m_vehicleElementIds[i].contains("rudder")) 
+            || (m_vehicleElementIds[i].contains("steering")) || (m_vehicleElementIds[i] == "singleaileron-aileron")) {
+            addArrows  = true;
+        }
+
+        if (addArrows) {
+            QString arrowUp   = "-up"; // right if rudder / steering
+            QString arrowDown = "-down"; // left
+
+            QGraphicsSvgItem *itemUp = new QGraphicsSvgItem();
+
+            itemUp->setSharedRenderer(m_vehicleRenderer);
+            QString elementUp = m_vehicleElementIds[i] + arrowUp;
+            qDebug() << "############### Add " << elementUp;
+            itemUp->setElementId(elementUp);
+            itemUp->setZValue(i+10);
+            itemUp->setOpacity(0);
+
+            QRectF itemBounds = m_vehicleRenderer->boundsOnElement(elementUp);
+            itemUp->setPos(itemBounds.x() - parentBounds.x(), itemBounds.y() - parentBounds.y());
+            m_vehicleScene->addItem(itemUp);
+
+            m_arrowsItems << itemUp;
+
+            QGraphicsSvgItem *itemDown = new QGraphicsSvgItem();
+            itemDown->setSharedRenderer(m_vehicleRenderer);
+            QString elementDown = m_vehicleElementIds[i] + arrowDown;
+            itemDown->setElementId(elementDown);
+            itemDown->setZValue(i+10);
+            itemDown->setOpacity(0);
+
+            itemBounds = m_vehicleRenderer->boundsOnElement(elementDown);
+            itemDown->setPos(itemBounds.x() - parentBounds.x(), itemBounds.y() - parentBounds.y());
+            m_vehicleScene->addItem(itemDown);
+
+            m_arrowsItems << itemDown;
+        }
     }
 }
 
@@ -320,6 +362,26 @@ void OutputCalibrationPage::setupVehicleHighlightedPart()
     for (int i = 0; i < m_vehicleItems.size(); i++) {
         QGraphicsSvgItem *item = m_vehicleItems[i];
         item->setOpacity((highlightedIndex == i) ? highlightOpaque : dimOpaque);
+    }
+}
+
+void OutputCalibrationPage::showElementMovement(bool isUp, float value)
+{
+    QString highlightedItemName = m_vehicleItems[m_currentWizardIndex]->elementId();
+    qDebug() << "+++++" << highlightedItemName;
+
+    for (int i = 0; i < m_arrowsItems.size(); i++) {
+        QString upItemName = highlightedItemName + "-up";
+        QString downItemName = highlightedItemName + "-down";
+        if (m_arrowsItems[i]->elementId() == upItemName) {
+             QGraphicsSvgItem *itemUp = m_arrowsItems[i];
+             itemUp->setOpacity(isUp ? value : 0);
+        }
+        if (m_arrowsItems[i]->elementId() == downItemName) {
+             QGraphicsSvgItem *itemDown = m_arrowsItems[i];
+             itemDown->setOpacity(isUp ? 0 : value);
+        }
+     qDebug() << "***** " <<  i << " ****** " << m_arrowsItems[i]->elementId();
     }
 }
 
@@ -366,6 +428,9 @@ void OutputCalibrationPage::setWizardPage()
         }
     }
     setupVehicleHighlightedPart();
+    // Hide arrows 
+    showElementMovement(true, 0);
+    showElementMovement(false, 0);
 }
 
 void OutputCalibrationPage::initializePage()
@@ -414,6 +479,8 @@ void OutputCalibrationPage::customBackClicked()
     } else {
         getWizard()->back();
     }
+
+
 }
 
 quint16 OutputCalibrationPage::getCurrentChannel()
@@ -479,6 +546,9 @@ void OutputCalibrationPage::enableServoSliders(bool enabled)
     ui->servoMinAngleSlider->setEnabled(enabled);
     ui->servoMaxAngleSlider->setEnabled(enabled);
     ui->reverseCheckbox->setEnabled(!enabled);
+    // Hide arrows 
+    showElementMovement(true, 0);
+    showElementMovement(false, 0);
 }
 
 bool OutputCalibrationPage::checkAlarms()
@@ -567,6 +637,21 @@ void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
             ui->servoMaxAngleSlider->setValue(value);
         }
     }
+
+    quint16 minValue = (ui->reverseCheckbox->isChecked()) ? ui->servoMaxAngleSlider->value() : ui->servoMinAngleSlider->value();
+    quint16 maxValue = (ui->reverseCheckbox->isChecked()) ? ui->servoMinAngleSlider->value() : ui->servoMaxAngleSlider->value();
+    quint16 range = maxValue - minValue;
+    // Reset arows
+    showElementMovement(true, 0);
+    showElementMovement(false, 0);
+
+    // 20% "Dead band" : no arrow display
+    if (value < minValue + (range * 0.40)) {
+       showElementMovement((ui->reverseCheckbox->isChecked() ? true : false), 1.0);
+    } else if (value > maxValue - (range * 0.40)) {
+       showElementMovement((ui->reverseCheckbox->isChecked() ? false : true), 1.0);
+    } 
+
     debugLogChannelValues();
 }
 

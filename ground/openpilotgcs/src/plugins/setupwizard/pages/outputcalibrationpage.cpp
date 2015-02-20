@@ -662,6 +662,7 @@ void OutputCalibrationPage::on_servoMinAngleSlider_valueChanged(int position)
     quint16 value = ui->servoMinAngleSlider->value();
     m_calibrationUtil->setChannelOutputValue(value);
     m_actuatorSettings[getCurrentChannel()].channelMin = value;
+    ui->servoPWMValue->setText(tr("Output value : <b>%1</b> µs (Min)").arg(value));
 
     // Adjust neutral and max
     if (ui->reverseCheckbox->isChecked()) {
@@ -688,6 +689,7 @@ void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
     quint16 value = ui->servoMaxAngleSlider->value();
     m_calibrationUtil->setChannelOutputValue(value);
     m_actuatorSettings[getCurrentChannel()].channelMax = value;
+    ui->servoPWMValue->setText(tr("Output value : <b>%1</b> µs (Max)").arg(value));
 
     // Adjust neutral and min
     if (ui->reverseCheckbox->isChecked()) {

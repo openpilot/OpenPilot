@@ -647,10 +647,10 @@ void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
     qreal arrowOpacity = 0;
     if (value < limitLow) {
         arrowOpacity = (qreal)(middle - value) / (qreal)(middle - minValue);
-        showElementMovement((ui->reverseCheckbox->isChecked() ? true : false), arrowOpacity);
+        showElementMovement(ui->reverseCheckbox->isChecked(), arrowOpacity);
     } else if (value > limitHigh) {
         arrowOpacity = (qreal)(value - middle) / (qreal)(maxValue - middle);
-        showElementMovement((ui->reverseCheckbox->isChecked() ? false : true), arrowOpacity);
+        showElementMovement(!ui->reverseCheckbox->isChecked(), arrowOpacity);
     }
 
     debugLogChannelValues();

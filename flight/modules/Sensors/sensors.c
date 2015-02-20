@@ -517,11 +517,11 @@ static void updateGyroTempBias(float temperature)
 
 static void updateBaroTempBias(float temperature)
 {
-    baro_temperature = temp_alpha_baro * (temperature - baro_temperature) + baro_temperature;
-    baro_temp_calibration_count--;
     if (isnan(baro_temperature)) {
         baro_temperature = temperature;
     }
+
+    baro_temperature = temp_alpha_baro * (temperature - baro_temperature) + baro_temperature;
 
     if (baro_temp_correction_enabled && !baro_temp_calibration_count) {
         baro_temp_calibration_count = BARO_TEMP_CALIB_INTERVAL;
@@ -530,6 +530,7 @@ static void updateBaroTempBias(float temperature)
         float ctemp = boundf(baro_temperature, baroCorrectionExtent.max, baroCorrectionExtent.min);
         baro_temp_bias = baroCorrection.a + ((baroCorrection.d * ctemp + baroCorrection.c) * ctemp + baroCorrection.b) * ctemp;
     }
+    baro_temp_calibration_count--;
 }
 /**
  * Locally cache some variables from the AtttitudeSettings object

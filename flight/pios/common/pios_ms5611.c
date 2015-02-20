@@ -306,11 +306,11 @@ static float PIOS_MS5611_GetTemperature(void)
 }
 
 /**
- * Return the most recently computed pressure in kPa
+ * Return the most recently computed pressure in Pa
  */
 static float PIOS_MS5611_GetPressure(void)
 {
-    return ((float)Pressure) / 1000.0f;
+    return (float)Pressure;
 }
 
 /**

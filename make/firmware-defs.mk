@@ -71,6 +71,9 @@ MSG_FLASH_IMG        = $(QUOTE) FLASH_IMG $(MSG_EXTRA) $(QUOTE)
 # to the top of the source tree.
 toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 
+# Function to replace special characters like is done for the symbols.
+replace_special_chars = $(subst ~,_,$(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1))))))
+
 # Display compiler version information.
 .PHONY: gccversion
 gccversion:
@@ -100,9 +103,9 @@ gccversion:
 	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		--wildcard \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_start=_binary_start \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_end=_binary_end \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_size=_binary_size \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_start=_binary_start \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_end=_binary_end \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_size=_binary_size \
 		$< $@
 
 # Create extended listing file/disassambly from ELF output file.

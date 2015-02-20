@@ -119,6 +119,45 @@ void PIDControlNE::UpdatePositionSetpoint(float setpointNorth, float setpointEas
     mPositionSetpointTarget[1] = setpointEast;
 }
 
+void PIDControlNE::UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity)
+{
+    if (startingVelocity >= 0.0f) {
+        *updatedVelocity = startingVelocity - dT * brakeRate;
+        if (*updatedVelocity > currentVelocity) {
+            *updatedVelocity = currentVelocity;
+        }
+        if (*updatedVelocity < 0.0f) {
+            *updatedVelocity = 0.0f;
+        }
+    } else {
+        *updatedVelocity = startingVelocity + dT * brakeRate;
+        if (*updatedVelocity < currentVelocity) {
+            *updatedVelocity = currentVelocity;
+        }
+        if (*updatedVelocity > 0.0f) {
+            *updatedVelocity = 0.0f;
+        }
+    }
+}
+
+void PIDControlNE::UpdateVelocityStateWithBrake(float pvNorth, float pvEast, float path_time, float brakeRate)
+{
+    mVelocityState[0] = pvNorth;
+    mVelocityState[1] = pvEast;
+
+    float velocitySetpointDesired[2];
+
+    updateBrakeVelocity(mVelocitySetpointTarget[0], path_time, brakeRate, pvNorth, &velocitySetpointDesired[0]);
+    updateBrakeVelocity(mVelocitySetpointTarget[1], path_time, brakeRate, pvEast, &velocitySetpointDesired[1]);
+
+    // Calculate the rate of change
+    for (int iaxis = 0; iaxis < 2; iaxis++) {
+        // RateLimit(velocitySetpointDesired[iaxis], mVelocitySetpointCurrent[iaxis], 2.0f );
+
+        mVelocitySetpointCurrent[iaxis] = velocitySetpointDesired[iaxis];
+    }
+}
+
 void PIDControlNE::UpdateVelocityState(float pvNorth, float pvEast)
 {
     mVelocityState[0] = pvNorth;

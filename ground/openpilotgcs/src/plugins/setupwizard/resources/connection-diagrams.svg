@@ -32,11 +32,11 @@
      showgrid="false"
      inkscape:zoom="1.9844144"
      inkscape:cx="355.03275"
-     inkscape:cy="546.25362"
+     inkscape:cy="505.93946"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer54"
+     inkscape:current-layer="nano-ppm"
      fit-margin-top="15"
      fit-margin-left="15"
      fit-margin-right="15"
@@ -17791,7 +17791,7 @@
        inkscape:groupmode="layer"
        id="layer54"
        inkscape:label="revo-ppm"
-       style="display:inline"
+       style="display:none"
        sodipodi:insensitive="true">
       <g
          style="display:inline"
@@ -18783,7 +18783,8 @@
        style="display:none"
        sodipodi:insensitive="true">
       <g
-         id="nano-pwm">
+         id="nano-pwm"
+         transform="translate(-4,0)">
         <path
            sodipodi:nodetypes="ccc"
            style="fill:none;stroke:#6b6b6b;stroke-width:1.21428466;stroke-linecap:butt;stroke-linejoin:miter"
@@ -18818,7 +18819,7 @@
            sodipodi:nodetypes="cccc"
            style="fill:none;stroke:#ec6004;stroke-width:5.61390018;stroke-linecap:butt;stroke-linejoin:miter"
            inkscape:connector-curvature="0"
-           d="M 423.76407,417.95113 L 440.88407,418.27993 L 555.8,418.02753 L 555.8,240.51434"
+           d="M 423.76407,417.95113 L 440.88407,418.27993 L 555.8,418.02753 L 555.8,240.51473"
            id="path8856-5-1-7-1-0" />
         <path
            sodipodi:nodetypes="ccc"
@@ -18983,16 +18984,23 @@
              d="M 409.9616,420.0324 L 409.9616,421.14803 L 400.80691,421.14803 C 400.90171,422.06678 401.23347,422.75584 401.80223,423.21522 C 402.37097,423.67459 403.16576,423.90428 404.1866,423.90428 C 405.01055,423.90428 405.85274,423.78397 406.71316,423.54334 C 407.58086,423.29543 408.47044,422.92355 409.38191,422.42772 L 409.38191,425.44647 C 408.45586,425.79647 407.52982,426.05897 406.60379,426.23397 C 405.67774,426.41626 404.7517,426.5074 403.82566,426.5074 C 401.60899,426.5074 399.88451,425.94595 398.65223,424.82303 C 397.42723,423.69282 396.81473,422.11053 396.81473,420.07615 C 396.81473,418.07825 397.41629,416.50689 398.61941,415.36209 C 399.82983,414.21731 401.49233,413.64492 403.60691,413.6449 C 405.5319,413.64492 407.07045,414.2246 408.22254,415.38397 C 409.3819,416.54335 409.96159,418.09283 409.9616,420.0324 M 405.9366,418.73084 C 405.93659,417.9871 405.71784,417.38918 405.28035,416.93709 C 404.85013,416.47773 404.28503,416.24804 403.58504,416.24803 C 402.8267,416.24804 402.21055,416.46314 401.7366,416.89334 C 401.26264,417.31627 400.96733,417.92877 400.85066,418.73084 L 405.9366,418.73084"
              inkscape:connector-curvature="0" />
         </g>
+        <path
+           id="path22050-6-0"
+           d="M 562.64272,307.01434 L 563.00144,240.51473"
+           inkscape:connector-curvature="0"
+           style="fill:none;stroke:#7a00ff;stroke-width:5.61390018;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;display:inline"
+           sodipodi:nodetypes="cc" />
       </g>
     </g>
     <g
        inkscape:groupmode="layer"
        id="layer3"
        inkscape:label="nano-ppm"
-       style="display:none"
+       style="display:inline"
        sodipodi:insensitive="true">
       <g
-         id="nano-ppm">
+         id="nano-ppm"
+         transform="translate(-4,0)">
         <path
            sodipodi:nodetypes="ccc"
            style="fill:none;stroke:#6b6b6b;stroke-width:1.21428466;stroke-linecap:butt;stroke-linejoin:miter;display:inline"
@@ -19068,6 +19076,36 @@
              d="M 402.57206,302.54811 L 406.48769,302.54811 L 406.48769,319.56686 L 402.57206,319.56686 L 402.57206,302.54811"
              inkscape:connector-curvature="0" />
         </g>
+        <path
+           sodipodi:nodetypes="cc"
+           style="fill:none;stroke:#1f4697;stroke-width:5.61390018;stroke-linecap:butt;stroke-linejoin:miter;display:inline"
+           inkscape:connector-curvature="0"
+           d="M 533.94,342.71873 L 533.93967,240.51434"
+           id="path8856-5-4-4" />
+        <path
+           sodipodi:nodetypes="cc"
+           style="fill:none;stroke:#fac204;stroke-width:5.61390018;stroke-linecap:butt;stroke-linejoin:miter;display:inline"
+           inkscape:connector-curvature="0"
+           d="M 541,342.71873 L 541,240.51434"
+           id="path8856-5-1-8-0" />
+        <path
+           sodipodi:nodetypes="cc"
+           style="fill:none;stroke:#32a304;stroke-width:5.61399984;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;display:inline"
+           inkscape:connector-curvature="0"
+           d="M 548.804,342.71873 L 548.80447,240.51434"
+           id="path8856-5-1-7-0-5" />
+        <path
+           sodipodi:nodetypes="cc"
+           style="fill:none;stroke:#ec6004;stroke-width:5.61390018;stroke-linecap:butt;stroke-linejoin:miter;display:inline"
+           inkscape:connector-curvature="0"
+           d="M 555.8,342.71873 L 555.8,240.51473"
+           id="path8856-5-1-7-1-0-3" />
+        <path
+           id="path22050-6-0-8"
+           d="M 562.64272,342.71873 L 563.00144,240.51473"
+           inkscape:connector-curvature="0"
+           style="fill:none;stroke:#7a00ff;stroke-width:5.61390018;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;display:inline"
+           sodipodi:nodetypes="cc" />
       </g>
     </g>
     <g
@@ -29172,7 +29210,7 @@
        inkscape:groupmode="layer"
        id="layer15"
        inkscape:label="revo"
-       style="display:inline">
+       style="display:none">
       <g
          style="display:inline"
          transform="translate(-1.4348189,-1.0188297)"
@@ -32473,10 +32511,10 @@
              cx="151.73199" />
           <polygon
              id="polygon8706"
-             points="186.194,11.031 181.129,13.319 186.083,4.74 191.036,13.319 " />
+             points="186.083,4.74 191.036,13.319 186.194,11.031 181.129,13.319 " />
           <polygon
              id="polygon8708"
-             points="36.194,11.031 31.129,13.319 36.083,4.74 41.036,13.319 " />
+             points="36.083,4.74 41.036,13.319 36.194,11.031 31.129,13.319 " />
           <g
              id="g8710">
             <circle
@@ -35319,8 +35357,7 @@
        inkscape:groupmode="layer"
        id="layer18"
        inkscape:label="nano"
-       style="display:none"
-       sodipodi:insensitive="true">
+       style="display:inline">
       <g
          id="controller-nano"
          transform="translate(-726.76021,-465.53821)">

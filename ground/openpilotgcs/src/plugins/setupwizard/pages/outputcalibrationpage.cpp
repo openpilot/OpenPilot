@@ -304,12 +304,12 @@ void OutputCalibrationPage::setupVehicleItems()
         m_vehicleScene->addItem(item);
         m_vehicleItems << item;
 
-        bool addArrows  = false;
+        bool addArrows = false;
 
         if ((m_vehicleElementIds[i].contains("left")) || (m_vehicleElementIds[i].contains("right"))
-            || (m_vehicleElementIds[i].contains("elevator")) || (m_vehicleElementIds[i].contains("rudder")) 
+            || (m_vehicleElementIds[i].contains("elevator")) || (m_vehicleElementIds[i].contains("rudder"))
             || (m_vehicleElementIds[i].contains("steering")) || (m_vehicleElementIds[i] == "singleaileron-aileron")) {
-            addArrows  = true;
+            addArrows = true;
         }
 
         if (addArrows) {
@@ -320,9 +320,8 @@ void OutputCalibrationPage::setupVehicleItems()
 
             itemUp->setSharedRenderer(m_vehicleRenderer);
             QString elementUp = m_vehicleElementIds[i] + arrowUp;
-            qDebug() << "############### Add " << elementUp;
             itemUp->setElementId(elementUp);
-            itemUp->setZValue(i+10);
+            itemUp->setZValue(i + 10);
             itemUp->setOpacity(0);
 
             QRectF itemBounds = m_vehicleRenderer->boundsOnElement(elementUp);
@@ -335,7 +334,7 @@ void OutputCalibrationPage::setupVehicleItems()
             itemDown->setSharedRenderer(m_vehicleRenderer);
             QString elementDown = m_vehicleElementIds[i] + arrowDown;
             itemDown->setElementId(elementDown);
-            itemDown->setZValue(i+10);
+            itemDown->setZValue(i + 10);
             itemDown->setOpacity(0);
 
             itemBounds = m_vehicleRenderer->boundsOnElement(elementDown);
@@ -365,23 +364,21 @@ void OutputCalibrationPage::setupVehicleHighlightedPart()
     }
 }
 
-void OutputCalibrationPage::showElementMovement(bool isUp, float value)
+void OutputCalibrationPage::showElementMovement(bool isUp, qreal value)
 {
     QString highlightedItemName = m_vehicleItems[m_currentWizardIndex]->elementId();
-    qDebug() << "+++++" << highlightedItemName;
 
     for (int i = 0; i < m_arrowsItems.size(); i++) {
-        QString upItemName = highlightedItemName + "-up";
+        QString upItemName   = highlightedItemName + "-up";
         QString downItemName = highlightedItemName + "-down";
         if (m_arrowsItems[i]->elementId() == upItemName) {
-             QGraphicsSvgItem *itemUp = m_arrowsItems[i];
-             itemUp->setOpacity(isUp ? value : 0);
+            QGraphicsSvgItem *itemUp = m_arrowsItems[i];
+            itemUp->setOpacity(isUp ? value : 0);
         }
         if (m_arrowsItems[i]->elementId() == downItemName) {
-             QGraphicsSvgItem *itemDown = m_arrowsItems[i];
-             itemDown->setOpacity(isUp ? 0 : value);
+            QGraphicsSvgItem *itemDown = m_arrowsItems[i];
+            itemDown->setOpacity(isUp ? 0 : value);
         }
-     qDebug() << "***** " <<  i << " ****** " << m_arrowsItems[i]->elementId();
     }
 }
 
@@ -428,7 +425,7 @@ void OutputCalibrationPage::setWizardPage()
         }
     }
     setupVehicleHighlightedPart();
-    // Hide arrows 
+    // Hide arrows
     showElementMovement(true, 0);
     showElementMovement(false, 0);
 }
@@ -479,8 +476,6 @@ void OutputCalibrationPage::customBackClicked()
     } else {
         getWizard()->back();
     }
-
-
 }
 
 quint16 OutputCalibrationPage::getCurrentChannel()
@@ -546,7 +541,7 @@ void OutputCalibrationPage::enableServoSliders(bool enabled)
     ui->servoMinAngleSlider->setEnabled(enabled);
     ui->servoMaxAngleSlider->setEnabled(enabled);
     ui->reverseCheckbox->setEnabled(!enabled);
-    // Hide arrows 
+    // Hide arrows
     showElementMovement(true, 0);
     showElementMovement(false, 0);
 }
@@ -640,17 +635,23 @@ void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
 
     quint16 minValue = (ui->reverseCheckbox->isChecked()) ? ui->servoMaxAngleSlider->value() : ui->servoMinAngleSlider->value();
     quint16 maxValue = (ui->reverseCheckbox->isChecked()) ? ui->servoMinAngleSlider->value() : ui->servoMaxAngleSlider->value();
-    quint16 range = maxValue - minValue;
+    quint16 range    = maxValue - minValue;
     // Reset arows
     showElementMovement(true, 0);
     showElementMovement(false, 0);
 
-    // 20% "Dead band" : no arrow display
-    if (value < minValue + (range * 0.40)) {
-       showElementMovement((ui->reverseCheckbox->isChecked() ? true : false), 1.0);
-    } else if (value > maxValue - (range * 0.40)) {
-       showElementMovement((ui->reverseCheckbox->isChecked() ? false : true), 1.0);
-    } 
+    // 30% "Dead band" : no arrow display
+    quint16 limitLow   = minValue + (range * 0.35);
+    quint16 limitHigh  = maxValue - (range * 0.35);
+    quint16 middle     = minValue + (range / 2);
+    qreal arrowOpacity = 0;
+    if (value < limitLow) {
+        arrowOpacity = double(middle - value) / double(middle - minValue);
+        showElementMovement((ui->reverseCheckbox->isChecked() ? true : false), arrowOpacity);
+    } else if (value > limitHigh) {
+        arrowOpacity = double(value - middle) / double(maxValue - middle);
+        showElementMovement((ui->reverseCheckbox->isChecked() ? false : true), arrowOpacity);
+    }
 
     debugLogChannelValues();
 }

@@ -76,7 +76,7 @@ private:
     void startWizard();
     void setupVehicleItems();
     void setupVehicleHighlightedPart();
-    void showElementMovement(bool isUp, float value);
+    void showElementMovement(bool isUp, qreal value);
     void setWizardPage();
     void enableButtons(bool enable);
     void enableServoSliders(bool enabled);

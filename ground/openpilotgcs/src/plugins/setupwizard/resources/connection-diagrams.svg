@@ -36,7 +36,7 @@
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="nano-ppm"
+     inkscape:current-layer="layer5"
      fit-margin-top="15"
      fit-margin-left="15"
      fit-margin-right="15"
@@ -17915,7 +17915,7 @@
        inkscape:groupmode="layer"
        id="layer53"
        inkscape:label="revo-pwm"
-       style="display:none"
+       style="display:inline"
        sodipodi:insensitive="true">
       <g
          style="display:inline"
@@ -18996,7 +18996,7 @@
        inkscape:groupmode="layer"
        id="layer3"
        inkscape:label="nano-ppm"
-       style="display:inline"
+       style="display:none"
        sodipodi:insensitive="true">
       <g
          id="nano-ppm"
@@ -19293,7 +19293,7 @@
      id="layer8"
      inkscape:label="gps"
      transform="translate(-32.46875,315.85439)"
-     style="display:none"
+     style="display:inline"
      sodipodi:insensitive="true">
     <g
        inkscape:groupmode="layer"
@@ -20845,9 +20845,9 @@
         <polygon
            transform="matrix(1.5711089,0,0,1.5372108,235.33403,522.2062)"
            id="polygon8706-1"
-           points="186.083,4.74 191.036,13.319 186.194,11.031 181.129,13.319 " />
+           points="186.194,11.031 181.129,13.319 186.083,4.74 191.036,13.319 " />
         <polygon
-           points="181.129,13.319 186.083,4.74 191.036,13.319 186.194,11.031 "
+           points="191.036,13.319 186.194,11.031 181.129,13.319 186.083,4.74 "
            id="polygon10148"
            transform="matrix(1.5711089,0,0,1.5372108,357.19879,522.2062)" />
         <g
@@ -22445,13 +22445,13 @@
            inkscape:connector-curvature="0"
            sodipodi:nodetypes="cscsscssscssccscccccscsssscscssscsssscssssssssscsscsscccccscscscssscccsccssssssccsccsccssssccccccccccsccccsccscssssssssccssssscsccscsscsscccsccsscccsscscsssccccccscccsccssscscsscssscssscssscsscssccsscccsscssscsssssscsssssssssssssscscsccsssscsssssscccsscccsssssssscssscssssscsssscccssccsccscssscccsssssssssccssssccsscsscssssssssscccsccssscccssscscccscsssscssscccssssssscccssssscsssscccccsssscsscscsssccccccsccs" />
         <polygon
-           points="181.129,13.319 186.083,4.74 191.036,13.319 186.194,11.031 "
+           points="191.036,13.319 186.194,11.031 181.129,13.319 186.083,4.74 "
            id="polygon8706-1-5"
            transform="matrix(1.5711089,0,0,1.5372108,223.37514,520.91932)" />
         <polygon
            transform="matrix(1.5711089,0,0,1.5372108,345.23991,520.91932)"
            id="polygon10148-2"
-           points="186.194,11.031 181.129,13.319 186.083,4.74 191.036,13.319 " />
+           points="186.083,4.74 191.036,13.319 186.194,11.031 181.129,13.319 " />
         <g
            style="font-size:12px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial Narrow;-inkscape-font-specification:Arial Narrow Bold Condensed"
            id="text10150-4"
@@ -24111,9 +24111,9 @@
         <polygon
            transform="matrix(1.5711089,0,0,1.5372108,235.33403,522.2062)"
            id="polygon8706-1-0"
-           points="186.083,4.74 191.036,13.319 186.194,11.031 181.129,13.319 " />
+           points="186.194,11.031 181.129,13.319 186.083,4.74 191.036,13.319 " />
         <polygon
-           points="181.129,13.319 186.083,4.74 191.036,13.319 186.194,11.031 "
+           points="191.036,13.319 186.194,11.031 181.129,13.319 186.083,4.74 "
            id="polygon10148-4"
            transform="matrix(1.5711089,0,0,1.5372108,357.19879,522.2062)" />
         <g
@@ -25716,13 +25716,13 @@
            inkscape:connector-curvature="0"
            sodipodi:nodetypes="cscsscssscssccscccccscsssscscssscsssscssssssssscsscsscccccscscscssscccsccssssssccsccsccssssccccccccccsccccsccscssssssssccssssscsccscsscsscccsccsscccsscscsssccccccscccsccssscscsscssscssscssscsscssccsscccsscssscsssssscsssssssssssssscscsccsssscsssssscccsscccsssssssscssscssssscsssscccssccsccscssscccsssssssssccssssccsscsscssssssssscccsccssscccssscscccscsssscssscccssssssscccssssscsssscccccsssscsscscsssccccccsccs" />
         <polygon
-           points="191.036,13.319 186.194,11.031 181.129,13.319 186.083,4.74 "
+           points="181.129,13.319 186.083,4.74 191.036,13.319 186.194,11.031 "
            id="polygon8706-1-5-0"
            transform="matrix(1.5711089,0,0,1.5372108,223.37514,520.91932)" />
         <polygon
            transform="matrix(1.5711089,0,0,1.5372108,345.23991,520.91932)"
            id="polygon10148-2-2"
-           points="186.083,4.74 191.036,13.319 186.194,11.031 181.129,13.319 " />
+           points="186.194,11.031 181.129,13.319 186.083,4.74 191.036,13.319 " />
         <g
            style="font-size:12px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial Narrow;-inkscape-font-specification:Arial Narrow Bold Condensed"
            id="text10150-4-7"
@@ -29210,7 +29210,7 @@
        inkscape:groupmode="layer"
        id="layer15"
        inkscape:label="revo"
-       style="display:none">
+       style="display:inline">
       <g
          style="display:inline"
          transform="translate(-1.4348189,-1.0188297)"
@@ -32511,10 +32511,10 @@
              cx="151.73199" />
           <polygon
              id="polygon8706"
-             points="186.083,4.74 191.036,13.319 186.194,11.031 181.129,13.319 " />
+             points="186.194,11.031 181.129,13.319 186.083,4.74 191.036,13.319 " />
           <polygon
              id="polygon8708"
-             points="36.083,4.74 41.036,13.319 36.194,11.031 31.129,13.319 " />
+             points="36.194,11.031 31.129,13.319 36.083,4.74 41.036,13.319 " />
           <g
              id="g8710">
             <circle
@@ -35357,7 +35357,7 @@
        inkscape:groupmode="layer"
        id="layer18"
        inkscape:label="nano"
-       style="display:inline">
+       style="display:none">
       <g
          id="controller-nano"
          transform="translate(-726.76021,-465.53821)">
@@ -36033,7 +36033,7 @@
            inkscape:transform-center-y="95.699765"
            inkscape:transform-center-x="-66.090998"
            transform="matrix(0,-1.0887723,1.065281,0,1247.1905,860.25683)"
-           points="186.194,11.031 181.129,13.319 186.083,4.74 191.036,13.319 "
+           points="186.083,4.74 191.036,13.319 186.194,11.031 181.129,13.319 "
            id="polygon8706-0" />
         <g
            transform="translate(726.6625,-66.912713)"

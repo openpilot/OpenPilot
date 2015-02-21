@@ -6403,7 +6403,7 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>Update rate:</source>
-        <translation>更新频率：</translation>
+        <translation>频率：</translation>
     </message>
     <message>
         <location/>
@@ -6443,7 +6443,7 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>Motors spin at neutral output when armed and throttle below zero (be careful)</source>
-        <translation>解锁后且油门关闭时，电机中速旋转（危险）</translation>
+        <translation>解锁后且油门关闭时，电机开始按照上方设定的“最低旋转输出量”旋转（危险）</translation>
     </message>
     <message>
         <location/>
@@ -6496,7 +6496,7 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>Output Channel Configuration</source>
-        <translation>输出通道配置</translation>
+        <translation>输出端口设置</translation>
     </message>
     <message>
         <location/>
@@ -6511,12 +6511,12 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>Output configuration</source>
-        <translation>输出配置</translation>
+        <translation>输出设置</translation>
     </message>
     <message>
         <location/>
         <source>Bank(Channels):</source>
-        <translation type="unfinished">输出端口：</translation>
+        <translation>输出集：</translation>
     </message>
     <message>
         <location/>
@@ -6546,7 +6546,7 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
     <message>
         <location/>
         <source>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
-        <translation type="unfinished">标准电调配置为PWM或OneShot模式。
+        <translation>标准电调配置为PWM或OneShot模式。
 类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。
 当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后再输出给电调 （例如：1000/8 = 125, 2000/8 = 250).。</translation>
     </message>
@@ -6556,47 +6556,47 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
     <message>
         <location filename="../../../src/plugins/config/outputchannelform.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>关联</translation>
     </message>
     <message>
         <location/>
         <source>Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>序号</translation>
     </message>
     <message>
         <location/>
         <source>Check to invert the channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>勾选让电机反向旋转。</translation>
     </message>
     <message>
         <location/>
         <source>Neutral (slowest for motor)</source>
-        <translation type="unfinished"></translation>
+        <translation>最低旋转输出量</translation>
     </message>
     <message>
         <location/>
         <source>Assignment</source>
-        <translation type="unfinished"></translation>
+        <translation>别名</translation>
     </message>
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation>最小值</translation>
     </message>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>最大值</translation>
     </message>
     <message>
         <location/>
         <source>Output mode</source>
-        <translation type="unfinished"></translation>
+        <translation>输出模式</translation>
     </message>
     <message>
         <source>0:</source>
@@ -6605,44 +6605,46 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
     <message>
         <location/>
         <source>Reversed</source>
-        <translation type="unfinished"></translation>
+        <translation>反转</translation>
     </message>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source> # - Bank</source>
-        <translation type="unfinished"></translation>
+        <translation># - 输出集</translation>
     </message>
     <message>
         <location/>
         <source>Minimum PWM value, beware of not overdriving your servo.
 Using OneShot125 a value of 1000(uS) here will produce a pulse of 125(uS).</source>
-        <translation type="unfinished"></translation>
+        <translation>PWM最小值，如果此通道连接的是伺服舵机，请确保设置值不会造成电机过载。
+如果使用OneShot125模式，实际输出脉冲为该值的1/8，即设置值为1000uS，实际输出值为125uS.</translation>
     </message>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation>0</translation>
     </message>
     <message>
         <location/>
         <source>Bank number</source>
-        <translation type="unfinished"></translation>
+        <translation>集序号</translation>
     </message>
     <message>
         <location/>
         <source> 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum value, beware of not overdriving your servo.
 Using OneShot125 a value of 2000(uS) here will produce a pulse of 250(uS).</source>
-        <translation type="unfinished"></translation>
+        <translation>PWM最大值，如果此通道连接的是伺服舵机，请确保设置值不会造成电机过载。
+如果使用OneShot125模式，实际输出脉冲值为该值的1/8，即设置值为1000uS，实际输出值为125uS.</translation>
     </message>
 </context>
 <context>
@@ -9029,7 +9031,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. This setup is perfect for sport flying and is also commonly used for FPV platforms.</source>
-        <translation>X型四轴是目前最常见的一种多轴飞行器，非常适合于飞行竞赛和FPV。</translation>
+        <translation>X型四轴是目前最常见的一种多轴飞行器，非常适合于飞行竞赛和第一视角飞行。</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -9039,7 +9041,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited for FPV since the fore rotor tend to be in the way of the camera.</source>
-        <translation>十字型四轴飞行器类似于X型四轴，区别在于前进方向相差45度。十字型四轴前后两个电机顺时针旋转，左右两个电机逆时针旋转。由于正前方有电机阻挡，这种类型的四轴飞行器并不适合FPV。</translation>
+        <translation>十字型四轴飞行器类似于X型四轴，区别在于前进方向相差45度。十字型四轴前后两个电机顺时针旋转，左右两个电机逆时针旋转。由于正前方电机容易阻碍摄像机镜头，这种类型的四轴飞行器并不适合第一视角飞行。</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -9115,32 +9117,34 @@ Please select the type of multirotor you want to create a configuration for belo
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Output calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>电机输出校准</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+415"/>
         <location line="+90"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-90"/>
         <location line="+90"/>
         <source>Stop</source>
-        <translation type="unfinished">停止</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location line="-41"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
-        <translation type="unfinished"></translation>
+        <translation>输出模块出错。
+
+请确认设备上固件版本是否正确，然后重新启动设置向导。如果问题继续存在，请到openpilot.org官网论坛寻求进一步技术支持。</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
@@ -9152,7 +9156,16 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;VERY IMPORTANT!&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;REMOVE ALL PROPELLERS FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Connect all components according to the illustration on the summary page, and provide power using an external power supply such as a battery before continuing.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Depending on what vehicle you have selected, both the motors controlled by ESCs and/or servos controlled directly by the OpenPilot controller may have to be calibrated. The following steps will guide you safely through this process. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;现在开始对电机控制信号进行校准。It is now time to calibrate the output levels for the signals controlling your vehicle. &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;警告！&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;
+&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;在进行下一步操作之前，请先将所有螺旋桨从电机上移除！&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;按照示意图将航模所有部件连接好，插上动力电池。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;接下来的步骤中，设置向导将会安全的引导您为多轴飞行器的电机控制信号进行校准。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -9162,7 +9175,16 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br /&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br /&gt;&lt;br /&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;现在向导将引导您为右图中高亮显示的电机设置最低旋转输出量。 &lt;br /&gt;
+请注意观察电机是否按照图中所示的顺时针或逆时针方向旋转。如若电机旋转方向和示意图中相反，请将三根电机输入线中的任意两根对调。 &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;为了帮助您找到&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;该电机的最低旋转输出量&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, ，请点击下面的“开始”按钮，拖动滑动条直到电机开始低速稳定旋转。 &lt;br /&gt;
+  &lt;br /&gt;
+  完成后请点击“停止”按钮。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -9177,22 +9199,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Reverse</source>
-        <translation type="unfinished"></translation>
+        <translation>反向</translation>
     </message>
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation>最小值</translation>
     </message>
     <message>
         <location/>
         <source>Center</source>
-        <translation type="unfinished"></translation>
+        <translation>中值</translation>
     </message>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>最大值</translation>
     </message>
 </context>
 <context>
@@ -9205,7 +9227,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Write configuration to controller</source>
-        <translation>保存配置</translation>
+        <translation>将设置信息写入到OpenPilot设备中</translation>
     </message>
     <message>
         <location/>
@@ -9234,7 +9256,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The wizard is now ready to save the configuration directly to your OpenPilot controller. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;If any of the selections made in this wizard require a reboot of the controller, then power cycling the OpenPilot controller board will have to be performed after you save in this step.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Press the Save button to save the configuration.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot设置保存&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;设置向导准备将设置信息写入到OpenPilot设备中。 &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;保存结束后，OpenPilot设备可能会重启以激活某些设置项。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请点击下方“Save”按钮保存设置。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -10050,7 +10080,7 @@ Do you still want to proceed?</source>
     <message>
         <location line="+7"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
-        <translation type="unfinished"></translation>
+        <translation>安全起见，在后续操作开始之前，飞行器强制进入锁定状态。</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10060,7 +10090,7 @@ Do you still want to proceed?</source>
     <message>
         <location line="+211"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>下一项</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -10200,12 +10230,12 @@ Move the %1 stick.</source>
     <message>
         <location line="+6"/>
         <source>Next / Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>下一项/忽略</translation>
     </message>
     <message>
         <location line="+726"/>
         <source>Stop Manual Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>结束手动校准</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10220,7 +10250,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+33"/>
         <source>Start Manual Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>开始手动校准</translation>
     </message>
     <message>
         <location line="-764"/>
@@ -12959,7 +12989,7 @@ The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRAN
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12969,79 +12999,87 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Initial Tuning&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;; font-size:10pt;&quot;&gt;This section of the OpenPilot Wizard allows you to select a set of initial tuning parameters for your airframe. Presented below is a list of common airframe types, select the one that matches your airframe the closest, if unsure select the generic variant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;预设稳态飞行参数&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;; font-size:10pt;&quot;&gt;OpenPilot根据目前流行的多轴飞行器提供了一系列机型的稳态飞行控制参数。请从下面列表中选取一个最接近你实际机型的飞行器，如果不确定，请选择以Generic开头的选项。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Information about the Vehicle in short.</source>
-        <translation type="unfinished"></translation>
+        <translation>机型简述。</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.cpp" line="+120"/>
         <source>Name of Vehicle: </source>
-        <translation type="unfinished"></translation>
+        <translation>机型： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Name of Owner: </source>
-        <translation type="unfinished"></translation>
+        <translation>参数维护者： </translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Size: </source>
-        <translation type="unfinished"></translation>
+        <translation>尺寸： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Weight: </source>
-        <translation type="unfinished"></translation>
+        <translation>重量： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Motor(s): </source>
-        <translation type="unfinished"></translation>
+        <translation>电机型号： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>ESC(s): </source>
-        <translation type="unfinished"></translation>
+        <translation>电调： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Servo(s): </source>
-        <translation type="unfinished"></translation>
+        <translation>舵机： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Battery: </source>
-        <translation type="unfinished"></translation>
+        <translation>电池： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Propellers(s): </source>
-        <translation type="unfinished"></translation>
+        <translation>螺旋桨： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Controller: </source>
-        <translation type="unfinished"></translation>
+        <translation>飞行控制器： </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Comments: </source>
-        <translation type="unfinished"></translation>
+        <translation>备注： </translation>
     </message>
     <message>
         <location line="+3"/>
         <source>This option will use the current tuning settings saved on the controller, if your controller is currently unconfigured, then the OpenPilot firmware defaults will be used.
 
 It is suggested that if this is a first time configuration of your controller, rather than use this option, instead select a tuning set that matches your own airframe as close as possible from the list above or if you are not able to fine one, then select the generic item from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>选择此项将会使用飞行控制器上已有的控制参数，首次使用的控制器将会使用固件内预设的默认参数。
+
+首次投入使用的飞行控制器，建议不要选择此项设置，请尽可能从列表中选择一项最为接近的机型，或者选择以Generic开头的选项。</translation>
     </message>
     <message>
         <location line="+85"/>
         <source>Current Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>维持现有参数</translation>
     </message>
 </context>
 <context>
@@ -13049,7 +13087,7 @@ It is suggested that if this is a first time configuration of your controller, r
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/biascalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13060,33 +13098,41 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Sensor Calibration Procedure&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The wizard needs to get information from the controller to determine in which position the vehicle is normally considered to be level. To be able to successfully perform these measurements, you need to place the vehicle on a surface that is as flat and level as possible. Examples of such surfaces could be a table top or the floor. Be careful to ensure that the vehicle really is level, since this step will affect the accelerometer and gyro bias in the controller software.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To perform the calibration, please push the Calculate button and wait for the process to finish.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot传感器校准&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;在校准过程中需要获取足够数据以确定水平位置，作为航模判断是否水平的参考依据。为了能够获取到正确数据，请将您的航模放置到一个尽可能水平的平面上，如果可能，建议使用水平尺以确保航模水平摆放。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;准备就绪后，请点击下方”Calculate“按钮开始校准，并耐心等待直到校准完成。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Calculate gyro and accelerometer bias</source>
-        <translation type="unfinished"></translation>
+        <translation>计算陀螺仪和加速度传感器误差并确定航模水平参考值</translation>
     </message>
     <message>
         <location/>
         <source>Calculate</source>
-        <translation type="unfinished"></translation>
+        <translation>计算</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/biascalibrationpage.cpp" line="+74"/>
         <source>An OpenPilot controller must be connected to your computer to perform bias calculations.
 Please connect your OpenPilot controller to your computer and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>未检测到OpenPilot设备。
+请确保设备和电脑已经连接，然后重新尝试。</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Retrieving data...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在获取传感器数据...</translation>
     </message>
     <message>
         <location line="+48"/>
         <source>&lt;font color=&apos;green&apos;&gt;Done!&lt;/font&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;font color=&apos;green&apos;&gt;完成！&lt;/font&gt;</translation>
     </message>
 </context>
 <context>
@@ -13094,7 +13140,7 @@ Please connect your OpenPilot controller to your computer and try again.</source
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13107,47 +13153,56 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will tell you to connect the battery to your aircraft, before doing so you absolutely &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#f30f1d;&quot;&gt;must remove the propellers from all motors&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The steps to perform this calibration are as follows:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;1.&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; Confirm all safety questions,&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;2.&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; Press the Start button when it becomes enabled, &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;battery not connected&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;,&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;3.&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; Connect the battery to your airframe,&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;4.&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; Wait for ESC calibration beep(s),&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;5.&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; Press the Stop button,&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;6.&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; Wait for ESC confirmation beep(s),&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;7.&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; Disconnect battery.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot电调校准&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;电子调速器（ESC），特别是航空模型使用的无刷电机电子调速器，首次使用之前或更换遥控器以后，必须通过校准来学习最大及最小油门行程量。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;在电调校准过程中，向导会提示您给航模接上动力电池，在上电之前，请&lt;span style=&quot; font-size:10pt; font-weight:600; color:#f30f1d;&quot;&gt;务必从电机上卸除所有螺旋桨&lt;/span&gt;。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;整个校准过程分为以下几个步骤：&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;1、&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;确认所有安全须知；&lt;br /&gt;
+&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;2、&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;点击“开始”按钮，&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;此时电池尚未连接&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;；&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;3、&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;接上电池；&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;4、&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;等待电调通过电机发出的校准提示音；&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;5、&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;点击停止按钮；&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;6、&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;等待校准确认提示音；&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;7、&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;断开电池。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>I have removed ALL propellers from ALL motors of my vehicle.</source>
-        <translation type="unfinished"></translation>
+        <translation>已经将所有螺旋桨从电机上拆除。</translation>
     </message>
     <message>
         <location/>
         <source>The vehicle is NOT powered by any external power source but USB</source>
-        <translation type="unfinished"></translation>
+        <translation>除USB以外，没有外接电池供电</translation>
     </message>
     <message>
         <location/>
         <source>I confirm i have read and understood the above instructions in full</source>
-        <translation type="unfinished"></translation>
+        <translation>已经全部阅读并理解上述所有内容及安全注意事项</translation>
     </message>
     <message>
         <location/>
         <source>Low/Off</source>
-        <translation type="unfinished"></translation>
+        <translation>油门最低行程</translation>
     </message>
     <message>
         <location/>
         <source>N/A</source>
-        <translation type="unfinished">N/A</translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <location/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>油门最高行程</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <location/>
         <source>Stop</source>
-        <translation type="unfinished">停止</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+49"/>
@@ -13156,7 +13211,7 @@ p, li { white-space: pre-wrap; }
         <location line="+7"/>
         <location line="+9"/>
         <source>%1 µs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13180,8 +13235,8 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot输出信号设置&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;为了更好的给电机输出控制信号，系统需要知道电子速度控制器（电调）的类型。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请在下方选择电调类型。如果你不确定，请保持默认选项，点击下一步继续操作。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;为了更好的给电机输出控制信号，系统需要知道电子调速器的类型。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请在下方选择电调类型，如果不确定，请保持默认选项，点击下一步继续操作。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -13197,7 +13252,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Turbo PWM ESC 400Hz</source>
-        <translation type="unfinished">490Hz PWM高速电调</translation>
+        <translatorcomment>400 or 490？</translatorcomment>
+        <translation>490Hz PWM高速电调</translation>
     </message>
     <message>
         <location/>
@@ -13210,18 +13266,18 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/opendpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Go to Input Wizard...</source>
-        <translation type="unfinished"></translation>
+        <translation>进入遥控器设置向导...</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/opendpage.cpp" line="+59"/>
         <source>Unable to open Input Wizard since the Config Plugin is not
 loaded in the current workspace.</source>
-        <translation type="unfinished"></translation>
+        <translation>因为配置插件没有加载，无法启动遥控器设置向导。</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/opendpage.ui"/>
@@ -13233,7 +13289,14 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Setup wizard is completed.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;This part of the setup procedure is now complete and you are one step away from completing the setup of your OpenPilot controller.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To complete the setup please click the button below to close this wizard and go directly to the Transmitter Setup Wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Congratulations!&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;基本设置已经结束。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;目前我们已经完成OpenPilot设备必需的所有基础设置，您还差一步即可完成整个航模设置。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请点击下方按钮进入遥控器设置向导。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -13259,7 +13322,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Disregarding this warning puts you at&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risk of injury&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Now that your props are removed we can get started. Ready?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -13271,7 +13334,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot;font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;警告：请确认在进行下一步操作之前 &lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;&lt;span style=&quot;font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;所有螺旋桨已经被从模型上安全拆卸&lt;/span&gt;!&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请不要忽略该警告，否则会有受伤风险！&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;安全起见，请不要忽略该警告！&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot;font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;准备好了吗？请点击“下一步”开始。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>

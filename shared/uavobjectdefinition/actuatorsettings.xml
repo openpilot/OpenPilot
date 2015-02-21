@@ -2,14 +2,7 @@
     <object name="ActuatorSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType</description>
         <field name="BankUpdateFreq" units="Hz" type="uint16" elements="6" defaultvalue="50"/>
-        <field name="BankMode" type="enum" units="" elements="6" options="PWM,OneShot,OneShot125" defaultvalue="PWM"
-        limits="%0401NE:OneShot:OneShot125,%0402NE:OneShot:OneShot125; \
-        %0401NE:OneShot:OneShot125,%0402NE:OneShot:OneShot125; \
-        %0401NE:OneShot:OneShot125,%0402NE:OneShot:OneShot125; \
-        %0401NE:OneShot:OneShot125,%0402NE:OneShot:OneShot125; \
-        %0401NE:OneShot:OneShot125,%0402NE:OneShot:OneShot125; \
-        %0401NE:OneShot:OneShot125,%0402NE:OneShot:OneShot125;"
-        />
+        <field name="BankMode" type="enum" units="" elements="6" options="PWM,PWMSync,OneShot125" defaultvalue="PWM"/>
         <field name="ChannelMax" units="us" type="int16" elements="12" defaultvalue="1000"/>
         <field name="ChannelNeutral" units="us" type="int16" elements="12" defaultvalue="1000"/>
         <field name="ChannelMin" units="us" type="int16" elements="12" defaultvalue="1000"/>

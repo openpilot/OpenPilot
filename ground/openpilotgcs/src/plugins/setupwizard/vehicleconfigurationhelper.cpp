@@ -139,7 +139,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
     case VehicleConfigurationSource::CONTROLLER_CC:
     case VehicleConfigurationSource::CONTROLLER_CC3D:
         // Reset all ports
-        data.CC_RcvrPort  = HwSettings::CC_RCVRPORT_DISABLED;
+        data.CC_RcvrPort  = HwSettings::CC_RCVRPORT_DISABLEDONESHOT;
 
         // Default mainport to be active telemetry link
         data.CC_MainPort  = HwSettings::CC_MAINPORT_TELEMETRY;
@@ -147,10 +147,10 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DISABLED;
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
-            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PWM;
+            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PWMNOONESHOT;
             break;
         case VehicleConfigurationSource::INPUT_PPM:
-            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM;
+            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPMNOONESHOT;
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
             // We have to set teletry on flexport since s.bus needs the mainport.
@@ -679,8 +679,10 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         }
     }
 
-    // Default maxThrottle
+    // Default maxThrottle and minThrottle
     float maxThrottle = 0.9;
+    float minThrottle = 0;
+
 
     // Save mixer values for sliders
     switch (m_configSource->getVehicleType()) {
@@ -737,17 +739,26 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
     {
         switch (m_configSource->getVehicleSubType()) {
         case VehicleConfigurationSource::GROUNDVEHICLE_MOTORCYCLE:
-        case VehicleConfigurationSource::GROUNDVEHICLE_CAR:
             mSettings->setMixerValueRoll(100);
             mSettings->setMixerValuePitch(100);
             mSettings->setMixerValueYaw(100);
             maxThrottle = 1;
+            break;
+        case VehicleConfigurationSource::GROUNDVEHICLE_CAR:
+            mSettings->setMixerValueRoll(100);
+            mSettings->setMixerValuePitch(100);
+            mSettings->setMixerValueYaw(100);
+            // Set curve2 range from -0.926 to 1 : take in account 4% offset in Throttle input
+            // 0.5 / 0.54 = 0.926
+            maxThrottle = 1;
+            minThrottle = -0.926;
             break;
         case VehicleConfigurationSource::GROUNDVEHICLE_DIFFERENTIAL:
             mSettings->setMixerValueRoll(100);
             mSettings->setMixerValuePitch(100);
             mSettings->setMixerValueYaw(100);
             maxThrottle = 0.8;
+            minThrottle = -0.8;
             break;
         default:
             break;
@@ -765,7 +776,7 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         UAVObjectField *field = mSettings->getField(throttlePattern.arg(i));
         Q_ASSERT(field);
         for (quint32 i = 0; i < field->getNumElements(); i++) {
-            field->setValue(i * (maxThrottle / (field->getNumElements() - 1)), i);
+            field->setValue(minThrottle + (i * ((maxThrottle - minThrottle) / (field->getNumElements() - 1))), i);
         }
     }
 
@@ -2033,7 +2044,7 @@ void VehicleConfigurationHelper::setupCar()
     channels[0].yaw       = 100;
 
     // Motor (Chan 2)
-    channels[1].type      = MIXER_TYPE_MOTOR;
+    channels[1].type      = MIXER_TYPE_REVERSABLEMOTOR;
     channels[1].throttle1 = 0;
     channels[1].throttle2 = 100;
     channels[1].roll      = 0;
@@ -2058,7 +2069,7 @@ void VehicleConfigurationHelper::setupTank()
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     // Left Motor (Chan 1)
-    channels[0].type      = MIXER_TYPE_SERVO;
+    channels[0].type      = MIXER_TYPE_REVERSABLEMOTOR;
     channels[0].throttle1 = 0;
     channels[0].throttle2 = 100;
     channels[0].roll      = 0;
@@ -2066,7 +2077,7 @@ void VehicleConfigurationHelper::setupTank()
     channels[0].yaw       = 100;
 
     // Right Motor (Chan 2)
-    channels[1].type      = MIXER_TYPE_MOTOR;
+    channels[1].type      = MIXER_TYPE_REVERSABLEMOTOR;
     channels[1].throttle1 = 0;
     channels[1].throttle2 = 100;
     channels[1].roll      = 0;
@@ -2098,10 +2109,10 @@ void VehicleConfigurationHelper::setupMotorcycle()
     channels[0].pitch     = 0;
     channels[0].yaw       = 100;
 
-    // Motor (Chan 2)
+    // Motor (Chan 2) : Curve1, no reverse
     channels[1].type      = MIXER_TYPE_MOTOR;
-    channels[1].throttle1 = 0;
-    channels[1].throttle2 = 100;
+    channels[1].throttle1 = 100;
+    channels[1].throttle2 = 0;
     channels[1].roll      = 0;
     channels[1].pitch     = 0;
     channels[1].yaw       = 0;

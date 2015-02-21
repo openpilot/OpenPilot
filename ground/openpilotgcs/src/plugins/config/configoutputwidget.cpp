@@ -32,7 +32,6 @@
 #include "mixersettings.h"
 #include "actuatorcommand.h"
 #include "actuatorsettings.h"
-#include "systemalarms.h"
 #include "systemsettings.h"
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 #include <extensionsystem/pluginmanager.h>
@@ -52,6 +51,8 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 {
     ui = new Ui_OutputWidget();
     ui->setupUi(this);
+
+    ui->gvFrame->setVisible(false);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
@@ -105,6 +106,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode5, 4, 0, true);
     addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode6, 5, 0, true);
 
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+    connect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
+
     disconnect(this, SLOT(refreshWidgetsValues(UAVObject *)));
 
     populateWidgets();
@@ -115,6 +119,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
 ConfigOutputWidget::~ConfigOutputWidget()
 {
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+
+    disconnect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
     // Do nothing
 }
 
@@ -195,6 +202,15 @@ void ConfigOutputWidget::runChannelTests(bool state)
     // Setup the correct initial channel values when the channel testing mode is turned on.
     if (state) {
         sendAllChannelTests();
+    }
+
+    // Add info at end
+    if (!state && isDirty()) {
+        QMessageBox mbox;
+        mbox.setText(QString(tr("You may want to save your neutral settings.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.setIcon(QMessageBox::Information);
+        mbox.exec();
     }
 }
 
@@ -435,4 +451,28 @@ void ConfigOutputWidget::openHelp()
 void ConfigOutputWidget::stopTests()
 {
     ui->channelOutTest->setChecked(false);
+}
+
+void ConfigOutputWidget::updateWarnings(UAVObject *)
+{
+    SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+    SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
+
+    if (systemAlarms.Alarm[SystemAlarms::ALARM_SYSTEMCONFIGURATION] > SystemAlarms::ALARM_WARNING) {
+        switch (systemAlarms.ExtendedAlarmStatus[SystemAlarms::EXTENDEDALARMSTATUS_SYSTEMCONFIGURATION]) {
+        case SystemAlarms::EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT:
+            setWarning(tr("OneShot only works with Receiver Port settings marked with '+OneShot'<br>"
+                          "When using Receiver Port setting 'PPM_PIN6+OneShot' "
+                          "<b><font color='#C3A8FF'>Bank 4 (output 6,9-10)</font></b> must be set to PWM"));
+            return;
+        }
+    }
+    setWarning(NULL);
+}
+
+void ConfigOutputWidget::setWarning(QString message)
+{
+    ui->gvFrame->setVisible(!message.isNull());
+    ui->picWarning->setPixmap(message.isNull() ? QPixmap() : QPixmap(":/configgadget/images/error.svg"));
+    ui->txtWarning->setText(message);
 }

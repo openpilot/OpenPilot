@@ -142,11 +142,7 @@ void PIOS_Servo_SetBankMode(uint8_t bank, uint8_t mode)
                 }
             }
         }
-        if (mode != PIOS_SERVO_BANK_MODE_PWM) {
-            // TIM_UpdateDisableConfig(pios_servo_bank_timer[bank], ENABLE);
-        } else {
-            // TIM_UpdateDisableConfig(pios_servo_bank_timer[bank], DISABLE);
-        }
+
         // Setup the timer accordingly
         TIM_SelectOnePulseMode(pios_servo_bank_timer[bank], TIM_OPMode_Repetitive);
         TIM_Cmd(pios_servo_bank_timer[bank], ENABLE);

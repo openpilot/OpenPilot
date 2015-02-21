@@ -67,8 +67,8 @@ public:
 
 private:
     void UpdateVelocityDesired(void);
-    int8_t UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction);
-    void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity)
+    int8_t UpdateStabilizationDesired(void);
+    void updateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
 
     PathFollowerFSM *fsm;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
@@ -78,6 +78,8 @@ private:
     PIDControlThrust controlThrust;
     PIDControlNE controlNE;
     uint8_t mActive;
+    uint8_t mHoldActive;
+    uint8_t mManualThrust;
 };
 
 #endif // PATHFOLLOWERCONTROLBRAKE_H

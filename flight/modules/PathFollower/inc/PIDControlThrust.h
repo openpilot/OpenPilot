@@ -50,8 +50,17 @@ public:
     void UpdateVelocityState(float pv);
     float GetVelocityDesired(void);
     float GetThrustCommand(void);
+    void UpdatePositionalParameters(float kp);
+    void UpdatePositionState(float pvDown);
+    void UpdatePositionSetpoint(float setpointDown);
+    void ControlPosition();
+    void UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
+    void UpdateVelocityStateWithBrake(float pvDown, float path_time, float brakeRate);
 
 private:
+    void setup_neutralThrustCalc();
+    void run_neutralThrustCalc();
+
     struct pid2 PID;
     float deltaTime;
     float mVelocitySetpointTarget;
@@ -61,7 +70,24 @@ private:
     PathFollowerFSM *mFSM;
     float mNeutral;
     float mVelocityMax;
+    struct pid PIDpos;
+    float mPositionSetpointTarget;
+    float mPositionState;
     uint8_t mActive;
+
+    struct NeutralThrustEstimation {
+         uint32_t count;
+         float    sum;
+         float    average;
+         float    correction;
+         float    algo_erro_check;
+         float    min;
+         float    max;
+         bool     start_sampling;
+         bool     have_correction;
+     };
+     struct NeutralThrustEstimation neutralThrustEst;
+
 };
 
 #endif // PIDCONTROLTHRUST_H

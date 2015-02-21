@@ -97,6 +97,27 @@ void PIDControlNE::UpdatePositionalParameters(float kp)
     pid_configure(&PIDposH[0], kp, 0.0f, 0.0f, 0.0f);
     pid_configure(&PIDposH[1], kp, 0.0f, 0.0f, 0.0f);
 }
+void PIDControlNE::UpdatePositionSetpoint(float setpointNorth, float setpointEast)
+{
+    mPositionSetpointTarget[0] = setpointNorth;
+    mPositionSetpointTarget[1] = setpointEast;
+}
+void PIDControlNE::UpdatePositionState(float pvNorth, float pvEast)
+{
+    mPositionState[0] = pvNorth;
+    mPositionState[1] = pvEast;
+}
+// This is a pure position hold position control
+void PIDControlNE::ControlPosition()
+{
+    // Current progress location relative to end
+    float velNorth = 0.0f;
+    float velEast  = 0.0f;
+
+    velNorth = pid_apply(&PIDposH[0], mPositionSetpointTarget[0] - mPositionState[0], deltaTime);
+    velEast  = pid_apply(&PIDposH[1], mPositionSetpointTarget[1] - mPositionState[1], deltaTime);
+    UpdateVelocitySetpoint(velNorth, velEast);
+}
 
 void PIDControlNE::UpdateVelocitySetpoint(float setpointNorth, float setpointEast)
 {
@@ -113,11 +134,6 @@ void PIDControlNE::UpdateVelocitySetpoint(float setpointNorth, float setpointEas
     mVelocitySetpointTarget[1] = setpointEast;
 }
 
-void PIDControlNE::UpdatePositionSetpoint(float setpointNorth, float setpointEast)
-{
-    mPositionSetpointTarget[0] = setpointNorth;
-    mPositionSetpointTarget[1] = setpointEast;
-}
 
 void PIDControlNE::UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity)
 {
@@ -147,8 +163,8 @@ void PIDControlNE::UpdateVelocityStateWithBrake(float pvNorth, float pvEast, flo
 
     float velocitySetpointDesired[2];
 
-    updateBrakeVelocity(mVelocitySetpointTarget[0], path_time, brakeRate, pvNorth, &velocitySetpointDesired[0]);
-    updateBrakeVelocity(mVelocitySetpointTarget[1], path_time, brakeRate, pvEast, &velocitySetpointDesired[1]);
+    UpdateBrakeVelocity(mVelocitySetpointTarget[0], path_time, brakeRate, pvNorth, &velocitySetpointDesired[0]);
+    UpdateBrakeVelocity(mVelocitySetpointTarget[1], path_time, brakeRate, pvEast, &velocitySetpointDesired[1]);
 
     // Calculate the rate of change
     for (int iaxis = 0; iaxis < 2; iaxis++) {
@@ -176,11 +192,6 @@ void PIDControlNE::UpdateVelocityState(float pvNorth, float pvEast)
     }
 }
 
-void PIDControlNE::UpdatePositionState(float pvNorth, float pvEast)
-{
-    mPositionState[0] = pvNorth;
-    mPositionState[1] = pvEast;
-}
 
 void PIDControlNE::UpdateCommandParameters(float minCommand, float maxCommand, float velocityFeedforward)
 {
@@ -189,17 +200,7 @@ void PIDControlNE::UpdateCommandParameters(float minCommand, float maxCommand, f
     mVelocityFeedforward = velocityFeedforward;
 }
 
-// This is a pure position hold position control
-void PIDControlNE::ControlPosition()
-{
-    // Current progress location relative to end
-    float velNorth = 0.0f;
-    float velEast  = 0.0f;
 
-    velNorth = pid_apply(&PIDposH[0], mPositionSetpointTarget[0] - mPositionState[0], deltaTime);
-    velEast  = pid_apply(&PIDposH[1], mPositionSetpointTarget[1] - mPositionState[1], deltaTime);
-    UpdateVelocitySetpoint(velNorth, velEast);
-}
 
 void PIDControlNE::GetNECommand(float *northCommand, float *eastCommand)
 {

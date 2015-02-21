@@ -81,6 +81,7 @@ extern "C" {
 }
 
 #include "fsm_land.h"
+#include "FSMBrake.h"
 #include "PathFollowerControlLanding.h"
 #include "PathFollowerControlVelocityRoam.h"
 #include "PathFollowerControlBrake.h"
@@ -99,13 +100,6 @@ extern "C" {
 
 
 
-#define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT     0.5f
-#define NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT          0.2f
-#define NEUTRALTHRUST_PH_VEL_STATE_LIMIT            0.2f
-#define NEUTRALTHRUST_PH_VEL_ERROR_LIMIT            0.1f
-
-#define NEUTRALTHRUST_START_DELAY                   (2 * 20) // 2 seconds at rate of 20Hz (50ms update rate)
-#define NEUTRALTHRUST_END_COUNT                     (NEUTRALTHRUST_START_DELAY + (4 * 20))  // 4 second sample
 
 // Private types
 
@@ -122,20 +116,6 @@ struct Globals {
     bool vtolEmergencyFallbackSwitch;
 };
 
-struct NeutralThrustEstimation {
-    uint32_t count;
-    float    sum;
-    float    average;
-    float    correction;
-    float    algo_erro_check;
-    float    min;
-    float    max;
-    bool     start_sampling;
-    bool     have_correction;
-};
-static struct NeutralThrustEstimation neutralThrustEst;
-
-
 // Private variables
 static DelayedCallbackInfo *pathFollowerCBInfo;
 static uint32_t updatePeriod = PF_IDLE_UPDATE_RATE_MS;
@@ -145,7 +125,6 @@ static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
 static VtolPathFollowerSettingsData vtolPathFollowerSettings;
 static FlightStatusData flightStatus;
-static PathSummaryData pathSummary;
 
 // correct speed by measured airspeed
 static float indicatedAirspeedStateBias = 0.0f;
@@ -223,8 +202,17 @@ int32_t PathFollowerInitialize()
     PathFollowerControlLanding::instance()->Initialize((PathFollowerFSM *)FSMLand::instance(),
                                                        &vtolPathFollowerSettings, &pathDesired, &flightStatus, &pathStatus);
     PathFollowerControlVelocityRoam::instance()->Initialize( &vtolPathFollowerSettings, &pathDesired, &pathStatus);
-    PathFollowerControlBrake::instance()->Initialize( &vtolPathFollowerSettings, &pathDesired, &pathStatus);
+    PathFollowerControlBrake::instance()->Initialize( (PathFollowerFSM *)FSMBrake::instance(),
+                                                      &vtolPathFollowerSettings,
+                                                      &pathDesired,
+                                                      &flightStatus,
+                                                      &pathStatus);
 
+    int32_t Initialize(PathFollowerFSM *fsm_ptr,
+                       VtolPathFollowerSettingsData *vtolPathFollowerSettings,
+                       PathDesiredData *pathDesired,
+                       FlightStatusData *flightStatus,
+                       PathStatusData *pathStatus);
     // reset integrals
     resetGlobals();
 
@@ -279,7 +267,6 @@ static void pathFollowerTask(void)
         return;
     }
 
-    int16_t old_uid = pathStatus.UID;
     pathStatus.UID    = pathDesired.UID;
     pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
 
@@ -455,17 +442,6 @@ static void resetGlobals()
     global.poiRadius = 0.0f;
     global.vtolEmergencyFallback = 0;
     global.vtolEmergencyFallbackSwitch = false;
-
-    // reset neutral thrust assessment. We restart this process
-    // and do once for each position hold engagement
-    neutralThrustEst.start_sampling  = false;
-    neutralThrustEst.count = 0;
-    neutralThrustEst.sum = 0.0f;
-    neutralThrustEst.have_correction = false;
-    neutralThrustEst.average    = 0.0f;
-    neutralThrustEst.correction = 0.0f;
-    neutralThrustEst.min = 0.0f;
-    neutralThrustEst.max = 0.0f;
 
     pathStatus.path_time = 0.0f;
 }
@@ -1252,81 +1228,6 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
     downCommand = -pid_apply_setpoint(&global.PIDvel[2], &local_scaler, velocityDesired.Down, velocityState.Down, dT);
 
-
-    // TODO Make this a little FSM library that can be run from multiple locations e.g. any mode that is PH
-
-    // if auto thrust and we have not run a correction calc check for PH and stability to then run an assessment
-    // note that arming into this flight mode is not allowed, so assumption here is that
-    // we have not landed.  If GPSAssist+Manual/Cruise control thrust mode is used, a user overriding the
-    // altitude maintaining PID will have moved the throttle state to FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL.
-    // In manualcontrol.c the state will stay in manual throttle until the throttle command exceeds the vtol thrust min,
-    // avoiding auto-takeoffs.  Therefore no need to check that here.
-    if (!manual_thrust && neutralThrustEst.have_correction != true) {
-        // Assess if position hold state running.  This can be normal position hold or
-        // another mode with assist-hold active.
-        bool ph_active =
-            ((flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD &&
-              flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) ||
-             (flightStatus.FlightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE &&
-              flightStatus.AssistedControlState == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD));
-
-        // Make FSM specific
-        bool stable = (fabsf(pathStatus.correction_direction_down) < NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT &&
-                       fabsf(velocityDesired.Down) < NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT &&
-                       fabsf(velocityState.Down) < NEUTRALTHRUST_PH_VEL_STATE_LIMIT &&
-                       fabsf(downError) < NEUTRALTHRUST_PH_VEL_ERROR_LIMIT);
-
-        if (ph_active && stable) {
-            if (neutralThrustEst.start_sampling) {
-                neutralThrustEst.count++;
-
-
-                // delay count for 2 seconds into hold allowing for stablisation
-                if (neutralThrustEst.count > NEUTRALTHRUST_START_DELAY) {
-                    neutralThrustEst.sum += global.PIDvel[2].iAccumulator;
-                    if (global.PIDvel[2].iAccumulator < neutralThrustEst.min) {
-                        neutralThrustEst.min = global.PIDvel[2].iAccumulator;
-                    }
-                    if (global.PIDvel[2].iAccumulator > neutralThrustEst.max) {
-                        neutralThrustEst.max = global.PIDvel[2].iAccumulator;
-                    }
-                }
-
-                if (neutralThrustEst.count >= NEUTRALTHRUST_END_COUNT) {
-                    // 6 seconds have past
-                    // lets take an average
-                    neutralThrustEst.average         = neutralThrustEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
-                    neutralThrustEst.correction      = neutralThrustEst.average / 1000.0f;
-
-                    global.PIDvel[2].iAccumulator   -= neutralThrustEst.average;
-
-                    neutralThrustEst.start_sampling  = false;
-                    neutralThrustEst.have_correction = true;
-
-                    // Write a new adjustment value
-                    // vtolSelfTuningStats.NeutralThrustOffset  was incremental adjusted above
-                    VtolSelfTuningStatsData new_vtolSelfTuningStats;
-                    // add the average remaining i value to the
-                    new_vtolSelfTuningStats.NeutralThrustOffset      = vtolSelfTuningStats.NeutralThrustOffset + neutralThrustEst.correction;
-                    new_vtolSelfTuningStats.NeutralThrustCorrection  = neutralThrustEst.correction; // the i term thrust correction value applied
-                    new_vtolSelfTuningStats.NeutralThrustAccumulator = global.PIDvel[2].iAccumulator; // the actual iaccumulator value after correction
-                    new_vtolSelfTuningStats.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
-                    VtolSelfTuningStatsSet(&new_vtolSelfTuningStats);
-                }
-            } else {
-                // start a tick count
-                neutralThrustEst.start_sampling = true;
-                neutralThrustEst.count = 0;
-                neutralThrustEst.sum   = 0.0f;
-                neutralThrustEst.max   = 0.0f;
-                neutralThrustEst.min   = 0.0f;
-            }
-        } else {
-            // reset sampling as we did't get 6 continuous seconds
-            neutralThrustEst.start_sampling = false;
-        }
-    } // else we already have a correction for this PH run
-
     stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
 
 
@@ -1397,24 +1298,6 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
         uint8_t thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
 
         switch (flightStatus.FlightMode) {
-        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-            thrustMode = settings.Stabilization1Settings.Thrust;
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-            thrustMode = settings.Stabilization2Settings.Thrust;
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-            thrustMode = settings.Stabilization3Settings.Thrust;
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
-            thrustMode = settings.Stabilization4Settings.Thrust;
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
-            thrustMode = settings.Stabilization5Settings.Thrust;
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-            thrustMode = settings.Stabilization6Settings.Thrust;
-            break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
             // we hard code the "GPS Assisted" PostionHold/Roam to use alt-vario which
             // is a more appropriate throttle mode.  "GPSAssist" adds braking

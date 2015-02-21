@@ -88,16 +88,13 @@ extern "C" {
 #include "PIDControlThrust.h"
 
 // Private constants
-#define BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK 0.95f
-#define BRAKE_EXIT_VELOCITY_LIMIT                   0.2f
-
 #define BRAKE_RATE_MINIMUM                          0.2f
 
 // pointer to a singleton instance
 PathFollowerControlBrake *PathFollowerControlBrake::p_inst = 0;
 
 PathFollowerControlBrake::PathFollowerControlBrake()
-    : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0), mActive(false)
+    : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0), mActive(false), mHoldActive(false), mManualThrust(false)
 {}
 
 // Called when mode first engaged
@@ -105,6 +102,8 @@ void PathFollowerControlBrake::Activate(void)
 {
     if (!mActive) {
         mActive = true;
+        mHoldActive = false;
+        mManualThrust = false;
         SettingsUpdated();
         fsm->Activate();
         controlThrust.Activate();
@@ -122,21 +121,23 @@ uint8_t PathFollowerControlBrake::Mode(void)
   return PATHDESIRED_MODE_BRAKE;
 }
 
-// Objective updated in pathdesired, e.g. same flight mode but new target velocity
+// Objective updated in pathdesired
 void PathFollowerControlBrake::ObjectiveUpdated(void)
 {
     // Set the objective's target velocity
     controlThrust.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_DOWN]);
     controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH],
                                      pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST]);
-    //controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
-
-
+    if (pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] > 0.0f) {
+             pathStatus->path_time = 0.0f;
+    }
 }
 void PathFollowerControlBrake::Deactivate(void)
 {
     if (mActive) {
         mActive = false;
+        mHoldActive = false;
+        mManualThrust = false;
         fsm->Inactive();
         controlThrust.Deactivate();
         controlNE.Deactivate();
@@ -213,22 +214,37 @@ void PathFollowerControlBrake::UpdateVelocityDesired()
 	brakeRate = BRAKE_RATE_MINIMUM; // set a minimum to avoid a divide by zero potential below
     }
 
-
-    controlThrust.UpdateVelocityStateWithBrake(velocityState.Down);
-    controlNE.UpdateVelocityStateWithBrake(velocityState.North, velocityState.East);
-
-#if 0
-// Implement optional horizontal position hold.
-    if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
-	// landing flight mode has stored original horizontal position in pathdesired
+    if (fsm->PositionHoldState()) {
         PositionStateData positionState;
         PositionStateGet(&positionState);
+
+        // On first engagement set the position setpoint
+	if (!mHoldActive) {
+	    mHoldActive = true;
+            controlNE.UpdatePositionSetpoint(positionState.North, positionState.East);
+            if (!mManualThrust) controlThrust.UpdatePositionSetpoint(positionState.Down);
+	}
+
+	// Update position state and control position to create inputs to velocity control
         controlNE.UpdatePositionState(positionState.North, positionState.East);
         controlNE.ControlPosition();
-    }
-#endif
+        if (!mManualThrust) {
+            controlThrust.UpdatePositionState(positionState.Down);
+            controlThrust.ControlPosition();
+        }
 
-    velocityDesired.Down  = controlThrust.GetVelocityDesired();
+	controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
+	if (!mManualThrust) controlThrust.UpdateVelocityState(velocityState.Down);
+
+    }
+    else {
+	controlNE.UpdateVelocityStateWithBrake(velocityState.North, velocityState.East, pathStatus->path_time, brakeRate);
+	if (!mManualThrust) controlThrust.UpdateVelocityStateWithBrake(velocityState.Down, pathStatus->path_time, brakeRate);
+    }
+
+    if (!mManualThrust) velocityDesired.Down  = controlThrust.GetVelocityDesired();
+else velocityDesired.Down = 0.0f;
+
     float north, east;
     controlNE.GetVelocityDesired(&north, &east);
     velocityDesired.North = north;
@@ -260,7 +276,7 @@ void PathFollowerControlBrake::UpdateVelocityDesired()
 
 }
 
-int8_t PathFollowerControlBrake::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
+int8_t PathFollowerControlBrake::UpdateStabilizationDesired(void)
 {
     uint8_t result = 1;
     StabilizationDesiredData stabDesired;
@@ -274,14 +290,6 @@ int8_t PathFollowerControlBrake::UpdateStabilizationDesired(bool yaw_attitude, f
     StabilizationBankGet(&stabSettings);
 
     controlNE.GetNECommand(&northCommand, &eastCommand);
-    stabDesired.Thrust = controlThrust.GetThrustCommand();
-
-    if ((vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL &&
-            flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) ||
-           (flightStatus.FlightModeAssist && flightStatus.AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL)) {
-           manual_thrust = true;
-       }
-
 
     float angle_radians = DEG2RAD(attitudeState.Yaw);
     float cos_angle     = cosf(angle_radians);
@@ -300,12 +308,12 @@ int8_t PathFollowerControlBrake::UpdateStabilizationDesired(bool yaw_attitude, f
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL;
 
     // when flight mode assist is active but in primary-thrust mode, the thrust mode must be set to the same as per the primary mode.
-        if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST) {
+    if (flightStatus->FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST) {
             FlightModeSettingsData settings;
             FlightModeSettingsGet(&settings);
             uint8_t thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
 
-            switch (flightStatus.FlightMode) {
+            switch (flightStatus->FlightMode) {
             case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
                 thrustMode = settings.Stabilization1Settings.Thrust;
                 break;
@@ -330,22 +338,16 @@ int8_t PathFollowerControlBrake::UpdateStabilizationDesired(bool yaw_attitude, f
                 // and a better throttle management to the standard Position Hold.
                 thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
                 break;
-
-                // LAND defaults to cruisecontrol managed by pathfollowers PID and
-                // can not be overridden in GPSAssist mode. The only time we look
-                // at the actual throttle position is in the decision to confirm
-                // landed and initiate disarming automatically.
             }
             stabDesired.StabilizationMode.Thrust = thrustMode;
             stabDesired.Thrust = manualControl.Thrust;
-        } else if (manual_thrust) {
+        } else if (mManualThrust) {
             stabDesired.Thrust = manualControl.Thrust;
         }
-        // else thrust is set by the PID controller
+        else {
+            stabDesired.Thrust = controlThrust.GetThrustCommand();
+        }
 
-
-
-    fsm->ConstrainStabiDesired(&stabDesired); // excludes thrust
     StabilizationDesiredSet(&stabDesired);
 
     return result;
@@ -356,24 +358,21 @@ int8_t PathFollowerControlBrake::UpdateStabilizationDesired(bool yaw_attitude, f
 void PathFollowerControlBrake::UpdateAutoPilot()
 {
     if (pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] > 0.0f) {
-         if (old_uid != pathStatus->UID) {
-             pathStatus->path_time = 0.0f;
-         } else {
-             pathStatus->path_time += updatePeriod / 1000.0f;
-         }
+         pathStatus->path_time += vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
      }
+
+    if (flightStatus->FlightModeAssist && flightStatus->AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL) {
+        mManualThrust = true;
+    } else {
+
+        mManualThrust = false;
+    }
 
     fsm->Update(); // This will run above end condition checks
 
     UpdateVelocityDesired();
 
-    // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
-    bool yaw_attitude = false;
-    float yaw = 0.0f;
-
-    //fsm->GetYaw(yaw_attitude, yaw);
-
-    int8_t result = UpdateStabilizationDesired(yaw_attitude, yaw);
+    int8_t result = UpdateStabilizationDesired();
 
     if (!result) {
         fsm->Abort(); // enter PH

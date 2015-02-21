@@ -31,9 +31,6 @@
 #ifndef FSM_BRAKE_H
 #define FSM_BRAKE_H
 
-extern "C" {
-#include "fsmlandstatus.h"
-}
 #include "PathFollowerFSM.h"
 
 // Brakeing state machine
@@ -43,6 +40,10 @@ typedef enum {
     BRAKE_STATE_HOLD, // Waiting for attainment of landing descent rate
     BRAKE_STATE_SIZE
 } PathFollowerFSM_BrakeState_T;
+
+typedef enum {
+  FSMBRAKESTATUS_STATEEXITREASON_NONE = 0
+} FSMBrakeStatusStateExitReasonOptions;
 
 class FSMBrake : PathFollowerFSM {
 private:
@@ -59,12 +60,14 @@ public:
     }
     int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings,
                        PathDesiredData *pathDesired,
-                       FlightStatusData *flightStatus);
+                       FlightStatusData *flightStatus,
+                       PathStatusData *ptr_pathStatus);
     void Inactive(void);
     void Activate(void);
     void Update(void);
     PathFollowerFSMState_T GetCurrentState(void);
     void Abort(void);
+    uint8_t PositionHoldState(void);
 
 protected:
 
@@ -89,6 +92,7 @@ protected:
     FSMBrakeData_T *mBrakeData;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
     PathDesiredData *pathDesired;
+    PathStatusData *pathStatus;
     FlightStatusData *flightStatus;
 
     void setup_inactive(void);
@@ -99,8 +103,7 @@ protected:
     void initFSM(void);
     void setState(PathFollowerFSM_BrakeState_T newState, FSMBrakeStatusStateExitReasonOptions reason);
     int32_t runState();
-    int32_t runAlways();
-    void updateFSMBrakeStatus();
+    //void updateFSMBrakeStatus();
 
     void setStateTimeout(int32_t count);
     void fallback_to_hold(void);

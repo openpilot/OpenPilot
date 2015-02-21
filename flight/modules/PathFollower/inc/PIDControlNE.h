@@ -44,22 +44,24 @@ public:
     void Activate();
     void UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax);
     void UpdatePositionalParameters(float kp);
-    void UpdateVelocitySetpoint(float setpointNorth, float setpointEast);
+    void UpdatePositionState(float pvNorth, float pvEast);
     void UpdatePositionSetpoint(float setpointNorth, float setpointEast);
+    void UpdateVelocitySetpoint(float setpointNorth, float setpointEast);
     // void RateLimit(float *spDesired, float *spCurrent, float rateLimit);
     void UpdateVelocityState(float pvNorth, float pvEast);
-    void UpdatePositionState(float pvNorth, float pvEast);
     void UpdateCommandParameters(float minCommand, float maxCommand, float velocityFeedforward);
     void ControlPosition();
     void GetNECommand(float *northCommand, float *eastCommand);
     void GetVelocityDesired(float *north, float *east);
+    void UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
+    void UpdateVelocityStateWithBrake(float pvNorth, float pvEast, float path_time, float brakeRate);
 
 private:
     struct pid2 PIDvel[2]; // North, East
-    struct pid PIDposH[2];
     float mVelocitySetpointTarget[2];
-    float mPositionSetpointTarget[2];
     float mVelocityState[2];
+    struct pid PIDposH[2];
+    float mPositionSetpointTarget[2];
     float mPositionState[2];
 
 

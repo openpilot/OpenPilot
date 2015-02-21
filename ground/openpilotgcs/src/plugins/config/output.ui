@@ -145,7 +145,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox">
              <property name="title">
-              <string>GroupBox</string>
+              <string>Output Configuration</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0">
               <property name="leftMargin">

@@ -33,6 +33,10 @@ win32 {
     QMAKE_RPATHDIR = \'\$$ORIGIN\'/$$relative_path($$GCS_LIBRARY_PATH, $$GCS_APP_PATH)
     QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_QT_LIBRARY_PATH, $$GCS_APP_PATH)
     include(../rpath.pri)
+
+    equals(copyqt, 1) {
+        RESOURCES += qtconf.qrc
+    }
 }
 
 OTHER_FILES += openpilotgcs.rc

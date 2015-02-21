@@ -40,6 +40,7 @@
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "actuatorsettings.h"
+#include "mixersettings.h"
 #include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>

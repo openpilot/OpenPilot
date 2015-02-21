@@ -178,24 +178,24 @@ int32_t configuration_check()
         }
     }
 
-    uint8_t checks_disabled;
-    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
-    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
-        severity = SYSTEMALARMS_ALARM_WARNING;
-    }
-
     // query sanity check hooks
-    if (severity == SYSTEMALARMS_ALARM_OK) {
+    if (severity < SYSTEMALARMS_ALARM_CRITICAL) {
         SANITYCHECK_CustomHookInstance *instance = NULL;
         LL_FOREACH(hooks, instance) {
             if (instance->enabled) {
                 alarmstatus = instance->hook();
                 if (alarmstatus != SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE) {
-                    severity = SYSTEMALARMS_ALARM_WARNING;
+                    severity = SYSTEMALARMS_ALARM_CRITICAL;
                     break;
                 }
             }
         }
+    }
+
+    uint8_t checks_disabled;
+    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
+    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
+        severity = SYSTEMALARMS_ALARM_WARNING;
     }
 
     if (severity != SYSTEMALARMS_ALARM_OK) {
@@ -287,6 +287,17 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
         return false;
     }
 
+
+    // if cruise control, ensure rate or acro are not set
+    if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL) {
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if ((modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATE ||
+                 modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ACRO)) {
+                return false;
+            }
+        }
+    }
+
     // Warning: This assumes that certain conditions in the XML file are met.  That
     // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL has the same numeric value for each channel
     // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
@@ -304,7 +315,6 @@ FrameType_t GetCurrentFrameType()
     switch ((SystemSettingsAirframeTypeOptions)airframe_type) {
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADH:
     case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX:

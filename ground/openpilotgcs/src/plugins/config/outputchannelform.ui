@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>768</width>
-    <height>54</height>
+    <height>55</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -289,8 +289,7 @@ margin:1px;</string>
       <enum>Qt::StrongFocus</enum>
      </property>
      <property name="toolTip">
-      <string>Minimum PWM value, beware of not overdriving your servo.
-Using OneShot125 a value of 1000(uS) here will produce a pulse of 125(uS).</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum PWM value, beware of not overdriving your servo.&lt;br/&gt;Using OneShot125 a value of 1000(µs) here will produce a pulse of 125(µs).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -628,8 +627,7 @@ margin:1px;</string>
       <enum>Qt::StrongFocus</enum>
      </property>
      <property name="toolTip">
-      <string>Maximum value, beware of not overdriving your servo.
-Using OneShot125 a value of 2000(uS) here will produce a pulse of 250(uS).</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum PWM value, beware of not overdriving your servo.&lt;br/&gt;Using OneShot125 a value of 1000(µs) here will produce a pulse of 125(µs).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

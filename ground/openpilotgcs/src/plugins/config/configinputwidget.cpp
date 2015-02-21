@@ -1698,12 +1698,31 @@ void ConfigInputWidget::resetChannelSettings()
 void ConfigInputWidget::resetActuatorSettings()
 {
     actuatorSettingsData = actuatorSettingsObj->getData();
-    // Clear all output data : Min, max, neutral = 1500
-    // 1500 = servo middle, can be applied to all outputs because board is 'Alwaysdisarmed'
+
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    QString mixerType;
+
+    // Clear all output data : Min, max, neutral at same value
+    // 1000 for motors and 1500 for all others (Reversable motor included)
     for (unsigned int output = 0; output < 12; output++) {
-        actuatorSettingsData.ChannelMax[output]     = 1500;
-        actuatorSettingsData.ChannelMin[output]     = 1000;
-        actuatorSettingsData.ChannelNeutral[output] = 1500;
+        QString mixerNumType  = QString("Mixer%1Type").arg(output + 1);
+        UAVObjectField *field = mixer->getField(mixerNumType);
+        Q_ASSERT(field);
+
+        if (field) {
+            mixerType = field->getValue().toString();
+        }
+        if ((mixerType == "Motor") || (mixerType == "Disabled")) {
+            actuatorSettingsData.ChannelMax[output]     = 1000;
+            actuatorSettingsData.ChannelMin[output]     = 1000;
+            actuatorSettingsData.ChannelNeutral[output] = 1000;
+        } else {
+            actuatorSettingsData.ChannelMax[output]     = 1500;
+            actuatorSettingsData.ChannelMin[output]     = 1500;
+            actuatorSettingsData.ChannelNeutral[output] = 1500;
+        }
         actuatorSettingsObj->setData(actuatorSettingsData);
     }
 }

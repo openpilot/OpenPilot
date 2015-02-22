@@ -742,12 +742,12 @@ void PIOS_Board_Init(void)
         break;
     case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
-    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
 #if defined(PIOS_INCLUDE_PPM)
         {
             uint32_t pios_ppm_id;
-            if (hwsettings_rcvrport == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT) {
-                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_pin6_cfg);
+            if (hwsettings_rcvrport == HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT) {
+                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_pin8_cfg);
             } else {
                 PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
             }
@@ -811,7 +811,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
     case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
-    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
         PIOS_Servo_Init(&pios_servo_cfg);
         break;
     case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
@@ -877,8 +877,8 @@ SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook()
     // Those modes allows oneshot usage
     case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
     case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
-    case HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT:
-        if ((recmode == HWSETTINGS_CC_RCVRPORT_PPM_PIN6ONESHOT ||
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
+        if ((recmode == HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT ||
              flexiMode == HWSETTINGS_CC_FLEXIPORT_PPM) &&
             (modes[3] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
              modes[3] == ACTUATORSETTINGS_BANKMODE_ONESHOT125)) {

@@ -1247,7 +1247,7 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
     .num_channels = 1,
 };
 
-const struct pios_ppm_cfg pios_ppm_pin6_cfg = {
+const struct pios_ppm_cfg pios_ppm_pin8_cfg = {
     .tim_ic_init         = {
         .TIM_ICPolarity  = TIM_ICPolarity_Rising,
         .TIM_ICSelection = TIM_ICSelection_DirectTI,

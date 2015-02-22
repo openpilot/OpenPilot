@@ -16,6 +16,8 @@
         <field name="UbxSBASMode" units="" type="enum" elements="1" options="Disabled,Ranging,Correction,Integrity,Ranging+Correction,Ranging+Integrity,Ranging+Correction+Integrity,Correction+Integrity" defaultvalue="Ranging" />
         <field name="UbxSBASChannelsUsed" units="" type="uint8" elements="1" defaultvalue="3"/>
         <field name="UbxSBASSats" units="" type="enum" elements="1" options="AutoScan,WAAS,EGNOS,MSAS,GAGAN,SDCM" defaultvalue="Auto-Scan" />
+        <!-- Ubx GNSS configuration, only applies to Ublox generation 7+ and GPS+GLONASS only to generation 8 -->
+        <field name="UbxGNSSMode" units="" type="enum" elements="1" options="GPS,GLONASS,GPS+GLONASS" defaultvalue="GPS" />
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

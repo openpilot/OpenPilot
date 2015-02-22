@@ -774,17 +774,17 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
 {
     static uint16_t prevBankUpdateFreq[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM];
     static uint8_t prevBankMode[ACTUATORSETTINGS_BANKMODE_NUMELEM];
-    bool updateMode = force_update || (memcmp(prevBankUpdateFreq, actuatorSettings->BankMode, sizeof(prevBankMode)) != 0);
+    bool updateMode = force_update || (memcmp(prevBankMode, actuatorSettings->BankMode, sizeof(prevBankMode)) != 0);
     bool updateFreq = force_update || (memcmp(prevBankUpdateFreq, actuatorSettings->BankUpdateFreq, sizeof(prevBankUpdateFreq)) != 0);
 
-    // check if the any rate setting is changed
+    // check if any setting is changed
     if (updateMode || updateFreq) {
         /* Something has changed, apply the settings to HW */
 
         uint16_t freq[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM];
         uint32_t clock[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM] = { 0 };
         for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
-            if (updateMode && (actuatorSettings->BankMode[i] != prevBankMode[i])) {
+            if (force_update || (actuatorSettings->BankMode[i] != prevBankMode[i])) {
                 PIOS_Servo_SetBankMode(i,
                                        actuatorSettings->BankMode[i] ==
                                        ACTUATORSETTINGS_BANKMODE_PWM ?

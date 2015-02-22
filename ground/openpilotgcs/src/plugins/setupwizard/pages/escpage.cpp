@@ -58,14 +58,32 @@ bool EscPage::validatePage()
 
 void EscPage::initializePage()
 {
-    if (getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC ||
-            getWizard()->getControllerType() == SetupWizard::CONTROLLER_CC3D) {
-        ui->oneshotESCButton->setEnabled(getWizard()->getInputType() != SetupWizard::INPUT_PWM);
-        if (ui->oneshotESCButton->isChecked() && getWizard()->getInputType() == SetupWizard::INPUT_PWM) {
-            ui->oneshotESCButton->setChecked(false);
-            ui->rapidESCButton->setChecked(true);
+    bool enabled = true;
+    switch(getWizard()->getControllerType()) {
+    case SetupWizard::CONTROLLER_CC:
+    case SetupWizard::CONTROLLER_CC3D:
+        switch (getWizard()->getVehicleType()) {
+        case SetupWizard::VEHICLE_MULTI:
+            switch (getWizard()->getVehicleSubType()) {
+            case SetupWizard::MULTI_ROTOR_TRI_Y:
+            case SetupWizard::MULTI_ROTOR_QUAD_X:
+            case SetupWizard::MULTI_ROTOR_QUAD_H:
+            case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
+                enabled = getWizard()->getInputType() != SetupWizard::INPUT_PWM;
+                break;
+            default:
+                enabled = false;
+                break;
+            }
+            break;
+        default: break;
         }
-    } else {
-        ui->oneshotESCButton->setEnabled(true);
+        break;
+    default: break;
+    }
+    ui->oneshotESCButton->setEnabled(enabled);
+    if (ui->oneshotESCButton->isChecked() && !enabled) {
+        ui->oneshotESCButton->setChecked(false);
+        ui->rapidESCButton->setChecked(true);
     }
 }

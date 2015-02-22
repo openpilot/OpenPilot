@@ -102,6 +102,7 @@ typedef enum {
     UBX_ID_CFG_MSG  = 0x01,
     UBX_ID_CFG_CFG  = 0x09,
     UBX_ID_CFG_SBAS = 0x16,
+    UBX_ID_CFG_GNSS = 0x3E
 } ubx_class_cfg_id;
 
 typedef enum {

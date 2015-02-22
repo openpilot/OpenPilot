@@ -46,9 +46,9 @@ bool EscPage::validatePage()
 {
     if (ui->oneshotESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_ONESHOT);
-    }else if (ui->rapidESCButton->isChecked()) {
+    } else if (ui->rapidESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_RAPID);
-    } else if (ui->defaultESCButton->isChecked()){
+    } else if (ui->defaultESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     }
 
@@ -59,7 +59,8 @@ bool EscPage::validatePage()
 void EscPage::initializePage()
 {
     bool enabled = true;
-    switch(getWizard()->getControllerType()) {
+
+    switch (getWizard()->getControllerType()) {
     case SetupWizard::CONTROLLER_CC:
     case SetupWizard::CONTROLLER_CC3D:
         switch (getWizard()->getVehicleType()) {

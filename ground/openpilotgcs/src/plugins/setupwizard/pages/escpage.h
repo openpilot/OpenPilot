@@ -45,7 +45,6 @@ public:
 
 private:
     Ui::EscPage *ui;
-
 };
 
 #endif // ESCPAGE_H

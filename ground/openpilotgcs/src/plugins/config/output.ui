@@ -323,46 +323,6 @@
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>50</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>60</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>125</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>165</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>270</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>330</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>400</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>490</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                     <item row="0" column="3">
@@ -404,46 +364,6 @@
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>50</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>60</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>125</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>165</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>270</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>330</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>400</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>490</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                     <item row="1" column="4">
@@ -475,46 +395,6 @@
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>50</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>60</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>125</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>165</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>270</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>330</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>400</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>490</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                     <item row="1" column="6">
@@ -546,46 +426,6 @@
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>50</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>60</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>125</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>165</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>270</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>330</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>400</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>490</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                     <item row="2" column="6">
@@ -696,46 +536,6 @@
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>50</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>60</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>125</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>165</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>270</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>330</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>400</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>490</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                     <item row="2" column="3">
@@ -851,46 +651,6 @@
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>50</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>60</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>125</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>165</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>270</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>330</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>400</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>490</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                     <item row="0" column="7">

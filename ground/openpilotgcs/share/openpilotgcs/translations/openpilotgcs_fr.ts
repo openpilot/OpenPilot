@@ -6649,15 +6649,13 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Sortie</translation>
     </message>
     <message>
-        <location/>
         <source>Output Update Speed</source>
         <translatorcomment>Bof...</translatorcomment>
-        <translation>Fréquence Mise à Jour Sorties</translation>
+        <translation type="vanished">Fréquence Mise à Jour Sorties</translation>
     </message>
     <message>
-        <location/>
         <source>Channel:</source>
-        <translation>Canal :</translation>
+        <translation type="vanished">Canal :</translation>
     </message>
     <message>
         <location/>
@@ -6763,15 +6761,57 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Test en Temps Réel</translation>
     </message>
     <message>
-        <location/>
         <source>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
 </source>
-        <translation>Configurer ici &quot;RapidESC&quot; : 490Hz est une valeur classique pour les multirotors.</translation>
+        <translation type="vanished">Configurer ici &quot;RapidESC&quot; : 490Hz est une valeur classique pour les multirotors.</translation>
     </message>
     <message>
         <location/>
         <source>490</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bank(Channels):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode:</source>
+        <translation type="unfinished">Mode :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Setup output mode. Use PWM or OneShot with Standard ESCs.
+Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.
+When using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibration status</source>
+        <translation type="unfinished">Statut de l&apos;étalonnage</translation>
     </message>
 </context>
 <context>
@@ -6788,18 +6828,12 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>#</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Channel Number</source>
         <translation>Numéro Canal</translation>
     </message>
     <message>
-        <location/>
         <source>Minimum PWM value, beware of not overdriving your servo.</source>
-        <translation>Valeur minimum PWM, attention de respecter les limites de votre servo.</translation>
+        <translation type="vanished">Valeur minimum PWM, attention de respecter les limites de votre servo.</translation>
     </message>
     <message>
         <location/>
@@ -6832,9 +6866,8 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Mode de sortie</translation>
     </message>
     <message>
-        <location/>
         <source>Maximum PWM value, beware of not overdriving your servo.</source>
-        <translation>Valeur maximum PWM, attention de respecter les limites de votre servo.</translation>
+        <translation type="vanished">Valeur maximum PWM, attention de respecter les limites de votre servo.</translation>
     </message>
     <message>
         <location/>
@@ -6843,13 +6876,40 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>0:</source>
+        <source>-</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>-</source>
-        <translation></translation>
+        <source> # - Bank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Minimum PWM value, beware of not overdriving your servo.
+Using OneShot125 a value of 1000(uS) here will produce a pulse of 125(uS).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0</source>
+        <translation type="unfinished">0</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bank number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum value, beware of not overdriving your servo.
+Using OneShot125 a value of 2000(uS) here will produce a pulse of 250(uS).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9609,19 +9669,32 @@ Veuillez sélectionner le type de multirotor désiré pour la configuration ci-d
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+415"/>
-        <location line="+90"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+435"/>
+        <location line="+104"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-90"/>
-        <location line="+90"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-198"/>
+        <location line="+8"/>
+        <location line="+178"/>
+        <location line="+25"/>
+        <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs</source>
+        <translation>Valeur de sortie : &lt;b&gt;%1&lt;/b&gt; µs</translation>
+    </message>
+    <message>
+        <location line="-206"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this reversable motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right or left until you find the value where the motor doesn&apos;t start. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour trouver &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;la valeur de neutre de ce moteur inversable&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, appuyez sur le bouton Démarrer et bouger le curseur à gauche ou à droite jusqu&apos;à trouver la position centrale où le moteur ne démarre pas. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est terminé, appuyer à nouveau sur le bouton pour arrêter.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location line="+89"/>
+        <location line="+104"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location line="-41"/>
+        <location line="-43"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
@@ -9668,14 +9741,13 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;En fonction du véhicule que vous avez sélectionné, les moteurs pilotés par des variateurs et/ou les servos contrôlés directement par la carte OpenPilot devront-être calibrés. Les étapes suivantes vous guideront en toute sécurité dans ce processus.  &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br /&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br /&gt;&lt;br /&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9697,6 +9769,29 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette étape va ajuster&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; l&apos;angle minimum, centré et maximum du servo&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;. Pour ajuster les positions de ce servo, appuyez sur &quot;Démarrer&quot; et déplacez les curseurs en fonction de l&apos;angle désiré. Le servo bouge en fonction de la position du curseur en cours.&lt;br /&gt;Lorsque vous avez terminé, appuyez à nouveau sur le bouton pour arrêter.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cochez &quot;Inverser&quot; pour changer la direction de mouvement du servo.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
 </translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br /&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;A cette étapes nous allons ajuster le neutre du moteur mis en évidence dans l&apos;illustration à droite. &lt;br/&gt;Veuillez faire attention aux détails et en particulier à la position et au sens de rotation du moteur concerné. Soyez certain que le moteur tourne dans le bon sens comme indiqué sur l&apos;illustration ci-contre. Vous pouvez intervertir deux fils du moteur pour changer son sens de rotation. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour trouver &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;le neutre de ce moteur&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, appuyez sur le bouton &quot;Démarrer&quot; ci-dessous et bougez le curseur vers la droite jusqu&apos;à ce que le moteur démarre et tourne de manière régulière. &lt;br /&gt;&lt;br /&gt;Lorsque c&apos;est réglé, appuyez à nouveau sur le bouton pour arrêter.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output value: 1000µs</source>
+        <translation>Valeur de sortie : &lt;b&gt;1000&lt;/b&gt; µs</translation>
     </message>
 </context>
 <context>
@@ -10529,7 +10624,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigMultiRotorWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+152"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+169"/>
         <source>Input</source>
         <translation>Entrée</translation>
     </message>
@@ -10539,7 +10634,7 @@ p, li { white-space: pre-wrap; }
         <translation>Sortie</translation>
     </message>
     <message>
-        <location line="+376"/>
+        <location line="+419"/>
         <location line="+24"/>
         <location line="+31"/>
         <location line="+31"/>
@@ -10547,18 +10642,33 @@ p, li { white-space: pre-wrap; }
         <location line="+24"/>
         <location line="+24"/>
         <location line="+44"/>
-        <location line="+202"/>
+        <location line="+255"/>
         <location line="+70"/>
         <source>Configuration OK</source>
         <translation>Configuration OK</translation>
     </message>
     <message>
-        <location line="-307"/>
+        <location line="-360"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign a Yaw channel&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter le canal de Yaw&lt;/font&gt;</translation>
     </message>
     <message>
-        <location line="+378"/>
+        <location line="+429"/>
+        <source>Duplicate channel in motor outputs</source>
+        <translation>Canaux en double dans le sorties moteur</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Channel already used</source>
+        <translation>Canal déjà utilisé</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Select output channel for Accessory%1 RcInput</source>
+        <translation>Sélectionnez le canal de sortie pour l&apos;entrée RC Accessory%1</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign all %1 motor channels&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter tous les %1 canaux moteurs&lt;/font&gt;</translation>
     </message>
@@ -10645,7 +10755,7 @@ Voulez-vous toujours continuer ?</translation>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+224"/>
+        <location line="+211"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
@@ -11522,7 +11632,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+146"/>
         <source>Writing mixer settings</source>
         <translation>Écriture paramètres mixeur</translation>
     </message>
@@ -11734,7 +11844,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>UploaderGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+284"/>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+286"/>
         <source>Connected Device</source>
         <translation>Périphérique Connecté</translation>
     </message>
@@ -11751,12 +11861,12 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+30"/>
-        <location line="+474"/>
+        <location line="+484"/>
         <source>Device</source>
         <translation>Périphérique</translation>
     </message>
     <message>
-        <location line="-393"/>
+        <location line="-403"/>
         <source>http://wiki.openpilot.org/display/Doc/Erase+board+settings</source>
         <translation></translation>
     </message>
@@ -11766,66 +11876,71 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>En cours d&apos;exécution</translation>
     </message>
     <message>
-        <location line="+245"/>
+        <location line="+255"/>
         <source>Timed out while waiting for all boards to be disconnected!</source>
         <translatorcomment>Bof</translatorcomment>
         <translation type="unfinished">Expiration du temps d&apos;attente de la déconnexion de toutes les cartes !</translation>
     </message>
     <message>
-        <location line="-190"/>
-        <location line="+205"/>
+        <location line="-193"/>
+        <location line="+208"/>
         <source>Timed out while waiting for a board to be connected!</source>
         <translatorcomment>Bof</translatorcomment>
         <translation type="unfinished">Expiration du temps dans l&apos;attente d&apos;une connexion de carte !</translation>
     </message>
     <message>
-        <location line="-216"/>
+        <location line="-238"/>
+        <source>To upgrade the OPLinkMini board please disconnect it from the USB port, press the Upgrade again button and follow instructions on screen.</source>
+        <translation>Pour mettre à jour une carte OPLinkMini veuillez la déconnecterdu port USB, appuyez à nouveau sur le bouton de mise à jour et suivez les instructions à l&apos;écran.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>Timed out while waiting for a board to be fully connected!</source>
-        <translation type="unfinished">Expiration du temps dans l&apos;attente d&apos;une connexion complète de carte !</translation>
+        <translation>Expiration du temps dans l&apos;attente d&apos;une connexion complète de carte !</translation>
     </message>
     <message>
         <location line="+23"/>
         <location line="+24"/>
         <source>Failed to enter bootloader mode.</source>
-        <translation type="unfinished">Échec du passage en mode bootloader.</translation>
+        <translation>Échec du passage en mode bootloader.</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Unknown board id &apos;0x%1&apos;</source>
-        <translation type="unfinished">Carte inconnue id &apos;0x%1&apos;</translation>
+        <translation>Carte inconnue id &apos;0x%1&apos;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Firmware image not found.</source>
-        <translation type="unfinished">Image firmware non trouvée.</translation>
+        <translation>Image firmware non trouvée.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Could not open firmware image for reading.</source>
-        <translation type="unfinished">Impossible d&apos;ouvrir l&apos;image de firmware en lecture.</translation>
+        <translation>Impossible d&apos;ouvrir l&apos;image de firmware en lecture.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Could not enter direct firmware upload mode.</source>
-        <translation type="unfinished">Impossible de passer en mode DFU.</translation>
+        <translation>Impossible de passer en mode DFU.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Firmware upload failed.</source>
-        <translation type="unfinished">Échec du téléversement du firmware.</translation>
+        <translation>Échec du téléversement du firmware.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Failed to upload firmware description.</source>
-        <translation type="unfinished">Échec du téléversement de la description firmware.</translation>
+        <translation>Échec du téléversement de la description firmware.</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+17"/>
         <source>Timed out while booting.</source>
-        <translation type="unfinished">Expiration du temps d&apos;attente lors du démarrage.</translation>
+        <translation>Expiration du temps d&apos;attente lors du démarrage.</translation>
     </message>
     <message>
-        <location line="+66"/>
+        <location line="+67"/>
         <source>Please disconnect your OpenPilot board.</source>
         <translation>Veuillez déconnecter votre carte OpenPilot.</translation>
     </message>
@@ -11848,7 +11963,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>La carte doit être connectée à un port USB !</translation>
     </message>
     <message>
-        <location line="+143"/>
+        <location line="+147"/>
         <source>Waiting for all OpenPilot boards to be disconnected from USB.</source>
         <translation>Attente de la déconnexion de toutes les cartes connectées en USB.</translation>
     </message>
@@ -11866,37 +11981,37 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+7"/>
         <source>Bringing the board into boot loader mode. Please wait.</source>
-        <translation type="unfinished">Passage de la carte en mode bootloader. Veuillez patienter.</translation>
+        <translation>Passage de la carte en mode bootloader. Veuillez patienter.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Step %1</source>
-        <translation type="unfinished">Étape %1</translation>
+        <translation>Étape %1</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Rebooting the board. Please wait.</source>
-        <translation type="unfinished">Redémarrage de la carte. Veuillez patienter.</translation>
+        <translation>Redémarrage de la carte. Veuillez patienter.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Rebooting and erasing the board. Please wait.</source>
-        <translation type="unfinished">Redémarrage et effacement de la carte. Veuillez patienter.</translation>
+        <translation>Redémarrage et effacement de la carte. Veuillez patienter.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Board was updated successfully. Press OK to finish.</source>
-        <translation type="unfinished">La carte a été mise à jour avec succès. Appuyez sur OK pour terminer.</translation>
+        <translation>La carte a été mise à jour avec succès. Appuyez sur OK pour terminer.</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Something went wrong.</source>
-        <translation type="unfinished">Quelque chose c&apos;est mal passé.</translation>
+        <translation>Quelque chose c&apos;est mal passé.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source> Press OK to finish, you will have to manually upgrade the board.</source>
-        <translation type="unfinished"> Appuyez sur OK pour terminer, vous devrez mettre à jour votre carte manuellement.</translation>
+        <translation> Appuyez sur OK pour terminer, vous devrez mettre à jour votre carte manuellement.</translation>
     </message>
     <message>
         <source>Bringing the board into boot loader mode.</source>
@@ -11986,7 +12101,7 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau Réinitialiser pour continuer ou allumer/éteindre la carte pour forcer la réinitialisation.</translation>
     </message>
     <message>
-        <location line="-449"/>
+        <location line="-465"/>
         <source></source>
         <translation>Annuler</translation>
     </message>
@@ -12428,12 +12543,12 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
     <message>
         <location/>
         <source>Source:</source>
-        <translation type="unfinished">Source :</translation>
+        <translation>Source :</translation>
     </message>
     <message>
         <location/>
         <source>The source of Curve 1 will always be Throttle</source>
-        <translation type="unfinished">La source de la Courbe 1 est toujours Throttle</translation>
+        <translation>La source de la Courbe 1 est toujours Throttle</translation>
     </message>
     <message>
         <location/>
@@ -12818,6 +12933,76 @@ Les valeurs classiques sont de 100% en configuration + et 50% en configuration X
         <source>Select the Multirotor frame type</source>
         <translation>Sélectionner ici le type de châssis Multirotor</translation>
     </message>
+    <message>
+        <location/>
+        <source>Select output channel for Accessory0 RcInput</source>
+        <translation>Sélectionnez le canal de sortie pour l&apos;entrée RC Accessory0</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accessory1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RcOutput channels</source>
+        <translation>Canaux de sortie RC</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RC Output</source>
+        <translation>Sorties RC</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accessory0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RC Input</source>
+        <translation>Entrées RC</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for Accessory2 RcInput</source>
+        <translation>Sélectionnez le canal de sortie pour l&apos;entrée RC Accessory2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for Accessory1 RcInput</source>
+        <translation>Sélectionnez le canal de sortie pour l&apos;entrée RC Accessory1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accessory2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RcOutput curve</source>
+        <translation>Courbe de sortie RC</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve</source>
+        <translation>Courbe</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output curve for Accessory0 RcInput</source>
+        <translation>Sélectionnez la courbe de mixage pour l&apos;entrée RC Accessory0</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output curve for Accessory1 RcInput</source>
+        <translation>Sélectionnez la courbe de mixage pour l&apos;entrée RC Accessory1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output curve for Accessory2 RcInput</source>
+        <translation>Sélectionnez la courbe de mixage pour l&apos;entrée RC Accessory2</translation>
+    </message>
 </context>
 <context>
     <name>RevoHWWidget</name>
@@ -12909,7 +13094,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
 <context>
     <name>OPLinkWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/pipxtreme.ui"/>
+        <location filename="../../../src/plugins/config/oplink.ui"/>
         <source>Form</source>
         <translation>Formulaire</translation>
     </message>
@@ -13060,9 +13245,8 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation>Tx Perdus</translation>
     </message>
     <message>
-        <location/>
         <source>TX Resent</source>
-        <translation>TX Renvoyés</translation>
+        <translation type="vanished">TX Renvoyés</translation>
     </message>
     <message>
         <location/>
@@ -13209,14 +13393,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation>Canal Mini</translation>
     </message>
     <message>
-        <location/>
         <source>Channel Set</source>
-        <translation>Canal fixe</translation>
+        <translation type="vanished">Canal fixe</translation>
     </message>
     <message>
-        <location/>
         <source>Sets the random sequence of channels to use for frequency hopping.</source>
-        <translation>Fixe une séquence aléatoire de canaux à utiliser pour les sauts de fréquence.</translation>
+        <translation type="vanished">Fixe une séquence aléatoire de canaux à utiliser pour les sauts de fréquence.</translation>
     </message>
     <message>
         <location/>
@@ -13261,17 +13443,17 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Channel 0 is 430 MHz, channel 250 is 440 MHz, and the channel spacing is 40 KHz.</source>
-        <translation type="unfinished">Canal 0 correspond à 430Mhz, canal 249 à 440Mhz, et l&apos;espacement des canaux est de 40KHz. {0 ?} {430 ?} {250 ?} {440 ?} {40 ?}</translation>
+        <translation>Canal 0 correspond à 430Mhz, canal 250 à 440Mhz, et l&apos;espacement des canaux est de 40KHz. </translation>
     </message>
     <message>
         <location/>
         <source>440.000 (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>430.000 (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13445,7 +13627,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+144"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+160"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuillez corriger cela avant de tester les sorties.</translation>
     </message>
@@ -13455,9 +13637,22 @@ p, li { white-space: pre-wrap; }
         <translation>Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
     </message>
     <message>
-        <location line="+253"/>
+        <location line="+35"/>
+        <source>You may want to save your neutral settings.</source>
+        <translation>Vous pouvez enregistrer vos changements des réglages de neutre.</translation>
+    </message>
+    <message>
+        <location line="+238"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
         <translation></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>OneShot only works with MainPort settings marked with &quot;+OneShot&quot;
+Using &quot;PPM_PIN6+OneShot&quot; bank 4 (output 6) must be set to PWM</source>
+        <translation type="unfinished">OneShot fonctionne uniquement avec les réglages de Mainport marqués avec &quot;+OneShot&quot;
+En utilisant &quot;PPM_PIN6+OneShot&quot; la banque 4 (sortie 6) doit être réglée sur PWM
+</translation>
     </message>
 </context>
 <context>
@@ -14298,36 +14493,25 @@ Veuillez vérifier le fichier.
 <context>
     <name>ConfigPipXtremeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+154"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <location line="+9"/>
         <source>Unbind</source>
-        <translation>Dissocier</translation>
+        <translation type="vanished">Dissocier</translation>
     </message>
     <message>
-        <location line="-27"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <location line="+9"/>
         <source>Bind</source>
-        <translation>Associer</translation>
+        <translation type="vanished">Associer</translation>
     </message>
     <message>
-        <location line="+34"/>
         <source>Unknown</source>
-        <translation>Inconnu</translation>
+        <translation type="vanished">Inconnu</translation>
     </message>
     <message>
-        <location line="+107"/>
         <source>Information</source>
-        <translation>Information</translation>
+        <translation type="vanished">Information</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>To apply the changes when binding/unbinding the board must be rebooted or power cycled.</source>
         <translatorcomment>détachement ou dissociation ~ unbinding ? tr Bof</translatorcomment>
-        <translation>Pour appliquer les changements d&apos;association/dissociation la carte doit être redémarrée ou débranchée/rebranchée.</translation>
+        <translation type="vanished">Pour appliquer les changements d&apos;association/dissociation la carte doit être redémarrée ou débranchée/rebranchée.</translation>
     </message>
 </context>
 <context>
@@ -14640,7 +14824,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation>Personnalisé</translation>
     </message>
     <message>
-        <location line="+315"/>
+        <location line="+314"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
         <translation></translation>
     </message>
@@ -14813,7 +14997,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>TimedDialog</name>
     <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="-654"/>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="-653"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -15587,7 +15771,7 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+49"/>
         <location line="+49"/>
-        <location line="+32"/>
+        <location line="+42"/>
         <location line="+7"/>
         <location line="+9"/>
         <source>%1 µs</source>
@@ -15762,22 +15946,56 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uploader/rebootdialog.ui"/>
         <source>Reboot</source>
-        <translation type="unfinished">Redémarrage</translation>
+        <translation>Redémarrage</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please wait. Your controller is rebooting.&lt;br/&gt;This can take up to a minute.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Veuillez patienter. Votre contrôleur redémarre&lt;br/&gt;Cela peut prendre jusqu&apos;à une minute.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Veuillez patienter. Votre contrôleur redémarre&lt;br/&gt;Cela peut prendre jusqu&apos;à une minute.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/uploader/rebootdialog.cpp" line="+69"/>
         <source>&lt;font color=&apos;red&apos;&gt;Reboot failed!&lt;/font&gt;&lt;p&gt;Please perform a manual reboot by power cycling the board.&lt;br&gt;To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.&lt;br&gt;After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds.&lt;br&gt;Then press Ok.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;font color=&apos;red&apos;&gt;Le rédémarrage a échoué !&lt;/font&gt;&lt;p&gt;Veuillez effectuer un redémarrage manuel de la carte.&lt;br&gt;Pour redémarrer la carte contrôleur, envelez toutes les batteries ainsi que le câble USB pour au moins 30 secondes.&lt;br&gt;Après 30 secondes, connecter à nouveau la carte et attendez qu&apos;elle soit connectée, cela peut prendre quelques secondes.&lt;br&gt;Ensuite cliquez sur Ok.&lt;/p&gt;</translation>
+        <translation>&lt;font color=&apos;red&apos;&gt;Le rédémarrage a échoué !&lt;/font&gt;&lt;p&gt;Veuillez effectuer un redémarrage manuel de la carte.&lt;br&gt;Pour redémarrer la carte contrôleur, envelez toutes les batteries ainsi que le câble USB pour au moins 30 secondes.&lt;br&gt;Après 30 secondes, connecter à nouveau la carte et attendez qu&apos;elle soit connectée, cela peut prendre quelques secondes.&lt;br&gt;Cliquez ensuite sur Ok.&lt;/p&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigOPLinkWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configoplinkwidget.cpp" line="+152"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <source>Unbind</source>
+        <translation>Dissocier</translation>
+    </message>
+    <message>
+        <location line="-27"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <source>Bind</source>
+        <translation>Associer</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Unknown</source>
+        <translation>Inconnu</translation>
+    </message>
+    <message>
+        <location line="+107"/>
+        <source>Information</source>
+        <translation>Information</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>To apply the changes when binding/unbinding the board must be rebooted or power cycled.</source>
+        <translation>Pour appliquer les changements d&apos;association/dissociation la carte doit être redémarrée ou débranchée/rebranchée.</translation>
     </message>
 </context>
 </TS>

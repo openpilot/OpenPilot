@@ -81,6 +81,7 @@ SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
+SRC += $(PIOSCOMMON)/pios_sensors.c
 
 ## Misc library functions
 SRC += $(FLIGHTLIB)/sanitycheck.c

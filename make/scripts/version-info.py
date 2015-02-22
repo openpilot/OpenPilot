@@ -113,15 +113,15 @@ class Repo:
         """Initialize object instance and read repo info"""
         self._path = path
         self._exec('rev-parse --verify HEAD')
-        if self._rc == 0:
+        if self._load_json():
+            pass
+        elif self._rc == 0:
             self._hash = self._out.strip(' \t\n\r')
             self._get_origin()
             self._get_time()
             self._get_tag()
             self._get_branch()
             self._get_dirty()
-        elif self._load_json():
-            pass
         else:
             self._hash = None
             self._origin = None

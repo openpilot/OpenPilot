@@ -216,6 +216,15 @@ void ConfigOutputWidget::runChannelTests(bool state)
     if (state) {
         sendAllChannelTests();
     }
+
+    // Add info at end
+    if (!state && isDirty()) {
+        QMessageBox mbox;
+        mbox.setText(QString(tr("You may want to save your neutral settings.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.setIcon(QMessageBox::Information);
+        mbox.exec();
+    }
 }
 
 OutputChannelForm *ConfigOutputWidget::getOutputChannelForm(const int index) const

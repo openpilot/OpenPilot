@@ -182,49 +182,6 @@
 #endif
 #endif
 
-/* PIOS sensor interfaces */
-#ifdef PIOS_INCLUDE_ADXL345
-/* ADXL345 3-Axis Accelerometer */
-#include <pios_adxl345.h>
-#endif
-
-#ifdef PIOS_INCLUDE_BMA180
-/* BMA180 3-Axis Accelerometer */
-#include <pios_bma180.h>
-#endif
-
-#ifdef PIOS_INCLUDE_L3GD20
-/* L3GD20 3-Axis Gyro */
-#include <pios_l3gd20.h>
-#endif
-
-#ifdef PIOS_INCLUDE_MPU6000
-/* MPU6000 3-Axis Gyro/Accelerometer */
-/* #define PIOS_MPU6000_ACCEL */
-#include <pios_mpu6000.h>
-#endif
-
-#ifdef PIOS_INCLUDE_HMC5843
-/* HMC5843 3-Axis Digital Compass */
-#include <pios_hmc5843.h>
-#endif
-
-#ifdef PIOS_INCLUDE_HMC5X83
-/* HMC5883/HMC5983 3-Axis Digital Compass */
-/* #define PIOS_HMC5x83_HAS_GPIOS */
-#include <pios_hmc5x83.h>
-#endif
-
-#ifdef PIOS_INCLUDE_BMP085
-/* BMP085 Barometric Pressure Sensor */
-#include <pios_bmp085.h>
-#endif
-
-#ifdef PIOS_INCLUDE_MS5611
-/* MS5611 Barometric Pressure Sensor */
-#include <pios_ms5611.h>
-#endif
-
 #ifdef PIOS_INCLUDE_MPXV
 /* MPXV5004, MPXV7002 based Airspeed Sensor */
 #include <pios_mpxv.h>

@@ -287,6 +287,17 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
         return false;
     }
 
+
+    // if cruise control, ensure rate or acro are not set
+    if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL) {
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if ((modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATE ||
+                 modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ACRO)) {
+                return false;
+            }
+        }
+    }
+
     // Warning: This assumes that certain conditions in the XML file are met.  That
     // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL has the same numeric value for each channel
     // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
@@ -304,7 +315,6 @@ FrameType_t GetCurrentFrameType()
     switch ((SystemSettingsAirframeTypeOptions)airframe_type) {
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADH:
     case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX:

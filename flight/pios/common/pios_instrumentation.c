@@ -52,8 +52,8 @@ pios_counter_t PIOS_Instrumentation_CreateCounter(uint32_t id)
     if (!counter_handle) {
         pios_perf_counter_t *newcounter = &pios_instrumentation_perf_counters[++pios_instrumentation_last_used_counter];
         newcounter->id  = id;
-        newcounter->max = INT32_MIN;
-        newcounter->min = INT32_MAX;
+        newcounter->max = INT32_MIN + 1;
+        newcounter->min = INT32_MAX - 1;
         counter_handle  = (pios_counter_t)newcounter;
     }
     return counter_handle;

@@ -30,7 +30,7 @@
  */
 
 #include "pios.h"
-
+#include <pios_l3gd20.h>
 #ifdef PIOS_INCLUDE_L3GD20
 
 #include "fifo_buffer.h"

@@ -100,6 +100,7 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
+    void resetOutputCalibrationUtil();
 
     static const QString MULTI_SVG_FILE;
     static const QString FIXEDWING_SVG_FILE;

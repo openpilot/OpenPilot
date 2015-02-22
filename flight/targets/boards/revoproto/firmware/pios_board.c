@@ -82,13 +82,14 @@ void PIOS_ADC_DMC_irq_handler(void)
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
 #if defined(PIOS_INCLUDE_HMC5X83)
+#include "pios_hmc5x83.h"
+
 pios_hmc5x83_dev_t onboard_mag = 0;
 
 bool pios_board_internal_mag_handler()
 {
     return PIOS_HMC5x83_IRQHandler(onboard_mag);
 }
-#include "pios_hmc5x83.h"
 static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
     .vector = pios_board_internal_mag_handler,
     .line   = EXTI_Line5,
@@ -893,19 +894,23 @@ void PIOS_Board_Init(void)
 
 #if defined(PIOS_INCLUDE_HMC5X83)
     onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_adapter_id, 0);
+    PIOS_HMC5x83_Register(onboard_mag);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)
     PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_pressure_adapter_id);
+    PIOS_MS5611_Register();
 #endif
 
     switch (bdinfo->board_rev) {
     case 0x01:
 #if defined(PIOS_INCLUDE_L3GD20)
+        PIOS_Assert(0); // L3gd20 has not been ported to Sensor framework!!!
         PIOS_L3GD20_Init(pios_spi_gyro_id, 0, &pios_l3gd20_cfg);
         PIOS_Assert(PIOS_L3GD20_Test() == 0);
 #endif
 #if defined(PIOS_INCLUDE_BMA180)
+        PIOS_Assert(0); // BMA180 has not been ported to Sensor framework!!!
         PIOS_BMA180_Init(pios_spi_accel_id, 0, &pios_bma180_cfg);
         PIOS_Assert(PIOS_BMA180_Test() == 0);
 #endif
@@ -914,6 +919,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_MPU6000)
         PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
         PIOS_MPU6000_CONFIG_Configure();
+        PIOS_MPU6000_Register();
 #endif
         break;
     default:

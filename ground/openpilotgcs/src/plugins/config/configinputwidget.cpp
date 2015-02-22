@@ -636,7 +636,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
     case wizardChooseMode:
     {
         wizardUi->wzBack->setEnabled(true);
-        QRadioButton* modeButtons[] = {
+        QRadioButton *modeButtons[] = {
             wizardUi->mode1Button,
             wizardUi->mode2Button,
             wizardUi->mode3Button,
@@ -755,20 +755,20 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         }
         break;
     case wizardChooseMode:
-        {
-            QRadioButton* modeButtons[] = {
-                wizardUi->mode1Button,
-                wizardUi->mode2Button,
-                wizardUi->mode3Button,
-                wizardUi->mode4Button
-            };
-            for (int i = mode1; i <= mode4; ++i) {
-                if (modeButtons[i]->isChecked()) {
-                    transmitterMode = static_cast<txMode>(i);
-                }
+    {
+        QRadioButton *modeButtons[] = {
+            wizardUi->mode1Button,
+            wizardUi->mode2Button,
+            wizardUi->mode3Button,
+            wizardUi->mode4Button
+        };
+        for (int i = mode1; i <= mode4; ++i) {
+            if (modeButtons[i]->isChecked()) {
+                transmitterMode = static_cast<txMode>(i);
             }
         }
-        break;
+    }
+    break;
     case wizardIdentifySticks:
         disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(identifyControls()));
         wizardUi->wzNext->setEnabled(true);
@@ -861,7 +861,7 @@ void ConfigInputWidget::setChannel(int newChan)
         wizardUi->identifyStickInstructions->setText(QString(tr("Please disable throttle hold mode.\n\nMove the Throttle stick.")));
     } else {
         wizardUi->identifyStickInstructions->setText(QString(tr("Please move each control one at a time according to the instructions and picture below.\n\n"
-                                       "Move the %1 stick.")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
+                                                                "Move the %1 stick.")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
     }
 
     if (manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory")) {

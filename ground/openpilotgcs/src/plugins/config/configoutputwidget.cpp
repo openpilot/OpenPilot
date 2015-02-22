@@ -93,7 +93,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     // Associate the buttons with their UAVO fields
     addWidget(m_ui->spinningArmed);
-    MixerSettings* mixer = MixerSettings::GetInstance(getObjectManager());
+    MixerSettings *mixer = MixerSettings::GetInstance(getObjectManager());
     Q_ASSERT(mixer);
     m_banks << OutputBankControls(mixer, m_ui->chBank1, QColor("#C6ECAE"), m_ui->cb_outputRate1, m_ui->cb_outputMode1);
     m_banks << OutputBankControls(mixer, m_ui->chBank2, QColor("#91E5D3"), m_ui->cb_outputRate2, m_ui->cb_outputMode2);
@@ -110,7 +110,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
         controls.rateCombo()->addItem(tr("-"), QVariant(0));
         controls.rateCombo()->model()->setData(controls.rateCombo()->model()->index(0, 0), QVariant(0), Qt::UserRole - 1);
-        foreach (int rate, rates) {
+        foreach(int rate, rates) {
             controls.rateCombo()->addItem(tr("%1 Hz").arg(rate), rate);
         }
 
@@ -132,6 +132,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 ConfigOutputWidget::~ConfigOutputWidget()
 {
     SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+
     disconnect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
     foreach(OutputBankControls controls, m_banks) {
         disconnect(controls.modeCombo(), SIGNAL(currentIndexChanged(int)), this, SLOT(onBankTypeChange(int)));
@@ -367,9 +368,10 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     int i = 0;
     foreach(QString banklabel, bankLabels) {
         OutputBankControls controls = m_banks.at(i);
+
         controls.label()->setText(banklabel);
         int index = controls.rateCombo()->findData(actuatorSettingsData.BankUpdateFreq[i]);
-        if (index  == -1) {
+        if (index == -1) {
             controls.rateCombo()->addItem(tr("%1 Hz").arg(actuatorSettingsData.BankUpdateFreq[i]), actuatorSettingsData.BankUpdateFreq[i]);
         }
         controls.rateCombo()->setCurrentIndex(index);
@@ -443,7 +445,8 @@ void ConfigOutputWidget::openHelp()
 
 void ConfigOutputWidget::onBankTypeChange()
 {
-    QComboBox* bankModeCombo = qobject_cast<QComboBox*>(sender());
+    QComboBox *bankModeCombo = qobject_cast<QComboBox *>(sender());
+
     if (bankModeCombo != NULL) {
         foreach(OutputBankControls controls, m_banks) {
             if (controls.modeCombo() == bankModeCombo) {
@@ -487,11 +490,9 @@ void ConfigOutputWidget::setWarning(QString message)
 }
 
 
-OutputBankControls::OutputBankControls(MixerSettings* mixer, QLabel *label, QColor color, QComboBox *rateCombo, QComboBox *modeCombo) :
+OutputBankControls::OutputBankControls(MixerSettings *mixer, QLabel *label, QColor color, QComboBox *rateCombo, QComboBox *modeCombo) :
     m_mixer(mixer), m_label(label), m_color(color), m_rateCombo(rateCombo), m_modeCombo(modeCombo)
-{
-}
+{}
 
 OutputBankControls::~OutputBankControls()
-{
-}
+{}

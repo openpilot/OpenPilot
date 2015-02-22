@@ -46,20 +46,32 @@ class MixerSettings;
 
 class OutputBankControls {
 public:
-    OutputBankControls(MixerSettings *mixer, QLabel* label, QColor color, QComboBox* rateCombo, QComboBox* modeCombo);
+    OutputBankControls(MixerSettings *mixer, QLabel *label, QColor color, QComboBox *rateCombo, QComboBox *modeCombo);
     virtual ~OutputBankControls();
 
-    QLabel *label() const { return m_label; }
-    QColor color() const { return m_color; }
-    QComboBox *rateCombo() const { return m_rateCombo; }
-    QComboBox *modeCombo() const { return m_modeCombo; }
+    QLabel *label() const
+    {
+        return m_label;
+    }
+    QColor color() const
+    {
+        return m_color;
+    }
+    QComboBox *rateCombo() const
+    {
+        return m_rateCombo;
+    }
+    QComboBox *modeCombo() const
+    {
+        return m_modeCombo;
+    }
 
 private:
-    MixerSettings* m_mixer;
-    QLabel* m_label;
+    MixerSettings *m_mixer;
+    QLabel *m_label;
     QColor m_color;
-    QComboBox* m_rateCombo;
-    QComboBox* m_modeCombo;
+    QComboBox *m_rateCombo;
+    QComboBox *m_modeCombo;
 };
 
 class ConfigOutputWidget : public ConfigTaskWidget {

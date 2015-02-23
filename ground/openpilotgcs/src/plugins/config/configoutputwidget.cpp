@@ -49,27 +49,27 @@
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    ui = new Ui_OutputWidget();
-    ui->setupUi(this);
+    m_ui = new Ui_OutputWidget();
+    m_ui->setupUi(this);
 
-    ui->gvFrame->setVisible(false);
+    m_ui->gvFrame->setVisible(false);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
     if (!settings->useExpertMode()) {
-        ui->saveRCOutputToRAM->setVisible(false);
+        m_ui->saveRCOutputToRAM->setVisible(false);
     }
 
     UAVSettingsImportExportFactory *importexportplugin = pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin, SIGNAL(importAboutToBegin()), this, SLOT(stopTests()));
 
-    connect(ui->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
+    connect(m_ui->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
     // Configure the task widget
     // Connect the help button
-    connect(ui->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    connect(m_ui->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
-    addApplySaveButtons(ui->saveRCOutputToRAM, ui->saveRCOutputToSD);
+    addApplySaveButtons(m_ui->saveRCOutputToRAM, m_ui->saveRCOutputToSD);
 
     // Track the ActuatorSettings object
     addUAVObject("ActuatorSettings");
@@ -78,9 +78,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     // Register for ActuatorSettings changes:
     for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
         OutputChannelForm *form = new OutputChannelForm(i, this);
-        form->moveTo(*(ui->channelLayout));
+        form->moveTo(*(m_ui->channelLayout));
 
-        connect(ui->channelOutTest, SIGNAL(toggled(bool)), form, SLOT(enableChannelTest(bool)));
+        connect(m_ui->channelOutTest, SIGNAL(toggled(bool)), form, SLOT(enableChannelTest(bool)));
         connect(form, SIGNAL(channelChanged(int, int)), this, SLOT(sendChannelTest(int, int)));
 
         addWidget(form->ui.actuatorMin);
@@ -90,21 +90,33 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
         addWidget(form->ui.actuatorLink);
     }
 
-    // Associate the buttons with their UAVO fields
-    addWidget(ui->cb_outputRate6);
-    addWidget(ui->cb_outputRate5);
-    addWidget(ui->cb_outputRate4);
-    addWidget(ui->cb_outputRate3);
-    addWidget(ui->cb_outputRate2);
-    addWidget(ui->cb_outputRate1);
-    addWidget(ui->spinningArmed);
 
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode1, 0, 0, true);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode2, 1, 0, true);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode3, 2, 0, true);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode4, 3, 0, true);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode5, 4, 0, true);
-    addWidgetBinding("ActuatorSettings", "BankMode", ui->cb_outputMode6, 5, 0, true);
+    // Associate the buttons with their UAVO fields
+    addWidget(m_ui->spinningArmed);
+    MixerSettings *mixer = MixerSettings::GetInstance(getObjectManager());
+    Q_ASSERT(mixer);
+    m_banks << OutputBankControls(mixer, m_ui->chBank1, QColor("#C6ECAE"), m_ui->cb_outputRate1, m_ui->cb_outputMode1);
+    m_banks << OutputBankControls(mixer, m_ui->chBank2, QColor("#91E5D3"), m_ui->cb_outputRate2, m_ui->cb_outputMode2);
+    m_banks << OutputBankControls(mixer, m_ui->chBank3, QColor("#FCEC52"), m_ui->cb_outputRate3, m_ui->cb_outputMode3);
+    m_banks << OutputBankControls(mixer, m_ui->chBank4, QColor("#C3A8FF"), m_ui->cb_outputRate4, m_ui->cb_outputMode4);
+    m_banks << OutputBankControls(mixer, m_ui->chBank5, QColor("#F7F7F2"), m_ui->cb_outputRate5, m_ui->cb_outputMode5);
+    m_banks << OutputBankControls(mixer, m_ui->chBank6, QColor("#FF9F51"), m_ui->cb_outputRate6, m_ui->cb_outputMode6);
+
+    QList<int> rates;
+    rates << 50 << 60 << 125 << 165 << 270 << 330 << 400 << 490;
+    int i = 0;
+    foreach(OutputBankControls controls, m_banks) {
+        addWidget(controls.rateCombo());
+
+        controls.rateCombo()->addItem(tr("-"), QVariant(0));
+        controls.rateCombo()->model()->setData(controls.rateCombo()->model()->index(0, 0), QVariant(0), Qt::UserRole - 1);
+        foreach(int rate, rates) {
+            controls.rateCombo()->addItem(tr("%1 Hz").arg(rate), rate);
+        }
+
+        addWidgetBinding("ActuatorSettings", "BankMode", controls.modeCombo(), i++, 0, true);
+        connect(controls.modeCombo(), SIGNAL(currentIndexChanged(int)), this, SLOT(onBankTypeChange()));
+    }
 
     SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
     connect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
@@ -122,7 +134,9 @@ ConfigOutputWidget::~ConfigOutputWidget()
     SystemAlarms *systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
 
     disconnect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
-    // Do nothing
+    foreach(OutputBankControls controls, m_banks) {
+        disconnect(controls.modeCombo(), SIGNAL(currentIndexChanged(int)), this, SLOT(onBankTypeChange(int)));
+    }
 }
 
 void ConfigOutputWidget::enableControls(bool enable)
@@ -130,9 +144,9 @@ void ConfigOutputWidget::enableControls(bool enable)
     ConfigTaskWidget::enableControls(enable);
 
     if (!enable) {
-        ui->channelOutTest->setChecked(false);
+        m_ui->channelOutTest->setChecked(false);
     }
-    ui->channelOutTest->setEnabled(enable);
+    m_ui->channelOutTest->setEnabled(enable);
 }
 
 /**
@@ -163,9 +177,9 @@ void ConfigOutputWidget::runChannelTests(bool state)
         mbox.exec();
 
         // Unfortunately must cache this since callback will reoccur
-        accInitialData = ActuatorCommand::GetInstance(getObjectManager())->getMetadata();
+        m_accInitialData = ActuatorCommand::GetInstance(getObjectManager())->getMetadata();
 
-        ui->channelOutTest->setChecked(false);
+        m_ui->channelOutTest->setChecked(false);
         return;
     }
 
@@ -179,7 +193,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
         if (retval != QMessageBox::Yes) {
             state = false;
             qDebug() << "Cancelled";
-            ui->channelOutTest->setChecked(false);
+            m_ui->channelOutTest->setChecked(false);
             return;
         }
     }
@@ -187,14 +201,14 @@ void ConfigOutputWidget::runChannelTests(bool state)
     ActuatorCommand *obj = ActuatorCommand::GetInstance(getObjectManager());
     UAVObject::Metadata mdata = obj->getMetadata();
     if (state) {
-        accInitialData = mdata;
+        m_accInitialData = mdata;
         UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
         UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         UAVObject::SetGcsTelemetryAcked(mdata, false);
         UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
     } else {
-        mdata = accInitialData; // Restore metadata
+        mdata = m_accInitialData; // Restore metadata
     }
     obj->setMetadata(mdata);
     obj->updated();
@@ -250,7 +264,7 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString &str)
  */
 void ConfigOutputWidget::sendChannelTest(int index, int value)
 {
-    if (!ui->channelOutTest->isChecked()) {
+    if (!m_ui->channelOutTest->isChecked()) {
         return;
     }
 
@@ -299,16 +313,6 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     // Get channel descriptions
     QStringList channelDesc = ConfigVehicleTypeWidget::getChannelDescriptions();
 
-    QList<int> channelBanks;
-    QList<QColor> bankColors;
-    bankColors
-        << QColor("#C6ECAE")
-        << QColor("#91E5D3")
-        << QColor("#FCEC52")
-        << QColor("#C3A8FF")
-        << QColor("#F7F7F2")
-        << QColor("#FF9F51");
-
     // Initialize output forms
     QList<OutputChannelForm *> outputChannelForms = findChildren<OutputChannelForm *>();
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
@@ -324,37 +328,19 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     }
 
     // Get the SpinWhileArmed setting
-    ui->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
+    m_ui->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
 
-    QList<QLabel *> bank;
-    bank << ui->chBank1 << ui->chBank2 << ui->chBank3 << ui->chBank4 << ui->chBank5 << ui->chBank6;
-
-    QList<QComboBox *> outputRateCombos;
-    outputRateCombos << ui->cb_outputRate1 << ui->cb_outputRate2 << ui->cb_outputRate3 <<
-        ui->cb_outputRate4 << ui->cb_outputRate5 << ui->cb_outputRate6;
-
-    QList<QComboBox *> outputModeCombos;
-    outputModeCombos << ui->cb_outputMode1 << ui->cb_outputMode2 << ui->cb_outputMode3 <<
-        ui->cb_outputMode4 << ui->cb_outputMode5 << ui->cb_outputMode6;
-
-    Q_ASSERT(outputModeCombos.count() == outputRateCombos.count());
-    Q_ASSERT(outputRateCombos.count() == bank.count());
-
-    for (int i = 0; i < outputModeCombos.count(); i++) {
-        // Setup output rates for all banks
-        if (outputRateCombos.at(i)->findText(QString::number(actuatorSettingsData.BankUpdateFreq[i])) == -1) {
-            outputRateCombos.at(i)->addItem(QString::number(actuatorSettingsData.BankUpdateFreq[i]));
-        }
-        outputRateCombos.at(i)->setCurrentIndex(outputRateCombos.at(i)->findText(QString::number(actuatorSettingsData.BankUpdateFreq[i])));
-
+    for (int i = 0; i < m_banks.count(); i++) {
+        OutputBankControls controls = m_banks.at(i);
         // Reset to all disabled
-        bank.at(i)->setText("-");
+        controls.label()->setText("-");
 
-        outputRateCombos.at(i)->setEnabled(false);
-        setColor(outputRateCombos.at(i), palette().color(QPalette::Background));
+        controls.rateCombo()->setEnabled(false);
+        setColor(controls.rateCombo(), palette().color(QPalette::Background));
+        controls.rateCombo()->setCurrentIndex(0);
 
-        outputModeCombos.at(i)->setEnabled(false);
-        setColor(outputModeCombos.at(i), palette().color(QPalette::Background));
+        controls.modeCombo()->setEnabled(false);
+        setColor(controls.modeCombo(), palette().color(QPalette::Background));
     }
 
     // Get connected board model
@@ -363,6 +349,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
     Q_ASSERT(utilMngr);
     QStringList bankLabels;
+    QList<int> channelBanks;
 
     if (utilMngr) {
         int board = utilMngr->getBoardModel();
@@ -380,13 +367,21 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 
     int i = 0;
     foreach(QString banklabel, bankLabels) {
-        bank[i]->setText(banklabel);
-        outputRateCombos[i]->setEnabled(true);
-        setColor(outputRateCombos[i], bankColors[i]);
-        outputModeCombos[i]->setEnabled(true);
-        setColor(outputModeCombos[i], bankColors[i]);
+        OutputBankControls controls = m_banks.at(i);
+
+        controls.label()->setText(banklabel);
+        int index = controls.rateCombo()->findData(actuatorSettingsData.BankUpdateFreq[i]);
+        if (index == -1) {
+            controls.rateCombo()->addItem(tr("%1 Hz").arg(actuatorSettingsData.BankUpdateFreq[i]), actuatorSettingsData.BankUpdateFreq[i]);
+        }
+        controls.rateCombo()->setCurrentIndex(index);
+        controls.rateCombo()->setEnabled(controls.modeCombo()->currentIndex() == ActuatorSettings::BANKMODE_PWM);
+        setColor(controls.rateCombo(), controls.color());
+        controls.modeCombo()->setEnabled(true);
+        setColor(controls.modeCombo(), controls.color());
         i++;
     }
+
     // Get Channel ranges:
     i = 0;
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
@@ -396,7 +391,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         outputChannelForm->setRange(minValue, maxValue);
         if (channelBanks.count() > i) {
             outputChannelForm->setBank(QString("%1").arg(channelBanks.at(i)));
-            outputChannelForm->setColor(bankColors[channelBanks.at(i++) - 1]);
+            outputChannelForm->setColor(m_banks.at(channelBanks.at(i++) - 1).color());
         }
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->setNeutral(neutral);
@@ -427,14 +422,14 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
         }
 
         // Set update rates
-        actuatorSettingsData.BankUpdateFreq[0]    = ui->cb_outputRate1->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[1]    = ui->cb_outputRate2->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[2]    = ui->cb_outputRate3->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[3]    = ui->cb_outputRate4->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[4]    = ui->cb_outputRate5->currentText().toUInt();
-        actuatorSettingsData.BankUpdateFreq[5]    = ui->cb_outputRate6->currentText().toUInt();
+        actuatorSettingsData.BankUpdateFreq[0]    = m_ui->cb_outputRate1->currentData().toUInt();
+        actuatorSettingsData.BankUpdateFreq[1]    = m_ui->cb_outputRate2->currentData().toUInt();
+        actuatorSettingsData.BankUpdateFreq[2]    = m_ui->cb_outputRate3->currentData().toUInt();
+        actuatorSettingsData.BankUpdateFreq[3]    = m_ui->cb_outputRate4->currentData().toUInt();
+        actuatorSettingsData.BankUpdateFreq[4]    = m_ui->cb_outputRate5->currentData().toUInt();
+        actuatorSettingsData.BankUpdateFreq[5]    = m_ui->cb_outputRate6->currentData().toUInt();
 
-        actuatorSettingsData.MotorsSpinWhileArmed = ui->spinningArmed->isChecked() ?
+        actuatorSettingsData.MotorsSpinWhileArmed = m_ui->spinningArmed->isChecked() ?
                                                     ActuatorSettings::MOTORSSPINWHILEARMED_TRUE :
                                                     ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
 
@@ -448,9 +443,25 @@ void ConfigOutputWidget::openHelp()
     QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/WIGf"), QUrl::StrictMode));
 }
 
+void ConfigOutputWidget::onBankTypeChange()
+{
+    QComboBox *bankModeCombo = qobject_cast<QComboBox *>(sender());
+
+    if (bankModeCombo != NULL) {
+        foreach(OutputBankControls controls, m_banks) {
+            if (controls.modeCombo() == bankModeCombo) {
+                bool enabled = bankModeCombo->currentIndex() == ActuatorSettings::BANKMODE_PWM;
+                controls.rateCombo()->setEnabled(enabled);
+                controls.rateCombo()->setCurrentIndex(enabled ? 1 : 0);
+                break;
+            }
+        }
+    }
+}
+
 void ConfigOutputWidget::stopTests()
 {
-    ui->channelOutTest->setChecked(false);
+    m_ui->channelOutTest->setChecked(false);
 }
 
 void ConfigOutputWidget::updateWarnings(UAVObject *)
@@ -462,8 +473,9 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
         switch (systemAlarms.ExtendedAlarmStatus[SystemAlarms::EXTENDEDALARMSTATUS_SYSTEMCONFIGURATION]) {
         case SystemAlarms::EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT:
             setWarning(tr("OneShot only works with Receiver Port settings marked with '+OneShot'<br>"
-                          "When using Receiver Port setting 'PPM_PIN6+OneShot' "
-                          "<b><font color='#C3A8FF'>Bank 4 (output 6,9-10)</font></b> must be set to PWM"));
+                          "When using Receiver Port setting 'PPM_PIN8+OneShot' "
+                          "<b><font color='%1'>Bank %2</font></b> must be set to PWM")
+                       .arg(m_banks.at(3).color().name()).arg(m_banks.at(3).label()->text()));
             return;
         }
     }
@@ -472,7 +484,15 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
 
 void ConfigOutputWidget::setWarning(QString message)
 {
-    ui->gvFrame->setVisible(!message.isNull());
-    ui->picWarning->setPixmap(message.isNull() ? QPixmap() : QPixmap(":/configgadget/images/error.svg"));
-    ui->txtWarning->setText(message);
+    m_ui->gvFrame->setVisible(!message.isNull());
+    m_ui->picWarning->setPixmap(message.isNull() ? QPixmap() : QPixmap(":/configgadget/images/error.svg"));
+    m_ui->txtWarning->setText(message);
 }
+
+
+OutputBankControls::OutputBankControls(MixerSettings *mixer, QLabel *label, QColor color, QComboBox *rateCombo, QComboBox *modeCombo) :
+    m_mixer(mixer), m_label(label), m_color(color), m_rateCombo(rateCombo), m_modeCombo(modeCombo)
+{}
+
+OutputBankControls::~OutputBankControls()
+{}

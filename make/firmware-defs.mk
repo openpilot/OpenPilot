@@ -171,14 +171,14 @@ endef
 define COMPILE_C_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@$(ECHO) $(MSG_COMPILING) $$(call toprel, $$<)
-	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C source files. ARM-only
 define COMPILE_C_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@$(ECHO) $(MSG_COMPILING_ARM) $$(call toprel, $$<)
-	$(V1) $(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C++ source files.
@@ -228,7 +228,7 @@ define LINK_TEMPLATE
 .PRECIOUS : $(2) $(3)
 $(1):  $(2) $(3)
 	@$(ECHO) $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
+	$(V1) $(CC) $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
 endef
 
 # Link: create ELF output file from object files.

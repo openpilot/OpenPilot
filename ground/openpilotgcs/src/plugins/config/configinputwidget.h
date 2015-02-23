@@ -28,6 +28,7 @@
 #define CONFIGINPUTWIDGET_H
 
 #include "ui_input.h"
+#include "ui_input_wizard.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -76,6 +77,8 @@ private:
     int movePos;
     void setTxMovement(txMovements movement);
     Ui_InputWidget *ui;
+    Ui_InputWizardWidget *wizardUi;
+
     wizardSteps wizardStep;
     QList<QPointer<QWidget> > extraWidgets;
     txMode transmitterMode;

@@ -2,16 +2,17 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup Sensors Sensors Module
+ * @addtogroup Sensors
+ * @brief Acquires sensor data
  * @{
  *
- * @file       attitude.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
- * @brief      Acquires sensor data and fuses it into attitude estimate for CC
+ * @file       sensors.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      Module to handle fetch and preprocessing of sensor data
  *
  * @see        The GNU Public License (GPL) Version 3
  *
- *****************************************************************************/
+ ******************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

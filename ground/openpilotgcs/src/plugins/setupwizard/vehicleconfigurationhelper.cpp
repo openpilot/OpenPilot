@@ -151,7 +151,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             break;
         case VehicleConfigurationSource::INPUT_PPM:
             if (m_configSource->getEscType() == VehicleConfigurationSource::ESC_ONESHOT) {
-                data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM_PIN6ONESHOT;
+                data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM_PIN8ONESHOT;
             } else {
                 data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPMNOONESHOT;
             }

@@ -63,7 +63,7 @@
         <field name="Stabilization6Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
 		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,AltitudeHold,AltitudeVario,CruiseControl"
-		defaultvalue="Rate,Rate,Rate,CruiseControl"
+		defaultvalue="Rate,Rate,Rate,Manual"
 		limits="%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \

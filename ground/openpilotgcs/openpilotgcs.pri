@@ -66,6 +66,8 @@ equals(TEST, 1) {
 win32:!isEmpty(QMAKE_SH):QMAKE_COPY_DIR = cp -r -f
 
 GCS_SOURCE_TREE = $$PWD
+ROOT_DIR = $$GCS_SOURCE_TREE/../..
+
 isEmpty(GCS_BUILD_TREE) {
     sub_dir = $$_PRO_FILE_PWD_
     sub_dir ~= s,^$$re_escape($$PWD),,
@@ -80,7 +82,7 @@ isEmpty(TOOLS_DIR) {
     # check for custom enviroment variable,
     TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
     # fallback to default location.
-    isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
+    isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$ROOT_DIR/tools)
 }
 
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin

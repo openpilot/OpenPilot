@@ -56,13 +56,6 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ui.actuatorMax->setMinimum(MINOUTPUT_VALUE);
     ui.actuatorValue->setMinimum(MINOUTPUT_VALUE);
 
-    // Remove keyboard focus
-    ui.actuatorMin->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorMax->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorRev->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorLink->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorValue->setFocusPolicy(Qt::NoFocus);
-
     setChannelRange();
 
     disableMouseWheelEvents();
@@ -290,6 +283,7 @@ void OutputChannelForm::setChannelRange()
         ui.actuatorMax->setEnabled(true);
         ui.actuatorNeutral->setEnabled(true);
         ui.actuatorValue->setEnabled(true);
+        ui.actuatorLink->setEnabled(true);
     } else {
         ui.actuatorMin->setEnabled(false);
         ui.actuatorMax->setEnabled(false);

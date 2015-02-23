@@ -135,7 +135,7 @@ ConfigOutputWidget::~ConfigOutputWidget()
 
     disconnect(systemAlarmsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateWarnings(UAVObject *)));
     foreach(OutputBankControls controls, m_banks) {
-        disconnect(controls.modeCombo(), SIGNAL(currentIndexChanged(int)), this, SLOT(onBankTypeChange(int)));
+        disconnect(controls.modeCombo(), SIGNAL(currentIndexChanged(int)), this, SLOT(onBankTypeChange()));
     }
 }
 

@@ -283,7 +283,7 @@ static void stabilizationOuterloopTask()
 }
 
 
-//TODO Also if stabdesired changes do a callback.
+// TODO Also if stabdesired changes do a callback.
 
 static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {

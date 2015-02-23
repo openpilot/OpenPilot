@@ -49,7 +49,7 @@ public:
     virtual void Activate(void) {}
     virtual void Update(void) {}
     virtual void SettingsUpdated(void) {}
-    virtual void BoundThrust(float &ulow, float &uhigh);
+    virtual void BoundThrust(__attribute__((unused)) float &ulow, __attribute__((unused)) float &uhigh) {}
     virtual PathFollowerFSMState_T GetCurrentState(void)
     {
         return PFFSM_STATE_INACTIVE;

@@ -42,7 +42,7 @@ typedef enum {
 } PathFollowerFSM_BrakeState_T;
 
 typedef enum {
-  FSMBRAKESTATUS_STATEEXITREASON_NONE = 0
+    FSMBRAKESTATUS_STATEEXITREASON_NONE = 0
 } FSMBrakeStatusStateExitReasonOptions;
 
 class FSMBrake : PathFollowerFSM {
@@ -103,7 +103,7 @@ protected:
     void initFSM(void);
     void setState(PathFollowerFSM_BrakeState_T newState, FSMBrakeStatusStateExitReasonOptions reason);
     int32_t runState();
-    //void updateFSMBrakeStatus();
+    // void updateFSMBrakeStatus();
 
     void setStateTimeout(int32_t count);
     void fallback_to_hold(void);

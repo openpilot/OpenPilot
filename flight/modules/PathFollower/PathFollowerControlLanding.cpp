@@ -115,7 +115,7 @@ uint8_t PathFollowerControlLanding::IsActive(void)
 
 uint8_t PathFollowerControlLanding::Mode(void)
 {
-  return PATHDESIRED_MODE_LAND;
+    return PATHDESIRED_MODE_LAND;
 }
 
 // Objective updated in pathdesired, e.g. same flight mode but new target velocity
@@ -268,14 +268,14 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
     float cos_angle     = cosf(angle_radians);
     float sine_angle    = sinf(angle_radians);
     float maxPitch = vtolPathFollowerSettings->MaxRollPitch;
+    stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.Pitch = boundf(-northCommand * cos_angle - eastCommand * sine_angle, -maxPitch, maxPitch);
-    stabDesired.Roll  = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -maxPitch, maxPitch);
+    stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.Roll = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -maxPitch, maxPitch);
 
     ManualControlCommandData manualControl;
     ManualControlCommandGet(&manualControl);
 
-    stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     if (yaw_attitude) {
         stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
         stabDesired.Yaw = yaw_direction;

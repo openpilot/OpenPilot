@@ -77,7 +77,7 @@ extern "C" {
 PathFollowerControlVelocityRoam *PathFollowerControlVelocityRoam::p_inst = 0;
 
 PathFollowerControlVelocityRoam::PathFollowerControlVelocityRoam()
-: vtolPathFollowerSettings(0), pathDesired(0), pathStatus(0), mActive(false)
+    : vtolPathFollowerSettings(0), pathDesired(0), pathStatus(0), mActive(false)
 {}
 
 // Called when mode first engaged
@@ -97,7 +97,7 @@ uint8_t PathFollowerControlVelocityRoam::IsActive(void)
 
 uint8_t PathFollowerControlVelocityRoam::Mode(void)
 {
-  return PATHDESIRED_MODE_VELOCITY;
+    return PATHDESIRED_MODE_VELOCITY;
 }
 
 void PathFollowerControlVelocityRoam::ObjectiveUpdated(void)
@@ -128,20 +128,19 @@ void PathFollowerControlVelocityRoam::SettingsUpdated(void)
 
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
-
 }
 
-int32_t PathFollowerControlVelocityRoam::Initialize( VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                                               PathDesiredData *ptr_pathDesired,
-                                               PathStatusData *ptr_pathStatus)
+int32_t PathFollowerControlVelocityRoam::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
+                                                    PathDesiredData *ptr_pathDesired,
+                                                    PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     PIOS_Assert(ptr_pathDesired);
     PIOS_Assert(ptr_pathStatus);
 
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    pathDesired  = ptr_pathDesired;
-    pathStatus   = ptr_pathStatus;
+    pathDesired = ptr_pathDesired;
+    pathStatus  = ptr_pathStatus;
     return 0;
 }
 
@@ -194,8 +193,10 @@ int8_t PathFollowerControlVelocityRoam::UpdateStabilizationDesired(__attribute__
     float cos_angle     = cosf(angle_radians);
     float sine_angle    = sinf(angle_radians);
     float maxPitch = vtolPathFollowerSettings->MaxRollPitch;
+    stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.Pitch = boundf(-northCommand * cos_angle - eastCommand * sine_angle, -maxPitch, maxPitch);
-    stabDesired.Roll  = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -maxPitch, maxPitch);
+    stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.Roll = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -maxPitch, maxPitch);
 
     ManualControlCommandData manualControl;
     ManualControlCommandGet(&manualControl);
@@ -218,7 +219,7 @@ void PathFollowerControlVelocityRoam::UpdateAutoPilot()
     bool yaw_attitude = false;
     float yaw = 0.0f;
 
-    int8_t result = UpdateStabilizationDesired(yaw_attitude, yaw);
+    int8_t result     = UpdateStabilizationDesired(yaw_attitude, yaw);
 
     if (!result) {
         fallback_to_hold();

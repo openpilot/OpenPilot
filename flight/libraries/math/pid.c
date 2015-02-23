@@ -219,7 +219,7 @@ float pid2_apply(
     pid->D = pid->ad * pid->D - pid->bd * (y - pid->yold);
 
     // compute temporary output
-    float v = pid->va + pid->vb * ( pid->P + pid->I + pid->D);
+    float v = pid->va + pid->vb * (pid->P + pid->I + pid->D);
 
     // simulate actuator saturation
     float u = boundf(v, ulow, uhigh);

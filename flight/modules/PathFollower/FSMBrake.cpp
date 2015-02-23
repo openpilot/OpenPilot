@@ -83,12 +83,12 @@ extern "C" {
 
 
 // Private constants
-#define TIMER_COUNT_PER_SECOND            (1000 / vtolPathFollowerSettings->UpdatePeriod)
+#define TIMER_COUNT_PER_SECOND (1000 / vtolPathFollowerSettings->UpdatePeriod)
 
 FSMBrake::PathFollowerFSM_BrakeStateHandler_T FSMBrake::sBrakeStateTable[BRAKE_STATE_SIZE] = {
-    [BRAKE_STATE_INACTIVE]       	=  { .setup = &FSMBrake::setup_inactive,.run = 0      },
-    [BRAKE_STATE_BRAKE]   		=  { .setup = &FSMBrake::setup_brake,   .run = &FSMBrake::run_brake         },
-    [BRAKE_STATE_HOLD] 			=  { .setup = &FSMBrake::setup_hold,    .run = &FSMBrake::run_hold  }
+    [BRAKE_STATE_INACTIVE] = { .setup = &FSMBrake::setup_inactive, .run = 0                    },
+    [BRAKE_STATE_BRAKE]    = { .setup = &FSMBrake::setup_brake,    .run = &FSMBrake::run_brake },
+    [BRAKE_STATE_HOLD]     = { .setup = &FSMBrake::setup_hold,     .run = &FSMBrake::run_hold  }
 };
 
 // pointer to a singleton instance
@@ -96,7 +96,7 @@ FSMBrake *FSMBrake::p_inst = 0;
 
 
 FSMBrake::FSMBrake()
-: mBrakeData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
+    : mBrakeData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
 {}
 
 // Private types
@@ -108,9 +108,9 @@ FSMBrake::FSMBrake()
  * \returns 0 on success or -1 if initialisation failed
  */
 int32_t FSMBrake::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                            PathDesiredData *ptr_pathDesired,
-                            FlightStatusData *ptr_flightStatus,
-                            PathStatusData *ptr_pathStatus)
+                             PathDesiredData *ptr_pathDesired,
+                             FlightStatusData *ptr_flightStatus,
+                             PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     PIOS_Assert(ptr_pathDesired);
@@ -122,7 +122,7 @@ int32_t FSMBrake::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerS
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;
     flightStatus = ptr_flightStatus;
-    pathStatus = ptr_pathStatus;
+    pathStatus   = ptr_pathStatus;
     initFSM();
 
     return 0;
@@ -143,7 +143,7 @@ void FSMBrake::initFSM(void)
 void FSMBrake::Activate()
 {
     memset(mBrakeData, sizeof(FSMBrakeData_T), 0);
-    mBrakeData->currentState   = BRAKE_STATE_INACTIVE;
+    mBrakeData->currentState = BRAKE_STATE_INACTIVE;
     setState(BRAKE_STATE_BRAKE, FSMBRAKESTATUS_STATEEXITREASON_NONE);
 }
 
@@ -193,12 +193,12 @@ int32_t FSMBrake::runState(void)
 // state transitions.
 void FSMBrake::setState(PathFollowerFSM_BrakeState_T newState, __attribute__((unused)) FSMBrakeStatusStateExitReasonOptions reason)
 {
-    //mBrakeData->fsmBrakeStatus.StateExitReason[mBrakeData->currentState] = reason;
+    // mBrakeData->fsmBrakeStatus.StateExitReason[mBrakeData->currentState] = reason;
 
     if (mBrakeData->currentState == newState) {
         return;
     }
-    mBrakeData->currentState = newState;
+    mBrakeData->currentState      = newState;
 
     // Restart state timer counter
     mBrakeData->stateRunCount     = 0;
@@ -210,7 +210,7 @@ void FSMBrake::setState(PathFollowerFSM_BrakeState_T newState, __attribute__((un
         (this->*sBrakeStateTable[mBrakeData->currentState].setup)();
     }
 
-    //updateFSMBrakeStatus();
+    // updateFSMBrakeStatus();
 }
 
 
@@ -247,8 +247,8 @@ void FSMBrake::setup_inactive(void)
 void FSMBrake::setup_brake(void)
 {
     setStateTimeout(TIMER_COUNT_PER_SECOND * pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT]);
-    mBrakeData->observationCount = 0;
-    mBrakeData->observation2Count     = 0;
+    mBrakeData->observationCount  = 0;
+    mBrakeData->observation2Count = 0;
 }
 
 #define BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK 0.95f
@@ -257,59 +257,56 @@ void FSMBrake::setup_brake(void)
 void FSMBrake::run_brake(uint8_t flTimeout)
 {
 // Brake mode end condition checks
-     bool exit_brake = false;
-     VelocityStateData velocityState;
-     PathSummaryData pathSummary;
+    bool exit_brake = false;
+    VelocityStateData velocityState;
+    PathSummaryData pathSummary;
 
-     if (flTimeout) {
-         pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_TIMEOUT;
-         exit_brake = true;
-     } else if (pathStatus->fractional_progress > BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK) {
-         VelocityStateGet(&velocityState);
-         if (fabsf(velocityState.East) < BRAKE_EXIT_VELOCITY_LIMIT && fabsf(velocityState.North) < BRAKE_EXIT_VELOCITY_LIMIT) {
-             pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
-             exit_brake = true;
-         }
-     }
+    if (flTimeout) {
+        pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_TIMEOUT;
+        exit_brake = true;
+    } else if (pathStatus->fractional_progress > BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK) {
+        VelocityStateGet(&velocityState);
+        if (fabsf(velocityState.East) < BRAKE_EXIT_VELOCITY_LIMIT && fabsf(velocityState.North) < BRAKE_EXIT_VELOCITY_LIMIT) {
+            pathSummary.brake_exit_reason = PATHSUMMARY_BRAKE_EXIT_REASON_PATHCOMPLETED;
+            exit_brake = true;
+        }
+    }
 
-     if (exit_brake) {
-         // Calculate the distance error between the originally desired
-         // stopping point and the actual brake-exit point.
+    if (exit_brake) {
+        // Calculate the distance error between the originally desired
+        // stopping point and the actual brake-exit point.
 
-         PositionStateData p;
-         PositionStateGet(&p);
-         float north_offset = pathDesired->End.North - p.North;
-         float east_offset  = pathDesired->End.East - p.East;
-         float down_offset  = pathDesired->End.Down - p.Down;
-         pathSummary.brake_distance_offset = sqrtf(north_offset * north_offset + east_offset * east_offset + down_offset * down_offset);
-         pathSummary.time_remaining = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] - pathStatus->path_time;
-         pathSummary.fractional_progress   = pathStatus->fractional_progress;
-         float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
-         cur_velocity = sqrtf(cur_velocity);
-         pathSummary.decelrate = (pathDesired->StartingVelocity - cur_velocity) / pathStatus->path_time;
-         pathSummary.brakeRateActualDesiredRatio = pathSummary.decelrate / vtolPathFollowerSettings->BrakeRate;
-         pathSummary.velocityIntoHold = cur_velocity;
-         pathSummary.Mode = PATHSUMMARY_MODE_BRAKE;
-         pathSummary.UID  = pathStatus->UID;
-         PathSummarySet(&pathSummary);
+        PositionStateData p;
+        PositionStateGet(&p);
+        float north_offset = pathDesired->End.North - p.North;
+        float east_offset  = pathDesired->End.East - p.East;
+        float down_offset  = pathDesired->End.Down - p.Down;
+        pathSummary.brake_distance_offset = sqrtf(north_offset * north_offset + east_offset * east_offset + down_offset * down_offset);
+        pathSummary.time_remaining = pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_BRAKE_TIMEOUT] - pathStatus->path_time;
+        pathSummary.fractional_progress   = pathStatus->fractional_progress;
+        float cur_velocity = velocityState.North * velocityState.North + velocityState.East * velocityState.East + velocityState.Down * velocityState.Down;
+        cur_velocity = sqrtf(cur_velocity);
+        pathSummary.decelrate = (pathDesired->StartingVelocity - cur_velocity) / pathStatus->path_time;
+        pathSummary.brakeRateActualDesiredRatio = pathSummary.decelrate / vtolPathFollowerSettings->BrakeRate;
+        pathSummary.velocityIntoHold = cur_velocity;
+        pathSummary.Mode = PATHSUMMARY_MODE_BRAKE;
+        pathSummary.UID  = pathStatus->UID;
+        PathSummarySet(&pathSummary);
 
-         setState(BRAKE_STATE_HOLD, FSMBRAKESTATUS_STATEEXITREASON_NONE);
-     }
+        setState(BRAKE_STATE_HOLD, FSMBRAKESTATUS_STATEEXITREASON_NONE);
+    }
 }
 
 // abort repeatedly overwrites pathfollower's objective on a brakeing abort and
 // continues to do so until a flight mode change.
 void FSMBrake::setup_hold(void)
-{
-}
+{}
 
 void FSMBrake::run_hold(__attribute__((unused)) uint8_t flTimeout)
-{
-
-}
+{}
 
 
 uint8_t FSMBrake::PositionHoldState(void)
 {
-  return (mBrakeData->currentState == BRAKE_STATE_HOLD);
+    return mBrakeData->currentState == BRAKE_STATE_HOLD;
 }

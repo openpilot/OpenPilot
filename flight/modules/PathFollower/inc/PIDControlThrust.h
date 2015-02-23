@@ -54,6 +54,7 @@ public:
     void UpdatePositionState(float pvDown);
     void UpdatePositionSetpoint(float setpointDown);
     void ControlPosition();
+    void ControlPositionWithPath(struct path_status *progress);
     void UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
     void UpdateVelocityStateWithBrake(float pvDown, float path_time, float brakeRate);
 
@@ -76,18 +77,17 @@ private:
     uint8_t mActive;
 
     struct NeutralThrustEstimation {
-         uint32_t count;
-         float    sum;
-         float    average;
-         float    correction;
-         float    algo_erro_check;
-         float    min;
-         float    max;
-         bool     start_sampling;
-         bool     have_correction;
-     };
-     struct NeutralThrustEstimation neutralThrustEst;
-
+        uint32_t count;
+        float    sum;
+        float    average;
+        float    correction;
+        float    algo_erro_check;
+        float    min;
+        float    max;
+        bool     start_sampling;
+        bool     have_correction;
+    };
+    struct NeutralThrustEstimation neutralThrustEst;
 };
 
 #endif // PIDCONTROLTHRUST_H

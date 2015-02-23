@@ -28,22 +28,23 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PATHFOLLOWERCONTROLVELOCITYROAM_H
-#define PATHFOLLOWERCONTROLVELOCITYROAM_H
+#ifndef PATHFOLLOWERCONTROLFLY_H
+#define PATHFOLLOWERCONTROLFLY_H
 #include "PathFollowerControl.h"
 #include "PIDControlNE.h"
+#include "PIDControlThrust.h"
 
-class PathFollowerControlVelocityRoam : PathFollowerControl {
+class PathFollowerControlFly : PathFollowerControl {
 private:
-    static PathFollowerControlVelocityRoam *p_inst;
-    PathFollowerControlVelocityRoam();
+    static PathFollowerControlFly *p_inst;
+    PathFollowerControlFly();
 
 
 public:
-    static PathFollowerControlVelocityRoam *instance()
+    static PathFollowerControlFly *instance()
     {
         if (!p_inst) {
-            p_inst = new PathFollowerControlVelocityRoam();
+            p_inst = new PathFollowerControlFly();
         }
         return p_inst;
     }
@@ -64,13 +65,24 @@ public:
 private:
     void UpdateVelocityDesired(void);
     int8_t UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction);
+    void UpdateDesiredAttitudeEmergencyFallback();
     void fallback_to_hold(void);
+    float updateTailInBearing();
+    float updateCourseBearing();
+    float updatePathBearing();
+    float updatePOIBearing();
+    uint8_t RunAutoPilot();
 
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
     PathDesiredData *pathDesired;
     PathStatusData *pathStatus;
     PIDControlNE controlNE;
+    PIDControlThrust controlThrust;
     uint8_t mActive;
+    uint8_t mManualThrust;
+    uint8_t mMode;
+    float vtolEmergencyFallback;
+    bool vtolEmergencyFallbackSwitch;
 };
 
-#endif // PATHFOLLOWERCONTROLVELOCITYROAM_H
+#endif // PATHFOLLOWERCONTROLFLY_H

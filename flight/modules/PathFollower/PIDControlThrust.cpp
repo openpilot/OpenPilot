@@ -48,14 +48,13 @@ extern "C" {
 #include "PathFollowerFSM.h"
 #include "PIDControlThrust.h"
 
-#define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT     0.5f
-#define NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT          0.2f
-#define NEUTRALTHRUST_PH_VEL_STATE_LIMIT            0.2f
-#define NEUTRALTHRUST_PH_VEL_ERROR_LIMIT            0.1f
+#define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT 0.5f
+#define NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT      0.2f
+#define NEUTRALTHRUST_PH_VEL_STATE_LIMIT        0.2f
+#define NEUTRALTHRUST_PH_VEL_ERROR_LIMIT        0.1f
 
-#define NEUTRALTHRUST_START_DELAY                   (2 * 20) // 2 seconds at rate of 20Hz (50ms update rate)
-#define NEUTRALTHRUST_END_COUNT                     (NEUTRALTHRUST_START_DELAY + (4 * 20))  // 4 second sample
-
+#define NEUTRALTHRUST_START_DELAY               (2 * 20) // 2 seconds at rate of 20Hz (50ms update rate)
+#define NEUTRALTHRUST_END_COUNT                 (NEUTRALTHRUST_START_DELAY + (4 * 20))  // 4 second sample
 
 
 PIDControlThrust::PIDControlThrust()
@@ -90,15 +89,16 @@ void PIDControlThrust::Activate()
 void PIDControlThrust::UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax)
 {
     // pid_configure(&PID, kp, ki, kd, ilimit);
-    float Ti   = kp / ki;
-    float Td   = kd / kp;
-    float Tt   = (Ti + Td) / 2.0f;
-    float kt   = 1.0f / Tt;
-    float N    = 10.0f;
-    float Tf   = Td / N;
+    float Ti = kp / ki;
+    float Td = kd / kp;
+    float Tt = (Ti + Td) / 2.0f;
+    float kt = 1.0f / Tt;
+    float N  = 10.0f;
+    float Tf = Td / N;
+
     if (kd < 1e-6f) {
-	// PI Controller
-	Tf = Ti / N;
+        // PI Controller
+        Tf = Ti / N;
     }
 
     pid2_configure(&PID, kp, ki, kd, Tf, kt, dT, beta, mNeutral, mNeutral, -1.0f);
@@ -132,90 +132,100 @@ void PIDControlThrust::ControlPosition()
     run_neutralThrustCalc();
 }
 
-void PIDControlThrust::run_neutralThrustCalc(void) {
-   // if auto thrust and we have not run a correction calc check for PH and stability to then run an assessment
-   // note that arming into this flight mode is not allowed, so assumption here is that
-   // we have not landed.  If GPSAssist+Manual/Cruise control thrust mode is used, a user overriding the
-   // altitude maintaining PID will have moved the throttle state to FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL.
-   // In manualcontrol.c the state will stay in manual throttle until the throttle command exceeds the vtol thrust min,
-   // avoiding auto-takeoffs.  Therefore no need to check that here.
 
-   if (neutralThrustEst.have_correction != true) {
+void PIDControlThrust::ControlPositionWithPath(struct path_status *progress)
+{
+    // Current progress location relative to end
+    float velDown = progress->path_vector[2];
 
-       // Make FSM specific
-       bool stable = (fabsf(mPositionSetpointTarget - mPositionState) < NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT &&
-                      fabsf(mVelocitySetpointCurrent) < NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT &&
-                      fabsf(mVelocityState) < NEUTRALTHRUST_PH_VEL_STATE_LIMIT &&
-                      fabsf(mVelocitySetpointCurrent - mVelocityState) < NEUTRALTHRUST_PH_VEL_ERROR_LIMIT);
-
-       if (stable) {
-           if (neutralThrustEst.start_sampling) {
-               neutralThrustEst.count++;
+    velDown += pid_apply(&PIDpos, progress->correction_vector[2], deltaTime);
+    UpdateVelocitySetpoint(velDown);
+}
 
 
-               // delay count for 2 seconds into hold allowing for stablisation
-               if (neutralThrustEst.count > NEUTRALTHRUST_START_DELAY) {
-                   neutralThrustEst.sum += PID.I;
-                   if (PID.I < neutralThrustEst.min) {
-                       neutralThrustEst.min = PID.I;
-                   }
-                   if (PID.I > neutralThrustEst.max) {
-                       neutralThrustEst.max = PID.I;
-                   }
-               }
+void PIDControlThrust::run_neutralThrustCalc(void)
+{
+    // if auto thrust and we have not run a correction calc check for PH and stability to then run an assessment
+    // note that arming into this flight mode is not allowed, so assumption here is that
+    // we have not landed.  If GPSAssist+Manual/Cruise control thrust mode is used, a user overriding the
+    // altitude maintaining PID will have moved the throttle state to FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL.
+    // In manualcontrol.c the state will stay in manual throttle until the throttle command exceeds the vtol thrust min,
+    // avoiding auto-takeoffs.  Therefore no need to check that here.
 
-               if (neutralThrustEst.count >= NEUTRALTHRUST_END_COUNT) {
-                   // 6 seconds have past
-                   // lets take an average
-                   neutralThrustEst.average         = neutralThrustEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
-                   neutralThrustEst.correction      = neutralThrustEst.average;
+    if (neutralThrustEst.have_correction != true) {
+        // Make FSM specific
+        bool stable = (fabsf(mPositionSetpointTarget - mPositionState) < NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT &&
+                       fabsf(mVelocitySetpointCurrent) < NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT &&
+                       fabsf(mVelocityState) < NEUTRALTHRUST_PH_VEL_STATE_LIMIT &&
+                       fabsf(mVelocitySetpointCurrent - mVelocityState) < NEUTRALTHRUST_PH_VEL_ERROR_LIMIT);
 
-                   PID.I   -= neutralThrustEst.average;
+        if (stable) {
+            if (neutralThrustEst.start_sampling) {
+                neutralThrustEst.count++;
 
-                   neutralThrustEst.start_sampling  = false;
-                   neutralThrustEst.have_correction = true;
 
-                   // Write a new adjustment value
-                   // vtolSelfTuningStats.NeutralThrustOffset  was incremental adjusted above
-                   VtolSelfTuningStatsData vtolSelfTuningStats;
-                   VtolSelfTuningStatsGet(&vtolSelfTuningStats);
-                   // add the average remaining i value to the
-                   vtolSelfTuningStats.NeutralThrustOffset      += neutralThrustEst.correction;
-                   vtolSelfTuningStats.NeutralThrustCorrection  = neutralThrustEst.correction; // the i term thrust correction value applied
-                   vtolSelfTuningStats.NeutralThrustAccumulator = PID.I; // the actual iaccumulator value after correction
-                   vtolSelfTuningStats.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
-                   VtolSelfTuningStatsSet(&vtolSelfTuningStats);
-               }
-           } else {
-               // start a tick count
-               neutralThrustEst.start_sampling = true;
-               neutralThrustEst.count = 0;
-               neutralThrustEst.sum   = 0.0f;
-               neutralThrustEst.max   = 0.0f;
-               neutralThrustEst.min   = 0.0f;
-           }
-       } else {
-           // reset sampling as we did't get 6 continuous seconds
-           neutralThrustEst.start_sampling = false;
-       }
-   } // else we already have a correction for this PH run
+                // delay count for 2 seconds into hold allowing for stablisation
+                if (neutralThrustEst.count > NEUTRALTHRUST_START_DELAY) {
+                    neutralThrustEst.sum += PID.I;
+                    if (PID.I < neutralThrustEst.min) {
+                        neutralThrustEst.min = PID.I;
+                    }
+                    if (PID.I > neutralThrustEst.max) {
+                        neutralThrustEst.max = PID.I;
+                    }
+                }
+
+                if (neutralThrustEst.count >= NEUTRALTHRUST_END_COUNT) {
+                    // 6 seconds have past
+                    // lets take an average
+                    neutralThrustEst.average    = neutralThrustEst.sum / (float)(NEUTRALTHRUST_END_COUNT - NEUTRALTHRUST_START_DELAY);
+                    neutralThrustEst.correction = neutralThrustEst.average;
+
+                    PID.I -= neutralThrustEst.average;
+
+                    neutralThrustEst.start_sampling  = false;
+                    neutralThrustEst.have_correction = true;
+
+                    // Write a new adjustment value
+                    // vtolSelfTuningStats.NeutralThrustOffset  was incremental adjusted above
+                    VtolSelfTuningStatsData vtolSelfTuningStats;
+                    VtolSelfTuningStatsGet(&vtolSelfTuningStats);
+                    // add the average remaining i value to the
+                    vtolSelfTuningStats.NeutralThrustOffset     += neutralThrustEst.correction;
+                    vtolSelfTuningStats.NeutralThrustCorrection  = neutralThrustEst.correction; // the i term thrust correction value applied
+                    vtolSelfTuningStats.NeutralThrustAccumulator = PID.I; // the actual iaccumulator value after correction
+                    vtolSelfTuningStats.NeutralThrustRange = neutralThrustEst.max - neutralThrustEst.min;
+                    VtolSelfTuningStatsSet(&vtolSelfTuningStats);
+                }
+            } else {
+                // start a tick count
+                neutralThrustEst.start_sampling = true;
+                neutralThrustEst.count = 0;
+                neutralThrustEst.sum   = 0.0f;
+                neutralThrustEst.max   = 0.0f;
+                neutralThrustEst.min   = 0.0f;
+            }
+        } else {
+            // reset sampling as we did't get 6 continuous seconds
+            neutralThrustEst.start_sampling = false;
+        }
+    } // else we already have a correction for this PH run
 }
 
 
 void PIDControlThrust::setup_neutralThrustCalc(void)
 {
-     // reset neutral thrust assessment.
-        // and do once for each position hold engagement
-        neutralThrustEst.start_sampling  = false;
-        neutralThrustEst.count = 0;
-        neutralThrustEst.sum = 0.0f;
-        neutralThrustEst.have_correction = false;
-        neutralThrustEst.average    = 0.0f;
-        neutralThrustEst.correction = 0.0f;
-        neutralThrustEst.min = 0.0f;
-        neutralThrustEst.max = 0.0f;
+    // reset neutral thrust assessment.
+    // and do once for each position hold engagement
+    neutralThrustEst.start_sampling  = false;
+    neutralThrustEst.count = 0;
+    neutralThrustEst.sum = 0.0f;
+    neutralThrustEst.have_correction = false;
+    neutralThrustEst.average    = 0.0f;
+    neutralThrustEst.correction = 0.0f;
+    neutralThrustEst.min = 0.0f;
+    neutralThrustEst.max = 0.0f;
 }
-
 
 
 void PIDControlThrust::UpdateNeutralThrust(float neutral)
@@ -290,9 +300,9 @@ void PIDControlThrust::UpdateVelocityStateWithBrake(float pvDown, float path_tim
     UpdateBrakeVelocity(mVelocitySetpointTarget, path_time, brakeRate, pvDown, &velocitySetpointDesired);
 
     // Calculate the rate of change
-        // RateLimit(velocitySetpointDesired[iaxis], mVelocitySetpointCurrent[iaxis], 2.0f );
+    // RateLimit(velocitySetpointDesired[iaxis], mVelocitySetpointCurrent[iaxis], 2.0f );
 
-        mVelocitySetpointCurrent = velocitySetpointDesired;
+    mVelocitySetpointCurrent = velocitySetpointDesired;
 }
 
 
@@ -324,15 +334,15 @@ float PIDControlThrust::GetThrustCommand(void)
     mFSM->BoundThrust(ulow, uhigh);
     float downCommand = pid2_apply(&PID, mVelocitySetpointCurrent, mVelocityState, ulow, uhigh);
     pidStatus.setpoint = mVelocitySetpointCurrent;
-    pidStatus.actual = mVelocityState;
-    pidStatus.error = mVelocitySetpointCurrent - mVelocityState;
+    pidStatus.actual   = mVelocityState;
+    pidStatus.error    = mVelocitySetpointCurrent - mVelocityState;
     pidStatus.setpoint = mVelocitySetpointCurrent;
-    pidStatus.ulow = ulow;
-    pidStatus.uhigh = uhigh;
-    pidStatus.command = downCommand;
-    pidStatus.P = PID.P;
-    pidStatus.I = PID.I;
-    pidStatus.D = PID.D;
+    pidStatus.ulow     = ulow;
+    pidStatus.uhigh    = uhigh;
+    pidStatus.command  = downCommand;
+    pidStatus.P    = PID.P;
+    pidStatus.I    = PID.I;
+    pidStatus.D    = PID.D;
     PIDStatusSet(&pidStatus);
     mThrustCommand = downCommand;
     return mThrustCommand;

@@ -81,9 +81,10 @@ void PIDControlNE::UpdateParameters(float kp, float ki, float kd, __attribute__(
     float u0   = 0.0f;
     float N    = 10.0f;
     float Tf   = Td / N;
+
     if (kd < 1e-6f) {
-   	// PI Controller
-   	Tf = Ti / N;
+        // PI Controller
+        Tf = Ti / N;
     }
 
     pid2_configure(&PIDvel[0], kp, ki, kd, Tf, kt, dT, beta, u0, 0.0f, 1.0f);
@@ -116,6 +117,17 @@ void PIDControlNE::ControlPosition()
 
     velNorth = pid_apply(&PIDposH[0], mPositionSetpointTarget[0] - mPositionState[0], deltaTime);
     velEast  = pid_apply(&PIDposH[1], mPositionSetpointTarget[1] - mPositionState[1], deltaTime);
+    UpdateVelocitySetpoint(velNorth, velEast);
+}
+
+void PIDControlNE::ControlPositionWithPath(struct path_status *progress)
+{
+    // Current progress location relative to end
+    float velNorth = progress->path_vector[0];
+    float velEast  = progress->path_vector[1];
+
+    velNorth += pid_apply(&PIDposH[0], progress->correction_vector[0], deltaTime);
+    velEast  += pid_apply(&PIDposH[1], progress->correction_vector[1], deltaTime);
     UpdateVelocitySetpoint(velNorth, velEast);
 }
 
@@ -201,12 +213,11 @@ void PIDControlNE::UpdateCommandParameters(float minCommand, float maxCommand, f
 }
 
 
-
 void PIDControlNE::GetNECommand(float *northCommand, float *eastCommand)
 {
-    PIDvel[0].va = mVelocitySetpointCurrent[0] * mVelocityFeedforward;
+    PIDvel[0].va  = mVelocitySetpointCurrent[0] * mVelocityFeedforward;
     *northCommand = pid2_apply(&(PIDvel[0]), mVelocitySetpointCurrent[0], mVelocityState[0], mMinCommand, mMaxCommand);
-    PIDvel[1].va = mVelocitySetpointCurrent[1] * mVelocityFeedforward;
+    PIDvel[1].va  = mVelocitySetpointCurrent[1] * mVelocityFeedforward;
     *eastCommand  = pid2_apply(&(PIDvel[1]), mVelocitySetpointCurrent[1], mVelocityState[1], mMinCommand, mMaxCommand);
 }
 

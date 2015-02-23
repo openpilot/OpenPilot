@@ -51,6 +51,7 @@ public:
     void UpdateVelocityState(float pvNorth, float pvEast);
     void UpdateCommandParameters(float minCommand, float maxCommand, float velocityFeedforward);
     void ControlPosition();
+    void ControlPositionWithPath(struct path_status *progress);
     void GetNECommand(float *northCommand, float *eastCommand);
     void GetVelocityDesired(float *north, float *east);
     void UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);

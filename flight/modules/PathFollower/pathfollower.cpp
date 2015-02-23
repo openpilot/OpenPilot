@@ -85,20 +85,19 @@ extern "C" {
 #include "PathFollowerControlLanding.h"
 #include "PathFollowerControlVelocityRoam.h"
 #include "PathFollowerControlBrake.h"
+#include "PathFollowerControlFly.h"
 
 // Private constants
 
-#define CALLBACK_PRIORITY                           CALLBACK_PRIORITY_LOW
-#define CBTASK_PRIORITY                             CALLBACK_TASK_FLIGHTCONTROL
+#define CALLBACK_PRIORITY      CALLBACK_PRIORITY_LOW
+#define CBTASK_PRIORITY        CALLBACK_TASK_FLIGHTCONTROL
 
-#define PF_IDLE_UPDATE_RATE_MS                      100
+#define PF_IDLE_UPDATE_RATE_MS 100
 
-#define STACK_SIZE_BYTES                            2048
+#define STACK_SIZE_BYTES       2048
 
-#define DEADBAND_HIGH                               0.10f
-#define DEADBAND_LOW                                -0.10f
-
-
+#define DEADBAND_HIGH          0.10f
+#define DEADBAND_LOW           -0.10f
 
 
 // Private types
@@ -201,18 +200,14 @@ int32_t PathFollowerInitialize()
     FSMLand::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
     PathFollowerControlLanding::instance()->Initialize((PathFollowerFSM *)FSMLand::instance(),
                                                        &vtolPathFollowerSettings, &pathDesired, &flightStatus, &pathStatus);
-    PathFollowerControlVelocityRoam::instance()->Initialize( &vtolPathFollowerSettings, &pathDesired, &pathStatus);
-    PathFollowerControlBrake::instance()->Initialize( (PathFollowerFSM *)FSMBrake::instance(),
-                                                      &vtolPathFollowerSettings,
-                                                      &pathDesired,
-                                                      &flightStatus,
-                                                      &pathStatus);
+    PathFollowerControlVelocityRoam::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
+    PathFollowerControlFly::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
+    PathFollowerControlBrake::instance()->Initialize((PathFollowerFSM *)FSMBrake::instance(),
+                                                     &vtolPathFollowerSettings,
+                                                     &pathDesired,
+                                                     &flightStatus,
+                                                     &pathStatus);
 
-    int32_t Initialize(PathFollowerFSM *fsm_ptr,
-                       VtolPathFollowerSettingsData *vtolPathFollowerSettings,
-                       PathDesiredData *pathDesired,
-                       FlightStatusData *flightStatus,
-                       PathStatusData *pathStatus);
     // reset integrals
     resetGlobals();
 
@@ -233,19 +228,38 @@ MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
 static void pathFollowerSetActiveController(void)
 {
     if (activeController == 0) {
-        switch (pathDesired.Mode) {
-        case PATHDESIRED_MODE_BRAKE:
-            activeController = (PathFollowerControlLanding *)PathFollowerControlBrake::instance();
-            activeController->Activate();
+        switch (global.frameType) {
+        case FRAME_TYPE_MULTIROTOR:
+        case FRAME_TYPE_HELI:
+
+            switch (pathDesired.Mode) {
+            case PATHDESIRED_MODE_BRAKE: // brake then hold sequence controller
+                activeController = (PathFollowerControlLanding *)PathFollowerControlBrake::instance();
+                activeController->Activate();
+                break;
+            case PATHDESIRED_MODE_VELOCITY: // velocity roam controller
+                activeController = (PathFollowerControlLanding *)PathFollowerControlVelocityRoam::instance();
+                activeController->Activate();
+                break;
+            case PATHDESIRED_MODE_FLYENDPOINT:
+            case PATHDESIRED_MODE_FLYVECTOR:
+            case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+            case PATHDESIRED_MODE_FLYCIRCLELEFT:
+                activeController = (PathFollowerControlLanding *)PathFollowerControlFly::instance();
+                activeController->Activate();
+                break;
+            case PATHDESIRED_MODE_LAND: // land with optional velocity roam option
+                activeController = (PathFollowerControlLanding *)PathFollowerControlLanding::instance();
+                activeController->Activate();
+                break;
+            default:
+                activeController = 0;
+                break;
+            }
+
+
             break;
-        case PATHDESIRED_MODE_VELOCITY:
-            activeController = (PathFollowerControlLanding *)PathFollowerControlVelocityRoam::instance();
-            activeController->Activate();
-            break;
-        case PATHDESIRED_MODE_LAND:
-            activeController = (PathFollowerControlLanding *)PathFollowerControlLanding::instance();
-            activeController->Activate();
-            break;
+        case FRAME_TYPE_FIXED_WING:
         default:
             activeController = 0;
             break;
@@ -510,23 +524,23 @@ static uint8_t updateAutoPilotVtol()
         bool yaw_attitude = true;
         float yaw = 0.0f;
 
-            switch (vtolPathFollowerSettings.YawControl) {
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
-                yaw_attitude = false;
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
-                yaw = updateTailInBearing();
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
-                yaw = updateCourseBearing();
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
-                yaw = updatePathBearing();
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
-                yaw = updatePOIBearing();
-                break;
-            }
+        switch (vtolPathFollowerSettings.YawControl) {
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
+            yaw_attitude = false;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
+            yaw = updateTailInBearing();
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
+            yaw = updateCourseBearing();
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
+            yaw = updatePathBearing();
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
+            yaw = updatePOIBearing();
+            break;
+        }
 
         result = updateVtolDesiredAttitude(yaw_attitude, yaw);
 
@@ -732,8 +746,6 @@ static void processPOI()
 }
 
 
-
-
 /**
  * Compute desired velocity from the current position and path
  */
@@ -748,53 +760,52 @@ static void updatePathVelocity(float kFF, bool limited)
 
     const float dT = updatePeriod / 1000.0f;
 
-        // look ahead kFF seconds
-        float cur[3] = { positionState.North + (velocityState.North * kFF),
-                         positionState.East + (velocityState.East * kFF),
-                         positionState.Down + (velocityState.Down * kFF) };
-        struct path_status progress;
-        path_progress(&pathDesired, cur, &progress);
+    // look ahead kFF seconds
+    float cur[3]   = { positionState.North + (velocityState.North * kFF),
+                       positionState.East + (velocityState.East * kFF),
+                       positionState.Down + (velocityState.Down * kFF) };
+    struct path_status progress;
+    path_progress(&pathDesired, cur, &progress);
 
-        // calculate velocity - can be zero if waypoints are too close
-        velocityDesired.North = progress.path_vector[0];
-        velocityDesired.East  = progress.path_vector[1];
-        velocityDesired.Down  = progress.path_vector[2];
+    // calculate velocity - can be zero if waypoints are too close
+    velocityDesired.North = progress.path_vector[0];
+    velocityDesired.East  = progress.path_vector[1];
+    velocityDesired.Down  = progress.path_vector[2];
 
-        if (limited &&
-            // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
-            // it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
-            // once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
-            // leading to an S-shape snake course the wrong way
-            // this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
-            // turn steep unless there is enough space complete the turn before crossing the flightpath
-            // in this case the plane effectively needs to be turned around
-            // indicators:
-            // difference between correction_direction and velocitystate >90 degrees and
-            // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
-            // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
-            // calculating angles < 90 degrees through dot products
-            (vector_lengthf(progress.path_vector, 2) > 1e-6f) &&
-            ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
-            ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
-            ;
-        } else {
-            // calculate correction
-            velocityDesired.North += pid_apply(&global.PIDposH[0], progress.correction_vector[0], dT);
-            velocityDesired.East  += pid_apply(&global.PIDposH[1], progress.correction_vector[1], dT);
-        }
-        velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
+    if (limited &&
+        // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
+        // it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
+        // once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
+        // leading to an S-shape snake course the wrong way
+        // this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
+        // turn steep unless there is enough space complete the turn before crossing the flightpath
+        // in this case the plane effectively needs to be turned around
+        // indicators:
+        // difference between correction_direction and velocitystate >90 degrees and
+        // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
+        // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
+        // calculating angles < 90 degrees through dot products
+        (vector_lengthf(progress.path_vector, 2) > 1e-6f) &&
+        ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
+        ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
+        ;
+    } else {
+        // calculate correction
+        velocityDesired.North += pid_apply(&global.PIDposH[0], progress.correction_vector[0], dT);
+        velocityDesired.East  += pid_apply(&global.PIDposH[1], progress.correction_vector[1], dT);
+    }
+    velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
 
-        // update pathstatus
-        pathStatus.error      = progress.error;
-        pathStatus.fractional_progress  = progress.fractional_progress;
-        pathStatus.path_direction_north = progress.path_vector[0];
-        pathStatus.path_direction_east  = progress.path_vector[1];
-        pathStatus.path_direction_down  = progress.path_vector[2];
+    // update pathstatus
+    pathStatus.error      = progress.error;
+    pathStatus.fractional_progress  = progress.fractional_progress;
+    pathStatus.path_direction_north = progress.path_vector[0];
+    pathStatus.path_direction_east  = progress.path_vector[1];
+    pathStatus.path_direction_down  = progress.path_vector[2];
 
-        pathStatus.correction_direction_north = progress.correction_vector[0];
-        pathStatus.correction_direction_east  = progress.correction_vector[1];
-        pathStatus.correction_direction_down  = progress.correction_vector[2];
-
+    pathStatus.correction_direction_north = progress.correction_vector[0];
+    pathStatus.correction_direction_east  = progress.correction_vector[1];
+    pathStatus.correction_direction_down  = progress.correction_vector[2];
 
 
     VelocityDesiredSet(&velocityDesired);
@@ -1195,28 +1206,28 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
 
 
-        // scale velocity if it is above configured maximum
-        // for braking, we can not help it if initial velocity was greater
-        float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
-        if (velH > vtolPathFollowerSettings.HorizontalVelMax) {
-            velocityDesired.North *= vtolPathFollowerSettings.HorizontalVelMax / velH;
-            velocityDesired.East  *= vtolPathFollowerSettings.HorizontalVelMax / velH;
-        }
-        if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings.VerticalVelMax) {
-            velocityDesired.Down *= vtolPathFollowerSettings.VerticalVelMax / fabsf(velocityDesired.Down);
-        }
+    // scale velocity if it is above configured maximum
+    // for braking, we can not help it if initial velocity was greater
+    float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
+    if (velH > vtolPathFollowerSettings.HorizontalVelMax) {
+        velocityDesired.North *= vtolPathFollowerSettings.HorizontalVelMax / velH;
+        velocityDesired.East  *= vtolPathFollowerSettings.HorizontalVelMax / velH;
+    }
+    if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings.VerticalVelMax) {
+        velocityDesired.Down *= vtolPathFollowerSettings.VerticalVelMax / fabsf(velocityDesired.Down);
+    }
 
     // calculate the velocity errors between desired and actual
-    northError = velocityDesired.North - velocityState.North;
-    eastError  = velocityDesired.East - velocityState.East;
-    downError  = velocityDesired.Down - velocityState.Down;
+    northError   = velocityDesired.North - velocityState.North;
+    eastError    = velocityDesired.East - velocityState.East;
+    downError    = velocityDesired.Down - velocityState.Down;
 
     // Must flip this sign
-    downError  = -downError;
+    downError    = -downError;
 
     // Compute desired commands
-        northCommand = pid_apply(&global.PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings.VelocityFeedforward;
-        eastCommand  = pid_apply(&global.PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings.VelocityFeedforward;
+    northCommand = pid_apply(&global.PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings.VelocityFeedforward;
+    eastCommand  = pid_apply(&global.PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings.VelocityFeedforward;
 
     if ((vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL &&
          flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) ||
@@ -1263,7 +1274,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
     // craft should move similarly for 5 deg roll versus 5 deg pitch
 
-    float maxPitch = vtolPathFollowerSettings.MaxRollPitch;
+    float maxPitch      = vtolPathFollowerSettings.MaxRollPitch;
 
     float angle_radians = DEG2RAD(attitudeState.Yaw);
     float cos_angle     = cosf(angle_radians);

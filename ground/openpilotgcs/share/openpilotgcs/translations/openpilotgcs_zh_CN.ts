@@ -287,7 +287,7 @@
     <message>
         <location line="+3"/>
         <source>Goto Next View</source>
-        <translation type="unfinished">跳转到下一个子窗口</translation>
+        <translation>跳转到下一视图</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -492,12 +492,12 @@
     <message>
         <location line="+9"/>
         <source>The name must not contain any of the characters &apos;%1&apos;.</source>
-        <translation>名称不能包含 &apos;%1&apos; 中的任何一个字符</translation>
+        <translation>名称不能包含&apos;%1&apos;中的任何一个字符。</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>The name must not contain &apos;%1&apos;.</source>
-        <translation>名称不能包含 &apos;%1&apos; </translation>
+        <translation>名称不能包含&apos;%1&apos;。</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -1014,12 +1014,12 @@ Reason: %3</source>
     <message>
         <location line="+35"/>
         <source>Plugin Details of %1</source>
-        <translation>插件%1 的详细信息</translation>
+        <translation>插件%1的详细信息</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Plugin Errors of %1</source>
-        <translation>插件 %1 的错误信息</translation>
+        <translation>插件%1的错误信息</translation>
     </message>
 </context>
 <context>
@@ -1251,12 +1251,12 @@ Reason: %3</source>
     <message>
         <location line="+60"/>
         <source>Update Available: %1</source>
-        <translation>最新版本: %1</translation>
+        <translation>最新版本：%1</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.h" line="+73"/>
         <source>OpenPilot GCS Version: %1 </source>
-        <translation>OpenPilot GCS 当前版本: %1</translation>
+        <translation>OpenPilot GCS 当前版本：%1</translation>
     </message>
 </context>
 <context>
@@ -1869,12 +1869,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>DataObject</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">事件类型</translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">事件</translation>
     </message>
     <message>
         <location/>
@@ -2588,7 +2588,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">事件</translation>
     </message>
     <message>
         <location/>
@@ -3442,7 +3442,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">毫秒</translation>
     </message>
     <message>
         <location/>
@@ -3662,7 +3662,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+0"/>
         <source>Altitude:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">海拔：</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -3769,7 +3769,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/emptygadget/emptygadgetfactory.cpp" line="+34"/>
         <source>Choose Gadget...</source>
-        <translation type="unfinished"></translation>
+        <translation>选择一个应用...</translation>
     </message>
 </context>
 <context>
@@ -3778,19 +3778,21 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/emptygadget/emptygadgetwidget.cpp" line="+41"/>
         <source>Choose a gadget to display in this view.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>请为此视图选择一个应用。
+</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You can also split this view in two.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>你也可以将此视图分割成两个视图。
+</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>请先执行“窗口”菜单中的“工作区编辑模式”。</translation>
     </message>
 </context>
 <context>
@@ -3824,7 +3826,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+2"/>
         <source>Images (*.png *.jpg *.bmp *.xpm)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">图片文件 (*.png *.jpg *.bmp *.xpm)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -4251,7 +4253,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>Move the magic waypoint to the home position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">将特殊航点移到原点位置</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -4437,7 +4439,7 @@ p, li { white-space: pre-wrap; }
         <location line="+1"/>
         <location line="+1"/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">毫秒</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -4483,32 +4485,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">模式：</translation>
     </message>
     <message>
         <location/>
         <source>Serial Connection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">串口连接</translation>
     </message>
     <message>
         <location/>
         <source>Data Bits:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">数据位：</translation>
     </message>
     <message>
         <location/>
         <source>Stop Bits:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">停止位：</translation>
     </message>
     <message>
         <location/>
         <source>Parity:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">奇偶校验：</translation>
     </message>
     <message>
         <location/>
         <source>Timeout(ms):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">超时(毫秒)：</translation>
     </message>
     <message>
         <location/>
@@ -4518,12 +4520,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Port Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">波特率：</translation>
     </message>
     <message>
         <location/>
         <source>Flow Control:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">流控制：</translation>
     </message>
 </context>
 <context>
@@ -4531,7 +4533,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/antennatrack/antennatrackwidget.ui"/>
         <source>Coord:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">坐标：</translation>
     </message>
     <message>
         <location/>
@@ -4684,7 +4686,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
@@ -4719,7 +4721,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
@@ -4942,17 +4944,17 @@ have to define channel output range using Output configuration tab.</source>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方向</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
@@ -5006,7 +5008,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
     <message>
         <location/>
         <source>Attitude</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">姿态</translation>
     </message>
     <message>
         <location/>
@@ -5434,24 +5436,12 @@ The same value is used for all axes.</source>
     </message>
     <message>
         <location/>
-        <source>MainPort</source>
-        <translatorcomment>不用翻译，保持跟硬件板上一致</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>FlexiPort</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>USB VCP Port</source>
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>RcvrPort</source>
-        <translation>遥控接收器端口</translation>
+        <translation type="vanished">遥控接收器端口</translation>
     </message>
     <message>
         <location/>
@@ -5485,6 +5475,21 @@ Beware of not locking yourself out!</source>
         <location/>
         <source>GPS protocol :</source>
         <translation>GPS协议 :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Port</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flexi Port</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Receiver Port</source>
+        <translation>遥控接收器端口</translation>
     </message>
 </context>
 <context>
@@ -5655,7 +5660,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">右</translation>
     </message>
     <message>
         <location/>
@@ -5665,7 +5670,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">左</translation>
     </message>
     <message>
         <location/>
@@ -5770,12 +5775,12 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
@@ -5790,7 +5795,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始</translation>
     </message>
     <message>
         <location/>
@@ -5810,22 +5815,22 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">状态</translation>
     </message>
     <message>
         <location/>
         <source>Neutral</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">中值</translation>
     </message>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最大值</translation>
     </message>
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最小值</translation>
     </message>
     <message>
         <location/>
@@ -5835,7 +5840,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">位置</translation>
     </message>
     <message>
         <location/>
@@ -5870,7 +5875,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方向</translation>
     </message>
     <message>
         <location/>
@@ -6533,25 +6538,22 @@ Applies and Saves all settings to SD</source>
         <translation>490</translation>
     </message>
     <message>
-        <location/>
         <source>Output configuration</source>
-        <translation>输出设置</translation>
+        <translation type="vanished">输出设置</translation>
     </message>
     <message>
         <location/>
         <source>Bank(Channels):</source>
-        <translation>输出集：</translation>
+        <translation>序号：</translation>
     </message>
     <message>
-        <location/>
         <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value
 </source>
-        <translation>设置PWM：通常多轴飞行器是490Hz。OneShot以及OneShot125则不需要配置此项</translation>
+        <translation type="vanished">设置PWM：通常多轴飞行器是490Hz。OneShot以及OneShot125则不需要配置此项</translation>
     </message>
     <message>
-        <location/>
         <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</source>
-        <translation>设置PWM：通常多轴飞行器是490Hz。OneShot以及OneShot125则不需要配置此项</translation>
+        <translation type="vanished">设置PWM：通常多轴飞行器是490Hz。OneShot以及OneShot125则不需要配置此项</translation>
     </message>
     <message>
         <location/>
@@ -6559,20 +6561,33 @@ Applies and Saves all settings to SD</source>
         <translation>模式：</translation>
     </message>
     <message>
-        <location/>
         <source>Setup output mode. Use PWM or OneShot with Standard ESCs.
 Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.
 When using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
-        <translation>标准电调配置为PWM或OneShot模式。
+        <translation type="vanished">标准电调配置为PWM或OneShot模式。
+类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。
+当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后再输出给电调 （例如：1000/8 = 125, 2000/8 = 250).。</translation>
+    </message>
+    <message>
+        <source>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
+        <translation type="vanished">标准电调配置为PWM或OneShot模式。
 类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。
 当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后再输出给电调 （例如：1000/8 = 125, 2000/8 = 250).。</translation>
     </message>
     <message>
         <location/>
-        <source>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
-        <translation>标准电调配置为PWM或OneShot模式。
-类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。
-当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后再输出给电调 （例如：1000/8 = 125, 2000/8 = 250).。</translation>
+        <source>GroupBox</source>
+        <translation>输出集</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Setup PWM rate here: usual value is 490 Hz for multirotor airframes.&lt;br/&gt;PWMSync and OneShot125 does not use this value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置PWM：通常多轴飞行器是490Hz。&lt;br/&gt;&lt;br/&gt;PWMSync以及OneShot125则不需要配置此项</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Setup output mode. Use PWM or PWMSync with Standard ESCs.&lt;br/&gt;Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.&lt;br/&gt;When using OneShot125 all values set in min/max and idle are divided by &lt;br/&gt;eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;标准电调配置为PWM或OneShot模式。&lt;br/&gt;类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。&lt;br/&gt;当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后&lt;/br&gt;再输出给电调 （例如：1000/8 = 125, 2000/8 = 250)。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -6642,10 +6657,9 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
         <translation># - 输出集</translation>
     </message>
     <message>
-        <location/>
         <source>Minimum PWM value, beware of not overdriving your servo.
 Using OneShot125 a value of 1000(uS) here will produce a pulse of 125(uS).</source>
-        <translation>PWM最小值，如果此通道连接的是伺服舵机，请确保设置值不会造成电机过载。
+        <translation type="vanished">PWM最小值，如果此通道连接的是伺服舵机，请确保设置值不会造成电机过载。
 如果使用OneShot125模式，实际输出脉冲为该值的1/8，即设置值为1000uS，实际输出值为125uS.</translation>
     </message>
     <message>
@@ -6664,11 +6678,15 @@ Using OneShot125 a value of 1000(uS) here will produce a pulse of 125(uS).</sour
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Maximum value, beware of not overdriving your servo.
 Using OneShot125 a value of 2000(uS) here will produce a pulse of 250(uS).</source>
-        <translation>PWM最大值，如果此通道连接的是伺服舵机，请确保设置值不会造成电机过载。
+        <translation type="vanished">PWM最大值，如果此通道连接的是伺服舵机，请确保设置值不会造成电机过载。
 如果使用OneShot125模式，实际输出脉冲值为该值的1/8，即设置值为1000uS，实际输出值为125uS.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum PWM value, beware of not overdriving your servo.&lt;br/&gt;Using OneShot125 a value of 1000(µs) here will produce a pulse of 125(µs).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PWM最大值，如果此通道连接的是伺服舵机，请确保设置值不会造成电机过载。&lt;br/&gt;如果使用OneShot125模式，实际输出脉冲值为该值的1/8，即设置值为1000µs，实际输出值为125µs。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -6681,12 +6699,12 @@ Using OneShot125 a value of 2000(uS) here will produce a pulse of 250(uS).</sour
     <message>
         <location/>
         <source>Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">水平校准</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始</translation>
     </message>
     <message>
         <location/>
@@ -6813,32 +6831,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Rotate virtual attitude relative to board</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">飞行控制板与真实飞行姿态相对旋转角度</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方向</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Filtering</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">低通过滤</translation>
     </message>
     <message>
         <location/>
         <source>Accelerometers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">加速度传感器</translation>
     </message>
     <message>
         <location/>
@@ -6852,7 +6870,14 @@ Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
 Start low and raise until drift stops.
 
 A setting of 0.00 disables the filter.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">加速度传感器阙值。
+
+过滤加速度传感器偏移误差。
+设置适当的阙值可以有效过滤传感器偏移误差，提升飞行器自稳性能。
+
+范围：0.00到0.20，通常设置在0.05至0.10区间比较好
+
+设定0.00关闭该功能。</translation>
     </message>
     <message>
         <location/>
@@ -6877,7 +6902,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Latitude:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">纬度：</translation>
     </message>
     <message>
         <location/>
@@ -6897,7 +6922,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Altitude:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">海拔：</translation>
     </message>
     <message>
         <location/>
@@ -6932,7 +6957,7 @@ A setting of 0.00 disables the filter.</source>
     <message>
         <location/>
         <source>Longitude:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">经度：</translation>
     </message>
     <message>
         <location/>
@@ -7049,17 +7074,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方向</translation>
     </message>
     <message>
         <location/>
@@ -7351,7 +7376,7 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">点击打开wiki知识库</translation>
     </message>
     <message>
         <location/>
@@ -7527,7 +7552,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Attitude</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">姿态</translation>
     </message>
     <message>
         <location/>
@@ -8146,12 +8171,12 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</sou
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最小值</translation>
     </message>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最大值</translation>
     </message>
     <message>
         <location/>
@@ -8577,7 +8602,7 @@ only when system is armed without disabling the module.</source>
     <message>
         <location/>
         <source>Save to file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存到文件</translation>
     </message>
     <message>
         <location/>
@@ -8635,17 +8660,17 @@ only when system is armed without disabling the module.</source>
     <message>
         <location/>
         <source>Latitude:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">纬度：</translation>
     </message>
     <message>
         <location/>
         <source>Longitude:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">经度：</translation>
     </message>
     <message>
         <location/>
         <source>Altitude:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">海拔：</translation>
     </message>
     <message>
         <location/>
@@ -8726,7 +8751,7 @@ only when system is armed without disabling the module.</source>
     <message>
         <location/>
         <source>Serial Connection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">串口连接</translation>
     </message>
     <message>
         <location/>
@@ -8944,7 +8969,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To continue, the wizard needs to determine the configuration required for the type of OpenPilot controller you have. When connected, the wizard will attempt to automatically detect the type of board.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;If the board is already connected and successfully detected, the board type will already be displayed. You can &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;Disconnect&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; and select another device if you need to detect another board.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;If your board is not connected, please connect the board to a USB port on your computer and select the device from the list below. Then press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;Connect&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9150,19 +9175,32 @@ Please select the type of multirotor you want to create a configuration for belo
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+415"/>
-        <location line="+90"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+435"/>
+        <location line="+104"/>
         <source>Start</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-90"/>
-        <location line="+90"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-198"/>
+        <location line="+8"/>
+        <location line="+178"/>
+        <location line="+25"/>
+        <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs</source>
+        <translation>输出值：&lt;b&gt;%1&lt;/b&gt;µs</translation>
+    </message>
+    <message>
+        <location line="-206"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this reversable motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right or left until you find the value where the motor doesn&apos;t start. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+89"/>
+        <location line="+104"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location line="-41"/>
+        <location line="-43"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
@@ -9192,14 +9230,13 @@ p, li { white-space: pre-wrap; }
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br /&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br /&gt;&lt;br /&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9239,6 +9276,30 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Max</source>
         <translation>最大值</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br /&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;现在向导将引导您为右图中高亮显示的电机设置怠速输出量。&lt;br /&gt;请注意观察电机是否按照图中所示的顺时针或逆时针方向旋转。如若电机旋转方向和示意图中相反，请将三根电机输入线中的任意两根对调。&lt;/span&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;为了帮助您找到&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;该电机的怠速点&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;，请点击下面的“开始”按钮，拖动滑动条直到电机开始以最低速稳定旋转。&lt;br/&gt;&lt;br/&gt;完成后请点击“停止”按钮。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output value: 1000µs</source>
+        <translation>输出值：1000µs</translation>
     </message>
 </context>
 <context>
@@ -9351,7 +9412,7 @@ Please select the type of ground vehicle you want to create a configuration for 
     <message>
         <location line="+6"/>
         <source>Car</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">汽车</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -9361,7 +9422,7 @@ Please select the type of ground vehicle you want to create a configuration for 
     <message>
         <location line="+4"/>
         <source>Tank</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">坦克</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -9371,7 +9432,7 @@ Please select the type of ground vehicle you want to create a configuration for 
     <message>
         <location line="+4"/>
         <source>Motorcycle</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摩托车</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -9525,12 +9586,12 @@ then close the dialog.</source>
     <message>
         <location filename="../../../src/plugins/uploader/devicewidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Device Information</source>
-        <translation type="unfinished"></translation>
+        <translation>设备信息</translation>
     </message>
     <message>
         <location/>
@@ -9550,7 +9611,7 @@ then close the dialog.</source>
     <message>
         <location/>
         <source>RW</source>
-        <translation type="unfinished"></translation>
+        <translation>可读/可写</translation>
     </message>
     <message>
         <location/>
@@ -9565,32 +9626,32 @@ then close the dialog.</source>
     <message>
         <location/>
         <source>Open a file with new firmware image to be flashed</source>
-        <translation type="unfinished"></translation>
+        <translation>请选择需要烧写的固件</translation>
     </message>
     <message>
         <location/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>打开...</translation>
     </message>
     <message>
         <location/>
         <source>Write loaded firmware image to the board</source>
-        <translation type="unfinished"></translation>
+        <translation>将固件烧写入硬件设备中</translation>
     </message>
     <message>
         <location/>
         <source>Flash</source>
-        <translation type="unfinished"></translation>
+        <translation>烧写...</translation>
     </message>
     <message>
         <location/>
         <source>Read and save current board firmware to a file</source>
-        <translation type="unfinished"></translation>
+        <translation>从硬件设备上下载固件并保存</translation>
     </message>
     <message>
         <location/>
         <source>Retrieve...</source>
-        <translation type="unfinished"></translation>
+        <translation>下载...</translation>
     </message>
     <message>
         <location/>
@@ -9600,87 +9661,87 @@ then close the dialog.</source>
     <message>
         <location/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>状态</translation>
     </message>
     <message>
         <location/>
         <source>Firmware:</source>
-        <translation type="unfinished"></translation>
+        <translation>固件：</translation>
     </message>
     <message>
         <location/>
         <source>Board name:</source>
-        <translation type="unfinished"></translation>
+        <translation>设备：</translation>
     </message>
     <message>
         <location/>
         <source>Firmware tag:</source>
-        <translation type="unfinished"></translation>
+        <translation>固件标签：</translation>
     </message>
     <message>
         <location/>
         <source>Firmware date:</source>
-        <translation type="unfinished"></translation>
+        <translation>编译时间：</translation>
     </message>
     <message>
         <location/>
         <source>Git commit hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>Git commit hash：</translation>
     </message>
     <message>
         <location/>
         <source>CRC:</source>
-        <translation type="unfinished"></translation>
+        <translation>固件CRC：</translation>
     </message>
     <message>
         <location/>
         <source>On Device</source>
-        <translation type="unfinished"></translation>
+        <translation>板载信息</translation>
     </message>
     <message>
         <location/>
         <source>lblBrdName</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblDescription</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblBuildDate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblGitTag</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCRC</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCertified</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Loaded</source>
-        <translation type="unfinished">已载入</translation>
+        <translation>已加载</translation>
     </message>
     <message>
         <location/>
         <source>lblDescritpionL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCertifiedL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9690,7 +9751,7 @@ then close the dialog.</source>
     <message>
         <location/>
         <source>I know what I&apos;m doing!</source>
-        <translation type="unfinished"></translation>
+        <translation>确认当前操作！</translation>
     </message>
     <message>
         <location/>
@@ -9779,7 +9840,10 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation></translation>
+        <translation>启动系统进入安全模式（使用默认设置）。
+（控制板上蓝色LED慢速闪烁，橙色LED不亮）
+
+从右边的下拉菜单中选择适当的连接方式。</translation>
     </message>
     <message>
         <location/>
@@ -9941,7 +10005,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/welcome/qml/NewsPanel.qml" line="+14"/>
         <source>Project News</source>
-        <translation type="unfinished"></translation>
+        <translation>项目近况</translation>
     </message>
 </context>
 <context>
@@ -9949,37 +10013,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/welcome/qml/SitesPanel.qml" line="+13"/>
         <source>OpenPilot Websites</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot网站</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Home</source>
-        <translation type="unfinished">主页</translation>
+        <translation>主页</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Wiki</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiki知识库</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>商店</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Forums</source>
-        <translation type="unfinished"></translation>
+        <translation>论坛</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Code Reviews</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Progress Tracker</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10009,15 +10073,15 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+169"/>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>输入</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Output</source>
-        <translation type="unfinished">输出</translation>
+        <translation>输出</translation>
     </message>
     <message>
-        <location line="+436"/>
+        <location line="+419"/>
         <location line="+24"/>
         <location line="+31"/>
         <location line="+31"/>
@@ -10025,25 +10089,25 @@ p, li { white-space: pre-wrap; }
         <location line="+24"/>
         <location line="+24"/>
         <location line="+44"/>
-        <location line="+257"/>
+        <location line="+255"/>
         <location line="+70"/>
         <source>Configuration OK</source>
-        <translation type="unfinished"></translation>
+        <translation>设置成功</translation>
     </message>
     <message>
-        <location line="-362"/>
+        <location line="-360"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign a Yaw channel&lt;/font&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;font color=&apos;red&apos;&gt;错误：请为方向舵指定一个输出通道&lt;/font&gt;</translation>
     </message>
     <message>
-        <location line="+431"/>
+        <location line="+429"/>
         <source>Duplicate channel in motor outputs</source>
-        <translation type="unfinished"></translation>
+        <translation>通道已经被占用</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Channel already used</source>
-        <translation type="unfinished"></translation>
+        <translation>通道已经被占用</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -10086,7 +10150,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+15"/>
         <source>http://wiki.openpilot.org/x/D4AUAQ</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10099,7 +10163,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+58"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10419,7 +10483,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+0"/>
         <source>OpenPilot Log (*.opl)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenPilot日志文件(*.opl)</translation>
     </message>
 </context>
 <context>
@@ -10538,7 +10602,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+144"/>
         <source>File Parsing Failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">文件解析失败。</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10548,12 +10612,12 @@ Move the %1 stick.</source>
     <message>
         <location line="+11"/>
         <source>Wrong file contents</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">文件内容错误</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This file does not contain correct UAVSettings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">文件包含错误的UAV设置</translation>
     </message>
 </context>
 <context>
@@ -10574,7 +10638,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+9"/>
         <source>Save File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存文件</translation>
     </message>
 </context>
 <context>
@@ -10603,7 +10667,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+174"/>
         <source>Controller type: </source>
-        <translation type="unfinished">设备类型： </translation>
+        <translation>设备类型： </translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10949,7 +11013,7 @@ Move the %1 stick.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+146"/>
         <source>Writing mixer settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11456,7 +11520,7 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">右</translation>
     </message>
     <message>
         <location/>
@@ -11466,7 +11530,7 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">左</translation>
     </message>
     <message>
         <location/>
@@ -11571,12 +11635,12 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
@@ -11591,7 +11655,7 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始</translation>
     </message>
     <message>
         <location/>
@@ -11611,22 +11675,22 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">状态</translation>
     </message>
     <message>
         <location/>
         <source>Neutral</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">中值</translation>
     </message>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最大值</translation>
     </message>
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最小值</translation>
     </message>
     <message>
         <location/>
@@ -11636,7 +11700,7 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">位置</translation>
     </message>
     <message>
         <location/>
@@ -11671,7 +11735,7 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方向</translation>
     </message>
     <message>
         <location/>
@@ -11699,22 +11763,22 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">类型</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">方向</translation>
     </message>
     <message>
         <location/>
@@ -11807,12 +11871,12 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Airframe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">飞行器</translation>
     </message>
     <message>
         <location/>
         <source>Throttle Curve</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">油门曲线</translation>
     </message>
     <message>
         <location/>
@@ -11822,7 +11886,7 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">横滚</translation>
     </message>
     <message>
         <location/>
@@ -11837,12 +11901,12 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Airframe Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">飞行器类型：</translation>
     </message>
     <message>
         <location/>
@@ -12063,7 +12127,7 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
         <location/>
         <source>Weight of Yaw mixing in percent.
 Typical value is 50% for + or X configuration on quads.</source>
-        <translation>方向控制量权重
+        <translation type="unfinished">方向控制量权重
 十字型和X型四轴飞行器通常都设为50%。</translation>
     </message>
     <message>
@@ -12174,7 +12238,7 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>RC Input</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">遥控输入</translation>
     </message>
     <message>
         <location/>
@@ -12227,12 +12291,12 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>HW settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">硬件设置</translation>
     </message>
     <message>
         <location/>
         <source>Changes on this page only take effect after board reset or power cycle</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">所有配置信息将在控制板重启才生效</translation>
     </message>
     <message>
         <location/>
@@ -12247,7 +12311,7 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>Receiver Port</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">遥控接收器端口</translation>
     </message>
     <message>
         <location/>
@@ -12277,13 +12341,14 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">点击打开wiki知识库</translation>
     </message>
     <message>
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到OpenPilot控制板，但不保存。
+断电后配置将消失！</translation>
     </message>
     <message>
         <location/>
@@ -12294,7 +12359,7 @@ Beware of not locking yourself out!</source>
         <location/>
         <source>Applies and Saves all settings to SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板并保存</translation>
     </message>
     <message>
         <location/>
@@ -12582,7 +12647,7 @@ even lead to crash. Use with caution.</source>
     <message>
         <location/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">状态</translation>
     </message>
     <message>
         <location/>
@@ -13271,7 +13336,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+49"/>
         <location line="+49"/>
-        <location line="+32"/>
+        <location line="+42"/>
         <location line="+7"/>
         <location line="+9"/>
         <source>%1 µs</source>
@@ -13427,22 +13492,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/selectionpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>placeholder_text</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished">TextLabel</translation>
+        <translation>TextLabel</translation>
     </message>
     <message>
         <location/>
         <source>Select:</source>
-        <translation type="unfinished"></translation>
+        <translation>请选择：</translation>
     </message>
 </context>
 <context>
@@ -13674,7 +13739,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+5"/>
         <source>Helicopter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">直升机</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -13779,77 +13844,77 @@ Please try again.</source>
     <message>
         <location filename="../../../src/plugins/welcome/qml/ActivityPanel.qml" line="+13"/>
         <source>Project Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>开发活动</translation>
     </message>
     <message>
         <location line="+131"/>
         <source>Commented on </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Created </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Created and started </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Completed </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Closed </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Abandoned </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Committed </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Resolved </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Started </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Started working on </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stopped working on </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Requested code review on </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Requested testing of </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Updated </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -14162,7 +14227,7 @@ Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse clic
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+153"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+160"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14172,9 +14237,19 @@ Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse clic
         <translation>打开此功能将会使用界面中的滑动条来替代遥控器的油门摇杆。强烈建议您在操作之前卸除螺旋桨。确定使用此功能吗？</translation>
     </message>
     <message>
-        <location line="+264"/>
+        <location line="+35"/>
+        <source>You may want to save your neutral settings.</source>
+        <translation>你可能需要保存当前怠速设置。</translation>
+    </message>
+    <message>
+        <location line="+238"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>OneShot only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN6+OneShot&apos; &lt;b&gt;&lt;font color=&apos;#C3A8FF&apos;&gt;Bank 4 (output 6,9-10)&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>
+        <translation>遥控接收器端口设置为“+OneShot”后才能&lt;br&gt;正常工作。假设设置为“PPM_PIN6+OneShot”，则&lt;b&gt;&lt;font color=&apos;#C3A8FF&apos;&gt;输出集4（6，9-10）&lt;/font&gt;&lt;/b&gt;必须设置为PWM</translation>
     </message>
 </context>
 <context>
@@ -14218,7 +14293,7 @@ Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse clic
     <message>
         <location line="-53"/>
         <source>Thrust</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">强推</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -14305,7 +14380,7 @@ not only the ones visible on screen.</source>
 <context>
     <name>ConfigVehicleTypeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+143"/>
+        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+142"/>
         <source>Multirotor</source>
         <translation>多轴飞行器</translation>
     </message>
@@ -14330,7 +14405,7 @@ not only the ones visible on screen.</source>
         <translation>自定义</translation>
     </message>
     <message>
-        <location line="+315"/>
+        <location line="+314"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
         <translation></translation>
     </message>
@@ -14623,7 +14698,7 @@ Double click legend or plot to show/hide legend.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/biascalibrationutil.cpp" line="+120"/>
         <source>Calibration timed out before receiving required updates.</source>
-        <translation>无法获取数据，校准等待超时</translation>
+        <translation>无法获取数据，校准等待超时。</translation>
     </message>
 </context>
 <context>
@@ -14718,7 +14793,7 @@ Please select the type of fixed-wing you want to create a configuration for belo
     <message>
         <location line="+5"/>
         <source>Elevon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">升降副翼</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -14856,7 +14931,7 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
         <location line="+2"/>
         <location line="+15"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">类型</translation>
     </message>
     <message>
         <location line="-14"/>
@@ -14930,27 +15005,27 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
     <message>
         <location filename="../../../src/plugins/uploader/devicewidget.cpp" line="+81"/>
         <source>Device ID: </source>
-        <translation type="unfinished"></translation>
+        <translation>设备ID：</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>HW Revision: </source>
-        <translation type="unfinished"></translation>
+        <translation>硬件版本：</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Flash access: </source>
-        <translation type="unfinished"></translation>
+        <translation>Flash读写权限：</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Max code size: </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>BL version: </source>
-        <translation type="unfinished"></translation>
+        <translation>Bootloader版本：</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -14958,85 +15033,85 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
         <location line="+1"/>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>未知</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>Custom Firmware Build</source>
-        <translation type="unfinished"></translation>
+        <translation>非官方固件</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>No file loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>未读取到有效文件</translation>
     </message>
     <message>
         <location line="+50"/>
         <location line="+24"/>
         <source>Tagged officially released firmware build</source>
-        <translation type="unfinished"></translation>
+        <translation>官方发布正式版固件</translation>
     </message>
     <message>
         <location line="-20"/>
         <location line="+25"/>
         <source>Untagged or custom firmware build</source>
-        <translation type="unfinished"></translation>
+        <translation>无法识别的固件或非官方固件</translation>
     </message>
     <message>
         <location line="+80"/>
         <source>Can&apos;t calculate, file too big for device</source>
-        <translation type="unfinished"></translation>
+        <translation>文件太大</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>The board has the same firmware as loaded. No need to update.</source>
-        <translation type="unfinished"></translation>
+        <translation>固件与板载文件相同，无需升级。</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>WARNING: the loaded firmware is for different hardware. Do not update!</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：固件与硬件设备不匹配，请勿升级！</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The board has newer firmware than loaded. Are you sure you want to update?</source>
-        <translation type="unfinished"></translation>
+        <translation>硬件设备内固件版本高于您选取的文件，是否继续更新？</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build).</source>
-        <translation type="unfinished"></translation>
+        <translation>选取的文件为非官方正式版，建议您只信任官方渠道获取正式发布版或自行编译的文件。</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>This is the tagged officially released OpenPilot firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>此固件为OpenPilot官方发布正式版。</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：文件并非OpenPilot格式，请确定是否继续操作。</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Firmware loaded: </source>
-        <translation type="unfinished"></translation>
+        <translation>固件读取成功：</translation>
     </message>
     <message>
         <location line="+227"/>
         <location line="+15"/>
         <source>Select firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>选择固件</translation>
     </message>
     <message>
         <location line="-13"/>
         <source>Firmware Files (*.opfw *.bin)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Firmware Files (*.bin)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -15049,7 +15124,7 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
     <message>
         <location line="+2"/>
         <source>Firmware CRC: </source>
-        <translation>校验和： </translation>
+        <translation>固件CRC： </translation>
     </message>
     <message>
         <location line="+33"/>
@@ -15061,7 +15136,7 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
         <location line="+4"/>
         <location line="+8"/>
         <source>Firmware tag: </source>
-        <translation>标签： </translation>
+        <translation>固件标签： </translation>
     </message>
     <message>
         <location line="-10"/>

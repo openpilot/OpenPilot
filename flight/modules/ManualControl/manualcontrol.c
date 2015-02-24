@@ -43,8 +43,8 @@
 #include <systemsettings.h>
 #include <stabilizationdesired.h>
 #include <callbackinfo.h>
-#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <stabilizationsettings.h>
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <vtolpathfollowersettings.h>
 #endif
 
@@ -160,9 +160,9 @@ int32_t ManualControlInitialize()
     ManualControlSettingsInitialize();
     FlightModeSettingsInitialize();
     SystemSettingsInitialize();
+    StabilizationSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     VtolSelfTuningStatsInitialize();
-    StabilizationSettingsInitialize();
     VtolPathFollowerSettingsInitialize();
 #endif
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);

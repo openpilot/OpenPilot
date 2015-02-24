@@ -88,6 +88,8 @@ extern "C" {
 #include "PIDControlThrust.h"
 
 // Private constants
+#define DEADBAND_HIGH          0.10f
+#define DEADBAND_LOW           -0.10f
 
 // pointer to a singleton instance
 PathFollowerControlFly *PathFollowerControlFly::p_inst = 0;
@@ -197,8 +199,6 @@ void PathFollowerControlFly::UpdateVelocityDesired()
     VelocityStateGet(&velocityState);
 
     VelocityDesiredData velocityDesired;
-
-    const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
 
     // look ahead kFF seconds
     float cur[3]   = { positionState.North + (velocityState.North * vtolPathFollowerSettings->CourseFeedForward),
@@ -320,17 +320,12 @@ int8_t PathFollowerControlFly::UpdateStabilizationDesired(bool yaw_attitude, flo
  */
 void PathFollowerControlFly::UpdateDesiredAttitudeEmergencyFallback()
 {
-    const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
-
     VelocityDesiredData velocityDesired;
     VelocityStateData velocityState;
     StabilizationDesiredData stabDesired;
 
     float courseError;
     float courseCommand;
-
-    float downError;
-    float downCommand;
 
     VelocityStateGet(&velocityState);
     VelocityDesiredGet(&velocityDesired);
@@ -382,7 +377,7 @@ void PathFollowerControlFly::UpdateAutoPilot()
     if (result) {
         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
     } else {
-        pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
+        pathStatus->Status = PATHSTATUS_STATUS_CRITICAL;
         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
     }
 

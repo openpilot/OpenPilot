@@ -592,7 +592,7 @@ void VehicleConfigurationHelper::applyFlightModeConfiguration()
     data.Stabilization6Settings[0] = FlightModeSettings::STABILIZATION6SETTINGS_RATE;
     data.Stabilization6Settings[1] = FlightModeSettings::STABILIZATION6SETTINGS_RATE;
     data.Stabilization6Settings[2] = FlightModeSettings::STABILIZATION6SETTINGS_RATE;
-    data.Stabilization6Settings[3] = FlightModeSettings::STABILIZATION6SETTINGS_CRUISECONTROL;
+    data.Stabilization6Settings[3] = FlightModeSettings::STABILIZATION6SETTINGS_MANUAL;
     data2.FlightModeNumber = 3;
     data.FlightModePosition[0]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED1;
     data.FlightModePosition[1]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED2;

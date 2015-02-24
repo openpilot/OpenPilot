@@ -119,7 +119,7 @@ void OutputChannelForm::enableChannelTest(bool state)
         ui.actuatorMin->setEnabled(false);
         ui.actuatorMax->setEnabled(false);
         ui.actuatorRev->setEnabled(false);
-    } else if (m_mixerType != "Disabled"){
+    } else if (m_mixerType != "Disabled") {
         ui.actuatorMin->setEnabled(true);
         ui.actuatorMax->setEnabled(true);
         if (m_mixerType != "Motor") {

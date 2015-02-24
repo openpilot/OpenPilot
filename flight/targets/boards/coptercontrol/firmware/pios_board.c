@@ -242,7 +242,7 @@ void PIOS_Board_Init(void)
 
 #ifndef ERASE_FLASH
     /* Initialize watchdog as early as possible to catch faults during init */
-    PIOS_WDG_Init();
+    //PIOS_WDG_Init();
 #endif
 
     /* Initialize the alarms library */

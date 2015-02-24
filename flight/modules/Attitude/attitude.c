@@ -178,7 +178,7 @@ int32_t AttitudeStart(void)
     // Start main task
     xTaskCreate(AttitudeTask, "Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, taskHandle);
-    PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
+    //PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 
     return 0;
 }
@@ -253,7 +253,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         // Set critical error and wait until the accel is producing data
         while (PIOS_ADXL345_FifoElements() == 0) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
-            PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+            //PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
         }
         accel_test = PIOS_ADXL345_Test();
 #endif
@@ -311,7 +311,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             init = 1;
         }
 
-        PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+        //PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 
         AccelStateData accelState;
         GyroStateData gyros;

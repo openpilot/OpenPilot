@@ -33,6 +33,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <pios_math.h>
+#include <mathmisc.h>
 
 // constants/macros/typdefs
 #define NUMX 13 // number of states, X is the state vector
@@ -43,15 +44,15 @@
 // Private functions
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
                           float Q[NUMW], float dT, float P[NUMX][NUMX]);
-void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
-                  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
-                  uint16_t SensorsUsed);
-void RungeKutta(float X[NUMX], float U[NUMU], float dT);
-void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX]);
-void LinearizeFG(float X[NUMX], float U[NUMU], float F[NUMX][NUMX],
-                 float G[NUMX][NUMW]);
-void MeasurementEq(float X[NUMX], float Be[3], float Y[NUMV]);
-void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]);
+static void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
+                         float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
+                         uint16_t SensorsUsed);
+static void RungeKutta(float X[NUMX], float U[NUMU], float dT);
+static void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX]);
+static void LinearizeFG(float X[NUMX], float U[NUMU], float F[NUMX][NUMX],
+                        float G[NUMX][NUMW]);
+static void MeasurementEq(float X[NUMX], float Be[3], float Y[NUMV]);
+static void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]);
 
 // Private variables
 
@@ -60,22 +61,22 @@ void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]);
 // LinearizeFG() and LinearizeH():
 //
 // usage F:        usage G:   usage H:
-// 0123456789abc  012345678  0123456789abc
+// -0123456789abc  012345678  0123456789abc
 // 0...X.........  .........  X............
 // 1....X........  .........  .X...........
 // 2.....X.......  .........  ..X..........
 // 3......XXXX...  ...XXX...  ...X.........
 // 4......XXXX...  ...XXX...  ....X........
 // 5......XXXX...  ...XXX...  .....X.......
-// 6.......XXXXXX  XXX......  ......XXXX...
-// 7......X.XXXXX  XXX......  ......XXXX...
-// 8......XX.XXXX  XXX......  ......XXXX...
-// 9......XXX.XXX  XXX......  ..X..........
-// a.............  ......X..
-// b.............  .......X.
-// c.............  ........X
+// 6.....ooXXXXXX  XXX......  ......XXXX...
+// 7.....oXoXXXXX  XXX......  ......XXXX...
+// 8.....oXXoXXXX  XXX......  ......XXXX...
+// 9.....oXXXoXXX  XXX......  ..X..........
+// a.............  ......Xoo
+// b.............  ......oXo
+// c.............  ......ooX
 
-static const int8_t FrowMin[NUMX] = { 3, 4, 5, 6, 6, 6, 7, 6, 6, 6, 13, 13, 13 };
+static const int8_t FrowMin[NUMX] = { 3, 4, 5, 6, 6, 6,  5,  5,  5,  5, 13, 13, 13 };
 static const int8_t FrowMax[NUMX] = { 3, 4, 5, 9, 9, 9, 12, 12, 12, 12, -1, -1, -1 };
 
 static const int8_t GrowMin[NUMX] = { 9, 9, 9, 3, 3, 3, 0, 0, 0, 0, 6, 7, 8 };
@@ -289,7 +290,7 @@ void INSSetMagNorth(float B[3])
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
 {
     float U[6];
-    float qmag;
+    float invqmag;
 
     // rate gyro inputs in units of rad/s
     U[0] = gyro_data[0];
@@ -304,11 +305,11 @@ void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
     // EKF prediction step
     LinearizeFG(ekf.X, U, ekf.F, ekf.G);
     RungeKutta(ekf.X, U, dT);
-    qmag      = sqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
-    ekf.X[6] /= qmag;
-    ekf.X[7] /= qmag;
-    ekf.X[8] /= qmag;
-    ekf.X[9] /= qmag;
+    invqmag   = fast_invsqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
+    ekf.X[6] *= invqmag;
+    ekf.X[7] *= invqmag;
+    ekf.X[8] *= invqmag;
+    ekf.X[9] *= invqmag;
     // CovariancePrediction(ekf.F,ekf.G,ekf.Q,dT,ekf.P);
 
     // Update Nav solution structure
@@ -373,40 +374,37 @@ void VelBaroCorrection(float Vel[3], float BaroAlt)
 void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
                    float BaroAlt, uint16_t SensorsUsed)
 {
-    float Z[10], Y[10];
-    float Bmag, qmag;
+    float Z[10] = { 0 };
+    float Y[10] = { 0 };
+    float invBmag;
 
     // GPS Position in meters and in local NED frame
-    Z[0] = Pos[0];
-    Z[1] = Pos[1];
-    Z[2] = Pos[2];
+    Z[0]    = Pos[0];
+    Z[1]    = Pos[1];
+    Z[2]    = Pos[2];
 
     // GPS Velocity in meters and in local NED frame
-    Z[3] = Vel[0];
-    Z[4] = Vel[1];
-    Z[5] = Vel[2];
-
+    Z[3]    = Vel[0];
+    Z[4]    = Vel[1];
+    Z[5]    = Vel[2];
     // magnetometer data in any units (use unit vector) and in body frame
-    Bmag =
-        sqrtf(mag_data[0] * mag_data[0] + mag_data[1] * mag_data[1] +
-              mag_data[2] * mag_data[2]);
-    Z[6] = mag_data[0] / Bmag;
-    Z[7] = mag_data[1] / Bmag;
-    Z[8] = mag_data[2] / Bmag;
-
+    invBmag = fast_invsqrtf(mag_data[0] * mag_data[0] + mag_data[1] * mag_data[1] + mag_data[2] * mag_data[2]);
+    Z[6]    = mag_data[0] * invBmag;
+    Z[7]    = mag_data[1] * invBmag;
+    Z[8]    = mag_data[2] * invBmag;
     // barometric altimeter in meters and in local NED frame
-    Z[9] = BaroAlt;
+    Z[9]    = BaroAlt;
 
     // EKF correction step
     LinearizeH(ekf.X, ekf.Be, ekf.H);
     MeasurementEq(ekf.X, ekf.Be, Y);
     SerialUpdate(ekf.H, ekf.R, Z, Y, ekf.P, ekf.X, SensorsUsed);
-    qmag       = sqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
-    ekf.X[6]  /= qmag;
-    ekf.X[7]  /= qmag;
-    ekf.X[8]  /= qmag;
-    ekf.X[9]  /= qmag;
 
+    invBmag    = fast_invsqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
+    ekf.X[6]  *= invBmag;
+    ekf.X[7]  *= invBmag;
+    ekf.X[8]  *= invBmag;
+    ekf.X[9]  *= invBmag;
     // Update Nav solution structure
     Nav.Pos[0] = ekf.X[0];
     Nav.Pos[1] = ekf.X[1];
@@ -440,56 +438,74 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 {
     // Pnew = (I+F*T)*P*(I+F*T)' + (T^2)*G*Q*G' = (T^2)[(P/T + F*P)*(I/T + F') + G*Q*G')]
 
-    float dT1  = 1.0f / dT; // multiplication is faster than division on fpu.
-    float dTsq = dT * dT;
+    const float dT1  = 1.0f / dT; // multiplication is faster than division on fpu.
+    const float dTsq = dT * dT;
 
     float Dummy[NUMX][NUMX];
     int8_t i;
-
+    int8_t k;
     for (i = 0; i < NUMX; i++) { // Calculate Dummy = (P/T +F*P)
-        float *Firow   = F[i];
-        float *Pirow   = P[i];
-        float *Dirow   = Dummy[i];
-        int8_t Fistart = FrowMin[i];
-        int8_t Fiend   = FrowMax[i];
+        float *Firow = F[i];
+        float *Pirow = P[i];
+        float *Dirow = Dummy[i];
+        const int8_t Fistart = FrowMin[i];
+        const int8_t Fiend   = FrowMax[i];
         int8_t j;
+
         for (j = 0; j < NUMX; j++) {
             Dirow[j] = Pirow[j] * dT1; // Dummy = P / T ...
-            int8_t k;
-            for (k = Fistart; k <= Fiend; k++) {
+        }
+        for (k = Fistart; k <= Fiend; k++) {
+            for (j = 0; j < NUMX; j++) {
                 Dirow[j] += Firow[k] * P[k][j]; // [] + F * P
             }
         }
     }
     for (i = 0; i < NUMX; i++) { // Calculate Pnew = (T^2) [Dummy/T + Dummy*F' + G*Qw*G']
-        float *Dirow   = Dummy[i];
-        float *Girow   = G[i];
-        float *Pirow   = P[i];
-        int8_t Gistart = GrowMin[i];
-        int8_t Giend   = GrowMax[i];
+        float *Dirow = Dummy[i];
+        float *Girow = G[i];
+        float *Pirow = P[i];
+        const int8_t Gistart = GrowMin[i];
+        const int8_t Giend   = GrowMax[i];
         int8_t j;
+
+
         for (j = i; j < NUMX; j++) { // Use symmetry, ie only find upper triangular
             float Ptmp = Dirow[j] * dT1; // Pnew = Dummy / T ...
 
-            {
-                float *Fjrow   = F[j];
-                int8_t Fjstart = FrowMin[j];
-                int8_t Fjend   = FrowMax[j];
-                int8_t k;
-                for (k = Fjstart; k <= Fjend; k++) {
-                    Ptmp += Dirow[k] * Fjrow[k]; // [] + Dummy*F' ...
-                }
+            const float *Fjrow = F[j];
+            int8_t Fjstart = FrowMin[j];
+            int8_t Fjend   = FrowMax[j];
+            k = Fjstart;
+
+            while (k <= Fjend - 3) {
+                Ptmp += Dirow[k] * Fjrow[k]; // [] + Dummy*F' ...
+                Ptmp += Dirow[k + 1] * Fjrow[k + 1];
+                Ptmp += Dirow[k + 2] * Fjrow[k + 2];
+                Ptmp += Dirow[k + 3] * Fjrow[k + 3];
+                k+=4;
+            }
+            while (k <= Fjend) {
+                Ptmp += Dirow[k] * Fjrow[k];
+                k++;
             }
 
-            {
-                float *Gjrow   = G[j];
-                int8_t Gjstart = MAX(Gistart, GrowMin[j]);
-                int8_t Gjend   = MIN(Giend, GrowMax[j]);
-                int8_t k;
-                for (k = Gjstart; k <= Gjend; k++) {
-                    Ptmp += Q[k] * Girow[k] * Gjrow[k]; // [] + G*Q*G' ...
-                }
+            float *Gjrow = G[j];
+            const int8_t Gjstart = MAX(Gistart, GrowMin[j]);
+            const int8_t Gjend = MIN(Giend, GrowMax[j]);
+            k = Gjstart;
+            while (k <= Gjend - 2) {
+                Ptmp += Q[k] * Girow[k] * Gjrow[k]; // [] + G*Q*G' ...
+                Ptmp += Q[k + 1] * Girow[k + 1] * Gjrow[k + 1];
+                Ptmp += Q[k + 2] * Girow[k + 2] * Gjrow[k + 2];
+                k+=3;
             }
+            if (k <= Gjend) {
+                 Ptmp += Q[k] * Girow[k] * Gjrow[k];
+                 if (k <= Gjend - 1) {
+                     Ptmp += Q[k + 1] * Girow[k + 1] * Gjrow[k + 1];
+                 }
+             }
 
             P[j][i] = Pirow[j] = Ptmp * dTsq; // [] * (T^2)
         }
@@ -560,8 +576,8 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
 
 void RungeKutta(float X[NUMX], float U[NUMU], float dT)
 {
-    float dT2 =
-        dT / 2.0f, K1[NUMX], K2[NUMX], K3[NUMX], K4[NUMX], Xlast[NUMX];
+    const float dT2 = dT / 2.0f;
+    float K1[NUMX], K2[NUMX], K3[NUMX], K4[NUMX], Xlast[NUMX];
     uint8_t i;
 
     for (i = 0; i < NUMX; i++) {
@@ -608,7 +624,7 @@ void RungeKutta(float X[NUMX], float U[NUMU], float dT)
 // H is output of LinearizeH(), all elements not set should be zero
 // ************************************************
 
-void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX])
+static void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX])
 {
     float ax, ay, az, wx, wy, wz, q0, q1, q2, q3;
 

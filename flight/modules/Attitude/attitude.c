@@ -767,13 +767,13 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accel_bias.Y  = accelGyroSettings.accel_bias.Y;
         accel_bias.Z  = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale.X  = accelGyroSettings.gyro_scale.X * scales[0];
-        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * scales[0];
-        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * scales[0];
+        gyro_scale.X  = accelGyroSettings.gyro_scale.X * scales[1];
+        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * scales[1];
+        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * scales[1];
 
-        accel_scale.X = accelGyroSettings.accel_scale.X * scales[1];
-        accel_scale.Y = accelGyroSettings.accel_scale.Y * scales[1];
-        accel_scale.Z = accelGyroSettings.accel_scale.Z * scales[1];
+        accel_scale.X = accelGyroSettings.accel_scale.X * scales[0];
+        accel_scale.Y = accelGyroSettings.accel_scale.Y * scales[0];
+        accel_scale.Z = accelGyroSettings.accel_scale.Z * scales[0];
     } else {
         // Original CC with analog gyros and ADXL accel
         accel_bias.X  = accelGyroSettings.accel_bias.X;

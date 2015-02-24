@@ -373,6 +373,7 @@ void ConfigMultiRotorWidget::resetMixers()
 
     for (int channel = 0; channel < (int)ConfigMultiRotorWidget::CHANNEL_NUMELEM; channel++) {
         resetMixerVector(mixer, channel);
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
     }
 }
 

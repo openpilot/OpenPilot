@@ -290,6 +290,7 @@ void OutputChannelForm::setChannelRange()
         ui.actuatorMax->setEnabled(true);
         ui.actuatorNeutral->setEnabled(true);
         ui.actuatorValue->setEnabled(true);
+        ui.actuatorLink->setEnabled(true);
     } else {
         ui.actuatorMin->setEnabled(false);
         ui.actuatorMax->setEnabled(false);

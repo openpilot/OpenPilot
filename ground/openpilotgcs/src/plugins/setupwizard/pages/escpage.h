@@ -41,6 +41,7 @@ public:
     explicit EscPage(SetupWizard *wizard, QWidget *parent = 0);
     ~EscPage();
     bool validatePage();
+    void initializePage();
 
 private:
     Ui::EscPage *ui;

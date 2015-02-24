@@ -368,7 +368,7 @@ margin:1px;</string>
          <string>Channel Number</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">border-radius: 5;\nfont: bold 12px;\nmargin:1px;</string>
+         <string notr="true">border-radius: 5;font: bold 12px;margin:1px;</string>
         </property>
         <property name="text">
          <string>0</string>
@@ -399,7 +399,7 @@ margin:1px;</string>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">border-radius: 5;\nfont: 12px;\nmargin:1px;</string>
+         <string notr="true">border-radius: 5;font: 12px;margin:1px;</string>
         </property>
         <property name="text">
          <string/>
@@ -433,7 +433,7 @@ margin:1px;</string>
          <string>Bank number</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">border-radius: 5;\nfont: 12px;\nmargin:1px;</string>
+         <string notr="true">border-radius: 5;font: 12px;margin:1px;</string>
         </property>
         <property name="text">
          <string> 0</string>

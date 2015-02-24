@@ -774,37 +774,28 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
 {
     static uint16_t prevBankUpdateFreq[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM];
     static uint8_t prevBankMode[ACTUATORSETTINGS_BANKMODE_NUMELEM];
+    bool updateMode = force_update || (memcmp(prevBankMode, actuatorSettings->BankMode, sizeof(prevBankMode)) != 0);
+    bool updateFreq = force_update || (memcmp(prevBankUpdateFreq, actuatorSettings->BankUpdateFreq, sizeof(prevBankUpdateFreq)) != 0);
 
-    // check if the any rate setting is changed
-    if (force_update ||
-        (memcmp(prevBankUpdateFreq,
-                actuatorSettings->BankUpdateFreq,
-                sizeof(prevBankUpdateFreq)) != 0) ||
-        (memcmp(prevBankUpdateFreq,
-                actuatorSettings->BankMode,
-                sizeof(prevBankMode)) != 0)
-        ) {
+    // check if any setting is changed
+    if (updateMode || updateFreq) {
         /* Something has changed, apply the settings to HW */
-        memcpy(prevBankUpdateFreq,
-               actuatorSettings->BankUpdateFreq,
-               sizeof(prevBankUpdateFreq));
-        memcpy(prevBankMode,
-               actuatorSettings->BankMode,
-               sizeof(prevBankMode));
 
         uint16_t freq[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM];
         uint32_t clock[ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM] = { 0 };
         for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
-            PIOS_Servo_SetBankMode(i,
-                                   actuatorSettings->BankMode[i] ==
-                                   ACTUATORSETTINGS_BANKMODE_PWM ?
-                                   PIOS_SERVO_BANK_MODE_PWM :
-                                   PIOS_SERVO_BANK_MODE_SINGLE_PULSE
-                                   );
+            if (force_update || (actuatorSettings->BankMode[i] != prevBankMode[i])) {
+                PIOS_Servo_SetBankMode(i,
+                                       actuatorSettings->BankMode[i] ==
+                                       ACTUATORSETTINGS_BANKMODE_PWM ?
+                                       PIOS_SERVO_BANK_MODE_PWM :
+                                       PIOS_SERVO_BANK_MODE_SINGLE_PULSE
+                                       );
+            }
             switch (actuatorSettings->BankMode[i]) {
             case ACTUATORSETTINGS_BANKMODE_ONESHOT125:
                 freq[i]  = 100; // Value must be small enough so CCr isn't update until the PIOS_Servo_Update is triggered
-                clock[i] = ACTUATOR_ONESHOT125_CLOCK; // Setup an 8MHz timer clock
+                clock[i] = ACTUATOR_ONESHOT125_CLOCK; // Setup an 2MHz timer clock
                 break;
             case ACTUATORSETTINGS_BANKMODE_PWMSYNC:
                 freq[i]  = 100;
@@ -816,8 +807,16 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
                 break;
             }
         }
+
+        memcpy(prevBankMode,
+               actuatorSettings->BankMode,
+               sizeof(prevBankMode));
+
         PIOS_Servo_SetHz(freq, clock, ACTUATORSETTINGS_BANKUPDATEFREQ_NUMELEM);
 
+        memcpy(prevBankUpdateFreq,
+               actuatorSettings->BankUpdateFreq,
+               sizeof(prevBankUpdateFreq));
         // retrieve mode from related bank
         for (uint8_t i = 0; i < MAX_MIX_ACTUATORS; i++) {
             uint8_t bank = PIOS_Servo_GetPinBank(i);

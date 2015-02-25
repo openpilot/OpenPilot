@@ -56,13 +56,6 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ui.actuatorMax->setMinimum(MINOUTPUT_VALUE);
     ui.actuatorValue->setMinimum(MINOUTPUT_VALUE);
 
-    // Remove keyboard focus
-    ui.actuatorMin->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorMax->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorRev->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorLink->setFocusPolicy(Qt::ClickFocus);
-    ui.actuatorValue->setFocusPolicy(Qt::NoFocus);
-
     setChannelRange();
 
     disableMouseWheelEvents();
@@ -126,7 +119,7 @@ void OutputChannelForm::enableChannelTest(bool state)
         ui.actuatorMin->setEnabled(false);
         ui.actuatorMax->setEnabled(false);
         ui.actuatorRev->setEnabled(false);
-    } else {
+    } else if (m_mixerType != "Disabled") {
         ui.actuatorMin->setEnabled(true);
         ui.actuatorMax->setEnabled(true);
         if (m_mixerType != "Motor") {

@@ -178,8 +178,9 @@ int32_t AttitudeStart(void)
     // Start main task
     xTaskCreate(AttitudeTask, "Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, taskHandle);
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
-
+#endif
     return 0;
 }
 
@@ -253,7 +254,9 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         // Set critical error and wait until the accel is producing data
         while (PIOS_ADXL345_FifoElements() == 0) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+#ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+#endif
         }
         accel_test = PIOS_ADXL345_Test();
 #endif
@@ -310,9 +313,9 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             }
             init = 1;
         }
-
+#ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
-
+#endif
         AccelStateData accelState;
         GyroStateData gyros;
         int32_t retval = 0;
@@ -487,7 +490,7 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
 
         count++;
         // check if further samples are already in queue
-        ret = xQueueReceive(queue, (void *)&mpu6000_data, 0);
+        ret = xQueueReceive(queue, (void *)mpu6000_data, 0);
     }
     PERF_TRACK_VALUE(counterAccelSamples, count);
 
@@ -764,13 +767,13 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accel_bias.Y  = accelGyroSettings.accel_bias.Y;
         accel_bias.Z  = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale.X  = accelGyroSettings.gyro_scale.X * scales[0];
-        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * scales[0];
-        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * scales[0];
+        gyro_scale.X  = accelGyroSettings.gyro_scale.X * scales[1];
+        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * scales[1];
+        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * scales[1];
 
-        accel_scale.X = accelGyroSettings.accel_scale.X * scales[1];
-        accel_scale.Y = accelGyroSettings.accel_scale.Y * scales[1];
-        accel_scale.Z = accelGyroSettings.accel_scale.Z * scales[1];
+        accel_scale.X = accelGyroSettings.accel_scale.X * scales[0];
+        accel_scale.Y = accelGyroSettings.accel_scale.Y * scales[0];
+        accel_scale.Z = accelGyroSettings.accel_scale.Z * scales[0];
     } else {
         // Original CC with analog gyros and ADXL accel
         accel_bias.X  = accelGyroSettings.accel_bias.X;

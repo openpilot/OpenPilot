@@ -376,18 +376,19 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         bankMode     = ActuatorSettings::BANKMODE_PWM;
         break;
     case VehicleConfigurationSource::ESC_RAPID:
-        escFrequence = RAPID_ESC_FREQUENCY;
         if ((m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
              m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) &&
             m_configSource->getInputType() == VehicleConfigurationSource::INPUT_PWM) {
             bankMode = ActuatorSettings::BANKMODE_PWM;
+            escFrequence = RAPID_ESC_FREQUENCY;
         } else {
             bankMode = ActuatorSettings::BANKMODE_PWMSYNC;
+            escFrequence = PWMSYNC_ESC_FREQUENCY;
         }
         break;
     case VehicleConfigurationSource::ESC_ONESHOT:
-        escFrequence = RAPID_ESC_FREQUENCY;
         bankMode     = ActuatorSettings::BANKMODE_ONESHOT125;
+        escFrequence = ONESHOT_ESC_FREQUENCY;
         break;
     default:
         break;

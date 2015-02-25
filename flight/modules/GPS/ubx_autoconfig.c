@@ -363,12 +363,6 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
 
     switch (status->currentStep) {
     case INIT_STEP_ERROR:
-        if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_ERROR_RETRY_TIMEOUT) {
-            status->currentStep = INIT_STEP_START;
-            status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
-        }
-        return;
-
     case INIT_STEP_DISABLED:
     case INIT_STEP_DONE:
         return;

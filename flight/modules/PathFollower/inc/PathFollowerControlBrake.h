@@ -35,7 +35,7 @@
 #include "PIDControlNE.h"
 // forward decl
 class PathFollowerFSM;
-class PathFollowerControlBrake : PathFollowerControl {
+class PathFollowerControlBrake : public PathFollowerControl {
 private:
     static PathFollowerControlBrake *p_inst;
     PathFollowerControlBrake();

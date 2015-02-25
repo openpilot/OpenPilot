@@ -51,7 +51,7 @@ typedef enum {
     LAND_STATE_SIZE
 } PathFollowerFSM_LandState_T;
 
-class FSMLand : PathFollowerFSM {
+class FSMLand : public PathFollowerFSM {
 private:
     static FSMLand *p_inst;
     FSMLand();

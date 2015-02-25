@@ -45,7 +45,7 @@ typedef enum {
     FSMBRAKESTATUS_STATEEXITREASON_NONE = 0
 } FSMBrakeStatusStateExitReasonOptions;
 
-class FSMBrake : PathFollowerFSM {
+class FSMBrake : public PathFollowerFSM {
 private:
     static FSMBrake *p_inst;
     FSMBrake();

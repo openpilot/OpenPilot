@@ -33,7 +33,7 @@
 #include "PathFollowerControl.h"
 #include "PIDControlNE.h"
 
-class PathFollowerControlVelocityRoam : PathFollowerControl {
+class PathFollowerControlVelocityRoam : public PathFollowerControl {
 private:
     static PathFollowerControlVelocityRoam *p_inst;
     PathFollowerControlVelocityRoam();

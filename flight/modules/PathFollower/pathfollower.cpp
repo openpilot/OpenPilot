@@ -105,7 +105,6 @@ extern "C" {
 struct Globals {
     struct pid  PIDposH[2];
     struct pid  PIDposV;
-    struct pid  PIDvel[3]; // North, East, Down
     struct pid  PIDcourse;
     struct pid  PIDspeed;
     struct pid  PIDpower;
@@ -135,19 +134,11 @@ static PathFollowerControlLanding *activeController = 0;
 static void pathFollowerTask(void);
 static void resetGlobals();
 static void SettingsUpdatedCb(UAVObjEvent *ev);
-static uint8_t updateAutoPilotByFrameType();
 static uint8_t updateAutoPilotFixedWing();
-static uint8_t updateAutoPilotVtol();
-static float updateTailInBearing();
-static float updateCourseBearing();
-static float updatePathBearing();
-static float updatePOIBearing();
-static void processPOI();
+// static void processPOI();
 static void updatePathVelocity(float kFF, bool limited);
 static uint8_t updateFixedDesiredAttitude();
-static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction);
 static void updateFixedAttitude(float *attitude);
-static void updateVtolDesiredAttitudeEmergencyFallback();
 static void airspeedStateUpdatedCb(UAVObjEvent *ev);
 static void pathFollowerObjectiveUpdatedCb(UAVObjEvent *ev);
 static void flightStatusUpdatedCb(UAVObjEvent *ev);
@@ -284,6 +275,12 @@ static void pathFollowerTask(void)
     pathStatus.UID    = pathDesired.UID;
     pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
 
+#if 0
+    if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POI) { // TODO Hack from vtolpathfollower, move into manualcontrol!
+        processPOI();
+    }
+#endif
+
     pathFollowerSetActiveController();
 
     if (activeController) {
@@ -292,9 +289,6 @@ static void pathFollowerTask(void)
         return;
     }
 
-    if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POI) { // TODO Hack from vtolpathfollower, move into manualcontrol!
-        processPOI();
-    }
 
     switch (pathDesired.Mode) {
     case PATHDESIRED_MODE_FLYENDPOINT:
@@ -302,13 +296,19 @@ static void pathFollowerTask(void)
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
     case PATHDESIRED_MODE_FLYCIRCLELEFT:
     {
-        uint8_t result = updateAutoPilotByFrameType();
+      if (global.frameType == FRAME_TYPE_FIXED_WING) {
+        uint8_t result = updateAutoPilotFixedWing();
         if (result) {
             AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
         } else {
             pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
             AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
         }
+      }
+      else {
+        pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
+        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+      }
     }
     break;
     case PATHDESIRED_MODE_FIXEDATTITUDE:
@@ -391,23 +391,14 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         break;
     }
 
-    if (global.frameType == FRAME_TYPE_FIXED_WING) {
-        pid_configure(&global.PIDposH[0], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-        pid_configure(&global.PIDposH[1], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-        pid_configure(&global.PIDposV, fixedWingPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
-    } else {
-        pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-        pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-        pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
-    }
+    // fixed wing PID only
+    pid_configure(&global.PIDposH[0], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    pid_configure(&global.PIDposH[1], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    pid_configure(&global.PIDposV, fixedWingPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
 
     pid_configure(&global.PIDcourse, fixedWingPathFollowerSettings.CoursePI.Kp, fixedWingPathFollowerSettings.CoursePI.Ki, 0.0f, fixedWingPathFollowerSettings.CoursePI.ILimit);
     pid_configure(&global.PIDspeed, fixedWingPathFollowerSettings.SpeedPI.Kp, fixedWingPathFollowerSettings.SpeedPI.Ki, 0.0f, fixedWingPathFollowerSettings.SpeedPI.ILimit);
     pid_configure(&global.PIDpower, fixedWingPathFollowerSettings.PowerPI.Kp, fixedWingPathFollowerSettings.PowerPI.Ki, 0.0f, fixedWingPathFollowerSettings.PowerPI.ILimit);
-
-    pid_configure(&global.PIDvel[0], vtolPathFollowerSettings.HorizontalVelPID.Kp, vtolPathFollowerSettings.HorizontalVelPID.Ki, vtolPathFollowerSettings.HorizontalVelPID.Kd, vtolPathFollowerSettings.HorizontalVelPID.ILimit);
-    pid_configure(&global.PIDvel[1], vtolPathFollowerSettings.HorizontalVelPID.Kp, vtolPathFollowerSettings.HorizontalVelPID.Ki, vtolPathFollowerSettings.HorizontalVelPID.Kd, vtolPathFollowerSettings.HorizontalVelPID.ILimit);
-    pid_configure(&global.PIDvel[2], vtolPathFollowerSettings.VerticalVelPID.Kp, vtolPathFollowerSettings.VerticalVelPID.Ki, vtolPathFollowerSettings.VerticalVelPID.Kd, vtolPathFollowerSettings.VerticalVelPID.ILimit);
 
     if (activeController) {
         activeController->SettingsUpdated();
@@ -447,9 +438,6 @@ static void resetGlobals()
     pid_zero(&global.PIDposH[0]);
     pid_zero(&global.PIDposH[1]);
     pid_zero(&global.PIDposV);
-    pid_zero(&global.PIDvel[0]);
-    pid_zero(&global.PIDvel[1]);
-    pid_zero(&global.PIDvel[2]);
     pid_zero(&global.PIDcourse);
     pid_zero(&global.PIDspeed);
     pid_zero(&global.PIDpower);
@@ -458,23 +446,6 @@ static void resetGlobals()
     global.vtolEmergencyFallbackSwitch = false;
 
     pathStatus.path_time = 0.0f;
-}
-
-static uint8_t updateAutoPilotByFrameType()
-{
-    switch (global.frameType) {
-    case FRAME_TYPE_MULTIROTOR:
-    case FRAME_TYPE_HELI:
-        return updateAutoPilotVtol();
-
-        break;
-
-    case FRAME_TYPE_FIXED_WING:
-    default:
-        return updateAutoPilotFixedWing();
-
-        break;
-    }
 }
 
 /**
@@ -489,177 +460,7 @@ static uint8_t updateAutoPilotFixedWing()
     return updateFixedDesiredAttitude();
 }
 
-/**
- * vtol autopilot
- * use hover capable algorithm with unlimeted movement calculation. if that fails (flyaway situation due to compass failure)
- * fall back to emergency fallback autopilot to keep minimum amount of flight control
- */
-static uint8_t updateAutoPilotVtol()
-{
-    enum { RETURN_0 = 0, RETURN_1 = 1, RETURN_RESULT } returnmode;
-    enum { FOLLOWER_REGULAR, FOLLOWER_FALLBACK } followermode;
-    uint8_t result = 0;
-
-    // decide on behaviour based on settings and system state
-    if (global.vtolEmergencyFallbackSwitch) {
-        returnmode   = RETURN_0;
-        followermode = FOLLOWER_FALLBACK;
-    } else {
-        if (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ALWAYS) {
-            returnmode   = RETURN_1;
-            followermode = FOLLOWER_FALLBACK;
-        } else {
-            returnmode   = RETURN_RESULT;
-            followermode = FOLLOWER_REGULAR;
-        }
-    }
-
-    switch (followermode) {
-    case FOLLOWER_REGULAR:
-    {
-        // horizontal position control PID loop works according to settings in regular mode, allowing integral terms
-        updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, false);
-
-        // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
-        bool yaw_attitude = true;
-        float yaw = 0.0f;
-
-        switch (vtolPathFollowerSettings.YawControl) {
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
-            yaw_attitude = false;
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
-            yaw = updateTailInBearing();
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
-            yaw = updateCourseBearing();
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
-            yaw = updatePathBearing();
-            break;
-        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
-            yaw = updatePOIBearing();
-            break;
-        }
-
-        result = updateVtolDesiredAttitude(yaw_attitude, yaw);
-
-        if (!result) {
-            if (vtolPathFollowerSettings.FlyawayEmergencyFallback != VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DISABLED) {
-                // switch to emergency follower if follower indicates problems
-                global.vtolEmergencyFallbackSwitch = true;
-            }
-        }
-    }
-    break;
-    case FOLLOWER_FALLBACK:
-    {
-        // fallback loop only cares about intended horizontal flight direction, simplify control behaviour accordingly
-        pid_configure(&global.PIDposH[0], 1.0f, 0.0f, 0.0f, 0.0f);
-        pid_configure(&global.PIDposH[1], 1.0f, 0.0f, 0.0f, 0.0f);
-        updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, true);
-
-        // emergency follower has no return value
-        updateVtolDesiredAttitudeEmergencyFallback();
-    }
-    break;
-    }
-
-    switch (returnmode) {
-    case RETURN_RESULT:
-        return result;
-
-    default:
-        // returns either 0 or 1 according to enum definition above
-        return returnmode;
-    }
-}
-
-
-/**
- * Compute bearing of current takeoff location
- */
-static float updateTailInBearing()
-{
-    PositionStateData p;
-
-    PositionStateGet(&p);
-    TakeOffLocationData t;
-    TakeOffLocationGet(&t);
-    // atan2f always returns in between + and - 180 degrees
-    return RAD2DEG(atan2f(p.East - t.East, p.North - t.North));
-}
-
-/**
- * Compute bearing of current movement direction
- */
-static float updateCourseBearing()
-{
-    VelocityStateData v;
-
-    VelocityStateGet(&v);
-    // atan2f always returns in between + and - 180 degrees
-    return RAD2DEG(atan2f(v.East, v.North));
-}
-
-/**
- * Compute bearing of current path direction
- */
-static float updatePathBearing()
-{
-    PositionStateData positionState;
-
-    PositionStateGet(&positionState);
-
-    float cur[3] = { positionState.North,
-                     positionState.East,
-                     positionState.Down };
-    struct path_status progress;
-
-    path_progress(&pathDesired, cur, &progress);
-
-    // atan2f always returns in between + and - 180 degrees
-    return RAD2DEG(atan2f(progress.path_vector[1], progress.path_vector[0]));
-}
-
-/**
- * Compute bearing between current position and POI
- */
-static float updatePOIBearing()
-{
-    PoiLocationData poi;
-
-    PoiLocationGet(&poi);
-    PositionStateData positionState;
-    PositionStateGet(&positionState);
-
-    const float dT = updatePeriod / 1000.0f;
-    float dLoc[3];
-    float yaw = 0;
-    /*float elevation = 0;*/
-
-    dLoc[0] = positionState.North - poi.North;
-    dLoc[1] = positionState.East - poi.East;
-    dLoc[2] = positionState.Down - poi.Down;
-
-    if (dLoc[1] < 0) {
-        yaw = RAD2DEG(atan2f(dLoc[1], dLoc[0])) + 180.0f;
-    } else {
-        yaw = RAD2DEG(atan2f(dLoc[1], dLoc[0])) - 180.0f;
-    }
-    ManualControlCommandData manualControlData;
-    ManualControlCommandGet(&manualControlData);
-
-    float pathAngle = 0;
-    if (manualControlData.Roll > DEADBAND_HIGH) {
-        pathAngle = -(manualControlData.Roll - DEADBAND_HIGH) * dT * 300.0f;
-    } else if (manualControlData.Roll < DEADBAND_LOW) {
-        pathAngle = -(manualControlData.Roll - DEADBAND_LOW) * dT * 300.0f;
-    }
-
-    return yaw + (pathAngle / 2.0f);
-}
-
+#if 0
 /**
  * process POI control logic TODO: this should most likely go into manualcontrol!!!!
  * TODO: the whole process of POI handling likely needs cleanup and rethinking, might be broken since manualcontrol was refactored currently
@@ -744,6 +545,7 @@ static void processPOI()
         // CameraDesiredSet(&cameraDesired);
     }
 }
+#endif
 
 
 /**
@@ -1165,234 +967,6 @@ static bool correctCourse(float *C, float *V, float *F, float s)
         return false;
     }
 }
-
-/**
- * Compute desired attitude from the desired velocity
- *
- * Takes in @ref NedState which has the acceleration in the
- * NED frame as the feedback term and then compares the
- * @ref VelocityState against the @ref VelocityDesired
- */
-static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
-{
-    const float dT     = updatePeriod / 1000.0f;
-    uint8_t result     = 1;
-    bool manual_thrust = false;
-
-    VelocityDesiredData velocityDesired;
-    VelocityStateData velocityState;
-    StabilizationDesiredData stabDesired;
-    AttitudeStateData attitudeState;
-    StabilizationBankData stabSettings;
-    SystemSettingsData systemSettings;
-    VtolSelfTuningStatsData vtolSelfTuningStats;
-
-    float northError;
-    float northCommand;
-
-    float eastError;
-    float eastCommand;
-
-    float downError;
-    float downCommand;
-
-    SystemSettingsGet(&systemSettings);
-    VelocityStateGet(&velocityState);
-    VelocityDesiredGet(&velocityDesired);
-    StabilizationDesiredGet(&stabDesired);
-    VelocityDesiredGet(&velocityDesired);
-    AttitudeStateGet(&attitudeState);
-    StabilizationBankGet(&stabSettings);
-    VtolSelfTuningStatsGet(&vtolSelfTuningStats);
-
-
-    // scale velocity if it is above configured maximum
-    // for braking, we can not help it if initial velocity was greater
-    float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
-    if (velH > vtolPathFollowerSettings.HorizontalVelMax) {
-        velocityDesired.North *= vtolPathFollowerSettings.HorizontalVelMax / velH;
-        velocityDesired.East  *= vtolPathFollowerSettings.HorizontalVelMax / velH;
-    }
-    if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings.VerticalVelMax) {
-        velocityDesired.Down *= vtolPathFollowerSettings.VerticalVelMax / fabsf(velocityDesired.Down);
-    }
-
-    // calculate the velocity errors between desired and actual
-    northError   = velocityDesired.North - velocityState.North;
-    eastError    = velocityDesired.East - velocityState.East;
-    downError    = velocityDesired.Down - velocityState.Down;
-
-    // Must flip this sign
-    downError    = -downError;
-
-    // Compute desired commands
-    northCommand = pid_apply(&global.PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings.VelocityFeedforward;
-    eastCommand  = pid_apply(&global.PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings.VelocityFeedforward;
-
-    if ((vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL &&
-         flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) ||
-        (flightStatus.FlightModeAssist && flightStatus.AssistedThrottleState == FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL)) {
-        manual_thrust = true;
-    }
-
-    // downCommand = pid_apply(&global.PIDvel[2], downError, dT);
-    pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
-    downCommand = -pid_apply_setpoint(&global.PIDvel[2], &local_scaler, velocityDesired.Down, velocityState.Down, dT);
-
-    stabDesired.Thrust = boundf(vtolSelfTuningStats.NeutralThrustOffset + downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
-
-
-    // DEBUG HACK: allow user to skew compass on purpose to see if emergency failsafe kicks in
-    if (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DEBUGTEST) {
-        attitudeState.Yaw += 120.0f;
-        if (attitudeState.Yaw > 180.0f) {
-            attitudeState.Yaw -= 360.0f;
-        }
-    }
-
-
-    if ( // emergency flyaway detection
-        ( // integral already at its limit
-            vtolPathFollowerSettings.HorizontalVelPID.ILimit - fabsf(global.PIDvel[0].iAccumulator) < 1e-6f ||
-            vtolPathFollowerSettings.HorizontalVelPID.ILimit - fabsf(global.PIDvel[1].iAccumulator) < 1e-6f
-        ) &&
-        // angle between desired and actual velocity >90 degrees (by dot product)
-        (velocityDesired.North * velocityState.North + velocityDesired.East * velocityState.East < 0.0f) &&
-        // quad is moving at significant speed (during flyaway it would keep speeding up)
-        squaref(velocityState.North) + squaref(velocityState.East) > 1.0f
-        ) {
-        global.vtolEmergencyFallback += dT;
-        if (global.vtolEmergencyFallback >= vtolPathFollowerSettings.FlyawayEmergencyFallbackTriggerTime) {
-            // after emergency timeout, trigger alarm - everything else is handled by callers
-            // (switch to emergency algorithm, switch to emergency waypoint in pathplanner, alarms, ...)
-            result = 0;
-        }
-    } else {
-        global.vtolEmergencyFallback = 0.0f;
-    }
-
-    // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
-    // craft should move similarly for 5 deg roll versus 5 deg pitch
-
-    float maxPitch      = vtolPathFollowerSettings.MaxRollPitch;
-
-    float angle_radians = DEG2RAD(attitudeState.Yaw);
-    float cos_angle     = cosf(angle_radians);
-    float sine_angle    = sinf(angle_radians);
-
-    stabDesired.Pitch = boundf(-northCommand * cos_angle - eastCommand * sine_angle, -maxPitch, maxPitch);
-    stabDesired.Roll  = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -maxPitch, maxPitch);
-
-    ManualControlCommandData manualControl;
-    ManualControlCommandGet(&manualControl);
-
-
-    stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    if (yaw_attitude) {
-        stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-        stabDesired.Yaw = yaw_direction;
-    } else {
-        stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
-        stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
-    }
-
-    // default thrust mode to cruise control
-    stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL;
-
-    // The below is no longer relevant for all stabi which has moved to brke code
-
-    // when flight mode assist is active but in primary-thrust mode, the thrust mode must be set to the same as per the primary mode.
-    if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST) {
-        FlightModeSettingsData settings;
-        FlightModeSettingsGet(&settings);
-        uint8_t thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
-
-        switch (flightStatus.FlightMode) {
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            // we hard code the "GPS Assisted" PostionHold/Roam to use alt-vario which
-            // is a more appropriate throttle mode.  "GPSAssist" adds braking
-            // and a better throttle management to the standard Position Hold.
-            thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
-            break;
-
-            // LAND defaults to cruisecontrol managed by pathfollowers PID and
-            // can not be overridden in GPSAssist mode. The only time we look
-            // at the actual throttle position is in the decision to confirm
-            // landed and initiate disarming automatically.
-        }
-        stabDesired.StabilizationMode.Thrust = thrustMode;
-        stabDesired.Thrust = manualControl.Thrust;
-    } else if (manual_thrust) {
-        stabDesired.Thrust = manualControl.Thrust;
-    }
-    // else thrust is set by the PID controller
-
-    StabilizationDesiredSet(&stabDesired);
-
-    return result;
-}
-
-/**
- * Compute desired attitude for vtols - emergency fallback
- */
-static void updateVtolDesiredAttitudeEmergencyFallback()
-{
-    const float dT = updatePeriod / 1000.0f;
-
-    VelocityDesiredData velocityDesired;
-    VelocityStateData velocityState;
-    StabilizationDesiredData stabDesired;
-
-    float courseError;
-    float courseCommand;
-
-    float downError;
-    float downCommand;
-
-    VelocityStateGet(&velocityState);
-    VelocityDesiredGet(&velocityDesired);
-
-    ManualControlCommandData manualControlData;
-    ManualControlCommandGet(&manualControlData);
-
-    courseError = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North) - atan2f(velocityState.East, velocityState.North));
-
-    if (courseError < -180.0f) {
-        courseError += 360.0f;
-    }
-    if (courseError > 180.0f) {
-        courseError -= 360.0f;
-    }
-
-
-    courseCommand   = (courseError * vtolPathFollowerSettings.EmergencyFallbackYawRate.kP);
-
-    stabDesired.Yaw = boundf(courseCommand, -vtolPathFollowerSettings.EmergencyFallbackYawRate.Max, vtolPathFollowerSettings.EmergencyFallbackYawRate.Max);
-
-    // Compute desired down command
-    downError   = velocityDesired.Down - velocityState.Down;
-    // Must flip this sign
-    downError   = -downError;
-    downCommand = pid_apply(&global.PIDvel[2], downError, dT);
-
-    stabDesired.Thrust = boundf(downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
-
-
-    stabDesired.Roll   = vtolPathFollowerSettings.EmergencyFallbackAttitude.Roll;
-    stabDesired.Pitch  = vtolPathFollowerSettings.EmergencyFallbackAttitude.Pitch;
-
-    if (vtolPathFollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
-        stabDesired.Thrust = manualControlData.Thrust;
-    }
-
-    stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Pitch  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Yaw    = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
-    stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL;
-    StabilizationDesiredSet(&stabDesired);
-}
-
 
 /**
  * Compute desired attitude from a fixed preset

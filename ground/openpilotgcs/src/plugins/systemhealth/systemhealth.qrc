@@ -31,6 +31,8 @@
         <file>html/Magnetometer-Critical.html</file>
         <file>html/Magnetometer-Warning.html</file>
         <file>html/Stabilization-Critical.html</file>
+        <file>html/SystemConfiguration-UnsupportedConfig_OneShot.html</file>
+        <file>html/SystemConfiguration-FlightMode.html</file>
     </qresource>
     <qresource prefix="/systemhealth" lang="fr">
         <file alias="html/Actuator-Critical.html">html/fr/Actuator-Critical.html</file>
@@ -64,6 +66,8 @@
         <file alias="html/Magnetometer-Warning.html">html/fr/Magnetometer-Warning.html</file>
         <file alias="html/Magnetometer-Critical.html">html/fr/Magnetometer-Critical.html</file>
         <file alias="html/Stabilization-Critical.html">html/fr/Stabilization-Critical.html</file>
+        <file alias="html/SystemConfiguration-UnsupportedConfig_OneShot.html">html/fr/SystemConfiguration-UnsupportedConfig_OneShot.html</file>
+        <file alias="html/SystemConfiguration-FlightMode.html">html/fr/SystemConfiguration-FlightMode.html</file>
 </qresource>
 
 </RCC>

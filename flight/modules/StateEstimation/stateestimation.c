@@ -345,7 +345,6 @@ MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart);
  */
 static void StateEstimationCb(void)
 {
-    static enum { RUNSTATE_LOAD = 0, RUNSTATE_FILTER = 1, RUNSTATE_SAVE = 2 } runState = RUNSTATE_LOAD;
     static filterResult alarm     = FILTERRESULT_OK;
     static filterResult lastAlarm = FILTERRESULT_UNINITIALISED;
     static uint16_t alarmcounter  = 0;
@@ -361,193 +360,171 @@ static void StateEstimationCb(void)
         return;
     }
 
-    switch (runState) {
-    case RUNSTATE_LOAD:
+    alarm = FILTERRESULT_OK;
 
-        alarm = FILTERRESULT_OK;
-
-        // set alarm to warning if called through timeout
-        if (updatedSensors == 0) {
-            if (PIOS_DELAY_DiffuS(last_time) > 1000 * TIMEOUT_MS) {
-                alarm = FILTERRESULT_WARNING;
-            }
-        } else {
-            last_time = PIOS_DELAY_GetRaw();
+    // set alarm to warning if called through timeout
+    if (updatedSensors == 0) {
+        if (PIOS_DELAY_DiffuS(last_time) > 1000 * TIMEOUT_MS) {
+            alarm = FILTERRESULT_WARNING;
         }
+    } else {
+        last_time = PIOS_DELAY_GetRaw();
+    }
 
-        // check if a new filter chain should be initialized
-        if (fusionAlgorithm != revoSettings.FusionAlgorithm) {
-            FlightStatusData fs;
-            FlightStatusGet(&fs);
-            if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == FILTER_INIT_FORCE) {
-                const filterPipeline *newFilterChain;
-                switch (revoSettings.FusionAlgorithm) {
-                case REVOSETTINGS_FUSIONALGORITHM_BASICCOMPLEMENTARY:
-                    newFilterChain = cfQueue;
-                    break;
-                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
-                    newFilterChain = cfmiQueue;
-                    break;
-                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
-                    newFilterChain = cfmQueue;
-                    break;
-                case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
-                    newFilterChain = ekf13iQueue;
-                    break;
-                case REVOSETTINGS_FUSIONALGORITHM_GPSNAVIGATIONINS13:
-                    newFilterChain = ekf13Queue;
-                    break;
-                default:
-                    newFilterChain = NULL;
-                }
-                // initialize filters in chain
-                current = newFilterChain;
-                bool error = 0;
-                while (current != NULL) {
-                    int32_t result = current->filter->init((stateFilter *)current->filter);
-                    if (result != 0) {
-                        error = 1;
-                        break;
-                    }
-                    current = current->next;
-                }
-                if (error) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-                    return;
-                } else {
-                    // set new fusion algortithm
-                    filterChain     = newFilterChain;
-                    fusionAlgorithm = revoSettings.FusionAlgorithm;
-                }
-            }
-        }
-
-        // read updated sensor UAVObjects and set initial state
-        states.updated = updatedSensors;
-        updatedSensors = 0;
-
-        // fetch sensors, check values, and load into state struct
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GyroSensor, gyro, x, y, z);
-        if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
-            gyroRaw[0] = states.gyro[0];
-            gyroRaw[1] = states.gyro[1];
-            gyroRaw[2] = states.gyro[2];
-        }
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AccelSensor, accel, x, y, z);
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, boardMag, x, y, z);
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AuxMagSensor, auxMag, x, y, z);
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(BaroSensor, baro, Altitude, true);
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_2_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(AirspeedSensor, airspeed, CalibratedAirspeed, TrueAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
-
-        // GPS position data (LLA) is not fetched here since it does not contain floats. The filter must do all checks itself
-
-        // at this point sensor state is stored in "states" with some rudimentary filtering applied
-
-        // apply all filters in the current filter chain
-        current  = filterChain;
-
-        // we are not done, re-dispatch self execution
-        runState = RUNSTATE_FILTER;
-        PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
-        break;
-
-    case RUNSTATE_FILTER:
-
-        if (current != NULL) {
-            filterResult result = current->filter->filter((stateFilter *)current->filter, &states);
-            if (result > alarm) {
-                alarm = result;
-            }
-            current = current->next;
-        }
-
-        // we are not done, re-dispatch self execution
-        if (!current) {
-            runState = RUNSTATE_SAVE;
-        }
-        PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
-        break;
-
-    case RUNSTATE_SAVE:
-
-        // the final output of filters is saved in state variables
-        // EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(GyroState, gyro, x, y, z) // replaced by performance shortcut
-        if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
-            gyroDelta[0] = states.gyro[0] - gyroRaw[0];
-            gyroDelta[1] = states.gyro[1] - gyroRaw[1];
-            gyroDelta[2] = states.gyro[2] - gyroRaw[2];
-        }
-        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(AccelState, accel, x, y, z);
-        if (IS_SET(states.updated, SENSORUPDATES_mag)) {
-            MagStateData s;
-
-            MagStateGet(&s);
-            s.x = states.mag[0];
-            s.y = states.mag[1];
-            s.z = states.mag[2];
-            switch (states.magStatus) {
-            case MAGSTATUS_OK:
-                s.Source = MAGSTATE_SOURCE_ONBOARD;
+    // check if a new filter chain should be initialized
+    if (fusionAlgorithm != revoSettings.FusionAlgorithm) {
+        FlightStatusData fs;
+        FlightStatusGet(&fs);
+        if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == FILTER_INIT_FORCE) {
+            const filterPipeline *newFilterChain;
+            switch (revoSettings.FusionAlgorithm) {
+            case REVOSETTINGS_FUSIONALGORITHM_BASICCOMPLEMENTARY:
+                newFilterChain = cfQueue;
                 break;
-            case MAGSTATUS_AUX:
-                s.Source = MAGSTATE_SOURCE_AUX;
+            case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
+                newFilterChain = cfmiQueue;
+                break;
+            case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
+                newFilterChain = cfmQueue;
+                break;
+            case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
+                newFilterChain = ekf13iQueue;
+                break;
+            case REVOSETTINGS_FUSIONALGORITHM_GPSNAVIGATIONINS13:
+                newFilterChain = ekf13Queue;
                 break;
             default:
-                s.Source = MAGSTATE_SOURCE_INVALID;
+                newFilterChain = NULL;
             }
-            MagStateSet(&s);
+            // initialize filters in chain
+            current = newFilterChain;
+            bool error = 0;
+            while (current != NULL) {
+                int32_t result = current->filter->init((stateFilter *)current->filter);
+                if (result != 0) {
+                    error = 1;
+                    break;
+                }
+                current = current->next;
+            }
+            if (error) {
+                AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+                return;
+            } else {
+                // set new fusion algortithm
+                filterChain     = newFilterChain;
+                fusionAlgorithm = revoSettings.FusionAlgorithm;
+            }
         }
+    }
 
-        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(PositionState, pos, North, East, Down);
-        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(VelocityState, vel, North, East, Down);
-        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_2_DIMENSIONS(AirspeedState, airspeed, CalibratedAirspeed, TrueAirspeed);
-        // attitude nees manual conversion from quaternion to euler
-        if (IS_SET(states.updated, SENSORUPDATES_attitude)) { \
-            AttitudeStateData s;
-            AttitudeStateGet(&s);
-            s.q1 = states.attitude[0];
-            s.q2 = states.attitude[1];
-            s.q3 = states.attitude[2];
-            s.q4 = states.attitude[3];
-            Quaternion2RPY(&s.q1, &s.Roll);
-            AttitudeStateSet(&s);
+    // read updated sensor UAVObjects and set initial state
+    states.updated = updatedSensors;
+    updatedSensors = 0;
+
+    // fetch sensors, check values, and load into state struct
+    FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GyroSensor, gyro, x, y, z);
+    if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
+        gyroRaw[0] = states.gyro[0];
+        gyroRaw[1] = states.gyro[1];
+        gyroRaw[2] = states.gyro[2];
+    }
+    FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AccelSensor, accel, x, y, z);
+    FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, boardMag, x, y, z);
+    FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AuxMagSensor, auxMag, x, y, z);
+    FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
+    FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(BaroSensor, baro, Altitude, true);
+    FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_2_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(AirspeedSensor, airspeed, CalibratedAirspeed, TrueAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
+
+    // GPS position data (LLA) is not fetched here since it does not contain floats. The filter must do all checks itself
+
+    // at this point sensor state is stored in "states" with some rudimentary filtering applied
+
+    // apply all filters in the current filter chain
+    current = filterChain;
+
+    // we are not done, re-dispatch self execution
+
+    while (current) {
+        filterResult result = current->filter->filter((stateFilter *)current->filter, &states);
+        if (result > alarm) {
+            alarm = result;
         }
+        current = current->next;
+    }
 
-        // throttle alarms, raise alarm flags immediately
-        // but require system to run for a while before decreasing
-        // to prevent alarm flapping
-        if (alarm >= lastAlarm) {
+    // the final output of filters is saved in state variables
+    // EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(GyroState, gyro, x, y, z) // replaced by performance shortcut
+    if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
+        gyroDelta[0] = states.gyro[0] - gyroRaw[0];
+        gyroDelta[1] = states.gyro[1] - gyroRaw[1];
+        gyroDelta[2] = states.gyro[2] - gyroRaw[2];
+    }
+    EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(AccelState, accel, x, y, z);
+    if (IS_SET(states.updated, SENSORUPDATES_mag)) {
+        MagStateData s;
+
+        MagStateGet(&s);
+        s.x = states.mag[0];
+        s.y = states.mag[1];
+        s.z = states.mag[2];
+        switch (states.magStatus) {
+        case MAGSTATUS_OK:
+            s.Source = MAGSTATE_SOURCE_ONBOARD;
+            break;
+        case MAGSTATUS_AUX:
+            s.Source = MAGSTATE_SOURCE_AUX;
+            break;
+        default:
+            s.Source = MAGSTATE_SOURCE_INVALID;
+        }
+        MagStateSet(&s);
+    }
+
+    EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(PositionState, pos, North, East, Down);
+    EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(VelocityState, vel, North, East, Down);
+    EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_2_DIMENSIONS(AirspeedState, airspeed, CalibratedAirspeed, TrueAirspeed);
+    // attitude nees manual conversion from quaternion to euler
+    if (IS_SET(states.updated, SENSORUPDATES_attitude)) { \
+        AttitudeStateData s;
+        AttitudeStateGet(&s);
+        s.q1 = states.attitude[0];
+        s.q2 = states.attitude[1];
+        s.q3 = states.attitude[2];
+        s.q4 = states.attitude[3];
+        Quaternion2RPY(&s.q1, &s.Roll);
+        AttitudeStateSet(&s);
+    }
+    // throttle alarms, raise alarm flags immediately
+    // but require system to run for a while before decreasing
+    // to prevent alarm flapping
+    if (alarm >= lastAlarm) {
+        lastAlarm    = alarm;
+        alarmcounter = 0;
+    } else {
+        if (alarmcounter < 100) {
+            alarmcounter++;
+        } else {
             lastAlarm    = alarm;
             alarmcounter = 0;
-        } else {
-            if (alarmcounter < 100) {
-                alarmcounter++;
-            } else {
-                lastAlarm    = alarm;
-                alarmcounter = 0;
-            }
         }
+    }
 
-        // clear alarms if everything is alright, then schedule callback execution after timeout
-        if (lastAlarm == FILTERRESULT_WARNING) {
-            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
-        } else if (lastAlarm == FILTERRESULT_CRITICAL) {
-            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
-        } else if (lastAlarm >= FILTERRESULT_ERROR) {
-            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-        } else {
-            AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
-        }
+    // clear alarms if everything is alright, then schedule callback execution after timeout
+    if (lastAlarm == FILTERRESULT_WARNING) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
+    } else if (lastAlarm == FILTERRESULT_CRITICAL) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+    } else if (lastAlarm >= FILTERRESULT_ERROR) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+    } else {
+        AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+    }
 
-        // we are done, re-schedule next self execution
-        runState = RUNSTATE_LOAD;
-        if (updatedSensors) {
-            PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
-        } else {
-            PIOS_CALLBACKSCHEDULER_Schedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
-        }
-        break;
+    if (updatedSensors) {
+        PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
+    } else {
+        PIOS_CALLBACKSCHEDULER_Schedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
     }
 }
 

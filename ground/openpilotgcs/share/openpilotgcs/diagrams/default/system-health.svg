@@ -30,7 +30,7 @@
      inkscape:zoom="6.5977991"
      inkscape:cx="55.083588"
      inkscape:cy="24.071773"
-     inkscape:current-layer="foreground"
+     inkscape:current-layer="layer45"
      id="namedview3608"
      showgrid="true"
      inkscape:window-width="1280"
@@ -1673,9 +1673,23 @@
   </g>
   <g
      inkscape:groupmode="layer"
+     id="layer45"
+     inkscape:label="BootFault-RebootRequired">
+    <rect
+       style="fill:#d40000;fill-opacity:1;stroke:none;display:inline"
+       id="BootFault-RebootRequired"
+       width="13.110236"
+       height="10.107105"
+       x="80.806435"
+       y="51.972187"
+       ry="0.98050147"
+       inkscape:label="#rect4550-8-1-4-21-1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
      id="layer43"
      inkscape:label="SystemConfiguration-FlightMode"
-     style="display:none">
+     style="display:inline">
     <rect
        style="fill:#d40000;fill-opacity:1;stroke:none;display:inline"
        id="SystemConfiguration-FlightMode"

@@ -40,7 +40,7 @@
 #define NUMW 9 // number of plant noise inputs, w is disturbance noise vector
 #define NUMV 10 // number of measurements, v is the measurement noise vector
 #define NUMU 6 // number of deterministic inputs, U is the input vector
-
+#pragma GCC optimize "O3"
 // Private functions
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
                           float Q[NUMW], float dT, float P[NUMX][NUMX]);
@@ -76,14 +76,14 @@ static void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]);
 // b.............  ......oXo
 // c.............  ......ooX
 
-static const int8_t FrowMin[NUMX] = { 3, 4, 5, 6, 6, 6,  5,  5,  5,  5, 13, 13, 13 };
-static const int8_t FrowMax[NUMX] = { 3, 4, 5, 9, 9, 9, 12, 12, 12, 12, -1, -1, -1 };
+static int8_t FrowMin[NUMX] = { 3, 4, 5, 6, 6, 6, 5, 5, 5, 5, 13, 13, 13 };
+static int8_t FrowMax[NUMX] = { 3, 4, 5, 9, 9, 9, 12, 12, 12, 12, -1, -1, -1 };
 
-static const int8_t GrowMin[NUMX] = { 9, 9, 9, 3, 3, 3, 0, 0, 0, 0, 6, 7, 8 };
-static const int8_t GrowMax[NUMX] = { -1, -1, -1, 5, 5, 5, 2, 2, 2, 2, 6, 7, 8 };
+static int8_t GrowMin[NUMX] = { 9, 9, 9, 3, 3, 3, 0, 0, 0, 0, 6, 7, 8 };
+static int8_t GrowMax[NUMX] = { -1, -1, -1, 5, 5, 5, 2, 2, 2, 2, 6, 7, 8 };
 
-static const int8_t HrowMin[NUMV] = { 0, 1, 2, 3, 4, 5, 6, 6, 6, 2 };
-static const int8_t HrowMax[NUMV] = { 0, 1, 2, 3, 4, 5, 9, 9, 9, 2 };
+static int8_t HrowMin[NUMV] = { 0, 1, 2, 3, 4, 5, 6, 6, 6, 2 };
+static int8_t HrowMax[NUMV] = { 0, 1, 2, 3, 4, 5, 9, 9, 9, 2 };
 
 static struct EKFData {
     // linearized system matrices
@@ -183,8 +183,8 @@ void INSGetP(float PDiag[NUMX])
     uint8_t i;
 
     // retrieve diagonal elements (aka state variance)
-    for (i = 0; i < NUMX; i++) {
-        if (PDiag != 0) {
+    if (PDiag != 0) {
+        for (i = 0; i < NUMX; i++) {
             PDiag[i] = ekf.P[i][i];
         }
     }
@@ -432,7 +432,6 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 // The first Method is very specific to this implementation
 // ************************************************
 
-__attribute__((optimize("O3")))
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
                           float Q[NUMW], float dT, float P[NUMX][NUMX])
 {
@@ -444,6 +443,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
     float Dummy[NUMX][NUMX];
     int8_t i;
     int8_t k;
+
     for (i = 0; i < NUMX; i++) { // Calculate Dummy = (P/T +F*P)
         float *Firow = F[i];
         float *Pirow = P[i];
@@ -471,11 +471,11 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 
 
         for (j = i; j < NUMX; j++) { // Use symmetry, ie only find upper triangular
-            float Ptmp = Dirow[j] * dT1; // Pnew = Dummy / T ...
+            float Ptmp         = Dirow[j] * dT1; // Pnew = Dummy / T ...
 
             const float *Fjrow = F[j];
-            int8_t Fjstart = FrowMin[j];
-            int8_t Fjend   = FrowMax[j];
+            int8_t Fjstart     = FrowMin[j];
+            int8_t Fjend       = FrowMax[j];
             k = Fjstart;
 
             while (k <= Fjend - 3) {
@@ -483,7 +483,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
                 Ptmp += Dirow[k + 1] * Fjrow[k + 1];
                 Ptmp += Dirow[k + 2] * Fjrow[k + 2];
                 Ptmp += Dirow[k + 3] * Fjrow[k + 3];
-                k+=4;
+                k    += 4;
             }
             while (k <= Fjend) {
                 Ptmp += Dirow[k] * Fjrow[k];
@@ -492,20 +492,20 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 
             float *Gjrow = G[j];
             const int8_t Gjstart = MAX(Gistart, GrowMin[j]);
-            const int8_t Gjend = MIN(Giend, GrowMax[j]);
+            const int8_t Gjend   = MIN(Giend, GrowMax[j]);
             k = Gjstart;
             while (k <= Gjend - 2) {
                 Ptmp += Q[k] * Girow[k] * Gjrow[k]; // [] + G*Q*G' ...
                 Ptmp += Q[k + 1] * Girow[k + 1] * Gjrow[k + 1];
                 Ptmp += Q[k + 2] * Girow[k + 2] * Gjrow[k + 2];
-                k+=3;
+                k    += 3;
             }
             if (k <= Gjend) {
-                 Ptmp += Q[k] * Girow[k] * Gjrow[k];
-                 if (k <= Gjend - 1) {
-                     Ptmp += Q[k + 1] * Girow[k + 1] * Gjrow[k + 1];
-                 }
-             }
+                Ptmp += Q[k] * Girow[k] * Gjrow[k];
+                if (k <= Gjend - 1) {
+                    Ptmp += Q[k + 1] * Girow[k + 1] * Gjrow[k + 1];
+                }
+            }
 
             P[j][i] = Pirow[j] = Ptmp * dTsq; // [] * (T^2)
         }
@@ -527,7 +527,6 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 // The SensorsUsed variable is a bitwise mask indicating which sensors
 // should be used in the update.
 // ************************************************
-
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
                   float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
                   uint16_t SensorsUsed)
@@ -540,7 +539,10 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
         if (SensorsUsed & (0x01 << m)) { // use this sensor for update
             for (j = 0; j < NUMX; j++) { // Find Hp = H*P
                 HP[j] = 0;
-                for (k = HrowMin[m]; k <= HrowMax[m]; k++) {
+            }
+
+            for (k = HrowMin[m]; k <= HrowMax[m]; k++) {
+                for (j = 0; j < NUMX; j++) { // Find Hp = H*P
                     HP[j] += H[m][k] * P[k][j];
                 }
             }
@@ -548,14 +550,13 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
             for (k = HrowMin[m]; k <= HrowMax[m]; k++) {
                 HPHR += HP[k] * H[m][k];
             }
-
+            float invHPHR = 1.0f / HPHR;
             for (k = 0; k < NUMX; k++) {
-                Km[k] = HP[k] / HPHR; // find K = HP/HPHR
+                Km[k] = HP[k] * invHPHR; // find K = HP/HPHR
             }
             for (i = 0; i < NUMX; i++) { // Find P(m)= P(m-1) + K*HP
                 for (j = i; j < NUMX; j++) {
-                    P[i][j] = P[j][i] =
-                                  P[i][j] - Km[i] * HP[j];
+                    P[i][j] = P[j][i] = P[i][j] - Km[i] * HP[j];
                 }
             }
 
@@ -601,7 +602,7 @@ void RungeKutta(float X[NUMX], float U[NUMU], float dT)
     for (i = 0; i < NUMX; i++) {
         X[i] =
             Xlast[i] + dT * (K1[i] + 2.0f * K2[i] + 2.0f * K3[i] +
-                             K4[i]) / 6.0f;
+                             K4[i]) * (1.0f / 6.0f);
     }
 }
 

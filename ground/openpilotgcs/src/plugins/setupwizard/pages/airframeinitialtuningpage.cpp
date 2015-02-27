@@ -169,15 +169,10 @@ bool AirframeInitialTuningPage::airframeIsCompatible(int vehicleType, int vehicl
     }
 }
 
-void AirframeInitialTuningPage::loadValidFiles()
+void AirframeInitialTuningPage::loadFilesInDir(QString templateBasePath)
 {
-    ui->templateList->clear();
-    foreach(QJsonObject * templ, m_templates.values()) {
-        delete templ;
-    }
-    m_templates.clear();
-
-    QDir templateDir(QString("%1/%2/").arg(Utils::PathUtils().InsertDataPath("%%DATAPATH%%cloudconfig")).arg(m_dir));
+    QDir templateDir(templateBasePath);
+    qDebug() << "Loading templates from base path:" << templateBasePath;
     QStringList names;
     names << "*.optmpl";
     templateDir.setNameFilters(names);
@@ -205,6 +200,18 @@ void AirframeInitialTuningPage::loadValidFiles()
         }
         file.close();
     }
+}
+
+void AirframeInitialTuningPage::loadValidFiles()
+{
+    ui->templateList->clear();
+    foreach(QJsonObject * templ, m_templates.values()) {
+        delete templ;
+    }
+    m_templates.clear();
+
+    loadFilesInDir(QString("%1/%2/").arg(Utils::PathUtils().InsertDataPath("%%DATAPATH%%cloudconfig")).arg(m_dir));
+    loadFilesInDir(QString("%1/%2/").arg(Utils::PathUtils().InsertStoragePath("%%STOREPATH%%cloudconfig")).arg(m_dir));
 }
 
 void AirframeInitialTuningPage::setupTemplateList()

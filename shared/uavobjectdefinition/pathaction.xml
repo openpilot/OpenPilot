@@ -2,9 +2,11 @@
     <object name="PathAction" singleinstance="false" settings="false" category="Navigation">
         <description>A waypoint command the pathplanner is to use at a certain waypoint</description>
 
+	    <!-- ensure the following Mode options are exactly the same as in pathdesired mode -->
         <field name="Mode" units="" type="enum" elements="1" options="FlyEndpoint,FlyVector,FlyCircleRight,FlyCircleLeft,
             DriveEndpoint,DriveVector,DriveCircleLeft,DriveCircleRight,
-            FixedAttitude, SetAccessory, DisarmAlarm" default="Endpoint" />
+            FixedAttitude,SetAccessory,DisarmAlarm,Land,Brake,Velocity" default="Endpoint" />
+            
         <field name="ModeParameters" units="" type="float" elements="4" default="0"/>
         <field name="EndCondition" units="" type="enum" elements="1" options="None,TimeOut,
             DistanceToTarget,LegRemaining,BelowError,AboveAltitude,AboveSpeed,PointingTowardsNext,

@@ -179,16 +179,19 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
         Servos[i]     = new QGraphicsSvgItem();
         Servos[i]->setSharedRenderer(renderer);
         Servos[i]->setElementId(ServoNames.at(i));
+        Servos[i]->setZValue(20);
         m_aircraft->SwashplateImage->scene()->addItem(Servos[i]);
 
         ServosText[i] = new QGraphicsTextItem();
         ServosText[i]->setDefaultTextColor(Qt::yellow);
         ServosText[i]->setPlainText(QString("-"));
         ServosText[i]->setFont(serifFont);
+        ServosText[i]->setZValue(31);
 
         ServosTextCircles[i] = new QGraphicsEllipseItem(1, 1, 30, 30);
         ServosTextCircles[i]->setBrush(brush);
         ServosTextCircles[i]->setPen(pen2);
+        ServosTextCircles[i]->setZValue(30);
         m_aircraft->SwashplateImage->scene()->addItem(ServosTextCircles[i]);
         m_aircraft->SwashplateImage->scene()->addItem(ServosText[i]);
 

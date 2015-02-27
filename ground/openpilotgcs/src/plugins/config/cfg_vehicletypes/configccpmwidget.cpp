@@ -1325,7 +1325,7 @@ void ConfigCcpmWidget::SwashLvlCancelButtonPressed()
     enableSwashplateLevellingControl(false);
 
     m_aircraft->SwashLvlStepInstruction->setText(
-        "<h2>Levelling Cancelled</h2><p>Previous settings have been restored.");
+        tr("<h2>Levelling Cancelled</h2><p>Previous settings have been restored."));
 
     ccpmSwashplateUpdate();
 }
@@ -1368,7 +1368,7 @@ void ConfigCcpmWidget::SwashLvlFinishButtonPressed()
     enableSwashplateLevellingControl(false);
 
     m_aircraft->SwashLvlStepInstruction->setText(
-        "<h2>Levelling Completed</h2><p>New settings have been saved to the SD card");
+        tr("<h2>Levelling Completed</h2><p>New settings have been saved to the SD card"));
 
     ShowDisclaimer(0);
     // ShowDisclaimer(2);
@@ -1380,13 +1380,13 @@ int ConfigCcpmWidget::ShowDisclaimer(int messageID)
 {
     QMessageBox msgBox;
 
-    msgBox.setText("<font color=red><h1>Warning!!!</h2></font>");
+    msgBox.setText(tr("<font color=red><h1>Warning!!!</h2></font>"));
     int ret;
     switch (messageID) {
     case 0:
         // Basic disclaimer
         msgBox.setInformativeText(
-            "<h2>This code has many configurations.</h2><p>Please double check all settings before attempting flight!");
+            tr("<h2>This code has many configurations.</h2><p>Please double check all settings before attempting flight!"));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Information);
@@ -1397,7 +1397,7 @@ int ConfigCcpmWidget::ShowDisclaimer(int messageID)
     case 1:
         // Not Tested disclaimer
         msgBox.setInformativeText(
-            "<h2>The CCPM mixer code needs more testing!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?");
+            tr("<h2>The CCPM mixer code needs more testing!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?"));
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
         msgBox.setIcon(QMessageBox::Warning);
@@ -1413,7 +1413,7 @@ int ConfigCcpmWidget::ShowDisclaimer(int messageID)
     case 2:
         // DO NOT use
         msgBox.setInformativeText(
-            "<h2>The CCPM swashplate levelling code is NOT complete!</h2><p><font color=red>DO NOT use it for flight!</font>");
+            tr("<h2>The CCPM swashplate levelling code is NOT complete!</h2><p><font color=red>DO NOT use it for flight!</font>"));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Critical);

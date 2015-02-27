@@ -377,7 +377,7 @@ static void StateEstimationCb(void)
         FlightStatusGet(&fs);
         if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == FILTER_INIT_FORCE) {
             const filterPipeline *newFilterChain;
-            switch (revoSettings.FusionAlgorithm) {
+            switch ((RevoSettingsFusionAlgorithmOptions)revoSettings.FusionAlgorithm) {
             case REVOSETTINGS_FUSIONALGORITHM_BASICCOMPLEMENTARY:
                 newFilterChain = cfQueue;
                 break;

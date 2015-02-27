@@ -40,8 +40,6 @@
 
 #include <math.h>
 
-#define  Pi 3.14159265358979323846
-
 QStringList ConfigCcpmWidget::getChannelDescriptions()
 {
     // init a channel_numelem list of channel desc defaults
@@ -392,9 +390,13 @@ void ConfigCcpmWidget::UpdateType()
     TypeText = m_aircraft->ccpmType->currentText();
     SingleServoIndex = m_aircraft->ccpmSingleServo->currentIndex();
 
-    // set visibility of user settings
+    // set visibility of user settings (When Custom)
     m_aircraft->ccpmAdvancedSettingsTable->setEnabled(TypeInt == 0);
+
+    // Clear advanced settings table if not Custom selected (Keep previous settings)
+    if (TypeText.compare(QString::fromUtf8("Custom - Advanced Settings"), Qt::CaseInsensitive) != 0) {
     m_aircraft->ccpmAdvancedSettingsTable->clearFocus();
+    }
 
     m_aircraft->ccpmAngleW->setEnabled(TypeInt == 1);
     m_aircraft->ccpmAngleX->setEnabled(TypeInt == 1);
@@ -597,10 +599,10 @@ void ConfigCcpmWidget::ccpmSwashplateRedraw()
     used[1]    = ((m_aircraft->ccpmServoXChannel->currentIndex() > 0) && (m_aircraft->ccpmServoXChannel->isEnabled()));
     used[2]    = ((m_aircraft->ccpmServoYChannel->currentIndex() > 0) && (m_aircraft->ccpmServoYChannel->isEnabled()));
     used[3]    = ((m_aircraft->ccpmServoZChannel->currentIndex() > 0) && (m_aircraft->ccpmServoZChannel->isEnabled()));
-    angle[0]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleW->value()) * Pi / 180.00;
-    angle[1]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleX->value()) * Pi / 180.00;
-    angle[2]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleY->value()) * Pi / 180.00;
-    angle[3]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleZ->value()) * Pi / 180.00;
+    angle[0]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleW->value()) * M_PI / 180.00;
+    angle[1]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleX->value()) * M_PI / 180.00;
+    angle[2]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleY->value()) * M_PI / 180.00;
+    angle[3]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleZ->value()) * M_PI / 180.00;
 
 
     for (i = 0; i < CCPM_MAX_SWASH_SERVOS; i++) {
@@ -690,8 +692,8 @@ void ConfigCcpmWidget::UpdateMixer()
             ;
         }
     }
-
-    if (config.heli.SwashplateType > 0) { // not advanced settings
+    int TypeInt  = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
+    if (TypeInt != 0) { // not advanced settings
         // get the channel data from the ui
         MixerChannelData[0] = m_aircraft->ccpmEngineChannel->currentIndex();
         MixerChannelData[1] = m_aircraft->ccpmTailChannel->currentIndex();
@@ -767,11 +769,11 @@ void ConfigCcpmWidget::UpdateMixer()
                     table->item(i, 3)->setText(
                         QString("%1").arg(
                             (int)(127.0 * (RollConstant)
-                                  * sin((180 + config.heli.CorrectionAngle + ThisAngle[i]) * Pi / 180.00)))); // Roll
+                                  * sin((180 + config.heli.CorrectionAngle + ThisAngle[i]) * M_PI / 180.00)))); // Roll
                     table->item(i, 4)->setText(
                         QString("%1").arg(
                             (int)(127.0 * (PitchConstant)
-                                  * cos((config.heli.CorrectionAngle + ThisAngle[i]) * Pi / 180.00)))); // Pitch
+                                  * cos((config.heli.CorrectionAngle + ThisAngle[i]) * M_PI / 180.00)))); // Pitch
                     // Yaw
                     table->item(i, 5)->setText(QString("%1").arg(0));
                 }
@@ -784,13 +786,14 @@ void ConfigCcpmWidget::UpdateMixer()
     } else {
         // advanced settings
         QTableWidget *table = m_aircraft->ccpmAdvancedSettingsTable;
+
         for (int i = 0; i < 6; i++) {
             Channel = table->item(i, 0)->text();
             if (Channel == "-") {
                 Channel = QString((int)ConfigCcpmWidget::CHANNEL_NUMELEM + 1);
             }
             MixerChannelData[i] = Channel.toInt();
-        }
+        } 
     }
 }
 
@@ -1323,6 +1326,8 @@ void ConfigCcpmWidget::SwashLvlCancelButtonPressed()
 
     m_aircraft->SwashLvlStepInstruction->setText(
         "<h2>Levelling Cancelled</h2><p>Previous settings have been restored.");
+
+    ccpmSwashplateUpdate();
 }
 
 
@@ -1367,6 +1372,8 @@ void ConfigCcpmWidget::SwashLvlFinishButtonPressed()
 
     ShowDisclaimer(0);
     // ShowDisclaimer(2);
+
+    ccpmSwashplateUpdate();
 }
 
 int ConfigCcpmWidget::ShowDisclaimer(int messageID)

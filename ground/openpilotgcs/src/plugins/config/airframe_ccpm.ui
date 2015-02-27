@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>850</width>
-    <height>798</height>
+    <height>694</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1946,7 +1946,7 @@ margin:1px;
              <property name="minimumSize">
               <size>
                <width>228</width>
-               <height>0</height>
+               <height>200</height>
               </size>
              </property>
              <property name="title">
@@ -1990,7 +1990,7 @@ margin:1px;
                   <property name="minimumSize">
                    <size>
                     <width>85</width>
-                    <height>0</height>
+                    <height>20</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -2009,7 +2009,7 @@ margin:1px;
                   <property name="minimumSize">
                    <size>
                     <width>85</width>
-                    <height>0</height>
+                    <height>20</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -2031,7 +2031,7 @@ margin:1px;
                   <property name="minimumSize">
                    <size>
                     <width>85</width>
-                    <height>0</height>
+                    <height>20</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -2058,7 +2058,7 @@ margin:1px;
                 <property name="minimumSize">
                  <size>
                   <width>250</width>
-                  <height>150</height>
+                  <height>20</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -2086,37 +2086,15 @@ margin:1px;
                 <property name="bottomMargin">
                  <number>3</number>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QPushButton" name="SwashLvlCancelButton">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>170</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>170</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Cancel</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
+                <item row="2" column="0">
                  <widget class="QPushButton" name="SwashLvlFinishButton">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>170</width>
-                    <height>0</height>
+                    <width>85</width>
+                    <height>20</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -2130,6 +2108,28 @@ margin:1px;
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="0">
+                 <widget class="QPushButton" name="SwashLvlCancelButton">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>85</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>170</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Cancel</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </item>
              </layout>
@@ -2138,7 +2138,7 @@ margin:1px;
            <item>
             <widget class="QGroupBox" name="SwashLvlStatusBox">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Maximum">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -2146,7 +2146,7 @@ margin:1px;
              <property name="minimumSize">
               <size>
                <width>200</width>
-               <height>0</height>
+               <height>130</height>
               </size>
              </property>
              <property name="title">
@@ -2300,7 +2300,7 @@ margin:1px;
            <property name="minimumSize">
             <size>
              <width>70</width>
-             <height>100</height>
+             <height>250</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -2436,7 +2436,7 @@ margin:1px;</string>
            <property name="minimumSize">
             <size>
              <width>200</width>
-             <height>200</height>
+             <height>300</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -2499,8 +2499,8 @@ margin:1px;</string>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
-                 <height>100</height>
+                 <width>250</width>
+                 <height>300</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -3269,7 +3269,6 @@ margin:1px;</string>
   <tabstop>ccpmCollectivespinBox</tabstop>
   <tabstop>SwashplateImage</tabstop>
   <tabstop>SwashLvlNextButton</tabstop>
-  <tabstop>SwashLvlStepInstruction</tabstop>
   <tabstop>SwashLvlCancelButton</tabstop>
   <tabstop>SwashLvlFinishButton</tabstop>
   <tabstop>SwashLvlStepList</tabstop>

@@ -4830,32 +4830,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/camerastabilization.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Camera Stabilization</source>
-        <translation type="unfinished"></translation>
+        <translation>相机稳定</translation>
     </message>
     <message>
         <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation>模块控制</translation>
     </message>
     <message>
         <location/>
         <source>Enable CameraStabilization module</source>
-        <translation type="unfinished"></translation>
+        <translation>开启相机稳定模块</translation>
     </message>
     <message>
         <location/>
         <source>After enabling the module, you must power cycle before using and configuring.</source>
-        <translation type="unfinished"></translation>
+        <translation>开启相机稳定模块后，请重启设备，再进行后续功能设置。</translation>
     </message>
     <message>
         <location/>
         <source>Basic Settings (Stabilization)</source>
-        <translation type="unfinished"></translation>
+        <translation>基本设置项（稳定）</translation>
     </message>
     <message>
         <location/>
@@ -4863,37 +4863,39 @@ p, li { white-space: pre-wrap; }
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>全量输出时，对应相机左右平移的最大角度。
+
+根据您的云台和舵机具体情况设置该值，并且在“Output”选项页中设置好相应输出端口的范围。</translation>
     </message>
     <message>
         <location/>
         <source>objname:CameraStabSettings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:OutputRange</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4901,12 +4903,14 @@ have to define channel output range using Output configuration tab.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>全量输出时，对应相机前后俯仰的最大角度。
+
+根据您的云台和舵机具体情况设置该值，并且在“Output”选项页中设置好相应输出端口的范围。</translation>
     </message>
     <message>
         <location/>
         <source>element:Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4914,88 +4918,96 @@ have to define channel output range using Output configuration tab.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>全量输出时，对应相机左右横滚的最大角度。
+
+根据您的云台和舵机具体情况设置该值，并且在“Output”选项页中设置好相应输出端口的范围。</translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>云台左右平移输出通道</translation>
     </message>
     <message>
         <location/>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location/>
         <source>Pitch output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>云台前后俯仰输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Roll output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>云台左右横滚输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Output Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished">方向</translation>
+        <translation>左右平移</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished">俯仰</translation>
+        <translation>前后俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished">横滚</translation>
+        <translation>左右横滚</translation>
     </message>
     <message>
         <location/>
         <source>Advanced Settings (Control)</source>
-        <translation type="unfinished"></translation>
+        <translation>高级设置项（控制）</translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera yaw
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>相机左右平移控制通道
+
+请在“Input”选项页中同时设置好相应的遥控器通道。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Input</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera pitch
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>相机前后俯仰控制通道
+
+请在“Input”选项页中同时设置好相应的遥控器通道。</translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera roll
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>相机左右横滚控制通道
+
+请在“Input”选项页中同时设置好相应的遥控器通道。</translation>
     </message>
     <message>
         <location/>
         <source>Input Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>控制器通道</translation>
     </message>
     <message>
         <location/>
@@ -5003,77 +5015,80 @@ Don&apos;t forget to map this channel using Input configuration tab.</source>
 
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式
+
+Attitude：相机自动绕轴保持稳定，遥控器控制偏移。
+AxisLock：相机保持绕轴转动量，遥控器控制偏移。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:StabilizationMode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Attitude</source>
-        <translation type="unfinished">姿态</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation>在Attitude模式下，遥控全量输入时，相机左右平移的最大偏移角度。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:InputRange</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，遥控全量输入时，相机左右平移的最大偏移角速度，单位：度/秒。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:InputRate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:ResponseTime</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation>在Attitude模式下，遥控全量输入时，相机前后俯仰的最大偏移角度。</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，遥控全量输入时，相机前后俯仰的最大偏移角速度，单位：度/秒。</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation>在Attitude模式下，遥控全量输入时，相机左右横滚的最大偏移角度。</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，遥控全量输入时，相机左右横滚的最大偏移角速度，单位：度/秒。</translation>
     </message>
     <message>
         <location/>
         <source>MaxAxisLockRate</source>
-        <translation type="unfinished"></translation>
+        <translation>轴转向速率阙值</translation>
     </message>
     <message>
         <location/>
         <source>Stabilization Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式</translation>
     </message>
     <message>
         <location/>
         <source>(the same value for Roll, Pitch, Yaw)</source>
-        <translation type="unfinished"></translation>
+        <translation>（同时作用于X，Y，Z三个转动轴向）</translation>
     </message>
     <message>
         <location/>
@@ -5085,32 +5100,34 @@ rate depending on input value.
 
 If you have drift in your Tx controls, you may want to increase this
 value.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，X，Y，Z三个轴向的转动速率死区， 单位：度/秒。
+
+当遥控操纵杆输入量小于或等于此值时，相机保持当前姿态，不响应输入控制。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation>信息</translation>
     </message>
     <message>
         <location/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>button:help</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5118,17 +5135,19 @@ value.</source>
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>重置相机稳定设置。
+
+重置后不会自动设置到控制板内，请点击“应用”或“保存”默认值。</translation>
     </message>
     <message>
         <location/>
         <source>Reset To Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>重置</translation>
     </message>
     <message>
         <location/>
         <source>button:default</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5138,82 +5157,85 @@ settings.
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>读取上一次保存到控制板上的相机稳定设置，如果您意外改动了
+设置，请使用此功能恢复正确设置。
+
+读取到的设置不会自动设置到控制板内，请点击“应用”或“保存”设置。</translation>
     </message>
     <message>
         <location/>
         <source>Reload Board Data</source>
-        <translation type="unfinished"></translation>
+        <translation>读取</translation>
     </message>
     <message>
         <location/>
         <source>button:reload</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到控制板，但不保存</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <location/>
         <source>button:apply</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到控制板并保存</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>button:save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Output Range (Angle)</source>
-        <translation type="unfinished"></translation>
+        <translation>移动范围（角度）</translation>
     </message>
     <message>
         <location/>
         <source>Pitch Or Servo2</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰/舵机2</translation>
     </message>
     <message>
         <location/>
         <source>Roll Or Servo1</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚/舵机1</translation>
     </message>
     <message>
         <location/>
         <source>Input Rate (Speed)</source>
-        <translation type="unfinished"></translation>
+        <translation>最大转动速率</translation>
     </message>
     <message>
         <location/>
         <source>Input Range (Angle)</source>
-        <translation type="unfinished"></translation>
+        <translation>最大转动角度</translation>
     </message>
     <message>
         <location/>
         <source>Expert Settings (Attitude Filter and Feed Forward)</source>
-        <translation type="unfinished"></translation>
+        <translation>专家设置项（姿态缓释与前馈）</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Filter RT</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定缓释响应时间</translation>
     </message>
     <message>
         <location/>
@@ -5222,7 +5244,11 @@ Apply or Save button afterwards.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚自稳缓慢释放响应时间量（设置时间范围内缓慢响应绕轴转动）
+
+范围：0至250毫秒，默认值为0，表示立即响应绕轴自稳。
+
+合理设置该参数可以使相机更平稳。</translation>
     </message>
     <message>
         <location/>
@@ -5231,7 +5257,11 @@ Smoothes estimated airframe attitude used by camera stabilization.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰自稳缓慢释放响应时间量（设置时间范围内缓慢响应绕轴转动）
+
+范围：0至250毫秒，默认值为0，表示立即响应绕轴自稳。
+
+合理设置该参数可以使相机更平稳。</translation>
     </message>
     <message>
         <location/>
@@ -5240,12 +5270,16 @@ Smoothes estimated airframe attitude used by camera stabilization.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移转动缓慢释放响应时间量（设置时间范围内响应绕轴转动）
+
+范围：0至250毫秒，默认值为0，表示立即响应绕轴自稳。
+
+合理设置该参数可以使相机更平稳。</translation>
     </message>
     <message>
         <location/>
         <source>FF Servo Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>舵机前馈加速度</translation>
     </message>
     <message>
         <location/>
@@ -5255,12 +5289,17 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚控制舵机前馈加速度
+
+范围：0至25，默认值为0，表示在此转动轴向上关闭前馈控制。
+
+建议从2至7开始设置，逐渐提高以达到满意结果。
+警告：设置过高可能会烧毁舵机！</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:FeedForward</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5270,7 +5309,12 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰控制舵机前馈加速度
+
+范围：0至25，默认值为0，表示在此转动轴向上关闭前馈控制。
+
+建议从2至7开始设置，逐渐提高以达到满意结果。
+警告：设置过高可能会烧毁舵机！</translation>
     </message>
     <message>
         <location/>
@@ -5280,74 +5324,91 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移控制舵机前馈加速度
+
+范围：0至25，默认值为0，表示在此转动轴向上关闭前馈控制。
+
+建议从2至7开始设置，逐渐提高以达到满意结果。
+警告：设置过高可能会烧毁舵机！</translation>
     </message>
     <message>
         <location/>
         <source>FF Accel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation>前馈加速时间常量</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚前馈加速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AccelTime</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰前馈加速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>Yaw servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移前馈加速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>FF Decel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation>前馈减速时间常量</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚前馈减速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:DecelTime</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰前馈减速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>Yaw servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移前馈减速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>Gimbal Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>云台类型：</translation>
     </message>
     <message>
         <location/>
@@ -5355,22 +5416,23 @@ Range: 0-50ms, default is 5.</source>
 
 Used to limit feed forward acceleration at extreme angles.
 Generic type provides no limit.</source>
-        <translation type="unfinished"></translation>
+        <translation>设置相应的云台类型，极端角度时用于限制前馈加速度。
+Generic类型表示不做限制。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:GimbalType</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw-Roll-Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>FF Max Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>最大前馈加速度</translation>
     </message>
     <message>
         <location/>
@@ -5379,17 +5441,21 @@ Generic type provides no limit.</source>
 Range: 0-1000, default is 500.
 
 The same value is used for all axes.</source>
-        <translation type="unfinished"></translation>
+        <translation>最大前馈加速度
+
+范围：0至1000，默认值为500.
+
+同时作用于X，Y，Z三个转动轴向。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAccel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Input configuration also provides smoothing for controls. Look for RT options on the RC Input tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Input设置页中对应输入通道的”RT“（响应时间）同样提供平滑控制功能。</translation>
     </message>
 </context>
 <context>
@@ -10542,7 +10608,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewgadgetfactory.cpp" line="+36"/>
         <source>ModelView</source>
-        <translation type="unfinished"></translation>
+        <translation>模型文件</translation>
     </message>
 </context>
 <context>

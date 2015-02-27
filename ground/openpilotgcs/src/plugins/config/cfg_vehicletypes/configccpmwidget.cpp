@@ -257,6 +257,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
 
     connect(m_aircraft->SwashLvlStartButton, SIGNAL(clicked()), this, SLOT(SwashLvlStartButtonPressed()));
     connect(m_aircraft->SwashLvlNextButton, SIGNAL(clicked()), this, SLOT(SwashLvlNextButtonPressed()));
+    connect(m_aircraft->SwashLvlPrevButton, SIGNAL(clicked()), this, SLOT(SwashLvlPrevButtonPressed()));
     connect(m_aircraft->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_aircraft->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
@@ -1094,6 +1095,7 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
 
         m_aircraft->SwashLvlStartButton->setEnabled(false);
         m_aircraft->SwashLvlNextButton->setEnabled(true);
+        m_aircraft->SwashLvlPrevButton->setEnabled(false);
         m_aircraft->SwashLvlCancelButton->setEnabled(true);
         m_aircraft->SwashLvlFinishButton->setEnabled(false);
         // clear status check boxes
@@ -1155,6 +1157,7 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
 
         m_aircraft->SwashLvlStartButton->setEnabled(true);
         m_aircraft->SwashLvlNextButton->setEnabled(false);
+        m_aircraft->SwashLvlPrevButton->setEnabled(false);
         m_aircraft->SwashLvlCancelButton->setEnabled(false);
         m_aircraft->SwashLvlFinishButton->setEnabled(false);
         break;
@@ -1164,15 +1167,24 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
     }
 }
 
+void ConfigCcpmWidget::SwashLvlPrevButtonPressed()
+{
+    SwashLvlState--;
+    SwashLvlPrevNextButtonPressed();
+}
+
 void ConfigCcpmWidget::SwashLvlNextButtonPressed()
 {
-    // ShowDisclaimer(2);
     SwashLvlState++;
-
+    SwashLvlPrevNextButtonPressed();
+}
+void ConfigCcpmWidget::SwashLvlPrevNextButtonPressed()
+{
     switch (SwashLvlState) {
     case 0:
         break;
     case 1: // Neutral levelling
+        m_aircraft->SwashLvlPrevButton->setEnabled(false);
         m_aircraft->SwashLvlStepList->setCurrentRow(0);
         // set spin boxes and swashplate servos to Neutral values
         setSwashplateLevel(50);
@@ -1192,6 +1204,7 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
             tr("<h2>Neutral levelling</h2><p>Using adjustment of:<ul><li>Servo horns,</li><li>Link lengths,</li><li>Neutral triming spinboxes to the right</li></ul><br>Ensure that the swashplate is in the center of desired travel range and is level."));
         break;
     case 2: // Max levelling
+        m_aircraft->SwashLvlPrevButton->setEnabled(true);
         // check Neutral status as complete
         m_aircraft->SwashLvlStepList->item(0)->setCheckState(Qt::Checked);
         m_aircraft->SwashLvlStepList->setCurrentRow(1);
@@ -1219,6 +1232,7 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
         break;
     case 4: // levelling verification
         // check Min status as complete
+        m_aircraft->SwashLvlNextButton->setEnabled(true);
         m_aircraft->SwashLvlStepList->item(2)->setCheckState(Qt::Checked);
         m_aircraft->SwashLvlStepList->setCurrentRow(3);
         // enable position slider
@@ -1252,6 +1266,7 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
 
         m_aircraft->SwashLvlStartButton->setEnabled(false);
         m_aircraft->SwashLvlNextButton->setEnabled(false);
+        m_aircraft->SwashLvlPrevButton->setEnabled(true);
         m_aircraft->SwashLvlCancelButton->setEnabled(true);
         m_aircraft->SwashLvlFinishButton->setEnabled(true);
 
@@ -1275,6 +1290,7 @@ void ConfigCcpmWidget::SwashLvlCancelButtonPressed()
 
     m_aircraft->SwashLvlStartButton->setEnabled(true);
     m_aircraft->SwashLvlNextButton->setEnabled(false);
+    m_aircraft->SwashLvlPrevButton->setEnabled(false);
     m_aircraft->SwashLvlCancelButton->setEnabled(false);
     m_aircraft->SwashLvlFinishButton->setEnabled(false);
 
@@ -1318,6 +1334,7 @@ void ConfigCcpmWidget::SwashLvlFinishButtonPressed()
 
     m_aircraft->SwashLvlStartButton->setEnabled(true);
     m_aircraft->SwashLvlNextButton->setEnabled(false);
+    m_aircraft->SwashLvlPrevButton->setEnabled(false);
     m_aircraft->SwashLvlCancelButton->setEnabled(false);
     m_aircraft->SwashLvlFinishButton->setEnabled(false);
 

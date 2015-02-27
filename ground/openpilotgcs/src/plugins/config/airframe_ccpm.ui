@@ -1968,14 +1968,42 @@ margin:1px;
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_9">
                 <property name="spacing">
-                 <number>0</number>
+                 <number>3</number>
+                </property>
+                <property name="leftMargin">
+                 <number>3</number>
                 </property>
                 <property name="topMargin">
                  <number>30</number>
                 </property>
+                <property name="rightMargin">
+                 <number>3</number>
+                </property>
                 <property name="bottomMargin">
                  <number>3</number>
                 </property>
+                <item>
+                 <widget class="QPushButton" name="SwashLvlPrevButton">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>85</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>85</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Prev</string>
+                  </property>
+                 </widget>
+                </item>
                 <item>
                  <widget class="QPushButton" name="SwashLvlStartButton">
                   <property name="minimumSize">
@@ -3240,7 +3268,6 @@ margin:1px;</string>
   <tabstop>ccpmCollectiveSlider</tabstop>
   <tabstop>ccpmCollectivespinBox</tabstop>
   <tabstop>SwashplateImage</tabstop>
-  <tabstop>SwashLvlStartButton</tabstop>
   <tabstop>SwashLvlNextButton</tabstop>
   <tabstop>SwashLvlStepInstruction</tabstop>
   <tabstop>SwashLvlCancelButton</tabstop>

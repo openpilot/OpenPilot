@@ -553,8 +553,12 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
         newconfig.enableGPS     = false;
         newconfig.enableGLONASS = true;
         break;
-    default:
+    case GPSSETTINGS_UBXGNSSMODE_GPS:
         newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        break;
+    default:
+        newconfig.enableGPS     = false;
         newconfig.enableGLONASS = false;
         break;
     }

@@ -296,8 +296,13 @@ static void configure(uint16_t *bytes_to_send)
         config_nav(bytes_to_send);
         break;
     case LAST_CONFIG_SENT_START + 2:
-        config_gnss(bytes_to_send);
-        break;
+        if (status->currentSettings.enableGLONASS || status->currentSettings.enableGPS) {
+            config_gnss(bytes_to_send);
+            break;
+        } else {
+            // Skip and fall through to next step
+            status->lastConfigSent++;
+        }
     case LAST_CONFIG_SENT_START + 3:
         config_sbas(bytes_to_send);
         if (!status->currentSettings.storeSettings) {

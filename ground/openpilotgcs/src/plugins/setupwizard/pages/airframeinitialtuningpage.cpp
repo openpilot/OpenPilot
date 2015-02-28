@@ -172,6 +172,7 @@ bool AirframeInitialTuningPage::airframeIsCompatible(int vehicleType, int vehicl
 void AirframeInitialTuningPage::loadFilesInDir(QString templateBasePath)
 {
     QDir templateDir(templateBasePath);
+
     qDebug() << "Loading templates from base path:" << templateBasePath;
     QStringList names;
     names << "*.optmpl";

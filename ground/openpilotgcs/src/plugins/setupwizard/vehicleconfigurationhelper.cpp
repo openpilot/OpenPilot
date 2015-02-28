@@ -151,7 +151,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             break;
         case VehicleConfigurationSource::INPUT_PPM:
             if (m_configSource->getEscType() == VehicleConfigurationSource::ESC_ONESHOT ||
-                    m_configSource->getEscType() == VehicleConfigurationSource::ESC_RAPID) {
+                m_configSource->getEscType() == VehicleConfigurationSource::ESC_RAPID) {
                 data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM_PIN8ONESHOT;
             } else {
                 data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPMNOONESHOT;
@@ -380,10 +380,10 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         if ((m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
              m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) &&
             m_configSource->getInputType() == VehicleConfigurationSource::INPUT_PWM) {
-            bankMode = ActuatorSettings::BANKMODE_PWM;
+            bankMode     = ActuatorSettings::BANKMODE_PWM;
             escFrequence = RAPID_ESC_FREQUENCY;
         } else {
-            bankMode = ActuatorSettings::BANKMODE_PWMSYNC;
+            bankMode     = ActuatorSettings::BANKMODE_PWMSYNC;
             escFrequence = PWMSYNC_ESC_FREQUENCY;
         }
         break;

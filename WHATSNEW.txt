@@ -38,7 +38,7 @@ Release Notes - OpenPilot - Version RELEASE-15.02
 
 ** Improvement
     * [OP-1576] - Remove tx resent accounting from OPlink
-    * [OP-1635] - Remove Quah H from wizard to avoid confusion with Quad X
+    * [OP-1635] - Remove Quad H from wizard to avoid confusion with Quad X
     * [OP-1650] - Reduce telemetry to improve OPLink
     * [OP-1658] - Sensor driver API and overhaul of sensor module
     * [OP-1683] - Support synchronous (OneShot) and OneShot125 output mode

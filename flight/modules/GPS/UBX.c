@@ -107,7 +107,7 @@ struct UBX_ACK_NAK ubxLastNak;
 #define UBX_PVT_TIMEOUT (1000)
 // parse incoming character stream for messages in UBX binary format
 
-int parse_ubx_stream(uint8_t *rx, uint8_t len, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
+int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
 {
     int ret = PARSER_INCOMPLETE; // message not (yet) complete
     enum proto_states {
@@ -124,7 +124,7 @@ int parse_ubx_stream(uint8_t *rx, uint8_t len, char *gps_rx_buffer, GPSPositionS
     };
     uint8_t c;
     static enum proto_states proto_state = START;
-    static uint8_t rx_count = 0;
+    static uint16_t rx_count = 0;
     struct UBXPacket *ubx   = (struct UBXPacket *)gps_rx_buffer;
 
     for (int i = 0; i < len; i++) {

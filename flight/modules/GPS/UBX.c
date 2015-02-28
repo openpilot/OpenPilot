@@ -125,7 +125,7 @@ int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPosition
     uint8_t c;
     static enum proto_states proto_state = START;
     static uint16_t rx_count = 0;
-    struct UBXPacket *ubx   = (struct UBXPacket *)gps_rx_buffer;
+    struct UBXPacket *ubx    = (struct UBXPacket *)gps_rx_buffer;
 
     for (int i = 0; i < len; i++) {
         c = rx[i];

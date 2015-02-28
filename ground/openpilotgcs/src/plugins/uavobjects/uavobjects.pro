@@ -98,6 +98,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.h \
+    $$UAVOBJECT_SYNTHETICS/groundpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/ratedesired.h \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.h \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
@@ -206,6 +207,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/groundpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/ratedesired.cpp \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.cpp \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \

@@ -58,6 +58,7 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
+#include <groundpathfollowersettings.h>
 #include <fixedwingpathfollowersettings.h>
 #include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
@@ -87,6 +88,7 @@ extern "C" {
 #include "PathFollowerControlBrake.h"
 #include "PathFollowerControlFly.h"
 #include "FixedWingControlFly.h"
+#include "GroundDriveController.h"
 
 // Private constants
 
@@ -107,6 +109,7 @@ static FrameType_t frameType;
 static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
+static GroundPathFollowerSettingsData groundPathFollowerSettings;
 static VtolPathFollowerSettingsData vtolPathFollowerSettings;
 static FlightStatusData flightStatus;
 static PathFollowerControl *activeController = 0;
@@ -140,6 +143,7 @@ int32_t PathFollowerStart()
 int32_t PathFollowerInitialize()
 {
     // initialize objects
+    GroundPathFollowerSettingsInitialize();
     FixedWingPathFollowerSettingsInitialize();
     FixedWingPathFollowerStatusInitialize();
     VtolPathFollowerSettingsInitialize();
@@ -169,6 +173,7 @@ int32_t PathFollowerInitialize()
     PathFollowerControlVelocityRoam::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
     PathFollowerControlFly::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
     FixedWingControlFly::instance()->Initialize(&fixedWingPathFollowerSettings, &pathDesired, &pathStatus);
+    GroundDriveController::instance()->Initialize(&groundPathFollowerSettings, &pathDesired, &pathStatus);
     PathFollowerControlBrake::instance()->Initialize((PathFollowerFSM *)FSMBrake::instance(),
                                                      &vtolPathFollowerSettings,
                                                      &pathDesired,
@@ -178,6 +183,7 @@ int32_t PathFollowerInitialize()
     // Create object queue
     pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_PATHFOLLOWER, STACK_SIZE_BYTES);
     FixedWingPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
+    GroundPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
     VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
     PathDesiredConnectCallback(&pathFollowerObjectiveUpdatedCb);
     FlightStatusConnectCallback(&flightStatusUpdatedCb);
@@ -237,7 +243,22 @@ static void pathFollowerSetActiveController(void)
                break;
            }
            break;
-          break;
+
+        case FRAME_TYPE_GROUND:
+
+          switch (pathDesired.Mode) {
+           case PATHDESIRED_MODE_DRIVEENDPOINT:
+           case PATHDESIRED_MODE_DRIVEVECTOR:
+           case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
+           case PATHDESIRED_MODE_DRIVECIRCLELEFT:
+               activeController = GroundDriveController::instance();
+               activeController->Activate();
+               break;
+           default:
+               activeController = 0;
+               break;
+           }
+           break;
 
         default:
             activeController = 0;
@@ -326,17 +347,21 @@ static void flightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     FixedWingPathFollowerSettingsGet(&fixedWingPathFollowerSettings);
+    GroundPathFollowerSettingsGet(&groundPathFollowerSettings);
     VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
 
     frameType = GetCurrentFrameType();
 
-    if (frameType == FRAME_TYPE_CUSTOM || frameType == FRAME_TYPE_GROUND) {
+    if (frameType == FRAME_TYPE_CUSTOM) {
         switch (vtolPathFollowerSettings.TreatCustomCraftAs) {
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
             frameType = FRAME_TYPE_FIXED_WING;
             break;
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
             frameType = FRAME_TYPE_MULTIROTOR;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
+            frameType = FRAME_TYPE_GROUND;
             break;
         }
     }
@@ -346,6 +371,11 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         updatePeriod = vtolPathFollowerSettings.UpdatePeriod;
         break;
     case FRAME_TYPE_FIXED_WING:
+        updatePeriod = fixedWingPathFollowerSettings.UpdatePeriod;
+        break;
+    case FRAME_TYPE_GROUND:
+        updatePeriod = groundPathFollowerSettings.UpdatePeriod;
+      break;
     default:
         updatePeriod = fixedWingPathFollowerSettings.UpdatePeriod;
         break;

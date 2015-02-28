@@ -398,7 +398,7 @@ void ConfigCcpmWidget::UpdateType()
 
     // Clear advanced settings table if not Custom selected (Keep previous settings)
     if (TypeText.compare(QString::fromUtf8("Custom - Advanced Settings"), Qt::CaseInsensitive) != 0) {
-    m_aircraft->ccpmAdvancedSettingsTable->clearFocus();
+        m_aircraft->ccpmAdvancedSettingsTable->clearFocus();
     }
 
     m_aircraft->ccpmAngleW->setEnabled(TypeInt == 1);
@@ -695,7 +695,7 @@ void ConfigCcpmWidget::UpdateMixer()
             ;
         }
     }
-    int TypeInt  = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
+    int TypeInt = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
     if (TypeInt != 0) { // not advanced settings
         // get the channel data from the ui
         MixerChannelData[0] = m_aircraft->ccpmEngineChannel->currentIndex();
@@ -796,7 +796,7 @@ void ConfigCcpmWidget::UpdateMixer()
                 Channel = QString((int)ConfigCcpmWidget::CHANNEL_NUMELEM + 1);
             }
             MixerChannelData[i] = Channel.toInt();
-        } 
+        }
     }
 }
 

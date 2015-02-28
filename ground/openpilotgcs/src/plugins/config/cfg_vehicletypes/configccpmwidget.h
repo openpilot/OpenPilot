@@ -120,7 +120,9 @@ private slots:
     void UpdateType();
 
     void SwashLvlStartButtonPressed();
+    void SwashLvlPrevButtonPressed();
     void SwashLvlNextButtonPressed();
+    void SwashLvlPrevNextButtonPressed();
     void SwashLvlCancelButtonPressed();
     void SwashLvlFinishButtonPressed();
 

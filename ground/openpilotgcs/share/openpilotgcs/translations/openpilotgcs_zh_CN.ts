@@ -1610,7 +1610,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Beware! Check &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:600;&quot;&gt;all three&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt; checkboxes to test Feed Forward.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;It will run only if your airframe armed.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;注意！勾选&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:600;&quot;&gt;全部三个&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;多选框以确认继续操作。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;只有当飞行器解锁以后才能生效。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -1672,7 +1677,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -2030,7 +2035,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Telemetry</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2525,12 +2530,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+57"/>
         <source>settings</source>
-        <translation>配置</translation>
+        <translation>设置</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
         <source>IP Network Telemetry</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5402,7 +5407,7 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>Messages</source>
-        <translation></translation>
+        <translation>信息</translation>
     </message>
     <message>
         <location/>
@@ -5412,7 +5417,7 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>Telemetry speed:</source>
-        <translation>管理端口速率：</translation>
+        <translation>Telemetry波特率：</translation>
     </message>
     <message>
         <location/>
@@ -5437,7 +5442,7 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>USB VCP Port</source>
-        <translation></translation>
+        <translation>USB VCP端口</translation>
     </message>
     <message>
         <source>RcvrPort</source>
@@ -5575,7 +5580,8 @@ A setting of 0.00 disables the filter.</source>
 过滤加速度传感器偏移误差。
 设置适当的阙值可以有效过滤传感器偏移误差，提升飞行器自稳性能。
 
-范围：0.00到0.20，通常设置在0.05至0.10区间比较好
+范围：0.00到0.20，通常可以尝试从0.05至0.10区间开始，
+逐渐提高，直到偏移消除。
 
 设定0.00关闭该功能。</translation>
     </message>
@@ -5916,7 +5922,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;姿态校准&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;当前未检测到任何OpenPilot设备，请将设备通过管理端口与GCS连接后开始进行校准。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;当前未检测到任何OpenPilot设备，请将设备通过USB端口或telemetry与GCS连接后开始进行校准。&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
@@ -5943,7 +5949,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;硬件设置&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;当前未检测到任何OpenPilot设备，请将设备通过管理端口与GCS连接。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;当前未检测到任何OpenPilot设备，请将设备通过USB端口或Telemetry与GCS连接。&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
@@ -6096,7 +6102,7 @@ channel value for each flight mode.</source>
         <source>After the time indicated here, the frame go back to disarmed state.
 Set to 0 to disable (recommended for soaring fixed wings).</source>
         <translation>经过这段时间间隔后，飞行器将重新被置为锁定状态。
-设置0将不会再次锁定（建议飞得又高又远的固定翼飞行器设置为0，不要锁定）。</translation>
+设置0将不会再次锁定（建议固定翼飞行器设置为0，不要锁定）。</translation>
     </message>
     <message>
         <location/>
@@ -6577,7 +6583,7 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
     <message>
         <location/>
         <source>GroupBox</source>
-        <translation>输出集</translation>
+        <translation>输出设置</translation>
     </message>
     <message>
         <location/>
@@ -8746,22 +8752,22 @@ only when system is armed without disabling the module.</source>
     <message>
         <location filename="../../../src/plugins/serialconnection/serialpluginoptions.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Serial Connection</source>
-        <translation type="unfinished">串口连接</translation>
+        <translation>串口连接</translation>
     </message>
     <message>
         <location/>
         <source>Serial telemetry speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>串口telemetry波特率：</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/serialconnection/serialpluginoptionspage.h" line="+61"/>
         <source>settings</source>
-        <translation type="unfinished"></translation>
+        <translation>设置</translation>
     </message>
 </context>
 <context>
@@ -9347,7 +9353,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot设置保存&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;设置向导准备将设置信息写入到OpenPilot设备中。 &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;保存结束后，OpenPilot设备可能会重启以激活某些设置项。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;保存结束后，OpenPilot设备可能会重启以激活设置项。&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请点击下方“Save”按钮保存设置。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -9806,7 +9812,7 @@ to bootloader mode.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
         <translation>终止控制板上运行着的操作系统和控制程序，返回到bootloader模式（类似PC的BIOS）
-(请确保控制板已经通过串口或USB成功连接)</translation>
+(请确保控制板已经通过Telemetry成功连接)</translation>
     </message>
     <message>
         <location/>
@@ -9824,7 +9830,7 @@ menu on the right.</source>
         <translation>启动系统。
 只有控制板处于bootloader模式（控制板上绿色LED常亮，蓝色LED慢速闪烁）才有用。
 
-从右边的下拉菜单中选择适当的连接方式。
+如果Telemetry连接尚未建立，请从右边的下拉菜单中选择一项正确的连接方式。
 </translation>
     </message>
     <message>
@@ -9843,7 +9849,7 @@ menu on the right.</source>
         <translation>启动系统进入安全模式（使用默认设置）。
 （控制板上蓝色LED慢速闪烁，橙色LED不亮）
 
-从右边的下拉菜单中选择适当的连接方式。</translation>
+如果Telemetry连接尚未建立，请从右边的下拉菜单中选择一项正确的连接方式。</translation>
     </message>
     <message>
         <location/>
@@ -9856,7 +9862,7 @@ menu on the right.</source>
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
         <translation>重启系统。
-（当设备通过串口或USB连接成功后才能发送该命令）</translation>
+（当设备通过Telemetry连接成功后才能使用此命令）</translation>
     </message>
     <message>
         <location/>
@@ -9885,7 +9891,7 @@ method using this combo box.
 You can use this to force a communication channel when doing
 a &quot;Boot&quot; (button on the left). It is updated automatically when
 halting a running board.</source>
-        <translation>如果管理端口尚未连接控制板，请从下拉菜单中选择一项正确的连接方式。
+        <translation>如果Telemetry连接尚未建立，请从右边的下拉菜单中选择一项正确的连接方式。
 
 你也可以在重启系统过程中（点击左边“重启系统”按钮）强制指定一种连接方式。
 执行“终止系统”后，该选项会自动更新为当前连接方式。</translation>
@@ -9984,8 +9990,8 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;请按照下列步骤升级固件或者升级固件并清除设置：&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- 连接管理端口；&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- 当系统识别到设备后，点击上面&amp;quot;终止系统&amp;quot;按钮；&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- 连接Telemetry；&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- 当系统成功识别设备后，点击上面&amp;quot;终止系统&amp;quot;按钮；&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- 你将会看到一份设备列表清单；&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- 你可以将固件烧写到设备中，也可以将设备上的固件备份到电脑里；&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- 操作结束后，请点击&amp;quot;启动系统&amp;quot;。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
@@ -10125,27 +10131,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+91"/>
         <source>Enable GPS module and reboot the board to be able to select GPS protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>设备将在重启后才能选择GPS协议</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Warning: you have configured more than one DebugConsole, this currently is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>注意：不支持同时选择两个以上端口作为DebugConsole</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Warning: you have configured both MainPort and FlexiPort for the same function, this currently is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>注意：MainPort和FlexiPort不能同时配置为相同功能接口</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Warning: you have configured both USB HID Port and USB VCP Port for the same function, this currently is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>注意：USB HID端口和VCP端口不能同时配置为相同功能接口</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Warning: you have disabled USB Telemetry on both USB HID Port and USB VCP Port, this currently is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>注意：不允许将USBTelemetry功能从USB HID和VCP端口上同时关闭</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -14875,7 +14881,7 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
     <message>
         <location filename="../../../src/plugins/telemetry/monitorgadgetfactory.cpp" line="+39"/>
         <source>Telemetry Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Telemetry</translation>
     </message>
 </context>
 <context>
@@ -15271,6 +15277,80 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
         <location line="+0"/>
         <source>To apply the changes when binding/unbinding the board must be rebooted or power cycled.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>InputWizardWidget</name>
+    <message>
+        <source>Welcome to the inputs configuration wizard.
+
+Please follow the instructions on the screen and only move your controls when asked to.
+Make sure you already configured your hardware settings on the proper tab and restarted your board.
+
+You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
+</source>
+        <translation type="obsolete">欢迎使用遥控输入设置向导。
+
+请按照屏幕上提示的指令操作遥控器。
+
+设置过程中你可以随时点击“上一步”返回上一设置界面，也可以点击“取消”退出设置向导。
+</translation>
+    </message>
+    <message>
+        <source>Please choose your transmitter type:</source>
+        <translation type="obsolete">请选择遥控类型：</translation>
+    </message>
+    <message>
+        <source>Acro: normal transmitter for fixed-wing or quad</source>
+        <translation type="obsolete">Acro：固定翼和多轴飞行器</translation>
+    </message>
+    <message>
+        <source>Helicopter: has collective pitch and throttle input</source>
+        <translation type="obsolete">Helicopter：直升机（油门和俯仰混控）</translation>
+    </message>
+    <message>
+        <source>Please choose your transmitter mode:</source>
+        <translation type="obsolete">请选择遥控器模式：</translation>
+    </message>
+    <message>
+        <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
+        <translation type="obsolete">对于多轴飞行器，升降舵相当于俯仰，副翼相当于横滚。</translation>
+    </message>
+    <message>
+        <source>Please center all controls and trims and press Next when ready.
+
+If your FlightMode switch has only two positions, leave it in either position.</source>
+        <translation type="obsolete">请将所有摇杆和控制钮放置在中间位置。
+
+如果您的飞行模式按钮只有两个档位，请放置在任意一个档位上。</translation>
+    </message>
+    <message>
+        <source>Please move all controls to their maximum extents on both directions.
+
+Press Next when ready.</source>
+        <translation type="obsolete">请拨动所有摇杆和控制钮，移动范围涵盖它们的最大行程空间。
+
+完成后请点击“下一步”继续。</translation>
+    </message>
+    <message>
+        <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
+        <translation type="obsolete">拨动摇杆并观察图中显示的移动方向，如果需要，请勾选下方对应选框设置逆转，完成后请点击“下一步”继续。</translation>
+    </message>
+    <message>
+        <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
+
+IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
+        <translation type="obsolete">遥控器校准结束，请拨动遥控器摇杆和控制钮，观察下方动画与操作是否完全一致。
+
+注意：遥控器校准结果尚未保存，请点击“下一步”进入“解锁设置”页，将解锁动作设置好以后，再点击”保存“按钮将所有遥控器输入设置信息保存。</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="obsolete">上一步</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="obsolete">取消</translation>
     </message>
 </context>
 </TS>

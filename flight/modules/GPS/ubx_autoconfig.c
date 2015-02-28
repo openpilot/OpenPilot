@@ -422,8 +422,9 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
             // Continue with next configuration option
             status->retryCount = 0;
             status->lastConfigSent++;
-        } else if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_REPLY_TIMEOUT) {
-            // timeout, resend the message or abort
+        } else if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_REPLY_TIMEOUT ||
+                   (ubxLastNak.clsID == status->requiredAck.clsID && ubxLastNak.msgID == status->requiredAck.msgID)) {
+            // timeout or NAK, resend the message or abort
             status->retryCount++;
             if (status->retryCount > UBX_MAX_RETRIES) {
                 status->currentStep = INIT_STEP_ERROR;

@@ -414,7 +414,7 @@ static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) 
 
     svdata.SatsInView = 0;
     for (chan = 0; chan < svinfo->numCh; chan++) {
-        if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM) {
+        if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM && svinfo->sv[chan].cno > 0) {
             svdata.Azimuth[svdata.SatsInView]   = svinfo->sv[chan].azim;
             svdata.Elevation[svdata.SatsInView] = svinfo->sv[chan].elev;
             svdata.PRN[svdata.SatsInView] = svinfo->sv[chan].svid;

@@ -73,7 +73,7 @@ private slots:
     void on_calibrateAllMotors_toggled(bool checked);
 
 private:
-    enum ElementType{ FULL, FRAME, MOTOR, SERVO };
+    enum ElementType { FULL, FRAME, MOTOR, SERVO };
     void setupVehicle();
     void startWizard();
     void setupVehicleItems();

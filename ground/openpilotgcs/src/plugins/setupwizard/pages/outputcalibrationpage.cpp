@@ -46,7 +46,7 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
     connect(ui->calibrateAllMotors, SIGNAL(toggled(bool)), this, SLOT(calibrateAllMotorsChanged()));
 
     // move the code that was here to setupVehicle() so we can determine which image to use.
-    m_vehicleScene    = new QGraphicsScene(this);
+    m_vehicleScene = new QGraphicsScene(this);
     ui->vehicleView->setScene(m_vehicleScene);
 }
 
@@ -407,8 +407,8 @@ bool OutputCalibrationPage::validatePage()
     if (!isFinished()) {
         m_currentWizardIndex++;
         if (ui->calibrateAllMotors->isChecked() &&
-                m_currentWizardIndex > 0 &&
-                m_wizardIndexes[m_currentWizardIndex - 1] == 1) {
+            m_currentWizardIndex > 0 &&
+            m_wizardIndexes[m_currentWizardIndex - 1] == 1) {
             while (!isFinished() && m_wizardIndexes[m_currentWizardIndex] == 1) {
                 m_currentWizardIndex++;
             }
@@ -465,7 +465,7 @@ void OutputCalibrationPage::customBackClicked()
 void OutputCalibrationPage::getCurrentChannels(QList<quint16> &channels)
 {
     if (ui->calibrateAllMotors->isChecked()) {
-        for(int i = 1; i < m_channelIndex.size(); i++) {
+        for (int i = 1; i < m_channelIndex.size(); i++) {
             if (m_vehicleElementTypes[i + 1] == MOTOR) {
                 channels << m_channelIndex[i];
             }
@@ -630,7 +630,7 @@ void OutputCalibrationPage::on_servoButton_toggled(bool checked)
 void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
 {
     Q_UNUSED(position);
-    quint16 value   = ui->servoCenterAngleSlider->value();
+    quint16 value = ui->servoCenterAngleSlider->value();
     m_calibrationUtil->setChannelOutputValue(value);
 
     QList<quint16> currentChannels;

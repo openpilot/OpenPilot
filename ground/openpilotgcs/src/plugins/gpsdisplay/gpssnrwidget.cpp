@@ -105,11 +105,13 @@ void GpsSnrWidget::drawSat(int index)
         QRectF boxRect = boxes[index]->boundingRect();
 
         // Change color for SBAS sat (Egnos, etc..) 120 - 158 range
-        // GLONASS range 65-96 or 255
+        // GLONASS range 65-96 or 255, BeiDou 33-64 or 159-163
         if (prn > 119 && prn < 159) {
             boxes[index]->setBrush(QColor("#fd700b"));
         } else if ((prn > 64 && prn < 97) || 255 == prn) {
             boxes[index]->setBrush(QColor("Cyan"));
+        } else if ((prn > 32 && prn < 65) || (prn > 158 && prn < 164)) {
+            boxes[index]->setBrush(QColor("Red"));
         } else {
             boxes[index]->setBrush(QColor("Green"));
         }

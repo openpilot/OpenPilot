@@ -43,8 +43,6 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
     qDebug() << "calling output calibration page";
     m_vehicleRenderer = new QSvgRenderer();
 
-    connect(ui->calibrateAllMotors, SIGNAL(toggled(bool)), this, SLOT(calibrateAllMotorsChanged()));
-
     // move the code that was here to setupVehicle() so we can determine which image to use.
     m_vehicleScene = new QGraphicsScene(this);
     ui->vehicleView->setScene(m_vehicleScene);

@@ -73,6 +73,7 @@ private slots:
     void on_calibrateAllMotors_toggled(bool checked);
 
 private:
+    enum ElementType{ FULL, FRAME, MOTOR, SERVO };
     void setupVehicle();
     void startWizard();
     void setupVehicleItems();
@@ -94,6 +95,7 @@ private:
     qint16 m_currentWizardIndex;
 
     QList<QString> m_vehicleElementIds;
+    QList<ElementType> m_vehicleElementTypes;
     QList<QGraphicsSvgItem *> m_vehicleItems;
     QList<quint16> m_vehicleHighlightElementIndexes;
     QList<quint16> m_channelIndex;

@@ -114,6 +114,7 @@ void OutputCalibrationPage::setupVehicle()
     m_actuatorSettings = getWizard()->getActuatorSettings();
     m_wizardIndexes.clear();
     m_vehicleElementIds.clear();
+    m_vehicleElementTypes.clear();
     m_vehicleHighlightElementIndexes.clear();
     m_channelIndex.clear();
     m_currentWizardIndex = 0;
@@ -133,6 +134,9 @@ void OutputCalibrationPage::setupVehicle()
         // All element ids to load from the svg file and manage.
         m_vehicleElementIds << "tri" << "tri-frame" << "tri-m1" << "tri-m2" << "tri-m3" << "tri-s1";
 
+        // The type of each element.
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR << MOTOR << SERVO;
+
         // The index of the elementId to highlight ( not dim ) for each step
         // this is the index in the m_vehicleElementIds - 1.
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
@@ -148,6 +152,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "quad-x" << "quad-x-frame" << "quad-x-m1" << "quad-x-m2" << "quad-x-m3" << "quad-x-m4";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR << MOTOR << MOTOR;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
         setupActuatorMinMaxAndNeutral(0, 3, 4);
@@ -156,6 +161,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "quad-p" << "quad-p-frame" << "quad-p-m1" << "quad-p-m2" << "quad-p-m3" << "quad-p-m4";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR << MOTOR << MOTOR;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
         setupActuatorMinMaxAndNeutral(0, 3, 4);
@@ -164,6 +170,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa" << "hexa-frame" << "hexa-m1" << "hexa-m2" << "hexa-m3" << "hexa-m4" << "hexa-m5" << "hexa-m6";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         setupActuatorMinMaxAndNeutral(0, 5, 6);
@@ -172,6 +179,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa-y6" << "hexa-y6-frame" << "hexa-y6-m2" << "hexa-y6-m1" << "hexa-y6-m4" << "hexa-y6-m3" << "hexa-y6-m6" << "hexa-y6-m5";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR;
         m_vehicleHighlightElementIndexes << 0 << 2 << 1 << 4 << 3 << 6 << 5;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         setupActuatorMinMaxAndNeutral(0, 5, 6);
@@ -180,6 +188,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa-h" << "hexa-h-frame" << "hexa-h-m1" << "hexa-h-m2" << "hexa-h-m3" << "hexa-h-m4" << "hexa-h-m5" << "hexa-h-m6";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         setupActuatorMinMaxAndNeutral(0, 5, 6);
@@ -188,6 +197,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa-x" << "hexa-x-frame" << "hexa-x-m1" << "hexa-x-m2" << "hexa-x-m3" << "hexa-x-m4" << "hexa-x-m5" << "hexa-x-m6";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR << MOTOR;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         setupActuatorMinMaxAndNeutral(0, 5, 6);
@@ -197,6 +207,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(FIXEDWING_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2;
         m_vehicleElementIds << "aileron" << "aileron-frame" << "aileron-motor" << "aileron-ail-left" << "aileron-ail-right" << "aileron-elevator" << "aileron-rudder";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << SERVO << SERVO << SERVO << SERVO;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
         m_channelIndex << 0 << 2 << 0 << 5 << 1 << 3;
 
@@ -208,6 +219,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(FIXEDWING_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2 << 2 << 2;
         m_vehicleElementIds << "aileron-single" << "ail2-frame" << "ail2-motor" << "ail2-aileron" << "ail2-elevator" << "ail2-rudder";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << SERVO << SERVO << SERVO;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 2 << 0 << 1 << 3;
 
@@ -219,6 +231,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(FIXEDWING_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2 << 2;
         m_vehicleElementIds << "elevon" << "elevon-frame" << "elevon-motor" << "elevon-left" << "elevon-right";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << SERVO << SERVO;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3;
         m_channelIndex << 0 << 2 << 0 << 1;
 
@@ -230,6 +243,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(FIXEDWING_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2;
         m_vehicleElementIds << "vtail" << "vtail-frame" << "vtail-motor" << "vtail-ail-left" << "vtail-ail-right" << "vtail-rudder-left" << "vtail-rudder-right";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << SERVO << SERVO << SERVO << SERVO;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
         m_channelIndex << 0 << 2 << 0 << 5 << 3 << 1;
 
@@ -243,6 +257,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(GROUND_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2;
         m_vehicleElementIds << "car" << "car-frame" << "car-motor" << "car-steering";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << SERVO;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2;
         m_channelIndex << 0 << 1 << 0;
 
@@ -254,6 +269,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(GROUND_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1;
         m_vehicleElementIds << "tank" << "tank-frame" << "tank-left-motor" << "tank-right-motor";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << MOTOR;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2;
         m_channelIndex << 0 << 0 << 1;
 
@@ -265,6 +281,7 @@ void OutputCalibrationPage::setupVehicle()
         loadSVGFile(GROUND_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2;
         m_vehicleElementIds << "motorbike" << "motorbike-frame" << "motorbike-motor" << "motorbike-steering";
+        m_vehicleElementTypes << FULL << FRAME << MOTOR << SERVO;
         m_vehicleHighlightElementIndexes << 0 << 1 << 2;
         m_channelIndex << 0 << 1 << 0;
 
@@ -322,7 +339,7 @@ void OutputCalibrationPage::setupVehicleHighlightedPart()
 
     for (int i = 0; i < m_vehicleItems.size(); i++) {
         QGraphicsSvgItem *item = m_vehicleItems[i];
-        if (highlightedIndex == i || (ui->calibrateAllMotors->isChecked() && m_wizardIndexes[m_currentWizardIndex] == 1)) {
+        if (highlightedIndex == i || (ui->calibrateAllMotors->isChecked() && m_vehicleElementTypes[i] == MOTOR)) {
             item->setOpacity(highlightOpaque);
         } else {
             item->setOpacity(dimOpaque);
@@ -672,6 +689,7 @@ void OutputCalibrationPage::on_reverseCheckbox_toggled(bool checked)
 
 void OutputCalibrationPage::on_calibrateAllMotors_toggled(bool checked)
 {
+    Q_UNUSED(checked);
     setupVehicleHighlightedPart();
 }
 

@@ -357,7 +357,9 @@ void OutputCalibrationPage::setWizardPage()
     qDebug() << "Current page: " << currentPageIndex;
     ui->calibrationStack->setCurrentIndex(currentPageIndex);
 
-    int currentChannel = getCurrentChannel();
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    int currentChannel = currentChannels[0];
     qDebug() << "Current channel: " << currentChannel + 1;
     if (currentChannel >= 0) {
         if (currentPageIndex == 1) {
@@ -460,9 +462,17 @@ void OutputCalibrationPage::customBackClicked()
     }
 }
 
-quint16 OutputCalibrationPage::getCurrentChannel()
+void OutputCalibrationPage::getCurrentChannels(QList<quint16> &channels)
 {
-    return m_channelIndex[m_currentWizardIndex];
+    if (ui->calibrateAllMotors->isChecked()) {
+        for(int i = 1; i < m_channelIndex.size(); i++) {
+            if (m_vehicleElementTypes[i + 1] == MOTOR) {
+                channels << m_channelIndex[i];
+            }
+        }
+    } else {
+        channels << m_channelIndex[m_currentWizardIndex];
+    }
 }
 
 void OutputCalibrationPage::enableAllMotorsCheckBox(bool enable)
@@ -490,35 +500,43 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
 {
     ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
     ui->motorNeutralSlider->setEnabled(checked);
-    quint16 channel   = getCurrentChannel();
-    quint16 safeValue = m_actuatorSettings[channel].channelMin;
 
-    if (m_actuatorSettings[channel].isReversableMotor) {
-        safeValue = m_actuatorSettings[channel].channelNeutral;
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    quint16 currentChannel = currentChannels[0];
+
+    quint16 safeValue = m_actuatorSettings[currentChannel].channelMin;
+
+    if (m_actuatorSettings[currentChannel].isReversableMotor) {
+        safeValue = m_actuatorSettings[currentChannel].channelNeutral;
     }
 
-    onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, safeValue, ui->motorNeutralSlider);
+    onStartButtonToggle(ui->motorNeutralButton, currentChannels, m_actuatorSettings[currentChannel].channelNeutral, safeValue, ui->motorNeutralSlider);
 }
 
-void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider)
+void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, QList<quint16> &channels,
+                                                quint16 value, quint16 safeValue, QSlider *slider)
 {
     if (button->isChecked()) {
+        // Start calibration
         if (checkAlarms()) {
             enableButtons(false);
             enableServoSliders(true);
-            m_calibrationUtil->startChannelOutput(channel, safeValue);
+            m_calibrationUtil->startChannelOutput(channels, safeValue);
             slider->setValue(value);
             m_calibrationUtil->setChannelOutputValue(value);
         } else {
             button->setChecked(false);
         }
     } else {
-        // Servos and ReversableMotors
-        m_calibrationUtil->startChannelOutput(channel, m_actuatorSettings[channel].channelNeutral);
-
-        // Normal motor
+        // Stop calibration
+        quint16 channel = channels[0];
         if ((button == ui->motorNeutralButton) && !m_actuatorSettings[channel].isReversableMotor) {
-            m_calibrationUtil->startChannelOutput(channel, m_actuatorSettings[channel].channelMin);
+            // Normal motor
+            m_calibrationUtil->startChannelOutput(channels, m_actuatorSettings[channel].channelMin);
+        } else {
+            // Servos and ReversableMotors
+            m_calibrationUtil->startChannelOutput(channels, m_actuatorSettings[channel].channelNeutral);
         }
 
         m_calibrationUtil->stopChannelOutput();
@@ -570,11 +588,13 @@ bool OutputCalibrationPage::checkAlarms()
 
 void OutputCalibrationPage::debugLogChannelValues()
 {
-    quint16 channel = getCurrentChannel();
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    quint16 currentChannel = currentChannels[0];
 
-    qDebug() << "ChannelMin    : " << m_actuatorSettings[channel].channelMin;
-    qDebug() << "ChannelNeutral: " << m_actuatorSettings[channel].channelNeutral;
-    qDebug() << "ChannelMax    : " << m_actuatorSettings[channel].channelMax;
+    qDebug() << "ChannelMin    : " << m_actuatorSettings[currentChannel].channelMin;
+    qDebug() << "ChannelNeutral: " << m_actuatorSettings[currentChannel].channelNeutral;
+    qDebug() << "ChannelMax    : " << m_actuatorSettings[currentChannel].channelMax;
 }
 
 void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
@@ -585,7 +605,12 @@ void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
     if (ui->motorNeutralButton->isChecked()) {
         quint16 value = ui->motorNeutralSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);
-        m_actuatorSettings[getCurrentChannel()].channelNeutral = value;
+
+        QList<quint16> currentChannels;
+        getCurrentChannels(currentChannels);
+        foreach(quint16 channel, currentChannels) {
+            m_actuatorSettings[channel].channelNeutral = value;
+        }
         debugLogChannelValues();
     }
 }
@@ -593,9 +618,13 @@ void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 void OutputCalibrationPage::on_servoButton_toggled(bool checked)
 {
     ui->servoButton->setText(checked ? tr("Stop") : tr("Start"));
-    quint16 channel   = getCurrentChannel();
-    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
-    onStartButtonToggle(ui->servoButton, channel, safeValue, safeValue, ui->servoCenterAngleSlider);
+
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    quint16 currentChannel = currentChannels[0];
+
+    quint16 safeValue = m_actuatorSettings[currentChannel].channelNeutral;
+    onStartButtonToggle(ui->servoButton, currentChannels, safeValue, safeValue, ui->servoCenterAngleSlider);
 }
 
 void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
@@ -603,23 +632,27 @@ void OutputCalibrationPage::on_servoCenterAngleSlider_valueChanged(int position)
     Q_UNUSED(position);
     quint16 value   = ui->servoCenterAngleSlider->value();
     m_calibrationUtil->setChannelOutputValue(value);
-    quint16 channel = getCurrentChannel();
-    m_actuatorSettings[channel].channelNeutral = value;
+
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    quint16 currentChannel = currentChannels[0];
+
+    m_actuatorSettings[currentChannel].channelNeutral = value;
     ui->servoPWMValue->setText(tr("Output value : <b>%1</b> µs").arg(value));
 
     // Adjust min and max
     if (ui->reverseCheckbox->isChecked()) {
-        if (value >= m_actuatorSettings[channel].channelMin) {
+        if (value >= m_actuatorSettings[currentChannel].channelMin) {
             ui->servoMinAngleSlider->setValue(value);
         }
-        if (value <= m_actuatorSettings[channel].channelMax) {
+        if (value <= m_actuatorSettings[currentChannel].channelMax) {
             ui->servoMaxAngleSlider->setValue(value);
         }
     } else {
-        if (value <= m_actuatorSettings[channel].channelMin) {
+        if (value <= m_actuatorSettings[currentChannel].channelMin) {
             ui->servoMinAngleSlider->setValue(value);
         }
-        if (value >= m_actuatorSettings[channel].channelMax) {
+        if (value >= m_actuatorSettings[currentChannel].channelMax) {
             ui->servoMaxAngleSlider->setValue(value);
         }
     }
@@ -631,21 +664,26 @@ void OutputCalibrationPage::on_servoMinAngleSlider_valueChanged(int position)
     Q_UNUSED(position);
     quint16 value = ui->servoMinAngleSlider->value();
     m_calibrationUtil->setChannelOutputValue(value);
-    m_actuatorSettings[getCurrentChannel()].channelMin = value;
+
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    quint16 currentChannel = currentChannels[0];
+
+    m_actuatorSettings[currentChannel].channelMin = value;
 
     // Adjust neutral and max
     if (ui->reverseCheckbox->isChecked()) {
-        if (value <= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value <= m_actuatorSettings[currentChannel].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if (value <= m_actuatorSettings[getCurrentChannel()].channelMax) {
+        if (value <= m_actuatorSettings[currentChannel].channelMax) {
             ui->servoMaxAngleSlider->setValue(value);
         }
     } else {
-        if (value >= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value >= m_actuatorSettings[currentChannel].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if (value >= m_actuatorSettings[getCurrentChannel()].channelMax) {
+        if (value >= m_actuatorSettings[currentChannel].channelMax) {
             ui->servoMaxAngleSlider->setValue(value);
         }
     }
@@ -657,21 +695,26 @@ void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
     Q_UNUSED(position);
     quint16 value = ui->servoMaxAngleSlider->value();
     m_calibrationUtil->setChannelOutputValue(value);
-    m_actuatorSettings[getCurrentChannel()].channelMax = value;
+
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    quint16 currentChannel = currentChannels[0];
+
+    m_actuatorSettings[currentChannel].channelMax = value;
 
     // Adjust neutral and min
     if (ui->reverseCheckbox->isChecked()) {
-        if (value >= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value >= m_actuatorSettings[currentChannel].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if (value >= m_actuatorSettings[getCurrentChannel()].channelMin) {
+        if (value >= m_actuatorSettings[currentChannel].channelMin) {
             ui->servoMinAngleSlider->setValue(value);
         }
     } else {
-        if (value <= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value <= m_actuatorSettings[currentChannel].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if (value <= m_actuatorSettings[getCurrentChannel()].channelMin) {
+        if (value <= m_actuatorSettings[currentChannel].channelMin) {
             ui->servoMinAngleSlider->setValue(value);
         }
     }
@@ -680,14 +723,18 @@ void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
 
 void OutputCalibrationPage::on_reverseCheckbox_toggled(bool checked)
 {
-    if (checked && m_actuatorSettings[getCurrentChannel()].channelMax > m_actuatorSettings[getCurrentChannel()].channelMin) {
-        quint16 oldMax = m_actuatorSettings[getCurrentChannel()].channelMax;
-        m_actuatorSettings[getCurrentChannel()].channelMax = m_actuatorSettings[getCurrentChannel()].channelMin;
-        m_actuatorSettings[getCurrentChannel()].channelMin = oldMax;
-    } else if (!checked && m_actuatorSettings[getCurrentChannel()].channelMax < m_actuatorSettings[getCurrentChannel()].channelMin) {
-        quint16 oldMax = m_actuatorSettings[getCurrentChannel()].channelMax;
-        m_actuatorSettings[getCurrentChannel()].channelMax = m_actuatorSettings[getCurrentChannel()].channelMin;
-        m_actuatorSettings[getCurrentChannel()].channelMin = oldMax;
+    QList<quint16> currentChannels;
+    getCurrentChannels(currentChannels);
+    quint16 currentChannel = currentChannels[0];
+
+    if (checked && m_actuatorSettings[currentChannel].channelMax > m_actuatorSettings[currentChannel].channelMin) {
+        quint16 oldMax = m_actuatorSettings[currentChannel].channelMax;
+        m_actuatorSettings[currentChannel].channelMax = m_actuatorSettings[currentChannel].channelMin;
+        m_actuatorSettings[currentChannel].channelMin = oldMax;
+    } else if (!checked && m_actuatorSettings[currentChannel].channelMax < m_actuatorSettings[currentChannel].channelMin) {
+        quint16 oldMax = m_actuatorSettings[currentChannel].channelMax;
+        m_actuatorSettings[currentChannel].channelMax = m_actuatorSettings[currentChannel].channelMin;
+        m_actuatorSettings[currentChannel].channelMin = oldMax;
     }
     ui->servoCenterAngleSlider->setInvertedAppearance(checked);
     ui->servoCenterAngleSlider->setInvertedControls(checked);
@@ -697,13 +744,13 @@ void OutputCalibrationPage::on_reverseCheckbox_toggled(bool checked)
     ui->servoMaxAngleSlider->setInvertedControls(checked);
 
     if (ui->reverseCheckbox->isChecked()) {
-        ui->servoMaxAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMax);
-        ui->servoCenterAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelNeutral);
-        ui->servoMinAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMin);
+        ui->servoMaxAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMax);
+        ui->servoCenterAngleSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
+        ui->servoMinAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMin);
     } else {
-        ui->servoMinAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMin);
-        ui->servoCenterAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelNeutral);
-        ui->servoMaxAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMax);
+        ui->servoMinAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMin);
+        ui->servoCenterAngleSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
+        ui->servoMaxAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMax);
     }
 }
 

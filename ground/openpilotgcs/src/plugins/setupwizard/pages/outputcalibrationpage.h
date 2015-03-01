@@ -81,10 +81,11 @@ private:
     void setWizardPage();
     void enableButtons(bool enable);
     void enableServoSliders(bool enabled);
-    void onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider);
+    void onStartButtonToggle(QAbstractButton *button, QList<quint16> &channels,
+                             quint16 value, quint16 safeValue, QSlider *slider);
     bool checkAlarms();
     void debugLogChannelValues();
-    quint16 getCurrentChannel();
+    void getCurrentChannels(QList<quint16> &channels);
     void enableAllMotorsCheckBox(bool enable);
 
     Ui::OutputCalibrationPage *ui;

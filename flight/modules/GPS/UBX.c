@@ -413,6 +413,8 @@ static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) 
     struct UBX_NAV_SVINFO *svinfo = &ubx->payload.nav_svinfo;
 
     svdata.SatsInView = 0;
+
+    // First, use slots for SVs actually being received
     for (chan = 0; chan < svinfo->numCh; chan++) {
         if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM && svinfo->sv[chan].cno > 0) {
             svdata.Azimuth[svdata.SatsInView]   = svinfo->sv[chan].azim;
@@ -422,6 +424,18 @@ static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) 
             svdata.SatsInView++;
         }
     }
+
+    // Now try to add the rest
+    for (chan = 0; chan < svinfo->numCh; chan++) {
+        if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM && 0 == svinfo->sv[chan].cno) {
+            svdata.Azimuth[svdata.SatsInView]   = svinfo->sv[chan].azim;
+            svdata.Elevation[svdata.SatsInView] = svinfo->sv[chan].elev;
+            svdata.PRN[svdata.SatsInView] = svinfo->sv[chan].svid;
+            svdata.SNR[svdata.SatsInView] = svinfo->sv[chan].cno;
+            svdata.SatsInView++;
+        }
+    }
+
     // fill remaining slots (if any)
     for (chan = svdata.SatsInView; chan < GPSSATELLITES_PRN_NUMELEM; chan++) {
         svdata.Azimuth[chan]   = 0;

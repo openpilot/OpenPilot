@@ -43,6 +43,8 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
     qDebug() << "calling output calibration page";
     m_vehicleRenderer = new QSvgRenderer();
 
+    connect(ui->calibrateAllMotors, SIGNAL(toggled(bool)), this, SLOT(calibrateAllMotorsChanged()));
+
     // move the code that was here to setupVehicle() so we can determine which image to use.
     m_vehicleScene    = new QGraphicsScene(this);
     ui->vehicleView->setScene(m_vehicleScene);
@@ -308,6 +310,7 @@ void OutputCalibrationPage::setupVehicleItems()
 void OutputCalibrationPage::startWizard()
 {
     ui->calibrationStack->setCurrentIndex(m_wizardIndexes[0]);
+    enableAllMotorsCheckBox(true);
     setupVehicleHighlightedPart();
 }
 
@@ -319,7 +322,11 @@ void OutputCalibrationPage::setupVehicleHighlightedPart()
 
     for (int i = 0; i < m_vehicleItems.size(); i++) {
         QGraphicsSvgItem *item = m_vehicleItems[i];
-        item->setOpacity((highlightedIndex == i) ? highlightOpaque : dimOpaque);
+        if (highlightedIndex == i || (ui->calibrateAllMotors->isChecked() && m_wizardIndexes[m_currentWizardIndex] == 1)) {
+            item->setOpacity(highlightOpaque);
+        } else {
+            item->setOpacity(dimOpaque);
+        }
     }
 }
 
@@ -421,12 +428,24 @@ quint16 OutputCalibrationPage::getCurrentChannel()
     return m_channelIndex[m_currentWizardIndex];
 }
 
+void OutputCalibrationPage::enableAllMotorsCheckBox(bool enable)
+{
+    if (getWizard()->getVehicleType() == SetupWizard::VEHICLE_MULTI) {
+        ui->calibrateAllMotors->setVisible(true);
+        ui->calibrateAllMotors->setEnabled(enable);
+    } else {
+        ui->calibrateAllMotors->setChecked(false);
+        ui->calibrateAllMotors->setVisible(false);
+    }
+}
+
 void OutputCalibrationPage::enableButtons(bool enable)
 {
     getWizard()->button(QWizard::NextButton)->setEnabled(enable);
     getWizard()->button(QWizard::CustomButton1)->setEnabled(enable);
     getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
     getWizard()->button(QWizard::BackButton)->setEnabled(enable);
+    enableAllMotorsCheckBox(enable);
     QApplication::processEvents();
 }
 
@@ -649,6 +668,11 @@ void OutputCalibrationPage::on_reverseCheckbox_toggled(bool checked)
         ui->servoCenterAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelNeutral);
         ui->servoMaxAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMax);
     }
+}
+
+void OutputCalibrationPage::on_calibrateAllMotors_toggled(bool checked)
+{
+    setupVehicleHighlightedPart();
 }
 
 void OutputCalibrationPage::resetOutputCalibrationUtil()

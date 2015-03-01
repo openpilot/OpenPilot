@@ -70,6 +70,7 @@ private slots:
     void on_servoMinAngleSlider_valueChanged(int position);
     void on_servoMaxAngleSlider_valueChanged(int position);
     void on_reverseCheckbox_toggled(bool checked);
+    void on_calibrateAllMotors_toggled(bool checked);
 
 private:
     void setupVehicle();
@@ -83,6 +84,7 @@ private:
     bool checkAlarms();
     void debugLogChannelValues();
     quint16 getCurrentChannel();
+    void enableAllMotorsCheckBox(bool enable);
 
     Ui::OutputCalibrationPage *ui;
     QSvgRenderer *m_vehicleRenderer;

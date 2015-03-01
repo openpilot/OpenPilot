@@ -124,7 +124,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="cb_all_motor_outputs">
+        <widget class="QCheckBox" name="calibrateAllMotors">
          <property name="text">
           <string>Calibrate all motor outputs at the same time</string>
          </property>

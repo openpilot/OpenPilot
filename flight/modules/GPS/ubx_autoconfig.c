@@ -266,6 +266,13 @@ void config_gnss(uint16_t *bytes_to_send)
                 status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].resTrkCh = 8;
             }
             break;
+        case UBX_GNSS_ID_BEIDOU:
+            if (status->currentSettings.enableBeiDou) {
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].flags    = UBX_CFG_GNSS_FLAGS_ENABLED | UBX_CFG_GNSS_FLAGS_BEIDOU_B1I;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].maxTrkCh = 14;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].resTrkCh = 8;
+            }
+            break;
         default:
             break;
         }

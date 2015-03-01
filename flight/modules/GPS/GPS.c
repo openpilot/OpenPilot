@@ -548,18 +548,32 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
     case GPSSETTINGS_UBXGNSSMODE_GPSGLONASS:
         newconfig.enableGPS     = true;
         newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
         break;
     case GPSSETTINGS_UBXGNSSMODE_GLONASS:
         newconfig.enableGPS     = false;
         newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
         break;
     case GPSSETTINGS_UBXGNSSMODE_GPS:
         newconfig.enableGPS     = true;
         newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GPSBEIDOU:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = true;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GLONASSBEIDOU:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = true;
         break;
     default:
         newconfig.enableGPS     = false;
         newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
         break;
     }
 

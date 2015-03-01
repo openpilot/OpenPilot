@@ -91,6 +91,7 @@ typedef struct {
 
     bool    enableGPS;
     bool    enableGLONASS;
+    bool    enableBeiDou;
 } ubx_autoconfig_settings_t;
 
 // Mask for "all supported devices": battery backed RAM, Flash, EEPROM, SPI Flash
@@ -181,6 +182,7 @@ typedef enum {
 #define UBX_CFG_GNSS_FLAGS_ENABLED      0x01
 #define UBX_CFG_GNSS_FLAGS_GPS_L1CA     0x010000
 #define UBX_CFG_GNSS_FLAGS_SBAS_L1CA    0x010000
+#define UBX_CFG_GNSS_FLAGS_BEIDOU_B1I   0x010000
 #define UBX_CFG_GNSS_FLAGS_QZSS_L1CA    0x010000
 #define UBX_CFG_GNSS_FLAGS_QZSS_L1SAIF  0x040000
 #define UBX_CFG_GNSS_FLAGS_GLONASS_L1OF 0x010000

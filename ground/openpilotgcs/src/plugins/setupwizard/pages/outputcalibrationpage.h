@@ -49,7 +49,7 @@ public:
 
     bool isFinished()
     {
-        return m_currentWizardIndex >= m_wizardIndexes.size() - 1;
+        return m_currentWizardIndex >= m_wizardIndexes.size();
     }
 
     void loadSVGFile(QString file);

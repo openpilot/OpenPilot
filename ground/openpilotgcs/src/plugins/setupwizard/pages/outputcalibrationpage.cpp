@@ -339,7 +339,7 @@ void OutputCalibrationPage::setupVehicleHighlightedPart()
 
     for (int i = 0; i < m_vehicleItems.size(); i++) {
         QGraphicsSvgItem *item = m_vehicleItems[i];
-        if (highlightedIndex == i || (ui->calibrateAllMotors->isChecked() && m_vehicleElementTypes[i] == MOTOR)) {
+        if (highlightedIndex == i || (ui->calibrateAllMotors->isChecked() && m_vehicleElementTypes[i + 1] == MOTOR)) {
             item->setOpacity(highlightOpaque);
         } else {
             item->setOpacity(dimOpaque);
@@ -402,11 +402,21 @@ void OutputCalibrationPage::initializePage()
 
 bool OutputCalibrationPage::validatePage()
 {
+    if (!isFinished()) {
+        m_currentWizardIndex++;
+        if (ui->calibrateAllMotors->isChecked() &&
+                m_currentWizardIndex > 0 &&
+                m_wizardIndexes[m_currentWizardIndex - 1] == 1) {
+            while (!isFinished() && m_wizardIndexes[m_currentWizardIndex] == 1) {
+                m_currentWizardIndex++;
+            }
+        }
+    }
+
     if (isFinished()) {
         getWizard()->setActuatorSettings(m_actuatorSettings);
         return true;
     } else {
-        m_currentWizardIndex++;
         setWizardPage();
         return false;
     }
@@ -432,8 +442,18 @@ void OutputCalibrationPage::resizeEvent(QResizeEvent *event)
 
 void OutputCalibrationPage::customBackClicked()
 {
-    if (m_currentWizardIndex > 0) {
+    if (m_currentWizardIndex >= 0) {
         m_currentWizardIndex--;
+        if (ui->calibrateAllMotors->isChecked()) {
+            while (m_currentWizardIndex > 0 &&
+                   m_wizardIndexes[m_currentWizardIndex] == 1 &&
+                   m_wizardIndexes[m_currentWizardIndex - 1] == 1) {
+                m_currentWizardIndex--;
+            }
+        }
+    }
+
+    if (m_currentWizardIndex >= 0) {
         setWizardPage();
     } else {
         getWizard()->back();

@@ -80,6 +80,10 @@ void SavePage::writeToController()
     enableButtons(true);
 
     emit completeChanged();
+
+    if (m_successfulWrite) {
+        getWizard()->next();
+    }
 }
 
 void SavePage::enableButtons(bool enable)

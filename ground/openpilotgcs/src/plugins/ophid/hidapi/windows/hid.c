@@ -11,7 +11,7 @@
  
  At the discretion of the user of this library,
  this software may be licensed under the terms of the
- GNU General Public License v3, a BSD-Style license, or the
+ GNU Public License v3, a BSD-Style license, or the
  original HIDAPI license as outlined in the LICENSE.txt,
  LICENSE-gpl3.txt, LICENSE-bsd.txt, and LICENSE-orig.txt
  files located at the root of the source distribution.
@@ -106,7 +106,6 @@ extern "C" {
 	typedef BOOLEAN (__stdcall *HidD_GetPreparsedData_)(HANDLE handle, PHIDP_PREPARSED_DATA *preparsed_data);
 	typedef BOOLEAN (__stdcall *HidD_FreePreparsedData_)(PHIDP_PREPARSED_DATA preparsed_data);
 	typedef NTSTATUS (__stdcall *HidP_GetCaps_)(PHIDP_PREPARSED_DATA preparsed_data, HIDP_CAPS *caps);
-	typedef BOOLEAN (__stdcall *HidD_SetNumInputBuffers_)(HANDLE handle, ULONG number_buffers);
 
 	static HidD_GetAttributes_ HidD_GetAttributes;
 	static HidD_GetSerialNumberString_ HidD_GetSerialNumberString;
@@ -118,7 +117,6 @@ extern "C" {
 	static HidD_GetPreparsedData_ HidD_GetPreparsedData;
 	static HidD_FreePreparsedData_ HidD_FreePreparsedData;
 	static HidP_GetCaps_ HidP_GetCaps;
-	static HidD_SetNumInputBuffers_ HidD_SetNumInputBuffers;
 
 	static HMODULE lib_handle = NULL;
 	static BOOLEAN initialized = FALSE;
@@ -133,7 +131,8 @@ struct hid_device_ {
 		DWORD last_error_num;
 		BOOL read_pending;
 		char *read_buf;
-		OVERLAPPED ol;
+		OVERLAPPED rx_ol;
+		OVERLAPPED tx_ol;
 };
 
 static hid_device *new_hid_device()
@@ -147,15 +146,18 @@ static hid_device *new_hid_device()
 	dev->last_error_num = 0;
 	dev->read_pending = FALSE;
 	dev->read_buf = NULL;
-	memset(&dev->ol, 0, sizeof(dev->ol));
-	dev->ol.hEvent = CreateEvent(NULL, FALSE, FALSE /*inital state f=nonsignaled*/, NULL);
+	memset(&dev->rx_ol, 0, sizeof(dev->rx_ol));
+	memset(&dev->tx_ol, 0, sizeof(dev->tx_ol));
+	dev->rx_ol.hEvent = CreateEvent(NULL, FALSE, FALSE /*inital state f=nonsignaled*/, NULL);
+	dev->tx_ol.hEvent = CreateEvent(NULL, FALSE, FALSE /*inital state f=nonsignaled*/, NULL);
 
 	return dev;
 }
 
 static void free_hid_device(hid_device *dev)
 {
-	CloseHandle(dev->ol.hEvent);
+	CloseHandle(dev->rx_ol.hEvent);
+	CloseHandle(dev->tx_ol.hEvent);
 	CloseHandle(dev->device_handle);
 	LocalFree(dev->last_error_str);
 	free(dev->read_buf);
@@ -208,7 +210,6 @@ static int lookup_functions()
 		RESOLVE(HidD_GetPreparsedData);
 		RESOLVE(HidD_FreePreparsedData);
 		RESOLVE(HidP_GetCaps);
-		RESOLVE(HidD_SetNumInputBuffers);
 #undef RESOLVE
 	}
 	else
@@ -222,9 +223,7 @@ static HANDLE open_device(const char *path, BOOL enumerate)
 {
 	HANDLE handle;
 	DWORD desired_access = (enumerate)? 0: (GENERIC_WRITE | GENERIC_READ);
-	DWORD share_mode = (enumerate)?
-	                      FILE_SHARE_READ|FILE_SHARE_WRITE:
-	                      FILE_SHARE_READ;
+	DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
 	handle = CreateFileA(path,
 		desired_access,
@@ -233,7 +232,7 @@ static HANDLE open_device(const char *path, BOOL enumerate)
 		OPEN_EXISTING,
 		FILE_FLAG_OVERLAPPED,/*FILE_ATTRIBUTE_NORMAL,*/
 		0);
-
+	DWORD error = GetLastError();
 	return handle;
 }
 
@@ -570,13 +569,6 @@ HID_API_EXPORT hid_device * HID_API_CALL hid_open_path(const char *path)
 		goto err;
 	}
 
-	/* Set the Input Report buffer size to 64 reports. */
-	res = HidD_SetNumInputBuffers(dev->device_handle, 64);
-	if (!res) {
-		register_error(dev, "HidD_SetNumInputBuffers");
-		goto err;
-	}
-
 	/* Get the Input Report length for the device. */
 	res = HidD_GetPreparsedData(dev->device_handle, &pp_data);
 	if (!res) {
@@ -608,9 +600,7 @@ int HID_API_EXPORT HID_API_CALL hid_write(hid_device *dev, const unsigned char *
 	DWORD bytes_written;
 	BOOL res;
 
-	OVERLAPPED ol;
 	unsigned char *buf;
-	memset(&ol, 0, sizeof(ol));
 
 	/* Make sure the right number of bytes are passed to WriteFile. Windows
 	   expects the number of bytes which are in the _longest_ report (plus
@@ -630,7 +620,8 @@ int HID_API_EXPORT HID_API_CALL hid_write(hid_device *dev, const unsigned char *
 		length = dev->output_report_length;
 	}
 
-	res = WriteFile(dev->device_handle, buf, length, NULL, &ol);
+	ResetEvent(dev->tx_ol.hEvent);
+	res = WriteFile(dev->device_handle, buf, length, NULL, &dev->tx_ol);
 	
 	if (!res) {
 		if (GetLastError() != ERROR_IO_PENDING) {
@@ -643,7 +634,7 @@ int HID_API_EXPORT HID_API_CALL hid_write(hid_device *dev, const unsigned char *
 
 	/* Wait here until the write is done. This makes
 	   hid_write() synchronous. */
-	res = GetOverlappedResult(dev->device_handle, &ol, &bytes_written, TRUE/*wait*/);
+	res = GetOverlappedResult(dev->device_handle, &dev->tx_ol, &bytes_written, TRUE/*wait*/);
 	if (!res) {
 		/* The Write operation failed. */
 		register_error(dev, "WriteFile");
@@ -662,18 +653,17 @@ end_of_function:
 int HID_API_EXPORT HID_API_CALL hid_read_timeout(hid_device *dev, unsigned char *data, size_t length, int milliseconds)
 {
 	DWORD bytes_read = 0;
-	size_t copy_len = 0;
 	BOOL res;
 
 	/* Copy the handle for convenience. */
-	HANDLE ev = dev->ol.hEvent;
+	HANDLE ev = dev->rx_ol.hEvent;
 
 	if (!dev->read_pending) {
 		/* Start an Overlapped I/O read. */
 		dev->read_pending = TRUE;
 		memset(dev->read_buf, 0, dev->input_report_length);
 		ResetEvent(ev);
-		res = ReadFile(dev->device_handle, dev->read_buf, dev->input_report_length, &bytes_read, &dev->ol);
+		res = ReadFile(dev->device_handle, dev->read_buf, dev->input_report_length, &bytes_read, &dev->rx_ol);
 		
 		if (!res) {
 			if (GetLastError() != ERROR_IO_PENDING) {
@@ -699,7 +689,7 @@ int HID_API_EXPORT HID_API_CALL hid_read_timeout(hid_device *dev, unsigned char 
 	/* Either WaitForSingleObject() told us that ReadFile has completed, or
 	   we are in non-blocking mode. Get the number of bytes read. The actual
 	   data has been copied to the data[] array which was passed to ReadFile(). */
-	res = GetOverlappedResult(dev->device_handle, &dev->ol, &bytes_read, TRUE/*wait*/);
+	res = GetOverlappedResult(dev->device_handle, &dev->rx_ol, &bytes_read, TRUE/*wait*/);
 	
 	/* Set pending back to false, even if GetOverlappedResult() returned error. */
 	dev->read_pending = FALSE;
@@ -710,13 +700,14 @@ int HID_API_EXPORT HID_API_CALL hid_read_timeout(hid_device *dev, unsigned char 
 			   number (0x0) on the beginning of the report anyway. To make this
 			   work like the other platforms, and to make it work more like the
 			   HID spec, we'll skip over this byte. */
+			size_t copy_len;
 			bytes_read--;
 			copy_len = length > bytes_read ? bytes_read : length;
 			memcpy(data, dev->read_buf+1, copy_len);
 		}
 		else {
 			/* Copy the whole buffer, report number and all. */
-			copy_len = length > bytes_read ? bytes_read : length;
+			size_t copy_len = length > bytes_read ? bytes_read : length;
 			memcpy(data, dev->read_buf, copy_len);
 		}
 	}
@@ -727,7 +718,7 @@ end_of_function:
 		return -1;
 	}
 	
-	return copy_len;
+	return bytes_read;
 }
 
 int HID_API_EXPORT HID_API_CALL hid_read(hid_device *dev, unsigned char *data, size_t length)
@@ -791,12 +782,6 @@ int HID_API_EXPORT HID_API_CALL hid_get_feature_report(hid_device *dev, unsigned
 		register_error(dev, "Send Feature Report GetOverLappedResult");
 		return -1;
 	}
-
-	/* bytes_returned does not include the first byte which contains the
-	   report ID. The data buffer actually contains one more byte than
-	   bytes_returned. */
-	bytes_returned++;
-
 	return bytes_returned;
 #endif
 }

@@ -8,8 +8,7 @@
 	<field name="EndingVelocity" units="m/s" type="float" elements="1" default="0"/>
 
 	<!-- ensure the following Mode options are exactly the same as in pathaction mode -->
-    <field name="Mode" units="" type="enum" elements="1" options="FlyEndpoint,FlyVector,FlyCircleRight,FlyCircleLeft,
-            DriveEndpoint,DriveVector,DriveCircleLeft,DriveCircleRight,
+    <field name="Mode" units="" type="enum" elements="1" options="GoToEndpoint,FollowVector,CircleRight,CircleLeft,
             FixedAttitude,SetAccessory,DisarmAlarm,Land,Brake,Velocity" default="Endpoint" />
 
 	<!-- Endpoint mode - move directly towards endpoint regardless of position -->

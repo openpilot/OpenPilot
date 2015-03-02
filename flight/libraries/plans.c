@@ -112,7 +112,7 @@ void plan_setup_positionHold()
     pathDesired.Start.Down       = positionState.Down;
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
-    pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+    pathDesired.Mode = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(&pathDesired);
 }
@@ -153,7 +153,7 @@ void plan_setup_returnToBase()
 
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
-    pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+    pathDesired.Mode = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(&pathDesired);
 }
@@ -589,7 +589,7 @@ void plan_setup_AutoCruise()
     pathDesired.Start.Down       = pathDesired.End.Down;
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
-    pathDesired.Mode             = PATHDESIRED_MODE_FLYENDPOINT;
+    pathDesired.Mode             = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(&pathDesired);
 
@@ -698,7 +698,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
             pathDesired.Start.Down       = positionState.Down;
             pathDesired.StartingVelocity = 0.0f;
             pathDesired.EndingVelocity   = 0.0f;
-            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+            pathDesired.Mode = PATHDESIRED_MODE_GOTOENDPOINT;
         }
         assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
     } else {

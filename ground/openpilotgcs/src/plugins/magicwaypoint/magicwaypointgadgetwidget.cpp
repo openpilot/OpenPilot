@@ -138,7 +138,7 @@ void MagicWaypointGadgetWidget::positionSelected(double north, double east)
 
     pathDesired.End[PathDesired::END_NORTH] = north * scale;
     pathDesired.End[PathDesired::END_EAST]  = east * scale;
-    pathDesired.Mode = PathDesired::MODE_FLYENDPOINT;
+    pathDesired.Mode = PathDesired::MODE_GOTOENDPOINT;
     getPathDesired()->setData(pathDesired);
 }
 

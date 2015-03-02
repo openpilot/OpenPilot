@@ -205,7 +205,7 @@ void PathFollowerControlFly::UpdateVelocityDesired()
                        positionState.East + (velocityState.East * vtolPathFollowerSettings->CourseFeedForward),
                        positionState.Down + (velocityState.Down * vtolPathFollowerSettings->CourseFeedForward) };
     struct path_status progress;
-    path_progress(pathDesired, cur, &progress);
+    path_progress(pathDesired, cur, &progress, true);
 
     controlNE.ControlPositionWithPath(&progress);
     if (!mManualThrust) {
@@ -511,7 +511,7 @@ float PathFollowerControlFly::updatePathBearing()
                      positionState.Down };
     struct path_status progress;
 
-    path_progress(pathDesired, cur, &progress);
+    path_progress(pathDesired, cur, &progress,true);
 
     // atan2f always returns in between + and - 180 degrees
     return RAD2DEG(atan2f(progress.path_vector[1], progress.path_vector[0]));

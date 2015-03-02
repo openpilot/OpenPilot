@@ -211,10 +211,10 @@ static void pathFollowerSetActiveController(void)
                 activeController = PathFollowerControlVelocityRoam::instance();
                 activeController->Activate();
                 break;
-            case PATHDESIRED_MODE_FLYENDPOINT:
-            case PATHDESIRED_MODE_FLYVECTOR:
-            case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-            case PATHDESIRED_MODE_FLYCIRCLELEFT:
+            case PATHDESIRED_MODE_GOTOENDPOINT:
+            case PATHDESIRED_MODE_FOLLOWVECTOR:
+            case PATHDESIRED_MODE_CIRCLERIGHT:
+            case PATHDESIRED_MODE_CIRCLELEFT:
                 activeController = PathFollowerControlFly::instance();
                 activeController->Activate();
                 break;
@@ -231,10 +231,10 @@ static void pathFollowerSetActiveController(void)
         case FRAME_TYPE_FIXED_WING:
 
           switch (pathDesired.Mode) {
-           case PATHDESIRED_MODE_FLYENDPOINT:
-           case PATHDESIRED_MODE_FLYVECTOR:
-           case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-           case PATHDESIRED_MODE_FLYCIRCLELEFT:
+           case PATHDESIRED_MODE_GOTOENDPOINT:
+           case PATHDESIRED_MODE_FOLLOWVECTOR:
+           case PATHDESIRED_MODE_CIRCLERIGHT:
+           case PATHDESIRED_MODE_CIRCLELEFT:
                activeController = FixedWingControlFly::instance();
                activeController->Activate();
                break;
@@ -247,10 +247,10 @@ static void pathFollowerSetActiveController(void)
         case FRAME_TYPE_GROUND:
 
           switch (pathDesired.Mode) {
-           case PATHDESIRED_MODE_DRIVEENDPOINT:
-           case PATHDESIRED_MODE_DRIVEVECTOR:
-           case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
-           case PATHDESIRED_MODE_DRIVECIRCLELEFT:
+           case PATHDESIRED_MODE_GOTOENDPOINT:
+           case PATHDESIRED_MODE_FOLLOWVECTOR:
+           case PATHDESIRED_MODE_CIRCLERIGHT:
+           case PATHDESIRED_MODE_CIRCLELEFT:
                activeController = GroundDriveController::instance();
                activeController->Activate();
                break;

@@ -223,7 +223,7 @@ void FixedWingControlFly::updatePathVelocity(float kFF, bool limited)
                        positionState.East + (velocityState.East * kFF),
                        positionState.Down + (velocityState.Down * kFF) };
     struct path_status progress;
-    path_progress(pathDesired, cur, &progress);
+    path_progress(pathDesired, cur, &progress, true);
 
     // calculate velocity - can be zero if waypoints are too close
     velocityDesired.North = progress.path_vector[0];

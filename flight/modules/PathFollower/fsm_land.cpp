@@ -717,7 +717,7 @@ void FSMLand::fallback_to_hold(void)
     pathDesired->Start.Down       = positionState.Down;
     pathDesired->StartingVelocity = 0.0f;
     pathDesired->EndingVelocity   = 0.0f;
-    pathDesired->Mode = PATHDESIRED_MODE_FLYENDPOINT;
+    pathDesired->Mode = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(pathDesired);
 }

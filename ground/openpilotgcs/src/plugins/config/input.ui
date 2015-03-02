@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="RCInput">
       <attribute name="title">
@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>774</width>
-            <height>497</height>
+            <width>1228</width>
+            <height>661</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -274,8 +274,7 @@
                   </item>
                  </layout>
                 </widget>
-                <widget class="QWidget" name="wizard">
-                </widget>
+                <widget class="QWidget" name="wizard"/>
                </widget>
               </item>
              </layout>
@@ -491,8 +490,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>730</width>
-            <height>554</height>
+            <width>1228</width>
+            <height>661</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -723,13 +722,13 @@ font:bold;</string>
                <widget class="QFrame" name="frame_3">
                 <property name="minimumSize">
                  <size>
-                  <width>106</width>
+                  <width>90</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>105</width>
+                  <width>90</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -1127,13 +1126,13 @@ font:bold;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>230</height>
+               <height>275</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>230</height>
+               <height>275</height>
               </size>
              </property>
              <property name="title">
@@ -1349,7 +1348,7 @@ font:bold;</string>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>150</height>
+                     <height>200</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
@@ -1759,6 +1758,12 @@ font:bold;</string>
               </item>
               <item row="1" column="12">
                <widget class="QSpinBox" name="fmsPosNum">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>29</height>
+                 </size>
+                </property>
                 <property name="toolTip">
                  <string>Number of positions your FlightMode switch has.
 
@@ -2214,8 +2219,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>544</width>
-            <height>169</height>
+            <width>1228</width>
+            <height>661</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

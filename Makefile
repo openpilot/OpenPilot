@@ -887,9 +887,8 @@ build-info:
 ##############################
 
 DIST_VER_INFO := $(DIST_DIR)/version-info.json
-MODIFIED_FILES := $(shell git ls-files -m)
 
-$(DIST_VER_INFO): .git/index $(MODIFIED_FILES) | $(DIST_DIR)
+$(DIST_VER_INFO): .git/index | $(DIST_DIR)
 	$(V1) $(VERSION_INFO) --jsonpath="$(DIST_DIR)"
 
 

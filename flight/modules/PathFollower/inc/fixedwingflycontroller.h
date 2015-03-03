@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @addtogroup FixedWing CONTROL interface class
+ * @brief CONTROL interface class for pathfollower fixed wing fly controller
  * @{
  *
- * @file       PathFollowerCONTROL.h
+ * @file       FixedWingCONTROL.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Executes CONTROL for fixed wing fly objectives
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,32 +28,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PATHFOLLOWERCONTROLLANDING_H
-#define PATHFOLLOWERCONTROLLANDING_H
-#include "PathFollowerControl.h"
-#include "PIDControlThrust.h"
-#include "PIDControlNE.h"
-// forward decl
-class PathFollowerFSM;
-class PathFollowerControlLanding : public PathFollowerControl {
+#ifndef FIXEDWINGFLYCONTROLLER_H
+#define FIXEDWINGFLYCONTROLLER_H
+#include "pathfollowercontrol.h"
+
+class FixedWingFlyController : public PathFollowerControl {
 private:
-    static PathFollowerControlLanding *p_inst;
-    PathFollowerControlLanding();
+    static FixedWingFlyController *p_inst;
+    FixedWingFlyController();
 
 
 public:
-    static PathFollowerControlLanding *instance()
+    static FixedWingFlyController *instance()
     {
         if (!p_inst) {
-            p_inst = new PathFollowerControlLanding();
+            p_inst = new FixedWingFlyController();
         }
         return p_inst;
     }
 
-    int32_t Initialize(PathFollowerFSM *fsm_ptr,
-                       VtolPathFollowerSettingsData *vtolPathFollowerSettings,
+    int32_t Initialize(FixedWingPathFollowerSettingsData *fixedWingSettings,
                        PathDesiredData *pathDesired,
-                       FlightStatusData *flightStatus,
                        PathStatusData *pathStatus);
 
 
@@ -64,20 +59,28 @@ public:
     void ObjectiveUpdated(void);
     uint8_t IsActive(void);
     uint8_t Mode(void);
+    void AirspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent * ev);
 
 private:
-    void UpdateVelocityDesired(void);
-    int8_t UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction);
-    void setArmedIfChanged(uint8_t val);
+    void resetGlobals();
+    uint8_t updateAutoPilotFixedWing();
+    void updatePathVelocity(float kFF, bool limited);
+    uint8_t updateFixedDesiredAttitude();
+    bool correctCourse(float *C, float *V, float *F, float s);
 
-    PathFollowerFSM *fsm;
-    VtolPathFollowerSettingsData *vtolPathFollowerSettings;
+    FixedWingPathFollowerSettingsData *fixedWingSettings;
     PathDesiredData *pathDesired;
-    FlightStatusData *flightStatus;
     PathStatusData *pathStatus;
-    PIDControlThrust controlThrust;
-    PIDControlNE controlNE;
     uint8_t mActive;
+    uint8_t mMode;
+
+    struct pid PIDposH[2];
+    struct pid PIDposV;
+    struct pid PIDcourse;
+    struct pid PIDspeed;
+    struct pid PIDpower;
+    // correct speed by measured airspeed
+    float indicatedAirspeedStateBias;
 };
 
-#endif // PATHFOLLOWERCONTROLLANDING_H
+#endif // FIXEDWINGFLYCONTROLLER_H

@@ -81,14 +81,14 @@ extern "C" {
 #include <pidstatus.h>
 }
 
-#include "fsm_land.h"
-#include "FSMBrake.h"
-#include "PathFollowerControlLanding.h"
-#include "PathFollowerControlVelocityRoam.h"
-#include "PathFollowerControlBrake.h"
-#include "PathFollowerControlFly.h"
-#include "FixedWingControlFly.h"
-#include "GroundDriveController.h"
+#include "vtollandfsm.h"
+#include "vtolbrakefsm.h"
+#include "vtollandcontroller.h"
+#include "vtolvelocitycontroller.h"
+#include "vtolbrakecontroller.h"
+#include "vtolflycontroller.h"
+#include "fixedwingflycontroller.h"
+#include "grounddrivecontroller.h"
 
 // Private constants
 
@@ -167,14 +167,14 @@ int32_t PathFollowerInitialize()
     PIDStatusInitialize();
 
     // Initialise the autopilot mode implementations that use an FSM
-    FSMLand::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
-    PathFollowerControlLanding::instance()->Initialize((PathFollowerFSM *)FSMLand::instance(),
+    VtolLandFSM::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
+    VtolLandController::instance()->Initialize((PathFollowerFSM *)VtolLandFSM::instance(),
                                                        &vtolPathFollowerSettings, &pathDesired, &flightStatus, &pathStatus);
-    PathFollowerControlVelocityRoam::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
-    PathFollowerControlFly::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
-    FixedWingControlFly::instance()->Initialize(&fixedWingPathFollowerSettings, &pathDesired, &pathStatus);
+    VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
+    VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
+    FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings, &pathDesired, &pathStatus);
     GroundDriveController::instance()->Initialize(&groundPathFollowerSettings, &pathDesired, &pathStatus);
-    PathFollowerControlBrake::instance()->Initialize((PathFollowerFSM *)FSMBrake::instance(),
+    VtolBrakeController::instance()->Initialize((PathFollowerFSM *)VtolBrakeFSM::instance(),
                                                      &vtolPathFollowerSettings,
                                                      &pathDesired,
                                                      &flightStatus,
@@ -204,22 +204,22 @@ static void pathFollowerSetActiveController(void)
 
             switch (pathDesired.Mode) {
             case PATHDESIRED_MODE_BRAKE: // brake then hold sequence controller
-                activeController = PathFollowerControlBrake::instance();
+                activeController = VtolBrakeController::instance();
                 activeController->Activate();
                 break;
             case PATHDESIRED_MODE_VELOCITY: // velocity roam controller
-                activeController = PathFollowerControlVelocityRoam::instance();
+                activeController = VtolVelocityController::instance();
                 activeController->Activate();
                 break;
             case PATHDESIRED_MODE_GOTOENDPOINT:
             case PATHDESIRED_MODE_FOLLOWVECTOR:
             case PATHDESIRED_MODE_CIRCLERIGHT:
             case PATHDESIRED_MODE_CIRCLELEFT:
-                activeController = PathFollowerControlFly::instance();
+                activeController = VtolFlyController::instance();
                 activeController->Activate();
                 break;
             case PATHDESIRED_MODE_LAND: // land with optional velocity roam option
-                activeController = PathFollowerControlLanding::instance();
+                activeController = VtolLandController::instance();
                 activeController->Activate();
                 break;
             default:
@@ -230,35 +230,35 @@ static void pathFollowerSetActiveController(void)
 
         case FRAME_TYPE_FIXED_WING:
 
-          switch (pathDesired.Mode) {
-           case PATHDESIRED_MODE_GOTOENDPOINT:
-           case PATHDESIRED_MODE_FOLLOWVECTOR:
-           case PATHDESIRED_MODE_CIRCLERIGHT:
-           case PATHDESIRED_MODE_CIRCLELEFT:
-               activeController = FixedWingControlFly::instance();
-               activeController->Activate();
-               break;
-           default:
-               activeController = 0;
-               break;
-           }
-           break;
+            switch (pathDesired.Mode) {
+            case PATHDESIRED_MODE_GOTOENDPOINT:
+            case PATHDESIRED_MODE_FOLLOWVECTOR:
+            case PATHDESIRED_MODE_CIRCLERIGHT:
+            case PATHDESIRED_MODE_CIRCLELEFT:
+                activeController = FixedWingFlyController::instance();
+                activeController->Activate();
+                break;
+            default:
+                activeController = 0;
+                break;
+            }
+            break;
 
         case FRAME_TYPE_GROUND:
 
-          switch (pathDesired.Mode) {
-           case PATHDESIRED_MODE_GOTOENDPOINT:
-           case PATHDESIRED_MODE_FOLLOWVECTOR:
-           case PATHDESIRED_MODE_CIRCLERIGHT:
-           case PATHDESIRED_MODE_CIRCLELEFT:
-               activeController = GroundDriveController::instance();
-               activeController->Activate();
-               break;
-           default:
-               activeController = 0;
-               break;
-           }
-           break;
+            switch (pathDesired.Mode) {
+            case PATHDESIRED_MODE_GOTOENDPOINT:
+            case PATHDESIRED_MODE_FOLLOWVECTOR:
+            case PATHDESIRED_MODE_CIRCLERIGHT:
+            case PATHDESIRED_MODE_CIRCLELEFT:
+                activeController = GroundDriveController::instance();
+                activeController->Activate();
+                break;
+            default:
+                activeController = 0;
+                break;
+            }
+            break;
 
         default:
             activeController = 0;
@@ -375,7 +375,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         break;
     case FRAME_TYPE_GROUND:
         updatePeriod = groundPathFollowerSettings.UpdatePeriod;
-      break;
+        break;
     default:
         updatePeriod = fixedWingPathFollowerSettings.UpdatePeriod;
         break;
@@ -389,9 +389,8 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
 static void airspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-  FixedWingControlFly::instance()->AirspeedStateUpdatedCb(ev);
+    FixedWingFlyController::instance()->AirspeedStateUpdatedCb(ev);
 }
-
 
 
 /**

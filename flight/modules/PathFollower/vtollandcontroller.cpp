@@ -1,14 +1,9 @@
 /*
  ******************************************************************************
  *
- * @file       PathFollowerControlLanding.c
+ * @file       vtollandcontroller.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      This landing state machine is a helper state machine to the
- *              pathfollower task/thread to implement detailed landing controls.
- *		This is to be called only from the pathfollower task.
- *		Note that initiation of the land occurs in the manual control
- *		command thread calling plans.c plan_setup_land which writes
- *		the required PathDesired LAND mode.
+ * @brief      Vtol landing controller loop
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,21 +23,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/**
- * Input object: TODO Update when completed
- * Input object:
- * Input object:
- * Output object:
- *
- * This module acts as a landing FSM "autopilot"
- * This is a periodic delayed callback module
- *
- * Modules have no API, all communication to other modules is done through UAVObjects.
- * However modules may use the API exposed by shared libraries.
- * See the OpenPilot wiki for more details.
- * http://www.openpilot.org/OpenPilot_Application_Architecture
- *
- */
 extern "C" {
 #include <openpilot.h>
 
@@ -57,11 +37,8 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-// TODO Remove unused
 #include <homelocation.h>
 #include <accelstate.h>
-#include <fixedwingpathfollowersettings.h>
-#include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
@@ -83,62 +60,62 @@ extern "C" {
 }
 
 // C++ includes
-#include "PathFollowerControlLanding.h"
-#include "PathFollowerFSM.h"
-#include "PIDControlThrust.h"
+#include "vtollandcontroller.h"
+#include "pathfollowerfsm.h"
+#include "pidcontroldown.h"
 
 // Private constants
 
 // pointer to a singleton instance
-PathFollowerControlLanding *PathFollowerControlLanding::p_inst = 0;
+VtolLandController *VtolLandController::p_inst = 0;
 
-PathFollowerControlLanding::PathFollowerControlLanding()
+VtolLandController::VtolLandController()
     : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0), mActive(false)
 {}
 
 // Called when mode first engaged
-void PathFollowerControlLanding::Activate(void)
+void VtolLandController::Activate(void)
 {
     if (!mActive) {
         mActive = true;
         SettingsUpdated();
         fsm->Activate();
-        controlThrust.Activate();
+        controlDown.Activate();
         controlNE.Activate();
     }
 }
 
-uint8_t PathFollowerControlLanding::IsActive(void)
+uint8_t VtolLandController::IsActive(void)
 {
     return mActive;
 }
 
-uint8_t PathFollowerControlLanding::Mode(void)
+uint8_t VtolLandController::Mode(void)
 {
     return PATHDESIRED_MODE_LAND;
 }
 
 // Objective updated in pathdesired, e.g. same flight mode but new target velocity
-void PathFollowerControlLanding::ObjectiveUpdated(void)
+void VtolLandController::ObjectiveUpdated(void)
 {
     // Set the objective's target velocity
-    controlThrust.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]);
+    controlDown.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]);
     controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH],
                                      pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]);
     controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
 }
-void PathFollowerControlLanding::Deactivate(void)
+void VtolLandController::Deactivate(void)
 {
     if (mActive) {
         mActive = false;
         fsm->Inactive();
-        controlThrust.Deactivate();
+        controlDown.Deactivate();
         controlNE.Deactivate();
     }
 }
 
 
-void PathFollowerControlLanding::SettingsUpdated(void)
+void VtolLandController::SettingsUpdated(void)
 {
     const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
 
@@ -153,16 +130,16 @@ void PathFollowerControlLanding::SettingsUpdated(void)
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 
-    controlThrust.UpdateParameters(vtolPathFollowerSettings->LandVerticalVelPID.Kp,
-                                   vtolPathFollowerSettings->LandVerticalVelPID.Ki,
-                                   vtolPathFollowerSettings->LandVerticalVelPID.Kd,
-                                   vtolPathFollowerSettings->LandVerticalVelPID.Beta,
-                                   dT,
-                                   vtolPathFollowerSettings->VerticalVelMax);
+    controlDown.UpdateParameters(vtolPathFollowerSettings->LandVerticalVelPID.Kp,
+                                 vtolPathFollowerSettings->LandVerticalVelPID.Ki,
+                                 vtolPathFollowerSettings->LandVerticalVelPID.Kd,
+                                 vtolPathFollowerSettings->LandVerticalVelPID.Beta,
+                                 dT,
+                                 vtolPathFollowerSettings->VerticalVelMax);
     // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
-    controlThrust.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
     fsm->SettingsUpdated();
 }
 
@@ -170,11 +147,11 @@ void PathFollowerControlLanding::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t PathFollowerControlLanding::Initialize(PathFollowerFSM *fsm_ptr,
-                                               VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                                               PathDesiredData *ptr_pathDesired,
-                                               FlightStatusData *ptr_flightStatus,
-                                               PathStatusData *ptr_pathStatus)
+int32_t VtolLandController::Initialize(PathFollowerFSM *fsm_ptr,
+                                       VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
+                                       PathDesiredData *ptr_pathDesired,
+                                       FlightStatusData *ptr_flightStatus,
+                                       PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     PIOS_Assert(ptr_pathDesired);
@@ -202,20 +179,20 @@ int32_t PathFollowerControlLanding::Initialize(PathFollowerFSM *fsm_ptr,
     pathDesired  = ptr_pathDesired;
     flightStatus = ptr_flightStatus;
     pathStatus   = ptr_pathStatus;
-    controlThrust.Initialize(fsm);
+    controlDown.Initialize(fsm);
 
     return 0;
 }
 
 
-void PathFollowerControlLanding::UpdateVelocityDesired()
+void VtolLandController::UpdateVelocityDesired()
 {
     VelocityStateData velocityState;
 
     VelocityStateGet(&velocityState);
     VelocityDesiredData velocityDesired;
 
-    controlThrust.UpdateVelocityState(velocityState.Down);
+    controlDown.UpdateVelocityState(velocityState.Down);
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // Implement optional horizontal position hold.
@@ -227,7 +204,7 @@ void PathFollowerControlLanding::UpdateVelocityDesired()
         controlNE.ControlPosition();
     }
 
-    velocityDesired.Down  = controlThrust.GetVelocityDesired();
+    velocityDesired.Down  = controlDown.GetVelocityDesired();
     float north, east;
     controlNE.GetVelocityDesired(&north, &east);
     velocityDesired.North = north;
@@ -248,7 +225,7 @@ void PathFollowerControlLanding::UpdateVelocityDesired()
     VelocityDesiredSet(&velocityDesired);
 }
 
-int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
+int8_t VtolLandController::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
 {
     uint8_t result = 1;
     StabilizationDesiredData stabDesired;
@@ -262,7 +239,7 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
     StabilizationBankGet(&stabSettings);
 
     controlNE.GetNECommand(&northCommand, &eastCommand);
-    stabDesired.Thrust = controlThrust.GetThrustCommand();
+    stabDesired.Thrust = controlDown.GetDownCommand();
 
     float angle_radians = DEG2RAD(attitudeState.Yaw);
     float cos_angle     = cosf(angle_radians);
@@ -293,7 +270,7 @@ int8_t PathFollowerControlLanding::UpdateStabilizationDesired(bool yaw_attitude,
     return result;
 }
 
-void PathFollowerControlLanding::UpdateAutoPilot()
+void VtolLandController::UpdateAutoPilot()
 {
     fsm->Update();
 
@@ -318,7 +295,7 @@ void PathFollowerControlLanding::UpdateAutoPilot()
     PathStatusSet(pathStatus);
 }
 
-void PathFollowerControlLanding::setArmedIfChanged(uint8_t val)
+void VtolLandController::setArmedIfChanged(uint8_t val)
 {
     if (flightStatus->Armed != val) {
         flightStatus->Armed = val;

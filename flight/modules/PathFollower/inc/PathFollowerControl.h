@@ -3,12 +3,12 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @brief CONTROL interface class for pathfollower goal implementations
  * @{
  *
- * @file       PathFollowerCONTROL.h
+ * @file       pathfollowercontrol.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Interface class for controllers
  *
  * @see        The GNU Public License (GPL) Version 3
  *

@@ -3,12 +3,12 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup PathFollower FSM Brake
- * @brief Executes FSM for landing sequence
+ * @brief Executes brake seqeuence
  * @{
  *
- * @file       fsm_land.h
+ * @file       vtolbrakfsm.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes FSM for landing sequence
+ * @brief      Executes brake sequence fsm
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,10 +28,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef FSM_BRAKE_H
-#define FSM_BRAKE_H
+#ifndef VTOLBRAKEFSM_H
+#define VTOLBRAKEFSM_H
 
-#include "PathFollowerFSM.h"
+#include "pathfollowerfsm.h"
 
 // Brakeing state machine
 typedef enum {
@@ -43,18 +43,18 @@ typedef enum {
 
 typedef enum {
     FSMBRAKESTATUS_STATEEXITREASON_NONE = 0
-} FSMBrakeStatusStateExitReasonOptions;
+} VtolBrakeFSMStatusStateExitReasonOptions;
 
-class FSMBrake : public PathFollowerFSM {
+class VtolBrakeFSM : public PathFollowerFSM {
 private:
-    static FSMBrake *p_inst;
-    FSMBrake();
+    static VtolBrakeFSM *p_inst;
+    VtolBrakeFSM();
 
 public:
-    static FSMBrake *instance()
+    static VtolBrakeFSM *instance()
     {
         if (!p_inst) {
-            p_inst = new FSMBrake();
+            p_inst = new VtolBrakeFSM();
         }
         return p_inst;
     }
@@ -80,16 +80,16 @@ protected:
         float    sum2;
         uint8_t  observationCount;
         uint8_t  observation2Count;
-    } FSMBrakeData_T;
+    } VtolBrakeFSMData_T;
 
     // FSM state structure
     typedef struct {
-        void(FSMBrake::*setup) (void); // Called to initialise the state
-        void(FSMBrake::*run) (uint8_t); // Run the event detection code for a state
+        void(VtolBrakeFSM::*setup) (void); // Called to initialise the state
+        void(VtolBrakeFSM::*run) (uint8_t); // Run the event detection code for a state
     } PathFollowerFSM_BrakeStateHandler_T;
 
     // Private variables
-    FSMBrakeData_T *mBrakeData;
+    VtolBrakeFSMData_T *mBrakeData;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
     PathDesiredData *pathDesired;
     PathStatusData *pathStatus;
@@ -101,9 +101,9 @@ protected:
     void run_brake(uint8_t);
     void run_hold(uint8_t);
     void initFSM(void);
-    void setState(PathFollowerFSM_BrakeState_T newState, FSMBrakeStatusStateExitReasonOptions reason);
+    void setState(PathFollowerFSM_BrakeState_T newState, VtolBrakeFSMStatusStateExitReasonOptions reason);
     int32_t runState();
-    // void updateFSMBrakeStatus();
+    // void updateVtolBrakeFSMStatus();
 
     void setStateTimeout(int32_t count);
     void fallback_to_hold(void);
@@ -111,4 +111,4 @@ protected:
     static PathFollowerFSM_BrakeStateHandler_T sBrakeStateTable[BRAKE_STATE_SIZE];
 };
 
-#endif // FSM_BRAKE_H
+#endif // VTOLBRAKEFSM_H

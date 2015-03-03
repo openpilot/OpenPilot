@@ -1,14 +1,9 @@
 /*
  ******************************************************************************
  *
- * @file       PathFollowerControlFly.c
+ * @file       vtolflycontroller.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      This landing state machine is a helper state machine to the
- *              pathfollower task/thread to implement detailed landing controls.
- *		This is to be called only from the pathfollower task.
- *		Note that initiation of the land occurs in the manual control
- *		command thread calling plans.c plan_setup_land which writes
- *		the required PathDesired LAND mode.
+ * @brief      Class implements the fly controller for vtols
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,21 +23,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/**
- * Input object: TODO Update when completed
- * Input object:
- * Input object:
- * Output object:
- *
- * This module acts as a landing FSM "autopilot"
- * This is a periodic delayed callback module
- *
- * Modules have no API, all communication to other modules is done through UAVObjects.
- * However modules may use the API exposed by shared libraries.
- * See the OpenPilot wiki for more details.
- * http://www.openpilot.org/OpenPilot_Application_Architecture
- *
- */
 extern "C" {
 #include <openpilot.h>
 
@@ -57,11 +37,8 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-// TODO Remove unused
 #include <homelocation.h>
 #include <accelstate.h>
-#include <fixedwingpathfollowersettings.h>
-#include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
@@ -83,60 +60,61 @@ extern "C" {
 }
 
 // C++ includes
-#include "PathFollowerControlFly.h"
-#include "PathFollowerFSM.h"
-#include "PIDControlThrust.h"
+#include "vtolflycontroller.h"
+#include "pathfollowerfsm.h"
+#include "pidcontroldown.h"
+#include "pidcontrolne.h"
 
 // Private constants
-#define DEADBAND_HIGH          0.10f
-#define DEADBAND_LOW           -0.10f
+#define DEADBAND_HIGH 0.10f
+#define DEADBAND_LOW  -0.10f
 
 // pointer to a singleton instance
-PathFollowerControlFly *PathFollowerControlFly::p_inst = 0;
+VtolFlyController *VtolFlyController::p_inst = 0;
 
-PathFollowerControlFly::PathFollowerControlFly()
+VtolFlyController::VtolFlyController()
     : vtolPathFollowerSettings(0), pathDesired(0), pathStatus(0), mActive(false), mManualThrust(false)
 {}
 
 // Called when mode first engaged
-void PathFollowerControlFly::Activate(void)
+void VtolFlyController::Activate(void)
 {
     if (!mActive) {
         mActive = true;
         mManualThrust = false;
         SettingsUpdated();
-        controlThrust.Activate();
+        controlDown.Activate();
         controlNE.Activate();
         mMode = pathDesired->Mode;
     }
 }
 
-uint8_t PathFollowerControlFly::IsActive(void)
+uint8_t VtolFlyController::IsActive(void)
 {
     return mActive;
 }
 
-uint8_t PathFollowerControlFly::Mode(void)
+uint8_t VtolFlyController::Mode(void)
 {
     return mMode;
 }
 
 // Objective updated in pathdesired
-void PathFollowerControlFly::ObjectiveUpdated(void)
+void VtolFlyController::ObjectiveUpdated(void)
 {}
 
-void PathFollowerControlFly::Deactivate(void)
+void VtolFlyController::Deactivate(void)
 {
     if (mActive) {
         mActive = false;
         mManualThrust = false;
-        controlThrust.Deactivate();
+        controlDown.Deactivate();
         controlNE.Deactivate();
     }
 }
 
 
-void PathFollowerControlFly::SettingsUpdated(void)
+void VtolFlyController::SettingsUpdated(void)
 {
     const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
 
@@ -151,27 +129,27 @@ void PathFollowerControlFly::SettingsUpdated(void)
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 
-    controlThrust.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp,
-                                   vtolPathFollowerSettings->VerticalVelPID.Ki,
-                                   vtolPathFollowerSettings->VerticalVelPID.Kd,
-                                   vtolPathFollowerSettings->VerticalVelPID.ILimit, // TODO Change to BETA
-                                   dT,
-                                   vtolPathFollowerSettings->VerticalVelMax);
+    controlDown.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp,
+                                 vtolPathFollowerSettings->VerticalVelPID.Ki,
+                                 vtolPathFollowerSettings->VerticalVelPID.Kd,
+                                 vtolPathFollowerSettings->VerticalVelPID.ILimit, // TODO Change to BETA
+                                 dT,
+                                 vtolPathFollowerSettings->VerticalVelMax);
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
 
     // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
-    controlThrust.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
 }
 
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t PathFollowerControlFly::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                                           PathDesiredData *ptr_pathDesired,
-                                           PathStatusData *ptr_pathStatus)
+int32_t VtolFlyController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
+                                      PathDesiredData *ptr_pathDesired,
+                                      PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     PIOS_Assert(ptr_pathDesired);
@@ -180,7 +158,7 @@ int32_t PathFollowerControlFly::Initialize(VtolPathFollowerSettingsData *ptr_vto
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired = ptr_pathDesired;
     pathStatus  = ptr_pathStatus;
-    controlThrust.Initialize(0);
+    controlDown.Initialize(0);
 
     return 0;
 }
@@ -189,7 +167,7 @@ int32_t PathFollowerControlFly::Initialize(VtolPathFollowerSettingsData *ptr_vto
 /**
  * Compute desired velocity from the current position and path
  */
-void PathFollowerControlFly::UpdateVelocityDesired()
+void VtolFlyController::UpdateVelocityDesired()
 {
     PositionStateData positionState;
 
@@ -201,15 +179,15 @@ void PathFollowerControlFly::UpdateVelocityDesired()
     VelocityDesiredData velocityDesired;
 
     // look ahead kFF seconds
-    float cur[3]   = { positionState.North + (velocityState.North * vtolPathFollowerSettings->CourseFeedForward),
-                       positionState.East + (velocityState.East * vtolPathFollowerSettings->CourseFeedForward),
-                       positionState.Down + (velocityState.Down * vtolPathFollowerSettings->CourseFeedForward) };
+    float cur[3] = { positionState.North + (velocityState.North * vtolPathFollowerSettings->CourseFeedForward),
+                     positionState.East + (velocityState.East * vtolPathFollowerSettings->CourseFeedForward),
+                     positionState.Down + (velocityState.Down * vtolPathFollowerSettings->CourseFeedForward) };
     struct path_status progress;
     path_progress(pathDesired, cur, &progress, true);
 
     controlNE.ControlPositionWithPath(&progress);
     if (!mManualThrust) {
-        controlThrust.ControlPositionWithPath(&progress);
+        controlDown.ControlPositionWithPath(&progress);
     }
 
     float north, east;
@@ -217,7 +195,7 @@ void PathFollowerControlFly::UpdateVelocityDesired()
     velocityDesired.North = north;
     velocityDesired.East  = east;
     if (!mManualThrust) {
-        velocityDesired.Down = controlThrust.GetVelocityDesired();
+        velocityDesired.Down = controlDown.GetVelocityDesired();
     } else { velocityDesired.Down = 0.0f; }
 
     // update pathstatus
@@ -235,7 +213,7 @@ void PathFollowerControlFly::UpdateVelocityDesired()
 }
 
 
-int8_t PathFollowerControlFly::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
+int8_t VtolFlyController::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
 {
     uint8_t result = 1;
     StabilizationDesiredData stabDesired;
@@ -307,7 +285,7 @@ int8_t PathFollowerControlFly::UpdateStabilizationDesired(bool yaw_attitude, flo
     if (mManualThrust) {
         stabDesired.Thrust = manualControl.Thrust;
     } else {
-        stabDesired.Thrust = controlThrust.GetThrustCommand();
+        stabDesired.Thrust = controlDown.GetDownCommand();
     }
 
     StabilizationDesiredSet(&stabDesired);
@@ -318,7 +296,7 @@ int8_t PathFollowerControlFly::UpdateStabilizationDesired(bool yaw_attitude, flo
 /**
  * Compute desired attitude for vtols - emergency fallback
  */
-void PathFollowerControlFly::UpdateDesiredAttitudeEmergencyFallback()
+void VtolFlyController::UpdateDesiredAttitudeEmergencyFallback()
 {
     VelocityDesiredData velocityDesired;
     VelocityStateData velocityState;
@@ -346,9 +324,9 @@ void PathFollowerControlFly::UpdateDesiredAttitudeEmergencyFallback()
     courseCommand   = (courseError * vtolPathFollowerSettings->EmergencyFallbackYawRate.kP);
     stabDesired.Yaw = boundf(courseCommand, -vtolPathFollowerSettings->EmergencyFallbackYawRate.Max, vtolPathFollowerSettings->EmergencyFallbackYawRate.Max);
 
-    controlThrust.UpdateVelocitySetpoint(velocityDesired.Down);
-    controlThrust.UpdateVelocityState(velocityState.Down);
-    stabDesired.Thrust = controlThrust.GetThrustCommand();
+    controlDown.UpdateVelocitySetpoint(velocityDesired.Down);
+    controlDown.UpdateVelocityState(velocityState.Down);
+    stabDesired.Thrust = controlDown.GetDownCommand();
 
 
     stabDesired.Roll   = vtolPathFollowerSettings->EmergencyFallbackAttitude.Roll;
@@ -366,7 +344,7 @@ void PathFollowerControlFly::UpdateDesiredAttitudeEmergencyFallback()
 }
 
 
-void PathFollowerControlFly::UpdateAutoPilot()
+void VtolFlyController::UpdateAutoPilot()
 {
     if (vtolPathFollowerSettings->ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_MANUAL) {
         mManualThrust = true;
@@ -388,7 +366,7 @@ void PathFollowerControlFly::UpdateAutoPilot()
  * use hover capable algorithm with unlimeted movement calculation. if that fails (flyaway situation due to compass failure)
  * fall back to emergency fallback autopilot to keep minimum amount of flight control
  */
-uint8_t PathFollowerControlFly::RunAutoPilot()
+uint8_t VtolFlyController::RunAutoPilot()
 {
     enum { RETURN_0 = 0, RETURN_1 = 1, RETURN_RESULT } returnmode;
     enum { FOLLOWER_REGULAR, FOLLOWER_FALLBACK } followermode;
@@ -472,7 +450,7 @@ uint8_t PathFollowerControlFly::RunAutoPilot()
 /**
  * Compute bearing of current takeoff location
  */
-float PathFollowerControlFly::updateTailInBearing()
+float VtolFlyController::updateTailInBearing()
 {
     PositionStateData p;
 
@@ -487,7 +465,7 @@ float PathFollowerControlFly::updateTailInBearing()
 /**
  * Compute bearing of current movement direction
  */
-float PathFollowerControlFly::updateCourseBearing()
+float VtolFlyController::updateCourseBearing()
 {
     VelocityStateData v;
 
@@ -500,7 +478,7 @@ float PathFollowerControlFly::updateCourseBearing()
 /**
  * Compute bearing of current path direction
  */
-float PathFollowerControlFly::updatePathBearing()
+float VtolFlyController::updatePathBearing()
 {
     PositionStateData positionState;
 
@@ -511,7 +489,7 @@ float PathFollowerControlFly::updatePathBearing()
                      positionState.Down };
     struct path_status progress;
 
-    path_progress(pathDesired, cur, &progress,true);
+    path_progress(pathDesired, cur, &progress, true);
 
     // atan2f always returns in between + and - 180 degrees
     return RAD2DEG(atan2f(progress.path_vector[1], progress.path_vector[0]));
@@ -521,7 +499,7 @@ float PathFollowerControlFly::updatePathBearing()
 /**
  * Compute bearing between current position and POI
  */
-float PathFollowerControlFly::updatePOIBearing()
+float VtolFlyController::updatePOIBearing()
 {
     PoiLocationData poi;
 

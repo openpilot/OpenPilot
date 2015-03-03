@@ -3,12 +3,12 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @brief PID controller for NE
  * @{
  *
  * @file       PIDControlNE.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Executes PID control loops for NE directions
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -41,8 +41,8 @@ extern "C" {
 #include <paths.h>
 #include "plans.h"
 }
-#include "PathFollowerFSM.h"
-#include "PIDControlNE.h"
+#include "pathfollowerfsm.h"
+#include "pidcontrolne.h"
 
 PIDControlNE::PIDControlNE()
     : deltaTime(0), mNECommand(0), mFSM(0), mNeutral(0), mVelocityMax(0), mMinCommand(0), mMaxCommand(0), mVelocityFeedforward(0), mActive(false)

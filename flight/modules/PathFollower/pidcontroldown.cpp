@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @addtogroup PathFollower PID interface class
+ * @brief PID loop for down control
  * @{
  *
- * @file       PIDControlThrust.h
+ * @file       pidcontroldown.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Executes PID control for down direction
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -45,8 +45,8 @@ extern "C" {
 #include <vtolselftuningstats.h>
 }
 
-#include "PathFollowerFSM.h"
-#include "PIDControlThrust.h"
+#include "pathfollowerfsm.h"
+#include "pidcontroldown.h"
 
 #define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT 0.5f
 #define NEUTRALTHRUST_PH_VEL_DESIRED_LIMIT      0.2f
@@ -57,26 +57,26 @@ extern "C" {
 #define NEUTRALTHRUST_END_COUNT                 (NEUTRALTHRUST_START_DELAY + (4 * 20))  // 4 second sample
 
 
-PIDControlThrust::PIDControlThrust()
-    : deltaTime(0), mVelocitySetpointTarget(0), mVelocityState(0), mThrustCommand(0.0f), mFSM(0), mNeutral(0.5f), mActive(false)
+PIDControlDown::PIDControlDown()
+    : deltaTime(0), mVelocitySetpointTarget(0), mVelocityState(0), mDownCommand(0.0f), mFSM(0), mNeutral(0.5f), mActive(false)
 {
     Deactivate();
 }
 
-PIDControlThrust::~PIDControlThrust() {}
+PIDControlDown::~PIDControlDown() {}
 
-void PIDControlThrust::Initialize(PathFollowerFSM *fsm)
+void PIDControlDown::Initialize(PathFollowerFSM *fsm)
 {
     mFSM = fsm;
 }
 
-void PIDControlThrust::Deactivate()
+void PIDControlDown::Deactivate()
 {
     // pid_zero(&PID);
     mActive = false;
 }
 
-void PIDControlThrust::Activate()
+void PIDControlDown::Activate()
 {
     float currentThrust;
 
@@ -86,7 +86,7 @@ void PIDControlThrust::Activate()
     mActive = true;
 }
 
-void PIDControlThrust::UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax)
+void PIDControlDown::UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax)
 {
     // pid_configure(&PID, kp, ki, kd, ilimit);
     float Ti = kp / ki;
@@ -107,21 +107,21 @@ void PIDControlThrust::UpdateParameters(float kp, float ki, float kd, float beta
 }
 
 
-void PIDControlThrust::UpdatePositionalParameters(float kp)
+void PIDControlDown::UpdatePositionalParameters(float kp)
 {
     pid_configure(&PIDpos, kp, 0.0f, 0.0f, 0.0f);
 }
-void PIDControlThrust::UpdatePositionSetpoint(float setpointDown)
+void PIDControlDown::UpdatePositionSetpoint(float setpointDown)
 {
     mPositionSetpointTarget = setpointDown;
 }
-void PIDControlThrust::UpdatePositionState(float pvDown)
+void PIDControlDown::UpdatePositionState(float pvDown)
 {
     mPositionState = pvDown;
     setup_neutralThrustCalc();
 }
 // This is a pure position hold position control
-void PIDControlThrust::ControlPosition()
+void PIDControlDown::ControlPosition()
 {
     // Current progress location relative to end
     float velDown = 0.0f;
@@ -133,7 +133,7 @@ void PIDControlThrust::ControlPosition()
 }
 
 
-void PIDControlThrust::ControlPositionWithPath(struct path_status *progress)
+void PIDControlDown::ControlPositionWithPath(struct path_status *progress)
 {
     // Current progress location relative to end
     float velDown = progress->path_vector[2];
@@ -143,7 +143,7 @@ void PIDControlThrust::ControlPositionWithPath(struct path_status *progress)
 }
 
 
-void PIDControlThrust::run_neutralThrustCalc(void)
+void PIDControlDown::run_neutralThrustCalc(void)
 {
     // if auto thrust and we have not run a correction calc check for PH and stability to then run an assessment
     // note that arming into this flight mode is not allowed, so assumption here is that
@@ -213,7 +213,7 @@ void PIDControlThrust::run_neutralThrustCalc(void)
 }
 
 
-void PIDControlThrust::setup_neutralThrustCalc(void)
+void PIDControlDown::setup_neutralThrustCalc(void)
 {
     // reset neutral thrust assessment.
     // and do once for each position hold engagement
@@ -228,17 +228,17 @@ void PIDControlThrust::setup_neutralThrustCalc(void)
 }
 
 
-void PIDControlThrust::UpdateNeutralThrust(float neutral)
+void PIDControlDown::UpdateNeutralThrust(float neutral)
 {
     if (mActive) {
         // adjust neutral and achieve bumpless transfer
         PID.va = neutral;
-        pid2_transfer(&PID, mThrustCommand);
+        pid2_transfer(&PID, mDownCommand);
     }
     mNeutral = neutral;
 }
 
-void PIDControlThrust::UpdateVelocitySetpoint(float setpoint)
+void PIDControlDown::UpdateVelocitySetpoint(float setpoint)
 {
     mVelocitySetpointTarget = setpoint;
     if (fabsf(mVelocitySetpointTarget) > mVelocityMax) {
@@ -247,7 +247,7 @@ void PIDControlThrust::UpdateVelocitySetpoint(float setpoint)
     }
 }
 
-void PIDControlThrust::RateLimit(float *spDesired, float *spCurrent, float rateLimit)
+void PIDControlDown::RateLimit(float *spDesired, float *spCurrent, float rateLimit)
 {
     float velocity_delta = *spDesired - *spCurrent;
 
@@ -270,7 +270,7 @@ void PIDControlThrust::RateLimit(float *spDesired, float *spCurrent, float rateL
     }
 }
 
-void PIDControlThrust::UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity)
+void PIDControlDown::UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity)
 {
     if (startingVelocity >= 0.0f) {
         *updatedVelocity = startingVelocity - dT * brakeRate;
@@ -291,7 +291,7 @@ void PIDControlThrust::UpdateBrakeVelocity(float startingVelocity, float dT, flo
     }
 }
 
-void PIDControlThrust::UpdateVelocityStateWithBrake(float pvDown, float path_time, float brakeRate)
+void PIDControlDown::UpdateVelocityStateWithBrake(float pvDown, float path_time, float brakeRate)
 {
     mVelocityState = pvDown;
 
@@ -308,7 +308,7 @@ void PIDControlThrust::UpdateVelocityStateWithBrake(float pvDown, float path_tim
 
 // Update velocity state called per dT. Also update current
 // desired velocity
-void PIDControlThrust::UpdateVelocityState(float pv)
+void PIDControlDown::UpdateVelocityState(float pv)
 {
     mVelocityState = pv;
 
@@ -318,12 +318,12 @@ void PIDControlThrust::UpdateVelocityState(float pv)
     mVelocitySetpointCurrent = velocitySetpointDesired;
 }
 
-float PIDControlThrust::GetVelocityDesired(void)
+float PIDControlDown::GetVelocityDesired(void)
 {
     return mVelocitySetpointCurrent;
 }
 
-float PIDControlThrust::GetThrustCommand(void)
+float PIDControlDown::GetDownCommand(void)
 {
     PIDStatusData pidStatus;
     // pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
@@ -340,10 +340,10 @@ float PIDControlThrust::GetThrustCommand(void)
     pidStatus.ulow     = ulow;
     pidStatus.uhigh    = uhigh;
     pidStatus.command  = downCommand;
-    pidStatus.P    = PID.P;
-    pidStatus.I    = PID.I;
-    pidStatus.D    = PID.D;
+    pidStatus.P  = PID.P;
+    pidStatus.I  = PID.I;
+    pidStatus.D  = PID.D;
     PIDStatusSet(&pidStatus);
-    mThrustCommand = downCommand;
-    return mThrustCommand;
+    mDownCommand = downCommand;
+    return mDownCommand;
 }

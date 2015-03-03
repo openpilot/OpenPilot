@@ -2,11 +2,11 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup PathFollower FSM Land
- * @brief Executes FSM for landing sequence
+ * @addtogroup PathFollower FSM
+ * @brief Executes landing sequence via an FSM
  * @{
  *
- * @file       fsm_land.h
+ * @file       vtollandfsm.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      Executes FSM for landing sequence
  *
@@ -28,13 +28,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef FSM_LAND_H
-#define FSM_LAND_H
+#ifndef VTOLLANDFSM_H
+#define VTOLLANDFSM_H
 
 extern "C" {
 #include "fsmlandstatus.h"
 }
-#include "PathFollowerFSM.h"
+#include "pathfollowerfsm.h"
 
 // Landing state machine
 typedef enum {
@@ -51,16 +51,16 @@ typedef enum {
     LAND_STATE_SIZE
 } PathFollowerFSM_LandState_T;
 
-class FSMLand : public PathFollowerFSM {
+class VtolLandFSM : public PathFollowerFSM {
 private:
-    static FSMLand *p_inst;
-    FSMLand();
+    static VtolLandFSM *p_inst;
+    VtolLandFSM();
 
 public:
-    static FSMLand *instance()
+    static VtolLandFSM *instance()
     {
         if (!p_inst) {
-            p_inst = new FSMLand();
+            p_inst = new VtolLandFSM();
         }
         return p_inst;
     }
@@ -99,16 +99,16 @@ protected:
         uint8_t  flConstrainThrust;
         uint8_t  flLowAltitude;
         uint8_t  flAltitudeHold;
-    } FSMLandData_T;
+    } VtolLandFSMData_T;
 
     // FSM state structure
     typedef struct {
-        void(FSMLand::*setup) (void); // Called to initialise the state
-        void(FSMLand::*run) (uint8_t); // Run the event detection code for a state
+        void(VtolLandFSM::*setup) (void); // Called to initialise the state
+        void(VtolLandFSM::*run) (uint8_t); // Run the event detection code for a state
     } PathFollowerFSM_LandStateHandler_T;
 
     // Private variables
-    FSMLandData_T *mLandData;
+    VtolLandFSMData_T *mLandData;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
     PathDesiredData *pathDesired;
     FlightStatusData *flightStatus;
@@ -136,7 +136,7 @@ protected:
     void setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateExitReasonOptions reason);
     int32_t runState();
     int32_t runAlways();
-    void updateFSMLandStatus();
+    void updateVtolLandFSMStatus();
     void assessAltitude(void);
 
     void setStateTimeout(int32_t count);
@@ -145,4 +145,4 @@ protected:
     static PathFollowerFSM_LandStateHandler_T sLandStateTable[LAND_STATE_SIZE];
 };
 
-#endif // FSM_LAND_H
+#endif // VTOLLANDFSM_H

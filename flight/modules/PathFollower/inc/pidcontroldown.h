@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @addtogroup PathFollower PID Control implementation
+ * @brief PID Controller for down direction
  * @{
  *
- * @file       PIDControlNE.h
+ * @file       PIDControlDown.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Executes control loop for down direction
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,54 +28,66 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PIDCONTROLNE_H
-#define PIDCONTROLNE_H
+#ifndef PIDCONTROLDOWN_H
+#define PIDCONTROLDOWN_H
 extern "C" {
 #include <pid.h>
+#include <stabilizationdesired.h>
 }
-#include "PathFollowerFSM.h"
+#include "pathfollowerfsm.h"
 
-class PIDControlNE {
+class PIDControlDown {
 public:
-    PIDControlNE();
-    ~PIDControlNE();
+    PIDControlDown();
+    ~PIDControlDown();
     void Initialize(PathFollowerFSM *fsm);
     void Deactivate();
     void Activate();
-    void UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax);
+    void UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax);
+    void UpdateNeutralThrust(float neutral);
+    void UpdateVelocitySetpoint(float setpoint);
+    void RateLimit(float *spDesired, float *spCurrent, float rateLimit);
+    void UpdateVelocityState(float pv);
+    float GetVelocityDesired(void);
+    float GetDownCommand(void);
     void UpdatePositionalParameters(float kp);
-    void UpdatePositionState(float pvNorth, float pvEast);
-    void UpdatePositionSetpoint(float setpointNorth, float setpointEast);
-    void UpdateVelocitySetpoint(float setpointNorth, float setpointEast);
-    // void RateLimit(float *spDesired, float *spCurrent, float rateLimit);
-    void UpdateVelocityState(float pvNorth, float pvEast);
-    void UpdateCommandParameters(float minCommand, float maxCommand, float velocityFeedforward);
+    void UpdatePositionState(float pvDown);
+    void UpdatePositionSetpoint(float setpointDown);
     void ControlPosition();
     void ControlPositionWithPath(struct path_status *progress);
-    void GetNECommand(float *northCommand, float *eastCommand);
-    void GetVelocityDesired(float *north, float *east);
     void UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
-    void UpdateVelocityStateWithBrake(float pvNorth, float pvEast, float path_time, float brakeRate);
+    void UpdateVelocityStateWithBrake(float pvDown, float path_time, float brakeRate);
 
 private:
-    struct pid2 PIDvel[2]; // North, East
-    float mVelocitySetpointTarget[2];
-    float mVelocityState[2];
-    struct pid PIDposH[2];
-    float mPositionSetpointTarget[2];
-    float mPositionState[2];
+    void setup_neutralThrustCalc();
+    void run_neutralThrustCalc();
 
-
+    struct pid2 PID;
     float deltaTime;
-    float mVelocitySetpointCurrent[2];
-    float mNECommand;
+    float mVelocitySetpointTarget;
+    float mVelocitySetpointCurrent;
+    float mVelocityState;
+    float mDownCommand;
     PathFollowerFSM *mFSM;
     float mNeutral;
     float mVelocityMax;
-    float mMinCommand;
-    float mMaxCommand;
-    float mVelocityFeedforward;
+    struct pid PIDpos;
+    float mPositionSetpointTarget;
+    float mPositionState;
     uint8_t mActive;
+
+    struct NeutralThrustEstimation {
+        uint32_t count;
+        float    sum;
+        float    average;
+        float    correction;
+        float    algo_erro_check;
+        float    min;
+        float    max;
+        bool     start_sampling;
+        bool     have_correction;
+    };
+    struct NeutralThrustEstimation neutralThrustEst;
 };
 
-#endif // PIDCONTROLNE_H
+#endif // PIDCONTROLDOWN_H

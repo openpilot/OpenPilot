@@ -1,14 +1,9 @@
 /*
  ******************************************************************************
  *
- * @file       PathFollowerControlVelocityRoam.c
+ * @file       VtolVelocityController.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      This landing state machine is a helper state machine to the
- *              pathfollower task/thread to implement detailed landing controls.
- *		This is to be called only from the pathfollower task.
- *		Note that initiation of the land occurs in the manual control
- *		command thread calling plans.c plan_setup_land which writes
- *		the required PathDesired VELOCITYROAM mode.
+ * @brief      Velocity roam controller for vtols
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -42,11 +37,8 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-// TODO Remove unused
 #include <homelocation.h>
 #include <accelstate.h>
-#include <fixedwingpathfollowersettings.h>
-#include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
@@ -68,20 +60,20 @@ extern "C" {
 }
 
 // C++ includes
-#include "PathFollowerControlVelocityRoam.h"
-#include "PIDControlNE.h"
+#include "vtolvelocitycontroller.h"
+#include "pidcontrolne.h"
 
 // Private constants
 
 // pointer to a singleton instance
-PathFollowerControlVelocityRoam *PathFollowerControlVelocityRoam::p_inst = 0;
+VtolVelocityController *VtolVelocityController::p_inst = 0;
 
-PathFollowerControlVelocityRoam::PathFollowerControlVelocityRoam()
+VtolVelocityController::VtolVelocityController()
     : vtolPathFollowerSettings(0), pathDesired(0), pathStatus(0), mActive(false)
 {}
 
 // Called when mode first engaged
-void PathFollowerControlVelocityRoam::Activate(void)
+void VtolVelocityController::Activate(void)
 {
     if (!mActive) {
         mActive = true;
@@ -90,23 +82,23 @@ void PathFollowerControlVelocityRoam::Activate(void)
     }
 }
 
-uint8_t PathFollowerControlVelocityRoam::IsActive(void)
+uint8_t VtolVelocityController::IsActive(void)
 {
     return mActive;
 }
 
-uint8_t PathFollowerControlVelocityRoam::Mode(void)
+uint8_t VtolVelocityController::Mode(void)
 {
     return PATHDESIRED_MODE_VELOCITY;
 }
 
-void PathFollowerControlVelocityRoam::ObjectiveUpdated(void)
+void VtolVelocityController::ObjectiveUpdated(void)
 {
     controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH],
                                      pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]);
 }
 
-void PathFollowerControlVelocityRoam::Deactivate(void)
+void VtolVelocityController::Deactivate(void)
 {
     if (mActive) {
         mActive = false;
@@ -114,7 +106,7 @@ void PathFollowerControlVelocityRoam::Deactivate(void)
     }
 }
 
-void PathFollowerControlVelocityRoam::SettingsUpdated(void)
+void VtolVelocityController::SettingsUpdated(void)
 {
     const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
 
@@ -130,9 +122,9 @@ void PathFollowerControlVelocityRoam::SettingsUpdated(void)
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 }
 
-int32_t PathFollowerControlVelocityRoam::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                                                    PathDesiredData *ptr_pathDesired,
-                                                    PathStatusData *ptr_pathStatus)
+int32_t VtolVelocityController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
+                                           PathDesiredData *ptr_pathDesired,
+                                           PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     PIOS_Assert(ptr_pathDesired);
@@ -145,7 +137,7 @@ int32_t PathFollowerControlVelocityRoam::Initialize(VtolPathFollowerSettingsData
 }
 
 
-void PathFollowerControlVelocityRoam::UpdateVelocityDesired()
+void VtolVelocityController::UpdateVelocityDesired()
 {
     VelocityStateData velocityState;
 
@@ -174,7 +166,7 @@ void PathFollowerControlVelocityRoam::UpdateVelocityDesired()
     VelocityDesiredSet(&velocityDesired);
 }
 
-int8_t PathFollowerControlVelocityRoam::UpdateStabilizationDesired(__attribute__((unused)) bool yaw_attitude, __attribute__((unused)) float yaw_direction)
+int8_t VtolVelocityController::UpdateStabilizationDesired(__attribute__((unused)) bool yaw_attitude, __attribute__((unused)) float yaw_direction)
 {
     uint8_t result = 1;
     StabilizationDesiredData stabDesired;
@@ -212,7 +204,7 @@ int8_t PathFollowerControlVelocityRoam::UpdateStabilizationDesired(__attribute__
     return result;
 }
 
-void PathFollowerControlVelocityRoam::UpdateAutoPilot()
+void VtolVelocityController::UpdateAutoPilot()
 {
     UpdateVelocityDesired();
 
@@ -228,7 +220,7 @@ void PathFollowerControlVelocityRoam::UpdateAutoPilot()
     PathStatusSet(pathStatus);
 }
 
-void PathFollowerControlVelocityRoam::fallback_to_hold(void)
+void VtolVelocityController::fallback_to_hold(void)
 {
     PositionStateData positionState;
 

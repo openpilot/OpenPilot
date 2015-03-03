@@ -6,9 +6,9 @@
  * @brief FSM interface class for pathfollower goal fsm implementations
  * @{
  *
- * @file       PathFollowerFSM.h
+ * @file       pathfollowerfsm.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes FSM for landing sequence
+ * @brief      Interface class for PathFollower FSMs
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -74,7 +74,7 @@ public:
         return false;
     }
 
-    // virtual ~PathFollowerFSM();
+    // virtual ~PathFollowerFSM() = 0;
 };
 
 #endif // PATHFOLLOWERFSM_H

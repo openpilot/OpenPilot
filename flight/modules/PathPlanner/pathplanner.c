@@ -139,6 +139,7 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     uint8_t TreatCustomCraftAs;
+
     VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
     frameType = GetCurrentFrameType();
@@ -147,22 +148,19 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         switch (TreatCustomCraftAs) {
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
             frameType = FRAME_TYPE_FIXED_WING;
-            mode3D = true;
+            mode3D    = true;
             break;
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
             frameType = FRAME_TYPE_MULTIROTOR;
-            mode3D = true;
+            mode3D    = true;
             break;
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
             frameType = FRAME_TYPE_GROUND;
-            mode3D = false;
+            mode3D    = false;
             break;
         }
     }
 }
-
-
-
 
 
 /**

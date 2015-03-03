@@ -3,12 +3,12 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @brief CONTROL interface class for brake controller
  * @{
  *
- * @file       PathFollowerCONTROL.h
+ * @file       vtolbrakecontroller.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Executes brake controller for vtol
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,24 +28,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PATHFOLLOWERCONTROLBRAKE_H
-#define PATHFOLLOWERCONTROLBRAKE_H
-#include "PathFollowerControl.h"
-#include "PIDControlThrust.h"
-#include "PIDControlNE.h"
+#ifndef VTOLBRAKECONTROLLER_H
+#define VTOLBRAKECONTROLLER_H
+#include "pathfollowercontrol.h"
+#include "pidcontroldown.h"
+#include "pidcontrolne.h"
 // forward decl
 class PathFollowerFSM;
-class PathFollowerControlBrake : public PathFollowerControl {
+class VtolBrakeController : public PathFollowerControl {
 private:
-    static PathFollowerControlBrake *p_inst;
-    PathFollowerControlBrake();
+    static VtolBrakeController *p_inst;
+    VtolBrakeController();
 
 
 public:
-    static PathFollowerControlBrake *instance()
+    static VtolBrakeController *instance()
     {
         if (!p_inst) {
-            p_inst = new PathFollowerControlBrake();
+            p_inst = new VtolBrakeController();
         }
         return p_inst;
     }
@@ -75,11 +75,11 @@ private:
     PathDesiredData *pathDesired;
     FlightStatusData *flightStatus;
     PathStatusData *pathStatus;
-    PIDControlThrust controlThrust;
+    PIDControlDown controlDown;
     PIDControlNE controlNE;
     uint8_t mActive;
     uint8_t mHoldActive;
     uint8_t mManualThrust;
 };
 
-#endif // PATHFOLLOWERCONTROLBRAKE_H
+#endif // VTOLBRAKECONTROLLER_H

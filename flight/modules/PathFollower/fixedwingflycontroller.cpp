@@ -1,14 +1,9 @@
 /*
  ******************************************************************************
  *
- * @file       FixedWingControlFly.c
+ * @file       FixedWingFlyController.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      This landing state machine is a helper state machine to the
- *              pathfollower task/thread to implement detailed landing controls.
- *		This is to be called only from the pathfollower task.
- *		Note that initiation of the land occurs in the manual control
- *		command thread calling plans.c plan_setup_land which writes
- *		the required PathDesired LAND mode.
+ * @brief      Fixed wing fly controller implementation
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,21 +23,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/**
- * Input object: TODO Update when completed
- * Input object:
- * Input object:
- * Output object:
- *
- * This module acts as a landing FSM "autopilot"
- * This is a periodic delayed callback module
- *
- * Modules have no API, all communication to other modules is done through UAVObjects.
- * However modules may use the API exposed by shared libraries.
- * See the OpenPilot wiki for more details.
- * http://www.openpilot.org/OpenPilot_Application_Architecture
- *
- */
 extern "C" {
 #include <openpilot.h>
 
@@ -57,7 +37,6 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-// TODO Remove unused
 #include <homelocation.h>
 #include <accelstate.h>
 #include <fixedwingpathfollowersettings.h>
@@ -82,45 +61,43 @@ extern "C" {
 }
 
 // C++ includes
-#include "FixedWingControlFly.h"
+#include "fixedwingflycontroller.h"
 
 // Private constants
-#define DEADBAND_HIGH          0.10f
-#define DEADBAND_LOW           -0.10f
 
 // pointer to a singleton instance
-FixedWingControlFly *FixedWingControlFly::p_inst = 0;
+FixedWingFlyController *FixedWingFlyController::p_inst = 0;
 
-FixedWingControlFly::FixedWingControlFly()
-: fixedWingSettings(0), pathDesired(0), pathStatus(0), mActive(false), indicatedAirspeedStateBias(0.0f)
+FixedWingFlyController::FixedWingFlyController()
+    : fixedWingSettings(0), pathDesired(0), pathStatus(0), mActive(false), indicatedAirspeedStateBias(0.0f)
 {}
 
 // Called when mode first engaged
-void FixedWingControlFly::Activate(void)
+void FixedWingFlyController::Activate(void)
 {
     if (!mActive) {
         mActive = true;
         SettingsUpdated();
         resetGlobals();
-        mMode = pathDesired->Mode;
+        mMode   = pathDesired->Mode;
     }
 }
 
-uint8_t FixedWingControlFly::IsActive(void)
+uint8_t FixedWingFlyController::IsActive(void)
 {
     return mActive;
 }
 
-uint8_t FixedWingControlFly::Mode(void)
+uint8_t FixedWingFlyController::Mode(void)
 {
     return mMode;
 }
 
 // Objective updated in pathdesired
-void FixedWingControlFly::ObjectiveUpdated(void)
+void FixedWingFlyController::ObjectiveUpdated(void)
 {}
 
-void FixedWingControlFly::Deactivate(void)
+void FixedWingFlyController::Deactivate(void)
 {
     if (mActive) {
         mActive = false;
@@ -129,9 +106,8 @@ void FixedWingControlFly::Deactivate(void)
 }
 
 
-void FixedWingControlFly::SettingsUpdated(void)
+void FixedWingFlyController::SettingsUpdated(void)
 {
-
     // fixed wing PID only
     pid_configure(&PIDposH[0], fixedWingSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
     pid_configure(&PIDposH[1], fixedWingSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
@@ -146,7 +122,7 @@ void FixedWingControlFly::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t FixedWingControlFly::Initialize(FixedWingPathFollowerSettingsData *ptr_fixedWingSettings,
+int32_t FixedWingFlyController::Initialize(FixedWingPathFollowerSettingsData *ptr_fixedWingSettings,
                                            PathDesiredData *ptr_pathDesired,
                                            PathStatusData *ptr_pathStatus)
 {
@@ -166,7 +142,7 @@ int32_t FixedWingControlFly::Initialize(FixedWingPathFollowerSettingsData *ptr_f
 /**
  * reset integrals
  */
-void FixedWingControlFly::resetGlobals()
+void FixedWingFlyController::resetGlobals()
 {
     pid_zero(&PIDposH[0]);
     pid_zero(&PIDposH[1]);
@@ -177,9 +153,8 @@ void FixedWingControlFly::resetGlobals()
     pathStatus->path_time = 0.0f;
 }
 
-void FixedWingControlFly::UpdateAutoPilot()
+void FixedWingFlyController::UpdateAutoPilot()
 {
-
     uint8_t result = updateAutoPilotFixedWing();
 
     if (result) {
@@ -198,7 +173,7 @@ void FixedWingControlFly::UpdateAutoPilot()
  * 1. update path velocity for limited motion crafts
  * 2. update attitude according to default fixed wing pathfollower algorithm
  */
-uint8_t FixedWingControlFly::updateAutoPilotFixedWing()
+uint8_t FixedWingFlyController::updateAutoPilotFixedWing()
 {
     updatePathVelocity(fixedWingSettings->CourseFeedForward, true);
     return updateFixedDesiredAttitude();
@@ -207,7 +182,7 @@ uint8_t FixedWingControlFly::updateAutoPilotFixedWing()
 /**
  * Compute desired velocity from the current position and path
  */
-void FixedWingControlFly::updatePathVelocity(float kFF, bool limited)
+void FixedWingFlyController::updatePathVelocity(float kFF, bool limited)
 {
     PositionStateData positionState;
 
@@ -255,7 +230,7 @@ void FixedWingControlFly::updatePathVelocity(float kFF, bool limited)
     velocityDesired.Down += pid_apply(&PIDposV, progress.correction_vector[2], dT);
 
     // update pathstatus
-    pathStatus->error      = progress.error;
+    pathStatus->error     = progress.error;
     pathStatus->fractional_progress  = progress.fractional_progress;
     pathStatus->path_direction_north = progress.path_vector[0];
     pathStatus->path_direction_east  = progress.path_vector[1];
@@ -273,7 +248,7 @@ void FixedWingControlFly::updatePathVelocity(float kFF, bool limited)
 /**
  * Compute desired attitude from the desired velocity for fixed wing craft
  */
-uint8_t FixedWingControlFly::updateFixedDesiredAttitude()
+uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
 {
     uint8_t result = 1;
 
@@ -535,7 +510,7 @@ uint8_t FixedWingControlFly::updateFixedDesiredAttitude()
  * returns true if a valid solution could be found for V,F,s, false if not
  * C will be set to a best effort attempt either way
  */
-bool FixedWingControlFly::correctCourse(float *C, float *V, float *F, float s)
+bool FixedWingFlyController::correctCourse(float *C, float *V, float *F, float s)
 {
     // Approach:
     // Let Sc be a circle around origin marking possible movement vectors
@@ -625,7 +600,7 @@ bool FixedWingControlFly::correctCourse(float *C, float *V, float *F, float s)
 }
 
 
-void FixedWingControlFly::AirspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+void FixedWingFlyController::AirspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     AirspeedStateData airspeedState;
     VelocityStateData velocityState;
@@ -647,4 +622,3 @@ void FixedWingControlFly::AirspeedStateUpdatedCb(__attribute__((unused)) UAVObjE
     // This has a side effect that in the absence of any airspeed updates, the
     // pathfollower will fly using groundspeed.
 }
-

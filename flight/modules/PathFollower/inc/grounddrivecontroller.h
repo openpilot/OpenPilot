@@ -3,12 +3,12 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup Ground CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @brief CONTROL interface class for ground drive controller
  * @{
  *
- * @file       GroundCONTROL.h
+ * @file       grounddrivecontroller.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Class definition for ground drive controller implementation
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -30,7 +30,7 @@
  */
 #ifndef GROUNDDRIVECONTROLLER_H
 #define GROUNDDRIVECONTROLLER_H
-#include "PathFollowerControl.h"
+#include "pathfollowercontrol.h"
 
 class GroundDriveController : public PathFollowerControl {
 private:
@@ -72,13 +72,9 @@ private:
     uint8_t mActive;
     uint8_t mMode;
 
-    struct pid  PIDposH[2];
-    struct pid  PIDposV;
-    struct pid  PIDcourse;
-    struct pid  PIDspeed;
-    struct pid  PIDpower;
+    struct pid PIDposH[2];
+    struct pid PIDposV;
     // correct speed by measured airspeed
-    float indicatedAirspeedStateBias;
     struct pid PIDgndspeed;
 };
 

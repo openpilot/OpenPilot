@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal fsm implementations
+ * @addtogroup PathFollower Controller
+ * @brief Controller for Vtol velocity roam
  * @{
  *
- * @file       PathFollowerCONTROL.h
+ * @file       vtolvelocitycontroller.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Executes CONTROL for landing sequence
+ * @brief      Executes velocity roam control
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -30,20 +30,20 @@
  */
 #ifndef PATHFOLLOWERCONTROLVELOCITYROAM_H
 #define PATHFOLLOWERCONTROLVELOCITYROAM_H
-#include "PathFollowerControl.h"
-#include "PIDControlNE.h"
+#include "pathfollowercontrol.h"
+#include "pidcontrolne.h"
 
-class PathFollowerControlVelocityRoam : public PathFollowerControl {
+class VtolVelocityController : public PathFollowerControl {
 private:
-    static PathFollowerControlVelocityRoam *p_inst;
-    PathFollowerControlVelocityRoam();
+    static VtolVelocityController *p_inst;
+    VtolVelocityController();
 
 
 public:
-    static PathFollowerControlVelocityRoam *instance()
+    static VtolVelocityController *instance()
     {
         if (!p_inst) {
-            p_inst = new PathFollowerControlVelocityRoam();
+            p_inst = new VtolVelocityController();
         }
         return p_inst;
     }
@@ -73,4 +73,4 @@ private:
     uint8_t mActive;
 };
 
-#endif // PATHFOLLOWERCONTROLVELOCITYROAM_H
+#endif // ifndef PATHFOLLOWERCONTROLVELOCITYROAM_H

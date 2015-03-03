@@ -222,7 +222,8 @@ class Repo:
         json_data['time'] = self._time
         json_data['tag'] = self._tag
         json_data['branch'] = self._branch
-        json_data['dirty'] = self._dirty
+        # version-info.json is for use with git archive which doesn't take in dirty changes
+        json_data['dirty'] = False
 
         json_path = os.path.join(path, 'version-info.json')
         with open(json_path, 'w') as json_file:

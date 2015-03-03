@@ -9,7 +9,7 @@
 
 	<!-- ensure the following Mode options are exactly the same as in pathaction mode -->
     <field name="Mode" units="" type="enum" elements="1" options="GoToEndpoint,FollowVector,CircleRight,CircleLeft,
-            FixedAttitude,SetAccessory,DisarmAlarm,Land,Brake,Velocity" default="Endpoint" />
+            FixedAttitude,SetAccessory,DisarmAlarm,Land,Brake,Velocity" default="GoToEndpoint" />
 
 	<!-- Endpoint mode - move directly towards endpoint regardless of position -->
 	<!-- Straight Mode - move across linear path through Start towards the waypoint end, adjusting velocity - continue straight -->

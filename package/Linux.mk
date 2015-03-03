@@ -7,7 +7,7 @@ ifndef OPENPILOT_IS_COOL
 endif
 
 # Are we using a debian based distro?
-ifneq ($(shell which dpkg),)
+ifneq ($(shell which dpkg 2> /dev/null),)
 
 DEB_DIST             := unstable
 # Instead of RELEASE-15.01-RC1 debian wants 15.01~RC1

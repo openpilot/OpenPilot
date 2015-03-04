@@ -106,7 +106,7 @@ extern "C" {
 // Private variables
 static DelayedCallbackInfo *pathFollowerCBInfo;
 static uint32_t updatePeriod = PF_IDLE_UPDATE_RATE_MS;
-static FrameType_t frameType;
+static FrameType_t frameType  = FRAME_TYPE_MULTIROTOR;
 static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
@@ -122,6 +122,7 @@ static void airspeedStateUpdatedCb(UAVObjEvent *ev);
 static void pathFollowerObjectiveUpdatedCb(UAVObjEvent *ev);
 static void flightStatusUpdatedCb(UAVObjEvent *ev);
 static void updateFixedAttitude(float *attitude);
+static void pathFollowerInitializeControllersForFrameType();
 
 /**
  * Initialise the module, called on startup
@@ -136,6 +137,7 @@ int32_t PathFollowerStart()
 
     return 0;
 }
+
 
 /**
  * Initialise the module, called on startup
@@ -171,18 +173,11 @@ int32_t PathFollowerInitialize()
     HomeLocationInitialize();
     AccelStateInitialize();
 
-    // Initialise references to controllers
+    // Init references to controllers
     PathFollowerControl::Initialize(&pathDesired, &flightStatus, &pathStatus);
 
-    // Vtol controllers
-    VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
-    VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
-    VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
-    VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
-
-    // Other controllers
-    FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
-    GroundDriveController::instance()->Initialize(&groundPathFollowerSettings);
+    // Init controllers for the frame type
+    pathFollowerInitializeControllersForFrameType();
 
     // Create object queue
     pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_PATHFOLLOWER, STACK_SIZE_BYTES);
@@ -198,6 +193,28 @@ int32_t PathFollowerInitialize()
 }
 MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
 
+void pathFollowerInitializeControllersForFrameType() {
+  switch (frameType) {
+    case FRAME_TYPE_MULTIROTOR:
+    case FRAME_TYPE_HELI:
+      VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
+      VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
+      VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
+      VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
+      break;
+
+    case FRAME_TYPE_FIXED_WING:
+      FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
+      break;
+
+    case FRAME_TYPE_GROUND:
+      GroundDriveController::instance()->Initialize(&groundPathFollowerSettings);
+      break;
+
+    default:
+      break;
+    }
+}
 
 static void pathFollowerSetActiveController(void)
 {
@@ -352,6 +369,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
 
+    FrameType_t previous_frameType  = frameType;
     frameType = GetCurrentFrameType();
 
     if (frameType == FRAME_TYPE_CUSTOM) {
@@ -367,6 +385,12 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
             break;
         }
     }
+
+    // If frame type changes, initialise the frame type controllers
+    if (frameType != previous_frameType) {
+	pathFollowerInitializeControllersForFrameType();
+    }
+
     switch (frameType) {
     case FRAME_TYPE_MULTIROTOR:
     case FRAME_TYPE_HELI:

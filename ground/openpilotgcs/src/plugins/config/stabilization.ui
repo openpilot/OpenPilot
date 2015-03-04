@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>780</height>
+            <width>939</width>
+            <height>776</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -2900,7 +2900,7 @@ border-radius: 5;</string>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>160</height>
+                  <height>16777215</height>
                  </size>
                 </property>
                 <property name="title">
@@ -5626,7 +5626,7 @@ Then lower the value by 5 or so.</string>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>135</height>
+                  <height>16777215</height>
                  </size>
                 </property>
                 <property name="autoFillBackground">
@@ -8244,8 +8244,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>780</height>
+            <width>952</width>
+            <height>763</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -18236,8 +18236,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>780</height>
+            <width>952</width>
+            <height>763</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -24082,8 +24082,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>780</height>
+            <width>952</width>
+            <height>763</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

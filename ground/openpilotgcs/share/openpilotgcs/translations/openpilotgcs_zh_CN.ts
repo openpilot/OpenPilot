@@ -6270,7 +6270,7 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;切忌不要为多旋翼飞行器设置 &amp;quot;手动&amp;quot; 模式！ 不要为固定翼飞行器设置 &amp;quot;姿态&amp;quot;, &amp;quot;速度控制&amp;quot; 或 &amp;quot;巡航控制&amp;quot;！&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;切忌不要为多旋翼飞行器设置 &amp;quot;手动&amp;quot; 模式！ 不要为固定翼飞行器设置 &amp;quot;姿态&amp;quot;, &amp;quot;速度控制&amp;quot; 或 &amp;quot;巡航控制&amp;quot;！&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6370,6 +6370,11 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>fieldname:FlightModeAssistMap</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:yes</source>
         <translation></translation>
     </message>
 </context>
@@ -10444,7 +10449,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+13"/>
         <source>Connections:</source>
-        <translation>连接设备：</translation>
+        <translation>设备：</translation>
     </message>
     <message>
         <location line="+72"/>
@@ -15446,27 +15451,27 @@ IMPORTANT: These new settings have not been saved to the board yet. After pressi
     <message>
         <location/>
         <source>Mode 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Mode 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Mode 3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Mode 4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Identify sticks instructions</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>

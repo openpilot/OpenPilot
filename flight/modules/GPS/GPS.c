@@ -275,6 +275,12 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             ubx_autoconfig_run(&buffer, &count, status != GPSPOSITIONSENSOR_STATUS_NOGPS);
             // Something to send?
             if (count) {
+                // clear ack/nak
+                ubxLastAck.clsID = 0x00;
+                ubxLastAck.msgID = 0x00;
+                ubxLastNak.clsID = 0x00;
+                ubxLastNak.msgID = 0x00;
+
                 PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
             }
         }

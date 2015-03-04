@@ -381,10 +381,6 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
 
     case INIT_STEP_START:
     case INIT_STEP_ASK_VER:
-        // clear ack
-        ubxLastAck.clsID = 0x00;
-        ubxLastAck.msgID = 0x00;
-
         status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
         build_request(&status->working_packet, UBX_CLASS_MON, UBX_ID_MON_VER, bytes_to_send);
         status->currentStep = INIT_STEP_WAIT_VER;
@@ -427,10 +423,6 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
     {
         bool step_configure = (status->currentStep == INIT_STEP_CONFIGURE_WAIT_ACK);
         if (ubxLastAck.clsID == status->requiredAck.clsID && ubxLastAck.msgID == status->requiredAck.msgID) {
-            // clear ack
-            ubxLastAck.clsID   = 0x00;
-            ubxLastAck.msgID   = 0x00;
-
             // Continue with next configuration option
             status->retryCount = 0;
             status->lastConfigSent++;

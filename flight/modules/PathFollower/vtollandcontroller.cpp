@@ -62,6 +62,7 @@ extern "C" {
 // C++ includes
 #include "vtollandcontroller.h"
 #include "pathfollowerfsm.h"
+#include "vtollandfsm.h"
 #include "pidcontroldown.h"
 
 // Private constants
@@ -147,13 +148,12 @@ void VtolLandController::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t VtolLandController::Initialize(PathFollowerFSM *fsm_ptr,
-                                       VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
+int32_t VtolLandController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
-    PIOS_Assert(fsm_ptr);
 
-    fsm = fsm_ptr;
+    fsm = (PathFollowerFSM *)VtolLandFSM::instance();
+    VtolLandFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     controlDown.Initialize(fsm);
 

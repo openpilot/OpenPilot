@@ -84,8 +84,6 @@ extern "C" {
 }
 
 #include "pathfollowercontrol.h"
-#include "vtollandfsm.h"
-#include "vtolbrakefsm.h"
 #include "vtollandcontroller.h"
 #include "vtolvelocitycontroller.h"
 #include "vtolbrakecontroller.h"
@@ -173,18 +171,17 @@ int32_t PathFollowerInitialize()
     HomeLocationInitialize();
     AccelStateInitialize();
 
-    // Initialise the autopilot mode implementations that use an FSM
+    // Initialise references to controllers
     PathFollowerControl::Initialize(&pathDesired, &flightStatus, &pathStatus);
-    VtolLandFSM::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
-    VtolLandController::instance()->Initialize((PathFollowerFSM *)VtolLandFSM::instance(),
-                                                       &vtolPathFollowerSettings);
+
+    // Vtol controllers
+    VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
     VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
     VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
-    VtolBrakeController::instance()->Initialize((PathFollowerFSM *)VtolBrakeFSM::instance(),
-                                                     &vtolPathFollowerSettings);
+    VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
 
+    // Other controllers
     FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
-
     GroundDriveController::instance()->Initialize(&groundPathFollowerSettings);
 
     // Create object queue
@@ -353,8 +350,6 @@ static void flightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    FixedWingPathFollowerSettingsGet(&fixedWingPathFollowerSettings);
-    GroundPathFollowerSettingsGet(&groundPathFollowerSettings);
     VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
 
     frameType = GetCurrentFrameType();
@@ -378,13 +373,15 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         updatePeriod = vtolPathFollowerSettings.UpdatePeriod;
         break;
     case FRAME_TYPE_FIXED_WING:
+        FixedWingPathFollowerSettingsGet(&fixedWingPathFollowerSettings);
         updatePeriod = fixedWingPathFollowerSettings.UpdatePeriod;
         break;
     case FRAME_TYPE_GROUND:
+        GroundPathFollowerSettingsGet(&groundPathFollowerSettings);
         updatePeriod = groundPathFollowerSettings.UpdatePeriod;
         break;
     default:
-        updatePeriod = fixedWingPathFollowerSettings.UpdatePeriod;
+        updatePeriod = vtolPathFollowerSettings.UpdatePeriod;
         break;
     }
 

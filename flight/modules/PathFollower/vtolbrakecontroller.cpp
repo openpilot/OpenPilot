@@ -67,6 +67,7 @@ extern "C" {
 // C++ includes
 #include "vtolbrakecontroller.h"
 #include "pathfollowerfsm.h"
+#include "vtolbrakefsm.h"
 #include "pidcontroldown.h"
 
 // Private constants
@@ -161,14 +162,12 @@ void VtolBrakeController::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t VtolBrakeController::Initialize(PathFollowerFSM *fsm_ptr,
-                                        VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
+int32_t VtolBrakeController::Initialize( VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
-    PIOS_Assert(fsm_ptr);
-
-    fsm = fsm_ptr;
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
+    VtolBrakeFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus, pathStatus);
+    fsm = (PathFollowerFSM *)VtolBrakeFSM::instance();
     controlDown.Initialize(fsm);
 
     return 0;

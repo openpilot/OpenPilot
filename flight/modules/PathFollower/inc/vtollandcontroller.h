@@ -50,8 +50,7 @@ public:
         return p_inst;
     }
 
-    int32_t Initialize(PathFollowerFSM *fsm_ptr,
-                       VtolPathFollowerSettingsData *vtolPathFollowerSettings);
+    int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings);
 
 
     void Activate(void);

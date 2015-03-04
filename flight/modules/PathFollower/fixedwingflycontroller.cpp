@@ -69,7 +69,7 @@ extern "C" {
 FixedWingFlyController *FixedWingFlyController::p_inst = 0;
 
 FixedWingFlyController::FixedWingFlyController()
-    : fixedWingSettings(0), pathDesired(0), pathStatus(0), mActive(false), indicatedAirspeedStateBias(0.0f)
+    : fixedWingSettings(0), mActive(false), indicatedAirspeedStateBias(0.0f)
 {}
 
 // Called when mode first engaged
@@ -122,17 +122,11 @@ void FixedWingFlyController::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t FixedWingFlyController::Initialize(FixedWingPathFollowerSettingsData *ptr_fixedWingSettings,
-                                           PathDesiredData *ptr_pathDesired,
-                                           PathStatusData *ptr_pathStatus)
+int32_t FixedWingFlyController::Initialize(FixedWingPathFollowerSettingsData *ptr_fixedWingSettings)
 {
     PIOS_Assert(ptr_fixedWingSettings);
-    PIOS_Assert(ptr_pathDesired);
-    PIOS_Assert(ptr_pathStatus);
 
     fixedWingSettings = ptr_fixedWingSettings;
-    pathDesired = ptr_pathDesired;
-    pathStatus  = ptr_pathStatus;
 
     resetGlobals();
 

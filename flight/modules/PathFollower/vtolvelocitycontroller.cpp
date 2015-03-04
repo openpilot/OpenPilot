@@ -69,7 +69,7 @@ extern "C" {
 VtolVelocityController *VtolVelocityController::p_inst = 0;
 
 VtolVelocityController::VtolVelocityController()
-    : vtolPathFollowerSettings(0), pathDesired(0), pathStatus(0), mActive(false)
+    : vtolPathFollowerSettings(0), mActive(false)
 {}
 
 // Called when mode first engaged
@@ -122,17 +122,11 @@ void VtolVelocityController::SettingsUpdated(void)
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 }
 
-int32_t VtolVelocityController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                                           PathDesiredData *ptr_pathDesired,
-                                           PathStatusData *ptr_pathStatus)
+int32_t VtolVelocityController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
-    PIOS_Assert(ptr_pathDesired);
-    PIOS_Assert(ptr_pathStatus);
 
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    pathDesired = ptr_pathDesired;
-    pathStatus  = ptr_pathStatus;
     return 0;
 }
 

@@ -79,8 +79,11 @@ extern "C" {
 #include <vtolselftuningstats.h>
 #include <pathsummary.h>
 #include <pidstatus.h>
+#include <homelocation.h>
+#include <accelstate.h>
 }
 
+#include "pathfollowercontrol.h"
 #include "vtollandfsm.h"
 #include "vtolbrakefsm.h"
 #include "vtollandcontroller.h"
@@ -166,19 +169,23 @@ int32_t PathFollowerInitialize()
     VtolSelfTuningStatsInitialize();
     PIDStatusInitialize();
 
+    // VtolLandFSM additional objects
+    HomeLocationInitialize();
+    AccelStateInitialize();
+
     // Initialise the autopilot mode implementations that use an FSM
+    PathFollowerControl::Initialize(&pathDesired, &flightStatus, &pathStatus);
     VtolLandFSM::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &flightStatus);
     VtolLandController::instance()->Initialize((PathFollowerFSM *)VtolLandFSM::instance(),
-                                                       &vtolPathFollowerSettings, &pathDesired, &flightStatus, &pathStatus);
-    VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
-    VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings, &pathDesired, &pathStatus);
-    FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings, &pathDesired, &pathStatus);
-    GroundDriveController::instance()->Initialize(&groundPathFollowerSettings, &pathDesired, &pathStatus);
+                                                       &vtolPathFollowerSettings);
+    VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
+    VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
     VtolBrakeController::instance()->Initialize((PathFollowerFSM *)VtolBrakeFSM::instance(),
-                                                     &vtolPathFollowerSettings,
-                                                     &pathDesired,
-                                                     &flightStatus,
-                                                     &pathStatus);
+                                                     &vtolPathFollowerSettings);
+
+    FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
+
+    GroundDriveController::instance()->Initialize(&groundPathFollowerSettings);
 
     // Create object queue
     pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_PATHFOLLOWER, STACK_SIZE_BYTES);

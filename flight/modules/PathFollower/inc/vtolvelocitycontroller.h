@@ -48,9 +48,7 @@ public:
         return p_inst;
     }
 
-    int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings,
-                       PathDesiredData *pathDesired,
-                       PathStatusData *pathStatus);
+    int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings);
 
 
     void Activate(void);
@@ -67,8 +65,6 @@ private:
     void fallback_to_hold(void);
 
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
-    PathDesiredData *pathDesired;
-    PathStatusData *pathStatus;
     PIDControlNE controlNE;
     uint8_t mActive;
 };

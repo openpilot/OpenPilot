@@ -1,15 +1,9 @@
-/**
+/*
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup PathFollower CONTROL interface class
- * @brief CONTROL interface class for pathfollower goal implementations
- * @{
  *
- * @file       pathfollowercontrol.h
+ * @file       PathFollowerControl.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Interface class for controllers
- *
+ * @brief      Controller interface class implementation
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,23 +22,31 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PATHFOLLOWERCONTROL_H
-#define PATHFOLLOWERCONTROL_H
-class PathFollowerControl {
-public:
-    virtual void Activate(void)   = 0;
-    virtual void Deactivate(void) = 0;
-    virtual void SettingsUpdated(void)  = 0;
-    virtual void UpdateAutoPilot(void)  = 0;
-    virtual void ObjectiveUpdated(void) = 0;
-    virtual uint8_t Mode(void) = 0;
-    static int32_t Initialize( PathDesiredData *ptr_pathDesired,
-                                           FlightStatusData *ptr_flightStatus,
-                                           PathStatusData *ptr_pathStatus);
-protected:
-    static PathDesiredData *pathDesired;
-    static FlightStatusData *flightStatus;
-    static PathStatusData *pathStatus;
-};
 
-#endif // PATHFOLLOWERCONTROL_H
+extern "C" {
+#include <openpilot.h>
+#include <flightstatus.h>
+#include <pathstatus.h>
+#include <pathdesired.h>
+}
+
+// C++ includes
+#include "pathfollowercontrol.h"
+
+PathDesiredData *PathFollowerControl::pathDesired = 0;
+FlightStatusData *PathFollowerControl::flightStatus = 0;
+PathStatusData *PathFollowerControl::pathStatus = 0;
+
+int32_t PathFollowerControl::Initialize( PathDesiredData *ptr_pathDesired,
+                                       FlightStatusData *ptr_flightStatus,
+                                       PathStatusData *ptr_pathStatus)
+{
+    PIOS_Assert(ptr_pathDesired);
+    PIOS_Assert(ptr_flightStatus);
+    PIOS_Assert(ptr_pathStatus);
+
+    pathDesired  = ptr_pathDesired;
+    flightStatus = ptr_flightStatus;
+    pathStatus   = ptr_pathStatus;
+    return 0;
+}

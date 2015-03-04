@@ -73,7 +73,7 @@ extern "C" {
 VtolFlyController *VtolFlyController::p_inst = 0;
 
 VtolFlyController::VtolFlyController()
-    : vtolPathFollowerSettings(0), pathDesired(0), pathStatus(0), mActive(false), mManualThrust(false)
+    : vtolPathFollowerSettings(0), mActive(false), mManualThrust(false)
 {}
 
 // Called when mode first engaged
@@ -147,17 +147,11 @@ void VtolFlyController::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t VtolFlyController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                                      PathDesiredData *ptr_pathDesired,
-                                      PathStatusData *ptr_pathStatus)
+int32_t VtolFlyController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
-    PIOS_Assert(ptr_pathDesired);
-    PIOS_Assert(ptr_pathStatus);
 
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    pathDesired = ptr_pathDesired;
-    pathStatus  = ptr_pathStatus;
     controlDown.Initialize(0);
 
     return 0;

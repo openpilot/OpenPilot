@@ -47,11 +47,7 @@ public:
         return p_inst;
     }
 
-    int32_t Initialize(GroundPathFollowerSettingsData *groundSettings,
-                       PathDesiredData *pathDesired,
-                       PathStatusData *pathStatus);
-
-
+    int32_t Initialize(GroundPathFollowerSettingsData *groundSettings);
     void Activate(void);
     void Deactivate(void);
     void SettingsUpdated(void);
@@ -67,8 +63,6 @@ private:
     uint8_t updateGroundDesiredAttitude();
 
     GroundPathFollowerSettingsData *groundSettings;
-    PathDesiredData *pathDesired;
-    PathStatusData *pathStatus;
     uint8_t mActive;
     uint8_t mMode;
 

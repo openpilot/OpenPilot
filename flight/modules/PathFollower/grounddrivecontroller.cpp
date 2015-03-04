@@ -68,7 +68,7 @@ extern "C" {
 GroundDriveController *GroundDriveController::p_inst = 0;
 
 GroundDriveController::GroundDriveController()
-    : groundSettings(0), pathDesired(0), pathStatus(0), mActive(false)
+    : groundSettings(0), mActive(false)
 {}
 
 // Called when mode first engaged
@@ -118,17 +118,11 @@ void GroundDriveController::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t GroundDriveController::Initialize(GroundPathFollowerSettingsData *ptr_groundSettings,
-                                          PathDesiredData *ptr_pathDesired,
-                                          PathStatusData *ptr_pathStatus)
+int32_t GroundDriveController::Initialize(GroundPathFollowerSettingsData *ptr_groundSettings)
 {
     PIOS_Assert(ptr_groundSettings);
-    PIOS_Assert(ptr_pathDesired);
-    PIOS_Assert(ptr_pathStatus);
 
     groundSettings = ptr_groundSettings;
-    pathDesired    = ptr_pathDesired;
-    pathStatus     = ptr_pathStatus;
 
     resetGlobals();
 

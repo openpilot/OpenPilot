@@ -51,10 +51,7 @@ public:
     }
 
     int32_t Initialize(PathFollowerFSM *fsm_ptr,
-                       VtolPathFollowerSettingsData *vtolPathFollowerSettings,
-                       PathDesiredData *pathDesired,
-                       FlightStatusData *flightStatus,
-                       PathStatusData *pathStatus);
+                       VtolPathFollowerSettingsData *vtolPathFollowerSettings);
 
 
     void Activate(void);
@@ -72,9 +69,6 @@ private:
 
     PathFollowerFSM *fsm;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
-    PathDesiredData *pathDesired;
-    FlightStatusData *flightStatus;
-    PathStatusData *pathStatus;
     PIDControlDown controlDown;
     PIDControlNE controlNE;
     uint8_t mActive;

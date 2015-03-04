@@ -1,14 +1,10 @@
 /*
  ******************************************************************************
  *
- * @file       fsm_brake.c
+ * @file       vtolbrakefsm.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      This brakeing state machine is a helper state machine to the
- *              pathfollower task/thread to implement detailed brakeing controls.
- *		This is to be called only from the pathfollower task.
- *		Note that initiation of the brake occurs in the manual control
- *		command thread calling plans.c plan_setup_brake which writes
- *		the required PathDesired BRAKE mode.
+ * @brief      Vtol brake finate state machine to regulate behaviour of the
+ * 		brake controller.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,21 +24,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/**
- * Input object: TODO Update when completed
- * Input object:
- * Input object:
- * Output object:
- *
- * This module acts as a brakeing FSM "autopilot"
- * This is a periodic delayed callback module
- *
- * Modules have no API, all communication to other modules is done through UAVObjects.
- * However modules may use the API exposed by shared libraries.
- * See the OpenPilot wiki for more details.
- * http://www.openpilot.org/OpenPilot_Application_Architecture
- *
- */
 extern "C" {
 #include <openpilot.h>
 
@@ -57,9 +38,6 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-// TODO Remove unused
-#include <homelocation.h>
-#include <accelstate.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
@@ -68,7 +46,6 @@ extern "C" {
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
@@ -96,7 +73,7 @@ VtolBrakeFSM *VtolBrakeFSM::p_inst = 0;
 
 
 VtolBrakeFSM::VtolBrakeFSM()
-    : mBrakeData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
+: mBrakeData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
 {}
 
 // Private types
@@ -116,8 +93,11 @@ int32_t VtolBrakeFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollo
     PIOS_Assert(ptr_pathDesired);
     PIOS_Assert(ptr_flightStatus);
 
-    mBrakeData = (VtolBrakeFSMData_T *)pios_malloc(sizeof(VtolBrakeFSMData_T));
-    PIOS_Assert(mBrakeData);
+    // allow for Initialize being called more than once.
+    if (!mBrakeData) {
+	mBrakeData = (VtolBrakeFSMData_T *)pios_malloc(sizeof(VtolBrakeFSMData_T));
+	PIOS_Assert(mBrakeData);
+    }
     memset(mBrakeData, sizeof(VtolBrakeFSMData_T), 0);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;

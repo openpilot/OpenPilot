@@ -76,7 +76,7 @@ extern "C" {
 VtolBrakeController *VtolBrakeController::p_inst = 0;
 
 VtolBrakeController::VtolBrakeController()
-    : fsm(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0), pathStatus(0), mActive(false), mHoldActive(false), mManualThrust(false)
+    : fsm(0), vtolPathFollowerSettings(0), mActive(false), mHoldActive(false), mManualThrust(false)
 {}
 
 // Called when mode first engaged
@@ -162,22 +162,13 @@ void VtolBrakeController::SettingsUpdated(void)
  * \returns 0 on success or -1 if initialisation failed
  */
 int32_t VtolBrakeController::Initialize(PathFollowerFSM *fsm_ptr,
-                                        VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                                        PathDesiredData *ptr_pathDesired,
-                                        FlightStatusData *ptr_flightStatus,
-                                        PathStatusData *ptr_pathStatus)
+                                        VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
-    PIOS_Assert(ptr_pathDesired);
-    PIOS_Assert(ptr_flightStatus);
-    PIOS_Assert(ptr_pathStatus);
     PIOS_Assert(fsm_ptr);
 
     fsm = fsm_ptr;
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    pathDesired  = ptr_pathDesired;
-    flightStatus = ptr_flightStatus;
-    pathStatus   = ptr_pathStatus;
     controlDown.Initialize(fsm);
 
     return 0;

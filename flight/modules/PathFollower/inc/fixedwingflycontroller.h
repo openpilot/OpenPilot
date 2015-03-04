@@ -47,11 +47,7 @@ public:
         return p_inst;
     }
 
-    int32_t Initialize(FixedWingPathFollowerSettingsData *fixedWingSettings,
-                       PathDesiredData *pathDesired,
-                       PathStatusData *pathStatus);
-
-
+    int32_t Initialize(FixedWingPathFollowerSettingsData *fixedWingSettings);
     void Activate(void);
     void Deactivate(void);
     void SettingsUpdated(void);
@@ -69,8 +65,6 @@ private:
     bool correctCourse(float *C, float *V, float *F, float s);
 
     FixedWingPathFollowerSettingsData *fixedWingSettings;
-    PathDesiredData *pathDesired;
-    PathStatusData *pathStatus;
     uint8_t mActive;
     uint8_t mMode;
 

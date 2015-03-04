@@ -618,7 +618,7 @@
     <linearGradient
        id="linearGradient3845-3">
       <stop
-         style="stop-color:#ffe054;stop-opacity:1;"
+         style="stop-color:#00e054;stop-opacity:1;"
          offset="0"
          id="stop3847-6" />
       <stop
@@ -1012,7 +1012,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.2199122"
-     inkscape:cx="597.90072"
+     inkscape:cx="466.74374"
      inkscape:cy="457.17106"
      inkscape:document-units="px"
      inkscape:current-layer="layer13"
@@ -1340,7 +1340,7 @@
            sodipodi:cy="195.93361"
            sodipodi:cx="569.28571"
            id="path3712"
-           style="fill:url(#linearGradient3859-7);fill-opacity:1;stroke:#fcaa21;stroke-width:1.56471384;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           style="fill:url(#linearGradient3859-7);fill-opacity:1;stroke:#029909;stroke-width:1.56471384000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
            sodipodi:type="arc" />
         <path
            sodipodi:type="arc"
@@ -1360,7 +1360,7 @@
          style="opacity:0.4">
         <path
            sodipodi:type="arc"
-           style="fill:#ffe054;fill-opacity:1;stroke:#fcaa21;stroke-width:1.56471384;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           style="fill:#54ff95;fill-opacity:1;stroke:#03ba3a;stroke-width:1.56471384000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
            id="path3891"
            sodipodi:cx="569.28571"
            sodipodi:cy="195.93361"

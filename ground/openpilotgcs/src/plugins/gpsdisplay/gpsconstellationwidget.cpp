@@ -129,8 +129,8 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
                        -satIcons[index]->boundingRect().center().y());
         satIcons[index]->setTransform(QTransform::fromTranslate(opd.x(), opd.y()), false);
 
-        // Show normal GPS, SBAS (120 - 158 range), BeiDou (33 - 64, 159 - 163) or GLONASS (65 - 96, 255 if unidentified)
-        if (prn > 119 && prn < 159) {
+        // Show normal GPS, SBAS/QZSS (120-158,193-197 range), BeiDou (33-64, 159-163) or GLONASS (65-96, 255 if unidentified)
+        if ((prn > 119 && prn < 159) || (prn > 192 && prn < 198)) {
             if (snr) {
                 satIcons[index]->setElementId("satellite-sbas");
             } else {

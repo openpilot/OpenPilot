@@ -33,13 +33,13 @@ extern "C" {
 // C++ includes
 #include "pathfollowercontrol.h"
 
-PathDesiredData *PathFollowerControl::pathDesired = 0;
+PathDesiredData *PathFollowerControl::pathDesired   = 0;
 FlightStatusData *PathFollowerControl::flightStatus = 0;
-PathStatusData *PathFollowerControl::pathStatus = 0;
+PathStatusData *PathFollowerControl::pathStatus     = 0;
 
-int32_t PathFollowerControl::Initialize( PathDesiredData *ptr_pathDesired,
-                                       FlightStatusData *ptr_flightStatus,
-                                       PathStatusData *ptr_pathStatus)
+int32_t PathFollowerControl::Initialize(PathDesiredData *ptr_pathDesired,
+                                        FlightStatusData *ptr_flightStatus,
+                                        PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_pathDesired);
     PIOS_Assert(ptr_flightStatus);

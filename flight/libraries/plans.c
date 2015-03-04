@@ -153,10 +153,18 @@ void plan_setup_returnToBase()
 
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
+
+    uint8_t ReturnToBaseNextCommand;
+    FlightModeSettingsReturnToBaseNextCommandGet(&ReturnToBaseNextCommand);
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND] = (float)ReturnToBaseNextCommand;
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED1]     = 0.0f;
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED2]     = 0.0f;
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED3]     = 0.0f;
     pathDesired.Mode = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(&pathDesired);
 }
+
 
 static void plan_setup_land_helper(PathDesiredData *pathDesired)
 {

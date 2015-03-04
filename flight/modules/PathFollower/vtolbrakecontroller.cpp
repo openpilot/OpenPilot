@@ -162,7 +162,7 @@ void VtolBrakeController::SettingsUpdated(void)
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t VtolBrakeController::Initialize( VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
+int32_t VtolBrakeController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;

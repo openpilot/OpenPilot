@@ -106,7 +106,7 @@ extern "C" {
 // Private variables
 static DelayedCallbackInfo *pathFollowerCBInfo;
 static uint32_t updatePeriod = PF_IDLE_UPDATE_RATE_MS;
-static FrameType_t frameType  = FRAME_TYPE_MULTIROTOR;
+static FrameType_t frameType = FRAME_TYPE_MULTIROTOR;
 static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
@@ -193,26 +193,27 @@ int32_t PathFollowerInitialize()
 }
 MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
 
-void pathFollowerInitializeControllersForFrameType() {
-  switch (frameType) {
+void pathFollowerInitializeControllersForFrameType()
+{
+    switch (frameType) {
     case FRAME_TYPE_MULTIROTOR:
     case FRAME_TYPE_HELI:
-      VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
-      VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
-      VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
-      VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
-      break;
+        VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
+        VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
+        VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
+        VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
+        break;
 
     case FRAME_TYPE_FIXED_WING:
-      FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
-      break;
+        FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
+        break;
 
     case FRAME_TYPE_GROUND:
-      GroundDriveController::instance()->Initialize(&groundPathFollowerSettings);
-      break;
+        GroundDriveController::instance()->Initialize(&groundPathFollowerSettings);
+        break;
 
     default:
-      break;
+        break;
     }
 }
 
@@ -369,7 +370,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
 
-    FrameType_t previous_frameType  = frameType;
+    FrameType_t previous_frameType = frameType;
     frameType = GetCurrentFrameType();
 
     if (frameType == FRAME_TYPE_CUSTOM) {
@@ -388,7 +389,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // If frame type changes, initialise the frame type controllers
     if (frameType != previous_frameType) {
-	pathFollowerInitializeControllersForFrameType();
+        pathFollowerInitializeControllersForFrameType();
     }
 
     switch (frameType) {

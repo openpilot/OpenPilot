@@ -86,6 +86,10 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred);
 #define PATHDESIRED_MODEPARAMETER_LAND_OPTION_NONE                0
 #define PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH       1
 
+#define PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND        0
+#define PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED1            1
+#define PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED2            2
+#define PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED3            3
 /**
  * @brief setup pathfollower for positionvario
  */

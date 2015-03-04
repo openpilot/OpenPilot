@@ -38,9 +38,9 @@ public:
     virtual void UpdateAutoPilot(void)  = 0;
     virtual void ObjectiveUpdated(void) = 0;
     virtual uint8_t Mode(void) = 0;
-    static int32_t Initialize( PathDesiredData *ptr_pathDesired,
-                                           FlightStatusData *ptr_flightStatus,
-                                           PathStatusData *ptr_pathStatus);
+    static int32_t Initialize(PathDesiredData *ptr_pathDesired,
+                              FlightStatusData *ptr_flightStatus,
+                              PathStatusData *ptr_pathStatus);
 protected:
     static PathDesiredData *pathDesired;
     static FlightStatusData *flightStatus;

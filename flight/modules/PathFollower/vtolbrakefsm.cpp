@@ -4,7 +4,7 @@
  * @file       vtolbrakefsm.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      Vtol brake finate state machine to regulate behaviour of the
- * 		brake controller.
+ *              brake controller.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -63,7 +63,7 @@ extern "C" {
 #define TIMER_COUNT_PER_SECOND (1000 / vtolPathFollowerSettings->UpdatePeriod)
 
 VtolBrakeFSM::PathFollowerFSM_BrakeStateHandler_T VtolBrakeFSM::sBrakeStateTable[BRAKE_STATE_SIZE] = {
-    [BRAKE_STATE_INACTIVE] = { .setup = &VtolBrakeFSM::setup_inactive, .run = 0                    },
+    [BRAKE_STATE_INACTIVE] = { .setup = &VtolBrakeFSM::setup_inactive, .run = 0                        },
     [BRAKE_STATE_BRAKE]    = { .setup = &VtolBrakeFSM::setup_brake,    .run = &VtolBrakeFSM::run_brake },
     [BRAKE_STATE_HOLD]     = { .setup = &VtolBrakeFSM::setup_hold,     .run = &VtolBrakeFSM::run_hold  }
 };
@@ -73,7 +73,7 @@ VtolBrakeFSM *VtolBrakeFSM::p_inst = 0;
 
 
 VtolBrakeFSM::VtolBrakeFSM()
-: mBrakeData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
+    : mBrakeData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
 {}
 
 // Private types
@@ -85,9 +85,9 @@ VtolBrakeFSM::VtolBrakeFSM()
  * \returns 0 on success or -1 if initialisation failed
  */
 int32_t VtolBrakeFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
-                             PathDesiredData *ptr_pathDesired,
-                             FlightStatusData *ptr_flightStatus,
-                             PathStatusData *ptr_pathStatus)
+                                 PathDesiredData *ptr_pathDesired,
+                                 FlightStatusData *ptr_flightStatus,
+                                 PathStatusData *ptr_pathStatus)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     PIOS_Assert(ptr_pathDesired);
@@ -95,8 +95,8 @@ int32_t VtolBrakeFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollo
 
     // allow for Initialize being called more than once.
     if (!mBrakeData) {
-	mBrakeData = (VtolBrakeFSMData_T *)pios_malloc(sizeof(VtolBrakeFSMData_T));
-	PIOS_Assert(mBrakeData);
+        mBrakeData = (VtolBrakeFSMData_T *)pios_malloc(sizeof(VtolBrakeFSMData_T));
+        PIOS_Assert(mBrakeData);
     }
     memset(mBrakeData, sizeof(VtolBrakeFSMData_T), 0);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;

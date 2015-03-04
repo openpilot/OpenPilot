@@ -50,7 +50,7 @@ public:
         return p_inst;
     }
 
-    int32_t Initialize( VtolPathFollowerSettingsData *vtolPathFollowerSettings);
+    int32_t Initialize(VtolPathFollowerSettingsData *vtolPathFollowerSettings);
     void Activate(void);
     void Deactivate(void);
     void SettingsUpdated(void);

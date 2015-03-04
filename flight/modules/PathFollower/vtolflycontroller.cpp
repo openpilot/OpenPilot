@@ -101,7 +101,10 @@ uint8_t VtolFlyController::Mode(void)
 
 // Objective updated in pathdesired
 void VtolFlyController::ObjectiveUpdated(void)
-{}
+{
+    // if objective changes set new endpoint targets TODO
+}
+
 
 void VtolFlyController::Deactivate(void)
 {
@@ -354,6 +357,18 @@ void VtolFlyController::UpdateAutoPilot()
     }
 
     PathStatusSet(pathStatus);
+
+    // If rtbl, detect arrival at the endpoint and then triggers a change
+    // to the pathDesired to initiate a Landing sequence. This is the simpliest approach. plans.c
+    // can't manage this.  And pathplanner whilst similar does not manage this as it is not a
+    // waypoint traversal and is not aware of flight modes other than path plan.
+    if ((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND] == FLIGHTMODESETTINGS_RETURNTOBASENEXTCOMMAND_LAND) {
+        if (pathStatus->fractional_progress > 0.95f) {
+            if (fabsf(pathStatus->correction_direction_north) < 2.0f && fabsf(pathStatus->correction_direction_east) < 2.0f) {
+                plan_setup_land();
+            }
+        }
+    }
 }
 /**
  * vtol autopilot

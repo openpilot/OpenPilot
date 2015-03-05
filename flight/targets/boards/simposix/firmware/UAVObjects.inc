@@ -24,6 +24,8 @@
 # (all architectures)
 
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += pidstatus
+UAVOBJSRCFILENAMES += fsmlandstatus
 UAVOBJSRCFILENAMES += vtolselftuningstats
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand

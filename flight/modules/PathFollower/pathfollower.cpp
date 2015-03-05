@@ -128,7 +128,7 @@ static void pathFollowerInitializeControllersForFrameType();
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-extern "C" uint32_t PathFollowerStart()
+extern "C" int32_t PathFollowerStart()
 {
     // Start main task
     PathStatusGet(&pathStatus);
@@ -143,7 +143,7 @@ extern "C" uint32_t PathFollowerStart()
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-extern "C" uint32_t PathFollowerInitialize()
+extern "C" int32_t PathFollowerInitialize()
 {
     // initialize objects
     GroundPathFollowerSettingsInitialize();
@@ -191,9 +191,7 @@ extern "C" uint32_t PathFollowerInitialize()
 
     return 0;
 }
-extern "C" {
 MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
-}
 
 void pathFollowerInitializeControllersForFrameType()
 {

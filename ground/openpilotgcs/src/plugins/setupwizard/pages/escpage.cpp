@@ -47,7 +47,7 @@ bool EscPage::validatePage()
     if (ui->oneshotESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_ONESHOT);
     } else if (ui->rapidESCButton->isChecked()) {
-        if (isSynchOrOneShotAvalable()) {
+        if (isSynchOrOneShotAvailable()) {
             getWizard()->setEscType(SetupWizard::ESC_SYNCHED);
         } else {
             getWizard()->setEscType(SetupWizard::ESC_RAPID);
@@ -63,7 +63,7 @@ bool EscPage::validatePage()
 
 void EscPage::initializePage()
 {
-    bool enabled = isSynchOrOneShotAvalable();
+    bool enabled = isSynchOrOneShotAvailable();
 
     ui->oneshotESCButton->setEnabled(enabled);
     if (ui->oneshotESCButton->isChecked() && !enabled) {
@@ -72,7 +72,7 @@ void EscPage::initializePage()
     }
 }
 
-bool EscPage::isSynchOrOneShotAvalable()
+bool EscPage::isSynchOrOneShotAvailable()
 {
     bool available = true;
 

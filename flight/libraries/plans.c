@@ -165,6 +165,57 @@ void plan_setup_returnToBase()
     PathDesiredSet(&pathDesired);
 }
 
+static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
+{
+    PositionStateData positionState;
+
+    PositionStateGet(&positionState);
+    float velocity_down;
+
+    FlightModeSettingsAutoTakeOffVelocityGet(&velocity_down);
+
+    pathDesired->Start.North = positionState.North;
+    pathDesired->Start.East  = positionState.East;
+    pathDesired->Start.Down  = positionState.Down;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH] = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST] = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN] = -velocity_down;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_UNUSED3] = 0.0f;
+
+    pathDesired->End.North = positionState.North;
+    pathDesired->End.East  = positionState.East;
+    pathDesired->End.Down  = positionState.Down - 5.0f;
+
+    pathDesired->StartingVelocity = 0.0f;
+    pathDesired->EndingVelocity   = 0.0f;
+    pathDesired->Mode = PATHDESIRED_MODE_AUTOTAKEOFF;
+}
+
+typedef enum {
+  STATE_AUTOTAKEOFF_NONE = 0,
+  STATE_AUTOTAKEOFF_SETUP,
+  STATE_AUTOTAKEOFF_INITIATED
+} AutoTakeoffPlanState_T;
+static AutoTakeoffPlanState_T autotakeoffState = STATE_AUTOTAKEOFF_NONE;
+
+void plan_setup_AutoTakeoff()
+{
+  autotakeoffState = STATE_AUTOTAKEOFF_SETUP;
+}
+
+void plan_run_AutoTakeoff()
+{
+    ManualControlCommandData cmd;
+    ManualControlCommandGet(&cmd);
+
+    if ( autotakeoffState == STATE_AUTOTAKEOFF_SETUP &&  cmd.Throttle > 0.5f) {
+      PathDesiredData pathDesired;
+      plan_setup_AutoTakeoff_helper(&pathDesired);
+      PathDesiredSet(&pathDesired);
+      autotakeoffState = STATE_AUTOTAKEOFF_INITIATED;
+    }
+
+}
 
 static void plan_setup_land_helper(PathDesiredData *pathDesired)
 {

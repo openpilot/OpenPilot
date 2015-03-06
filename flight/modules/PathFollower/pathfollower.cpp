@@ -85,6 +85,7 @@ extern "C" {
 
 #include "pathfollowercontrol.h"
 #include "vtollandcontroller.h"
+#include "vtolautotakeoffcontroller.h"
 #include "vtolvelocitycontroller.h"
 #include "vtolbrakecontroller.h"
 #include "vtolflycontroller.h"
@@ -199,6 +200,7 @@ void pathFollowerInitializeControllersForFrameType()
     case FRAME_TYPE_MULTIROTOR:
     case FRAME_TYPE_HELI:
         VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
+        VtolAutoTakeoffController::instance()->Initialize(&vtolPathFollowerSettings);
         VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
         VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
         VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
@@ -242,6 +244,10 @@ static void pathFollowerSetActiveController(void)
                 break;
             case PATHDESIRED_MODE_LAND: // land with optional velocity roam option
                 activeController = VtolLandController::instance();
+                activeController->Activate();
+                break;
+            case PATHDESIRED_MODE_AUTOTAKEOFF:
+                activeController = VtolAutoTakeoffController::instance();
                 activeController->Activate();
                 break;
             default:

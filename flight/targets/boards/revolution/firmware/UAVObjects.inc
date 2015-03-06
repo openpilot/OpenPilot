@@ -19,6 +19,7 @@
 # These are the UAVObjects supposed to be build as part of the OpenPilot target
 # (all architectures)
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += statusvtolautotakeoff
 UAVOBJSRCFILENAMES += pidstatus
 UAVOBJSRCFILENAMES += fsmlandstatus
 UAVOBJSRCFILENAMES += vtolselftuningstats

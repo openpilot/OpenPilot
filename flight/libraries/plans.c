@@ -41,6 +41,7 @@
 #include <attitudestate.h>
 #include <vtolpathfollowersettings.h>
 #include <stabilizationbank.h>
+#include <stabilizationdesired.h>
 #include <sin_lookup.h>
 
 #define UPDATE_EXPECTED 0.02f
@@ -88,6 +89,7 @@ void plan_initialize()
     VelocityStateInitialize();
     VtolPathFollowerSettingsInitialize();
     StabilizationBankInitialize();
+    StabilizationDesiredInitialize();
 }
 
 /**
@@ -191,29 +193,105 @@ static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
     pathDesired->Mode = PATHDESIRED_MODE_AUTOTAKEOFF;
 }
 
+// Vtol AutoTakeoff invocation from flight mode requires the following sequence:
+// 1. Arming must be done whilst in the AutoTakeOff flight mode
+// 2. If the AutoTakeoff flight mode is selected and already armed, requires disarming first
+// 3. Wait for armed state
+// 4. Once the user increases the throttle position to above 50%, then and only then initiate auto-takeoff.
+// 5. Whilst the throttle is < 50% before takeoff, all stick inputs are being ignored.
+// 6. If during the autotakeoff sequence, at any stage, if the throttle stick position reduces to less than 10%, landing is initiated.
 typedef enum {
   STATE_AUTOTAKEOFF_NONE = 0,
-  STATE_AUTOTAKEOFF_SETUP,
-  STATE_AUTOTAKEOFF_INITIATED
+  STATE_AUTOTAKEOFF_WAITFORARMED,
+  STATE_AUTOTAKEOFF_WAITFORMIDTHROTTLE,
+  STATE_AUTOTAKEOFF_REQUIRE_UNARMED_FIRST,
+  STATE_AUTOTAKEOFF_INITIATED,
+  STATE_AUTOTAKEOFF_POSITIONHOLD,
+  STATE_AUTOTAKEOFF_ABORT
 } AutoTakeoffPlanState_T;
 static AutoTakeoffPlanState_T autotakeoffState = STATE_AUTOTAKEOFF_NONE;
 
 void plan_setup_AutoTakeoff()
 {
-  autotakeoffState = STATE_AUTOTAKEOFF_SETUP;
+  autotakeoffState = STATE_AUTOTAKEOFF_WAITFORMIDTHROTTLE;
+  // We only allow takeoff if the state transition of disarmed to armed occurs
+  // whilst in the autotake flight mode
+  FlightStatusData flightStatus;
+  FlightStatusGet(&flightStatus);
+  StablizationDesiredData stabiDesired;
+  StablizationDesiredGet(&stabiDesired);
+
+  // Are we inflight?
+  if (flightStatus.Armed && stabiDesired.Thrust > 0.2f) {
+      // ok assume already in flight and just enter position hold
+      // if we are not actually inflight this will just be a violent autotakeoff
+      autotakeoffState = STATE_AUTOTAKEOFF_POSITIONHOLD;
+      plan_setup_positionHold();
+  }
+  else if (flightStatus.Armed) {
+      autotakeoffState = STATE_AUTOTAKEOFF_REQUIRE_UNARMED_FIRST;
+      // Note that if this mode was invoked unintentionally whilst in flight, effectively
+      // all inputs get ignored and the vtol continues to fly to its previous
+      // stabi command.    Can we detect motors running?
+  }
 }
 
 void plan_run_AutoTakeoff()
 {
-    ManualControlCommandData cmd;
-    ManualControlCommandGet(&cmd);
 
-    if ( autotakeoffState == STATE_AUTOTAKEOFF_SETUP &&  cmd.Throttle > 0.5f) {
-      PathDesiredData pathDesired;
-      plan_setup_AutoTakeoff_helper(&pathDesired);
-      PathDesiredSet(&pathDesired);
-      autotakeoffState = STATE_AUTOTAKEOFF_INITIATED;
-    }
+   switch (autotakeoffState) {
+     case STATE_AUTOTAKEOFF_REQUIRE_UNARMED_FIRST:
+       {
+       FlightStatusData flightStatus;
+       FlightStatusGet(&flightStatus);
+       if (!flightStatus.Armed) {
+	   autotakeoffState = STATE_AUTOTAKEOFF_WAITFORMIDTHROTTLE;
+   	}
+       }
+       break;
+     case STATE_AUTOTAKEOFF_WAITFORARMED:
+       {
+       FlightStatusData flightStatus;
+       FlightStatusGet(&flightStatus);
+       if (flightStatus.Armed) {
+	   autotakeoffState = STATE_AUTOTAKEOFF_WAITFORMIDTHROTTLE;
+   	}
+       }
+       break;
+     case STATE_AUTOTAKEOFF_WAITFORMIDTHROTTLE:
+       {
+
+	 ManualControlCommandData cmd;
+	 ManualControlCommandGet(&cmd);
+
+	 if (cmd.Throttle > 0.5f) { // TODO make this vtol neutral thrust
+	     autotakeoffState = STATE_AUTOTAKEOFF_INITIATED;
+	     PathDesiredData pathDesired;
+	     plan_setup_AutoTakeoff_helper(&pathDesired);
+	     PathDesiredSet(&pathDesired);
+	 }
+
+       }
+       break;
+     case STATE_AUTOTAKEOFF_INITIATED:
+       {
+
+	 ManualControlCommandData cmd;
+	 ManualControlCommandGet(&cmd);
+
+	 if (cmd.Throttle < 0.1f) {
+	     autotakeoffState = STATE_AUTOTAKEOFF_ABORT;
+	     plan_setup_land();
+	 }
+       }
+       break;
+
+     case STATE_AUTOTAKEOFF_ABORT:
+     case STATE_AUTOTAKEOFF_POSITIONHOLD:
+       // nothing to do. land has been requested. stay here for forever until mode change.
+     default:
+       break;
+   }
 
 }
 
@@ -525,6 +603,7 @@ void plan_run_VelocityRoam()
                 plan_setup_land_from_velocityroam();
             } else {
                 plan_setup_assistedcontrol(false);
+                // TODO Is the above called repeatedly and we need to introduce a STATE check??????
             }
         }
         // otherwise nothing to do in braking/hold modes

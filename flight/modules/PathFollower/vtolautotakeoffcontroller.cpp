@@ -115,7 +115,7 @@ void VtolAutoTakeoffController::Deactivate(void)
     }
 }
 
-
+// AutoTakeoff Uses different vertical velocity PID.
 void VtolAutoTakeoffController::SettingsUpdated(void)
 {
     const float dT = vtolPathFollowerSettings->UpdatePeriod / 1000.0f;
@@ -144,10 +144,7 @@ void VtolAutoTakeoffController::SettingsUpdated(void)
     fsm->SettingsUpdated();
 }
 
-/**
- * Initialise the module, called on startup
- * \returns 0 on success or -1 if initialisation failed
- */
+// AutoTakeoff Uses a different FSM to its parent
 int32_t VtolAutoTakeoffController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
@@ -171,11 +168,11 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
     controlDown.UpdateVelocityState(velocityState.Down);
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
-        // landing flight mode has stored original horizontal position in pathdesired
-        PositionStateData positionState;
-        PositionStateGet(&positionState);
-        controlNE.UpdatePositionState(positionState.North, positionState.East);
-        controlNE.ControlPosition();
+    // autotakeoff flight mode has stored original horizontal position in pathdesired
+    PositionStateData positionState;
+    PositionStateGet(&positionState);
+    controlNE.UpdatePositionState(positionState.North, positionState.East);
+    controlNE.ControlPosition();
 
     velocityDesired.Down  = controlDown.GetVelocityDesired();
     float north, east;
@@ -186,6 +183,7 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
     // update pathstatus
     pathStatus->error     = 0.0f;
     pathStatus->fractional_progress  = 0.0f;
+    // TODO Change to 1.0 when completed
     pathStatus->path_direction_north = velocityDesired.North;
     pathStatus->path_direction_east  = velocityDesired.East;
     pathStatus->path_direction_down  = velocityDesired.Down;

@@ -39,11 +39,11 @@ extern "C" {
 // AutoTakeoffing state machine
 typedef enum {
     AUTOTAKEOFF_STATE_INACTIVE = 0, // Inactive state is the initialised state on startup
-    AUTOTAKEOFF_STATE_INIT_ALTHOLD, // Initiate altitude hold before starting descent
-    AUTOTAKEOFF_STATE_WTG_FOR_DESCENTRATE, // Waiting for attainment of landing descent rate
-    AUTOTAKEOFF_STATE_AT_DESCENTRATE, // AutoTakeoffing descent rate achieved
-    AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, // Waiting for group effect to be detected
-    AUTOTAKEOFF_STATE_GROUNDEFFECT, // Ground effect detected
+    AUTOTAKEOFF_STATE_CHECKSTATE,   // Initial condition checks
+    AUTOTAKEOFF_STATE_SLOWSTART,    // Slow start motors
+    AUTOTAKEOFF_STATE_THRUSTUP,     // Ramp motors up to neutral thrust
+    AUTOTAKEOFF_STATE_ASCEND,       // Ascend to target velocity
+    AUTOTAKEOFF_STATE_ALTHOLD,      // Position Hold
     AUTOTAKEOFF_STATE_THRUSTDOWN, // Thrust down sequence
     AUTOTAKEOFF_STATE_THRUSTOFF, // Thrust is now off
     AUTOTAKEOFF_STATE_DISARMED, // Disarmed
@@ -74,7 +74,6 @@ public:
     PathFollowerFSMState_T GetCurrentState(void);
     void ConstrainStabiDesired(StabilizationDesiredData *stabDesired);
     float BoundVelocityDown(float);
-    void CheckPidScaler(pid_scaler *scaler);
     void Abort(void);
 
 protected:
@@ -114,28 +113,36 @@ protected:
     FlightStatusData *flightStatus;
 
     void setup_inactive(void);
+
+    void setup_init_checkstate(void);
+    void run_checkstate(uint8_t);
+
+    void setup_init_slowstart(void);
+    void run_slowstart(uint8_t);
+
+    void setup_init_ascend(void);
+    void run_ascend(uint8_t);
+
     void setup_init_althold(void);
-    void setup_wtg_for_descentrate(void);
-    void setup_at_descentrate(void);
-    void setup_wtg_for_groundeffect(void);
-    void run_init_althold(uint8_t);
-    void run_wtg_for_descentrate(uint8_t);
-    void run_at_descentrate(uint8_t);
-    void run_wtg_for_groundeffect(uint8_t);
-    void setup_groundeffect(void);
-    void run_groundeffect(uint8_t);
-    void setup_thrustdown(void);
+    void run_althold(uint8_t);
+
+    void setup_init_thrustdown(void);
     void run_thrustdown(uint8_t);
-    void setup_thrustoff(void);
+
+    void setup_init_thrustoff(void);
     void run_thrustoff(uint8_t);
+
     void setup_disarmed(void);
     void run_disarmed(uint8_t);
+
     void setup_abort(void);
     void run_abort(uint8_t);
+
     void initFSM(void);
     void setState(PathFollowerFSM_AutoTakeoffState_T newState, StatusVtolAutoTakeoffStateExitReasonOptions reason);
     int32_t runState();
     int32_t runAlways();
+
     void updateVtolAutoTakeoffFSMStatus();
     void assessAltitude(void);
 

@@ -20,6 +20,8 @@
 # (all architectures)
 UAVOBJSRCFILENAMES =
 UAVOBJSRCFILENAMES += statusvtolland
+UAVOBJSRCFILENAMES += statusvtolautotakeoff
+UAVOBJSRCFILENAMES += pidstatus
 UAVOBJSRCFILENAMES += vtolselftuningstats
 UAVOBJSRCFILENAMES += accelgyrosettings
 UAVOBJSRCFILENAMES += accessorydesired

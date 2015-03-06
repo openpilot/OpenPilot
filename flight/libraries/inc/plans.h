@@ -62,6 +62,7 @@ void plan_setup_returnToBase();
  * @brief setup pathplanner/pathfollower for land
  */
 void plan_setup_land();
+void plan_setup_AutoTakeoff();
 
 /**
  * @brief setup pathplanner/pathfollower for braking
@@ -90,6 +91,12 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred);
 #define PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED1            1
 #define PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED2            2
 #define PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED3            3
+
+#define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH            0
+#define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST            1
+#define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN            2
+#define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_UNUSED3            3
+
 /**
  * @brief setup pathfollower for positionvario
  */
@@ -107,6 +114,7 @@ void plan_run_PositionRoam();
 void plan_run_VelocityRoam();
 void plan_run_HomeLeash();
 void plan_run_AbsolutePosition();
+void plan_run_AutoTakeoff();
 
 /**
  * @brief setup pathplanner/pathfollower for AutoCruise

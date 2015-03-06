@@ -101,6 +101,9 @@ void pathFollowerHandler(bool newinit)
                 plan_setup_VelocityRoam();
             }
             break;
+        case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
+            plan_setup_AutoTakeoff();
+            break;
         case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
             plan_setup_AutoCruise();
             break;
@@ -145,6 +148,9 @@ void pathFollowerHandler(bool newinit)
             plan_run_VelocityRoam();
         }
         break;
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
+        plan_run_AutoTakeoff();
+	break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         plan_run_AutoCruise();
         break;

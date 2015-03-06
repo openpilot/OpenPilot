@@ -90,12 +90,12 @@ extern "C" {
 #define GROUNDEFFECT_SLOWDOWN_COUNT       4
 
 VtolAutoTakeoffFSM::PathFollowerFSM_AutoTakeoffStateHandler_T VtolAutoTakeoffFSM::sAutoTakeoffStateTable[AUTOTAKEOFF_STATE_SIZE] = {
-    [AUTOTAKEOFF_STATE_INACTIVE]       =       { .setup = &VtolAutoTakeoffFSM::setup_inactive,             .run = 0                                      },
-    [AUTOTAKEOFF_STATE_INIT_ALTHOLD]   =       { .setup = &VtolAutoTakeoffFSM::setup_init_althold,         .run = &VtolAutoTakeoffFSM::run_init_althold         },
-    [AUTOTAKEOFF_STATE_WTG_FOR_DESCENTRATE] =  { .setup = &VtolAutoTakeoffFSM::setup_wtg_for_descentrate,  .run = &VtolAutoTakeoffFSM::run_wtg_for_descentrate  },
-    [AUTOTAKEOFF_STATE_AT_DESCENTRATE] =       { .setup = &VtolAutoTakeoffFSM::setup_at_descentrate,       .run = &VtolAutoTakeoffFSM::run_at_descentrate       },
-    [AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = &VtolAutoTakeoffFSM::setup_wtg_for_groundeffect, .run = &VtolAutoTakeoffFSM::run_wtg_for_groundeffect },
-    [AUTOTAKEOFF_STATE_GROUNDEFFECT]   =       { .setup = &VtolAutoTakeoffFSM::setup_groundeffect,         .run = &VtolAutoTakeoffFSM::run_groundeffect         },
+    [AUTOTAKEOFF_STATE_INACTIVE]       =        { .setup = &VtolAutoTakeoffFSM::setup_inactive,             .run = 0                                      },
+    [AUTOTAKEOFF_STATE_CHECKSTATE]   =       	{ .setup = &VtolAutoTakeoffFSM::setup_checkstate,         .run = &VtolAutoTakeoffFSM::run_checkstate         },
+    [AUTOTAKEOFF_STATE_SLOWSTART] =  		{ .setup = &VtolAutoTakeoffFSM::setup_slowstart,  .run = &VtolAutoTakeoffFSM::run_slowstart  },
+    [AUTOTAKEOFF_STATE_THRUSTUP] =       	{ .setup = &VtolAutoTakeoffFSM::setup_thrustup,       .run = &VtolAutoTakeoffFSM::run_thrustup       },
+    [AUTOTAKEOFF_STATE_ASCEND] = 		{ .setup = &VtolAutoTakeoffFSM::setup_ascend, .run = &VtolAutoTakeoffFSM::run_ascend },
+    [AUTOTAKEOFF_STATE_ALTHOLD]   =    		{ .setup = &VtolAutoTakeoffFSM::setup_althold,         .run = &VtolAutoTakeoffFSM::run_althold         },
     [AUTOTAKEOFF_STATE_THRUSTDOWN]     =       { .setup = &VtolAutoTakeoffFSM::setup_thrustdown,           .run = &VtolAutoTakeoffFSM::run_thrustdown           },
     [AUTOTAKEOFF_STATE_THRUSTOFF]      =       { .setup = &VtolAutoTakeoffFSM::setup_thrustoff,            .run = &VtolAutoTakeoffFSM::run_thrustoff            },
     [AUTOTAKEOFF_STATE_DISARMED]       =       { .setup = &VtolAutoTakeoffFSM::setup_disarmed,             .run = &VtolAutoTakeoffFSM::run_disarmed             },
@@ -173,23 +173,21 @@ void VtolAutoTakeoffFSM::Activate()
 {
     memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
     mAutoTakeoffData->currentState   = AUTOTAKEOFF_STATE_INACTIVE;
+#if 0
     mAutoTakeoffData->flLowAltitude  = false;
     mAutoTakeoffData->flAltitudeHold = false;
     mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentRate      = MIN_AUTOTAKEOFFRATE;
     mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentThrust    = vtolPathFollowerSettings->ThrustLimits.Neutral;
     mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust = vtolPathFollowerSettings->ThrustLimits.Neutral;
+#endif
     mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
     mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
     TakeOffLocationGet(&(mAutoTakeoffData->takeOffLocation));
     mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeAtState[AUTOTAKEOFF_STATE_INACTIVE] = 0.0f;
-    assessAltitude();
+    //assessAltitude();
 
     if (pathDesired->Mode == PATHDESIRED_MODE_AUTOTAKEOFF) {
-#ifndef DEBUG_GROUNDIMPACT
-        setState(AUTOTAKEOFF_STATE_INIT_ALTHOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
-#else
-        setState(AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
-#endif
+        setState(AUTOTAKEOFF_STATE_CHECKSTATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
     } else {
         // move to error state and callback to position hold
         setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
@@ -250,7 +248,7 @@ int32_t VtolAutoTakeoffFSM::runState(void)
 
 int32_t VtolAutoTakeoffFSM::runAlways(void)
 {
-    void assessAltitude(void);
+    //void assessAltitude(void);
 
     return 0;
 }
@@ -279,15 +277,6 @@ void VtolAutoTakeoffFSM::ConstrainStabiDesired(StabilizationDesiredData *stabDes
         stabDesired->Yaw   = 0.0f;
     }
 }
-
-void VtolAutoTakeoffFSM::CheckPidScaler(pid_scaler *local_scaler)
-{
-    if (mAutoTakeoffData->flLowAltitude) {
-        local_scaler->p = AUTOTAKEOFFING_PID_SCALAR_P;
-        local_scaler->i = AUTOTAKEOFFING_PID_SCALAR_I;
-    }
-}
-
 
 // Set the new state and perform setup for subsequent state run calls
 // This is called by state run functions on event detection that drive
@@ -377,8 +366,6 @@ void VtolAutoTakeoffFSM::assessAltitude(void)
 }
 
 
-// FSM Setup and Run method implementation
-
 // State: INACTIVE
 void VtolAutoTakeoffFSM::setup_inactive(void)
 {
@@ -387,26 +374,50 @@ void VtolAutoTakeoffFSM::setup_inactive(void)
     mAutoTakeoffData->flConstrainThrust     = false;
 }
 
-// State: INIT ALTHOLD
-void VtolAutoTakeoffFSM::setup_init_althold(void)
+// State: CHECKSTATE
+void VtolAutoTakeoffFSM::setup_checkstate(void)
 {
-    setStateTimeout(TIMEOUT_INIT_ALTHOLD);
-    // get target descent velocity
-    mAutoTakeoffData->flZeroStabiHorizontal = false;
-    mAutoTakeoffData->fsmAutoTakeoffStatus.targetDescentRate = BoundVelocityDown(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]);
-    mAutoTakeoffData->flConstrainThrust     = false;
-    mAutoTakeoffData->flAltitudeHold = true;
-    mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
+    // Assumptions that do not need to be checked if flight mode is AUTOTAKEOFF
+    // 1. Already armed
+    // 2. Not in flight. This was checked in plans.c
+    // 3. User has placed throttle position to more than 50% to allow autotakeoff
+
+    // If pathplanner, we may need additional checks???
+    // E.g. if inflight, this mode is just positon hold??
+
+    // Start from a enforced thrust off condition
+    mAutoTakeoffData->thrustLimit       = -1.0f;
+    mAutoTakeoffData->flConstrainThrust = true;
+    mAutoTakeoffData->boundThrustMin    = -0.1f;
+    mAutoTakeoffData->boundThrustMax    = 0.0f;
+
+    setState(AUTOTAKEOFF_STATE_SLOWSTART, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
 }
 
-void VtolAutoTakeoffFSM::run_init_althold(uint8_t flTimeout)
+// STATE: SLOWSTART
+void VtolAutoTakeoffFSM::setup_slowstart(void)
 {
+    setStateTimeout(TIMEOUT_SLOWSTART);
+    mAutoTakeoffData->flZeroStabiHorizontal = true;
+    mAutoTakeoffData->flConstrainThrust     = true;
+    StabilizationDesiredData stabDesired;
+    StabilizationDesiredGet(&stabDesired);
+    mAutoTakeoffData->thrustLimit    = 0.0f;
+    mAutoTakeoffData->sum1 = 0.2f / (float)TIMEOUT_SLOWSTART;
+    mAutoTakeoffData->boundThrustMin = 0.05f;
+    mAutoTakeoffData->boundThrustMax = 0.05f;
+}
+
+void VtolAutoTakeoffFSM::run_slowstart(__attribute__((unused)) uint8_t flTimeout)
+{
+    // increase thrust setpoint step by step
+    mAutoTakeoffData->thrustLimit += mAutoTakeoffData->sum1;
+
     if (flTimeout) {
-        mAutoTakeoffData->flAltitudeHold = false;
-        setState(AUTOTAKEOFF_STATE_WTG_FOR_DESCENTRATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
+        setState(AUTOTAKEOFF_STATE_THRUSTUP, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
+
 
 
 // State: WAITING FOR DESCENT RATE

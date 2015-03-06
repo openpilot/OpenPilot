@@ -4,7 +4,7 @@
  * @file       vtolautotakeofffsm.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      This autotakeoff state machine is a helper state machine to the
- *             VtolAutoTakeOffController.
+ *             VtolAutoTakeoffController.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -89,25 +89,25 @@ extern "C" {
 #define GROUNDEFFECT_SLOWDOWN_FACTOR      0.3f
 #define GROUNDEFFECT_SLOWDOWN_COUNT       4
 
-VtolAutoTakeOffFSM::PathFollowerFSM_AutoTakeOffStateHandler_T VtolAutoTakeOffFSM::sAutoTakeOffStateTable[AUTOTAKEOFF_STATE_SIZE] = {
-    [AUTOTAKEOFF_STATE_INACTIVE]       =       { .setup = &VtolAutoTakeOffFSM::setup_inactive,             .run = 0                                      },
-    [AUTOTAKEOFF_STATE_INIT_ALTHOLD]   =       { .setup = &VtolAutoTakeOffFSM::setup_init_althold,         .run = &VtolAutoTakeOffFSM::run_init_althold         },
-    [AUTOTAKEOFF_STATE_WTG_FOR_DESCENTRATE] =  { .setup = &VtolAutoTakeOffFSM::setup_wtg_for_descentrate,  .run = &VtolAutoTakeOffFSM::run_wtg_for_descentrate  },
-    [AUTOTAKEOFF_STATE_AT_DESCENTRATE] =       { .setup = &VtolAutoTakeOffFSM::setup_at_descentrate,       .run = &VtolAutoTakeOffFSM::run_at_descentrate       },
-    [AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = &VtolAutoTakeOffFSM::setup_wtg_for_groundeffect, .run = &VtolAutoTakeOffFSM::run_wtg_for_groundeffect },
-    [AUTOTAKEOFF_STATE_GROUNDEFFECT]   =       { .setup = &VtolAutoTakeOffFSM::setup_groundeffect,         .run = &VtolAutoTakeOffFSM::run_groundeffect         },
-    [AUTOTAKEOFF_STATE_THRUSTDOWN]     =       { .setup = &VtolAutoTakeOffFSM::setup_thrustdown,           .run = &VtolAutoTakeOffFSM::run_thrustdown           },
-    [AUTOTAKEOFF_STATE_THRUSTOFF]      =       { .setup = &VtolAutoTakeOffFSM::setup_thrustoff,            .run = &VtolAutoTakeOffFSM::run_thrustoff            },
-    [AUTOTAKEOFF_STATE_DISARMED]       =       { .setup = &VtolAutoTakeOffFSM::setup_disarmed,             .run = &VtolAutoTakeOffFSM::run_disarmed             },
-    [AUTOTAKEOFF_STATE_ABORT] =                { .setup = &VtolAutoTakeOffFSM::setup_abort,                .run = &VtolAutoTakeOffFSM::run_abort                }
+VtolAutoTakeoffFSM::PathFollowerFSM_AutoTakeoffStateHandler_T VtolAutoTakeoffFSM::sAutoTakeoffStateTable[AUTOTAKEOFF_STATE_SIZE] = {
+    [AUTOTAKEOFF_STATE_INACTIVE]       =       { .setup = &VtolAutoTakeoffFSM::setup_inactive,             .run = 0                                      },
+    [AUTOTAKEOFF_STATE_INIT_ALTHOLD]   =       { .setup = &VtolAutoTakeoffFSM::setup_init_althold,         .run = &VtolAutoTakeoffFSM::run_init_althold         },
+    [AUTOTAKEOFF_STATE_WTG_FOR_DESCENTRATE] =  { .setup = &VtolAutoTakeoffFSM::setup_wtg_for_descentrate,  .run = &VtolAutoTakeoffFSM::run_wtg_for_descentrate  },
+    [AUTOTAKEOFF_STATE_AT_DESCENTRATE] =       { .setup = &VtolAutoTakeoffFSM::setup_at_descentrate,       .run = &VtolAutoTakeoffFSM::run_at_descentrate       },
+    [AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT] = { .setup = &VtolAutoTakeoffFSM::setup_wtg_for_groundeffect, .run = &VtolAutoTakeoffFSM::run_wtg_for_groundeffect },
+    [AUTOTAKEOFF_STATE_GROUNDEFFECT]   =       { .setup = &VtolAutoTakeoffFSM::setup_groundeffect,         .run = &VtolAutoTakeoffFSM::run_groundeffect         },
+    [AUTOTAKEOFF_STATE_THRUSTDOWN]     =       { .setup = &VtolAutoTakeoffFSM::setup_thrustdown,           .run = &VtolAutoTakeoffFSM::run_thrustdown           },
+    [AUTOTAKEOFF_STATE_THRUSTOFF]      =       { .setup = &VtolAutoTakeoffFSM::setup_thrustoff,            .run = &VtolAutoTakeoffFSM::run_thrustoff            },
+    [AUTOTAKEOFF_STATE_DISARMED]       =       { .setup = &VtolAutoTakeoffFSM::setup_disarmed,             .run = &VtolAutoTakeoffFSM::run_disarmed             },
+    [AUTOTAKEOFF_STATE_ABORT] =                { .setup = &VtolAutoTakeoffFSM::setup_abort,                .run = &VtolAutoTakeoffFSM::run_abort                }
 };
 
 // pointer to a singleton instance
-VtolAutoTakeOffFSM *VtolAutoTakeOffFSM::p_inst = 0;
+VtolAutoTakeoffFSM *VtolAutoTakeoffFSM::p_inst = 0;
 
 
-VtolAutoTakeOffFSM::VtolAutoTakeOffFSM()
-    : mAutoTakeOffData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
+VtolAutoTakeoffFSM::VtolAutoTakeoffFSM()
+    : mAutoTakeoffData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
 {}
 
 // Private types
@@ -118,7 +118,7 @@ VtolAutoTakeOffFSM::VtolAutoTakeOffFSM()
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t VtolAutoTakeOffFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
+int32_t VtolAutoTakeoffFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings,
                                 PathDesiredData *ptr_pathDesired,
                                 FlightStatusData *ptr_flightStatus)
 {
@@ -140,11 +140,11 @@ int32_t VtolAutoTakeOffFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPat
     StabilizationDesiredInitialize();
     TakeOffLocationInitialize();
     ManualControlCommandInitialize();
-    FSMAutoTakeOffStatusInitialize();
+    StatusVtolAutoTakeoffInitialize();
 
-    mAutoTakeOffData = (VtolAutoTakeOffFSMData_T *)pios_malloc(sizeof(VtolAutoTakeOffFSMData_T));
-    PIOS_Assert(mAutoTakeOffData);
-    memset(mAutoTakeOffData, sizeof(VtolAutoTakeOffFSMData_T), 0);
+    mAutoTakeoffData = (VtolAutoTakeoffFSMData_T *)pios_malloc(sizeof(VtolAutoTakeoffFSMData_T));
+    PIOS_Assert(mAutoTakeoffData);
+    memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;
     flightStatus = ptr_flightStatus;
@@ -153,57 +153,57 @@ int32_t VtolAutoTakeOffFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPat
     return 0;
 }
 
-void VtolAutoTakeOffFSM::Inactive(void)
+void VtolAutoTakeoffFSM::Inactive(void)
 {
-    memset(mAutoTakeOffData, sizeof(VtolAutoTakeOffFSMData_T), 0);
+    memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
     initFSM();
 }
 
 // Initialise the FSM
-void VtolAutoTakeOffFSM::initFSM(void)
+void VtolAutoTakeoffFSM::initFSM(void)
 {
     if (vtolPathFollowerSettings != 0) {
-        setState(AUTOTAKEOFF_STATE_INACTIVE, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_NONE);
+        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
     } else {
-        mAutoTakeOffData->currentState = AUTOTAKEOFF_STATE_INACTIVE;
+        mAutoTakeoffData->currentState = AUTOTAKEOFF_STATE_INACTIVE;
     }
 }
 
-void VtolAutoTakeOffFSM::Activate()
+void VtolAutoTakeoffFSM::Activate()
 {
-    memset(mAutoTakeOffData, sizeof(VtolAutoTakeOffFSMData_T), 0);
-    mAutoTakeOffData->currentState   = AUTOTAKEOFF_STATE_INACTIVE;
-    mAutoTakeOffData->flLowAltitude  = false;
-    mAutoTakeOffData->flAltitudeHold = false;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentRate      = MIN_AUTOTAKEOFFRATE;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentThrust    = vtolPathFollowerSettings->ThrustLimits.Neutral;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.calculatedNeutralThrust = vtolPathFollowerSettings->ThrustLimits.Neutral;
-    mAutoTakeOffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeOffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
-    TakeOffLocationGet(&(mAutoTakeOffData->takeOffLocation));
-    mAutoTakeOffData->fsmAutoTakeOffStatus.AltitudeAtState[AUTOTAKEOFF_STATE_INACTIVE] = 0.0f;
+    memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
+    mAutoTakeoffData->currentState   = AUTOTAKEOFF_STATE_INACTIVE;
+    mAutoTakeoffData->flLowAltitude  = false;
+    mAutoTakeoffData->flAltitudeHold = false;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentRate      = MIN_AUTOTAKEOFFRATE;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentThrust    = vtolPathFollowerSettings->ThrustLimits.Neutral;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust = vtolPathFollowerSettings->ThrustLimits.Neutral;
+    mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
+    mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
+    TakeOffLocationGet(&(mAutoTakeoffData->takeOffLocation));
+    mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeAtState[AUTOTAKEOFF_STATE_INACTIVE] = 0.0f;
     assessAltitude();
 
     if (pathDesired->Mode == PATHDESIRED_MODE_AUTOTAKEOFF) {
 #ifndef DEBUG_GROUNDIMPACT
-        setState(AUTOTAKEOFF_STATE_INIT_ALTHOLD, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_NONE);
+        setState(AUTOTAKEOFF_STATE_INIT_ALTHOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 #else
-        setState(AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_NONE);
+        setState(AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 #endif
     } else {
         // move to error state and callback to position hold
-        setState(AUTOTAKEOFF_STATE_ABORT, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_NONE);
+        setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
     }
 }
 
-void VtolAutoTakeOffFSM::Abort(void)
+void VtolAutoTakeoffFSM::Abort(void)
 {
-    setState(AUTOTAKEOFF_STATE_ABORT, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_NONE);
+    setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 }
 
-PathFollowerFSMState_T VtolAutoTakeOffFSM::GetCurrentState(void)
+PathFollowerFSMState_T VtolAutoTakeoffFSM::GetCurrentState(void)
 {
-    switch (mAutoTakeOffData->currentState) {
+    switch (mAutoTakeoffData->currentState) {
     case AUTOTAKEOFF_STATE_INACTIVE:
         return PFFSM_STATE_INACTIVE;
 
@@ -223,7 +223,7 @@ PathFollowerFSMState_T VtolAutoTakeOffFSM::GetCurrentState(void)
     }
 }
 
-void VtolAutoTakeOffFSM::Update()
+void VtolAutoTakeoffFSM::Update()
 {
     runState();
     if (GetCurrentState() != PFFSM_STATE_INACTIVE) {
@@ -231,24 +231,24 @@ void VtolAutoTakeOffFSM::Update()
     }
 }
 
-int32_t VtolAutoTakeOffFSM::runState(void)
+int32_t VtolAutoTakeoffFSM::runState(void)
 {
     uint8_t flTimeout = false;
 
-    mAutoTakeOffData->stateRunCount++;
+    mAutoTakeoffData->stateRunCount++;
 
-    if (mAutoTakeOffData->stateTimeoutCount > 0 && mAutoTakeOffData->stateRunCount > mAutoTakeOffData->stateTimeoutCount) {
+    if (mAutoTakeoffData->stateTimeoutCount > 0 && mAutoTakeoffData->stateRunCount > mAutoTakeoffData->stateTimeoutCount) {
         flTimeout = true;
     }
 
     // If the current state has a static function, call it
-    if (sAutoTakeOffStateTable[mAutoTakeOffData->currentState].run) {
-        (this->*sAutoTakeOffStateTable[mAutoTakeOffData->currentState].run)(flTimeout);
+    if (sAutoTakeoffStateTable[mAutoTakeoffData->currentState].run) {
+        (this->*sAutoTakeoffStateTable[mAutoTakeoffData->currentState].run)(flTimeout);
     }
     return 0;
 }
 
-int32_t VtolAutoTakeOffFSM::runAlways(void)
+int32_t VtolAutoTakeoffFSM::runAlways(void)
 {
     void assessAltitude(void);
 
@@ -260,29 +260,29 @@ int32_t VtolAutoTakeOffFSM::runAlways(void)
 // uses FSM's as helper functions that manage state and event detection.
 // PathFollower calls into FSM methods to alter its commands.
 
-void VtolAutoTakeOffFSM::BoundThrust(float &ulow, float &uhigh)
+void VtolAutoTakeoffFSM::BoundThrust(float &ulow, float &uhigh)
 {
-    ulow  = mAutoTakeOffData->boundThrustMin;
-    uhigh = mAutoTakeOffData->boundThrustMax;
+    ulow  = mAutoTakeoffData->boundThrustMin;
+    uhigh = mAutoTakeoffData->boundThrustMax;
 
 
-    if (mAutoTakeOffData->flConstrainThrust) {
-        uhigh = mAutoTakeOffData->thrustLimit;
+    if (mAutoTakeoffData->flConstrainThrust) {
+        uhigh = mAutoTakeoffData->thrustLimit;
     }
 }
 
-void VtolAutoTakeOffFSM::ConstrainStabiDesired(StabilizationDesiredData *stabDesired)
+void VtolAutoTakeoffFSM::ConstrainStabiDesired(StabilizationDesiredData *stabDesired)
 {
-    if (mAutoTakeOffData->flZeroStabiHorizontal && stabDesired) {
+    if (mAutoTakeoffData->flZeroStabiHorizontal && stabDesired) {
         stabDesired->Pitch = 0.0f;
         stabDesired->Roll  = 0.0f;
         stabDesired->Yaw   = 0.0f;
     }
 }
 
-void VtolAutoTakeOffFSM::CheckPidScaler(pid_scaler *local_scaler)
+void VtolAutoTakeoffFSM::CheckPidScaler(pid_scaler *local_scaler)
 {
-    if (mAutoTakeOffData->flLowAltitude) {
+    if (mAutoTakeoffData->flLowAltitude) {
         local_scaler->p = AUTOTAKEOFFING_PID_SCALAR_P;
         local_scaler->i = AUTOTAKEOFFING_PID_SCALAR_I;
     }
@@ -292,87 +292,87 @@ void VtolAutoTakeOffFSM::CheckPidScaler(pid_scaler *local_scaler)
 // Set the new state and perform setup for subsequent state run calls
 // This is called by state run functions on event detection that drive
 // state transitions.
-void VtolAutoTakeOffFSM::setState(PathFollowerFSM_AutoTakeOffState_T newState, FSMAutoTakeOffStatusStateExitReasonOptions reason)
+void VtolAutoTakeoffFSM::setState(PathFollowerFSM_AutoTakeoffState_T newState, StatusVtolAutoTakeoffStateExitReasonOptions reason)
 {
-    mAutoTakeOffData->fsmAutoTakeOffStatus.StateExitReason[mAutoTakeOffData->currentState] = reason;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.StateExitReason[mAutoTakeoffData->currentState] = reason;
 
-    if (mAutoTakeOffData->currentState == newState) {
+    if (mAutoTakeoffData->currentState == newState) {
         return;
     }
-    mAutoTakeOffData->currentState = newState;
+    mAutoTakeoffData->currentState = newState;
 
     if (newState != AUTOTAKEOFF_STATE_INACTIVE) {
         PositionStateData positionState;
         PositionStateGet(&positionState);
         float takeOffDown = 0.0f;
-        if (mAutoTakeOffData->takeOffLocation.Status == TAKEOFFLOCATION_STATUS_VALID) {
-            takeOffDown = mAutoTakeOffData->takeOffLocation.Down;
+        if (mAutoTakeoffData->takeOffLocation.Status == TAKEOFFLOCATION_STATUS_VALID) {
+            takeOffDown = mAutoTakeoffData->takeOffLocation.Down;
         }
-        mAutoTakeOffData->fsmAutoTakeOffStatus.AltitudeAtState[newState] = positionState.Down - takeOffDown;
+        mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeAtState[newState] = positionState.Down - takeOffDown;
         assessAltitude();
     }
 
     // Restart state timer counter
-    mAutoTakeOffData->stateRunCount     = 0;
+    mAutoTakeoffData->stateRunCount     = 0;
 
     // Reset state timeout to disabled/zero
-    mAutoTakeOffData->stateTimeoutCount = 0;
+    mAutoTakeoffData->stateTimeoutCount = 0;
 
-    if (sAutoTakeOffStateTable[mAutoTakeOffData->currentState].setup) {
-        (this->*sAutoTakeOffStateTable[mAutoTakeOffData->currentState].setup)();
+    if (sAutoTakeoffStateTable[mAutoTakeoffData->currentState].setup) {
+        (this->*sAutoTakeoffStateTable[mAutoTakeoffData->currentState].setup)();
     }
 
-    updateVtolAutoTakeOffFSMStatus();
+    updateVtolAutoTakeoffFSMStatus();
 }
 
 
 // Timeout utility function for use by state init implementations
-void VtolAutoTakeOffFSM::setStateTimeout(int32_t count)
+void VtolAutoTakeoffFSM::setStateTimeout(int32_t count)
 {
-    mAutoTakeOffData->stateTimeoutCount = count;
+    mAutoTakeoffData->stateTimeoutCount = count;
 }
 
-void VtolAutoTakeOffFSM::updateVtolAutoTakeOffFSMStatus()
+void VtolAutoTakeoffFSM::updateVtolAutoTakeoffFSMStatus()
 {
-    mAutoTakeOffData->fsmAutoTakeOffStatus.State = mAutoTakeOffData->currentState;
-    if (mAutoTakeOffData->flLowAltitude) {
-        mAutoTakeOffData->fsmAutoTakeOffStatus.AltitudeState = FSMAUTOTAKEOFFSTATUS_ALTITUDESTATE_LOW;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.State = mAutoTakeoffData->currentState;
+    if (mAutoTakeoffData->flLowAltitude) {
+        mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeState = STATUSVTOLAUTOTAKEOFF_ALTITUDESTATE_LOW;
     } else {
-        mAutoTakeOffData->fsmAutoTakeOffStatus.AltitudeState = FSMAUTOTAKEOFFSTATUS_ALTITUDESTATE_HIGH;
+        mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeState = STATUSVTOLAUTOTAKEOFF_ALTITUDESTATE_HIGH;
     }
-    FSMAutoTakeOffStatusSet(&mAutoTakeOffData->fsmAutoTakeOffStatus);
+    StatusVtolAutoTakeoffSet(&mAutoTakeoffData->fsmAutoTakeoffStatus);
 }
 
 
-float VtolAutoTakeOffFSM::BoundVelocityDown(float velocity_down)
+float VtolAutoTakeoffFSM::BoundVelocityDown(float velocity_down)
 {
     velocity_down = boundf(velocity_down, MIN_AUTOTAKEOFFRATE, MAX_AUTOTAKEOFFRATE);
-    if (mAutoTakeOffData->flLowAltitude) {
+    if (mAutoTakeoffData->flLowAltitude) {
         velocity_down *= LOW_ALT_DESCENT_REDUCTION_FACTOR;
     }
-    mAutoTakeOffData->fsmAutoTakeOffStatus.targetDescentRate = velocity_down;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.targetDescentRate = velocity_down;
 
-    if (mAutoTakeOffData->flAltitudeHold) {
+    if (mAutoTakeoffData->flAltitudeHold) {
         return 0.0f;
     } else {
         return velocity_down;
     }
 }
 
-void VtolAutoTakeOffFSM::assessAltitude(void)
+void VtolAutoTakeoffFSM::assessAltitude(void)
 {
     float positionDown;
 
     PositionStateDownGet(&positionDown);
     float takeOffDown = 0.0f;
-    if (mAutoTakeOffData->takeOffLocation.Status == TAKEOFFLOCATION_STATUS_VALID) {
-        takeOffDown = mAutoTakeOffData->takeOffLocation.Down;
+    if (mAutoTakeoffData->takeOffLocation.Status == TAKEOFFLOCATION_STATUS_VALID) {
+        takeOffDown = mAutoTakeoffData->takeOffLocation.Down;
     }
     float positionDownRelativeToTakeoff = positionDown - takeOffDown;
     if (positionDownRelativeToTakeoff < AUTOTAKEOFFING_SLOWDOWN_HEIGHT) {
-        mAutoTakeOffData->flLowAltitude = false;
+        mAutoTakeoffData->flLowAltitude = false;
     } else {
-        mAutoTakeOffData->flLowAltitude = true;
+        mAutoTakeoffData->flLowAltitude = true;
     }
 }
 
@@ -380,50 +380,50 @@ void VtolAutoTakeOffFSM::assessAltitude(void)
 // FSM Setup and Run method implementation
 
 // State: INACTIVE
-void VtolAutoTakeOffFSM::setup_inactive(void)
+void VtolAutoTakeoffFSM::setup_inactive(void)
 {
     // Re-initialise local variables
-    mAutoTakeOffData->flZeroStabiHorizontal = false;
-    mAutoTakeOffData->flConstrainThrust     = false;
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->flConstrainThrust     = false;
 }
 
 // State: INIT ALTHOLD
-void VtolAutoTakeOffFSM::setup_init_althold(void)
+void VtolAutoTakeoffFSM::setup_init_althold(void)
 {
     setStateTimeout(TIMEOUT_INIT_ALTHOLD);
     // get target descent velocity
-    mAutoTakeOffData->flZeroStabiHorizontal = false;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.targetDescentRate = BoundVelocityDown(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_VELOCITYVECTOR_DOWN]);
-    mAutoTakeOffData->flConstrainThrust     = false;
-    mAutoTakeOffData->flAltitudeHold = true;
-    mAutoTakeOffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeOffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.targetDescentRate = BoundVelocityDown(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]);
+    mAutoTakeoffData->flConstrainThrust     = false;
+    mAutoTakeoffData->flAltitudeHold = true;
+    mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
+    mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
 }
 
-void VtolAutoTakeOffFSM::run_init_althold(uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_init_althold(uint8_t flTimeout)
 {
     if (flTimeout) {
-        mAutoTakeOffData->flAltitudeHold = false;
-        setState(AUTOTAKEOFF_STATE_WTG_FOR_DESCENTRATE, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_TIMEOUT);
+        mAutoTakeoffData->flAltitudeHold = false;
+        setState(AUTOTAKEOFF_STATE_WTG_FOR_DESCENTRATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
 
 
 // State: WAITING FOR DESCENT RATE
-void VtolAutoTakeOffFSM::setup_wtg_for_descentrate(void)
+void VtolAutoTakeoffFSM::setup_wtg_for_descentrate(void)
 {
     setStateTimeout(TIMEOUT_WTG_FOR_DESCENTRATE);
     // get target descent velocity
-    mAutoTakeOffData->flZeroStabiHorizontal = false;
-    mAutoTakeOffData->observationCount = 0;
-    mAutoTakeOffData->observation2Count     = 0;
-    mAutoTakeOffData->flConstrainThrust     = false;
-    mAutoTakeOffData->flAltitudeHold = false;
-    mAutoTakeOffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeOffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->observationCount = 0;
+    mAutoTakeoffData->observation2Count     = 0;
+    mAutoTakeoffData->flConstrainThrust     = false;
+    mAutoTakeoffData->flAltitudeHold = false;
+    mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
+    mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
 }
 
-void VtolAutoTakeOffFSM::run_wtg_for_descentrate(uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_wtg_for_descentrate(uint8_t flTimeout)
 {
     // Look at current actual thrust...are we already shutdown??
     VelocityStateData velocityState;
@@ -438,36 +438,36 @@ void VtolAutoTakeOffFSM::run_wtg_for_descentrate(uint8_t flTimeout)
 
     // we need to see velocity down within a range of control before we proceed, without which we
     // really don't have confidence to allow later states to run.
-    if (velocityState.Down > (AUTOTAKEOFFRATE_LOWLIMIT_FACTOR * mAutoTakeOffData->fsmAutoTakeOffStatus.targetDescentRate) &&
-        velocityState.Down < (AUTOTAKEOFFRATE_HILIMIT_FACTOR * mAutoTakeOffData->fsmAutoTakeOffStatus.targetDescentRate)) {
-        if (mAutoTakeOffData->observationCount++ > WTG_FOR_DESCENTRATE_COUNT_LIMIT) {
-            setState(AUTOTAKEOFF_STATE_AT_DESCENTRATE, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_DESCENTRATEOK);
+    if (velocityState.Down > (AUTOTAKEOFFRATE_LOWLIMIT_FACTOR * mAutoTakeoffData->fsmAutoTakeoffStatus.targetDescentRate) &&
+        velocityState.Down < (AUTOTAKEOFFRATE_HILIMIT_FACTOR * mAutoTakeoffData->fsmAutoTakeoffStatus.targetDescentRate)) {
+        if (mAutoTakeoffData->observationCount++ > WTG_FOR_DESCENTRATE_COUNT_LIMIT) {
+            setState(AUTOTAKEOFF_STATE_AT_DESCENTRATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_DESCENTRATEOK);
             return;
         }
     }
 
     if (flTimeout) {
-        setState(AUTOTAKEOFF_STATE_ABORT, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_TIMEOUT);
+        setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
 
 
 // State: AT DESCENT RATE
-void VtolAutoTakeOffFSM::setup_at_descentrate(void)
+void VtolAutoTakeoffFSM::setup_at_descentrate(void)
 {
     setStateTimeout(TIMEOUT_AT_DESCENTRATE);
-    mAutoTakeOffData->flZeroStabiHorizontal = false;
-    mAutoTakeOffData->observationCount  = 0;
-    mAutoTakeOffData->sum1 = 0.0f;
-    mAutoTakeOffData->sum2 = 0.0f;
-    mAutoTakeOffData->flConstrainThrust = false;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentRate = MIN_AUTOTAKEOFFRATE;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentThrust = vtolPathFollowerSettings->ThrustLimits.Neutral;
-    mAutoTakeOffData->boundThrustMin    = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeOffData->boundThrustMax    = vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->observationCount  = 0;
+    mAutoTakeoffData->sum1 = 0.0f;
+    mAutoTakeoffData->sum2 = 0.0f;
+    mAutoTakeoffData->flConstrainThrust = false;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentRate = MIN_AUTOTAKEOFFRATE;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentThrust = vtolPathFollowerSettings->ThrustLimits.Neutral;
+    mAutoTakeoffData->boundThrustMin    = vtolPathFollowerSettings->ThrustLimits.Min;
+    mAutoTakeoffData->boundThrustMax    = vtolPathFollowerSettings->ThrustLimits.Max;
 }
 
-void VtolAutoTakeOffFSM::run_at_descentrate(uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_at_descentrate(uint8_t flTimeout)
 {
     VelocityStateData velocityState;
 
@@ -476,42 +476,42 @@ void VtolAutoTakeOffFSM::run_at_descentrate(uint8_t flTimeout)
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
 
-    mAutoTakeOffData->sum1 += velocityState.Down;
-    mAutoTakeOffData->sum2 += stabDesired.Thrust;
-    mAutoTakeOffData->observationCount++;
+    mAutoTakeoffData->sum1 += velocityState.Down;
+    mAutoTakeoffData->sum2 += stabDesired.Thrust;
+    mAutoTakeoffData->observationCount++;
     if (flTimeout) {
-        mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentRate   = boundf((mAutoTakeOffData->sum1 / (float)(mAutoTakeOffData->observationCount)), 0.5f * MIN_AUTOTAKEOFFRATE, 1.5f * MAX_AUTOTAKEOFFRATE);
-        mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentThrust = boundf((mAutoTakeOffData->sum2 / (float)(mAutoTakeOffData->observationCount)), vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
+        mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentRate   = boundf((mAutoTakeoffData->sum1 / (float)(mAutoTakeoffData->observationCount)), 0.5f * MIN_AUTOTAKEOFFRATE, 1.5f * MAX_AUTOTAKEOFFRATE);
+        mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentThrust = boundf((mAutoTakeoffData->sum2 / (float)(mAutoTakeoffData->observationCount)), vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
 
         // We need to calculate a neutral limit to use later to constrain upper thrust range during states where we are close to the ground
         // As our battery gets flat, ThrustLimits.Neutral needs to constrain us too much and we get too fast a descent rate. We can
         // detect this by the fact that the descent rate will exceed the target and the required thrust will exceed the neutral value
-        mAutoTakeOffData->fsmAutoTakeOffStatus.calculatedNeutralThrust = mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentRate / mAutoTakeOffData->fsmAutoTakeOffStatus.targetDescentRate * mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentThrust;
-        mAutoTakeOffData->fsmAutoTakeOffStatus.calculatedNeutralThrust = boundf(mAutoTakeOffData->fsmAutoTakeOffStatus.calculatedNeutralThrust, vtolPathFollowerSettings->ThrustLimits.Neutral, vtolPathFollowerSettings->ThrustLimits.Max);
+        mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust = mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentRate / mAutoTakeoffData->fsmAutoTakeoffStatus.targetDescentRate * mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentThrust;
+        mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust = boundf(mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust, vtolPathFollowerSettings->ThrustLimits.Neutral, vtolPathFollowerSettings->ThrustLimits.Max);
 
 
-        setState(AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_DESCENTRATEOK);
+        setState(AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_DESCENTRATEOK);
     }
 }
 
 
 // State: WAITING FOR GROUND EFFECT
-void VtolAutoTakeOffFSM::setup_wtg_for_groundeffect(void)
+void VtolAutoTakeoffFSM::setup_wtg_for_groundeffect(void)
 {
     // No timeout
-    mAutoTakeOffData->flZeroStabiHorizontal = false;
-    mAutoTakeOffData->observationCount = 0;
-    mAutoTakeOffData->observation2Count     = 0;
-    mAutoTakeOffData->sum1 = 0.0f;
-    mAutoTakeOffData->sum2 = 0.0f;
-    mAutoTakeOffData->flConstrainThrust     = false;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.WtgForGroundEffect.BounceVelocity = 0.0f;
-    mAutoTakeOffData->fsmAutoTakeOffStatus.WtgForGroundEffect.BounceAccel    = 0.0f;
-    mAutoTakeOffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeOffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->observationCount = 0;
+    mAutoTakeoffData->observation2Count     = 0;
+    mAutoTakeoffData->sum1 = 0.0f;
+    mAutoTakeoffData->sum2 = 0.0f;
+    mAutoTakeoffData->flConstrainThrust     = false;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.WtgForGroundEffect.BounceVelocity = 0.0f;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.WtgForGroundEffect.BounceAccel    = 0.0f;
+    mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
+    mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
 }
 
-void VtolAutoTakeOffFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTimeout)
 {
     // detect material downrating in thrust for 1 second.
     VelocityStateData velocityState;
@@ -530,9 +530,9 @@ void VtolAutoTakeOffFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_
     // detect bounce
     uint8_t flBounce = (velocityState.Down < BOUNCE_VELOCITY_TRIGGER_LIMIT);
     if (flBounce) {
-        mAutoTakeOffData->fsmAutoTakeOffStatus.WtgForGroundEffect.BounceVelocity = velocityState.Down;
+        mAutoTakeoffData->fsmAutoTakeoffStatus.WtgForGroundEffect.BounceVelocity = velocityState.Down;
     } else {
-        mAutoTakeOffData->fsmAutoTakeOffStatus.WtgForGroundEffect.BounceVelocity = 0.0f;
+        mAutoTakeoffData->fsmAutoTakeoffStatus.WtgForGroundEffect.BounceVelocity = 0.0f;
     }
 
     // invert sign of accel to the standard convention of down is +ve and subtract the gravity to get
@@ -540,66 +540,66 @@ void VtolAutoTakeOffFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_
     float bounceAccel     = -accelState.z - g_e;
     uint8_t flBounceAccel = (bounceAccel < BOUNCE_ACCELERATION_TRIGGER_LIMIT);
     if (flBounceAccel) {
-        mAutoTakeOffData->fsmAutoTakeOffStatus.WtgForGroundEffect.BounceAccel = bounceAccel;
+        mAutoTakeoffData->fsmAutoTakeoffStatus.WtgForGroundEffect.BounceAccel = bounceAccel;
     } else {
-        mAutoTakeOffData->fsmAutoTakeOffStatus.WtgForGroundEffect.BounceAccel = 0.0f;
+        mAutoTakeoffData->fsmAutoTakeoffStatus.WtgForGroundEffect.BounceAccel = 0.0f;
     }
 
     if (flBounce || flBounceAccel) {
-        mAutoTakeOffData->observation2Count++;
-        if (mAutoTakeOffData->observation2Count > BOUNCE_TRIGGER_COUNT) {
-            setState(AUTOTAKEOFF_STATE_GROUNDEFFECT, (flBounce ? FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_BOUNCEVELOCITY : FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_BOUNCEACCEL));
+        mAutoTakeoffData->observation2Count++;
+        if (mAutoTakeoffData->observation2Count > BOUNCE_TRIGGER_COUNT) {
+            setState(AUTOTAKEOFF_STATE_GROUNDEFFECT, (flBounce ? STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_BOUNCEVELOCITY : STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_BOUNCEACCEL));
             return;
         }
     } else {
-        mAutoTakeOffData->observation2Count = 0;
+        mAutoTakeoffData->observation2Count = 0;
     }
 
     // detect low descent rate
-    uint8_t flDescentRateLow = (velocityState.Down < (GROUNDEFFECT_SLOWDOWN_FACTOR * mAutoTakeOffData->fsmAutoTakeOffStatus.averageDescentRate));
+    uint8_t flDescentRateLow = (velocityState.Down < (GROUNDEFFECT_SLOWDOWN_FACTOR * mAutoTakeoffData->fsmAutoTakeoffStatus.averageDescentRate));
     if (flDescentRateLow) {
-        mAutoTakeOffData->boundThrustMax = mAutoTakeOffData->fsmAutoTakeOffStatus.calculatedNeutralThrust;
-        mAutoTakeOffData->observationCount++;
-        if (mAutoTakeOffData->observationCount > GROUNDEFFECT_SLOWDOWN_COUNT) {
+        mAutoTakeoffData->boundThrustMax = mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust;
+        mAutoTakeoffData->observationCount++;
+        if (mAutoTakeoffData->observationCount > GROUNDEFFECT_SLOWDOWN_COUNT) {
 #ifndef DEBUG_GROUNDIMPACT
-            setState(AUTOTAKEOFF_STATE_GROUNDEFFECT, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_LOWDESCENTRATE);
+            setState(AUTOTAKEOFF_STATE_GROUNDEFFECT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_LOWDESCENTRATE);
 #endif
             return;
         }
     } else {
-        mAutoTakeOffData->observationCount = 0;
+        mAutoTakeoffData->observationCount = 0;
     }
 
-    updateVtolAutoTakeOffFSMStatus();
+    updateVtolAutoTakeoffFSMStatus();
 }
 
 // STATE: GROUNDEFFET
-void VtolAutoTakeOffFSM::setup_groundeffect(void)
+void VtolAutoTakeoffFSM::setup_groundeffect(void)
 {
     setStateTimeout(TIMEOUT_GROUNDEFFECT);
-    mAutoTakeOffData->flZeroStabiHorizontal     = true;
+    mAutoTakeoffData->flZeroStabiHorizontal     = true;
     PositionStateData positionState;
     PositionStateGet(&positionState);
-    mAutoTakeOffData->expectedAutoTakeOffPositionNorth = positionState.North;
-    mAutoTakeOffData->expectedAutoTakeOffPositionEast  = positionState.East;
-    mAutoTakeOffData->flConstrainThrust = false;
+    mAutoTakeoffData->expectedAutoTakeoffPositionNorth = positionState.North;
+    mAutoTakeoffData->expectedAutoTakeoffPositionEast  = positionState.East;
+    mAutoTakeoffData->flConstrainThrust = false;
 
     // now that we have ground effect limit max thrust to neutral
-    mAutoTakeOffData->boundThrustMin    = -0.1f;
-    mAutoTakeOffData->boundThrustMax    = mAutoTakeOffData->fsmAutoTakeOffStatus.calculatedNeutralThrust;
+    mAutoTakeoffData->boundThrustMin    = -0.1f;
+    mAutoTakeoffData->boundThrustMax    = mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust;
 }
-void VtolAutoTakeOffFSM::run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
 {
     StabilizationDesiredData stabDesired;
 
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust < 0.0f) {
-        setState(AUTOTAKEOFF_STATE_THRUSTOFF, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_ZEROTHRUST);
+        setState(AUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ZEROTHRUST);
         return;
     }
 
     // Stay in this state until we get a low altitude flag.
-    if (mAutoTakeOffData->flLowAltitude == false) {
+    if (mAutoTakeoffData->flLowAltitude == false) {
         // worst case scenario is that we land and the pid brings thrust down to zero.
         return;
     }
@@ -607,84 +607,84 @@ void VtolAutoTakeOffFSM::run_groundeffect(__attribute__((unused)) uint8_t flTime
     // detect broad sideways drift.  If for some reason we have a hard landing that the bounce detection misses, this will kick in
     PositionStateData positionState;
     PositionStateGet(&positionState);
-    float north_error   = mAutoTakeOffData->expectedAutoTakeOffPositionNorth - positionState.North;
-    float east_error    = mAutoTakeOffData->expectedAutoTakeOffPositionEast - positionState.East;
+    float north_error   = mAutoTakeoffData->expectedAutoTakeoffPositionNorth - positionState.North;
+    float east_error    = mAutoTakeoffData->expectedAutoTakeoffPositionEast - positionState.East;
     float positionError = sqrtf(north_error * north_error + east_error * east_error);
     if (positionError > 0.3f) {
-        setState(AUTOTAKEOFF_STATE_THRUSTDOWN, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_POSITIONERROR);
+        setState(AUTOTAKEOFF_STATE_THRUSTDOWN, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_POSITIONERROR);
         return;
     }
 
     if (flTimeout) {
-        setState(AUTOTAKEOFF_STATE_THRUSTDOWN, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_TIMEOUT);
+        setState(AUTOTAKEOFF_STATE_THRUSTDOWN, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
 
 // STATE: THRUSTDOWN
-void VtolAutoTakeOffFSM::setup_thrustdown(void)
+void VtolAutoTakeoffFSM::setup_thrustdown(void)
 {
     setStateTimeout(TIMEOUT_THRUSTDOWN);
-    mAutoTakeOffData->flZeroStabiHorizontal = true;
-    mAutoTakeOffData->flConstrainThrust     = true;
+    mAutoTakeoffData->flZeroStabiHorizontal = true;
+    mAutoTakeoffData->flConstrainThrust     = true;
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
-    mAutoTakeOffData->thrustLimit    = stabDesired.Thrust;
-    mAutoTakeOffData->sum1 = stabDesired.Thrust / (float)TIMEOUT_THRUSTDOWN;
-    mAutoTakeOffData->boundThrustMin = -0.1f;
-    mAutoTakeOffData->boundThrustMax = mAutoTakeOffData->fsmAutoTakeOffStatus.calculatedNeutralThrust;
+    mAutoTakeoffData->thrustLimit    = stabDesired.Thrust;
+    mAutoTakeoffData->sum1 = stabDesired.Thrust / (float)TIMEOUT_THRUSTDOWN;
+    mAutoTakeoffData->boundThrustMin = -0.1f;
+    mAutoTakeoffData->boundThrustMax = mAutoTakeoffData->fsmAutoTakeoffStatus.calculatedNeutralThrust;
 }
 
-void VtolAutoTakeOffFSM::run_thrustdown(__attribute__((unused)) uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_thrustdown(__attribute__((unused)) uint8_t flTimeout)
 {
     // reduce thrust setpoint step by step
-    mAutoTakeOffData->thrustLimit -= mAutoTakeOffData->sum1;
+    mAutoTakeoffData->thrustLimit -= mAutoTakeoffData->sum1;
 
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
-    if (stabDesired.Thrust < 0.0f || mAutoTakeOffData->thrustLimit < 0.0f) {
-        setState(AUTOTAKEOFF_STATE_THRUSTOFF, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_ZEROTHRUST);
+    if (stabDesired.Thrust < 0.0f || mAutoTakeoffData->thrustLimit < 0.0f) {
+        setState(AUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ZEROTHRUST);
     }
 
     if (flTimeout) {
-        setState(AUTOTAKEOFF_STATE_THRUSTOFF, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_TIMEOUT);
+        setState(AUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
 
 // STATE: THRUSTOFF
-void VtolAutoTakeOffFSM::setup_thrustoff(void)
+void VtolAutoTakeoffFSM::setup_thrustoff(void)
 {
-    mAutoTakeOffData->thrustLimit       = -1.0f;
-    mAutoTakeOffData->flConstrainThrust = true;
-    mAutoTakeOffData->boundThrustMin    = -0.1f;
-    mAutoTakeOffData->boundThrustMax    = 0.0f;
+    mAutoTakeoffData->thrustLimit       = -1.0f;
+    mAutoTakeoffData->flConstrainThrust = true;
+    mAutoTakeoffData->boundThrustMin    = -0.1f;
+    mAutoTakeoffData->boundThrustMax    = 0.0f;
 }
 
-void VtolAutoTakeOffFSM::run_thrustoff(__attribute__((unused)) uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_thrustoff(__attribute__((unused)) uint8_t flTimeout)
 {
-    setState(AUTOTAKEOFF_STATE_DISARMED, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_NONE);
+    setState(AUTOTAKEOFF_STATE_DISARMED, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 }
 
 // STATE: DISARMED
-void VtolAutoTakeOffFSM::setup_disarmed(void)
+void VtolAutoTakeoffFSM::setup_disarmed(void)
 {
     // nothing to do
-    mAutoTakeOffData->flConstrainThrust     = false;
-    mAutoTakeOffData->flZeroStabiHorizontal = false;
-    mAutoTakeOffData->observationCount = 0;
-    mAutoTakeOffData->boundThrustMin   = -0.1f;
-    mAutoTakeOffData->boundThrustMax   = 0.0f;
+    mAutoTakeoffData->flConstrainThrust     = false;
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->observationCount = 0;
+    mAutoTakeoffData->boundThrustMin   = -0.1f;
+    mAutoTakeoffData->boundThrustMax   = 0.0f;
 }
 
-void VtolAutoTakeOffFSM::run_disarmed(__attribute__((unused)) uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_disarmed(__attribute__((unused)) uint8_t flTimeout)
 {
 #ifdef DEBUG_GROUNDIMPACT
-    if (mAutoTakeOffData->observationCount++ > 100) {
-        setState(AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, FSMAUTOTAKEOFFSTATUS_STATEEXITREASON_NONE);
+    if (mAutoTakeoffData->observationCount++ > 100) {
+        setState(AUTOTAKEOFF_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
     }
 #endif
 }
 
-void VtolAutoTakeOffFSM::fallback_to_hold(void)
+void VtolAutoTakeoffFSM::fallback_to_hold(void)
 {
     PositionStateData positionState;
 
@@ -704,14 +704,14 @@ void VtolAutoTakeOffFSM::fallback_to_hold(void)
 
 // abort repeatedly overwrites pathfollower's objective on a landing abort and
 // continues to do so until a flight mode change.
-void VtolAutoTakeOffFSM::setup_abort(void)
+void VtolAutoTakeoffFSM::setup_abort(void)
 {
-    mAutoTakeOffData->boundThrustMin        = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeOffData->boundThrustMax        = vtolPathFollowerSettings->ThrustLimits.Max;
-    mAutoTakeOffData->flConstrainThrust     = false;
-    mAutoTakeOffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->boundThrustMin        = vtolPathFollowerSettings->ThrustLimits.Min;
+    mAutoTakeoffData->boundThrustMax        = vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->flConstrainThrust     = false;
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
     fallback_to_hold();
 }
 
-void VtolAutoTakeOffFSM::run_abort(__attribute__((unused)) uint8_t flTimeout)
+void VtolAutoTakeoffFSM::run_abort(__attribute__((unused)) uint8_t flTimeout)
 {}

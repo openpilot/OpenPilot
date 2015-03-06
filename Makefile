@@ -50,8 +50,8 @@ export PACKAGE_DIR := $(ROOT_DIR)/build/package
 export DIST_DIR    := $(ROOT_DIR)/build/dist
 
 # Set up default build configurations (debug | release)
-GCS_BUILD_CONF		:= debug
-UAVOGEN_BUILD_CONF	:= debug
+GCS_BUILD_CONF		:= release
+UAVOGEN_BUILD_CONF	:= release
 ANDROIDGCS_BUILD_CONF	:= debug
 GOOGLE_API_VERSION	:= 14
 

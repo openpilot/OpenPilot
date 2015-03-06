@@ -44,6 +44,7 @@
 #include <QtCore/qmath.h>
 #include <QJsonObject>
 #include "auxmagsettings.h"
+#include "attitudesettings.h"
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
@@ -887,7 +888,7 @@ void VehicleConfigurationHelper::applyTemplateSettings()
 
 void VehicleConfigurationHelper::applyBoardRotationSettings()
 {
-    AttitudeSettings *attitudeSettings = = AttitudeSettings::GetInstance(m_uavoManager);
+    AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(m_uavoManager);
 
     Q_ASSERT(attitudeSettings);
     AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();

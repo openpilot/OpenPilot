@@ -90,6 +90,7 @@ private:
     void applyStabilizationConfiguration();
     void applyManualControlDefaults();
     void applyTemplateSettings();
+    void applyBoardRotationSettings();
 
     bool isApplicable(UAVObject *dataObj);
 

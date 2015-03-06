@@ -81,6 +81,8 @@ bool VehicleConfigurationHelper::setupVehicle(bool save)
 
     applyTemplateSettings();
 
+    applyBoardRotationSettings();
+
     bool result = saveChangesToController(save);
     emit saveProgress(m_modifiedObjects.count() + 1, ++m_progress, result ? tr("Done!") : tr("Failed!"));
     return result;
@@ -881,6 +883,19 @@ void VehicleConfigurationHelper::applyTemplateSettings()
             }
         }
     }
+}
+
+void VehicleConfigurationHelper::applyBoardRotationSettings()
+{
+    AttitudeSettings *attitudeSettings = = AttitudeSettings::GetInstance(m_uavoManager);
+
+    Q_ASSERT(attitudeSettings);
+    AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = 90;
+
+    attitudeSettings->setData(attitudeSettingsData);
+    addModifiedObject(attitudeSettings, tr("Writing board rotation settings"));
 }
 
 bool VehicleConfigurationHelper::saveChangesToController(bool save)

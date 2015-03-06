@@ -9207,7 +9207,7 @@ p, li { white-space: pre-wrap; }
 
 Please select the type of multirotor you want to create a configuration for below:</source>
         <translation>OpenPilot目前支持绝大部分的多旋翼飞行器类型。
-本页中未列出来的类型，请稍候进入“设置”界面中单独进行设置。
+本页中未列出来的类型，请稍候进入“Configuration”界面中的“Vehicle”选项页里设置。
 
 请选择多旋翼飞行器类型：</translation>
     </message>

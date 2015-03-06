@@ -538,7 +538,7 @@ int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path)
  * @param[in] fs_id The filesystem to use for this action
  * @param[in] path string to use for the search
  * @param[in] size number of bytes to use as a prefix for the search
- * @param[in] flags the flags for the open command, can be combinations of REMOVE
+ * @param[in] flags the flags for the find command, can be combinations of REMOVE
  */
 int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags)
 {
@@ -559,15 +559,60 @@ int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_siz
 
 	SPIFFS_opendir(&flashfs->fs, "/", &d);
 
-	while ((pe = SPIFFS_readdir(&d, pe)))
-		if (strncmp(path, (char*)pe->name, prefix_size) == 0) {
-			if (flags & PIOS_FLASHFS_REMOVE) {
-				file_id = SPIFFS_open_by_dirent(&flashfs->fs, pe, SPIFFS_RDWR, 0);
-				SPIFFS_fremove(&flashfs->fs, file_id);
-				flashfs->files--;
-			}
-			filecount++;
-		}
+	if ((strcmp(path, "*") == 0) && (prefix_size == 1)) {
+	    while ((pe = SPIFFS_readdir(&d, pe)))
+	        filecount++;
+	}
+	else
+	{
+	    while ((pe = SPIFFS_readdir(&d, pe))) {
+	        if (strncmp(path, (char*)pe->name, prefix_size) == 0) {
+	            if (flags & PIOS_FLASHFS_REMOVE) {
+	                file_id = SPIFFS_open_by_dirent(&flashfs->fs, pe, SPIFFS_RDWR, 0);
+	                SPIFFS_fremove(&flashfs->fs, file_id);
+	                flashfs->files--;
+	            }
+	            filecount++;
+	        }
+	    }
+	}
+
+    SPIFFS_closedir(&d);
+
+    return filecount;
+}
+
+
+/**
+ * @brief Helper function: 'ls / | awk '{nr++; if( nr == file_number) print $0}'
+ * @param[in] fs_id The filesystem to use for this action
+ * @param[out] file name.
+ * @param[out] file size.
+ * @param[in] file number in the dir.
+ * @param[in] flags the flags for the open command, can be combinations of TBD
+ */
+int32_t PIOS_FLASHFS_Info(uintptr_t fs_id, char *path, uint32_t *size, uint32_t file_number, __attribute__((unused)) uint32_t flags)
+{
+    uint32_t filecount = 0;
+
+    struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
+
+    if (!PIOS_FLASHFS_Validate(flashfs))
+        return PIOS_FLASHFS_ERROR_FS_INVALID;
+
+    spiffs_DIR d;
+    struct spiffs_dirent e;
+    struct spiffs_dirent *pe = &e;
+
+    SPIFFS_opendir(&flashfs->fs, "/", &d);
+
+    while ((pe = SPIFFS_readdir(&d, pe))) {
+        if (filecount == file_number) {
+            strcpy(path, (char*)pe->name);
+            *size = pe->size;
+        }
+        filecount++;
+    }
 
     SPIFFS_closedir(&d);
 

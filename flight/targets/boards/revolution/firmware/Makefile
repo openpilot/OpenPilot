@@ -50,6 +50,7 @@ MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
 MODULES += Notify
+MODULES += FileSync
 
 OPTMODULES += ComUsbBridge
 

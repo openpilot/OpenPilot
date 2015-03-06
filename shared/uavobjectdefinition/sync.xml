@@ -1,0 +1,18 @@
+<xml>
+    <object name="Sync" singleinstance="true" settings="false" category="System">
+        <description>File Sync Object - Used to issue transfer between GCS and OP board's filesystem.</description>
+        <field name="Device" units="" type="enum" elements="1" options="ExternalFlash, InternalFlash, MicroSDCard, USBStick, GPS" />
+        <field name="Command" units="" type="enum" elements="1" options="Download, Upload, List, Delete, Format, Download_response, Upload_response, List_response, Delete_response, Format_response, Idle" />
+        <field name="Sync" units="" type="enum" elements="1" options="Enabled, Disabled" />
+        <field name="Status" units="" type="enum" elements="1" options="Error, OK" />
+        <field name="Offset" units="" type="uint16" elements="1" />
+        <field name="Name" units="" type="uint8" elements="26" />
+        <field name="TotalSize" units="" type="uint32" elements="1" />
+        <field name="DataSize" units="" type="uint16" elements="1" />
+        <field name="Data" units="" type="uint8" elements="200" />
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
+        <telemetryflight acked="true" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

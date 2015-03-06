@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/filesync">
+        <file>FileSyncDialog.qml</file>
+        <file>functions.js</file>
+    </qresource>
+</RCC>

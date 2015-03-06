@@ -252,3 +252,9 @@ plugin_flightlog.depends += plugin_uavobjects
 plugin_flightlog.depends += plugin_uavtalk
 SUBDIRS += plugin_flightlog
 
+# File sync plugin
+plugin_filesync.subdir = filesync
+plugin_filesync.depends = plugin_coreplugin
+plugin_filesync.depends += plugin_uavobjects
+plugin_filesync.depends += plugin_uavtalk
+SUBDIRS += plugin_filesync

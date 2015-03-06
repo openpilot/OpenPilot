@@ -60,9 +60,9 @@ extern "C" {
 }
 
 // C++ includes
-#include "vtollandcontroller.h"
+#include "vtolautotakeoffcontroller.h"
 #include "pathfollowerfsm.h"
-#include "vtollandfsm.h"
+#include "vtolautotakeofffsm.h"
 #include "pidcontroldown.h"
 
 // Private constants
@@ -171,14 +171,11 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
     controlDown.UpdateVelocityState(velocityState.Down);
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
-    // Implement optional horizontal position hold.
-    if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_OPTIONS]) == PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_OPTION_HORIZONTAL_PH) {
         // landing flight mode has stored original horizontal position in pathdesired
         PositionStateData positionState;
         PositionStateGet(&positionState);
         controlNE.UpdatePositionState(positionState.North, positionState.East);
         controlNE.ControlPosition();
-    }
 
     velocityDesired.Down  = controlDown.GetVelocityDesired();
     float north, east;

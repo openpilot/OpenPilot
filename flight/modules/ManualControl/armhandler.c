@@ -306,6 +306,7 @@ static bool okToArm(void)
         break;
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
         return false;
+
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
         return true;
 

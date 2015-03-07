@@ -149,7 +149,7 @@ void pathFollowerHandler(bool newinit)
         break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
         plan_run_AutoTakeoff();
-	break;
+        break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         plan_run_AutoCruise();
         break;

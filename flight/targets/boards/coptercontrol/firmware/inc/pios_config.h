@@ -36,8 +36,8 @@
  * details.
  */
 
-#define PIOS_INCLUDE_DEBUG_CONSOLE
-#define DEBUG_LEVEL 10
+/* #define PIOS_INCLUDE_DEBUG_CONSOLE */
+/* #define DEBUG_LEVEL 0 */
 /* #define PIOS_ENABLE_DEBUG_PINS */
 
 /* PIOS FreeRTOS support */
@@ -69,7 +69,7 @@
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
-// #define PIOS_INCLUDE_WDG
+#define PIOS_INCLUDE_WDG
 
 /* PIOS USB functions */
 #define PIOS_INCLUDE_USB

@@ -21,7 +21,7 @@ ifndef OPENPILOT_IS_COOL
 endif
 
 # Set to YES to compile for debugging
-DEBUG                = YES
+DEBUG                ?= NO
 
 # Set to YES to compile C++ implemented features
 USE_CXX              ?= NO
@@ -43,6 +43,14 @@ DIAG_INSTRUMENTATION ?= NO
 # Or just turn on all the above diagnostics. WARNING: this consumes massive amounts of memory.
 DIAG_ALL             ?= NO
 
+# Optimization level, can be [0, 1, 2, 3, s].
+# 0 = turn off optimization. s = optimize for size.
+# Note: 3 is not always the best optimization level.
+ifeq ($(DEBUG), YES)
+    OPT = 0
+else
+    OPT = s
+endif
 
 # Output format (can be ihex or binary or both).
 #  binary to create a load-image in raw-binary format i.e. for SAM-BA,
@@ -113,7 +121,8 @@ CSTANDARD = -std=gnu99
 # Common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 CFLAGS += $(CDEFS)
-
+CFLAGS += -O$(OPT)
+CFLAGS += -g$(DEBUGF)
 CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -Wall -Wextra
@@ -145,19 +154,11 @@ BOARD_CDEFS += -DUSER_EE_BANK_SIZE=$(USER_EE_BANK_SIZE)
 endif
 CDEFS += $(BOARD_CDEFS)
 
-# Optimization level, can be [0, 1, 2, 3, s].
-# 0 = turn off optimization. s = optimize for size.
-# Note: 3 is not always the best optimization level.
 ifeq ($(DEBUG), YES)
-CFLAGS += -DDEBUG
-CFLAGS += -g$(DEBUGF)
-CFLAGS += -Os
-#CFLAGS += -finstrument-functions -ffixed-r10
+    CPPFLAGS += -DDEBUG
 else
-CFLAGS += -DNDEBUG
-CFLAGS += -Os
+    CFLAGS += -fdata-sections -ffunction-sections
 endif
-CFLAGS += -fdata-sections -ffunction-sections
 
 ifeq ($(USE_CXX), YES)
     CPPFLAGS += -DPIOS_ENABLE_CXX

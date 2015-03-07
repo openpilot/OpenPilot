@@ -86,7 +86,7 @@
 # ifdef DEBUG
 #  define HEAP_CHECK_LEVEL  2
 # else
-#  define HEAP_CHECK_LEVEL  3
+#  define HEAP_CHECK_LEVEL  0
 # endif
 #endif
 

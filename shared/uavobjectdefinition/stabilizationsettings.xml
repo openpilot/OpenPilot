@@ -49,7 +49,26 @@
 	<field name="FlightModeAssistMap" units="" type="enum"
 	    options="None,GPSAssist"
 	    elements="6"
-	    defaultvalue="None,None,None,None,None,None"/>
+	    defaultvalue="None,None,None,None,None,None"
+        limits="\
+                %0401NE:GPSAssist,\
+                %0402NE:GPSAssist;\
+                \
+                %0401NE:GPSAssist,\
+                %0402NE:GPSAssist;\
+                \
+                %0401NE:GPSAssist,\
+                %0402NE:GPSAssist;\
+                \
+                %0401NE:GPSAssist,\
+                %0402NE:GPSAssist;\
+                \
+                %0401NE:GPSAssist,\
+                %0402NE:GPSAssist;\
+                \
+                %0401NE:GPSAssist,\
+                %0402NE:GPSAssist;"
+    />
 
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

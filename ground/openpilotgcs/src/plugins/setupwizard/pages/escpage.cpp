@@ -47,7 +47,11 @@ bool EscPage::validatePage()
     if (ui->oneshotESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_ONESHOT);
     } else if (ui->rapidESCButton->isChecked()) {
-        getWizard()->setEscType(SetupWizard::ESC_RAPID);
+        if (isSynchOrOneShotAvailable()) {
+            getWizard()->setEscType(SetupWizard::ESC_SYNCHED);
+        } else {
+            getWizard()->setEscType(SetupWizard::ESC_RAPID);
+        }
     } else if (ui->defaultESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     }
@@ -58,7 +62,18 @@ bool EscPage::validatePage()
 
 void EscPage::initializePage()
 {
-    bool enabled = true;
+    bool enabled = isSynchOrOneShotAvailable();
+
+    ui->oneshotESCButton->setEnabled(enabled);
+    if (ui->oneshotESCButton->isChecked() && !enabled) {
+        ui->oneshotESCButton->setChecked(false);
+        ui->rapidESCButton->setChecked(true);
+    }
+}
+
+bool EscPage::isSynchOrOneShotAvailable()
+{
+    bool available = true;
 
     switch (getWizard()->getControllerType()) {
     case SetupWizard::CONTROLLER_CC:
@@ -70,10 +85,10 @@ void EscPage::initializePage()
             case SetupWizard::MULTI_ROTOR_QUAD_X:
             case SetupWizard::MULTI_ROTOR_QUAD_H:
             case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
-                enabled = getWizard()->getInputType() != SetupWizard::INPUT_PWM;
+                available = getWizard()->getInputType() != SetupWizard::INPUT_PWM;
                 break;
             default:
-                enabled = false;
+                available = false;
                 break;
             }
             break;
@@ -82,9 +97,5 @@ void EscPage::initializePage()
         break;
     default: break;
     }
-    ui->oneshotESCButton->setEnabled(enabled);
-    if (ui->oneshotESCButton->isChecked() && !enabled) {
-        ui->oneshotESCButton->setChecked(false);
-        ui->rapidESCButton->setChecked(true);
-    }
+    return available;
 }

@@ -44,7 +44,7 @@ public:
 
 public slots:
     void startChannelOutput(quint16 channel, quint16 safeValue);
-    void startChannelOutput(QList<quint16> channels, quint16 safeValue);
+    void startChannelOutput(QList<quint16> &channels, quint16 safeValue);
     void stopChannelOutput();
     void setChannelOutputValue(quint16 value);
 

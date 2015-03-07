@@ -4591,7 +4591,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">模块控制</translation>
     </message>
     <message>
         <location/>
@@ -4758,7 +4758,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Reload Board Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">读取</translation>
     </message>
     <message>
         <location/>
@@ -4773,7 +4773,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板，但不保存</translation>
     </message>
     <message>
         <location/>
@@ -4788,7 +4788,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板并保存</translation>
     </message>
     <message>
         <location/>
@@ -4822,7 +4822,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>After enabling the module, you must power cycle before using and configuring.</source>
-        <translation type="unfinished"></translation>
+        <translation>开启后请重启设备，再进行后续功能设置。</translation>
     </message>
 </context>
 <context>
@@ -4830,32 +4830,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/camerastabilization.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Camera Stabilization</source>
-        <translation type="unfinished"></translation>
+        <translation>相机稳定</translation>
     </message>
     <message>
         <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation>模块控制</translation>
     </message>
     <message>
         <location/>
         <source>Enable CameraStabilization module</source>
-        <translation type="unfinished"></translation>
+        <translation>开启相机稳定模块</translation>
     </message>
     <message>
         <location/>
         <source>After enabling the module, you must power cycle before using and configuring.</source>
-        <translation type="unfinished"></translation>
+        <translation>开启后请重启设备，再进行后续功能设置。</translation>
     </message>
     <message>
         <location/>
         <source>Basic Settings (Stabilization)</source>
-        <translation type="unfinished"></translation>
+        <translation>基本设置项（稳定）</translation>
     </message>
     <message>
         <location/>
@@ -4863,37 +4863,39 @@ p, li { white-space: pre-wrap; }
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>全量输出时，对应相机左右平移的最大角度。
+
+根据您的云台和舵机具体情况设置该值，并且在“Output”选项页中设置好相应输出端口的范围。</translation>
     </message>
     <message>
         <location/>
         <source>objname:CameraStabSettings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:OutputRange</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4901,12 +4903,14 @@ have to define channel output range using Output configuration tab.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>全量输出时，对应相机前后俯仰的最大角度。
+
+根据您的云台和舵机具体情况设置该值，并且在“Output”选项页中设置好相应输出端口的范围。</translation>
     </message>
     <message>
         <location/>
         <source>element:Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4914,88 +4918,96 @@ have to define channel output range using Output configuration tab.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>全量输出时，对应相机左右横滚的最大角度。
+
+根据您的云台和舵机具体情况设置该值，并且在“Output”选项页中设置好相应输出端口的范围。</translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>云台左右平移输出通道</translation>
     </message>
     <message>
         <location/>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location/>
         <source>Pitch output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>云台前后俯仰输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Roll output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>云台左右横滚输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Output Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished">方向</translation>
+        <translation>左右平移</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished">俯仰</translation>
+        <translation>前后俯仰</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished">横滚</translation>
+        <translation>左右横滚</translation>
     </message>
     <message>
         <location/>
         <source>Advanced Settings (Control)</source>
-        <translation type="unfinished"></translation>
+        <translation>高级设置项（控制）</translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera yaw
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>相机左右平移控制通道
+
+请在“Input”选项页中同时设置好相应的遥控器通道。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Input</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera pitch
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>相机前后俯仰控制通道
+
+请在“Input”选项页中同时设置好相应的遥控器通道。</translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera roll
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>相机左右横滚控制通道
+
+请在“Input”选项页中同时设置好相应的遥控器通道。</translation>
     </message>
     <message>
         <location/>
         <source>Input Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>控制器通道</translation>
     </message>
     <message>
         <location/>
@@ -5003,77 +5015,80 @@ Don&apos;t forget to map this channel using Input configuration tab.</source>
 
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式
+
+Attitude：相机自动绕轴保持稳定，遥控器控制偏移。
+AxisLock：相机保持绕轴转动量，遥控器控制偏移。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:StabilizationMode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Attitude</source>
-        <translation type="unfinished">姿态</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation>在Attitude模式下，遥控全量输入时，相机左右平移的最大偏移角度。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:InputRange</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，遥控全量输入时，相机左右平移的最大偏移角速度，单位：度/秒。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:InputRate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:ResponseTime</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation>在Attitude模式下，遥控全量输入时，相机前后俯仰的最大偏移角度。</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，遥控全量输入时，相机前后俯仰的最大偏移角速度，单位：度/秒。</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation>在Attitude模式下，遥控全量输入时，相机左右横滚的最大偏移角度。</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，遥控全量输入时，相机左右横滚的最大偏移角速度，单位：度/秒。</translation>
     </message>
     <message>
         <location/>
         <source>MaxAxisLockRate</source>
-        <translation type="unfinished"></translation>
+        <translation>轴转向速率阙值</translation>
     </message>
     <message>
         <location/>
         <source>Stabilization Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定模式</translation>
     </message>
     <message>
         <location/>
         <source>(the same value for Roll, Pitch, Yaw)</source>
-        <translation type="unfinished"></translation>
+        <translation>（同时作用于X，Y，Z三个转动轴向）</translation>
     </message>
     <message>
         <location/>
@@ -5085,32 +5100,34 @@ rate depending on input value.
 
 If you have drift in your Tx controls, you may want to increase this
 value.</source>
-        <translation type="unfinished"></translation>
+        <translation>在AxisLock模式下，X，Y，Z三个轴向的转动速率死区， 单位：度/秒。
+
+当遥控操纵杆输入量小于或等于此值时，相机保持当前姿态，不响应输入控制。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation>信息</translation>
     </message>
     <message>
         <location/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>button:help</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5118,17 +5135,19 @@ value.</source>
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>重置相机稳定设置。
+
+重置后不会自动设置到控制板内，请点击“应用”或“保存”默认值。</translation>
     </message>
     <message>
         <location/>
         <source>Reset To Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>重置</translation>
     </message>
     <message>
         <location/>
         <source>button:default</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5138,82 +5157,85 @@ settings.
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>读取上一次保存到控制板上的相机稳定设置，如果您意外改动了
+设置，请使用此功能恢复正确设置。
+
+读取到的设置不会自动设置到控制板内，请点击“应用”或“保存”设置。</translation>
     </message>
     <message>
         <location/>
         <source>Reload Board Data</source>
-        <translation type="unfinished"></translation>
+        <translation>读取</translation>
     </message>
     <message>
         <location/>
         <source>button:reload</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到控制板，但不保存</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <location/>
         <source>button:apply</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation>发送配置到控制板并保存</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location/>
         <source>button:save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Output Range (Angle)</source>
-        <translation type="unfinished"></translation>
+        <translation>移动范围（角度）</translation>
     </message>
     <message>
         <location/>
         <source>Pitch Or Servo2</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰/舵机2</translation>
     </message>
     <message>
         <location/>
         <source>Roll Or Servo1</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚/舵机1</translation>
     </message>
     <message>
         <location/>
         <source>Input Rate (Speed)</source>
-        <translation type="unfinished"></translation>
+        <translation>最大转动速率</translation>
     </message>
     <message>
         <location/>
         <source>Input Range (Angle)</source>
-        <translation type="unfinished"></translation>
+        <translation>最大转动角度</translation>
     </message>
     <message>
         <location/>
         <source>Expert Settings (Attitude Filter and Feed Forward)</source>
-        <translation type="unfinished"></translation>
+        <translation>专家设置项（姿态缓释与前馈）</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Filter RT</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定缓释响应时间</translation>
     </message>
     <message>
         <location/>
@@ -5222,7 +5244,11 @@ Apply or Save button afterwards.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚自稳缓慢释放响应时间量（设置时间范围内缓慢响应绕轴转动）
+
+范围：0至250毫秒，默认值为0，表示立即响应绕轴自稳。
+
+合理设置该参数可以使相机更平稳。</translation>
     </message>
     <message>
         <location/>
@@ -5231,7 +5257,11 @@ Smoothes estimated airframe attitude used by camera stabilization.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰自稳缓慢释放响应时间量（设置时间范围内缓慢响应绕轴转动）
+
+范围：0至250毫秒，默认值为0，表示立即响应绕轴自稳。
+
+合理设置该参数可以使相机更平稳。</translation>
     </message>
     <message>
         <location/>
@@ -5240,12 +5270,16 @@ Smoothes estimated airframe attitude used by camera stabilization.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移转动缓慢释放响应时间量（设置时间范围内响应绕轴转动）
+
+范围：0至250毫秒，默认值为0，表示立即响应绕轴自稳。
+
+合理设置该参数可以使相机更平稳。</translation>
     </message>
     <message>
         <location/>
         <source>FF Servo Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>舵机前馈加速度</translation>
     </message>
     <message>
         <location/>
@@ -5255,12 +5289,17 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚控制舵机前馈加速度
+
+范围：0至25，默认值为0，表示在此转动轴向上关闭前馈控制。
+
+建议从2至7开始设置，逐渐提高以达到满意结果。
+警告：设置过高可能会烧毁舵机！</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:FeedForward</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5270,7 +5309,12 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰控制舵机前馈加速度
+
+范围：0至25，默认值为0，表示在此转动轴向上关闭前馈控制。
+
+建议从2至7开始设置，逐渐提高以达到满意结果。
+警告：设置过高可能会烧毁舵机！</translation>
     </message>
     <message>
         <location/>
@@ -5280,74 +5324,91 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移控制舵机前馈加速度
+
+范围：0至25，默认值为0，表示在此转动轴向上关闭前馈控制。
+
+建议从2至7开始设置，逐渐提高以达到满意结果。
+警告：设置过高可能会烧毁舵机！</translation>
     </message>
     <message>
         <location/>
         <source>FF Accel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation>前馈加速时间常量</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚前馈加速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AccelTime</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰前馈加速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>Yaw servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移前馈加速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>FF Decel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation>前馈减速时间常量</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右横滚前馈减速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:DecelTime</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>前后俯仰前馈减速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>Yaw servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右平移前馈减速时间常量
+
+范围：0至50毫秒，默认值为5毫秒。</translation>
     </message>
     <message>
         <location/>
         <source>Gimbal Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>云台类型：</translation>
     </message>
     <message>
         <location/>
@@ -5355,22 +5416,23 @@ Range: 0-50ms, default is 5.</source>
 
 Used to limit feed forward acceleration at extreme angles.
 Generic type provides no limit.</source>
-        <translation type="unfinished"></translation>
+        <translation>设置相应的云台类型，极端角度时用于限制前馈加速度。
+Generic类型表示不做限制。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:GimbalType</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw-Roll-Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>FF Max Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>最大前馈加速度</translation>
     </message>
     <message>
         <location/>
@@ -5379,17 +5441,21 @@ Generic type provides no limit.</source>
 Range: 0-1000, default is 500.
 
 The same value is used for all axes.</source>
-        <translation type="unfinished"></translation>
+        <translation>最大前馈加速度
+
+范围：0至1000，默认值为500.
+
+同时作用于X，Y，Z三个转动轴向。</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAccel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Input configuration also provides smoothing for controls. Look for RT options on the RC Input tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Input设置页中对应输入通道的”RT“（响应时间）同样提供平滑控制功能。</translation>
     </message>
 </context>
 <context>
@@ -5412,7 +5478,7 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>Changes on this page only take effect after board reset or power cycle</source>
-        <translation>所有配置信息将在控制板重启才生效</translation>
+        <translation>所有配置信息将在控制板重启后生效</translation>
     </message>
     <message>
         <location/>
@@ -5561,7 +5627,7 @@ arming it in that case!</source>
     <message>
         <location/>
         <source>Zero gyros while arming aircraft</source>
-        <translation>每次解锁时，水平参考值归零</translation>
+        <translation>每次解锁时，重置陀螺仪读取数值</translation>
     </message>
     <message>
         <location/>
@@ -5976,19 +6042,16 @@ p, li { white-space: pre-wrap; }
         <translation>死区占操纵杆全程的百分比 （0-10），0为无死区</translation>
     </message>
     <message>
-        <location/>
         <source>Back</source>
-        <translation>上一步</translation>
+        <translation type="vanished">上一步</translation>
     </message>
     <message>
-        <location/>
         <source>Next</source>
-        <translation>下一步</translation>
+        <translation type="vanished">下一步</translation>
     </message>
     <message>
-        <location/>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="vanished">取消</translation>
     </message>
     <message>
         <location/>
@@ -6207,7 +6270,7 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;切忌不要为多轴飞行器设置 &amp;quot;手动&amp;quot; 模式！ 不要为固定翼飞行器设置 &amp;quot;姿态&amp;quot;, &amp;quot;速度控制&amp;quot; 或 &amp;quot;巡航控制&amp;quot;！&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;切忌不要为多旋翼飞行器设置 &amp;quot;手动&amp;quot; 模式！ 不要为固定翼飞行器设置 &amp;quot;姿态&amp;quot;, &amp;quot;速度控制&amp;quot; 或 &amp;quot;巡航控制&amp;quot;！&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6307,6 +6370,11 @@ Applies and Saves all settings to SD</source>
     <message>
         <location/>
         <source>fieldname:FlightModeAssistMap</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:yes</source>
         <translation></translation>
     </message>
 </context>
@@ -6441,39 +6509,32 @@ Applies and Saves all settings to SD</source>
         <translation>频率：</translation>
     </message>
     <message>
-        <location/>
         <source>50</source>
-        <translation>50</translation>
+        <translation type="vanished">50</translation>
     </message>
     <message>
-        <location/>
         <source>60</source>
-        <translation>60</translation>
+        <translation type="vanished">60</translation>
     </message>
     <message>
-        <location/>
         <source>125</source>
-        <translation>125</translation>
+        <translation type="vanished">125</translation>
     </message>
     <message>
-        <location/>
         <source>165</source>
-        <translation>165</translation>
+        <translation type="vanished">165</translation>
     </message>
     <message>
-        <location/>
         <source>270</source>
-        <translation>270</translation>
+        <translation type="vanished">270</translation>
     </message>
     <message>
-        <location/>
         <source>330</source>
-        <translation>330</translation>
+        <translation type="vanished">330</translation>
     </message>
     <message>
-        <location/>
         <source>400</source>
-        <translation>400</translation>
+        <translation type="vanished">400</translation>
     </message>
     <message>
         <location/>
@@ -6539,9 +6600,8 @@ Applies and Saves all settings to SD</source>
         <translation>实时测试</translation>
     </message>
     <message>
-        <location/>
         <source>490</source>
-        <translation>490</translation>
+        <translation type="vanished">490</translation>
     </message>
     <message>
         <source>Output configuration</source>
@@ -6581,19 +6641,23 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
 当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后再输出给电调 （例如：1000/8 = 125, 2000/8 = 250).。</translation>
     </message>
     <message>
-        <location/>
         <source>GroupBox</source>
-        <translation>输出设置</translation>
+        <translation type="vanished">输出设置</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Setup PWM rate here: usual value is 490 Hz for multirotor airframes.&lt;br/&gt;PWMSync and OneShot125 does not use this value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置PWM：通常多轴飞行器是490Hz。&lt;br/&gt;&lt;br/&gt;PWMSync以及OneShot125则不需要配置此项</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置PWM：通常多旋翼飞行器是490Hz。&lt;br/&gt;&lt;br/&gt;PWMSync以及OneShot125则不需要配置此项</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Setup output mode. Use PWM or PWMSync with Standard ESCs.&lt;br/&gt;Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.&lt;br/&gt;When using OneShot125 all values set in min/max and idle are divided by &lt;br/&gt;eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;标准电调配置为PWM或OneShot模式。&lt;br/&gt;类似于BLHeli 13+的电调则可以配置为更先进的OneShot125模式。&lt;br/&gt;当使用OneShot125模式时，最小/最大 以及 空闲 的数值将被除与8以后&lt;/br&gt;再输出给电调 （例如：1000/8 = 125, 2000/8 = 250)。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Configuration</source>
+        <translation>输出设置</translation>
     </message>
 </context>
 <context>
@@ -7403,7 +7467,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Reload Board Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">读取</translation>
     </message>
     <message>
         <location/>
@@ -7413,7 +7477,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板，但不保存</translation>
     </message>
     <message>
         <location/>
@@ -7428,7 +7492,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板并保存</translation>
     </message>
     <message>
         <location/>
@@ -8135,7 +8199,7 @@ response (deg)</source>
     <message>
         <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">模块控制</translation>
     </message>
     <message>
         <location/>
@@ -8157,7 +8221,7 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</sou
     <message>
         <location/>
         <source>After enabling the module, you must power cycle before using and configuring.</source>
-        <translation type="unfinished"></translation>
+        <translation>开启后请重启设备，再进行后续功能设置。</translation>
     </message>
     <message>
         <location/>
@@ -8272,7 +8336,7 @@ only when system is armed without disabling the module.</source>
     <message>
         <location/>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">信息</translation>
     </message>
     <message>
         <location/>
@@ -8287,7 +8351,7 @@ only when system is armed without disabling the module.</source>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板，但不保存</translation>
     </message>
     <message>
         <location/>
@@ -8297,7 +8361,7 @@ only when system is armed without disabling the module.</source>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板并保存</translation>
     </message>
     <message>
         <location/>
@@ -8793,7 +8857,7 @@ only when system is armed without disabling the module.</source>
         <translation>连接示意图</translation>
     </message>
     <message>
-        <location line="+213"/>
+        <location line="+230"/>
         <source>Save File</source>
         <translation>保存文件</translation>
     </message>
@@ -8981,7 +9045,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot设备识别&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot;font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;当设备正确连接以后，程序会自动识别控制板类型，根据不同设备类型决定下一步操作。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;你可以点击“&lt;strong&gt;断开设备&lt;/strong&gt;”，在下拉菜单中选择正确的连接类型和设备。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;您可以点击“&lt;strong&gt;断开设备&lt;/strong&gt;”，在下拉菜单中选择正确的连接类型和设备。&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;如果您的OpenPilot控制板尚未连接，请把它通过USB连接好，在下拉菜单中选择正确的设备型号，然后点击&lt;strong&gt;连接设备&lt;/strong&gt;。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -9050,8 +9114,8 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot遥控器类型设置&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;OpenPilot支持绝大多数遥控器，请选择对应的的遥控器类型。如果你不确定手上的遥控器是什么类型，请保持默认设置并点击下一步继续操作。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;某些遥控器类型选择后，需要OpenPilot控制板重启才能生效。当你选择了这样的遥控器类型后，点击下一步将会自动重启控制板。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;OpenPilot支持绝大多数遥控器，请选择对应的的遥控器类型。如果您不确定手上的遥控器是什么类型，请保持默认设置并点击下一步继续操作。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;某些遥控器类型选择后，需要OpenPilot控制板重启才能生效。如果您正好选择了此类遥控器，点击下一步将会自动重启控制板。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -9070,88 +9134,87 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/multipage.cpp" line="+58"/>
         <source>Tricopter</source>
-        <translation>三轴</translation>
+        <translation>三旋翼</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the rear motor. The front motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and it is very well suited for FPV since the front rotors are spread wide apart.</source>
-        <translatorcomment>最后一句先保留，稍后翻译</translatorcomment>
-        <translation>三轴飞行器通常由三个高速旋转电机和一个伺服舵机组成。前面两个电机以相反方向旋转，伺服舵机协同尾部电机控制方向。</translation>
+        <translation>三旋翼飞行器通常由三个高速旋转电机和一个伺服舵机组成。前面两个电机以相反方向旋转，伺服舵机协同尾部电机控制方向。由于正前方两电机间隙空间广且左右方向（Yaw）操控灵活，三旋翼极其适合第一视角飞行（FPV)。</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Quadcopter X</source>
-        <translation>X型四轴</translation>
+        <translation>X型四旋翼</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. This setup is perfect for sport flying and is also commonly used for FPV platforms.</source>
-        <translation>X型四轴是目前最常见的一种多轴飞行器，非常适合于飞行竞赛和第一视角飞行。</translation>
+        <translation>X型四旋翼是目前最常见的一种多旋翼飞行器，非常适合于飞行竞赛和第一视角飞行（FPV）。</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Quadcopter +</source>
-        <translation>十字型四轴</translation>
+        <translation>十字型四旋翼</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited for FPV since the fore rotor tend to be in the way of the camera.</source>
-        <translation>十字型四轴飞行器类似于X型四轴，区别在于前进方向相差45度。十字型四轴前后两个电机顺时针旋转，左右两个电机逆时针旋转。由于正前方电机容易阻碍摄像机镜头，这种类型的四轴飞行器并不适合第一视角飞行。</translation>
+        <translation>十字型四旋翼飞行器类似于X型四旋翼，区别在于前进方向相差45度。十字型四旋翼前后两个电机顺时针旋转，左右两个电机逆时针旋转。由于正前方电机容易阻碍摄像机镜头，这种类型的飞行器并不适合第一视角飞行（FPV）。</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Hexacopter</source>
-        <translation>六轴</translation>
+        <translation>六旋翼</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A multirotor with six motors, one motor in front.</source>
-        <translation>拥有六个电机的多轴飞行器，正前方只有一个电机（图中1号电机）。</translation>
+        <translation>拥有六个电机的多旋翼飞行器，正前方只有一个电机（图中1号电机）。</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>A multirotor with six motors, two motors in front.</source>
-        <translation>拥有六个电机的多轴飞行器，正前方有两个电机（1号和6号电机）。</translation>
+        <translation>拥有六个电机的多旋翼飞行器，正前方有两个电机（1号和6号电机）。</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>A multirotor with six motors in two rows.</source>
-        <translation>拥有六个电机的多轴飞行器，六个电机排列成平行的两行，每行三个电机。</translation>
+        <translation>拥有六个电机的多旋翼飞行器，六个电机排列成平行的两行，每行三个电机。</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Hexacopter Coax (Y6)</source>
-        <translation>同轴型六轴 （Y6）</translation>
+        <translation>同轴六旋翼 （Y6）</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A multirotor with six motors mounted in a coaxial fashion.</source>
-        <translation>在同一电机轴方向上放置两个电机的六轴飞行器。</translation>
+        <translation>在同一电机轴方向上放置两个电机的六旋翼飞行器。</translation>
     </message>
     <message>
         <location line="-11"/>
         <source>Hexacopter X</source>
-        <translation>X型六轴</translation>
+        <translation>X型六旋翼</translation>
     </message>
     <message>
         <location line="-33"/>
         <source>OpenPilot Multirotor Configuration</source>
-        <translation>OpenPilot多轴飞行器设置</translation>
+        <translation>OpenPilot多旋翼飞行器设置</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.
 
 Please select the type of multirotor you want to create a configuration for below:</source>
-        <translation>OpenPilot目前支持绝大部分的多轴飞行器类型。
-本页中未列出来的类型，请稍候进入“设置”界面中单独进行设置。
+        <translation>OpenPilot目前支持绝大部分的多旋翼飞行器类型。
+本页中未列出来的类型，请稍候进入“Configuration”界面中的“Vehicle”选项页里设置。
 
-请选择多轴飞行器类型：</translation>
+请选择多旋翼飞行器类型：</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Hexacopter H</source>
-        <translation>H型六轴</translation>
+        <translation>H型六旋翼</translation>
     </message>
 </context>
 <context>
@@ -9224,7 +9287,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;VERY IMPORTANT!&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;REMOVE ALL PROPELLERS FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Connect all components according to the illustration on the summary page, and provide power using an external power supply such as a battery before continuing.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Depending on what vehicle you have selected, both the motors controlled by ESCs and/or servos controlled directly by the OpenPilot controller may have to be calibrated. The following steps will guide you safely through this process. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9232,7 +9295,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;警告！&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;
 &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;在进行下一步操作之前，请先将所有螺旋桨从电机上移除！&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;按照示意图将航模所有部件连接好，插上动力电池。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;接下来的步骤中，设置向导将会安全的引导您为多轴飞行器的电机控制信号进行校准。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;接下来的步骤中，设置向导将会安全的引导您为多旋翼飞行器的电机控制信号进行校准。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -9387,7 +9450,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot设置概要&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;截至目前，所有基本的OpenPilot设备配置已经完成。&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;下面框中简要列出了设备类型和基本配置。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请点击“CONNECTION DIAGRAM&amp;quot;查看硬件连接示意图。在接下来的设置开始之前，请参照连接示意图完成航模连接，继续使用USB连接OpenPilot设备，但切记&lt;strong&gt;不要连接电池&lt;/strong&gt;，在后面的设置过程中会提示您何时接上电池。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请点击“CONNECTION DIAGRAM&amp;quot;查看硬件连接示意图。在接下来的设置开始之前，请参照连接示意图完成模型连接，继续使用USB连接OpenPilot设备，但切记&lt;strong&gt;不要连接电池&lt;/strong&gt;，在后面的设置过程中会提示您何时接上电池。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
@@ -9456,12 +9519,12 @@ Please select the type of ground vehicle you want to create a configuration for 
     <message>
         <location/>
         <source>Tricopter, Quadcopter, Hexacopter</source>
-        <translation>三轴，四周，六轴</translation>
+        <translation>三旋翼，四旋翼，六旋翼</translation>
     </message>
     <message>
         <location/>
         <source>Multirotor</source>
-        <translation>多轴飞行器</translation>
+        <translation>多旋翼飞行器</translation>
     </message>
     <message>
         <location/>
@@ -9477,7 +9540,7 @@ Please select the type of ground vehicle you want to create a configuration for 
         <location/>
         <source>Airplane, Sloper, Jet</source>
         <translatorcomment>不确定</translatorcomment>
-        <translation>普通，牵引式， 喷气式</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9509,8 +9572,8 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;航模类型选择&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请选择正确的航模类型。务必确保您的选择和实际情况一致，因为接下来的配置将会根据不同的模型有所区别。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;目前OpenPilot GCS只支持多轴飞行器和固定翼飞机。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;请选择正确的航模类型。务必确保您的选择和实际情况一致，接下来的配置将会根据不同的模型有所区别。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;目前OpenPilot GCS只支持多旋翼飞行器和固定翼飞机，其他类型尚待完善。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;
 </translation>
     </message>
@@ -10087,7 +10150,7 @@ p, li { white-space: pre-wrap; }
         <translation>输出</translation>
     </message>
     <message>
-        <location line="+419"/>
+        <location line="+420"/>
         <location line="+24"/>
         <location line="+31"/>
         <location line="+31"/>
@@ -10177,7 +10240,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+218"/>
         <source>Unsaved changes</source>
-        <translation>设置为保存</translation>
+        <translation>设置未保存</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -10189,27 +10252,27 @@ Do you still want to proceed?</source>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+385"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+388"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
         <translation></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
-        <translation>安全起见，在后续操作开始之前，飞行器强制进入永久锁定状态。</translation>
+        <translation>安全起见，在后续操作开始之前，强制遥控器进入
+永久锁定状态（除解锁操作外，不响应其他遥控输入）。</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
-        <translation>在设置向导结束以后会停留在“解锁设置”选项页，请务必修改飞行器解锁方式。</translation>
+        <translation>在设置向导结束以后会停留在“解锁设置”选项页，请务必修改遥控器解锁方式。</translation>
     </message>
     <message>
-        <location line="+211"/>
+        <location line="+210"/>
         <source>Next</source>
         <translation>下一步</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -10217,7 +10280,7 @@ Make sure you already configured your hardware settings on the proper tab and re
 
 You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
 </source>
-        <translation>欢迎使用遥控输入设置向导。
+        <translation type="vanished">欢迎使用遥控输入设置向导。
 
 请按照屏幕上提示的指令操作遥控器。
 
@@ -10225,32 +10288,23 @@ You can press &apos;back&apos; at any time to return to the previous screen or p
 </translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Please choose your transmitter type:</source>
-        <translation>请选择遥控类型：</translation>
+        <translation type="vanished">请选择遥控类型：</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Acro: normal transmitter for fixed-wing or quad</source>
-        <translation>Acro：固定翼和多轴飞行器</translation>
+        <translation type="vanished">Acro：固定翼和多轴飞行器</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Helicopter: has collective pitch and throttle input</source>
-        <translation>Helicopter：直升机（油门和俯仰混控）</translation>
+        <translation type="vanished">Helicopter：直升机（油门和俯仰混控）</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>If selecting the Helicopter option, please engage throttle hold now.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
         <source>Please choose your transmitter mode:</source>
-        <translation>请选择遥控器模式：</translation>
+        <translation type="vanished">请选择遥控器模式：</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+45"/>
         <source>Mode 1: Fore/Aft Cyclic and Yaw on the left, Throttle/Collective and Left/Right Cyclic on the right</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10270,7 +10324,7 @@ You can press &apos;back&apos; at any time to return to the previous screen or p
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Mode 1: Elevator and Rudder on the left, Throttle and Ailerons on the right</source>
         <translation>模式1：左手控制升降舵和方向舵，右手控制油门和副翼</translation>
     </message>
@@ -10292,42 +10346,38 @@ You can press &apos;back&apos; at any time to return to the previous screen or p
     <message>
         <location line="+3"/>
         <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
-        <translation>对于多轴飞行器，升降舵相当于俯仰，副翼相当于横滚。</translation>
+        <translation>对于多旋翼飞行器，升降舵（ELEV）控制俯仰，副翼（AILE）控制横滚，方向舵（RUDD）控制方向。</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
-        <translation>请将所有摇杆和控制钮放置在中间位置。
+        <translation type="vanished">请将所有摇杆和控制钮放置在中间位置。
 
 如果您的飞行模式按钮只有两个档位，请放置在任意一个档位上。</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Please move all controls to their maximum extents on both directions.
 
 Press Next when ready.</source>
-        <translation>请拨动所有摇杆和控制钮，移动范围涵盖它们的最大行程空间。
+        <translation type="vanished">请拨动所有摇杆和控制钮，移动范围涵盖它们的最大行程空间。
 
 完成后请点击“下一步”继续。</translation>
     </message>
     <message>
-        <location line="+36"/>
         <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
-        <translation>拨动摇杆并观察图中显示的移动方向，如果需要，请勾选下方对应选框设置逆转，完成后请点击“下一步”继续。</translation>
+        <translation type="vanished">拨动摇杆并观察图中显示的移动方向，如果需要，请勾选下方对应选框设置逆转，完成后请点击“下一步”继续。</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
 
 IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
-        <translation>遥控器校准结束，请拨动遥控器摇杆和控制钮，观察下方动画与操作是否完全一致。
+        <translation type="vanished">遥控器校准结束，请拨动遥控器摇杆和控制钮，观察下方动画与操作是否完全一致。
 
 注意：遥控器校准结果尚未保存，请点击“下一步”进入“解锁设置”页，将解锁动作设置好以后，再点击”保存“按钮将所有遥控器输入设置信息保存。</translation>
     </message>
     <message>
-        <location line="+124"/>
+        <location line="+191"/>
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
@@ -10338,7 +10388,7 @@ Move the Collective Pitch stick.</source>
         <source>Please toggle the Flight Mode switch.
 
 For switches you may have to repeat this rapidly.</source>
-        <translation>请拨动飞行模式控制开关。
+        <translation>请拨动飞行模式切换开关。
 
 您可能需要重复拨动开关数次。</translation>
     </message>
@@ -10361,7 +10411,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+6"/>
         <source>Next / Skip</source>
-        <translation>下一步/忽略</translation>
+        <translation>下一步/跳过</translation>
     </message>
     <message>
         <location line="+726"/>
@@ -10371,7 +10421,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+3"/>
         <source>&lt;p&gt;Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.&lt;/p&gt;&lt;p&gt;Be sure your receiver is powered with an external source and Transmitter is on.&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;&lt;b&gt;Stop Manual Calibration&lt;/b&gt; when done&lt;/p&gt;</source>
-        <translation>&lt;p&gt;安全起见，在后续操作开始之前，飞行器强制进入永久锁定状态。&lt;/p&gt;&lt;p&gt;请确认遥控器发射机和接收器已经打开。&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;完成手动校准后，请点击&lt;b&gt;结束手动校准&lt;/b&gt;&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;安全起见，在后续操作开始之前，强制遥控器进入永久锁定状态。&lt;/p&gt;&lt;p&gt;请确认遥控器发射机和接收器已经打开。&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;完成手动校准后，请点击&lt;b&gt;结束手动校准&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10386,7 +10436,7 @@ Move the %1 stick.</source>
     <message>
         <location line="-764"/>
         <source> Alternatively, click Next to skip this channel.</source>
-        <translation>你也可以点击“下一步/忽略”跳过这一步。</translation>
+        <translation>你也可以点击“下一步/跳过”忽略该项。</translation>
     </message>
 </context>
 <context>
@@ -10394,23 +10444,23 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+53"/>
         <source>USB: OPLinkMini</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Connections:</source>
-        <translation type="unfinished"></translation>
+        <translation>设备：</translation>
     </message>
     <message>
         <location line="+72"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>断开</translation>
     </message>
     <message>
         <location line="-81"/>
         <location line="+127"/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>连接</translation>
     </message>
 </context>
 <context>
@@ -10542,7 +10592,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewgadgetfactory.cpp" line="+36"/>
         <source>ModelView</source>
-        <translation type="unfinished"></translation>
+        <translation>模型文件</translation>
     </message>
 </context>
 <context>
@@ -10712,21 +10762,21 @@ Move the %1 stick.</source>
         <location line="+24"/>
         <location line="+6"/>
         <location line="+19"/>
-        <location line="+13"/>
+        <location line="+16"/>
         <location line="+16"/>
         <location line="+38"/>
         <source>Unknown</source>
         <translation>未知设备</translation>
     </message>
     <message>
-        <location line="-179"/>
+        <location line="-182"/>
         <source>Vehicle type: </source>
         <translation>航模类型： </translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Multirotor</source>
-        <translation>多轴飞行器</translation>
+        <translation>多旋翼飞行器</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10738,58 +10788,57 @@ Move the %1 stick.</source>
     <message>
         <location line="-66"/>
         <source>Tricopter</source>
-        <translation>三轴</translation>
+        <translation>三旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Quadcopter X</source>
-        <translation>X型四轴</translation>
+        <translation>X型四旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Quadcopter +</source>
-        <translation>十字型四轴</translation>
+        <translation>十字型四旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter</source>
-        <translation>六轴</translation>
+        <translation>六旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter Coax (Y6)</source>
-        <translatorcomment>同轴型六轴这样翻译是否合适？</translatorcomment>
-        <translation>同轴型六轴 （Y6）</translation>
+        <translation>同轴六旋翼 （Y6）</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter H</source>
-        <translation>H型六轴</translation>
+        <translation>H型六旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter X</source>
-        <translation>X型六轴</translation>
+        <translation>X型六旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter</source>
-        <translation>八轴</translation>
+        <translation>八旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter Coax X</source>
-        <translation>同轴X型八轴</translation>
+        <translation>同轴X型八旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter Coax +</source>
-        <translation>同轴十字型八轴</translation>
+        <translation>同轴十字型八旋翼</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter V</source>
-        <translation>V型八轴</translation>
+        <translation>V型八旋翼</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -10877,7 +10926,12 @@ Move the %1 stick.</source>
         <translation>电子调速器（ESC）类型： </translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+9"/>
+        <source>Oneshot ESC</source>
+        <translation>Oneshot电调</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Servo type: </source>
         <translation>伺服舵机类型： </translation>
     </message>
@@ -10957,16 +11011,16 @@ Move the %1 stick.</source>
         <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+85"/>
         <location line="+12"/>
         <source>Done!</source>
-        <translation type="unfinished"></translation>
+        <translation>成功！</translation>
     </message>
     <message>
         <location line="-12"/>
         <location line="+12"/>
         <source>Failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>失败！</translation>
     </message>
     <message>
-        <location line="+136"/>
+        <location line="+141"/>
         <source>Writing External Mag sensor settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10986,9 +11040,9 @@ Move the %1 stick.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+172"/>
-        <location line="+31"/>
-        <location line="+36"/>
+        <location line="+199"/>
+        <location line="+32"/>
+        <location line="+37"/>
         <source>Writing actuator settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11748,6 +11802,11 @@ The board will be restarted and all settings erased.</source>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Prev</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomConfigWidget</name>
@@ -11872,17 +11931,17 @@ The board will be restarted and all settings erased.</source>
     <message>
         <location filename="../../../src/plugins/config/airframe_fixedwing.ui"/>
         <source>Form</source>
-        <translation type="unfinished">界面</translation>
+        <translation>界面</translation>
     </message>
     <message>
         <location/>
         <source>Airframe</source>
-        <translation type="unfinished">飞行器</translation>
+        <translation>飞行器</translation>
     </message>
     <message>
         <location/>
         <source>Throttle Curve</source>
-        <translation type="unfinished">油门曲线</translation>
+        <translation>油门曲线</translation>
     </message>
     <message>
         <location/>
@@ -12105,7 +12164,7 @@ The board will be restarted and all settings erased.</source>
         <source>Weight of Roll mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads</source>
         <translation>横滚控制量权重
-十字型四轴飞行器通常设为100%，而X型则使用50%</translation>
+十字型四旋翼飞行器通常设为100%，而X型则使用50%</translation>
     </message>
     <message>
         <location/>
@@ -12122,7 +12181,7 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
         <source>Weight of Pitch mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
         <translation>俯仰控制量权重
-十字型四轴飞行器通常设为100%，而X型则使用50%。</translation>
+十字型四旋翼飞行器通常设为100%，而X型则使用50%。</translation>
     </message>
     <message>
         <location/>
@@ -12133,8 +12192,8 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
         <location/>
         <source>Weight of Yaw mixing in percent.
 Typical value is 50% for + or X configuration on quads.</source>
-        <translation type="unfinished">方向控制量权重
-十字型和X型四轴飞行器通常都设为50%。</translation>
+        <translation>方向控制量权重
+十字型和X型四旋翼飞行器通常都设为50%。</translation>
     </message>
     <message>
         <location/>
@@ -12209,7 +12268,7 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>Tricopter Yaw Servo channel</source>
-        <translation>三轴飞行器伺服舵机</translation>
+        <translation>三旋翼飞行器伺服舵机</translation>
     </message>
     <message>
         <location/>
@@ -12219,72 +12278,72 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>Select output channel for Accessory0 RcInput</source>
-        <translation type="unfinished"></translation>
+        <translation>请为Accessory0控制量选择一个输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Accessory1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>RcOutput channels</source>
-        <translation type="unfinished"></translation>
+        <translation>输出通道</translation>
     </message>
     <message>
         <location/>
         <source>RC Output</source>
-        <translation type="unfinished"></translation>
+        <translation>输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Accessory0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>RC Input</source>
-        <translation type="unfinished">遥控输入</translation>
+        <translation>遥控输入</translation>
     </message>
     <message>
         <location/>
         <source>Select output channel for Accessory2 RcInput</source>
-        <translation type="unfinished"></translation>
+        <translation>请为Accessory2控制量选择一个输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Select output channel for Accessory1 RcInput</source>
-        <translation type="unfinished"></translation>
+        <translation>请为Accessory1控制量选择一个输出通道</translation>
     </message>
     <message>
         <location/>
         <source>Accessory2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>RcOutput curve</source>
-        <translation type="unfinished"></translation>
+        <translation>输出曲线</translation>
     </message>
     <message>
         <location/>
         <source>Curve</source>
-        <translation type="unfinished"></translation>
+        <translation>输出曲线</translation>
     </message>
     <message>
         <location/>
         <source>Select output curve for Accessory0 RcInput</source>
-        <translation type="unfinished"></translation>
+        <translation>请为 Accessory0选择一个输出曲线</translation>
     </message>
     <message>
         <location/>
         <source>Select output curve for Accessory1 RcInput</source>
-        <translation type="unfinished"></translation>
+        <translation>请为 Accessory1选择一个输出曲线</translation>
     </message>
     <message>
         <location/>
         <source>Select output curve for Accessory2 RcInput</source>
-        <translation type="unfinished"></translation>
+        <translation>请为 Accessory2选择一个输出曲线</translation>
     </message>
 </context>
 <context>
@@ -12808,7 +12867,7 @@ even lead to crash. Use with caution.</source>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板，但不保存</translation>
     </message>
     <message>
         <location/>
@@ -12818,7 +12877,7 @@ even lead to crash. Use with caution.</source>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送配置到控制板并保存</translation>
     </message>
     <message>
         <location/>
@@ -13134,12 +13193,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Initial Tuning&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;; font-size:10pt;&quot;&gt;This section of the OpenPilot Wizard allows you to select a set of initial tuning parameters for your airframe. Presented below is a list of common airframe types, select the one that matches your airframe the closest, if unsure select the generic variant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;预设稳态飞行参数&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;; font-size:10pt;&quot;&gt;OpenPilot根据目前流行的多轴飞行器提供了一系列机型的稳态飞行控制参数。请从下面列表中选取一个最接近你实际机型的飞行器，如果不确定，请选择以Generic开头的选项。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;; font-size:10pt;&quot;&gt;OpenPilot根据目前流行的多旋翼飞行器提供了一系列机型的稳态飞行控制参数。请从下面列表中选取一个最接近你实际机型的飞行器，如果不确定，请选择以Generic开头的选项。&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -13212,7 +13271,7 @@ It is suggested that if this is a first time configuration of your controller, r
 首次投入使用的飞行控制器，建议不要选择此项设置，请尽可能从列表中选择一项最为接近的机型，或者选择以Generic开头的选项。</translation>
     </message>
     <message>
-        <location line="+85"/>
+        <location line="+93"/>
         <source>Current Tuning</source>
         <translation>维持现有参数</translation>
     </message>
@@ -13394,6 +13453,11 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Rapid ESC</source>
         <translation>高速电调</translation>
+    </message>
+    <message>
+        <location/>
+        <source>OneShot ESC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14233,7 +14297,18 @@ Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse clic
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+160"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+111"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+261"/>
+        <source>%1 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-201"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -14248,14 +14323,18 @@ Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse clic
         <translation>你可能需要保存当前怠速设置。</translation>
     </message>
     <message>
-        <location line="+238"/>
+        <location line="+219"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+32"/>
+        <source>OneShot only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN8+OneShot&apos; &lt;b&gt;&lt;font color=&apos;%1&apos;&gt;Bank %2&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>
+        <translation>遥控接收器端口设置为“+OneShot”后才能&lt;br&gt;正常工作。假设设置为“PPM_PIN6+OneShot”，则&lt;b&gt;&lt;font color=&apos;%1&apos;&gt;输出集%2&lt;/font&gt;&lt;/b&gt;必须设置为PWM</translation>
+    </message>
+    <message>
         <source>OneShot only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN6+OneShot&apos; &lt;b&gt;&lt;font color=&apos;#C3A8FF&apos;&gt;Bank 4 (output 6,9-10)&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>
-        <translation>遥控接收器端口设置为“+OneShot”后才能&lt;br&gt;正常工作。假设设置为“PPM_PIN6+OneShot”，则&lt;b&gt;&lt;font color=&apos;#C3A8FF&apos;&gt;输出集4（6，9-10）&lt;/font&gt;&lt;/b&gt;必须设置为PWM</translation>
+        <translation type="vanished">遥控接收器端口设置为“+OneShot”后才能&lt;br&gt;正常工作。假设设置为“PPM_PIN6+OneShot”，则&lt;b&gt;&lt;font color=&apos;#C3A8FF&apos;&gt;输出集4（6，9-10）&lt;/font&gt;&lt;/b&gt;必须设置为PWM</translation>
     </message>
 </context>
 <context>
@@ -14388,7 +14467,7 @@ not only the ones visible on screen.</source>
     <message>
         <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+142"/>
         <source>Multirotor</source>
-        <translation>多轴飞行器</translation>
+        <translation type="unfinished">多旋翼飞行器</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -15282,6 +15361,7 @@ Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
 <context>
     <name>InputWizardWidget</name>
     <message>
+        <location filename="../../../src/plugins/config/input_wizard.ui"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -15289,68 +15369,182 @@ Make sure you already configured your hardware settings on the proper tab and re
 
 You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
 </source>
-        <translation type="obsolete">欢迎使用遥控输入设置向导。
+        <translation>欢迎使用遥控输入设置向导。
 
 请按照屏幕上提示的指令操作遥控器。
 
-设置过程中你可以随时点击“上一步”返回上一设置界面，也可以点击“取消”退出设置向导。
+设置过程中您可以随时点击“上一步”返回上一设置界面，也可以点击“取消”退出设置向导。
 </translation>
     </message>
     <message>
+        <location/>
         <source>Please choose your transmitter type:</source>
-        <translation type="obsolete">请选择遥控类型：</translation>
+        <translation>请选择遥控类型：</translation>
     </message>
     <message>
+        <location/>
         <source>Acro: normal transmitter for fixed-wing or quad</source>
-        <translation type="obsolete">Acro：固定翼和多轴飞行器</translation>
+        <translation>Acro：固定翼和多旋翼飞行器</translation>
     </message>
     <message>
+        <location/>
         <source>Helicopter: has collective pitch and throttle input</source>
-        <translation type="obsolete">Helicopter：直升机（油门和俯仰混控）</translation>
+        <translation type="unfinished">Helicopter：直升机（油门和俯仰混控）</translation>
     </message>
     <message>
+        <location/>
         <source>Please choose your transmitter mode:</source>
-        <translation type="obsolete">请选择遥控器模式：</translation>
+        <translation>请选择遥控器模式：</translation>
     </message>
     <message>
+        <location/>
         <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
-        <translation type="obsolete">对于多轴飞行器，升降舵相当于俯仰，副翼相当于横滚。</translation>
+        <translation>对于多旋翼飞行器，升降舵（ELEV）控制俯仰，副翼（AILE）控制横滚，方向舵（RUDD）控制方向。</translation>
     </message>
     <message>
+        <location/>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
-        <translation type="obsolete">请将所有摇杆和控制钮放置在中间位置。
+        <translation>请将所有摇杆和控制钮居中放置。
 
 如果您的飞行模式按钮只有两个档位，请放置在任意一个档位上。</translation>
     </message>
     <message>
+        <location/>
         <source>Please move all controls to their maximum extents on both directions.
 
 Press Next when ready.</source>
-        <translation type="obsolete">请拨动所有摇杆和控制钮，移动范围涵盖它们的最大行程空间。
+        <translation>请拨动所有摇杆和控制钮，移动范围尽可能的覆盖最大行程空间。
 
 完成后请点击“下一步”继续。</translation>
     </message>
     <message>
+        <location/>
         <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
-        <translation type="obsolete">拨动摇杆并观察图中显示的移动方向，如果需要，请勾选下方对应选框设置逆转，完成后请点击“下一步”继续。</translation>
+        <translation>拨动摇杆并观察图中显示的移动方向，如果需要，请勾选下方对应选框设置逆转，完成后请点击“下一步”继续。</translation>
     </message>
     <message>
+        <location/>
         <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
 
 IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
-        <translation type="obsolete">遥控器校准结束，请拨动遥控器摇杆和控制钮，观察下方动画与操作是否完全一致。
+        <translation>遥控器校准结束，请拨动遥控器摇杆和控制钮，观察下方动画与操作是否完全一致。
 
 注意：遥控器校准结果尚未保存，请点击“下一步”进入“解锁设置”页，将解锁动作设置好以后，再点击”保存“按钮将所有遥控器输入设置信息保存。</translation>
     </message>
     <message>
+        <location/>
         <source>Back</source>
-        <translation type="obsolete">上一步</translation>
+        <translation>上一步</translation>
     </message>
     <message>
+        <location/>
         <source>Cancel</source>
-        <translation type="obsolete">取消</translation>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location/>
+        <source>If selecting the Helicopter option, please engage throttle hold now.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 3</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 4</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Identify sticks instructions</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Next</source>
+        <translation>下一步</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigCcpmWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget.cpp" line="+1081"/>
+        <source>&lt;h1&gt;Swashplate Leveling Routine&lt;/h1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;b&gt;You are about to start the Swashplate levelling routine.&lt;/b&gt;&lt;p&gt;This process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.&lt;p&gt;The final state of your system should match the current configuration in the GCS config gadget.&lt;/p&gt;&lt;p&gt;Please ensure all ccpm settings in the GCS are correct before continuing.&lt;/p&gt;&lt;p&gt;If this process is interrupted, then the state of your OP board may not match the GCS configuration.&lt;/p&gt;&lt;p&gt;&lt;i&gt;After completing this process, please check all settings before attempting to fly.&lt;/i&gt;&lt;/p&gt;&lt;p&gt;&lt;font color=red&gt;&lt;b&gt;Please disconnect your motor to ensure it will not spin up.&lt;/b&gt;&lt;/font&gt;&lt;p&gt;&lt;hr&gt;&lt;i&gt;Do you wish to proceed?&lt;/i&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+128"/>
+        <source>&lt;h2&gt;Neutral levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Servo horns,&lt;/li&gt;&lt;li&gt;Link lengths,&lt;/li&gt;&lt;li&gt;Neutral triming spinboxes to the right&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is in the center of desired travel range and is level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>&lt;h2&gt;Max levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Max triming spinboxes to the right ONLY&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is at the top of desired travel range and is level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>&lt;h2&gt;Min levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Min triming spinboxes to the right ONLY&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is at the bottom of desired travel range and is level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>&lt;h2&gt;Levelling verification&lt;/h2&gt;&lt;p&gt;Adjust the slider to the right over it&apos;s full range and observe the swashplate motion. It should remain level over the entire range of travel.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>&lt;h2&gt;Levelling complete&lt;/h2&gt;&lt;p&gt;Press the Finish button to save these settings to the SD card&lt;/p&gt;&lt;p&gt;Press the cancel button to return to the pre-levelling settings&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+68"/>
+        <source>&lt;h2&gt;Levelling Cancelled&lt;/h2&gt;&lt;p&gt;Previous settings have been restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+43"/>
+        <source>&lt;h2&gt;Levelling Completed&lt;/h2&gt;&lt;p&gt;New settings have been saved to the SD card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>&lt;font color=red&gt;&lt;h1&gt;Warning!!!&lt;/h2&gt;&lt;/font&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&lt;h2&gt;This code has many configurations.&lt;/h2&gt;&lt;p&gt;Please double check all settings before attempting flight!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>&lt;h2&gt;The CCPM mixer code needs more testing!&lt;/h2&gt;&lt;p&gt;&lt;font color=red&gt;Use it at your own risk!&lt;/font&gt;&lt;p&gt;Do you wish to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>&lt;h2&gt;The CCPM swashplate levelling code is NOT complete!&lt;/h2&gt;&lt;p&gt;&lt;font color=red&gt;DO NOT use it for flight!&lt;/font&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

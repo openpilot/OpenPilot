@@ -126,24 +126,10 @@ int32_t VtolLandFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollow
     PIOS_Assert(ptr_pathDesired);
     PIOS_Assert(ptr_flightStatus);
 
-    HomeLocationInitialize();
-    AccelStateInitialize();
-    VtolPathFollowerSettingsInitialize();
-    FlightStatusInitialize();
-    FlightModeSettingsInitialize();
-    PathStatusInitialize();
-    PathSummaryInitialize();
-    PathDesiredInitialize();
-    PositionStateInitialize();
-    VelocityStateInitialize();
-    VelocityDesiredInitialize();
-    StabilizationDesiredInitialize();
-    TakeOffLocationInitialize();
-    ManualControlCommandInitialize();
-    StatusVtolLandInitialize();
-
-    mLandData = (VtolLandFSMData_T *)pios_malloc(sizeof(VtolLandFSMData_T));
-    PIOS_Assert(mLandData);
+    if (mLandData == 0) {
+	mLandData = (VtolLandFSMData_T *)pios_malloc(sizeof(VtolLandFSMData_T));
+      PIOS_Assert(mLandData);
+    }
     memset(mLandData, sizeof(VtolLandFSMData_T), 0);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;

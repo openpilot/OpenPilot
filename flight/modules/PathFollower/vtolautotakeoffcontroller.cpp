@@ -149,11 +149,12 @@ int32_t VtolAutoTakeoffController::Initialize(VtolPathFollowerSettingsData *ptr_
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
 
-    fsm = (PathFollowerFSM *)VtolAutoTakeoffFSM::instance();
-    VtolAutoTakeoffFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus);
-    vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    controlDown.Initialize(fsm);
-
+    if (fsm == 0) {
+	fsm = (PathFollowerFSM *)VtolAutoTakeoffFSM::instance();
+	VtolAutoTakeoffFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus);
+	vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
+	controlDown.Initialize(fsm);
+    }
     return 0;
 }
 

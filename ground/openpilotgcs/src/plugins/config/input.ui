@@ -491,7 +491,7 @@
             <x>0</x>
             <y>0</y>
             <width>1228</width>
-            <height>661</height>
+            <height>669</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -1967,7 +1967,7 @@ font:bold;</string>
                      <string>objname:StabilizationSettings</string>
                      <string>fieldname:FlightModeAssistMap</string>
                      <string>index:0</string>
-                     <string>haslimits:no</string>
+                     <string>haslimits:yes</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
@@ -1993,7 +1993,7 @@ font:bold;</string>
                      <string>objname:StabilizationSettings</string>
                      <string>fieldname:FlightModeAssistMap</string>
                      <string>index:1</string>
-                     <string>haslimits:no</string>
+                     <string>haslimits:yes</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
@@ -2019,7 +2019,7 @@ font:bold;</string>
                      <string>objname:StabilizationSettings</string>
                      <string>fieldname:FlightModeAssistMap</string>
                      <string>index:2</string>
-                     <string>haslimits:no</string>
+                     <string>haslimits:yes</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
@@ -2048,7 +2048,7 @@ font:bold;</string>
                      <string>objname:StabilizationSettings</string>
                      <string>fieldname:FlightModeAssistMap</string>
                      <string>index:3</string>
-                     <string>haslimits:no</string>
+                     <string>haslimits:yes</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
@@ -2077,7 +2077,7 @@ font:bold;</string>
                      <string>objname:StabilizationSettings</string>
                      <string>fieldname:FlightModeAssistMap</string>
                      <string>index:4</string>
-                     <string>haslimits:no</string>
+                     <string>haslimits:yes</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
@@ -2106,7 +2106,7 @@ font:bold;</string>
                      <string>objname:StabilizationSettings</string>
                      <string>fieldname:FlightModeAssistMap</string>
                      <string>index:5</string>
-                     <string>haslimits:no</string>
+                     <string>haslimits:yes</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
@@ -2220,7 +2220,7 @@ font:bold;</string>
             <x>0</x>
             <y>0</y>
             <width>1228</width>
-            <height>661</height>
+            <height>669</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

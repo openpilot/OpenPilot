@@ -78,6 +78,7 @@ private:
     void startWizard();
     void setupVehicleItems();
     void setupVehicleHighlightedPart();
+    void showElementMovement(bool isUp, qreal value);
     void setWizardPage();
     void enableButtons(bool enable);
     void enableServoSliders(bool enabled);
@@ -98,6 +99,7 @@ private:
     QList<QString> m_vehicleElementIds;
     QList<ElementType> m_vehicleElementTypes;
     QList<QGraphicsSvgItem *> m_vehicleItems;
+    QList<QGraphicsSvgItem *> m_arrowsItems;
     QList<quint16> m_vehicleHighlightElementIndexes;
     QList<quint16> m_channelIndex;
     QList<quint16> m_wizardIndexes;

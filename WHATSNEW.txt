@@ -1,3 +1,72 @@
+--- RELEASE-15.02 RC4 
+This release introduces major flight performance improvements, enhancements as well as bug fixes. Many enhancements have been made to reducing dead-time of the communication between the flight controller and ESCs. In our testing, we have found this to be not only the best flight performance so far in the OpenPilot project but the best flight performance of any project we have tested against. This is a recommended upgrade for everyone and the more skilled of a pilot you are, the more you will love this release.
+
+A key improvement that helped achieve this was the addition of the PWMSync code path, this is now enabled by default. Some restrictions applies to CC3D/CC as it needs a compatible input method to enable PWMSync. Compatible input methods are PPM, S.Bus, DSM and OPLink. This release also introduces support for OneShot125 capable ESCs, such as the KISS ESCs and all ESCs supported in BLHeli V13 and above.  Note that OneShot125 support has the same restrictions as PWMSync for CC and CC3D. 
+
+Note for CC3D/CC: To support PWMSync/OneShot125 PPM input pin has changed from earlier releases to the last pin on the input IO port, please refer to the connection diagram in the setup wizard to see the required new pin layout for PPM. 
+
+Other enhancements include key parts of the GCS translated to Chinese and further OPLink reliability additions allowing us to confidently say it can be used as a primary control link as well as for telemetry.
+
+The full list of features, improvements and bugfixes in this release is accessible here:
+https://progress.openpilot.org/issues/?filter=12161
+
+
+Release Notes - OpenPilot - Version RELEASE-15.02
+
+** Bug
+    * [OP-969] - Input Configuration Wizard has scrollbars showing up and next/previous buttons are pushed down out of sight
+    * [OP-1034] - CCPM Config Widget crashes GCS if required boxes aren't set i.e. Channel set to None
+    * [OP-1466] - Gcs crashes on Helicopter config tab
+    * [OP-1522] - Improve Robustness of OPLink radio
+    * [OP-1601] - Still not enough ram on CC for gps to be usable
+    * [OP-1644] - Radio Setup Wiz problem with 6 flight modes
+    * [OP-1670] - cruise control conflict with flight modes (rate & acro +)
+    * [OP-1680] - OPLink control limited to 1000-1896
+    * [OP-1682] - Overflow issue with pwm rx and CC3D 
+    * [OP-1686] - Slave OPLM should receive PPM in PPM_only mode
+    * [OP-1706] - Output Reverse checkboxes tick them selves when min equals max
+    * [OP-1718] - FW vehicle setup wizard may strip servo gears
+    * [OP-1722] - libusb include is incorrect.
+    * [OP-1728] - FW servos ignore set neutral
+    * [OP-1733] - version-info.py should check for version-info.json not git repo.
+    * [OP-1735] - Build fails with a tilde (~) in path.
+    * [OP-1737] - Min/max will be greyed even if motor output test is canceled
+    * [OP-1741] - Repo path is incorrect in version_info.pro
+    * [OP-1743] - cc3d fails to connect once "next " is loaded 2-23-15
+    * [OP-1744] - Vehicle config wizard produces a bad configuration
+    * [OP-1754] - Vehicle Wizard bad config when setting PPM in and RapidESC out
+    * [OP-1755] - Add additional path for cloudconfigs
+    * [OP-1758] - Upgrade hidapi for all OSs (except windows) to solve mac issue:Fix incorrect device list after device removal 
+    * [OP-1761] - Wizard bad config when PPM in, RapidESC out and hexa frame with CC/CC3D/Atom
+
+
+** Improvement
+    * [OP-1519] - Auto Reboot of board when required by Wizard
+    * [OP-1576] - Remove tx resent accounting from OPlink
+    * [OP-1635] - Remove Quad H from wizard to avoid confusion with Quad X
+    * [OP-1650] - Reduce telemetry to improve OPLink
+    * [OP-1658] - Sensor driver API and overhaul of sensor module
+    * [OP-1683] - Support synchronous (OneShot) and OneShot125 output mode
+    * [OP-1685] - Support OneShot/OneShot125 for CC* targets
+    * [OP-1694] - Make package make rule non-nested
+    * [OP-1698] - Add easy to set channel passtrough GCS functionality
+    * [OP-1704] - Add support for sanity check custom hooks
+    * [OP-1759] - Hide CC3D non-supported options (GPSAssist)
+
+** New Feature
+    * [OP-1723] - RCCar Forward/reverse support
+
+
+** Task
+    * [OP-1721] - C++ enable flight controller and upgrade ARM tools
+    * [OP-1738] - change default flight modes and thrust settings
+
+** Sub task
+    * [OP-1748] - Chinese translation for 15.02
+    * [OP-1752] - Add Alarm sub status to SystemHealth
+
+
+
 --- RELEASE-15.01 --- Look Ma, No hands ---
 This release mainly focuses on a new feature, GPSAssist which is a new form of assisted control for multirotors.  
 Assisted Control provides assistance functions on top of existing flight modes.  GPSAssist is the 

@@ -385,6 +385,9 @@ QString SetupWizard::getSummaryText()
     case ESC_RAPID:
         summary.append(tr("Rapid ESC (%1 Hz)").arg(VehicleConfigurationHelper::RAPID_ESC_FREQUENCY));
         break;
+    case ESC_SYNCHED:
+        summary.append(tr("Synched ESC"));
+        break;
     case ESC_ONESHOT:
         summary.append(tr("Oneshot ESC"));
         break;

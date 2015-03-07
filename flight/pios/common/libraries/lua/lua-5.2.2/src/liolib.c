@@ -16,12 +16,10 @@
 
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define liolib_c
-#define LUA_LIB
 
 #include "lua.h"
 
@@ -360,7 +358,7 @@ static int read_number (lua_State *L, FILE *f) {
 
 
 static int test_eof (lua_State *L, FILE *f) {
-  int c = getc(f);
+  int c = lua_getc(f);
   ungetc(c, f);
   lua_pushlstring(L, NULL, 0);
   return (c != EOF);

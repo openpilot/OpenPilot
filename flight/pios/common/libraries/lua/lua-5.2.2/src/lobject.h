@@ -8,6 +8,9 @@
 #ifndef lobject_h
 #define lobject_h
 
+#ifndef PACK
+#define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
+#endif
 
 #include <stdarg.h>
 
@@ -101,9 +104,9 @@ typedef union Value Value;
 ** an actual value plus a tag with its type.
 */
 
-#define TValuefields	Value value_; int tt_
+#define TValuefields	Value value_; int8_t tt_
 
-typedef struct lua_TValue TValue;
+#define TValue lua_TValue
 
 
 /* macro defining a nil value */
@@ -134,6 +137,8 @@ typedef struct lua_TValue TValue;
 #define ttisnil(o)		checktag((o), LUA_TNIL)
 #define ttisboolean(o)		checktag((o), LUA_TBOOLEAN)
 #define ttislightuserdata(o)	checktag((o), LUA_TLIGHTUSERDATA)
+#define ttisrotable(o)          checktag((o), LUA_TROTABLE)
+#define ttislightfunction(o)    checktag((o), LUA_TLIGHTFUNCTION)
 #define ttisstring(o)		checktype((o), LUA_TSTRING)
 #define ttisshrstring(o)	checktag((o), ctb(LUA_TSHRSTR))
 #define ttislngstring(o)	checktag((o), ctb(LUA_TLNGSTR))
@@ -153,6 +158,8 @@ typedef struct lua_TValue TValue;
 #define nvalue(o)	check_exp(ttisnumber(o), num_(o))
 #define gcvalue(o)	check_exp(iscollectable(o), val_(o).gc)
 #define pvalue(o)	check_exp(ttislightuserdata(o), val_(o).p)
+#define rvalue(o)       check_exp(ttisrotable(o), val_(o).p)
+#define lfvalue(o)      check_exp(ttislightfunction(o), val_(o).p)
 #define rawtsvalue(o)	check_exp(ttisstring(o), &val_(o).gc->ts)
 #define tsvalue(o)	(&rawtsvalue(o)->tsv)
 #define rawuvalue(o)	check_exp(ttisuserdata(o), &val_(o).gc->u)
@@ -160,7 +167,7 @@ typedef struct lua_TValue TValue;
 #define clvalue(o)	check_exp(ttisclosure(o), &val_(o).gc->cl)
 #define clLvalue(o)	check_exp(ttisLclosure(o), &val_(o).gc->cl.l)
 #define clCvalue(o)	check_exp(ttisCclosure(o), &val_(o).gc->cl.c)
-#define fvalue(o)	check_exp(ttislcf(o), val_(o).f)
+#define lcfvalue(o)	check_exp(ttislcf(o), val_(o).f)
 #define hvalue(o)	check_exp(ttistable(o), &val_(o).gc->h)
 #define bvalue(o)	check_exp(ttisboolean(o), val_(o).b)
 #define thvalue(o)	check_exp(ttisthread(o), &val_(o).gc->th)
@@ -189,11 +196,17 @@ typedef struct lua_TValue TValue;
 
 #define setnilvalue(obj) settt_(obj, LUA_TNIL)
 
-#define setfvalue(obj,x) \
+#define setlcfvalue(obj,x) \
   { TValue *io=(obj); val_(io).f=(x); settt_(io, LUA_TLCF); }
 
 #define setpvalue(obj,x) \
   { TValue *io=(obj); val_(io).p=(x); settt_(io, LUA_TLIGHTUSERDATA); }
+
+#define setrvalue(obj,x) \
+  { TValue *io=(obj); val_(io).p=(x); settt_(io, LUA_TROTABLE); }
+
+#define setlfvalue(obj,x) \
+  { TValue *io=(obj); val_(io).p=(x); settt_(io, LUA_TLIGHTFUNCTION); }
 
 #define setbvalue(obj,x) \
   { TValue *io=(obj); val_(io).b=(x); settt_(io, LUA_TBOOLEAN); }
@@ -394,9 +407,9 @@ union Value {
 };
 
 
-struct lua_TValue {
+PACK(typedef struct {
   TValuefields;
-};
+}) lua_TValue;
 
 
 typedef TValue *StkId;  /* index to stack elements */
@@ -543,10 +556,10 @@ typedef union Closure {
 */
 
 typedef union TKey {
-  struct {
+  PACK(struct {
     TValuefields;
     struct Node *next;  /* for chaining */
-  } nk;
+  }) nk;
   TValue tvk;
 } TKey;
 
@@ -560,7 +573,7 @@ typedef struct Node {
 typedef struct Table {
   CommonHeader;
   lu_byte flags;  /* 1<<p means tagmethod(p) is not present */
-  lu_byte lsizenode;  /* log2 of size of `node' array */
+  lu_byte lsizenode;  /* size of `node' array */
   struct Table *metatable;
   TValue *array;  /* array part */
   Node *node;
@@ -579,7 +592,7 @@ typedef struct Table {
 
 
 #define twoto(x)	(1<<(x))
-#define sizenode(t)	(twoto((t)->lsizenode))
+#define sizenode(t)	((t)->lsizenode)
 
 
 /*

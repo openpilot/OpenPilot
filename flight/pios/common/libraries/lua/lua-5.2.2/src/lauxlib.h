@@ -10,7 +10,6 @@
 
 
 #include <stddef.h>
-#include <stdio.h>
 
 #include "lua.h"
 
@@ -25,6 +24,12 @@ typedef struct luaL_Reg {
   lua_CFunction func;
 } luaL_Reg;
 
+extern const luaL_Reg baselib[];
+extern const luaL_Reg mathlib[];
+extern const luaL_Reg opentxLib[];
+extern const luaL_Reg bitlib[];
+extern const luaL_Reg lcdLib[];
+extern const luaL_Reg modelLib[];
 
 LUALIB_API void (luaL_checkversion_) (lua_State *L, lua_Number ver);
 #define luaL_checkversion(L)	luaL_checkversion_(L, LUA_VERSION_NUM)
@@ -87,6 +92,8 @@ LUALIB_API int (luaL_len) (lua_State *L, int idx);
 
 LUALIB_API const char *(luaL_gsub) (lua_State *L, const char *s, const char *p,
                                                   const char *r);
+
+LUALIB_API void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize);
 
 LUALIB_API void (luaL_setfuncs) (lua_State *L, const luaL_Reg *l, int nup);
 
@@ -186,7 +193,11 @@ LUALIB_API char *(luaL_buffinitsize) (lua_State *L, luaL_Buffer *B, size_t sz);
 
 
 typedef struct luaL_Stream {
+#if defined(USE_FATFS)
+  FIL *f;  /* stream (NULL for incompletely created streams) */
+#else
   FILE *f;  /* stream (NULL for incompletely created streams) */
+#endif
   lua_CFunction closef;  /* to close stream (NULL for closed streams) */
 } luaL_Stream;
 

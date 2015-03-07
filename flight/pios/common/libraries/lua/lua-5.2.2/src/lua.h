@@ -11,10 +11,10 @@
 
 #include <stdarg.h>
 #include <stddef.h>
-
+#include <inttypes.h>
 
 #include "luaconf.h"
-
+#include "debug.h"
 
 #define LUA_VERSION_MAJOR	"5"
 #define LUA_VERSION_MINOR	"2"
@@ -77,15 +77,17 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 
 #define LUA_TNIL		0
 #define LUA_TBOOLEAN		1
-#define LUA_TLIGHTUSERDATA	2
-#define LUA_TNUMBER		3
-#define LUA_TSTRING		4
-#define LUA_TTABLE		5
-#define LUA_TFUNCTION		6
-#define LUA_TUSERDATA		7
-#define LUA_TTHREAD		8
+#define LUA_TROTABLE            2
+#define LUA_TLIGHTFUNCTION      3
+#define LUA_TLIGHTUSERDATA      4
+#define LUA_TNUMBER             5
+#define LUA_TSTRING             6
+#define LUA_TTABLE              7
+#define LUA_TFUNCTION           8
+#define LUA_TUSERDATA           9
+#define LUA_TTHREAD             10
 
-#define LUA_NUMTAGS		9
+#define LUA_NUMTAGS		11
 
 
 
@@ -214,6 +216,8 @@ LUA_API const char *(lua_pushfstring) (lua_State *L, const char *fmt, ...);
 LUA_API void  (lua_pushcclosure) (lua_State *L, lua_CFunction fn, int n);
 LUA_API void  (lua_pushboolean) (lua_State *L, int b);
 LUA_API void  (lua_pushlightuserdata) (lua_State *L, void *p);
+LUA_API void  (lua_pushlightfunction) (lua_State *L, void *p);
+LUA_API void  (lua_pushrotable) (lua_State *L, void *p);
 LUA_API int   (lua_pushthread) (lua_State *L);
 
 
@@ -413,6 +417,17 @@ struct lua_Debug {
   /* private part */
   struct CallInfo *i_ci;  /* active function */
 };
+
+#if defined(USE_FATFS)
+  #include "FatFs/ff.h"
+  int lua__getc(FIL *f);
+  #define lua_getc(f) lua__getc(&f)
+  #define lua_fclose  f_close
+#else
+  #include <stdio.h>
+  #define lua_getc    getc
+  #define lua_fclose  fclose
+#endif
 
 /* }====================================================================== */
 

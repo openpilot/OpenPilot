@@ -113,7 +113,7 @@ static Node *mainposition (const Table *t, const TValue *key) {
     case LUA_TLIGHTUSERDATA:
       return hashpointer(t, pvalue(key));
     case LUA_TLCF:
-      return hashpointer(t, fvalue(key));
+      return hashpointer(t, lcfvalue(key));
     default:
       return hashpointer(t, gcvalue(key));
   }
@@ -209,7 +209,10 @@ static int computesizes (int nums[], int *narray) {
     }
     if (a == *narray) break;  /* all elements already counted */
   }
-  *narray = n;
+  if (n - *narray > 1024)
+    *narray += 1024;
+  else
+    *narray = n;
   lua_assert(*narray/2 <= na && na <= *narray);
   return na;
 }
@@ -275,19 +278,20 @@ static void setarrayvector (lua_State *L, Table *t, int size) {
   t->sizearray = size;
 }
 
-
 static void setnodevector (lua_State *L, Table *t, int size) {
   int lsize;
   if (size == 0) {  /* no elements to hash part? */
     t->node = cast(Node *, dummynode);  /* use common `dummynode' */
-    lsize = 0;
+    lsize = 1;
   }
   else {
     int i;
-    lsize = luaO_ceillog2(size);
-    if (lsize > MAXBITS)
-      luaG_runerror(L, "table overflow");
-    size = twoto(lsize);
+    // lsize = luaO_ceillog2(size);
+    // if (lsize > MAXBITS)
+    //  luaG_runerror(L, "table overflow");
+    // size = twoto(lsize);
+    // size += size/2;
+    lsize = size;
     t->node = luaM_newvector(L, size, Node);
     for (i=0; i<size; i++) {
       Node *n = gnode(t, i);
@@ -299,7 +303,6 @@ static void setnodevector (lua_State *L, Table *t, int size) {
   t->lsizenode = cast_byte(lsize);
   t->lastfree = gnode(t, size);  /* all positions are free */
 }
-
 
 void luaH_resize (lua_State *L, Table *t, int nasize, int nhsize) {
   int i;
@@ -321,7 +324,7 @@ void luaH_resize (lua_State *L, Table *t, int nasize, int nhsize) {
     luaM_reallocvector(L, t->array, oldasize, nasize, TValue);
   }
   /* re-insert elements from hash part */
-  for (i = twoto(oldhsize) - 1; i >= 0; i--) {
+  for (i = oldhsize - 1; i >= 0; i--) {
     Node *old = nold+i;
     if (!ttisnil(gval(old))) {
       /* doesn't need barrier/invalidate cache, as entry was
@@ -330,7 +333,7 @@ void luaH_resize (lua_State *L, Table *t, int nasize, int nhsize) {
     }
   }
   if (!isdummy(nold))
-    luaM_freearray(L, nold, cast(size_t, twoto(oldhsize))); /* free old array */
+    luaM_freearray(L, nold, cast(size_t, oldhsize)); /* free old array */
 }
 
 

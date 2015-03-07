@@ -11,6 +11,9 @@
 #include <limits.h>
 #include <stddef.h>
 
+#if defined(SDCARD)
+#define USE_FATFS
+#endif
 
 /*
 ** ==================================================================
@@ -209,18 +212,24 @@
 ** They are only used in libraries and the stand-alone program. (The #if
 ** avoids including 'stdio.h' everywhere.)
 */
-#if defined(LUA_LIB) || defined(lua_c)
-#include <stdio.h>
-#define luai_writestring(s,l)	fwrite((s), sizeof(char), (l), stdout)
-#define luai_writeline()	(luai_writestring("\n", 1), fflush(stdout))
-#endif
 
 /*
 @@ luai_writestringerror defines how to print error messages.
 ** (A format string with one argument is enough for Lua...)
 */
+
+#if defined(LUA_LIB) || defined(lua_c)
+#include <stdio.h>
+#define luai_writestring(s,l)	fwrite((s), sizeof(char), (l), stdout)
+#define luai_writeline()	(luai_writestring("\n", 1), fflush(stdout))
 #define luai_writestringerror(s,p) \
-	(fprintf(stderr, (s), (p)), fflush(stderr))
+        (fprintf(stderr, (s), (p)), fflush(stderr))
+#else
+#define luai_writestring(s,l)       TRACE_DEBUG_WP("%s", s);
+#define luai_writeline()            TRACE_DEBUG_WP("\n");
+#define luai_writestringerror(s,p)  TRACE_DEBUG_WP(s, p);
+#endif
+
 
 
 /*
@@ -369,7 +378,11 @@
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
 ** CHANGE it if it uses too much C-stack space.
 */
+#if defined(USE_FATFS)
+#define LUAL_BUFFERSIZE         512
+#else
 #define LUAL_BUFFERSIZE		BUFSIZ
+#endif
 
 
 
@@ -431,14 +444,14 @@
 */
 
 /* the following operations need the math library */
-#if defined(lobject_c) || defined(lvm_c)
+//#if defined(lobject_c) || defined(lvm_c)
 #include <math.h>
 #define luai_nummod(L,a,b)	((a) - l_mathop(floor)((a)/(b))*(b))
 #define luai_numpow(L,a,b)	(l_mathop(pow)(a,b))
-#endif
+//#endif
 
 /* these are quite standard operations */
-#if defined(LUA_CORE)
+// #if defined(LUA_CORE)
 #define luai_numadd(L,a,b)	((a)+(b))
 #define luai_numsub(L,a,b)	((a)-(b))
 #define luai_nummul(L,a,b)	((a)*(b))
@@ -448,7 +461,7 @@
 #define luai_numlt(L,a,b)	((a)<(b))
 #define luai_numle(L,a,b)	((a)<=(b))
 #define luai_numisnan(L,a)	(!luai_numeq((a), (a)))
-#endif
+// #endif
 
 
 
@@ -457,7 +470,7 @@
 ** CHANGE that if ptrdiff_t is not adequate on your machine. (On most
 ** machines, ptrdiff_t gives a good choice between int or long.)
 */
-#define LUA_INTEGER	ptrdiff_t
+#define LUA_INTEGER	int
 
 /*
 @@ LUA_UNSIGNED is the integral type used by lua_pushunsigned/lua_tounsigned.
@@ -545,7 +558,7 @@
 ** without modifying the main part of the file.
 */
 
-
+#define LUA_MAX_ROTABLE_NAME      20
 
 #endif
 

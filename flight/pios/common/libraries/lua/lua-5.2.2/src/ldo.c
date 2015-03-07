@@ -205,6 +205,12 @@ static int stackinuse (lua_State *L) {
 void luaD_shrinkstack (lua_State *L) {
   int inuse = stackinuse(L);
   int goodsize = inuse + (inuse / 8) + 2*EXTRA_STACK;
+  if ((L->stacksize - goodsize) < 40) {
+    //skip shrink
+    // TRACE("luaD_shrinkstack(skip): L->stacksize: %d, goodsize: %d", L->stacksize, goodsize);
+    return;
+  }
+  // TRACE("luaD_shrinkstack(): L->stacksize: %d, goodsize: %d", L->stacksize, goodsize);
   if (goodsize > LUAI_MAXSTACK) goodsize = LUAI_MAXSTACK;
   if (inuse > LUAI_MAXSTACK ||  /* handling stack overflow? */
       goodsize >= L->stacksize)  /* would grow instead of shrink? */
@@ -299,7 +305,10 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
   ptrdiff_t funcr = savestack(L, func);
   switch (ttype(func)) {
     case LUA_TLCF:  /* light C function */
-      f = fvalue(func);
+      f = lcfvalue(func);
+      goto Cfunc;
+    case LUA_TLIGHTFUNCTION:
+      f = check_exp(ttislightfunction(func), val_(func).f);
       goto Cfunc;
     case LUA_TCCL: {  /* C closure */
       f = clCvalue(func)->f;

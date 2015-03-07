@@ -44,7 +44,7 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
     m_vehicleRenderer = new QSvgRenderer();
 
     // move the code that was here to setupVehicle() so we can determine which image to use.
-    m_vehicleScene = new QGraphicsScene(this);
+    m_vehicleScene    = new QGraphicsScene(this);
     ui->vehicleView->setScene(m_vehicleScene);
 }
 

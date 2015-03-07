@@ -206,7 +206,7 @@ const luaR_value_entry bitlib_vals[] = {
   {NULL, 0}
 };
 
-LUAMOD_API int luaopen_bit32 (lua_State *L) {
+LUAMOD_API int luaopen_bit32 (__attribute__((unused)) lua_State *L) {
   return 0;
 }
 

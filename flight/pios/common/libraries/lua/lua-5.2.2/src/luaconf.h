@@ -15,6 +15,10 @@
 #define USE_FATFS
 #endif
 
+#pragma GCC diagnostic ignored "-Wunsuffixed-float-constants"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+
+
 /*
 ** ==================================================================
 ** Search for "@@" to find all configurable definitions.

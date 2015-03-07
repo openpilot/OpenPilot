@@ -625,7 +625,7 @@ LUA_API void lua_getglobal (lua_State *L, const char *var) {
 
   lu_byte keytype;
   luaR_result res = luaR_findglobal(var, &keytype);
-  if (res != 0) {
+  if ((void*)(size_t)res != 0) {
     setsvalue2s(L, L->top++, luaS_new(L, var));
     setlfvalue(L->top - 1, (void*)(size_t)res)
   }

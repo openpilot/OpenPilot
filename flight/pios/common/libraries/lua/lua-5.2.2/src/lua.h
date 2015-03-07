@@ -14,7 +14,6 @@
 #include <inttypes.h>
 
 #include "luaconf.h"
-#include "debug.h"
 
 #define LUA_VERSION_MAJOR	"5"
 #define LUA_VERSION_MINOR	"2"

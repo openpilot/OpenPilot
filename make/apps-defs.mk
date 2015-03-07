@@ -49,6 +49,12 @@ else
 $(error Filesystem (SPIFFS) is only supported on revo! Other targets are now broken probably intentionnaly :p)
 endif
 
+## Lua support
+ifeq ($(USE_LUA),YES)
+LUA_DIR		= $(PIOSCOMMON)/libraries/lua
+include $(LUA_DIR)/library.mk
+endif
+
 ## Misc
 OPTESTS		= $(TOPDIR)/Tests
 

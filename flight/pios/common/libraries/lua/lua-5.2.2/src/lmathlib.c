@@ -272,7 +272,7 @@ const luaR_value_entry mathlib_vals[] = {
 /*
 ** Open math library
 */
-LUAMOD_API int luaopen_math (lua_State *L) {
+LUAMOD_API int luaopen_math (__attribute__((unused)) lua_State *L) {
   return 0;
 }
 

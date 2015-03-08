@@ -289,31 +289,31 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 
-#define PIOS_COM_TELEM_RF_RX_BUF_LEN  512
-#define PIOS_COM_TELEM_RF_TX_BUF_LEN  512
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN     512
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN     512
 
-#define PIOS_COM_GPS_RX_BUF_LEN       32
+#define PIOS_COM_GPS_RX_BUF_LEN          32
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 65
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 65
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN    65
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN    65
 
-#define PIOS_COM_BRIDGE_RX_BUF_LEN    65
-#define PIOS_COM_BRIDGE_TX_BUF_LEN    12
+#define PIOS_COM_BRIDGE_RX_BUF_LEN       65
+#define PIOS_COM_BRIDGE_TX_BUF_LEN       12
 
-#define PIOS_COM_AUX_RX_BUF_LEN       512
-#define PIOS_COM_AUX_TX_BUF_LEN       512
+#define PIOS_COM_AUX_RX_BUF_LEN          512
+#define PIOS_COM_AUX_TX_BUF_LEN          512
 
-#define PIOS_COM_HKOSD_RX_BUF_LEN     22
-#define PIOS_COM_HKOSD_TX_BUF_LEN     22
+#define PIOS_COM_SECOND_TELEM_RX_BUF_LEN 22
+#define PIOS_COM_SECOND_TELEM_TX_BUF_LEN 22
 
 
-uint32_t pios_com_aux_id       = 0;
-uint32_t pios_com_gps_id       = 0;
-uint32_t pios_com_telem_usb_id = 0;
-uint32_t pios_com_telem_rf_id  = 0;
-uint32_t pios_com_bridge_id    = 0;
-uint32_t pios_com_overo_id     = 0;
-uint32_t pios_com_hkosd_id     = 0;
+uint32_t pios_com_aux_id          = 0;
+uint32_t pios_com_gps_id          = 0;
+uint32_t pios_com_telem_usb_id    = 0;
+uint32_t pios_com_telem_rf_id     = 0;
+uint32_t pios_com_bridge_id       = 0;
+uint32_t pios_com_overo_id        = 0;
+uint32_t pios_com_second_telem_id = 0;
 
 uintptr_t pios_uavo_settings_fs_id;
 uintptr_t pios_user_fs_id;
@@ -692,8 +692,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_AUXPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RV_AUXPORT_OSDHK:
-        PIOS_Board_configure_com(&pios_usart_hkosd_aux_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+    case HWSETTINGS_RV_AUXPORT_SECONDARYTELEMETRY:
+        PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /* hwsettings_rv_auxport */
       /* Configure AUXSbusPort */
@@ -737,8 +737,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_AUXSBUSPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RV_AUXSBUSPORT_OSDHK:
-        PIOS_Board_configure_com(&pios_usart_hkosd_auxsbus_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+    case HWSETTINGS_RV_AUXSBUSPORT_SECONDARYTELEMETRY:
+        PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /* hwsettings_rv_auxport */
 

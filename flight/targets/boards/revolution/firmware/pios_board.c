@@ -231,26 +231,26 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_RFM22B_RF_RX_BUF_LEN    512
 #define PIOS_COM_RFM22B_RF_TX_BUF_LEN    512
 
-#define PIOS_COM_HKOSD_RX_BUF_LEN        22
-#define PIOS_COM_HKOSD_TX_BUF_LEN        22
+#define PIOS_COM_SECOND_TELEM_RX_BUF_LEN 22
+#define PIOS_COM_SECOND_TELEM_TX_BUF_LEN 22
 
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 #define PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN 40
 uint32_t pios_com_debug_id;
 #endif /* PIOS_INCLUDE_DEBUG_CONSOLE */
 
-uint32_t pios_com_gps_id       = 0;
-uint32_t pios_com_telem_usb_id = 0;
-uint32_t pios_com_telem_rf_id  = 0;
-uint32_t pios_com_rf_id        = 0;
-uint32_t pios_com_bridge_id    = 0;
-uint32_t pios_com_overo_id     = 0;
-uint32_t pios_com_hkosd_id     = 0;
+uint32_t pios_com_gps_id          = 0;
+uint32_t pios_com_telem_usb_id    = 0;
+uint32_t pios_com_telem_rf_id     = 0;
+uint32_t pios_com_rf_id           = 0;
+uint32_t pios_com_bridge_id       = 0;
+uint32_t pios_com_overo_id        = 0;
+uint32_t pios_com_second_telem_id = 0;
 
-uint32_t pios_com_vcp_id       = 0;
+uint32_t pios_com_vcp_id          = 0;
 
 #if defined(PIOS_INCLUDE_RFM22B)
-uint32_t pios_rfm22b_id        = 0;
+uint32_t pios_rfm22b_id           = 0;
 #endif
 
 uintptr_t pios_uavo_settings_fs_id;
@@ -495,8 +495,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_FLEXIPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RM_FLEXIPORT_OSDHK:
-        PIOS_Board_configure_com(&pios_usart_hkosd_flexi_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+    case HWSETTINGS_RM_FLEXIPORT_SECONDARYTELEMETRY:
+        PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /* hwsettings_rm_flexiport */
 
@@ -692,8 +692,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_MAINPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RM_MAINPORT_OSDHK:
-        PIOS_Board_configure_com(&pios_usart_hkosd_main_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+    case HWSETTINGS_RM_MAINPORT_SECONDARYTELEMETRY:
+        PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /*        hwsettings_rm_mainport */
 
@@ -842,6 +842,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
     case HWSETTINGS_RM_RCVRPORT_PPMPWM:
     case HWSETTINGS_RM_RCVRPORT_PPMTELEMETRY:
+    case HWSETTINGS_RM_RCVRPORT_PPMSECONDARYTELEMETRY:
 #if defined(PIOS_INCLUDE_PPM)
         PIOS_Board_configure_ppm(&pios_ppm_cfg);
 
@@ -859,6 +860,10 @@ void PIOS_Board_Init(void)
             PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         }
 
+        if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMSECONDARYTELEMETRY) {
+            PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
+        }
+
         break;
 #endif /* PIOS_INCLUDE_PPM */
     case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
@@ -867,6 +872,9 @@ void PIOS_Board_Init(void)
         break;
     case HWSETTINGS_RM_RCVRPORT_TELEMETRY:
         PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
+        break;
+    case HWSETTINGS_RM_RCVRPORT_SECONDARYTELEMETRY:
+        PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     }
 

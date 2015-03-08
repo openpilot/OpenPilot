@@ -2292,20 +2292,20 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
         sprintf(temp, "Stab6");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
-        sprintf(temp, "Tune");
-        break;
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
         sprintf(temp, "PH");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV	:
-        sprintf(temp, "PVFPV");
+    case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
+        sprintf(temp, "CO_LK");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
-        sprintf(temp, "PVLOS");
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+        sprintf(temp, "PROAM");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
-        sprintf(temp, "PVNSEW");
+    case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
+        sprintf(temp, "HOLEA");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
+        sprintf(temp, "ABSO");
         break;
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
         sprintf(temp, "RTB");
@@ -2319,7 +2319,7 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
     case FLIGHTSTATUS_FLIGHTMODE_POI:
         sprintf(temp, "POI");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE	:
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         sprintf(temp, "AutoCruise");
         break;
     default:

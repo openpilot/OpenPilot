@@ -399,7 +399,7 @@ int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, const char *path, uint16_t flags)
  * @param[in] fs_id The filesystem to use for this action
  * @param[in] the filehandle of the file to close
  */
-int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int32_t file_id)
+int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int16_t file_id)
 {
     struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;
 
@@ -419,7 +419,7 @@ int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int32_t file_id)
  * @param[in] data Contents of the object being written
  * @param[in] size Size of the object being saved
  */
-int32_t PIOS_FLASHFS_Write(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size)
+int32_t PIOS_FLASHFS_Write(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size)
 {
 	int32_t bytes_written = 0;
 	int32_t rc = PIOS_FLASHFS_OK;
@@ -452,7 +452,7 @@ out_exit:
  * @param[in] data Buffer to hold the contents of the loaded object
  * @param[in] size Size of the object to be loaded
  */
-int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, uint16_t fh, uint8_t *data, uint16_t size)
+int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size)
 {
     int32_t bytes_read = 0;
     int32_t rc = PIOS_FLASHFS_OK;
@@ -486,7 +486,7 @@ out_exit:
  *            if FLASHFS_SEEK_CUR, the file offset shall be set to its current location + offset
  *            if FLASHFS_SEEK_END, the file offset shall be set to the size of the file - offset
  */
-int32_t PIOS_FLASHFS_Lseek(uintptr_t fs_id, uint16_t fh, int32_t offset, enum pios_flashfs_lseek_flags flag)
+int32_t PIOS_FLASHFS_Lseek(uintptr_t fs_id, int16_t fh, int32_t offset, enum pios_flashfs_lseek_flags flag)
 {
     int32_t rc = PIOS_FLASHFS_OK;
 

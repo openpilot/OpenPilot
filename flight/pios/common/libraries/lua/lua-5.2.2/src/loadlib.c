@@ -327,11 +327,12 @@ static int ll_loadlib (lua_State *L) {
 
 
 static int readable (const char *filename) {
-#if defined(USE_FATFS)
-  FIL f;
-  FRESULT result = f_open(&f, filename, FA_OPEN_EXISTING | FA_READ);
-  if (result != FR_OK) return 0;
-  f_close(&f);
+#if defined(CONFIG_BUILD_SPIFFS)
+  extern uintptr_t pios_external_flash_fs_id;
+  int16_t fh;
+  fh =  PIOS_FLASHFS_Open(pios_external_flash_fs_id, filename, PIOS_FLASHFS_RDONLY);
+  if (fh < 0) return 0;
+  PIOS_FLASHFS_Close(pios_external_flash_fs_id, fh);
 #else
   FILE *f = fopen(filename, "r");  /* try to open file */
   if (f == NULL) return 0;  /* open failed */

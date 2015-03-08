@@ -193,7 +193,7 @@ LUALIB_API char *(luaL_buffinitsize) (lua_State *L, luaL_Buffer *B, size_t sz);
 
 
 typedef struct luaL_Stream {
-#if defined(USE_FATFS)
+#if defined(CONFIG_BUILD_SPIFFS)
   FIL *f;  /* stream (NULL for incompletely created streams) */
 #else
   FILE *f;  /* stream (NULL for incompletely created streams) */

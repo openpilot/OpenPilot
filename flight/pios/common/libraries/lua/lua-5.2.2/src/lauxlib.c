@@ -4,8 +4,9 @@
 ** See Copyright Notice in lua.h
 */
 
-
+#if !defined(CONFIG_BUILD_SPIFFS)
 #include <errno.h>
+#endif
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +23,12 @@
 
 #include "lauxlib.h"
 
+#if defined(CONFIG_BUILD_SPIFFS)
+static int errno;
+#define LAUXLIB_ERROR_FILE_DOES_NOT_EXIST -1
+#define LAUXLIB_ERROR_FILE_OPEN -2
+#define LAUXLIB_ERROR_FILE_READ -3
+#endif
 
 /*
 ** {======================================================
@@ -34,12 +41,12 @@
 #define LEVELS2	10	/* size of the second part of the stack */
 
 
-#if defined(USE_FATFS)
+#if defined(CONFIG_BUILD_SPIFFS)
+extern uintptr_t pios_external_flash_fs_id;
 int lua__getc(FIL *f)
 {
   char c;
-  UINT result;
-  if (f_read(f, &c, 1, &result) == FR_OK && result == 1)
+  if (!PIOS_FLASHFS_Read(pios_external_flash_fs_id, *f, (uint8_t*)&c, 1))
     return c;
   else
     return -1;
@@ -572,7 +579,7 @@ LUALIB_API void luaL_unref (lua_State *L, int t, int ref) {
 
 typedef struct LoadF {
   int n;  /* number of pre-read characters */
-#if defined(USE_FATFS)
+#if defined(CONFIG_BUILD_SPIFFS)
   FIL f;
 #else
   FILE *f;  /* file being read */
@@ -592,11 +599,10 @@ static const char *getF (lua_State *L, void *ud, size_t *size) {
     /* 'fread' can return > 0 *and* set the EOF flag. If next call to
        'getF' called 'fread', it might still wait for user input.
        The next check avoids this problem. */
-#if defined(USE_FATFS)
-    UINT f_read_size;
-    FRESULT result = f_read(&lf->f, lf->buff, sizeof(lf->buff), &f_read_size);
-    if (result != FR_OK || f_read_size == 0) return NULL;
-    *size = f_read_size;
+#if defined(CONFIG_BUILD_SPIFFS)
+    if (PIOS_FLASHFS_Read(pios_external_flash_fs_id, lf->f, (uint8_t*)lf->buff, sizeof(lf->buff)))
+        return NULL;
+    *size = sizeof(lf->buff);
 #else
     if (feof(lf->f)) return NULL;
     *size = fread(lf->buff, 1, sizeof(lf->buff), lf->f);  /* read block */
@@ -656,7 +662,8 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   int c;
   int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
   if (filename == NULL) {
-#if defined(USE_FATFS)
+#if defined(CONFIG_BUILD_SPIFFS)
+    errno = LAUXLIB_ERROR_FILE_DOES_NOT_EXIST;
     return errfile(L, "open", fnameindex);
 #else
     lua_pushliteral(L, "=stdin");
@@ -665,9 +672,12 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   }
   else {
     lua_pushfstring(L, "@%s", filename);
-#if defined(USE_FATFS)
-    FRESULT result = f_open(&lf.f, filename, FA_OPEN_EXISTING | FA_READ);
-    if (result != FR_OK) return errfile(L, "open", fnameindex);
+#if defined(CONFIG_BUILD_SPIFFS)
+    lf.f = PIOS_FLASHFS_Open(pios_external_flash_fs_id, filename, PIOS_FLASHFS_RDONLY);
+    if (lf.f < 0) {
+        errno = LAUXLIB_ERROR_FILE_OPEN;
+        return errfile(L, "open", fnameindex);
+    }
 #else
     lf.f = fopen(filename, "r");
     if (lf.f == NULL) return errfile(L, "open", fnameindex);
@@ -675,7 +685,7 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   }
   if (skipcomment(&lf, &c))  /* read initial portion */
     lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
-#if !defined(USE_FATFS)
+#if !defined(CONFIG_BUILD_SPIFFS)
   if (c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
     lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
     if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
@@ -685,15 +695,16 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   if (c != EOF)
     lf.buff[lf.n++] = c;  /* 'c' is the first character of the stream */
   status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode);
-#if defined(USE_FATFS)
+#if defined(CONFIG_BUILD_SPIFFS)
   readstatus = 0;
-  if (filename) f_close(&lf.f);
+  if (filename) PIOS_FLASHFS_Close(pios_external_flash_fs_id, lf.f);
 #else
   readstatus = ferror(lf.f);
   if (filename) fclose(lf.f);  /* close file (even in case of errors) */
 #endif
   if (readstatus) {
     lua_settop(L, fnameindex);  /* ignore results from `lua_load' */
+    errno = LAUXLIB_ERROR_FILE_READ;
     return errfile(L, "read", fnameindex);
   }
   lua_remove(L, fnameindex);

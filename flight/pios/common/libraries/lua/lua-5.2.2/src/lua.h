@@ -417,8 +417,9 @@ struct lua_Debug {
   struct CallInfo *i_ci;  /* active function */
 };
 
-#if defined(USE_FATFS)
-  #include "FatFs/ff.h"
+#if defined(CONFIG_BUILD_SPIFFS)
+  #include "pios_flashfs.h"
+  #define FIL int16_t
   int lua__getc(FIL *f);
   #define lua_getc(f) lua__getc(&f)
   #define lua_fclose  f_close

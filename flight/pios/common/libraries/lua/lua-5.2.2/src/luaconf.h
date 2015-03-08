@@ -11,10 +11,6 @@
 #include <limits.h>
 #include <stddef.h>
 
-#if defined(SDCARD)
-#define USE_FATFS
-#endif
-
 #pragma GCC diagnostic ignored "-Wunsuffixed-float-constants"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 
@@ -382,7 +378,7 @@
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
 ** CHANGE it if it uses too much C-stack space.
 */
-#if defined(USE_FATFS)
+#if defined(CONFIG_BUILD_SPIFFS)
 #define LUAL_BUFFERSIZE         512
 #else
 #define LUAL_BUFFERSIZE		BUFSIZ

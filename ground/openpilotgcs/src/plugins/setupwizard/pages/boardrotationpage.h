@@ -28,18 +28,19 @@
 #ifndef BOARDROTATIONPAGE_H
 #define BOARDROTATIONPAGE_H
 
-#include <QWizardPage>
+#include "abstractwizardpage.h"
+
 
 namespace Ui {
 class BoardRotationPage;
 }
 
-class BoardRotationPage : public QWizardPage
+class BoardRotationPage : public AbstractWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit BoardRotationPage(QWidget *parent = 0);
+    explicit BoardRotationPage(SetupWizard *wizard, QWidget *parent = 0);
     ~BoardRotationPage();
     bool validatePage();
 

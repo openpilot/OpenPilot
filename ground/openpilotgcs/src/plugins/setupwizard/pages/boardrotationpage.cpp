@@ -29,8 +29,9 @@
 #include "boardrotationpage.h"
 #include "ui_boardrotationpage.h"
 
-BoardRotationPage::BoardRotationPage(QWidget *parent) :
-    QWizardPage(parent),
+
+BoardRotationPage::BoardRotationPage(SetupWizard *wizard, QWidget *parent) :
+    AbstractWizardPage(wizard, parent),
     ui(new Ui::BoardRotationPage)
 {
     ui->setupUi(this);
@@ -43,6 +44,13 @@ BoardRotationPage::~BoardRotationPage()
 
 bool BoardRotationPage::validatePage()
 {
+	boardRotation rotation;
+
+	rotation.m_rollDegree = (float)ui->rollBias->value();
+	rotation.m_pitchDegree = (float)ui->pitchBias->value();
+	rotation.m_yawDegree = (float)ui->yawBias->value();
+
+	getWizard()->setBoardRotation(rotation);
     return true;
 }
 

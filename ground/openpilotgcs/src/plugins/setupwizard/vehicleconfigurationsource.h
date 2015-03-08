@@ -97,6 +97,8 @@ public:
     virtual bool isRestartNeeded() const = 0;
 
     virtual QString getSummaryText()     = 0;
+
+    virtual boardRotation getBoardRotation() const = 0;
 };
 
 #endif // VEHICLECONFIGURATIONSOURCE_H

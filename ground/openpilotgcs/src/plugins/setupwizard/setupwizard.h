@@ -134,6 +134,16 @@ public:
         return m_vehicleTemplate;
     }
 
+    void setBoardRotation(boardRotation rotation)
+    {
+        m_boardRotation = rotation;
+    }
+
+    boardRotation getBoardRotation() const
+    {
+        return m_boardRotation;
+    }
+
     void setLevellingBias(accelGyroBias bias)
     {
         m_calibrationBias = bias; m_calibrationPerformed = true;
@@ -208,6 +218,8 @@ private:
 
     bool m_calibrationPerformed;
     accelGyroBias m_calibrationBias;
+
+    boardRotation m_boardRotation;
 
     bool m_motorCalibrationPerformed;
     QList<actuatorChannelSettings> m_actuatorSettings;

@@ -893,7 +893,10 @@ void VehicleConfigurationHelper::applyBoardRotationSettings()
     Q_ASSERT(attitudeSettings);
     AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
 
-    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = 90;
+	boardRotation rotation = m_configSource->getBoardRotation();
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = rotation.m_rollDegree;
+	attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = rotation.m_pitchDegree;
+	attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_YAW] = rotation.m_yawDegree;
 
     attitudeSettings->setData(attitudeSettingsData);
     addModifiedObject(attitudeSettings, tr("Writing board rotation settings"));

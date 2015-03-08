@@ -71,6 +71,7 @@ public:
     bool shouldObjectBeSaved(UAVObject *object);
 
 private:
+    bool throttleError;
     bool growing;
     bool reverse[ManualControlSettings::CHANNELNEUTRAL_NUMELEM];
     txMovements currentMovement;
@@ -199,6 +200,7 @@ private slots:
     void invertControls();
     void simpleCalibration(bool state);
     void adjustSpecialNeutrals();
+    void checkThrottleRange();
     void updateCalibration();
     void resetChannelSettings();
     void resetActuatorSettings();

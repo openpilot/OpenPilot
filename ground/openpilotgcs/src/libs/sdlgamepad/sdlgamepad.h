@@ -34,7 +34,7 @@
  * SDL axis values greater than -NULL_RANGE and smaller than +NULL_RANGE
  * will be treated as null.
  */
-#define NULL_RANGE 2800
+#define NULL_RANGE 328
 
 /**
  * The default tick rate of refreshing the SDL info.

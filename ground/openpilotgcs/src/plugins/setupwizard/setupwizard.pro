@@ -8,7 +8,9 @@ include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjectutil/uavobjectutil.pri)
 include(../../plugins/config/config.pri)
+include(../../libs/glc_lib/glc_lib.pri)
 
+INCLUDEPATH += ../../libs/glc_lib
 LIBS *= -l$$qtLibraryName(Uploader)
 HEADERS += setupwizardplugin.h \ 
     setupwizard.h \
@@ -42,7 +44,8 @@ HEADERS += setupwizardplugin.h \
     pages/selectionpage.h \
     pages/airframeinitialtuningpage.h \
     vehicletemplateexportdialog.h \
-    pages/boardrotationpage.h
+    pages/boardrotationpage.h \
+    boardrotation3dview.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -76,7 +79,8 @@ SOURCES += setupwizardplugin.cpp \
     pages/selectionpage.cpp \
     pages/airframeinitialtuningpage.cpp \
     vehicletemplateexportdialog.cpp \
-    pages/boardrotationpage.cpp
+    pages/boardrotationpage.cpp \
+    boardrotation3dview.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 

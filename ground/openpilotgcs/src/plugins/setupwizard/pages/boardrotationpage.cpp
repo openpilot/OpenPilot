@@ -35,6 +35,10 @@ BoardRotationPage::BoardRotationPage(SetupWizard *wizard, QWidget *parent) :
     ui(new Ui::BoardRotationPage)
 {
     ui->setupUi(this);
+    m_board3DView = new BoardRotation3DView(ui->verticalLayoutWidget_4);
+    m_board3DView->setBoardFilename(QString("%%DATAPATH%%models/boards/CC3D/CC3D.3ds"));
+    ui->viewsLayout->addWidget(m_board3DView);
+    
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/setupwizard/resources/vehicle_bg.svg"));
     m_vehicleItem = new QGraphicsSvgItem();

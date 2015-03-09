@@ -54,5 +54,6 @@
         <file>resources/connected.png</file>
         <file>resources/bttn-oneshot-dwn.png</file>
         <file>resources/bttn-oneshot-up.png</file>
+        <file>resources/vehicle_bg.svg</file>
     </qresource>
 </RCC>

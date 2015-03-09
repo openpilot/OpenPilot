@@ -35,6 +35,13 @@ BoardRotationPage::BoardRotationPage(SetupWizard *wizard, QWidget *parent) :
     ui(new Ui::BoardRotationPage)
 {
     ui->setupUi(this);
+    QSvgRenderer *renderer = new QSvgRenderer();
+    renderer->load(QString(":/setupwizard/resources/vehicle_bg.svg"));
+    m_vehicleItem = new QGraphicsSvgItem();
+    m_vehicleItem->setSharedRenderer(renderer);
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    scene->addItem(m_vehicleItem);
+    ui->vehicleView->setScene(scene);
 }
 
 BoardRotationPage::~BoardRotationPage()
@@ -44,13 +51,25 @@ BoardRotationPage::~BoardRotationPage()
 
 bool BoardRotationPage::validatePage()
 {
-	boardRotation rotation;
+    boardRotation rotation;
 
-	rotation.m_rollDegree = (float)ui->rollBias->value();
-	rotation.m_pitchDegree = (float)ui->pitchBias->value();
-	rotation.m_yawDegree = (float)ui->yawBias->value();
+    rotation.m_rollDegree = (float)ui->rollBias->value();
+    rotation.m_pitchDegree = (float)ui->pitchBias->value();
+    rotation.m_yawDegree = (float)ui->yawBias->value();
 
-	getWizard()->setBoardRotation(rotation);
+    getWizard()->setBoardRotation(rotation);
     return true;
+}
+
+void BoardRotationPage::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event);
+
+    if (m_vehicleItem) {
+        ui->vehicleView->setSceneRect(m_vehicleItem->boundingRect());
+        ui->vehicleView->fitInView(m_vehicleItem, Qt::KeepAspectRatio);
+    }
+
+    return;
 }
 

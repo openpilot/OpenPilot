@@ -28,6 +28,7 @@
 #ifndef BOARDROTATIONPAGE_H
 #define BOARDROTATIONPAGE_H
 
+#include <QtSvg>
 #include "abstractwizardpage.h"
 
 
@@ -44,8 +45,12 @@ public:
     ~BoardRotationPage();
     bool validatePage();
 
+protected:
+    void showEvent(QShowEvent *event);
+
 private:
     Ui::BoardRotationPage *ui;
+    QGraphicsSvgItem *m_vehicleItem;
 };
 
 #endif // BOARDROTATIONPAGE_H

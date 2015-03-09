@@ -41,15 +41,21 @@ p, li { white-space: pre-wrap; }
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>12</x>
      <y>110</y>
      <width>751</width>
      <height>61</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>20</number>
+    </property>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>6</number>
+      </property>
       <item>
        <widget class="QLabel" name="label_2">
         <property name="styleSheet">
@@ -146,15 +152,18 @@ font:bold;</string>
   <widget class="QWidget" name="verticalLayoutWidget_4">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>180</y>
+     <x>12</x>
+     <y>190</y>
      <width>751</width>
-     <height>291</height>
+     <height>301</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QHBoxLayout" name="viewsLayout">
+    <property name="spacing">
+     <number>10</number>
+    </property>
     <item>
-     <widget class="QGraphicsView" name="graphicsView"/>
+     <widget class="QGraphicsView" name="vehicleView"/>
     </item>
    </layout>
   </widget>

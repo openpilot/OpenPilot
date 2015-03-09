@@ -1676,8 +1676,9 @@ void ConfigInputWidget::adjustSpecialNeutrals()
 
 void ConfigInputWidget::checkThrottleRange()
 {
-    if ((abs(manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
-             manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) < 300) && (throttleError == false)) {
+    int throttleRange = abs(manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
+             manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]);
+    if (!throttleError && (throttleRange < 300)) {
         throttleError = true;
         QMessageBox::warning(this, tr("Warning"), tr("<p>There is something wrong with Throttle range. Please redo calibration and move <b>ALL sticks</b>, Throttle stick included.</p>"), QMessageBox::Ok);
 

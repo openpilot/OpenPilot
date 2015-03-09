@@ -43,7 +43,7 @@
 #include <taskinfo.h>
 
 // a number of useful macros
-#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+#define ADDSEVERITY(check)                                  severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
 #define ADDEXTENDEDALARMSTATUS(error_code, error_substatus) if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) { alarmstatus = (error_code); alarmsubstatus = (error_substatus); }
 
 // private types
@@ -188,16 +188,16 @@ int32_t configuration_check()
     ManualControlSettingsChannelMinGet(&channelMin);
     ManualControlSettingsChannelMaxGet(&channelMax);
     switch (thrustType) {
-               case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
-        	 ADDSEVERITY( fabsf(channelMax.Throttle - channelMin.Throttle) > 300.0f) ;
-        	 ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
-                 break;
-               case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
-        	 ADDSEVERITY( fabsf(channelMax.Collective - channelMin.Collective) > 300.0f);
-        	 ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
-                   break;
-               default:
-                   break;
+    case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+        ADDSEVERITY(fabsf(channelMax.Throttle - channelMin.Throttle) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+        ADDSEVERITY(fabsf(channelMax.Collective - channelMin.Collective) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    default:
+        break;
     }
 
     // query sanity check hooks

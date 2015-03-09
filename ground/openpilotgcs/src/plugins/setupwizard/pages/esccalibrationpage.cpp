@@ -85,6 +85,15 @@ void EscCalibrationPage::resetAllSecurityCheckboxes()
     ui->securityCheckBox3->setChecked(false);
 }
 
+int EscCalibrationPage::getHighOutputRate()
+{
+    if (getWizard()->getEscType() == SetupWizard::ESC_ONESHOT) {
+        return HIGH_ONESHOT125_OUTPUT_PULSE_LENGTH_MICROSECONDS;
+    } else {
+        return HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS;
+    }
+}
+
 void EscCalibrationPage::startButtonClicked()
 {
     if (!m_isCalibrating) {
@@ -95,7 +104,7 @@ void EscCalibrationPage::startButtonClicked()
         ui->outputLow->setEnabled(false);
         ui->nonconnectedLabel->setEnabled(false);
         ui->connectedLabel->setEnabled(true);
-        ui->outputLevel->setText(QString(tr("%1 µs")).arg(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(getHighOutputRate()));
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *uavoManager = pm->getObject<UAVObjectManager>();
         Q_ASSERT(uavoManager);
@@ -123,7 +132,7 @@ void EscCalibrationPage::startButtonClicked()
         }
         m_outputUtil.startChannelOutput(m_outputChannels, OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
         QThread::msleep(100);
-        m_outputUtil.setChannelOutputValue(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+        m_outputUtil.setChannelOutputValue(getHighOutputRate());
 
         ui->stopButton->setEnabled(true);
     }

@@ -1,4 +1,4 @@
---- RELEASE-15.02 RC4 
+--- RELEASE-15.02 RC6 
 This release introduces major flight performance improvements, enhancements as well as bug fixes. Many enhancements have been made to reducing dead-time of the communication between the flight controller and ESCs. In our testing, we have found this to be not only the best flight performance so far in the OpenPilot project but the best flight performance of any project we have tested against. This is a recommended upgrade for everyone and the more skilled of a pilot you are, the more you will love this release.
 
 A key improvement that helped achieve this was the addition of the PWMSync code path, this is now enabled by default. Some restrictions applies to CC3D/CC as it needs a compatible input method to enable PWMSync. Compatible input methods are PPM, S.Bus, DSM and OPLink. This release also introduces support for OneShot125 capable ESCs, such as the KISS ESCs and all ESCs supported in BLHeli V13 and above.  Note that OneShot125 support has the same restrictions as PWMSync for CC and CC3D. 
@@ -10,12 +10,12 @@ Other enhancements include key parts of the GCS translated to Chinese and furthe
 The full list of features, improvements and bugfixes in this release is accessible here:
 https://progress.openpilot.org/issues/?filter=12161
 
-
 Release Notes - OpenPilot - Version RELEASE-15.02
 
 ** Bug
     * [OP-969] - Input Configuration Wizard has scrollbars showing up and next/previous buttons are pushed down out of sight
     * [OP-1034] - CCPM Config Widget crashes GCS if required boxes aren't set i.e. Channel set to None
+    * [OP-1236] - Icons on Welcome tab - moves to the left
     * [OP-1466] - Gcs crashes on Helicopter config tab
     * [OP-1522] - Improve Robustness of OPLink radio
     * [OP-1601] - Still not enough ram on CC for gps to be usable
@@ -38,6 +38,8 @@ Release Notes - OpenPilot - Version RELEASE-15.02
     * [OP-1755] - Add additional path for cloudconfigs
     * [OP-1758] - Upgrade hidapi for all OSs (except windows) to solve mac issue:Fix incorrect device list after device removal 
     * [OP-1761] - Wizard bad config when PPM in, RapidESC out and hexa frame with CC/CC3D/Atom
+    * [OP-1764] - System should sanity check RC Input Channel value ranges and raise alarm accordingly
+    * [OP-1768] - PWM Sync and OneShot125 wizard output level and warning are incorrect
 
 
 ** Improvement
@@ -60,11 +62,11 @@ Release Notes - OpenPilot - Version RELEASE-15.02
 ** Task
     * [OP-1721] - C++ enable flight controller and upgrade ARM tools
     * [OP-1738] - change default flight modes and thrust settings
+    * [OP-1747] - 15.02 rc1 motor end points do not reflect oneshot125 / pwmsync
 
 ** Sub task
     * [OP-1748] - Chinese translation for 15.02
     * [OP-1752] - Add Alarm sub status to SystemHealth
-
 
 
 --- RELEASE-15.01 --- Look Ma, No hands ---

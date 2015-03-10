@@ -56,10 +56,12 @@ private:
     static const int LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 1050;
     static const int OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 900;
     static const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 1900;
+    static const int HIGH_ONESHOT125_OUTPUT_PULSE_LENGTH_MICROSECONDS = 2000;
     Ui::EscCalibrationPage *ui;
     bool m_isCalibrating;
     OutputCalibrationUtil m_outputUtil;
     QList<quint16> m_outputChannels;
+    int getHighOutputRate();
 };
 
 #endif // ESCCALIBRATIONPAGE_H

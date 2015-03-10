@@ -1,4 +1,4 @@
-openpilot (<VERSION>) unstable; urgency=low
+openpilot (<VERSION>) <DIST>; urgency=low
 
   * Release from upstream Git (testing - unstable)
 

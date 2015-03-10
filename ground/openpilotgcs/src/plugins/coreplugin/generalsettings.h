@@ -57,6 +57,7 @@ public:
     bool autoConnect() const;
     bool autoSelect() const;
     bool useUDPMirror() const;
+    bool collectUsageData() const;
     void readSettings(QSettings *qs);
     void saveSettings(QSettings *qs);
     bool useExpertMode() const;
@@ -79,6 +80,7 @@ private:
     bool m_autoSelect;
     bool m_useUDPMirror;
     bool m_useExpertMode;
+    bool m_collectUsageData;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 };

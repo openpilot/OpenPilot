@@ -49,6 +49,7 @@ GeneralSettings::GeneralSettings() :
     m_autoSelect(true),
     m_useUDPMirror(false),
     m_useExpertMode(false),
+    m_collectUsageData(true),
     m_dialog(0)
 {}
 
@@ -125,6 +126,7 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->checkAutoSelect->setChecked(m_autoSelect);
     m_page->cbUseUDPMirror->setChecked(m_useUDPMirror);
     m_page->cbExpertMode->setChecked(m_useExpertMode);
+    m_page->cbUsageData->setChecked(m_collectUsageData);
     m_page->colorButton->setColor(StyleHelper::baseColor());
 
     connect(m_page->resetButton, SIGNAL(clicked()), this, SLOT(resetInterfaceColor()));
@@ -145,6 +147,7 @@ void GeneralSettings::apply()
     m_useExpertMode = m_page->cbExpertMode->isChecked();
     m_autoConnect   = m_page->checkAutoConnect->isChecked();
     m_autoSelect    = m_page->checkAutoSelect->isChecked();
+    m_collectUsageData = m_page->cbUsageData->isChecked();
 }
 
 void GeneralSettings::finish()
@@ -161,6 +164,7 @@ void GeneralSettings::readSettings(QSettings *qs)
     m_autoSelect    = qs->value(QLatin1String("AutoSelect"), m_autoSelect).toBool();
     m_useUDPMirror  = qs->value(QLatin1String("UDPMirror"), m_useUDPMirror).toBool();
     m_useExpertMode = qs->value(QLatin1String("ExpertMode"), m_useExpertMode).toBool();
+    m_collectUsageData = qs->value(QLatin1String("CollectUsageData"), m_collectUsageData).toBool();
     qs->endGroup();
 }
 
@@ -179,6 +183,7 @@ void GeneralSettings::saveSettings(QSettings *qs)
     qs->setValue(QLatin1String("AutoSelect"), m_autoSelect);
     qs->setValue(QLatin1String("UDPMirror"), m_useUDPMirror);
     qs->setValue(QLatin1String("ExpertMode"), m_useExpertMode);
+    qs->setValue(QLatin1String("CollectUsageData"), m_collectUsageData);
     qs->endGroup();
 }
 
@@ -247,6 +252,11 @@ bool GeneralSettings::autoSelect() const
 bool GeneralSettings::useUDPMirror() const
 {
     return m_useUDPMirror;
+}
+
+bool GeneralSettings::collectUsageData() const
+{
+    return m_collectUsageData;
 }
 
 bool GeneralSettings::useExpertMode() const

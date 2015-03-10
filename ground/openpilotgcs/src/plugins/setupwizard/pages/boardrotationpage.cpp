@@ -26,26 +26,46 @@
  */
 
 
+#include <QtDebug>
 #include "boardrotationpage.h"
 #include "ui_boardrotationpage.h"
 
+#ifndef SHARE_PATH
+#ifdef Q_OS_MAC
+    #define SHARE_PATH "/../Resources"
+#else
+    #define SHARE_PATH "/../share/openpilotgcs"
+#endif /* Q_OS_MAC */
+#endif /* SHARE_PATH */
+
 
 BoardRotationPage::BoardRotationPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage(wizard, parent), m_board3DView(NULL),
+    m_prevRoll(0), m_prevPitch(0), m_prevYaw(0),
     ui(new Ui::BoardRotationPage)
 {
     ui->setupUi(this);
-    m_board3DView = new BoardRotation3DView(this);
-    m_board3DView->setBoardFilename(QString("%%DATAPATH%%models/boards/CC3D/CC3D.3ds"));
-    ui->viewsLayout->addWidget(m_board3DView);
-    
-    QSvgRenderer *renderer = new QSvgRenderer();
-    renderer->load(QString(":/setupwizard/resources/vehicle_bg.svg"));
-    m_vehicleItem = new QGraphicsSvgItem();
-    m_vehicleItem->setSharedRenderer(renderer);
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    scene->addItem(m_vehicleItem);
-    ui->vehicleView->setScene(scene);
+
+    QDir directory(QCoreApplication::applicationDirPath() + SHARE_PATH + QString("/models/boards/"));
+    QString fileName = directory.absolutePath() + QDir::separator();
+    switch (getWizard()->getControllerType()) {
+    case VehicleConfigurationSource::CONTROLLER_REVO:
+    case VehicleConfigurationSource::CONTROLLER_NANO:
+        fileName += QString("Revolution/Revolution.3DS");
+        break;
+    case VehicleConfigurationSource::CONTROLLER_CC:
+    case VehicleConfigurationSource::CONTROLLER_CC3D:
+    default:
+        fileName += QString("CC3D/CC3D.3ds");
+        break;
+    }
+
+    m_board3DView = new BoardRotation3DView(this, fileName);
+    m_board3DView->setGeometry(QRect(12, 180, 731, 387));
+
+    connect(ui->rollBias, SIGNAL(valueChanged(int)), this, SLOT(onRollChanged()));
+    connect(ui->pitchBias, SIGNAL(valueChanged(int)), this, SLOT(onPitchChanged()));
+    connect(ui->yawBias, SIGNAL(valueChanged(int)), this, SLOT(onYawChanged()));
 }
 
 BoardRotationPage::~BoardRotationPage()
@@ -65,15 +85,42 @@ bool BoardRotationPage::validatePage()
     return true;
 }
 
-void BoardRotationPage::showEvent(QShowEvent *event)
+void BoardRotationPage::onRollChanged()
 {
-    Q_UNUSED(event);
-
-    if (m_vehicleItem) {
-        ui->vehicleView->setSceneRect(m_vehicleItem->boundingRect());
-        ui->vehicleView->fitInView(m_vehicleItem, Qt::KeepAspectRatio);
+    int changed(ui->rollBias->value() - m_prevRoll);
+    if ((changed > 1) || (changed < -1)) {
+        m_board3DView->rollRotation(-m_prevRoll);
+        m_board3DView->rollRotation(ui->rollBias->value());
+    } else {
+        m_board3DView->rollRotation(changed);
     }
 
-    return;
+    m_prevRoll = ui->rollBias->value();
+}
+
+void BoardRotationPage::onPitchChanged()
+{
+    int changed(ui->pitchBias->value() - m_prevPitch);
+    if ((changed > 1) || (changed < -1)) {
+        m_board3DView->pitchRotation(-m_prevPitch);
+        m_board3DView->pitchRotation(ui->pitchBias->value());
+    } else {
+        m_board3DView->pitchRotation(changed);
+    }
+
+    m_prevPitch = ui->pitchBias->value();
+}
+
+void BoardRotationPage::onYawChanged()
+{
+    int changed(ui->yawBias->value() - m_prevYaw);
+    if ((changed > 1) || (changed < -1)) {
+        m_board3DView->yawRotation(-m_prevYaw);
+        m_board3DView->yawRotation(ui->yawBias->value());
+    } else {
+        m_board3DView->yawRotation(changed);
+    }
+
+    m_prevYaw = ui->yawBias->value();
 }
 

@@ -42,13 +42,12 @@ class BoardRotation3DView : public QGLWidget {
     Q_OBJECT
 
 public:
-    BoardRotation3DView(QWidget *parent = 0);
+    BoardRotation3DView(QWidget *parent = 0, QString fname = QString());
     ~BoardRotation3DView();
 
-    void setBoardFilename(QString fname)
-    {
-        m_boardFilename = fname;
-    }
+    void rollRotation(int val);
+    void pitchRotation(int val);
+    void yawRotation(int val);
 
 private:
     GLC_Light m_glcLight;
@@ -63,6 +62,7 @@ private:
     void paintGL();
     void resizeGL(int width, int height);
     void CreateScene();
+    //void wheelEvent(QWheelEvent *e);
 };
 
 #endif /* BOARDROTATION3DVIEW_H */

@@ -35,10 +35,10 @@
 
 #include "boardrotation3dview.h"
 
-BoardRotation3DView::BoardRotation3DView(QWidget *parent)
+BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     : QGLWidget(new GLC_Context(QGLFormat(QGL::SampleBuffers)), parent),
     m_glcLight(), m_glcWorld(), m_glcView(), m_glcMoverController(),
-    m_glcBoundingBox(), m_boardFilename()
+    m_glcBoundingBox(), m_boardFilename(fname)
 {
     connect(&m_glcView, SIGNAL(updateOpenGL()), this, SLOT(updateGL()));
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -47,7 +47,8 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent)
     m_glcLight.setAmbientColor(Qt::lightGray);
 
     m_glcView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
-    m_glcView.cameraHandle()->setRearView();
+    m_glcView.cameraHandle()->setTopView();
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(180));
 
     QColor repColor;
     repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
@@ -60,6 +61,27 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent)
 
 BoardRotation3DView::~BoardRotation3DView()
 {
+}
+
+void BoardRotation3DView::rollRotation(int val)
+{
+    qDebug() << "rollRotation:" << val;
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, glc::toRadian(val));
+    updateGL();
+}
+
+void BoardRotation3DView::pitchRotation(int val)
+{
+    qDebug() << "pitchRotation:" << val;
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, glc::toRadian(val));
+    updateGL();
+}
+
+void BoardRotation3DView::yawRotation(int val)
+{
+    qDebug() << "yawRotation:" << val;
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(val));
+    updateGL();
 }
 
 void BoardRotation3DView::initializeGL()
@@ -122,12 +144,13 @@ void BoardRotation3DView::resizeGL(int width,int height)
 void BoardRotation3DView::CreateScene()
 {
     try {
-        m_glcView.loadBackGroundImage(QString(":/modelview/models/black.jpg"));
+        m_glcView.loadBackGroundImage(QString(":/setupwizard/resources/vehicle_bg.svg"));
     } catch(GLC_Exception e) {
         qDebug("BoardRotation3DView::CreateScene() fail to load background image file.");
     }
 
     try {
+        qDebug() << "m_boardFilename:" << m_boardFilename;
         if (QFile::exists(m_boardFilename)) {
             QFile boardFile(m_boardFilename);
             m_glcWorld = GLC_Factory::instance()->createWorldFromFile(boardFile);
@@ -142,4 +165,15 @@ void BoardRotation3DView::CreateScene()
 
     return;
 }
+
+/*
+void BoardRotation3DView::wheelEvent(QWheelEvent *e)
+{
+    double delta = m_glcView.cameraHandle()->distEyeTarget() - (e->delta() / 4);
+
+    m_glcView.cameraHandle()->setDistEyeTarget(delta);
+    m_glcView.setDistMinAndMax(m_glcWorld.boundingBox());
+    updateGL();
+}
+*/
 

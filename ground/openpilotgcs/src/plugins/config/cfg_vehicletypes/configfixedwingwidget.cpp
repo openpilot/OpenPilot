@@ -358,7 +358,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
     // rudder
     channel = m_aircraft->fwRudder1ChannelBox->currentIndex() - 1;
     setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
-    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
 
     // ailerons
     channel = m_aircraft->fwAileron1ChannelBox->currentIndex() - 1;
@@ -542,13 +542,13 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
         // First Vtail servo
         setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, -pitch);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -yaw);
 
         // Second Vtail servo
         channel = m_aircraft->fwElevator2ChannelBox->currentIndex() - 1;
         setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, pitch);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -yaw);
     }
 
     m_aircraft->fwStatusLabel->setText("Mixer generated");

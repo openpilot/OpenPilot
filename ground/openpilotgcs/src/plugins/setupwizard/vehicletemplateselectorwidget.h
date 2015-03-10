@@ -28,6 +28,8 @@
 #ifndef VEHICLETEMPLATESELECTORWIDGET_H
 #define VEHICLETEMPLATESELECTORWIDGET_H
 
+#include <QGraphicsItem>
+#include <QJsonObject>
 #include <QWidget>
 
 namespace Ui {
@@ -48,14 +50,34 @@ public:
         updateTemplates();
     }
 
+public slots:
+    void templateSelectionChanged();
+
+protected:
+    void resizeEvent(QResizeEvent *);
+    void showEvent(QShowEvent *);
+
 private:
     Ui::VehicleTemplateSelectorWidget *ui;
     QString m_templateFolder;
     int m_vehicleType;
     int m_vehicleSubType;
 
+    QMap<QString, QJsonObject *> m_templates;
+    QGraphicsPixmapItem *m_photoItem;
+
+    void loadValidFiles();
+    void loadFilesInDir(QString templateBasePath);
+    void setupTemplateList();
+    QString getTemplateKey(QJsonObject *templ);
+    void updatePhoto(QJsonObject *templ);
+    void updateDescription(QJsonObject *templ);
+    bool airframeIsCompatible(int vehicleType, int vehicleSubType);
+
 private slots:
     void updateTemplates();
 };
+
+Q_DECLARE_METATYPE(QJsonObject *)
 
 #endif // VEHICLETEMPLATESELECTORWIDGET_H

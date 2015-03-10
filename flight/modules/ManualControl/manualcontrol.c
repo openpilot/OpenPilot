@@ -104,6 +104,7 @@ static const controlHandler handler_PATHPLANNER = {
 static float thrustAtBrakeStart = 0.0f;
 static float thrustLo = 0.0f;
 static float thrustHi = 0.0f;
+static FrameType_t frameType    = FRAME_TYPE_MULTIROTOR;
 
 #endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
@@ -115,6 +116,7 @@ static void commandUpdatedCb(UAVObjEvent *ev);
 static void manualControlTask(void);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, FlightModeSettingsData *modeSettings);
+static void SettingsUpdatedCb(UAVObjEvent *ev);
 #endif
 
 #define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
@@ -135,11 +137,14 @@ int32_t ManualControlStart()
     // clear alarms
     AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 
+    SettingsUpdatedCb(NULL);
+
     // Make sure unarmed on power up
-    armHandler(true);
+    armHandler(true, frameType);
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     takeOffLocationHandlerInit();
+
 #endif
     // Start main task
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
@@ -164,6 +169,8 @@ int32_t ManualControlInitialize()
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     VtolSelfTuningStatsInitialize();
     VtolPathFollowerSettingsInitialize();
+    VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
+    SystemSettingsConnectCallback(&SettingsUpdatedCb);
 #endif
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);
 
@@ -171,13 +178,36 @@ int32_t ManualControlInitialize()
 }
 MODULE_INITCALL(ManualControlInitialize, ManualControlStart);
 
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    uint8_t TreatCustomCraftAs;
+
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
+
+    frameType = GetCurrentFrameType();
+
+    if (frameType == FRAME_TYPE_CUSTOM) {
+        switch (TreatCustomCraftAs) {
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
+            frameType = FRAME_TYPE_FIXED_WING;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
+            frameType = FRAME_TYPE_MULTIROTOR;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
+            frameType = FRAME_TYPE_GROUND;
+            break;
+        }
+    }
+}
+
 /**
  * Module task
  */
 static void manualControlTask(void)
 {
     // Process Arming
-    armHandler(false);
+    armHandler(false, frameType);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     takeOffLocationHandler();
 #endif

@@ -62,7 +62,7 @@ static bool forcedDisArm(void);
  * @input: ManualControlCommand, AccessoryDesired
  * @output: FlightStatus.Arming
  */
-void armHandler(bool newinit)
+void armHandler(bool newinit, FrameType_t frameType)
 {
     static ArmState_t armState;
 
@@ -82,7 +82,12 @@ void armHandler(bool newinit)
 
     bool lowThrottle = cmd.Throttle < 0;
 
-    bool armSwitch   = false;
+    if (frameType == FRAME_TYPE_GROUND) {
+        // Deadbanding appled in receiver.c at 2%
+        lowThrottle = fabsf(cmd.Throttle) < 0.01f;
+    }
+
+    bool armSwitch = false;
 
     switch (settings.Arming) {
     case FLIGHTMODESETTINGS_ARMING_ACCESSORY0:

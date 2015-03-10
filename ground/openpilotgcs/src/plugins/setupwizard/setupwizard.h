@@ -134,6 +134,16 @@ public:
         return m_vehicleTemplate;
     }
 
+    void setBoardRotation(boardRotation rotation)
+    {
+        m_boardRotation = rotation;
+    }
+
+    boardRotation getBoardRotation() const
+    {
+        return m_boardRotation;
+    }
+
     void setLevellingBias(accelGyroBias bias)
     {
         m_calibrationBias = bias; m_calibrationPerformed = true;
@@ -189,7 +199,7 @@ private:
            PAGE_AIRSPEED, PAGE_GPS, PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_ESC, PAGE_SERVO,
            PAGE_BIAS_CALIBRATION, PAGE_ESC_CALIBRATION, PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
            PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_AIRFRAME_INITIAL_TUNING,
-           PAGE_REBOOT, PAGE_END, PAGE_UPDATE };
+           PAGE_REBOOT, PAGE_END, PAGE_UPDATE, PAGE_BOARD_ROTATION };
     void createPages();
     bool saveHardwareSettings() const;
     bool canAutoUpdate() const;
@@ -208,6 +218,8 @@ private:
 
     bool m_calibrationPerformed;
     accelGyroBias m_calibrationBias;
+
+    boardRotation m_boardRotation;
 
     bool m_motorCalibrationPerformed;
     QList<actuatorChannelSettings> m_actuatorSettings;

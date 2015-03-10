@@ -42,6 +42,12 @@ struct accelGyroBias {
     float m_gyroZBias;
 };
 
+struct boardRotation {
+    float m_rollDegree;
+    float m_pitchDegree;
+    float m_yawDegree;
+};
+
 struct actuatorChannelSettings {
     quint16 channelMin;
     quint16 channelNeutral;
@@ -91,6 +97,8 @@ public:
     virtual bool isRestartNeeded() const = 0;
 
     virtual QString getSummaryText()     = 0;
+
+    virtual boardRotation getBoardRotation() const = 0;
 };
 
 #endif // VEHICLECONFIGURATIONSOURCE_H

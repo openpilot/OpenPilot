@@ -52,6 +52,7 @@
 #include "actuatorsettings.h"
 #include "pages/autoupdatepage.h"
 #include "uploader/uploadergadgetfactory.h"
+#include "pages/boardrotationpage.h"
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
@@ -127,6 +128,9 @@ int SetupWizard::nextId() const
         }
     }
     case PAGE_MULTI:
+        return PAGE_BOARD_ROTATION;
+
+    case PAGE_BOARD_ROTATION:
         return PAGE_ESC;
 
     case PAGE_FIXEDWING:
@@ -475,6 +479,7 @@ void SetupWizard::createPages()
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
     setPage(PAGE_AIRFRAME_INITIAL_TUNING, new AirframeInitialTuningPage(this));
     setPage(PAGE_END, new OPEndPage(this));
+    setPage(PAGE_BOARD_ROTATION, new BoardRotationPage(this));
 
     setStartId(PAGE_START);
 

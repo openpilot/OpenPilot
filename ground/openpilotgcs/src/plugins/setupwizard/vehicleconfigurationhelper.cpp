@@ -44,6 +44,7 @@
 #include <QtCore/qmath.h>
 #include <QJsonObject>
 #include "auxmagsettings.h"
+#include "attitudesettings.h"
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
@@ -80,6 +81,8 @@ bool VehicleConfigurationHelper::setupVehicle(bool save)
     applyManualControlDefaults();
 
     applyTemplateSettings();
+
+    applyBoardRotationSettings();
 
     bool result = saveChangesToController(save);
     emit saveProgress(m_modifiedObjects.count() + 1, ++m_progress, result ? tr("Done!") : tr("Failed!"));
@@ -881,6 +884,22 @@ void VehicleConfigurationHelper::applyTemplateSettings()
             }
         }
     }
+}
+
+void VehicleConfigurationHelper::applyBoardRotationSettings()
+{
+    AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(m_uavoManager);
+
+    Q_ASSERT(attitudeSettings);
+    AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+
+    boardRotation rotation = m_configSource->getBoardRotation();
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = rotation.m_rollDegree;
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = rotation.m_pitchDegree;
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_YAW] = rotation.m_yawDegree;
+
+    attitudeSettings->setData(attitudeSettingsData);
+    addModifiedObject(attitudeSettings, tr("Writing board rotation settings"));
 }
 
 bool VehicleConfigurationHelper::saveChangesToController(bool save)

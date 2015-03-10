@@ -472,7 +472,7 @@ void ConfigOutputWidget::updateWarnings(UAVObject *)
     if (systemAlarms.Alarm[SystemAlarms::ALARM_SYSTEMCONFIGURATION] > SystemAlarms::ALARM_WARNING) {
         switch (systemAlarms.ExtendedAlarmStatus[SystemAlarms::EXTENDEDALARMSTATUS_SYSTEMCONFIGURATION]) {
         case SystemAlarms::EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT:
-            setWarning(tr("OneShot only works with Receiver Port settings marked with '+OneShot'<br>"
+            setWarning(tr("OneShot and PWMSync output only works with Receiver Port settings marked with '+OneShot'<br>"
                           "When using Receiver Port setting 'PPM_PIN8+OneShot' "
                           "<b><font color='%1'>Bank %2</font></b> must be set to PWM")
                        .arg(m_banks.at(3).color().name()).arg(m_banks.at(3).label()->text()));

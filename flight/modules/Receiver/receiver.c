@@ -41,10 +41,10 @@
 #include <flighttelemetrystats.h>
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <stabilizationsettings.h>
+#include <vtolpathfollowersettings.h>
 #endif
 #include <flightmodesettings.h>
 #include <systemsettings.h>
-#include <vtolpathfollowersettings.h>
 #include <taskinfo.h>
 #include <sanitycheck.h>
 
@@ -146,9 +146,9 @@ int32_t ReceiverInitialize()
     ManualControlSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     StabilizationSettingsInitialize();
-#endif
     VtolPathFollowerSettingsInitialize();
     VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
+#endif
     SystemSettingsInitialize();
     SystemSettingsConnectCallback(&SettingsUpdatedCb);
 
@@ -159,11 +159,13 @@ MODULE_INITCALL(ReceiverInitialize, ReceiverStart);
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    uint8_t TreatCustomCraftAs;
-
-    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
     frameType = GetCurrentFrameType();
+
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
+
 
     if (frameType == FRAME_TYPE_CUSTOM) {
         switch (TreatCustomCraftAs) {
@@ -178,6 +180,8 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
             break;
         }
     }
+#endif
+
 }
 
 

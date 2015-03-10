@@ -47,7 +47,9 @@
 #include "taskinfo.h"
 #include <systemsettings.h>
 #include <sanitycheck.h>
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <vtolpathfollowersettings.h>
+#endif
 #undef PIOS_INCLUDE_INSTRUMENTATION
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <pios_instrumentation.h>
@@ -164,8 +166,10 @@ int32_t ActuatorInitialize()
     MixerStatusInitialize();
 #endif
 
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     VtolPathFollowerSettingsInitialize();
     VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
+#endif
     SystemSettingsInitialize();
     SystemSettingsConnectCallback(&SettingsUpdatedCb);
 
@@ -916,11 +920,11 @@ static void MixerSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 }
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    uint8_t TreatCustomCraftAs;
-
-    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
     frameType = GetCurrentFrameType();
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
     if (frameType == FRAME_TYPE_CUSTOM) {
         switch (TreatCustomCraftAs) {
@@ -935,6 +939,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
             break;
         }
     }
+#endif
 
     SystemSettingsThrustControlGet(&thrustType);
 }

@@ -104,11 +104,11 @@ static const controlHandler handler_PATHPLANNER = {
 static float thrustAtBrakeStart = 0.0f;
 static float thrustLo = 0.0f;
 static float thrustHi = 0.0f;
-static FrameType_t frameType    = FRAME_TYPE_MULTIROTOR;
 
 #endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
+static FrameType_t frameType    = FRAME_TYPE_MULTIROTOR;
 
 // Private functions
 static void configurationUpdatedCb(UAVObjEvent *ev);
@@ -116,8 +116,8 @@ static void commandUpdatedCb(UAVObjEvent *ev);
 static void manualControlTask(void);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, FlightModeSettingsData *modeSettings);
-static void SettingsUpdatedCb(UAVObjEvent *ev);
 #endif
+static void SettingsUpdatedCb(UAVObjEvent *ev);
 
 #define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
 
@@ -180,11 +180,12 @@ MODULE_INITCALL(ManualControlInitialize, ManualControlStart);
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    uint8_t TreatCustomCraftAs;
-
-    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
     frameType = GetCurrentFrameType();
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
+
 
     if (frameType == FRAME_TYPE_CUSTOM) {
         switch (TreatCustomCraftAs) {
@@ -199,6 +200,8 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
             break;
         }
     }
+#endif
+
 }
 
 /**

@@ -47,7 +47,7 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     m_glcLight.setAmbientColor(Qt::lightGray);
 
     m_glcView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
-    m_glcView.cameraHandle()->setTopView();
+    m_glcView.cameraHandle()->setIsoView();
     m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(180));
 
     QColor repColor;

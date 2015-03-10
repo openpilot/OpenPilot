@@ -432,14 +432,12 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
 
         if (inputPort) {
             // Block until data are available
-            uint8_t serial_data[1];
+            uint8_t serial_data[16];
             uint16_t bytes_to_process;
 
             bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
-                for (uint8_t i = 0; i < bytes_to_process; i++) {
-                    UAVTalkProcessInputStream(uavTalkCon, serial_data[i]);
-                }
+                UAVTalkProcessInputStream(uavTalkCon, serial_data, bytes_to_process);
             }
         } else {
             vTaskDelay(5);
@@ -457,14 +455,12 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
     while (1) {
         if (radioPort) {
             // Block until data are available
-            uint8_t serial_data[1];
+            uint8_t serial_data[16];
             uint16_t bytes_to_process;
 
             bytes_to_process = PIOS_COM_ReceiveBuffer(radioPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
-                for (uint8_t i = 0; i < bytes_to_process; i++) {
-                    UAVTalkProcessInputStream(radioUavTalkCon, serial_data[i]);
-                }
+                UAVTalkProcessInputStream(radioUavTalkCon, serial_data, bytes_to_process);
             }
         } else {
             vTaskDelay(5);

@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>19</x>
-     <y>9</y>
+     <y>-2</y>
      <width>741</width>
-     <height>91</height>
+     <height>121</height>
     </rect>
    </property>
    <property name="text">
@@ -42,7 +42,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>12</x>
-     <y>110</y>
+     <y>121</y>
      <width>751</width>
      <height>61</height>
     </rect>

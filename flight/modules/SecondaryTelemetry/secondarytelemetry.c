@@ -39,9 +39,9 @@
 #include "secondarytelemetry.h"
 
 // Private constants
-#define STACK_SIZE_BYTES       PIOS_TELEM_STACK_SIZE
+#define STACK_SIZE_BYTES PIOS_TELEM_STACK_SIZE
 
-#define TASK_PRIORITY          (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY    (tskIDLE_PRIORITY + 2)
 
 // Private types
 
@@ -62,9 +62,9 @@ static void updateSettings();
 int32_t SecondaryTelemetryStart(void)
 {
     // Start telemetry tasks
-	if (modEnabled && comPort) {
-		xTaskCreate(telemetryTask, "SecondTel", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
-	}
+    if (modEnabled && comPort) {
+        xTaskCreate(telemetryTask, "SecondTel", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    }
     return 0;
 }
 
@@ -88,10 +88,9 @@ int32_t SecondaryTelemetryInitialize(void)
         modEnabled = false;
     }
 
-    if(modEnabled && comPort)
-    {
-    	SecondaryTelemetrySettingsInitialize();
-    	updateSettings();
+    if (modEnabled && comPort) {
+        SecondaryTelemetrySettingsInitialize();
+        updateSettings();
     }
 
     return 0;

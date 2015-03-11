@@ -38,6 +38,7 @@
 
 // Private constants
 #define ARMED_THRESHOLD 0.50f
+#define GROUND_LOW_THROTTLE  0.01f
 
 // Private types
 typedef enum {
@@ -83,8 +84,8 @@ void armHandler(bool newinit, FrameType_t frameType)
     bool lowThrottle = cmd.Throttle < 0;
 
     if (frameType == FRAME_TYPE_GROUND) {
-        // Deadbanding appled in receiver.c at 2%
-        lowThrottle = fabsf(cmd.Throttle) < 0.01f;
+        // Deadbanding applied in receiver.c typically at 2% but we don't assume its enabled.
+        lowThrottle = fabsf(cmd.Throttle) < GROUND_LOW_THROTTLE;
     }
 
     bool armSwitch = false;

@@ -116,8 +116,6 @@ typedef struct {
     int8_t  matrix[5];
 } __attribute__((packed)) Mixer_t;
 
-#define DIAG_MIXERSTATUS
-
 /**
  * @brief Module initialization
  * @return 0
@@ -266,9 +264,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         }
 
         bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
-
-        // ground needs to cature for reverse which is negative throttle
-        bool activeThrottle   = (throttleDesired < 0.00f || throttleDesired > 0.00f);
+        bool activeThrottle   = (throttleDesired < -0.001f || throttleDesired > 0.001f); // for ground and reversible motors
         bool positiveThrottle = (throttleDesired > 0.00f);
 
         // safety settings

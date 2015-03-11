@@ -69,7 +69,8 @@ void pathFollowerHandler(bool newinit)
             plan_setup_returnToBase();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            if (flightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE && assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY) {
+            if ((flightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) &&
+        	(assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY)) {
                 // Switch from primary (just entered this PH flight mode) into brake
                 plan_setup_assistedcontrol(false);
             } else {

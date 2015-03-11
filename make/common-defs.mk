@@ -164,7 +164,6 @@ ifeq ($(USE_CXX), YES)
     CPPFLAGS += -DPIOS_ENABLE_CXX
 endif
 
-
 # Compiler flags to generate dependency files
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
 
@@ -204,9 +203,9 @@ endif
 
 # List of all source files.
 ifeq ($(USE_CXX), YES)
-ALLSRC     = $(CPPSRCARM) $(CPPSRC) $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) 
+	ALLSRC     = $(CPPSRCARM) $(CPPSRC) $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) 
 else
-ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC)
+	ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC)
 endif
 
 # List of all source files without directory and file-extension.
@@ -242,9 +241,9 @@ endif
 
 # Link: create ELF output file from object files.
 ifeq ($(USE_CXX), YES)
-$(eval $(call LINK_CXX_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
+	$(eval $(call LINK_CXX_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
 else
-$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
+	$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
 endif
 
 # Assemble: create object files from assembler source files.

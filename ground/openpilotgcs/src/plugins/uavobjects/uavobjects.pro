@@ -28,7 +28,7 @@ OTHER_FILES += UAVObjects.pluginspec
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
     $$UAVOBJECT_SYNTHETICS/pidstatus.h \
-    $$UAVOBJECT_SYNTHETICS/fsmlandstatus.h \
+    $$UAVOBJECT_SYNTHETICS/statusvtolland.h \
     $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.h \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
@@ -137,7 +137,7 @@ HEADERS += \
 
 SOURCES += \
     $$UAVOBJECT_SYNTHETICS/pidstatus.cpp \
-    $$UAVOBJECT_SYNTHETICS/fsmlandstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/statusvtolland.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.cpp \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \

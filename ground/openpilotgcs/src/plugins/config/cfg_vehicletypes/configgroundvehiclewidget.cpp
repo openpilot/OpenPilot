@@ -144,8 +144,8 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         m_aircraft->differentialSteeringSlider1->setEnabled(true);
         m_aircraft->differentialSteeringSlider2->setEnabled(true);
 
-        m_aircraft->gvThrottleCurve1GroupBox->setTitle("");
-        m_aircraft->gvThrottleCurve2GroupBox->setTitle("Throttle curve");
+        m_aircraft->gvThrottleCurve1GroupBox->setTitle("Throttle curve1");
+        m_aircraft->gvThrottleCurve2GroupBox->setTitle("Throttle curve2 ");
 
         m_aircraft->groundVehicleThrottle2->setMixerType(MixerCurve::MIXERCURVE_PITCH);
         m_aircraft->groundVehicleThrottle1->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
@@ -176,10 +176,10 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         m_aircraft->gvSteering2Label->setText("Balancing");
 
         // Curve1 for Motorcyle
-        m_aircraft->gvThrottleCurve1GroupBox->setTitle("Rear throttle curve");
+        m_aircraft->gvThrottleCurve1GroupBox->setTitle("Throttle curve1");
         m_aircraft->gvThrottleCurve1GroupBox->setEnabled(true);
-        m_aircraft->gvThrottleCurve2GroupBox->setTitle("");
-        m_aircraft->gvThrottleCurve2GroupBox->setEnabled(false);
+        m_aircraft->gvThrottleCurve2GroupBox->setTitle("Throttle curve2");
+        m_aircraft->gvThrottleCurve2GroupBox->setEnabled(true);
 
         m_aircraft->groundVehicleThrottle2->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
         m_aircraft->groundVehicleThrottle1->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
@@ -208,11 +208,10 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         m_aircraft->gvSteering1Label->setText("Front steering");
         m_aircraft->gvSteering2Label->setText("Rear steering");
 
-        // Curve2 for Car
-        m_aircraft->gvThrottleCurve2GroupBox->setTitle("");
+        m_aircraft->gvThrottleCurve2GroupBox->setTitle("Throttle curve2");
         m_aircraft->gvThrottleCurve2GroupBox->setEnabled(true);
-        m_aircraft->gvThrottleCurve1GroupBox->setTitle("Throttle curve");
-        m_aircraft->gvThrottleCurve1GroupBox->setEnabled(false);
+        m_aircraft->gvThrottleCurve1GroupBox->setTitle("Throttle curve1");
+        m_aircraft->gvThrottleCurve1GroupBox->setEnabled(true);
 
         m_aircraft->groundVehicleThrottle2->setMixerType(MixerCurve::MIXERCURVE_PITCH);
         m_aircraft->groundVehicleThrottle1->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
@@ -222,8 +221,6 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         // If new setup, set curves values
         if (frameTypeSaved->getValue().toString() != "GroundVehicleCar") {
             m_aircraft->groundVehicleThrottle1->initLinearCurve(5, 1.0, 0.0);
-            // Set curve2 range from 0 to 1.
-            // The curve is applied to both forward and reverse
             m_aircraft->groundVehicleThrottle2->initLinearCurve(5, 1.0, 0.0);
         }
     }

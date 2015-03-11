@@ -30,11 +30,15 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <extensionsystem/pluginmanager.h>
+#include <QCheckBox>
 #include <QDebug>
+#include <QMessageBox>
 #include <uavobjectutil/devicedescriptorstruct.h>
 #include <uavobjectutil/uavobjectutilmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "version_info/version_info.h"
+#include "coreplugin/icore.h"
+#include "qmainwindow.h"
 
 UsageTrackerPlugin::UsageTrackerPlugin() :
     m_telemetryManager(NULL)
@@ -72,6 +76,43 @@ void UsageTrackerPlugin::onAutopilotConnect()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
     if (settings->collectUsageData()) {
+        if (settings->showUsageDataDisclaimer()) {
+            QMessageBox message;
+            message.setWindowTitle(tr("Usage data collection"));
+            message.setIcon(QMessageBox::Information);
+            message.addButton(tr("Yes allow collecting information"), QMessageBox::AcceptRole);
+            message.addButton(tr("No do not allow collecting information"), QMessageBox::RejectRole);
+            message.setText(tr("Openpilot GCS has a function to collect limited anonymous information about "
+                                "the usage of the application itself and the OpenPilot hardware connected to it.\n\n"
+                                "The intention is to not include anything that can be considered sensitive "
+                                "or a threat to the users integrity. The collected information will be sent "
+                                "using a secure protocol to an OpenPilot web service and stored in a database "
+                                "for later analysis and statistical purposes.\n"
+                                "No information will be sold or given to any third party. The sole purpose is "
+                                "to collect statistics about the usage of our software and hardware to enable us "
+                                "to make things better for you users.\n\n"
+                                "The following things are collected:\n"
+                                "- Bootloader version\n"
+                                "- Firmware version, tag and git hash\n"
+                                "- OP Hardware type, revision and mcu serial number\n"
+                                "- GCS version\n"
+                                "- Operating system version and architecture\n"
+                                "- Current local time\n\n"
+                                "It is possible to enable or disable this functionality in the general "
+                                "settings part of the options for the GCS application at any time.\n\n"
+                                "Thank You for helping us making things better and for supporting OpenPilot!"));
+            QCheckBox* disclaimerCb = new QCheckBox(tr("&Don't show this message again."));
+            disclaimerCb->setChecked(true);
+            message.setCheckBox(disclaimerCb);
+            if (message.exec() != QMessageBox::AcceptRole) {
+                settings->setCollectUsageData(false);
+                settings->setShowUsageDataDisclaimer(!message.checkBox()->isChecked());
+                return;
+            } else {
+                settings->setCollectUsageData(true);
+                settings->setShowUsageDataDisclaimer(!message.checkBox()->isChecked());
+            }
+        }
         QTimer::singleShot(1000, this, SLOT(trackUsage()));
     }
 }

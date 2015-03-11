@@ -50,6 +50,7 @@ GeneralSettings::GeneralSettings() :
     m_useUDPMirror(false),
     m_useExpertMode(false),
     m_collectUsageData(true),
+    m_showUsageDataDisclaimer(true),
     m_dialog(0)
 {}
 
@@ -147,7 +148,7 @@ void GeneralSettings::apply()
     m_useExpertMode = m_page->cbExpertMode->isChecked();
     m_autoConnect   = m_page->checkAutoConnect->isChecked();
     m_autoSelect    = m_page->checkAutoSelect->isChecked();
-    m_collectUsageData = m_page->cbUsageData->isChecked();
+    setCollectUsageData(m_page->cbUsageData->isChecked());
 }
 
 void GeneralSettings::finish()
@@ -165,6 +166,7 @@ void GeneralSettings::readSettings(QSettings *qs)
     m_useUDPMirror  = qs->value(QLatin1String("UDPMirror"), m_useUDPMirror).toBool();
     m_useExpertMode = qs->value(QLatin1String("ExpertMode"), m_useExpertMode).toBool();
     m_collectUsageData = qs->value(QLatin1String("CollectUsageData"), m_collectUsageData).toBool();
+    m_showUsageDataDisclaimer = qs->value(QLatin1String("ShowUsageDataDisclaimer"), m_showUsageDataDisclaimer).toBool();
     qs->endGroup();
 }
 
@@ -184,6 +186,7 @@ void GeneralSettings::saveSettings(QSettings *qs)
     qs->setValue(QLatin1String("UDPMirror"), m_useUDPMirror);
     qs->setValue(QLatin1String("ExpertMode"), m_useExpertMode);
     qs->setValue(QLatin1String("CollectUsageData"), m_collectUsageData);
+    qs->setValue(QLatin1String("ShowUsageDataDisclaimer"), m_showUsageDataDisclaimer);
     qs->endGroup();
 }
 
@@ -259,9 +262,27 @@ bool GeneralSettings::collectUsageData() const
     return m_collectUsageData;
 }
 
+bool GeneralSettings::showUsageDataDisclaimer() const
+{
+    return m_showUsageDataDisclaimer;
+}
+
 bool GeneralSettings::useExpertMode() const
 {
     return m_useExpertMode;
+}
+
+bool GeneralSettings::setCollectUsageData(bool collect)
+{
+    if (collect && collect != m_collectUsageData) {
+        setShowUsageDataDisclaimer(true);
+    }
+    m_collectUsageData = collect;
+}
+
+bool GeneralSettings::setShowUsageDataDisclaimer(bool show)
+{
+    m_showUsageDataDisclaimer = show;
 }
 
 void GeneralSettings::slotAutoConnect(int value)

@@ -58,10 +58,12 @@ public:
     bool autoSelect() const;
     bool useUDPMirror() const;
     bool collectUsageData() const;
+    bool showUsageDataDisclaimer() const;
     void readSettings(QSettings *qs);
     void saveSettings(QSettings *qs);
     bool useExpertMode() const;
-signals:
+    bool setCollectUsageData(bool collect);
+    bool setShowUsageDataDisclaimer(bool show);
 
 private slots:
     void resetInterfaceColor();
@@ -81,6 +83,7 @@ private:
     bool m_useUDPMirror;
     bool m_useExpertMode;
     bool m_collectUsageData;
+    bool m_showUsageDataDisclaimer;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 };

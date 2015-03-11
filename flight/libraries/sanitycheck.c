@@ -118,7 +118,7 @@ int32_t configuration_check()
             ADDSEVERITY(navCapableFusion);
         }
 
-        switch (modes[i]) {
+        switch ((FlightModeSettingsFlightModePositionOptions)modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
             ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!multirotor);

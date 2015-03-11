@@ -59,7 +59,7 @@ extern "C" {
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <vtolselftuningstats.h>
-#include <fsmlandstatus.h>
+#include <statusvtolland.h>
 #include <pathsummary.h>
 }
 
@@ -149,7 +149,7 @@ void VtolLandFSM::Inactive(void)
 void VtolLandFSM::initFSM(void)
 {
     if (vtolPathFollowerSettings != 0) {
-        setState(LAND_STATE_INACTIVE, FSMLANDSTATUS_STATEEXITREASON_NONE);
+        setState(LAND_STATE_INACTIVE, STATUSVTOLLAND_STATEEXITREASON_NONE);
     } else {
         mLandData->currentState = LAND_STATE_INACTIVE;
     }
@@ -172,19 +172,19 @@ void VtolLandFSM::Activate()
 
     if (pathDesired->Mode == PATHDESIRED_MODE_LAND) {
 #ifndef DEBUG_GROUNDIMPACT
-        setState(LAND_STATE_INIT_ALTHOLD, FSMLANDSTATUS_STATEEXITREASON_NONE);
+        setState(LAND_STATE_INIT_ALTHOLD, STATUSVTOLLAND_STATEEXITREASON_NONE);
 #else
-        setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, FSMLANDSTATUS_STATEEXITREASON_NONE);
+        setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLLAND_STATEEXITREASON_NONE);
 #endif
     } else {
         // move to error state and callback to position hold
-        setState(LAND_STATE_ABORT, FSMLANDSTATUS_STATEEXITREASON_NONE);
+        setState(LAND_STATE_ABORT, STATUSVTOLLAND_STATEEXITREASON_NONE);
     }
 }
 
 void VtolLandFSM::Abort(void)
 {
-    setState(LAND_STATE_ABORT, FSMLANDSTATUS_STATEEXITREASON_NONE);
+    setState(LAND_STATE_ABORT, STATUSVTOLLAND_STATEEXITREASON_NONE);
 }
 
 PathFollowerFSMState_T VtolLandFSM::GetCurrentState(void)
@@ -278,7 +278,7 @@ void VtolLandFSM::CheckPidScaler(pid_scaler *local_scaler)
 // Set the new state and perform setup for subsequent state run calls
 // This is called by state run functions on event detection that drive
 // state transitions.
-void VtolLandFSM::setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateExitReasonOptions reason)
+void VtolLandFSM::setState(PathFollowerFSM_LandState_T newState, StatusVtolLandStateExitReasonOptions reason)
 {
     mLandData->fsmLandStatus.StateExitReason[mLandData->currentState] = reason;
 
@@ -322,11 +322,11 @@ void VtolLandFSM::updateVtolLandFSMStatus()
 {
     mLandData->fsmLandStatus.State = mLandData->currentState;
     if (mLandData->flLowAltitude) {
-        mLandData->fsmLandStatus.AltitudeState = FSMLANDSTATUS_ALTITUDESTATE_LOW;
+        mLandData->fsmLandStatus.AltitudeState = STATUSVTOLLAND_ALTITUDESTATE_LOW;
     } else {
-        mLandData->fsmLandStatus.AltitudeState = FSMLANDSTATUS_ALTITUDESTATE_HIGH;
+        mLandData->fsmLandStatus.AltitudeState = STATUSVTOLLAND_ALTITUDESTATE_HIGH;
     }
-    FSMLandStatusSet(&mLandData->fsmLandStatus);
+    StatusVtolLandSet(&mLandData->fsmLandStatus);
 }
 
 
@@ -390,7 +390,7 @@ void VtolLandFSM::run_init_althold(uint8_t flTimeout)
 {
     if (flTimeout) {
         mLandData->flAltitudeHold = false;
-        setState(LAND_STATE_WTG_FOR_DESCENTRATE, FSMLANDSTATUS_STATEEXITREASON_TIMEOUT);
+        setState(LAND_STATE_WTG_FOR_DESCENTRATE, STATUSVTOLLAND_STATEEXITREASON_TIMEOUT);
     }
 }
 
@@ -427,13 +427,13 @@ void VtolLandFSM::run_wtg_for_descentrate(uint8_t flTimeout)
     if (velocityState.Down > (LANDRATE_LOWLIMIT_FACTOR * mLandData->fsmLandStatus.targetDescentRate) &&
         velocityState.Down < (LANDRATE_HILIMIT_FACTOR * mLandData->fsmLandStatus.targetDescentRate)) {
         if (mLandData->observationCount++ > WTG_FOR_DESCENTRATE_COUNT_LIMIT) {
-            setState(LAND_STATE_AT_DESCENTRATE, FSMLANDSTATUS_STATEEXITREASON_DESCENTRATEOK);
+            setState(LAND_STATE_AT_DESCENTRATE, STATUSVTOLLAND_STATEEXITREASON_DESCENTRATEOK);
             return;
         }
     }
 
     if (flTimeout) {
-        setState(LAND_STATE_ABORT, FSMLANDSTATUS_STATEEXITREASON_TIMEOUT);
+        setState(LAND_STATE_ABORT, STATUSVTOLLAND_STATEEXITREASON_TIMEOUT);
     }
 }
 
@@ -476,7 +476,7 @@ void VtolLandFSM::run_at_descentrate(uint8_t flTimeout)
         mLandData->fsmLandStatus.calculatedNeutralThrust = boundf(mLandData->fsmLandStatus.calculatedNeutralThrust, vtolPathFollowerSettings->ThrustLimits.Neutral, vtolPathFollowerSettings->ThrustLimits.Max);
 
 
-        setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, FSMLANDSTATUS_STATEEXITREASON_DESCENTRATEOK);
+        setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLLAND_STATEEXITREASON_DESCENTRATEOK);
     }
 }
 
@@ -534,7 +534,7 @@ void VtolLandFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTim
     if (flBounce || flBounceAccel) {
         mLandData->observation2Count++;
         if (mLandData->observation2Count > BOUNCE_TRIGGER_COUNT) {
-            setState(LAND_STATE_GROUNDEFFECT, (flBounce ? FSMLANDSTATUS_STATEEXITREASON_BOUNCEVELOCITY : FSMLANDSTATUS_STATEEXITREASON_BOUNCEACCEL));
+            setState(LAND_STATE_GROUNDEFFECT, (flBounce ? STATUSVTOLLAND_STATEEXITREASON_BOUNCEVELOCITY : STATUSVTOLLAND_STATEEXITREASON_BOUNCEACCEL));
             return;
         }
     } else {
@@ -548,7 +548,7 @@ void VtolLandFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTim
         mLandData->observationCount++;
         if (mLandData->observationCount > GROUNDEFFECT_SLOWDOWN_COUNT) {
 #ifndef DEBUG_GROUNDIMPACT
-            setState(LAND_STATE_GROUNDEFFECT, FSMLANDSTATUS_STATEEXITREASON_LOWDESCENTRATE);
+            setState(LAND_STATE_GROUNDEFFECT, STATUSVTOLLAND_STATEEXITREASON_LOWDESCENTRATE);
 #endif
             return;
         }
@@ -580,7 +580,7 @@ void VtolLandFSM::run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
 
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust < 0.0f) {
-        setState(LAND_STATE_THRUSTOFF, FSMLANDSTATUS_STATEEXITREASON_ZEROTHRUST);
+        setState(LAND_STATE_THRUSTOFF, STATUSVTOLLAND_STATEEXITREASON_ZEROTHRUST);
         return;
     }
 
@@ -597,12 +597,12 @@ void VtolLandFSM::run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
     float east_error    = mLandData->expectedLandPositionEast - positionState.East;
     float positionError = sqrtf(north_error * north_error + east_error * east_error);
     if (positionError > 0.3f) {
-        setState(LAND_STATE_THRUSTDOWN, FSMLANDSTATUS_STATEEXITREASON_POSITIONERROR);
+        setState(LAND_STATE_THRUSTDOWN, STATUSVTOLLAND_STATEEXITREASON_POSITIONERROR);
         return;
     }
 
     if (flTimeout) {
-        setState(LAND_STATE_THRUSTDOWN, FSMLANDSTATUS_STATEEXITREASON_TIMEOUT);
+        setState(LAND_STATE_THRUSTDOWN, STATUSVTOLLAND_STATEEXITREASON_TIMEOUT);
     }
 }
 
@@ -628,11 +628,11 @@ void VtolLandFSM::run_thrustdown(__attribute__((unused)) uint8_t flTimeout)
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust < 0.0f || mLandData->thrustLimit < 0.0f) {
-        setState(LAND_STATE_THRUSTOFF, FSMLANDSTATUS_STATEEXITREASON_ZEROTHRUST);
+        setState(LAND_STATE_THRUSTOFF, STATUSVTOLLAND_STATEEXITREASON_ZEROTHRUST);
     }
 
     if (flTimeout) {
-        setState(LAND_STATE_THRUSTOFF, FSMLANDSTATUS_STATEEXITREASON_TIMEOUT);
+        setState(LAND_STATE_THRUSTOFF, STATUSVTOLLAND_STATEEXITREASON_TIMEOUT);
     }
 }
 
@@ -647,7 +647,7 @@ void VtolLandFSM::setup_thrustoff(void)
 
 void VtolLandFSM::run_thrustoff(__attribute__((unused)) uint8_t flTimeout)
 {
-    setState(LAND_STATE_DISARMED, FSMLANDSTATUS_STATEEXITREASON_NONE);
+    setState(LAND_STATE_DISARMED, STATUSVTOLLAND_STATEEXITREASON_NONE);
 }
 
 // STATE: DISARMED
@@ -665,7 +665,7 @@ void VtolLandFSM::run_disarmed(__attribute__((unused)) uint8_t flTimeout)
 {
 #ifdef DEBUG_GROUNDIMPACT
     if (mLandData->observationCount++ > 100) {
-        setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, FSMLANDSTATUS_STATEEXITREASON_NONE);
+        setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLLAND_STATEEXITREASON_NONE);
     }
 #endif
 }

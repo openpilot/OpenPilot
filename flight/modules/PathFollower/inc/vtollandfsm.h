@@ -32,7 +32,7 @@
 #define VTOLLANDFSM_H
 
 extern "C" {
-#include "fsmlandstatus.h"
+#include "statusvtolland.h"
 }
 #include "pathfollowerfsm.h"
 
@@ -81,7 +81,7 @@ protected:
 
     // FSM instance data type
     typedef struct {
-        FSMLandStatusData   fsmLandStatus;
+        StatusVtolLandData   fsmLandStatus;
         PathFollowerFSM_LandState_T currentState;
         TakeOffLocationData takeOffLocation;
         uint32_t stateRunCount;
@@ -133,7 +133,7 @@ protected:
     void setup_abort(void);
     void run_abort(uint8_t);
     void initFSM(void);
-    void setState(PathFollowerFSM_LandState_T newState, FSMLandStatusStateExitReasonOptions reason);
+    void setState(PathFollowerFSM_LandState_T newState, StatusVtolLandStateExitReasonOptions reason);
     int32_t runState();
     int32_t runAlways();
     void updateVtolLandFSMStatus();

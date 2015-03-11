@@ -11,8 +11,13 @@
 	<field name="decelrate" units="m/s2" type="float" elements="1"/>
 	<field name="brakeRateActualDesiredRatio" units="" type="float" elements="1"/>
 	<field name="velocityIntoHold" units="m/s" type="float" elements="1"/>
+<<<<<<< HEAD
     <field name="Mode" units="" type="enum" elements="1" options="GoToEndpoint,FollowVector,CircleRight,CircleLeft,
             FixedAttitude,SetAccessory,DisarmAlarm,Land,Brake,Velocity,AutoTakeoff" default="GoToEndpoint" />
+=======
+    	<field name="Mode" units="" type="enum" elements="1" options="GoToEndpoint,FollowVector,CircleRight,CircleLeft,
+            FixedAttitude,SetAccessory,DisarmAlarm,Land,Brake,Velocity" default="GoToEndpoint" />
+>>>>>>> 672732e95d555946300ef5093f687f3fa88bfd3a
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

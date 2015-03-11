@@ -1,7 +1,7 @@
 /*
  ******************************************************************************
  *
- * @file       VtolBrakeController.c
+ * @file       vtolbrakecontroller.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      This landing state machine is a helper state machine to the
  *              pathfollower task/thread to implement detailed landing controls.

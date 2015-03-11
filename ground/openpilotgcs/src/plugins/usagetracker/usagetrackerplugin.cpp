@@ -33,6 +33,8 @@
 #include <QDebug>
 #include <uavobjectutil/devicedescriptorstruct.h>
 #include <uavobjectutil/uavobjectutilmanager.h>
+#include <coreplugin/generalsettings.h>
+#include "version_info/version_info.h"
 
 UsageTrackerPlugin::UsageTrackerPlugin() :
     m_telemetryManager(NULL)
@@ -67,7 +69,11 @@ void UsageTrackerPlugin::shutdown()
 
 void UsageTrackerPlugin::onAutopilotConnect()
 {
-    QTimer::singleShot(1000, this, SLOT(trackUsage()));
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+    if (settings->collectUsageData()) {
+        QTimer::singleShot(1000, this, SLOT(trackUsage()));
+    }
 }
 
 void UsageTrackerPlugin::trackUsage()
@@ -84,11 +90,11 @@ void UsageTrackerPlugin::trackUsage()
     QMapIterator<QString, QString> iter(parameters);
     while (iter.hasNext()) {
         iter.next();
-        query.addQueryItem(iter.key(), iter.value());
+        query.addQueryItem(iter.key(), QUrl::toPercentEncoding(iter.value()));
     }
-    QUrl url("https://www.openpilot.org/opver?" + query.toString());
-    qDebug() << "Sending usage tracking as:" << url.toString();
-    networkAccessManager->get(QNetworkRequest(url));
+    QUrl url("https://www.openpilot.org/opver?" + query.toString(QUrl::FullyEncoded));
+    qDebug() << "Sending usage tracking as:" << url.toEncoded(QUrl::FullyEncoded);
+    networkAccessManager->get(QNetworkRequest(QUrl(url.toEncoded(QUrl::FullyEncoded))));
 }
 
 void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &parameters)
@@ -99,9 +105,13 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
     if (UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
-        parameters["bt"] = QString("0x%1").arg(QString::number(utilMngr->getBoardModel(),16).toUpper());
-        parameters["bid"] = utilMngr->getBoardCPUSerial().toHex();
-        parameters["bfwt"] = devDesc.gitTag;
-        parameters["bfwh"] = devDesc.gitHash;
+        parameters["hi0"] = "0x" + QString::number(utilMngr->getBoardModel(), 16).toLower();
+        parameters["hi1"] = utilMngr->getBoardCPUSerial().toHex();
+        parameters["bi0"] = QString::number(utilMngr->getBootloaderRevision());
+        parameters["fi0"] = devDesc.gitTag;
+        parameters["fi1"] = devDesc.gitHash;
+        parameters["oi0"] = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
+        parameters["si0"] = VersionInfo::revision();
+        parameters["ti0"] = QDateTime::currentDateTime().toString(Qt::ISODate);
     }
 }

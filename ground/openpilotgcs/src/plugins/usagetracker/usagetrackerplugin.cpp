@@ -78,10 +78,10 @@ void UsageTrackerPlugin::onAutopilotConnect()
     if (settings->collectUsageData()) {
         if (settings->showUsageDataDisclaimer()) {
             QMessageBox message;
-            message.setWindowTitle(tr("Usage data collection"));
+            message.setWindowTitle(tr("Usage feedback"));
             message.setIcon(QMessageBox::Information);
-            message.addButton(tr("Yes allow collecting information"), QMessageBox::AcceptRole);
-            message.addButton(tr("No do not allow collecting information"), QMessageBox::RejectRole);
+            message.addButton(tr("Yes, count me in"), QMessageBox::AcceptRole);
+            message.addButton(tr("No, I will not help"), QMessageBox::RejectRole);
             message.setText(tr("Openpilot GCS has a function to collect limited anonymous information about "
                                 "the usage of the application itself and the OpenPilot hardware connected to it.\n\n"
                                 "The intention is to not include anything that can be considered sensitive "
@@ -90,16 +90,19 @@ void UsageTrackerPlugin::onAutopilotConnect()
                                 "for later analysis and statistical purposes.\n"
                                 "No information will be sold or given to any third party. The sole purpose is "
                                 "to collect statistics about the usage of our software and hardware to enable us "
-                                "to make things better for you users.\n\n"
+                                "to make things better for you.\n\n"
                                 "The following things are collected:\n"
                                 "- Bootloader version\n"
                                 "- Firmware version, tag and git hash\n"
                                 "- OP Hardware type, revision and mcu serial number\n"
                                 "- GCS version\n"
                                 "- Operating system version and architecture\n"
-                                "- Current local time\n\n"
+                                "- Current local time\n"
+                                "The information is collected only at the time when a board is connecting to GCS.\n\n"
                                 "It is possible to enable or disable this functionality in the general "
                                 "settings part of the options for the GCS application at any time.\n\n"
+                                "We need your help, with your feedback we know where to improve things and what "
+                                "platforms are in use. This is a community project that depends on people being involved.\n"
                                 "Thank You for helping us making things better and for supporting OpenPilot!"));
             QCheckBox* disclaimerCb = new QCheckBox(tr("&Don't show this message again."));
             disclaimerCb->setChecked(true);

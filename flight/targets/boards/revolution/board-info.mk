@@ -34,7 +34,7 @@ USE_LUA		    := YES
 BL_BANK_BASE        := 0x08000000  # Start of bootloader flash
 BL_BANK_SIZE        := 0x00008000  # Should include BD_INFO region
 
-# 16KB for settings storage
+# 32KB for settings storage
 
 EE_BANK_BASE        := 0x08008000  # EEPROM storage area
 EE_BANK_SIZE        := 0x00008000  # Size of EEPROM storage area

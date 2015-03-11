@@ -35,7 +35,7 @@ static s32_t spiffs_gc_erase_block(
 
 #if SPIFFS_CACHE
   {
-    int i;
+    unsigned int i;
     for (i = 0; i < SPIFFS_PAGES_PER_BLOCK(fs); i++) {
       spiffs_cache_drop_page(fs, SPIFFS_PAGE_FOR_BLOCK(fs, bix) + i);
     }

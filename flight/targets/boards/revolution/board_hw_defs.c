@@ -684,15 +684,26 @@ const struct pios_rfm22b_cfg *PIOS_BOARD_HW_DEFS_GetRfm22Cfg(uint32_t board_revi
 
 static const struct pios_flash_internal_cfg flash_internal_cfg = {};
 
-static const struct flashfs_logfs_cfg flashfs_internal_cfg = {
-    .fs_magic      = 0x99abcfef,
-    .total_fs_size = EE_BANK_SIZE, /* 32K bytes (2x16KB sectors) */
-    .arena_size    = 0x00004000, /* 64 * slot size = 16K bytes = 1 sector */
-    .slot_size     = 0x00000100, /* 256 bytes */
+static const struct flashfs_cfg flashfs_external_cfg = {
+    .flashfs_magic          = 0x99abcfef,
+    .physical_size          = (1024*1024*2),
+    .physical_erase_block   = (65536),
+    .physical_addr          = (0),
+    .logical_block_size     = (65536),
+    .logical_page_size      = (256),
+    .work_buffer_size       = (256*2),
+    .cache_buffer_size      = (256+32)*8,
+};
 
-    .start_offset  = EE_BANK_BASE, /* start after the bootloader */
-    .sector_size   = 0x00004000, /* 16K bytes */
-    .page_size     = 0x00004000, /* 16K bytes */
+static const struct flashfs_cfg flashfs_internal_cfg = {
+    .flashfs_magic          = 0x99abcfef,
+    .physical_size          = EE_BANK_SIZE, /* 32KBytes */
+    .physical_erase_block   = 0x4000,
+    .physical_addr          = EE_BANK_BASE,
+    .logical_block_size     = 0x4000,
+    .logical_page_size      = 0x100,
+    .work_buffer_size       = (0x100*2),
+    .cache_buffer_size      = (0x100+32)*8,
 };
 
 #endif /* PIOS_INCLUDE_FLASH */

@@ -80,7 +80,19 @@ enum pios_flashfs_lseek_flags {
 /* File name */
 #define FLASHFS_FILENAME_LEN 26
 
+struct flashfs_cfg {
+    uint32_t flashfs_magic;
+    uint32_t physical_size; /* Max size used file system partition. */
+    uint32_t physical_addr; /* Start address of the file system partition. */
+    uint32_t physical_erase_block; /* Flash device specific: size affected during erase process*/
+    uint32_t logical_block_size;
+    uint32_t logical_page_size;
+    uint32_t work_buffer_size;
+    uint32_t cache_buffer_size;
+};
+
 /* API */
+int32_t PIOS_FLASHFS_Init(uintptr_t *fs_id, const struct flashfs_cfg *cfg, const struct pios_flash_driver *driver, uintptr_t flash_id);
 int32_t PIOS_FLASHFS_Format(uintptr_t fs_id);
 int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int16_t file_id);
 int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, const char *path, uint16_t flags);
@@ -91,5 +103,6 @@ int32_t PIOS_FLASHFS_GetStats(uintptr_t fs_id, struct PIOS_FLASHFS_Stats *stats)
 int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags);
 int32_t PIOS_FLASHFS_Lseek(uintptr_t fs_id, int16_t fh, int32_t offset, enum pios_flashfs_lseek_flags flag);
 int32_t PIOS_FLASHFS_Info(uintptr_t fs_id, char *path, uint32_t *size, uint32_t file_number, uint32_t flags);
+int32_t PIOS_FLASHFS_Logfs_Destroy(uintptr_t fs_id);
 
 #endif /* PIOS_FLASHFS_H */

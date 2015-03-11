@@ -256,7 +256,7 @@ uint32_t pios_rfm22b_id        = 0;
 uintptr_t pios_uavo_settings_fs_id = 0;
 uintptr_t pios_user_fs_id = 0;
 uintptr_t pios_external_flash_fs_id = 0;
-
+uintptr_t pios_flashfs_id = 0;
 
 /*
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -394,16 +394,15 @@ void PIOS_Board_Init(void)
     if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_telem_flash_id, 1)) {
         PIOS_DEBUG_Assert(0);
     }
-    PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
-    for (int i=0;i<6;i++)
-        PIOS_DEBUG_PinLow(i);
 
-    if (PIOS_FLASHFS_Init(&pios_external_flash_fs_id, &pios_jedec_flash_driver, flash_id)) {
+    if (PIOS_FLASHFS_Init(&pios_external_flash_fs_id, &flashfs_external_cfg, &pios_jedec_flash_driver, flash_id)) {
             PIOS_DEBUG_Assert(0);
     }
     /* Settings and log are on the same file system */
     pios_uavo_settings_fs_id = pios_external_flash_fs_id;
     pios_user_fs_id = pios_external_flash_fs_id;
+    /* We currently only have one filesystem. */
+    pios_flashfs_id = pios_external_flash_fs_id;
 
 #endif /* if defined(PIOS_INCLUDE_FLASH) */
 

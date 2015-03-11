@@ -309,7 +309,7 @@ s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
 
 #if SPIFFS_CACHE_WR
   if ((fd->flags & SPIFFS_DIRECT) == 0) {
-    if (len < SPIFFS_CFG_LOG_PAGE_SZ(fs)) {
+    if ((u32_t)len < SPIFFS_CFG_LOG_PAGE_SZ(fs)) {
       // small write, try to cache it
       u8_t alloc_cpage = 1;
       if (fd->cache_page) {

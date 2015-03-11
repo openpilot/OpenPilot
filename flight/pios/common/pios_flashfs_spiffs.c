@@ -43,8 +43,6 @@
 #endif
 
 #define SPIFFS_FDS_SIZE (32*4)
-#define SPIFFS_WORK_BUF_SIZE (SPIFFS_CFG_LOG_PAGE_SZ(ignore)*2)
-#define SPIFFS_CACHE_BUF_SIZE ((SPIFFS_CFG_LOG_PAGE_SZ(ignore)+32)*8)
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 xSemaphoreHandle flashfs_mutex = 0;
@@ -76,14 +74,15 @@ static uint32_t pios_flashfs2spiffs_lseek_flags[] = { SPIFFS_SEEK_SET, SPIFFS_SE
 struct flashfs_state {
     enum pios_flashfs_dev_magic magic;
     bool mounted;
-    u8_t spiffs_work_buf[SPIFFS_WORK_BUF_SIZE];
-    u8_t spiffs_cache_buf[SPIFFS_CACHE_BUF_SIZE];
-    u8_t spiffs_copy_buf[SPIFFS_COPY_BUFFER_STACK];
+    u8_t *work_buf;
+    u8_t *cache_buf;
+    u8_t *copy_buf;
     spiffs_config cfg_spiffs;
     u8_t spiffs_fds[SPIFFS_FDS_SIZE];
     spiffs fs;
     /* Underlying flash driver glue */
     const struct pios_flash_driver *driver;
+    const struct flashfs_cfg *cfg;
     uint16_t files;
     uintptr_t flash_id;
 };
@@ -218,15 +217,15 @@ static int32_t PIOS_FLASHFS_Mount(__attribute__((unused)) uintptr_t fs_id)
     if (!PIOS_FLASHFS_Validate(flashfs))
         return PIOS_FLASHFS_ERROR_FS_INVALID;
 
-    memset(flashfs->spiffs_cache_buf, 0, SPIFFS_CACHE_BUF_SIZE);
+    memset(flashfs->cache_buf, 0, flashfs->cfg->cache_buffer_size);
 
     if (SPIFFS_mount(&flashfs->fs,
                         &flashfs->cfg_spiffs,
-                        flashfs->spiffs_work_buf,
+                        flashfs->work_buf,
                         flashfs->spiffs_fds,
                         SPIFFS_FDS_SIZE,
-                        flashfs->spiffs_cache_buf,
-                        SPIFFS_CACHE_BUF_SIZE,
+                        flashfs->cache_buf,
+                        flashfs->cfg->cache_buffer_size,
                         NULL) != SPIFFS_OK) {
         rc = PIOS_FLASHFS_ERROR_FS_MOUNT;
     }
@@ -262,6 +261,7 @@ static int32_t PIOS_FLASHFS_Mount(__attribute__((unused)) uintptr_t fs_id)
  * @brief Initialize the file system
  */
 int32_t PIOS_FLASHFS_Init(__attribute__((unused)) uintptr_t *fs_id,
+                          const struct flashfs_cfg *cfg,
 						  const struct pios_flash_driver *driver,
 						  uintptr_t flash_id)
 {
@@ -289,31 +289,43 @@ int32_t PIOS_FLASHFS_Init(__attribute__((unused)) uintptr_t *fs_id,
     /* (we won't re-allocate memory in that case) */
     if (!flashfs)
     {
-    	flashfs = (struct flashfs_state *)PIOS_FLASHFS_alloc();
+        flashfs = (struct flashfs_state *)PIOS_FLASHFS_alloc();
 
-    	if (!flashfs)
-    		return PIOS_FLASHFS_ERROR_FS_ALLOC;
+        if (!flashfs)
+            return PIOS_FLASHFS_ERROR_FS_ALLOC;
 
-    	/* Mutex is used in SPIFFS */
+
+        flashfs->work_buf = pios_malloc(cfg->work_buffer_size);
+        flashfs->cache_buf = pios_malloc(cfg->cache_buffer_size);
+        flashfs->copy_buf = pios_malloc(cfg->logical_page_size);
+
+        /* Mutex is used in SPIFFS */
 #if defined(PIOS_INCLUDE_FREERTOS)
-    	if (!flashfs_mutex)
-    		flashfs_mutex = xSemaphoreCreateRecursiveMutex();
+        if (!flashfs_mutex)
+            flashfs_mutex = xSemaphoreCreateRecursiveMutex();
 #endif
 
-		/* Bind configuration parameters to this filesystem instance */
-    	flashfs->driver   = driver; /* lower-level flash driver */
-    	flashfs->flash_id = flash_id; /* lower-level flash device id */
-    	flashfs->mounted  = false;
+        /* Bind configuration parameters to this filesystem instance */
+        flashfs->driver   = driver; /* lower-level flash driver */
+        flashfs->flash_id = flash_id; /* lower-level flash device id */
+        flashfs->mounted  = false;
+        flashfs->cfg      = cfg;
 
-    	/* HAL Callbacks */
-    	flashfs->cfg_spiffs.hal_read_f = PIOS_FLASHFS_spiffs_read;
-    	flashfs->cfg_spiffs.hal_write_f = PIOS_FLASHFS_spiffs_write;
-    	flashfs->cfg_spiffs.hal_erase_f = PIOS_FLASHFS_spiffs_erase;
+        /* HAL Callbacks */
+        flashfs->cfg_spiffs.hal_read_f = PIOS_FLASHFS_spiffs_read;
+        flashfs->cfg_spiffs.hal_write_f = PIOS_FLASHFS_spiffs_write;
+        flashfs->cfg_spiffs.hal_erase_f = PIOS_FLASHFS_spiffs_erase;
 
-    	flashfs->cfg_spiffs.fs_id = (void *)flashfs;
+        flashfs->cfg_spiffs.phys_size = cfg->physical_size;
+        flashfs->cfg_spiffs.phys_addr = cfg->physical_addr;
+        flashfs->cfg_spiffs.phys_erase_block = cfg->physical_erase_block;
+        flashfs->cfg_spiffs.log_block_size = cfg->logical_block_size;
+        flashfs->cfg_spiffs.log_page_size = cfg->logical_page_size;
 
-		/* Init buffers */
-    	flashfs->cfg_spiffs.buffer = flashfs->spiffs_copy_buf;
+        flashfs->cfg_spiffs.fs_id = (void *)flashfs;
+
+        /* Init buffers */
+        flashfs->cfg_spiffs.buffer = flashfs->copy_buf;
     }
 
     /* File system should have one file (the "ID" file) */
@@ -338,9 +350,9 @@ int32_t PIOS_FLASHFS_Init(__attribute__((unused)) uintptr_t *fs_id,
         rc = PIOS_FLASHFS_ERROR_FS_INVALID;
     }
 
-	PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_INIT);
+    PIOS_DEBUG_PinLow(PINDEBUG_SPIFFS_INIT);
 
-	PIOS_Assert(rc == PIOS_FLASHFS_OK);
+    PIOS_Assert(rc == PIOS_FLASHFS_OK);
     return rc;
 }
 

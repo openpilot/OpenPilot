@@ -1593,7 +1593,7 @@ static s32_t spiffs_obj_lu_find_free_obj_id_bitmap_v(spiffs *fs, spiffs_obj_id i
     id &= ~SPIFFS_OBJ_ID_IX_FLAG;
     int bit_ix = (id-min_obj_id) & 7;
     int byte_ix = (id-min_obj_id) >> 3;
-    if (byte_ix >= 0 && byte_ix < SPIFFS_CFG_LOG_PAGE_SZ(fs)) {
+    if ((byte_ix >= 0) && ((unsigned int)byte_ix < SPIFFS_CFG_LOG_PAGE_SZ(fs))) {
       fs->work[byte_ix] |= (1<<bit_ix);
     }
   }
@@ -1641,9 +1641,9 @@ s32_t spiffs_obj_lu_find_free_obj_id(spiffs *fs, spiffs_obj_id *obj_id) {
   }
   state.compaction = 0;
   while (res == SPIFFS_OK && free_obj_id == SPIFFS_OBJ_ID_FREE) {
-    if (state.max_obj_id - state.min_obj_id <= SPIFFS_CFG_LOG_PAGE_SZ(fs)*8) {
+    if ((unsigned int)(state.max_obj_id - state.min_obj_id) <= SPIFFS_CFG_LOG_PAGE_SZ(fs)*8) {
       // possible to represent in bitmap
-      int i, j;
+      unsigned int i, j;
       SPIFFS_DBG("free_obj_id: BITM min:%04x max:%04x\n", state.min_obj_id, state.max_obj_id);
 
       memset(fs->work, 0, SPIFFS_CFG_LOG_PAGE_SZ(fs));
@@ -1700,7 +1700,7 @@ s32_t spiffs_obj_lu_find_free_obj_id(spiffs *fs, spiffs_obj_id *obj_id) {
           state.max_obj_id = state.min_obj_id + state.compaction;
           // decrease compaction
         }
-        if ((state.max_obj_id - state.min_obj_id <= SPIFFS_CFG_LOG_PAGE_SZ(fs)*8)) {
+        if (((unsigned int)(state.max_obj_id - state.min_obj_id) <= SPIFFS_CFG_LOG_PAGE_SZ(fs)*8)) {
           // no need for compacting, use bitmap
           continue;
         }

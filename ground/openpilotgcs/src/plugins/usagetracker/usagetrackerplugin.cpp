@@ -33,12 +33,14 @@
 #include <QCheckBox>
 #include <QDebug>
 #include <QMessageBox>
+#include <attitudesettings.h>
 #include <uavobjectutil/devicedescriptorstruct.h>
 #include <uavobjectutil/uavobjectutilmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "version_info/version_info.h"
 #include "coreplugin/icore.h"
 #include "qmainwindow.h"
+#include "manualcontrolsettings.h"
 
 UsageTrackerPlugin::UsageTrackerPlugin() :
     m_telemetryManager(NULL)
@@ -135,8 +137,10 @@ void UsageTrackerPlugin::trackUsage()
     QMapIterator<QString, QString> iter(parameters);
     while (iter.hasNext()) {
         iter.next();
-        query.addQueryItem(iter.key(), QUrl::toPercentEncoding(iter.value()));
+        query.addQueryItem(iter.key(), iter.value());
     }
+    qDebug() << "Parameters unencoded:" << query.toString();
+    qDebug() << "Parameters encoded:" << query.toString(QUrl::FullyEncoded);
     QUrl url("https://www.openpilot.org/opver?" + query.toString(QUrl::FullyEncoded));
     qDebug() << "Sending usage tracking as:" << url.toEncoded(QUrl::FullyEncoded);
     networkAccessManager->get(QNetworkRequest(QUrl(url.toEncoded(QUrl::FullyEncoded))));
@@ -150,16 +154,19 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
     if (UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
-        parameters["hi0"] = "0x" + QString::number(utilMngr->getBoardModel(), 16).toLower();
-        parameters["hi1"] = utilMngr->getBoardCPUSerial().toHex();
-        parameters["bi0"] = QString::number(utilMngr->getBootloaderRevision());
-        parameters["fi0"] = devDesc.gitTag;
-        parameters["fi1"] = devDesc.gitHash;
-        parameters["oi0"] = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
-        parameters["si0"] = VersionInfo::revision();
-        parameters["ti0"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+        parameters["board_type"] = "0x" + QString::number(utilMngr->getBoardModel(), 16).toLower();
+        parameters["board_serial"] = utilMngr->getBoardCPUSerial().toHex();
+        parameters["bl_version"] = QString::number(utilMngr->getBootloaderRevision());
+        parameters["fw_tag"] = devDesc.gitTag;
+        parameters["fw_hash"] = devDesc.gitHash;
+        parameters["os_version"] = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
+        parameters["gcs_version"] = VersionInfo::revision();
+        parameters["localtime"] = QDateTime::currentDateTime().toString(Qt::ISODate);
 
         // Configuration parameters
-        //parameters["ci0"] = ;
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+        ManualControlSettings * controlSettings = ManualControlSettings::GetInstance(objManager);
+        parameters["conf_receiver"] = controlSettings->getField("ChannelGroups")->getValue(ManualControlSettings::CHANNELGROUPS_THROTTLE).toString();
     }
 }

@@ -190,7 +190,7 @@ int8_t VtolVelocityController::UpdateStabilizationDesired(__attribute__((unused)
     stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
     stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
 
-    // default thrust mode to cruise control
+    // default thrust mode to altvario
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO;
 
     StabilizationDesiredSet(&stabDesired);

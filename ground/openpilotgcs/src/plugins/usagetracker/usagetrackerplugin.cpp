@@ -95,6 +95,7 @@ void UsageTrackerPlugin::onAutopilotConnect()
                                 "- Bootloader version\n"
                                 "- Firmware version, tag and git hash\n"
                                 "- OP Hardware type, revision and mcu serial number\n"
+                                "- Selected configuration parameters\n"
                                 "- GCS version\n"
                                 "- Operating system version and architecture\n"
                                 "- Current local time\n"
@@ -157,5 +158,8 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         parameters["oi0"] = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
         parameters["si0"] = VersionInfo::revision();
         parameters["ti0"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+
+        // Configuration parameters
+        //parameters["ci0"] = ;
     }
 }

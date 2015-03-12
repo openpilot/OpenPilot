@@ -159,13 +159,13 @@ void GeneralSettings::finish()
 void GeneralSettings::readSettings(QSettings *qs)
 {
     qs->beginGroup(QLatin1String("General"));
-    m_language      = qs->value(QLatin1String("OverrideLanguage"), QLocale::system().name()).toString();
+    m_language           = qs->value(QLatin1String("OverrideLanguage"), QLocale::system().name()).toString();
     m_saveSettingsOnExit = qs->value(QLatin1String("SaveSettingsOnExit"), m_saveSettingsOnExit).toBool();
-    m_autoConnect   = qs->value(QLatin1String("AutoConnect"), m_autoConnect).toBool();
-    m_autoSelect    = qs->value(QLatin1String("AutoSelect"), m_autoSelect).toBool();
-    m_useUDPMirror  = qs->value(QLatin1String("UDPMirror"), m_useUDPMirror).toBool();
-    m_useExpertMode = qs->value(QLatin1String("ExpertMode"), m_useExpertMode).toBool();
-    m_collectUsageData = qs->value(QLatin1String("CollectUsageData"), m_collectUsageData).toBool();
+    m_autoConnect        = qs->value(QLatin1String("AutoConnect"), m_autoConnect).toBool();
+    m_autoSelect         = qs->value(QLatin1String("AutoSelect"), m_autoSelect).toBool();
+    m_useUDPMirror       = qs->value(QLatin1String("UDPMirror"), m_useUDPMirror).toBool();
+    m_useExpertMode      = qs->value(QLatin1String("ExpertMode"), m_useExpertMode).toBool();
+    m_collectUsageData   = qs->value(QLatin1String("CollectUsageData"), m_collectUsageData).toBool();
     m_showUsageDataDisclaimer = qs->value(QLatin1String("ShowUsageDataDisclaimer"), m_showUsageDataDisclaimer).toBool();
     qs->endGroup();
 }

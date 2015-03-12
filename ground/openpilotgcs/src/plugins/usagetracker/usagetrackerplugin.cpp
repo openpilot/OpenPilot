@@ -34,6 +34,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <attitudesettings.h>
+#include <revosettings.h>
 #include <uavobjectutil/devicedescriptorstruct.h>
 #include <uavobjectutil/uavobjectutilmanager.h>
 #include <coreplugin/generalsettings.h>
@@ -44,12 +45,10 @@
 
 UsageTrackerPlugin::UsageTrackerPlugin() :
     m_telemetryManager(NULL)
-{
-}
+{}
 
 UsageTrackerPlugin::~UsageTrackerPlugin()
-{
-}
+{}
 
 bool UsageTrackerPlugin::initialize(const QStringList & args, QString *errMsg)
 {
@@ -62,6 +61,7 @@ bool UsageTrackerPlugin::initialize(const QStringList & args, QString *errMsg)
 void UsageTrackerPlugin::extensionsInitialized()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     m_telemetryManager = pm->getObject<TelemetryManager>();
     connect(m_telemetryManager, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
 }
@@ -77,6 +77,7 @@ void UsageTrackerPlugin::onAutopilotConnect()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+
     if (settings->collectUsageData()) {
         if (settings->showUsageDataDisclaimer()) {
             QMessageBox message;
@@ -85,29 +86,29 @@ void UsageTrackerPlugin::onAutopilotConnect()
             message.addButton(tr("Yes, count me in"), QMessageBox::AcceptRole);
             message.addButton(tr("No, I will not help"), QMessageBox::RejectRole);
             message.setText(tr("Openpilot GCS has a function to collect limited anonymous information about "
-                                "the usage of the application itself and the OpenPilot hardware connected to it.\n\n"
-                                "The intention is to not include anything that can be considered sensitive "
-                                "or a threat to the users integrity. The collected information will be sent "
-                                "using a secure protocol to an OpenPilot web service and stored in a database "
-                                "for later analysis and statistical purposes.\n"
-                                "No information will be sold or given to any third party. The sole purpose is "
-                                "to collect statistics about the usage of our software and hardware to enable us "
-                                "to make things better for you.\n\n"
-                                "The following things are collected:\n"
-                                "- Bootloader version\n"
-                                "- Firmware version, tag and git hash\n"
-                                "- OP Hardware type, revision and mcu serial number\n"
-                                "- Selected configuration parameters\n"
-                                "- GCS version\n"
-                                "- Operating system version and architecture\n"
-                                "- Current local time\n"
-                                "The information is collected only at the time when a board is connecting to GCS.\n\n"
-                                "It is possible to enable or disable this functionality in the general "
-                                "settings part of the options for the GCS application at any time.\n\n"
-                                "We need your help, with your feedback we know where to improve things and what "
-                                "platforms are in use. This is a community project that depends on people being involved.\n"
-                                "Thank You for helping us making things better and for supporting OpenPilot!"));
-            QCheckBox* disclaimerCb = new QCheckBox(tr("&Don't show this message again."));
+                               "the usage of the application itself and the OpenPilot hardware connected to it.\n\n"
+                               "The intention is to not include anything that can be considered sensitive "
+                               "or a threat to the users integrity. The collected information will be sent "
+                               "using a secure protocol to an OpenPilot web service and stored in a database "
+                               "for later analysis and statistical purposes.\n"
+                               "No information will be sold or given to any third party. The sole purpose is "
+                               "to collect statistics about the usage of our software and hardware to enable us "
+                               "to make things better for you.\n\n"
+                               "The following things are collected:\n"
+                               "- Bootloader version\n"
+                               "- Firmware version, tag and git hash\n"
+                               "- OP Hardware type, revision and mcu serial number\n"
+                               "- Selected configuration parameters\n"
+                               "- GCS version\n"
+                               "- Operating system version and architecture\n"
+                               "- Current local time\n"
+                               "The information is collected only at the time when a board is connecting to GCS.\n\n"
+                               "It is possible to enable or disable this functionality in the general "
+                               "settings part of the options for the GCS application at any time.\n\n"
+                               "We need your help, with your feedback we know where to improve things and what "
+                               "platforms are in use. This is a community project that depends on people being involved.\n"
+                               "Thank You for helping us making things better and for supporting OpenPilot!"));
+            QCheckBox *disclaimerCb = new QCheckBox(tr("&Don't show this message again."));
             disclaimerCb->setChecked(true);
             message.setCheckBox(disclaimerCb);
             if (message.exec() != QMessageBox::AcceptRole) {
@@ -153,20 +154,28 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
+
     if (UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
-        parameters["board_type"] = "0x" + QString::number(utilMngr->getBoardModel(), 16).toLower();
+        int boardModel = utilMngr->getBoardModel();
+        parameters["board_type"]   = "0x" + QString::number(boardModel, 16).toLower();
         parameters["board_serial"] = utilMngr->getBoardCPUSerial().toHex();
-        parameters["bl_version"] = QString::number(utilMngr->getBootloaderRevision());
+        parameters["bl_version"]   = QString::number(utilMngr->getBootloaderRevision());
         parameters["fw_tag"] = devDesc.gitTag;
         parameters["fw_hash"] = devDesc.gitHash;
-        parameters["os_version"] = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
-        parameters["gcs_version"] = VersionInfo::revision();
-        parameters["localtime"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+        parameters["os_version"]   = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
+        parameters["gcs_version"]  = VersionInfo::revision();
+        parameters["localtime"]    = QDateTime::currentDateTime().toString(Qt::ISODate);
 
         // Configuration parameters
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        ExtensionSystem::PluginManager *pm     = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-        ManualControlSettings * controlSettings = ManualControlSettings::GetInstance(objManager);
-        parameters["conf_receiver"] = controlSettings->getField("ChannelGroups")->getValue(ManualControlSettings::CHANNELGROUPS_THROTTLE).toString();
+        ManualControlSettings *controlSettings = ManualControlSettings::GetInstance(objManager);
+        parameters["settings_receiver"] = controlSettings->getField("ChannelGroups")->getValue(ManualControlSettings::CHANNELGROUPS_THROTTLE).toString();
+
+        RevoSettings revoSettings = RevoSettings::GetInstance(objManager);
+        // Only get this info if uavo is known by controller
+        if (revoSettings.isKnown()) {
+            parameters["settings_fusion"] = revoSettings.getField("FusionAlgorithm")->getValue().toString();
+        }
     }
 }

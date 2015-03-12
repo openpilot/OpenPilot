@@ -32,7 +32,7 @@
 
 class UsageTrackerPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "OpenPilot.UsageTracker")
+                                                   Q_PLUGIN_METADATA(IID "OpenPilot.UsageTracker")
 public:
     UsageTrackerPlugin();
     ~UsageTrackerPlugin();
@@ -47,7 +47,7 @@ private slots:
     void collectUsageParameters(QMap<QString, QString> &parameters);
 
 private:
-    TelemetryManager * m_telemetryManager;
+    TelemetryManager *m_telemetryManager;
 };
 
 #endif // USAGETRACKERPLUGIN_H

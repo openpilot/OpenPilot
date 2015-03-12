@@ -23,6 +23,9 @@ endif
 # Set to YES to compile for debugging
 DEBUG                ?= NO
 
+# Set to YES to compile C++ implemented features
+USE_CXX              ?= NO
+
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS    ?= NO
 
@@ -123,7 +126,7 @@ CFLAGS += -g$(DEBUGF)
 CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -Wall -Wextra
-CFLAGS += -Wfloat-equal -Wunsuffixed-float-constants -Wdouble-promotion
+CFLAGS += -Wfloat-equal -Wdouble-promotion
 CFLAGS += -Wshadow
 CFLAGS += -Werror
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
@@ -152,17 +155,29 @@ endif
 CDEFS += $(BOARD_CDEFS)
 
 ifeq ($(DEBUG), YES)
-    CFLAGS += -DDEBUG
+    CPPFLAGS += -DDEBUG
 else
     CFLAGS += -fdata-sections -ffunction-sections
 endif
+
+ifeq ($(USE_CXX), YES)
+    CPPFLAGS += -DPIOS_ENABLE_CXX
+endif
+
 
 # Compiler flags to generate dependency files
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
 
 # Flags only for C
 #CONLYFLAGS += -Wnested-externs
-CONLYFLAGS += $(CSTANDARD)
+CONLYFLAGS += $(CSTANDARD) -Wunsuffixed-float-constants
+
+# C++ Flags
+# Note C++ compilation also uses CFLAGS.  CONLYFLAGS has exclusions that 
+# can not be used with C++ compiler. C++ specific compile options are
+# as set in CXXFLAGS. Note CPPFLAGS is for C pre-process and has not been
+# used correctly - longer term move CDEFS to CPPFLAGS.
+CXXFLAGS += -fno-rtti -fno-exceptions -std=c++11 -fno-use-cxa-atexit
 
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.
@@ -188,7 +203,12 @@ ifneq ($(DEBUG), YES)
 endif
 
 # List of all source files.
-ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
+ifeq ($(USE_CXX), YES)
+ALLSRC     = $(CPPSRCARM) $(CPPSRC) $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) 
+else
+ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC)
+endif
+
 # List of all source files without directory and file-extension.
 ALLSRCBASE = $(notdir $(basename $(ALLSRC)))
 
@@ -221,7 +241,11 @@ endif
 #	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
 # Link: create ELF output file from object files.
+ifeq ($(USE_CXX), YES)
+$(eval $(call LINK_CXX_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
+else
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
+endif
 
 # Assemble: create object files from assembler source files.
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
@@ -235,11 +259,13 @@ $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 # Compile: create object files from C source files. ARM-only
 $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
 
+ifeq ($(USE_CXX), YES)
 # Compile: create object files from C++ source files.
-$(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
+$(foreach src, $(CPPSRC), $(eval $(call COMPILE_CXX_TEMPLATE, $(src))))
 
 # Compile: create object files from C++ source files. ARM-only
-$(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src))))
+$(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CXX_ARM_TEMPLATE, $(src))))
+endif
 
 # Compile: create assembler files from C source files. ARM/Thumb
 $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))

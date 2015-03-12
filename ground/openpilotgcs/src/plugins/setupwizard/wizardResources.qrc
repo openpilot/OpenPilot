@@ -52,5 +52,7 @@
         <file>resources/bttn-upgrade-up.png</file>
         <file>resources/not-connected.png</file>
         <file>resources/connected.png</file>
+        <file>resources/bttn-oneshot-dwn.png</file>
+        <file>resources/bttn-oneshot-up.png</file>
     </qresource>
 </RCC>

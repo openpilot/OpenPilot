@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "configpipxtremewidget.h"
+#include "configoplinkwidget.h"
 
 #include <coreplugin/generalsettings.h>
 #include <oplinksettings.h>
@@ -38,7 +38,7 @@ static const int MIN_CHANNEL_RANGE = 10;
 static const float FIRST_FREQUENCY = 430.000;
 static const float FREQUENCY_STEP  = 0.040;
 
-ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigOPLinkWidget::ConfigOPLinkWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_oplink = new Ui_OPLinkWidget();
     m_oplink->setupUi(this);
@@ -67,7 +67,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     addWidgetBinding("OPLinkSettings", "MaxRFPower", m_oplink->MaxRFTxPower);
     addWidgetBinding("OPLinkSettings", "MinChannel", m_oplink->MinimumChannel);
     addWidgetBinding("OPLinkSettings", "MaxChannel", m_oplink->MaximumChannel);
-    addWidgetBinding("OPLinkSettings", "ChannelSet", m_oplink->ChannelSet);
     addWidgetBinding("OPLinkSettings", "CoordID", m_oplink->CoordID);
     addWidgetBinding("OPLinkSettings", "Coordinator", m_oplink->Coordinator);
     addWidgetBinding("OPLinkSettings", "OneWay", m_oplink->OneWayLink);
@@ -83,7 +82,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     addWidgetBinding("OPLinkStatus", "RxFailure", m_oplink->RxFailure);
     addWidgetBinding("OPLinkStatus", "UAVTalkErrors", m_oplink->UAVTalkErrors);
     addWidgetBinding("OPLinkStatus", "TxDropped", m_oplink->Dropped);
-    addWidgetBinding("OPLinkStatus", "TxResent", m_oplink->Resent);
     addWidgetBinding("OPLinkStatus", "TxFailure", m_oplink->TxFailure);
     addWidgetBinding("OPLinkStatus", "Resets", m_oplink->Resets);
     addWidgetBinding("OPLinkStatus", "Timeouts", m_oplink->Timeouts);
@@ -119,13 +117,13 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     updateEnableControls();
 }
 
-ConfigPipXtremeWidget::~ConfigPipXtremeWidget()
+ConfigOPLinkWidget::~ConfigOPLinkWidget()
 {}
 
 /*!
    \brief Called by updates to @OPLinkStatus
  */
-void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
+void ConfigOPLinkWidget::updateStatus(UAVObject *object)
 {
     // Request and update of the setting object if we haven't received it yet.
     if (!settingsUpdated) {
@@ -233,7 +231,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 /*!
    \brief Called by updates to @OPLinkSettings
  */
-void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
+void ConfigOPLinkWidget::updateSettings(UAVObject *object)
 {
     Q_UNUSED(object);
 
@@ -284,20 +282,20 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
     }
 }
 
-void ConfigPipXtremeWidget::updateEnableControls()
+void ConfigOPLinkWidget::updateEnableControls()
 {
     enableControls(true);
     ppmOnlyChanged();
 }
 
-void ConfigPipXtremeWidget::disconnected()
+void ConfigOPLinkWidget::disconnected()
 {
     if (settingsUpdated) {
         settingsUpdated = false;
     }
 }
 
-void ConfigPipXtremeWidget::bind()
+void ConfigOPLinkWidget::bind()
 {
     QPushButton *bindButton = qobject_cast<QPushButton *>(sender());
 
@@ -323,7 +321,7 @@ void ConfigPipXtremeWidget::bind()
     }
 }
 
-void ConfigPipXtremeWidget::ppmOnlyChanged()
+void ConfigOPLinkWidget::ppmOnlyChanged()
 {
     bool is_ppm_only = m_oplink->PPMOnly->isChecked();
 
@@ -332,17 +330,17 @@ void ConfigPipXtremeWidget::ppmOnlyChanged()
     m_oplink->ComSpeed->setEnabled(!is_ppm_only);
 }
 
-void ConfigPipXtremeWidget::minChannelChanged()
+void ConfigOPLinkWidget::minChannelChanged()
 {
     channelChanged(false);
 }
 
-void ConfigPipXtremeWidget::maxChannelChanged()
+void ConfigOPLinkWidget::maxChannelChanged()
 {
     channelChanged(true);
 }
 
-void ConfigPipXtremeWidget::channelChanged(bool isMax)
+void ConfigOPLinkWidget::channelChanged(bool isMax)
 {
     int minChannel = m_oplink->MinimumChannel->value();
     int maxChannel = m_oplink->MaximumChannel->value();

@@ -399,6 +399,7 @@ void ubx_autoconfig_set(ubx_autoconfig_settings_t config)
     if (config.autoconfigEnabled) {
         if (!status) {
             status = (status_t *)pios_malloc(sizeof(status_t));
+            PIOS_Assert(status);
             memset(status, 0, sizeof(status_t));
             status->currentStep = INIT_STEP_DISABLED;
         }
@@ -406,7 +407,7 @@ void ubx_autoconfig_set(ubx_autoconfig_settings_t config)
         status->currentStep     = INIT_STEP_START;
         enabled = true;
     } else {
-        if (!status) {
+        if (status) {
             status->currentStep = INIT_STEP_DISABLED;
         }
     }

@@ -44,7 +44,6 @@ public:
     void initializePage();
     bool validatePage();
     bool isComplete() const;
-
 public slots:
     void templateSelectionChanged();
 
@@ -59,6 +58,7 @@ private:
     QGraphicsPixmapItem *m_photoItem;
 
     void loadValidFiles();
+    void loadFilesInDir(QString templateBasePath);
     void setupTemplateList();
     QString getTemplateKey(QJsonObject *templ);
     void updatePhoto(QJsonObject *templ);

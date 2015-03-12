@@ -62,6 +62,10 @@
 #include "manualcontrolcommand.h"
 #include "taskinfo.h"
 
+#include <pios_sensors.h>
+#include <pios_adxl345.h>
+#include <pios_mpu6000.h>
+
 #include "CoordinateConversions.h"
 #include <pios_notify.h>
 #include <mathmisc.h>
@@ -160,9 +164,11 @@ int32_t const MAX_TRIM_FLIGHT_SAMPLES = 65535;
 #define STD_CC_ANALOG_GYRO_NEUTRAL 1665
 #define STD_CC_ANALOG_GYRO_GAIN    0.42f
 
+static struct PIOS_SENSORS_3Axis_SensorsWithTemp *mpu6000_data = NULL;
+
 // Used to detect CC vs CC3D
 static const struct pios_board_info *bdinfo = &pios_board_info_blob;
-#define BOARDISCC3D                (bdinfo->board_rev == 0x02)
+#define BOARDISCC3D (bdinfo->board_rev == 0x02)
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -172,8 +178,9 @@ int32_t AttitudeStart(void)
     // Start main task
     xTaskCreate(AttitudeTask, "Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, taskHandle);
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
-
+#endif
     return 0;
 }
 
@@ -238,14 +245,18 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
 
     if (cc3d) {
 #if defined(PIOS_INCLUDE_MPU6000)
-        gyro_test = PIOS_MPU6000_Test();
+
+        gyro_test    = PIOS_MPU6000_Driver.test(0);
+        mpu6000_data = pios_malloc(sizeof(PIOS_SENSORS_3Axis_SensorsWithTemp) + sizeof(Vector3i16) * 2);
 #endif
     } else {
 #if defined(PIOS_INCLUDE_ADXL345)
         // Set critical error and wait until the accel is producing data
         while (PIOS_ADXL345_FifoElements() == 0) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+#ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+#endif
         }
         accel_test = PIOS_ADXL345_Test();
 #endif
@@ -302,9 +313,9 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             }
             init = 1;
         }
-
+#ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
-
+#endif
         AccelStateData accelState;
         GyroStateData gyros;
         int32_t retval = 0;
@@ -455,7 +466,6 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-static struct pios_mpu6000_data mpu6000_data;
 static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
     float accels[3] = { 0 };
@@ -465,22 +475,22 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
 
 #if defined(PIOS_INCLUDE_MPU6000)
 
-    xQueueHandle queue = PIOS_MPU6000_GetQueue();
-    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, sensor_period_ms);
+    xQueueHandle queue = PIOS_MPU6000_Driver.get_queue(0);
+    BaseType_t ret     = xQueueReceive(queue, (void *)mpu6000_data, sensor_period_ms);
     while (ret == pdTRUE) {
-        gyros[0]  += mpu6000_data.gyro_x;
-        gyros[1]  += mpu6000_data.gyro_y;
-        gyros[2]  += mpu6000_data.gyro_z;
+        gyros[0]  += mpu6000_data->sample[1].x;
+        gyros[1]  += mpu6000_data->sample[1].y;
+        gyros[2]  += mpu6000_data->sample[1].z;
 
-        accels[0] += mpu6000_data.accel_x;
-        accels[1] += mpu6000_data.accel_y;
-        accels[2] += mpu6000_data.accel_z;
+        accels[0] += mpu6000_data->sample[0].x;
+        accels[1] += mpu6000_data->sample[0].y;
+        accels[2] += mpu6000_data->sample[0].z;
 
-        temp += mpu6000_data.temperature;
+        temp += mpu6000_data->temperature;
 
         count++;
         // check if further samples are already in queue
-        ret = xQueueReceive(queue, (void *)&mpu6000_data, 0);
+        ret = xQueueReceive(queue, (void *)mpu6000_data, 0);
     }
     PERF_TRACK_VALUE(counterAccelSamples, count);
 
@@ -751,17 +761,19 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     temp_calibrated_extent.max = accelGyroSettings.temp_calibrated_extent.max;
 
     if (BOARDISCC3D) {
+        float scales[2];
+        PIOS_MPU6000_Driver.get_scale(scales, 2, 0);
         accel_bias.X  = accelGyroSettings.accel_bias.X;
         accel_bias.Y  = accelGyroSettings.accel_bias.Y;
         accel_bias.Z  = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale.X  = accelGyroSettings.gyro_scale.X * PIOS_MPU6000_GetScale();
-        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * PIOS_MPU6000_GetScale();
-        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * PIOS_MPU6000_GetScale();
+        gyro_scale.X  = accelGyroSettings.gyro_scale.X * scales[1];
+        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * scales[1];
+        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * scales[1];
 
-        accel_scale.X = accelGyroSettings.accel_scale.X * PIOS_MPU6000_GetAccelScale();
-        accel_scale.Y = accelGyroSettings.accel_scale.Y * PIOS_MPU6000_GetAccelScale();
-        accel_scale.Z = accelGyroSettings.accel_scale.Z * PIOS_MPU6000_GetAccelScale();
+        accel_scale.X = accelGyroSettings.accel_scale.X * scales[0];
+        accel_scale.Y = accelGyroSettings.accel_scale.Y * scales[0];
+        accel_scale.Z = accelGyroSettings.accel_scale.Z * scales[0];
     } else {
         // Original CC with analog gyros and ADXL accel
         accel_bias.X  = accelGyroSettings.accel_bias.X;

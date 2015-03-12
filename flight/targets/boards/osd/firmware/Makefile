@@ -31,7 +31,7 @@ MODULES += Osd/osdgen
 MODULES += Osd/osdinput
 MODULES += Osd/WavPlayer
 MODULES += GPS
-MODULES += Extensions/MagBaro
+#MODULES += Extensions/MagBaro
 MODULES += FirmwareIAP
 MODULES += Telemetry
 

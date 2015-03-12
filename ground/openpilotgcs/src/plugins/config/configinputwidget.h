@@ -28,6 +28,7 @@
 #define CONFIGINPUTWIDGET_H
 
 #include "ui_input.h"
+#include "ui_input_wizard.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -40,6 +41,7 @@
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "actuatorsettings.h"
+#include "mixersettings.h"
 #include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>
@@ -69,12 +71,15 @@ public:
     bool shouldObjectBeSaved(UAVObject *object);
 
 private:
+    bool throttleError;
     bool growing;
     bool reverse[ManualControlSettings::CHANNELNEUTRAL_NUMELEM];
     txMovements currentMovement;
     int movePos;
     void setTxMovement(txMovements movement);
     Ui_InputWidget *ui;
+    Ui_InputWizardWidget *wizardUi;
+
     wizardSteps wizardStep;
     QList<QPointer<QWidget> > extraWidgets;
     txMode transmitterMode;
@@ -195,6 +200,7 @@ private slots:
     void invertControls();
     void simpleCalibration(bool state);
     void adjustSpecialNeutrals();
+    void checkThrottleRange();
     void updateCalibration();
     void resetChannelSettings();
     void resetActuatorSettings();

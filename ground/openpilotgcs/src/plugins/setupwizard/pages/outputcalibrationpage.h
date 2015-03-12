@@ -72,6 +72,10 @@ private slots:
     void on_reverseCheckbox_toggled(bool checked);
 
 private:
+    static const int LOW_OUTPUT_RATE_MILLISECONDS = 1000;
+    static const int NEUTRAL_OUTPUT_RATE_MILLISECONDS = 1500;
+    static const int HIGH_OUTPUT_RATE_MILLISECONDS_PWM = 1900;
+    static const int HIGH_OUTPUT_RATE_MILLISECONDS_ONESHOT125 = 2000;
     void setupVehicle();
     void startWizard();
     void setupVehicleItems();
@@ -82,6 +86,7 @@ private:
     void onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider);
     bool checkAlarms();
     void debugLogChannelValues();
+    int getHighOutputRate();
     quint16 getCurrentChannel();
 
     Ui::OutputCalibrationPage *ui;
@@ -100,6 +105,7 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
+    void resetOutputCalibrationUtil();
 
     static const QString MULTI_SVG_FILE;
     static const QString FIXEDWING_SVG_FILE;

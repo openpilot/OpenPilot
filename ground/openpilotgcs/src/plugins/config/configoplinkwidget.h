@@ -29,15 +29,15 @@
 
 #include <oplinksettings.h>
 
-#include "ui_pipxtreme.h"
+#include "ui_oplink.h"
 #include "configtaskwidget.h"
 
-class ConfigPipXtremeWidget : public ConfigTaskWidget {
+class ConfigOPLinkWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
-    ConfigPipXtremeWidget(QWidget *parent = 0);
-    ~ConfigPipXtremeWidget();
+    ConfigOPLinkWidget(QWidget *parent = 0);
+    ~ConfigOPLinkWidget();
 
 public slots:
     void updateStatus(UAVObject *object1);

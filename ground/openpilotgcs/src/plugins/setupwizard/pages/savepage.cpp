@@ -74,9 +74,16 @@ void SavePage::writeToController()
 
     disconnect(&helper, SIGNAL(saveProgress(int, int, QString)), this, SLOT(saveProgress(int, int, QString)));
     ui->saveProgressLabel->setText(QString("<font color='%1'>%2</font>").arg(m_successfulWrite ? "green" : "red", ui->saveProgressLabel->text()));
+    if (m_successfulWrite) {
+        getWizard()->reboot();
+    }
     enableButtons(true);
 
     emit completeChanged();
+
+    if (m_successfulWrite) {
+        getWizard()->next();
+    }
 }
 
 void SavePage::enableButtons(bool enable)

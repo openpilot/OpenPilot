@@ -179,6 +179,7 @@ public:
         }
         return m_connectionManager;
     }
+    void reboot() const;
 
 private slots:
     void customBackClicked();
@@ -192,7 +193,6 @@ private:
     void createPages();
     bool saveHardwareSettings() const;
     bool canAutoUpdate() const;
-    void reboot() const;
 
     CONTROLLER_TYPE m_controllerType;
     VEHICLE_TYPE m_vehicleType;

@@ -135,7 +135,7 @@ int32_t ReceiverInitialize()
 {
     /* Check the assumptions about uavobject enum's are correct */
     PIOS_STATIC_ASSERT(assumptions);
-
+    AccessoryDesiredInitialize();
     ManualControlCommandInitialize();
     ReceiverActivityInitialize();
     ManualControlSettingsInitialize();

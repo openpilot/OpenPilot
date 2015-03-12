@@ -81,6 +81,7 @@ extern "C" {
 #include <pidstatus.h>
 #include <homelocation.h>
 #include <accelstate.h>
+#include <statusvtolland.h>
 }
 
 #include "pathfollowercontrol.h"
@@ -168,6 +169,7 @@ extern "C" int32_t PathFollowerInitialize()
     StabilizationBankInitialize();
     VtolSelfTuningStatsInitialize();
     PIDStatusInitialize();
+    StatusVtolLandInitialize();
 
     // VtolLandFSM additional objects
     HomeLocationInitialize();
@@ -176,8 +178,6 @@ extern "C" int32_t PathFollowerInitialize()
     // Init references to controllers
     PathFollowerControl::Initialize(&pathDesired, &flightStatus, &pathStatus);
 
-    // Init controllers for the frame type
-    pathFollowerInitializeControllersForFrameType();
 
     // Create object queue
     pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_PATHFOLLOWER, STACK_SIZE_BYTES);
@@ -195,21 +195,34 @@ MODULE_INITCALL(PathFollowerInitialize, PathFollowerStart);
 
 void pathFollowerInitializeControllersForFrameType()
 {
+  static uint8_t multirotor_initialised = 0;
+  static uint8_t fixedwing_initialised = 0;
+  static uint8_t ground_initialised = 0;
+
     switch (frameType) {
     case FRAME_TYPE_MULTIROTOR:
     case FRAME_TYPE_HELI:
+        if (!multirotor_initialised) {
         VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
         VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
         VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
         VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
+        multirotor_initialised = 1;
+        }
         break;
 
     case FRAME_TYPE_FIXED_WING:
+        if (!fixedwing_initialised) {
         FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
+        fixedwing_initialised = 1;
+        }
         break;
 
     case FRAME_TYPE_GROUND:
+      if (!ground_initialised) {
         GroundDriveController::instance()->Initialize(&groundPathFollowerSettings);
+        ground_initialised = 1;
+      }
         break;
 
     default:
@@ -219,7 +232,11 @@ void pathFollowerInitializeControllersForFrameType()
 
 static void pathFollowerSetActiveController(void)
 {
+    // Init controllers for the frame type
     if (activeController == 0) {
+	// Initialise
+	pathFollowerInitializeControllersForFrameType();
+
         switch (frameType) {
         case FRAME_TYPE_MULTIROTOR:
         case FRAME_TYPE_HELI:

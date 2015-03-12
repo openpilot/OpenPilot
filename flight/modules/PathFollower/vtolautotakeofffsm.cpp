@@ -59,7 +59,7 @@ extern "C" {
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <vtolselftuningstats.h>
-#include <fsmlandstatus.h>
+#include <statusvtolland.h>
 #include <pathsummary.h>
 }
 

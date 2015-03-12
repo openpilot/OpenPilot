@@ -81,8 +81,8 @@ extern "C" {
 #include <pidstatus.h>
 #include <homelocation.h>
 #include <accelstate.h>
-#include <fsmlandstatus.h>
 #include <statusvtolautotakeoff.h>
+#include <statusvtolland.h>
 }
 
 #include "pathfollowercontrol.h"
@@ -171,7 +171,7 @@ extern "C" int32_t PathFollowerInitialize()
     StabilizationBankInitialize();
     VtolSelfTuningStatsInitialize();
     PIDStatusInitialize();
-    FSMLandStatusInitialize();
+    StatusVtolLandInitialize();
     StatusVtolAutoTakeoffInitialize();
 
     // VtolLandFSM additional objects

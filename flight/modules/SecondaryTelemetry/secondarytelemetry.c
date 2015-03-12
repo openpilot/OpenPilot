@@ -38,6 +38,8 @@
 
 #include "secondarytelemetry.h"
 
+extern protocolHandler_t uavtalkProtocolHandler;
+
 // Private constants
 #define STACK_SIZE_BYTES PIOS_TELEM_STACK_SIZE
 
@@ -49,10 +51,14 @@
 static uint32_t comPort;
 static xTaskHandle taskHandle;
 static bool modEnabled;
+static protocolHandler_t *activeProtocolHandler = NULL;
+static uint8_t updatePeriod;
+static uint8_t intervalCounts[SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
+static uint8_t updateIntervals[SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
 
 // Private functions
 static void telemetryTask(void *parameters);
-static void updateSettings();
+static void updateSettings(UAVObjEvent *ev);
 
 /**
  * Initialise the telemetry module
@@ -62,7 +68,7 @@ static void updateSettings();
 int32_t SecondaryTelemetryStart(void)
 {
     // Start telemetry tasks
-    if (modEnabled && comPort) {
+    if (modEnabled && comPort && activeProtocolHandler) {
         xTaskCreate(telemetryTask, "SecondTel", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     }
     return 0;
@@ -90,7 +96,11 @@ int32_t SecondaryTelemetryInitialize(void)
 
     if (modEnabled && comPort) {
         SecondaryTelemetrySettingsInitialize();
-        updateSettings();
+        SecondaryTelemetrySettingsConnectCallback(updateSettings);
+        updateSettings(0);
+        if (activeProtocolHandler) {
+            activeProtocolHandler->initialize(comPort);
+        }
     }
 
     return 0;
@@ -102,21 +112,37 @@ MODULE_INITCALL(SecondaryTelemetryInitialize, SecondaryTelemetryStart);
  */
 static void telemetryTask(__attribute__((unused)) void *parameters)
 {
+    uint8_t i;
+    portTickType lastSysTime = xTaskGetTickCount();
+
     // Loop forever
     while (1) {
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelayUntil(&lastSysTime, updatePeriod / portTICK_RATE_MS);
+
+        /* Update interval counters */
+        for (i = 0; i < SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM; i++) {
+            if (updateIntervals[i]) {
+                intervalCounts[i]++;
+                if (intervalCounts[i] >= updateIntervals[i]) {
+                    intervalCounts[i] = 0;
+                    activeProtocolHandler->updateData(i);
+                }
+            }
+        }
     }
 }
 
 /**
  * Update the telemetry settings, called on startup.
  */
-static void updateSettings()
+static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
     if (modEnabled && comPort) {
-        // Retrieve settings
         uint8_t speed;
+        // Retrieve settings
         SecondaryTelemetrySettingsOutputSpeedGet(&speed);
+        SecondaryTelemetrySettingsUpdatePeriodGet(&updatePeriod);
+        SecondaryTelemetrySettingsUpdateIntervalsArrayGet(updateIntervals);
 
         // Set port speed
         switch (speed) {
@@ -142,6 +168,9 @@ static void updateSettings()
             PIOS_COM_ChangeBaud(comPort, 115200);
             break;
         }
+
+        // TODO: Select between protocols
+        activeProtocolHandler = &uavtalkProtocolHandler;
     }
 }
 

@@ -4,11 +4,7 @@
         <field name="OutputSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
         <field name="OutputProtocol" units="" type="enum" elements="1" options="Off,UAVTalk" defaultvalue="UAVTalk"/>
         <field name="UpdatePeriod" units="ms" type="uint8" elements="1" defaultvalue="100" />
-        <field name="SystemStatusInterval" units="" type="uint8" elements="1" defaultvalue="10" />
-        <field name="AttitudeInterval" units="" type="uint8" elements="1" defaultvalue="1" />
-        <field name="ManualControlInterval" units="" type="uint8" elements="1" defaultvalue="5" />
-        <field name="FlightBatteryInterval" units="" type="uint8" elements="1" defaultvalue="0" />
-        <field name="GPSDataInterval" units="" type="uint8" elements="1" defaultvalue="2" />
+        <field name="UpdateIntervals" units="" type="uint8" elementnames="Attitude,GPSData,ManualControl,SystemStatus,FlightBattery" defaultvalue="0" />
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

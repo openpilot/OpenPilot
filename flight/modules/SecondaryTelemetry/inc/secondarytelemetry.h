@@ -8,7 +8,7 @@
  * to external devices such as on screen displays.
  * @{
  *
- * @file       secondarytelemetry.c
+ * @file       secondarytelemetry.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      Secondary telemetry module, exports basic telemetry.
  * @see        The GNU Public License (GPL) Version 3
@@ -32,6 +32,21 @@
 
 #ifndef SECONDARYTELEMETRY_H
 #define SECONDARYTELEMETRY_H
+
+#include <attitudestate.h>
+#include <flightstatus.h>
+#include <systemalarms.h>
+#include <gpspositionsensor.h>
+#include <gpsvelocitysensor.h>
+#include <flightbatterystate.h>
+#include <manualcontrolcommand.h>
+#include <secondarytelemetrysettings.h>
+#include <pios_com.h>
+
+typedef struct {
+    void (*initialize)(uint32_t comPort);
+    void (*updateData)(SecondaryTelemetrySettingsUpdateIntervalsElem data);
+} protocolHandler_t;
 
 int32_t SecondaryTelemetryInitialize(void);
 

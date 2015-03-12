@@ -167,7 +167,6 @@ void BoardRotation3DView::CreateScene()
     return;
 }
 
-
 void BoardRotation3DView::wheelEvent(QWheelEvent *e)
 {
     double delta = m_glcView.cameraHandle()->distEyeTarget() - (e->delta() / 8);

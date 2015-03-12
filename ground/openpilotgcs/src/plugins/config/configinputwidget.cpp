@@ -549,6 +549,8 @@ void ConfigInputWidget::wzNext()
 
         // Force flight mode neutral to middle and Throttle neutral at 4%
         adjustSpecialNeutrals();
+        throttleError = false;
+        checkThrottleRange();
 
         manualSettingsObj->setData(manualSettingsData);
         // move to Arming Settings tab
@@ -1593,6 +1595,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         ui->saveRCInputToRAM->setEnabled(false);
         ui->saveRCInputToSD->setEnabled(false);
         ui->runCalibration->setText(tr("Stop Manual Calibration"));
+        throttleError = false;
 
         QMessageBox msgBox;
         msgBox.setText(tr("<p>Arming Settings are now set to 'Always Disarmed' for your safety.</p>"
@@ -1628,11 +1631,6 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         connect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     } else {
-        ui->configurationWizard->setEnabled(true);
-        ui->saveRCInputToRAM->setEnabled(true);
-        ui->saveRCInputToSD->setEnabled(true);
-        ui->runCalibration->setText(tr("Start Manual Calibration"));
-
         manualCommandData  = manualCommandObj->getData();
         manualSettingsData = manualSettingsObj->getData();
 
@@ -1641,15 +1639,20 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             if ((i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE) || (i == ManualControlSettings::CHANNELNUMBER_THROTTLE)) {
                 adjustSpecialNeutrals();
+                checkThrottleRange();
             } else {
                 manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
             }
         }
-
         manualSettingsObj->setData(manualSettingsData);
 
         // Load actuator settings back from beginning of manual calibration
         actuatorSettingsObj->setData(previousActuatorSettingsData);
+
+        ui->configurationWizard->setEnabled(true);
+        ui->saveRCInputToRAM->setEnabled(true);
+        ui->saveRCInputToSD->setEnabled(true);
+        ui->runCalibration->setText(tr("Start Manual Calibration"));
 
         disconnect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     }
@@ -1669,6 +1672,21 @@ void ConfigInputWidget::adjustSpecialNeutrals()
         manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
         ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
           manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
+}
+
+void ConfigInputWidget::checkThrottleRange()
+{
+    int throttleRange = abs(manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
+                            manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]);
+
+    if (!throttleError && (throttleRange < 300)) {
+        throttleError = true;
+        QMessageBox::warning(this, tr("Warning"), tr("<p>There is something wrong with Throttle range. Please redo calibration and move <b>ALL sticks</b>, Throttle stick included.</p>"), QMessageBox::Ok);
+
+        // Set Throttle neutral to max value so Throttle can't be positive
+        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
+            manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE];
+    }
 }
 
 bool ConfigInputWidget::shouldObjectBeSaved(UAVObject *object)

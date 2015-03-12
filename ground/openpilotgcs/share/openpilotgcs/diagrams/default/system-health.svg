@@ -30,7 +30,7 @@
      inkscape:zoom="6.5977991"
      inkscape:cx="55.083588"
      inkscape:cy="24.071773"
-     inkscape:current-layer="layer45"
+     inkscape:current-layer="layer46"
      id="namedview3608"
      showgrid="true"
      inkscape:window-width="1280"
@@ -1687,6 +1687,20 @@
   </g>
   <g
      inkscape:groupmode="layer"
+     id="layer46"
+     inkscape:label="SystemConfiguration-BadThrottleOrCollectiveInputRange">
+    <rect
+       style="fill:#d40000;fill-opacity:1;stroke:none;display:inline"
+       id="SystemConfiguration-BadThrottleOrCollectiveInputRange"
+       width="13.110236"
+       height="10.107105"
+       x="80.806435"
+       y="51.972187"
+       ry="0.98050147"
+       inkscape:label="#rect4550-8-1-4-21-1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
      id="layer43"
      inkscape:label="SystemConfiguration-FlightMode"
      style="display:inline">
@@ -3024,7 +3038,7 @@
            sodipodi:cy="35.07505"
            sodipodi:rx="0.5"
            sodipodi:ry="0.5"
-           d="M 14,35.07505 A 0.5,0.5 0 1 1 13.999725,35.058469"
+           d="M 14,35.07505 C 14,35.351193 13.776142,35.57505 13.5,35.57505 C 13.223858,35.57505 13,35.351193 13,35.07505 C 13,34.798908 13.223858,34.57505 13.5,34.57505 C 13.769688,34.57505 13.990781,34.78893 13.999725,35.058469"
            sodipodi:start="0"
            sodipodi:end="6.2500167"
            sodipodi:open="true"
@@ -3057,7 +3071,7 @@
            sodipodi:cy="35.07505"
            sodipodi:rx="0.5"
            sodipodi:ry="0.5"
-           d="M 14,35.07505 A 0.5,0.5 0 1 1 13.999725,35.058469"
+           d="M 14,35.07505 C 14,35.351193 13.776142,35.57505 13.5,35.57505 C 13.223858,35.57505 13,35.351193 13,35.07505 C 13,34.798908 13.223858,34.57505 13.5,34.57505 C 13.769688,34.57505 13.990781,34.78893 13.999725,35.058469"
            sodipodi:start="0"
            sodipodi:end="6.2500167"
            sodipodi:open="true"

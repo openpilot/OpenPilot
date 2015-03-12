@@ -74,6 +74,11 @@ private slots:
 
 private:
     enum ElementType { FULL, FRAME, MOTOR, SERVO };
+    static const int LOW_OUTPUT_RATE_MILLISECONDS      = 1000;
+    static const int NEUTRAL_OUTPUT_RATE_MILLISECONDS  = 1500;
+    static const int HIGH_OUTPUT_RATE_MILLISECONDS_PWM = 1900;
+    static const int HIGH_OUTPUT_RATE_MILLISECONDS_ONESHOT125 = 2000;
+
     void setupVehicle();
     void startWizard();
     void setupVehicleItems();
@@ -86,8 +91,11 @@ private:
                              quint16 value, quint16 safeValue, QSlider *slider);
     bool checkAlarms();
     void debugLogChannelValues();
+
     void getCurrentChannels(QList<quint16> &channels);
     void enableAllMotorsCheckBox(bool enable);
+    int getHighOutputRate();
+    quint16 getCurrentChannel();
 
     Ui::OutputCalibrationPage *ui;
     QSvgRenderer *m_vehicleRenderer;

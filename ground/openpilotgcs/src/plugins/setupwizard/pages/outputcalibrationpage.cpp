@@ -77,32 +77,32 @@ void OutputCalibrationPage::setupActuatorMinMaxAndNeutral(int motorChannelStart,
     for (int servoid = 0; servoid < 12; servoid++) {
         if (servoid >= motorChannelStart && servoid <= motorChannelEnd) {
             // Set to motor safe values
-            m_actuatorSettings[servoid].channelMin        = 1000;
-            m_actuatorSettings[servoid].channelNeutral    = 1000;
-            m_actuatorSettings[servoid].channelMax        = 1900;
+            m_actuatorSettings[servoid].channelMin        = LOW_OUTPUT_RATE_MILLISECONDS;
+            m_actuatorSettings[servoid].channelNeutral    = LOW_OUTPUT_RATE_MILLISECONDS;
+            m_actuatorSettings[servoid].channelMax        = getHighOutputRate();
             m_actuatorSettings[servoid].isReversableMotor = false;
             // Car and Tank should use reversable Esc/motors
             if ((getWizard()->getVehicleSubType() == SetupWizard::GROUNDVEHICLE_CAR)
                 || (getWizard()->getVehicleSubType() == SetupWizard::GROUNDVEHICLE_DIFFERENTIAL)) {
-                m_actuatorSettings[servoid].channelNeutral    = 1500;
+                m_actuatorSettings[servoid].channelNeutral    = NEUTRAL_OUTPUT_RATE_MILLISECONDS;
                 m_actuatorSettings[servoid].isReversableMotor = true;
                 // Set initial output value
-                m_calibrationUtil->startChannelOutput(servoid, 1500);
+                m_calibrationUtil->startChannelOutput(servoid, NEUTRAL_OUTPUT_RATE_MILLISECONDS);
                 m_calibrationUtil->stopChannelOutput();
             }
         } else if (servoid < totalUsedChannels) {
             // Set to servo safe values
-            m_actuatorSettings[servoid].channelMin     = 1500;
-            m_actuatorSettings[servoid].channelNeutral = 1500;
-            m_actuatorSettings[servoid].channelMax     = 1500;
+            m_actuatorSettings[servoid].channelMin     = NEUTRAL_OUTPUT_RATE_MILLISECONDS;
+            m_actuatorSettings[servoid].channelNeutral = NEUTRAL_OUTPUT_RATE_MILLISECONDS;
+            m_actuatorSettings[servoid].channelMax     = NEUTRAL_OUTPUT_RATE_MILLISECONDS;
             // Set initial servo output value
-            m_calibrationUtil->startChannelOutput(servoid, 1500);
+            m_calibrationUtil->startChannelOutput(servoid, NEUTRAL_OUTPUT_RATE_MILLISECONDS);
             m_calibrationUtil->stopChannelOutput();
         } else {
             // "Disable" these channels
-            m_actuatorSettings[servoid].channelMin     = 1000;
-            m_actuatorSettings[servoid].channelNeutral = 1000;
-            m_actuatorSettings[servoid].channelMax     = 1000;
+            m_actuatorSettings[servoid].channelMin     = LOW_OUTPUT_RATE_MILLISECONDS;
+            m_actuatorSettings[servoid].channelNeutral = LOW_OUTPUT_RATE_MILLISECONDS;
+            m_actuatorSettings[servoid].channelMax     = LOW_OUTPUT_RATE_MILLISECONDS;
         }
     }
 }
@@ -658,6 +658,15 @@ void OutputCalibrationPage::debugLogChannelValues()
     qDebug() << "ChannelMin    : " << m_actuatorSettings[currentChannel].channelMin;
     qDebug() << "ChannelNeutral: " << m_actuatorSettings[currentChannel].channelNeutral;
     qDebug() << "ChannelMax    : " << m_actuatorSettings[currentChannel].channelMax;
+}
+
+int OutputCalibrationPage::getHighOutputRate()
+{
+    if (getWizard()->getEscType() == SetupWizard::ESC_ONESHOT) {
+        return HIGH_OUTPUT_RATE_MILLISECONDS_ONESHOT125;
+    } else {
+        return HIGH_OUTPUT_RATE_MILLISECONDS_PWM;
+    }
 }
 
 void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)

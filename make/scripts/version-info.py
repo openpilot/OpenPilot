@@ -228,7 +228,8 @@ class Repo:
         json_data['last_tag'] = self._last_tag
         json_data['num_commits_past_tag'] = self._num_commits_past_tag
         json_data['branch'] = self._branch
-        json_data['dirty'] = self._dirty
+        # version-info.json is for use with git archive which doesn't take in dirty changes
+        json_data['dirty'] = False
 
         json_path = os.path.join(path, 'version-info.json')
         with open(json_path, 'w') as json_file:

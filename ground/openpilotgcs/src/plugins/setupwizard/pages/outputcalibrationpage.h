@@ -72,8 +72,8 @@ private slots:
     void on_reverseCheckbox_toggled(bool checked);
 
 private:
-    static const int LOW_OUTPUT_RATE_MILLISECONDS = 1000;
-    static const int NEUTRAL_OUTPUT_RATE_MILLISECONDS = 1500;
+    static const int LOW_OUTPUT_RATE_MILLISECONDS      = 1000;
+    static const int NEUTRAL_OUTPUT_RATE_MILLISECONDS  = 1500;
     static const int HIGH_OUTPUT_RATE_MILLISECONDS_PWM = 1900;
     static const int HIGH_OUTPUT_RATE_MILLISECONDS_ONESHOT125 = 2000;
     void setupVehicle();

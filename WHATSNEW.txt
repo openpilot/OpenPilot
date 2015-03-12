@@ -1,4 +1,4 @@
---- RELEASE-15.02 RC6 
+--- RELEASE-15.02 --- Ragin' Cajun ---
 This release introduces major flight performance improvements, enhancements as well as bug fixes. Many enhancements have been made to reducing dead-time of the communication between the flight controller and ESCs. In our testing, we have found this to be not only the best flight performance so far in the OpenPilot project but the best flight performance of any project we have tested against. This is a recommended upgrade for everyone and the more skilled of a pilot you are, the more you will love this release.
 
 A key improvement that helped achieve this was the addition of the PWMSync code path, this is now enabled by default. Some restrictions applies to CC3D/CC as it needs a compatible input method to enable PWMSync. Compatible input methods are PPM, S.Bus, DSM and OPLink. This release also introduces support for OneShot125 capable ESCs, such as the KISS ESCs and all ESCs supported in BLHeli V13 and above.  Note that OneShot125 support has the same restrictions as PWMSync for CC and CC3D. 
@@ -8,6 +8,7 @@ Note for CC3D/CC: To support PWMSync/OneShot125 PPM input pin has changed from e
 Other enhancements include key parts of the GCS translated to Chinese and further OPLink reliability additions allowing us to confidently say it can be used as a primary control link as well as for telemetry.
 
 The full list of features, improvements and bugfixes in this release is accessible here:
+
 https://progress.openpilot.org/issues/?filter=12161
 
 Release Notes - OpenPilot - Version RELEASE-15.02

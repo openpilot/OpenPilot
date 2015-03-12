@@ -2,15 +2,15 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup SecondaryTelemetryModule SecondaryTelemetry Module
- * @brief Secondary telemetry module UAVTalk protocol
+ * @addtogroup LightTelemetryModule LightTelemetry Module
+ * @brief Lightweight telemetry module UAVTalk protocol
  * Implements output in UAVTalk format. Little more than a wrapper for
  * the UAVTalk library.
  * @{
  *
  * @file       protouavtalk.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Secondary telemetry module UAVTalk protocol.
+ * @brief      Lightweight telemetry module UAVTalk protocol.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -33,7 +33,7 @@
 #include <openpilot.h>
 #include <pios_com.h>
 
-#include "secondarytelemetry.h"
+#include "lighttelemetry.h"
 
 // Private constants
 
@@ -45,7 +45,7 @@ static UAVTalkConnection uavTalkCon;
 
 // Private functions
 static void initialize(uint32_t comPort);
-static void updateData(SecondaryTelemetrySettingsUpdateIntervalsElem data);
+static void updateData(LightTelemetrySettingsUpdateIntervalsElem data);
 static int32_t transmitData(uint8_t *data, int32_t length);
 
 protocolHandler_t uavtalkProtocolHandler = {
@@ -59,27 +59,27 @@ static void initialize(uint32_t comPort)
     uavTalkCon = UAVTalkInitialize(&transmitData);
 }
 
-static void updateData(SecondaryTelemetrySettingsUpdateIntervalsElem data)
+static void updateData(LightTelemetrySettingsUpdateIntervalsElem data)
 {
     UAVObjHandle obj1 = NULL;
     UAVObjHandle obj2 = NULL;
 
     switch (data) {
-    case SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_ATTITUDE:
+    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_ATTITUDE:
         obj1 = AttitudeStateHandle();
         break;
-    case SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_GPSDATA:
+    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_GPSDATA:
         obj1 = GPSPositionSensorHandle();
         obj2 = GPSVelocitySensorHandle();
         break;
-    case SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_MANUALCONTROL:
+    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_MANUALCONTROL:
         obj1 = ManualControlCommandHandle();
         break;
-    case SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_SYSTEMSTATUS:
+    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_SYSTEMSTATUS:
         obj1 = FlightStatusHandle();
         obj2 = SystemAlarmsHandle();
         break;
-    case SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_FLIGHTBATTERY:
+    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_FLIGHTBATTERY:
         obj1 = FlightBatteryStateHandle();
         break;
     }

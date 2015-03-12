@@ -632,7 +632,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_MAINPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RM_MAINPORT_SECONDARYTELEMETRY:
+    case HWSETTINGS_RM_MAINPORT_LIGHTTELEMETRY:
         PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /*        hwsettings_rm_mainport */
@@ -678,7 +678,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_FLEXIPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RM_FLEXIPORT_SECONDARYTELEMETRY:
+    case HWSETTINGS_RM_FLEXIPORT_LIGHTTELEMETRY:
         PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /* hwsettings_rm_flexiport */

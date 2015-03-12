@@ -692,7 +692,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_AUXPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RV_AUXPORT_SECONDARYTELEMETRY:
+    case HWSETTINGS_RV_AUXPORT_LIGHTTELEMETRY:
         PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /* hwsettings_rv_auxport */
@@ -737,7 +737,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_AUXSBUSPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
-    case HWSETTINGS_RV_AUXSBUSPORT_SECONDARYTELEMETRY:
+    case HWSETTINGS_RV_AUXSBUSPORT_LIGHTTELEMETRY:
         PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_SECOND_TELEM_RX_BUF_LEN, PIOS_COM_SECOND_TELEM_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_second_telem_id);
         break;
     } /* hwsettings_rv_auxport */

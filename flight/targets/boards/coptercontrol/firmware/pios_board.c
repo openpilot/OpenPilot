@@ -554,7 +554,7 @@ void PIOS_Board_Init(void)
         }
     }
     break;
-    case HWSETTINGS_CC_MAINPORT_SECONDARYTELEMETRY:
+    case HWSETTINGS_CC_MAINPORT_LIGHTTELEMETRY:
     {
         uint32_t pios_usart_generic_id;
         if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
@@ -701,7 +701,7 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_I2C */
         break;
-    case HWSETTINGS_CC_FLEXIPORT_SECONDARYTELEMETRY:
+    case HWSETTINGS_CC_FLEXIPORT_LIGHTTELEMETRY:
     {
         uint32_t pios_usart_generic_id;
         if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {

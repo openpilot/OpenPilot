@@ -131,7 +131,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/auxmagsettings.h \
     $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.h \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h \
-    $$UAVOBJECT_SYNTHETICS/secondarytelemetrysettings.h
+    $$UAVOBJECT_SYNTHETICS/lighttelemetrysettings.h
 
 SOURCES += \
     $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.cpp \
@@ -239,5 +239,5 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/auxmagsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/perfcounter.cpp \
-    $$UAVOBJECT_SYNTHETICS/secondarytelemetrysettings.cpp
+    $$UAVOBJECT_SYNTHETICS/lighttelemetrysettings.cpp
 

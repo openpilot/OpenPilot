@@ -2,15 +2,15 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup SecondaryTelemetryModule SecondaryTelemetry Module
- * @brief Secondary telemetry module
+ * @addtogroup LightTelemetryModule LightTelemetry Module
+ * @brief Lightweight telemetry module
  * Exports basic telemetry data using a selectable serial protocol
  * to external devices such as on screen displays.
  * @{
  *
- * @file       secondarytelemetry.c
+ * @file       lighttelemetry.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Secondary telemetry module, exports basic telemetry.
+ * @brief      Lightweight telemetry module, exports basic telemetry.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -33,10 +33,10 @@
 #include <openpilot.h>
 #include <pios_com.h>
 
-#include "secondarytelemetrysettings.h"
+#include "lighttelemetrysettings.h"
 #include "hwsettings.h"
 
-#include "secondarytelemetry.h"
+#include "lighttelemetry.h"
 
 extern protocolHandler_t uavtalkProtocolHandler;
 
@@ -53,8 +53,8 @@ static xTaskHandle taskHandle;
 static bool modEnabled;
 static protocolHandler_t *activeProtocolHandler = NULL;
 static uint8_t updatePeriod;
-static uint8_t intervalCounts[SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
-static uint8_t updateIntervals[SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
+static uint8_t intervalCounts[LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
+static uint8_t updateIntervals[LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
 
 // Private functions
 static void telemetryTask(void *parameters);
@@ -65,7 +65,7 @@ static void updateSettings(UAVObjEvent *ev);
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-int32_t SecondaryTelemetryStart(void)
+int32_t LightTelemetryStart(void)
 {
     // Start telemetry tasks
     if (modEnabled && comPort && activeProtocolHandler) {
@@ -79,7 +79,7 @@ int32_t SecondaryTelemetryStart(void)
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-int32_t SecondaryTelemetryInitialize(void)
+int32_t LightTelemetryInitialize(void)
 {
     comPort = PIOS_COM_SECOND_TELEM;
 
@@ -88,15 +88,15 @@ int32_t SecondaryTelemetryInitialize(void)
 
     HwSettingsOptionalModulesGet(&optionalModules);
 
-    if (optionalModules.SecondaryTelemetry == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    if (optionalModules.LightTelemetry == HWSETTINGS_OPTIONALMODULES_ENABLED) {
         modEnabled = true;
     } else {
         modEnabled = false;
     }
 
     if (modEnabled && comPort) {
-        SecondaryTelemetrySettingsInitialize();
-        SecondaryTelemetrySettingsConnectCallback(updateSettings);
+        LightTelemetrySettingsInitialize();
+        LightTelemetrySettingsConnectCallback(updateSettings);
         updateSettings(0);
         if (activeProtocolHandler) {
             activeProtocolHandler->initialize(comPort);
@@ -106,7 +106,7 @@ int32_t SecondaryTelemetryInitialize(void)
     return 0;
 }
 
-MODULE_INITCALL(SecondaryTelemetryInitialize, SecondaryTelemetryStart);
+MODULE_INITCALL(LightTelemetryInitialize, LightTelemetryStart);
 
 /**
  */
@@ -120,7 +120,7 @@ static void telemetryTask(__attribute__((unused)) void *parameters)
         vTaskDelayUntil(&lastSysTime, updatePeriod / portTICK_RATE_MS);
 
         /* Update interval counters */
-        for (i = 0; i < SECONDARYTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM; i++) {
+        for (i = 0; i < LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM; i++) {
             if (updateIntervals[i]) {
                 intervalCounts[i]++;
                 if (intervalCounts[i] >= updateIntervals[i]) {
@@ -140,31 +140,31 @@ static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
     if (modEnabled && comPort) {
         uint8_t speed;
         // Retrieve settings
-        SecondaryTelemetrySettingsOutputSpeedGet(&speed);
-        SecondaryTelemetrySettingsUpdatePeriodGet(&updatePeriod);
-        SecondaryTelemetrySettingsUpdateIntervalsArrayGet(updateIntervals);
+        LightTelemetrySettingsOutputSpeedGet(&speed);
+        LightTelemetrySettingsUpdatePeriodGet(&updatePeriod);
+        LightTelemetrySettingsUpdateIntervalsArrayGet(updateIntervals);
 
         // Set port speed
         switch (speed) {
-        case SECONDARYTELEMETRYSETTINGS_OUTPUTSPEED_2400:
+        case LIGHTTELEMETRYSETTINGS_OUTPUTSPEED_2400:
             PIOS_COM_ChangeBaud(comPort, 2400);
             break;
-        case SECONDARYTELEMETRYSETTINGS_OUTPUTSPEED_4800:
+        case LIGHTTELEMETRYSETTINGS_OUTPUTSPEED_4800:
             PIOS_COM_ChangeBaud(comPort, 4800);
             break;
-        case SECONDARYTELEMETRYSETTINGS_OUTPUTSPEED_9600:
+        case LIGHTTELEMETRYSETTINGS_OUTPUTSPEED_9600:
             PIOS_COM_ChangeBaud(comPort, 9600);
             break;
-        case SECONDARYTELEMETRYSETTINGS_OUTPUTSPEED_19200:
+        case LIGHTTELEMETRYSETTINGS_OUTPUTSPEED_19200:
             PIOS_COM_ChangeBaud(comPort, 19200);
             break;
-        case SECONDARYTELEMETRYSETTINGS_OUTPUTSPEED_38400:
+        case LIGHTTELEMETRYSETTINGS_OUTPUTSPEED_38400:
             PIOS_COM_ChangeBaud(comPort, 38400);
             break;
-        case SECONDARYTELEMETRYSETTINGS_OUTPUTSPEED_57600:
+        case LIGHTTELEMETRYSETTINGS_OUTPUTSPEED_57600:
             PIOS_COM_ChangeBaud(comPort, 57600);
             break;
-        case SECONDARYTELEMETRYSETTINGS_OUTPUTSPEED_115200:
+        case LIGHTTELEMETRYSETTINGS_OUTPUTSPEED_115200:
             PIOS_COM_ChangeBaud(comPort, 115200);
             break;
         }

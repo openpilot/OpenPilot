@@ -50,7 +50,7 @@ MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
 MODULES += Notify
-MODULES += SecondaryTelemetry
+MODULES += LightTelemetry
 
 OPTMODULES += ComUsbBridge
 

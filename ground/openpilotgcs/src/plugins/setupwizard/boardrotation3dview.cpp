@@ -174,5 +174,6 @@ void BoardRotation3DView::wheelEvent(QWheelEvent *e)
 
     m_glcView.cameraHandle()->setDistEyeTarget(delta);
     m_glcView.setDistMinAndMax(m_glcWorld.boundingBox());
+    updateGL();
 }
 

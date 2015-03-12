@@ -43,15 +43,15 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     connect(&m_glcView, SIGNAL(updateOpenGL()), this, SLOT(updateGL()));
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    m_glcLight.setPosition(4000.0, 40000.0, 80000.0);
+    m_glcLight.setPosition(1.0, 1.0, 1.0);
     m_glcLight.setAmbientColor(Qt::lightGray);
 
     m_glcView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
     m_glcView.cameraHandle()->setIsoView();
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(180));
+    //m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(90));
 
     QColor repColor;
-    repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
+    repColor.setRgbF(1.0, 0.11372, 0.11372, 1.0);
     m_glcMoverController = GLC_Factory::instance()->createDefaultMoverController(repColor, &m_glcView);
 
     CreateScene();
@@ -156,6 +156,7 @@ void BoardRotation3DView::CreateScene()
             m_glcWorld = GLC_Factory::instance()->createWorldFromFile(boardFile);
             m_glcBoundingBox = m_glcWorld.boundingBox();
             m_glcView.reframe(m_glcBoundingBox);
+            //m_glcView.cameraHandle()->setDistEyeTarget(m_glcView.cameraHandle()->distEyeTarget() - 30);
         } else {
             qDebug("BoardRotation3DView::CreateScene() No board image file.");
         }
@@ -166,14 +167,12 @@ void BoardRotation3DView::CreateScene()
     return;
 }
 
-/*
+
 void BoardRotation3DView::wheelEvent(QWheelEvent *e)
 {
-    double delta = m_glcView.cameraHandle()->distEyeTarget() - (e->delta() / 4);
+    double delta = m_glcView.cameraHandle()->distEyeTarget() - (e->delta() / 8);
 
     m_glcView.cameraHandle()->setDistEyeTarget(delta);
     m_glcView.setDistMinAndMax(m_glcWorld.boundingBox());
-    updateGL();
 }
-*/
 

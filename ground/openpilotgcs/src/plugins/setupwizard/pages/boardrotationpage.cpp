@@ -56,12 +56,12 @@ BoardRotationPage::BoardRotationPage(SetupWizard *wizard, QWidget *parent) :
     case VehicleConfigurationSource::CONTROLLER_CC:
     case VehicleConfigurationSource::CONTROLLER_CC3D:
     default:
-        fileName += QString("CC3D/CC3D.3ds");
+    fileName += QString("CC3D/CC3D.3ds");
         break;
     }
 
     m_board3DView = new BoardRotation3DView(this, fileName);
-    m_board3DView->setGeometry(QRect(12, 180, 731, 387));
+    m_board3DView->setGeometry(QRect(12, 185, 750, 387));
 
     connect(ui->rollBias, SIGNAL(valueChanged(int)), this, SLOT(onRollChanged()));
     connect(ui->pitchBias, SIGNAL(valueChanged(int)), this, SLOT(onPitchChanged()));

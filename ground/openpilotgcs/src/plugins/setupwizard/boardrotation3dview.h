@@ -62,7 +62,7 @@ private:
     void paintGL();
     void resizeGL(int width, int height);
     void CreateScene();
-    //void wheelEvent(QWheelEvent *e);
+    void wheelEvent(QWheelEvent *e);
 };
 
 #endif /* BOARDROTATION3DVIEW_H */

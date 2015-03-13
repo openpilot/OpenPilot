@@ -317,7 +317,13 @@ void ConfigGroundVehicleWidget::initMixerCurves(QString frameType)
         m_aircraft->groundVehicleThrottle1->initCurve(&curveValues);
     } else {
         // no, init a straight curve
-        m_aircraft->groundVehicleThrottle1->initLinearCurve(curveValues.count(), 1.0, 0.0);
+        if (frameType == "GroundVehicleDifferential") {
+            m_aircraft->groundVehicleThrottle1->initLinearCurve(curveValues.count(), 0.8, 0.0);
+        } else if (frameType == "GroundVehicleCar") {
+            m_aircraft->groundVehicleThrottle1->initLinearCurve(curveValues.count(), 1.0, 0.0);
+        } else {
+            m_aircraft->groundVehicleThrottle1->initLinearCurve(curveValues.count(), 1.0, 0.0);
+        }
     }
 
     // Setup all Throttle2 curves for all types of airframes
@@ -328,7 +334,7 @@ void ConfigGroundVehicleWidget::initMixerCurves(QString frameType)
     } else {
         // no, init a straight curve
         if (frameType == "GroundVehicleDifferential") {
-            m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 1.0, 0.0);
+            m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 0.8, 0.0);
         } else if (frameType == "GroundVehicleCar") {
             m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 1.0, 0.0);
         } else {

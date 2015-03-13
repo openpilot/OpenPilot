@@ -1551,7 +1551,7 @@
           <enableVbo>false</enableVbo>
         </data>
       </Revolution>
-      <Blackout_MiniH>
+      <Blackout__PCT__20Mini__PCT__20H>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -1561,7 +1561,7 @@
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
-      </Blackout_MiniH>
+      </Blackout__PCT__20Mini__PCT__20H>
       <Zagi>
         <configInfo>
           <locked>false</locked>

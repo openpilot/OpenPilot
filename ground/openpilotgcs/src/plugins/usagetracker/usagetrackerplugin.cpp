@@ -172,10 +172,10 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         ManualControlSettings *controlSettings = ManualControlSettings::GetInstance(objManager);
         parameters["settings_receiver"] = controlSettings->getField("ChannelGroups")->getValue(ManualControlSettings::CHANNELGROUPS_THROTTLE).toString();
 
-        RevoSettings revoSettings = RevoSettings::GetInstance(objManager);
+        RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
         // Only get this info if uavo is known by controller
-        if (revoSettings.isKnown()) {
-            parameters["settings_fusion"] = revoSettings.getField("FusionAlgorithm")->getValue().toString();
+        if (revoSettings->isKnown()) {
+            parameters["settings_fusion"] = revoSettings->getField("FusionAlgorithm")->getValue().toString();
         }
     }
 }

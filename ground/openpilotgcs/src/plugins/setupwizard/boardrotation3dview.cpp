@@ -35,8 +35,8 @@
 
 #include "boardrotation3dview.h"
 
-#define DISTANCE_MIN    70
-#define DISTANCE_MAX    200
+#define DISTANCE_MIN 70
+#define DISTANCE_MAX 200
 
 BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     : QGLWidget(new GLC_Context(QGLFormat(QGL::SampleBuffers)), parent),
@@ -57,13 +57,10 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     m_glcMoverController = GLC_Factory::instance()->createDefaultMoverController(repColor, &m_glcView);
 
     CreateScene();
-
-    return;
 }
 
 BoardRotation3DView::~BoardRotation3DView()
-{
-}
+{}
 
 void BoardRotation3DView::rollRotation(int val)
 {
@@ -121,14 +118,12 @@ void BoardRotation3DView::paintGL()
         m_glcWorld.render(0, glc::TransparentRenderFlag);
 
         m_glcMoverController.drawActiveMoverRep();
-    }catch(GLC_Exception &e) {
+    } catch(GLC_Exception &e) {
         qDebug() << e.what();
     }
-
-    return;
 }
 
-void BoardRotation3DView::resizeGL(int width,int height)
+void BoardRotation3DView::resizeGL(int width, int height)
 {
     m_glcView.setWinGLSize(width, height);
     {
@@ -154,20 +149,19 @@ void BoardRotation3DView::CreateScene()
             m_glcWorld = GLC_Factory::instance()->createWorldFromFile(boardFile);
             m_glcBoundingBox = m_glcWorld.boundingBox();
             m_glcView.reframe(m_glcBoundingBox);
-            //m_glcView.cameraHandle()->setDistEyeTarget(m_glcView.cameraHandle()->distEyeTarget() - 30);
+            // m_glcView.cameraHandle()->setDistEyeTarget(m_glcView.cameraHandle()->distEyeTarget() - 30);
         } else {
             qDebug("BoardRotation3DView::CreateScene() No board image file.");
         }
     } catch(GLC_Exception e) {
         qDebug("BoardRotation3DView::CreateScene() fail to load board image file.");
     }
-
-    return;
 }
 
 void BoardRotation3DView::wheelEvent(QWheelEvent *e)
 {
     double current_dist = m_glcView.cameraHandle()->distEyeTarget();
+
     if ((current_dist < DISTANCE_MIN) && (e->delta() > 0)) {
         return;
     }
@@ -180,4 +174,3 @@ void BoardRotation3DView::wheelEvent(QWheelEvent *e)
     m_glcView.setDistMinAndMax(m_glcWorld.boundingBox());
     updateGL();
 }
-

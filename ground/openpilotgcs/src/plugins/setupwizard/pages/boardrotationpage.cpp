@@ -77,9 +77,9 @@ bool BoardRotationPage::validatePage()
 {
     boardRotation rotation;
 
-    rotation.m_rollDegree = (float)ui->rollBias->value();
+    rotation.m_rollDegree  = (float)ui->rollBias->value();
     rotation.m_pitchDegree = (float)ui->pitchBias->value();
-    rotation.m_yawDegree = (float)ui->yawBias->value();
+    rotation.m_yawDegree   = (float)ui->yawBias->value();
 
     getWizard()->setBoardRotation(rotation);
     return true;
@@ -88,6 +88,7 @@ bool BoardRotationPage::validatePage()
 void BoardRotationPage::onRollChanged()
 {
     int changed(ui->rollBias->value() - m_prevRoll);
+
     if ((changed > 1) || (changed < -1)) {
         m_board3DView->rollRotation(-m_prevRoll);
         m_board3DView->rollRotation(ui->rollBias->value());
@@ -101,6 +102,7 @@ void BoardRotationPage::onRollChanged()
 void BoardRotationPage::onPitchChanged()
 {
     int changed(ui->pitchBias->value() - m_prevPitch);
+
     if ((changed > 1) || (changed < -1)) {
         m_board3DView->pitchRotation(-m_prevPitch);
         m_board3DView->pitchRotation(ui->pitchBias->value());
@@ -114,6 +116,7 @@ void BoardRotationPage::onPitchChanged()
 void BoardRotationPage::onYawChanged()
 {
     int changed(ui->yawBias->value() - m_prevYaw);
+
     if ((changed > 1) || (changed < -1)) {
         m_board3DView->yawRotation(-m_prevYaw);
         m_board3DView->yawRotation(ui->yawBias->value());
@@ -123,4 +126,3 @@ void BoardRotationPage::onYawChanged()
 
     m_prevYaw = ui->yawBias->value();
 }
-

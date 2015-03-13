@@ -66,4 +66,3 @@ private:
 };
 
 #endif /* BOARDROTATION3DVIEW_H */
-

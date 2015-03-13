@@ -36,8 +36,7 @@ namespace Ui {
 class BoardRotationPage;
 }
 
-class BoardRotationPage : public AbstractWizardPage
-{
+class BoardRotationPage : public AbstractWizardPage {
     Q_OBJECT
 
 public:
@@ -47,7 +46,7 @@ public:
 
 private:
     Ui::BoardRotationPage *ui;
-    //QGraphicsSvgItem *m_vehicleItem;
+    // QGraphicsSvgItem *m_vehicleItem;
     BoardRotation3DView *m_board3DView;
     int m_prevRoll;
     int m_prevPitch;
@@ -60,4 +59,3 @@ private slots:
 };
 
 #endif // BOARDROTATIONPAGE_H
-

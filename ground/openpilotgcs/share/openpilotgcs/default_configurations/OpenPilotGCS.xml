@@ -1524,7 +1524,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/boards/CopterControl/CopterControl.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/boards/coptercontrol/coptercontrol.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1535,7 +1535,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/boards/CC3D/CC3D.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/boards/cc3d/cc3d.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1546,7 +1546,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/boards/Revolution/revolution.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/boards/revolution/revolution.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1557,7 +1557,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/blackout/BlackoutMiniHQuad.3DS</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/blackout/blackout_mini_h_quad.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1579,7 +1579,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/easy_quad/easy_quad_X.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/easy_quad/easy_quad_x.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1590,7 +1590,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/planes/Easystar/easystar.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/planes/easystar/easystar.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1645,7 +1645,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/mikrokopter/MK_Hexa.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/mikrokopter/mk_hexa.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1656,7 +1656,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-Q_+.3DS</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/j14-q_+.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1667,7 +1667,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-Q_X.3DS</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/j14-q_x.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1678,7 +1678,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-QT_+.3DS</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/j14-qt_+.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1689,7 +1689,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-QT_X.3DS</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/j14-qt_x.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1700,7 +1700,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/mikrokopter/MK_L4-ME.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/mikrokopter/mk_l4-me.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1711,7 +1711,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/ricoo/ricoo.3DS</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/ricoo/ricoo.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1733,7 +1733,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/mattL_Y6/mattL_Y6.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/mattl_y6/mattl_y6.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>
@@ -1755,7 +1755,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <acFilename>%%DATAPATH%%models/multi/test_quad/test_quad_X.3ds</acFilename>
+          <acFilename>%%DATAPATH%%models/multi/test_quad/test_quad_x.3ds</acFilename>
           <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
           <enableVbo>false</enableVbo>
         </data>

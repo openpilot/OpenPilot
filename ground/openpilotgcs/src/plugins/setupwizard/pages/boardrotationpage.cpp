@@ -56,7 +56,7 @@ BoardRotationPage::BoardRotationPage(SetupWizard *wizard, QWidget *parent) :
     case VehicleConfigurationSource::CONTROLLER_CC:
     case VehicleConfigurationSource::CONTROLLER_CC3D:
     default:
-    fileName += QString("CC3D/CC3D.3ds");
+        fileName += QString("CC3D/CC3D.3ds");
         break;
     }
 

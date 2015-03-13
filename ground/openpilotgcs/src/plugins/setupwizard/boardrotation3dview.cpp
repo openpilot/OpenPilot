@@ -35,6 +35,9 @@
 
 #include "boardrotation3dview.h"
 
+#define DISTANCE_MIN    70
+#define DISTANCE_MAX    200
+
 BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     : QGLWidget(new GLC_Context(QGLFormat(QGL::SampleBuffers)), parent),
     m_glcLight(), m_glcWorld(), m_glcView(), m_glcMoverController(),
@@ -48,7 +51,6 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
 
     m_glcView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
     m_glcView.cameraHandle()->setIsoView();
-    //m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(90));
 
     QColor repColor;
     repColor.setRgbF(1.0, 0.11372, 0.11372, 1.0);
@@ -65,22 +67,19 @@ BoardRotation3DView::~BoardRotation3DView()
 
 void BoardRotation3DView::rollRotation(int val)
 {
-    qDebug() << "rollRotation:" << val;
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, glc::toRadian(val));
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, glc::toRadian(-val));
     updateGL();
 }
 
 void BoardRotation3DView::pitchRotation(int val)
 {
-    qDebug() << "pitchRotation:" << val;
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, glc::toRadian(val));
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, glc::toRadian(-val));
     updateGL();
 }
 
 void BoardRotation3DView::yawRotation(int val)
 {
-    qDebug() << "yawRotation:" << val;
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(val));
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(-val));
     updateGL();
 }
 
@@ -150,7 +149,6 @@ void BoardRotation3DView::CreateScene()
     }
 
     try {
-        qDebug() << "m_boardFilename:" << m_boardFilename;
         if (QFile::exists(m_boardFilename)) {
             QFile boardFile(m_boardFilename);
             m_glcWorld = GLC_Factory::instance()->createWorldFromFile(boardFile);
@@ -169,8 +167,15 @@ void BoardRotation3DView::CreateScene()
 
 void BoardRotation3DView::wheelEvent(QWheelEvent *e)
 {
-    double delta = m_glcView.cameraHandle()->distEyeTarget() - (e->delta() / 8);
+    double current_dist = m_glcView.cameraHandle()->distEyeTarget();
+    if ((current_dist < DISTANCE_MIN) && (e->delta() > 0)) {
+        return;
+    }
+    if ((current_dist > DISTANCE_MAX) && (e->delta() < 0)) {
+        return;
+    }
 
+    double delta = current_dist - (e->delta() / 8);
     m_glcView.cameraHandle()->setDistEyeTarget(delta);
     m_glcView.setDistMinAndMax(m_glcWorld.boundingBox());
     updateGL();

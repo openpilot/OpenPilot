@@ -61,7 +61,7 @@ BoardRotationPage::BoardRotationPage(SetupWizard *wizard, QWidget *parent) :
     }
 
     m_board3DView = new BoardRotation3DView(this, fileName);
-    m_board3DView->setGeometry(QRect(12, 180, 731, 387));
+    m_board3DView->setGeometry(QRect(12, 185, 750, 387));
 
     connect(ui->rollBias, SIGNAL(valueChanged(int)), this, SLOT(onRollChanged()));
     connect(ui->pitchBias, SIGNAL(valueChanged(int)), this, SLOT(onPitchChanged()));

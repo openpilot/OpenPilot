@@ -35,6 +35,9 @@
 
 #include "boardrotation3dview.h"
 
+#define DISTANCE_MIN    70
+#define DISTANCE_MAX    200
+
 BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     : QGLWidget(new GLC_Context(QGLFormat(QGL::SampleBuffers)), parent),
     m_glcLight(), m_glcWorld(), m_glcView(), m_glcMoverController(),
@@ -43,15 +46,14 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     connect(&m_glcView, SIGNAL(updateOpenGL()), this, SLOT(updateGL()));
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    m_glcLight.setPosition(4000.0, 40000.0, 80000.0);
+    m_glcLight.setPosition(1.0, 1.0, 1.0);
     m_glcLight.setAmbientColor(Qt::lightGray);
 
     m_glcView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
-    m_glcView.cameraHandle()->setTopView();
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(180));
+    m_glcView.cameraHandle()->setIsoView();
 
     QColor repColor;
-    repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
+    repColor.setRgbF(1.0, 0.11372, 0.11372, 1.0);
     m_glcMoverController = GLC_Factory::instance()->createDefaultMoverController(repColor, &m_glcView);
 
     CreateScene();
@@ -65,22 +67,19 @@ BoardRotation3DView::~BoardRotation3DView()
 
 void BoardRotation3DView::rollRotation(int val)
 {
-    qDebug() << "rollRotation:" << val;
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, glc::toRadian(val));
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, glc::toRadian(-val));
     updateGL();
 }
 
 void BoardRotation3DView::pitchRotation(int val)
 {
-    qDebug() << "pitchRotation:" << val;
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, glc::toRadian(val));
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, glc::toRadian(-val));
     updateGL();
 }
 
 void BoardRotation3DView::yawRotation(int val)
 {
-    qDebug() << "yawRotation:" << val;
-    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(val));
+    m_glcView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, glc::toRadian(-val));
     updateGL();
 }
 
@@ -150,12 +149,12 @@ void BoardRotation3DView::CreateScene()
     }
 
     try {
-        qDebug() << "m_boardFilename:" << m_boardFilename;
         if (QFile::exists(m_boardFilename)) {
             QFile boardFile(m_boardFilename);
             m_glcWorld = GLC_Factory::instance()->createWorldFromFile(boardFile);
             m_glcBoundingBox = m_glcWorld.boundingBox();
             m_glcView.reframe(m_glcBoundingBox);
+            //m_glcView.cameraHandle()->setDistEyeTarget(m_glcView.cameraHandle()->distEyeTarget() - 30);
         } else {
             qDebug("BoardRotation3DView::CreateScene() No board image file.");
         }
@@ -166,14 +165,19 @@ void BoardRotation3DView::CreateScene()
     return;
 }
 
-/*
 void BoardRotation3DView::wheelEvent(QWheelEvent *e)
 {
-    double delta = m_glcView.cameraHandle()->distEyeTarget() - (e->delta() / 4);
+    double current_dist = m_glcView.cameraHandle()->distEyeTarget();
+    if ((current_dist < DISTANCE_MIN) && (e->delta() > 0)) {
+        return;
+    }
+    if ((current_dist > DISTANCE_MAX) && (e->delta() < 0)) {
+        return;
+    }
 
+    double delta = current_dist - (e->delta() / 8);
     m_glcView.cameraHandle()->setDistEyeTarget(delta);
     m_glcView.setDistMinAndMax(m_glcWorld.boundingBox());
     updateGL();
 }
-*/
 

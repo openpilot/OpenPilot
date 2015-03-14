@@ -646,12 +646,11 @@ static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalk
  */
 static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t *rxbuffer, uint8_t count)
 {
-    uint8_t position     = 0;
-    UAVTalkRxState state = UAVTALK_STATE_ERROR;
+    uint8_t position = 0;
 
     // Keep reading until we receive a completed packet.
     while (count > 0) {
-        state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbuffer, &count, &position);
+        UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbuffer, &count, &position);
         if (state == UAVTALK_STATE_COMPLETE) {
             // We only want to unpack certain objects from the remote modem
             // Similarly we only want to relay certain objects to the telemetry port

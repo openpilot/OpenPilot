@@ -578,7 +578,7 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
 }
 
 /**
- * Process an buffer from the telemetry stream.
+ * Process a buffer from the telemetry stream.
  * \param[in] connection UAVTalkConnection to be used
  * \param[in] rxbuffer Received buffer
  * \param[in] count bytes inside rxbuffer

@@ -560,27 +560,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  */
 static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements)
 {
-    float abs_input = fabsf(input);
-    float scale     = abs_input * (float)(elements - 1);
-    int idx1 = scale;
-
-    scale -= (float)idx1; // remainder
-    if (curve[0] < -1) {
-        return input;
-    }
-    if (idx1 < 0) {
-        idx1  = 0; // clamp to lowest entry in table
-        scale = 0;
-    }
-    int idx2 = idx1 + 1;
-    if (idx2 >= elements) {
-        idx2 = elements - 1; // clamp to highest entry in table
-        if (idx1 >= elements) {
-            idx1 = elements - 1;
-        }
-    }
-
-    float unsigned_value = curve[idx1] * (1.0f - scale) + curve[idx2] * scale;
+    float unsigned_value = MixerCurveFullRangeAbsolute(input, curve, elements);
     if (input < 0.0f) {
         return -unsigned_value;
     } else {

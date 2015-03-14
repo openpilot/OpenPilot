@@ -198,22 +198,17 @@ static void pathPlannerTask()
 
     static uint8_t failsafeRTHset = 0;
     if (!validPathPlan) {
-        // At this point the craft is in PathPlanner mode, so pilot has no manual control capability.
-        // Failsafe: behave as if in return to base mode
-        // what to do in this case is debatable, it might be better to just
-        // make a forced disarming but rth has a higher chance of survival when
-        // in flight.
         pathplanner_active = false;
 
         if (!failsafeRTHset) {
             failsafeRTHset = 1;
-            // copy pasta: same calculation as in manualcontrol, set return to home coordinates
             plan_setup_positionHold();
         }
         AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_CRITICAL);
 
         return;
     }
+
     failsafeRTHset = 0;
     AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
 

@@ -37,8 +37,8 @@
 #include <stabilizationdesired.h>
 
 // Private constants
-#define ARMED_THRESHOLD 0.50f
-#define GROUND_LOW_THROTTLE  0.01f
+#define ARMED_THRESHOLD     0.50f
+#define GROUND_LOW_THROTTLE 0.01f
 
 // Private types
 typedef enum {

@@ -2138,7 +2138,7 @@ void VehicleConfigurationHelper::setupMotorcycle()
     channels[0].pitch     = 0;
     channels[0].yaw       = 100;
 
-    // Motor (Chan 2) 
+    // Motor (Chan 2)
     channels[1].type      = MIXER_TYPE_MOTOR;
     channels[1].throttle1 = 100;
     channels[1].throttle2 = 0;

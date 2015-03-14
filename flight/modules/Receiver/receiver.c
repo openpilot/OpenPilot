@@ -159,7 +159,6 @@ MODULE_INITCALL(ReceiverInitialize, ReceiverStart);
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-
     frameType = GetCurrentFrameType();
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
@@ -181,7 +180,6 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         }
     }
 #endif
-
 }
 
 

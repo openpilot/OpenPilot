@@ -561,6 +561,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements)
 {
     float unsigned_value = MixerCurveFullRangeAbsolute(input, curve, elements);
+
     if (input < 0.0f) {
         return -unsigned_value;
     } else {
@@ -896,7 +897,6 @@ static void MixerSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 }
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-
     frameType = GetCurrentFrameType();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     uint8_t TreatCustomCraftAs;

@@ -108,7 +108,7 @@ static float thrustHi = 0.0f;
 #endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
-static FrameType_t frameType    = FRAME_TYPE_MULTIROTOR;
+static FrameType_t frameType = FRAME_TYPE_MULTIROTOR;
 
 // Private functions
 static void configurationUpdatedCb(UAVObjEvent *ev);
@@ -180,7 +180,6 @@ MODULE_INITCALL(ManualControlInitialize, ManualControlStart);
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-
     frameType = GetCurrentFrameType();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     uint8_t TreatCustomCraftAs;
@@ -201,7 +200,6 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         }
     }
 #endif
-
 }
 
 /**

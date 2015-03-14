@@ -73,7 +73,7 @@ extern "C" {
 VtolFlyController *VtolFlyController::p_inst = 0;
 
 VtolFlyController::VtolFlyController()
-    : vtolPathFollowerSettings(0), mActive(false), mManualThrust(false)
+    : vtolPathFollowerSettings(0), mActive(false), mManualThrust(false), mMode(0), vtolEmergencyFallback(0.0f), vtolEmergencyFallbackSwitch(false)
 {}
 
 // Called when mode first engaged
@@ -86,6 +86,9 @@ void VtolFlyController::Activate(void)
         controlDown.Activate();
         controlNE.Activate();
         mMode = pathDesired->Mode;
+
+        vtolEmergencyFallback = 0.0f;
+        vtolEmergencyFallbackSwitch = false;
     }
 }
 
@@ -102,7 +105,6 @@ uint8_t VtolFlyController::Mode(void)
 // Objective updated in pathdesired
 void VtolFlyController::ObjectiveUpdated(void)
 {
-    // if objective changes set new endpoint targets TODO
 }
 
 
@@ -113,6 +115,8 @@ void VtolFlyController::Deactivate(void)
         mManualThrust = false;
         controlDown.Deactivate();
         controlNE.Deactivate();
+        vtolEmergencyFallback = 0.0f;
+        vtolEmergencyFallbackSwitch = false;
     }
 }
 
@@ -237,6 +241,7 @@ int8_t VtolFlyController::UpdateStabilizationDesired(bool yaw_attitude, float ya
     ManualControlCommandData manualControl;
     ManualControlCommandGet(&manualControl);
 
+    // TODO The below need to be rewritten because the PID implementation has changed.
 #if 0
     // DEBUG HACK: allow user to skew compass on purpose to see if emergency failsafe kicks in
     if (vtolPathFollowerSettings->FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DEBUGTEST) {

@@ -139,13 +139,13 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
                     if (fh >= 0) {
                         if (filesync->Offset) {
                             if (PIOS_FLASHFS_Lseek(deviceSyncPtr->fs_id, fh, filesync->Offset, deviceSyncPtr->lseek_flags) == 0) {
-                                if (PIOS_FLASHFS_Read(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == 0) {
+                                if (PIOS_FLASHFS_Read(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == filesync->DataSize) {
                                     filesync->Status = SYNC_STATUS_OK;
                                 }
                             }
                         }
                         else {
-                            if (PIOS_FLASHFS_Read(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == 0) {
+                            if (PIOS_FLASHFS_Read(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == filesync->DataSize) {
                                 filesync->Status = SYNC_STATUS_OK;
                             }
                         }

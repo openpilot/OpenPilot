@@ -266,12 +266,12 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, __attribute__((unuse
         current_flight_opened = flight;
     }
 
-    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, LOG_ENTRY_HEADER_SIZE) != 0) {
+    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, LOG_ENTRY_HEADER_SIZE) != LOG_ENTRY_HEADER_SIZE) {
         rc = -1;
     }
     else
     {
-        if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)(mybuffer + LOG_ENTRY_HEADER_SIZE), ((DebugLogEntryData*)mybuffer)->Size) != 0) {
+        if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)(mybuffer + LOG_ENTRY_HEADER_SIZE), ((DebugLogEntryData*)mybuffer)->Size) != ((DebugLogEntryData*)mybuffer)->Size) {
             rc = -1;
         }
     }

@@ -586,11 +586,7 @@ static float MixerCurveFullRangeAbsolute(const float input, const float *curve, 
 
     scale -= (float)idx1; // remainder
     if (curve[0] < -1) {
-        return input;
-    }
-    if (idx1 < 0) {
-        idx1  = 0; // clamp to lowest entry in table
-        scale = 0;
+        return abs_input;
     }
     int idx2 = idx1 + 1;
     if (idx2 >= elements) {

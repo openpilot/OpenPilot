@@ -46,7 +46,7 @@ extern uintptr_t pios_external_flash_fs_id;
 int lua__getc(FIL *f)
 {
   char c;
-  if (!PIOS_FLASHFS_Read(pios_external_flash_fs_id, *f, (uint8_t*)&c, 1))
+  if (PIOS_FLASHFS_Read(pios_external_flash_fs_id, *f, (uint8_t*)&c, 1) == 1)
     return c;
   else
     return -1;
@@ -596,14 +596,18 @@ static const char *getF (lua_State *L, void *ud, size_t *size) {
     lf->n = 0;  /* no more pre-read characters */
   }
   else {  /* read a block from file */
+
+#if defined(CONFIG_BUILD_SPIFFS)
+    int rc;
+    rc = PIOS_FLASHFS_Read(pios_external_flash_fs_id, lf->f, (uint8_t*)lf->buff, sizeof(lf->buff));
+    if (rc < 0)
+        return NULL;
+    else
+        *size = rc;
+#else
     /* 'fread' can return > 0 *and* set the EOF flag. If next call to
        'getF' called 'fread', it might still wait for user input.
        The next check avoids this problem. */
-#if defined(CONFIG_BUILD_SPIFFS)
-    if (PIOS_FLASHFS_Read(pios_external_flash_fs_id, lf->f, (uint8_t*)lf->buff, sizeof(lf->buff)))
-        return NULL;
-    *size = sizeof(lf->buff);
-#else
     if (feof(lf->f)) return NULL;
     *size = fread(lf->buff, 1, sizeof(lf->buff), lf->f);  /* read block */
 #endif

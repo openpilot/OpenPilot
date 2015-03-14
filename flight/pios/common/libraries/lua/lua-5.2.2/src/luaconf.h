@@ -397,7 +397,8 @@
 */
 
 #define LUA_NUMBER_DOUBLE
-#define LUA_NUMBER	double
+//#define LUA_NUMBER	double
+#define LUA_NUMBER  int
 
 /*
 @@ LUAI_UACNUMBER is the result of an 'usual argument conversion'
@@ -413,7 +414,8 @@
 @@ LUAI_MAXNUMBER2STR is maximum size of previous conversion.
 */
 #define LUA_NUMBER_SCAN		"%lf"
-#define LUA_NUMBER_FMT		"%.14g"
+//#define LUA_NUMBER_FMT		"%.14g"
+#define LUA_NUMBER_FMT      "%d"
 #define lua_number2str(s,n)	sprintf((s), LUA_NUMBER_FMT, (n))
 #define LUAI_MAXNUMBER2STR	32 /* 16 digits, sign, point, and \0 */
 

@@ -693,8 +693,8 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if (timeout_occurred) {
-	FlightStatusFlightModeOptions flightMode;
-	FlightStatusFlightModeGet(&flightMode);
+        FlightStatusFlightModeOptions flightMode;
+        FlightStatusFlightModeGet(&flightMode);
         if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
             plan_setup_land_helper(&pathDesired);
         } else {

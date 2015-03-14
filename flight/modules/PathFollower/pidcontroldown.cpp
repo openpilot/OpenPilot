@@ -67,7 +67,14 @@ PIDControlDown::~PIDControlDown() {}
 
 void PIDControlDown::Initialize(PathFollowerFSM *fsm)
 {
+    PIOS_Assert(fsm);
     mFSM = fsm;
+}
+
+void PIDControlDown::Initialize(float min_thrust, float max_thrust)
+{
+    mMinThrust = min_thrust;
+    mMaxThrust = max_thrust;
 }
 
 void PIDControlDown::Deactivate()
@@ -312,10 +319,14 @@ void PIDControlDown::UpdateVelocityState(float pv)
 {
     mVelocityState = pv;
 
-    // The FSM controls the actual descent velocity and introduces step changes as required
-    float velocitySetpointDesired = mFSM->BoundVelocityDown(mVelocitySetpointTarget);
-    // RateLimit(velocitySetpointDesired, mVelocitySetpointCurrent, 2.0f );
-    mVelocitySetpointCurrent = velocitySetpointDesired;
+    if (mFSM) {
+        // The FSM controls the actual descent velocity and introduces step changes as required
+        float velocitySetpointDesired = mFSM->BoundVelocityDown(mVelocitySetpointTarget);
+        // RateLimit(velocitySetpointDesired, mVelocitySetpointCurrent, 2.0f );
+        mVelocitySetpointCurrent = velocitySetpointDesired;
+    } else {
+        mVelocitySetpointCurrent = mVelocitySetpointTarget;
+    }
 }
 
 float PIDControlDown::GetVelocityDesired(void)
@@ -326,12 +337,12 @@ float PIDControlDown::GetVelocityDesired(void)
 float PIDControlDown::GetDownCommand(void)
 {
     PIDStatusData pidStatus;
-    // pid_scaler local_scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
-    // mFSM->CheckPidScaler(&local_scaler);
-    // float downCommand    = -pid_apply_setpoint(&PID, &local_scaler, mVelocitySetpoint, mState, deltaTime);
-    float ulow, uhigh;
+    float ulow  = mMinThrust;
+    float uhigh = mMaxThrust;
 
-    mFSM->BoundThrust(ulow, uhigh);
+    if (mFSM) {
+        mFSM->BoundThrust(ulow, uhigh);
+    }
     float downCommand = pid2_apply(&PID, mVelocitySetpointCurrent, mVelocityState, ulow, uhigh);
     pidStatus.setpoint = mVelocitySetpointCurrent;
     pidStatus.actual   = mVelocityState;

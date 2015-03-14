@@ -166,10 +166,10 @@ int32_t VtolBrakeController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPa
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    if (fsm==0) {
-	VtolBrakeFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus, pathStatus);
-	fsm = (PathFollowerFSM *)VtolBrakeFSM::instance();
-	controlDown.Initialize(fsm);
+    if (fsm == 0) {
+        VtolBrakeFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus, pathStatus);
+        fsm = (PathFollowerFSM *)VtolBrakeFSM::instance();
+        controlDown.Initialize(fsm);
     }
     return 0;
 }

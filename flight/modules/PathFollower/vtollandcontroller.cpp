@@ -152,10 +152,10 @@ int32_t VtolLandController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPat
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     if (fsm == 0) {
-    fsm = (PathFollowerFSM *)VtolLandFSM::instance();
-    VtolLandFSM::instance()->Initialize(ptr_vtolPathFollowerSettings, pathDesired, flightStatus);
-    vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    controlDown.Initialize(fsm);
+        fsm = (PathFollowerFSM *)VtolLandFSM::instance();
+        VtolLandFSM::instance()->Initialize(ptr_vtolPathFollowerSettings, pathDesired, flightStatus);
+        vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
+        controlDown.Initialize(fsm);
     }
 
     return 0;

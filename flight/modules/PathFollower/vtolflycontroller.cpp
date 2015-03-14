@@ -155,7 +155,7 @@ int32_t VtolFlyController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPath
     PIOS_Assert(ptr_vtolPathFollowerSettings);
 
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    controlDown.Initialize(0);
+    controlDown.Initialize(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
 
     return 0;
 }

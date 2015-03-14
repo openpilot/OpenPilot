@@ -30,6 +30,30 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* Telemetry uses four tasks. Two are created for the main telemetry
+ * stream called "TelTx" and "TelRx". Two are created to handle the OPLink
+ * radio connection, called "RadioTx" and "Radio Rx", the latter being
+ * overridden by USB if connected.
+ *
+ * The telemetry port to use is defined by PIOS_COM_TELEM_RF in
+ * PIOS_Board_Init().
+ *
+ * A UAVTalk connection instance, telemUavTalkCon, is associated with the main
+ * telemetry channel and another, radioUavTalkCon, with the radio channel.
+ * Associated with each instance is a transmit routine which will send data
+ * to the appropriate port.
+ *
+ * Data is passed on the telemetry channels using queues. If
+ * PIOS_TELEM_PRIORITY_QUEUE is defined then two queues are created, one normal
+ * priority and the other high priority.
+ *
+ * The "Tx" tasks read events first from the priority queue and then from
+ * the normal queue, passing each event to processObjEvent() which ultimately
+ * passes each event to the UAVTalk library which results in the appropriate
+ * transmit routine being called to send the data back to the recipient on
+ * the telemetry or radio link.
+ */
+
 #include <openpilot.h>
 
 #include "telemetry.h"
@@ -53,62 +77,72 @@
 
 #ifdef PIOS_TELEM_RADIO_RX_STACK_SIZE
 #define STACK_SIZE_RADIO_RX_BYTES PIOS_TELEM_RADIO_RX_STACK_SIZE
+#define STACK_SIZE_RADIO_TX_BYTES PIOS_TELEM_RADIO_TX_STACK_SIZE
 #else
 #define STACK_SIZE_RADIO_RX_BYTES STACK_SIZE_RX_BYTES
+#define STACK_SIZE_RADIO_TX_BYTES STACK_SIZE_TX_BYTES
 #endif
 #define TASK_PRIORITY_RX          (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_TX          (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_RADRX       (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_RADTX       (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS            250
 #define MAX_RETRIES               2
 #define STATS_UPDATE_PERIOD_MS    4000
 #define CONNECTION_TIMEOUT_MS     8000
 
 // Private types
+typedef struct {
+    // Port on which to communicate telemetry information
+    uint32_t     telemetryPort;
+    // Main telemetry queue
+    xQueueHandle mainQueue;
+        #ifdef PIOS_TELEM_PRIORITY_QUEUE
+    // Priority telemetry queue
+    xQueueHandle priorityQueue;
+        #endif /* PIOS_TELEM_PRIORITY_QUEUE */
+    // Transmit/receive task handles
+    xTaskHandle  telemetryTxTaskHandle;
+    xTaskHandle  telemetryRxTaskHandle;
+    // Telemetry stream
+    UAVTalkConnection uavTalkCon;
+} telemetryContext;
 
-// Private variables
-static uint32_t telemetryPort;
-#ifdef PIOS_INCLUDE_RFM22B
-static uint32_t radioPort;
-#endif
-static xQueueHandle queue;
+// Main telemetry port
+static telemetryContext telemHandle;
+static int32_t transmitData(uint8_t *data, int32_t length);
+static void registerTelemObject(UAVObjHandle obj);
 
-#if defined(PIOS_TELEM_PRIORITY_QUEUE)
-static xQueueHandle priorityQueue;
-#else
-#define priorityQueue queue
-#endif
+// OPLink telemetry port
+static telemetryContext radioHandle;
+static int32_t transmitRadioData(uint8_t *data, int32_t length);
+static void registerRadioObject(UAVObjHandle obj);
 
-static xTaskHandle telemetryTxTaskHandle;
-static xTaskHandle telemetryRxTaskHandle;
-#ifdef PIOS_INCLUDE_RFM22B
-static xTaskHandle radioRxTaskHandle;
-#endif
+// Telemetry stats
 static uint32_t txErrors;
 static uint32_t txRetries;
 static uint32_t timeOfLastObjectUpdate;
-static UAVTalkConnection uavTalkCon;
-#ifdef PIOS_INCLUDE_RFM22B
-static UAVTalkConnection radioUavTalkCon;
-#endif
 
-// Private functions
 static void telemetryTxTask(void *parameters);
 static void telemetryRxTask(void *parameters);
-#ifdef PIOS_INCLUDE_RFM22B
-static void radioRxTask(void *parameters);
-static int32_t transmitRadioData(uint8_t *data, int32_t length);
-#endif
-static int32_t transmitData(uint8_t *data, int32_t length);
-static void registerObject(UAVObjHandle obj);
-static void updateObject(UAVObjHandle obj, int32_t eventType);
-static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
-static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs);
-static void processObjEvent(UAVObjEvent *ev);
+static void updateObject(
+    telemetryContext *telemetryHandle,
+    UAVObjHandle obj,
+    int32_t eventType);
+static void processObjEvent(
+    telemetryContext *telemetryHandle,
+    UAVObjEvent *ev);
+static int32_t setUpdatePeriod(
+    telemetryContext *telemetryHandle,
+    UAVObjHandle obj,
+    int32_t updatePeriodMs);
+static int32_t setLoggingPeriod(
+    telemetryContext *telemetryHandle,
+    UAVObjHandle obj,
+    int32_t updatePeriodMs);
 static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
-static uint32_t getComPort(bool input);
 
 /**
  * Initialise the telemetry module
@@ -117,22 +151,52 @@ static uint32_t getComPort(bool input);
  */
 int32_t TelemetryStart(void)
 {
-    // Process all registered objects and connect queue for updates
-    UAVObjIterate(&registerObject);
+    UAVObjIterate(&registerTelemObject);
+    UAVObjIterate(&registerRadioObject);
 
     // Listen to objects of interest
-    GCSTelemetryStatsConnectQueue(priorityQueue);
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+    GCSTelemetryStatsConnectQueue(telemHandle.priorityQueue);
+    GCSTelemetryStatsConnectQueue(radioHandle.priorityQueue);
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+    GCSTelemetryStatsConnectQueue(telemHandle.mainQueue);
+    GCSTelemetryStatsConnectQueue(radioHandle.mainQueue);
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     // Start telemetry tasks
-    xTaskCreate(telemetryTxTask, "TelTx", STACK_SIZE_TX_BYTES / 4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
-    xTaskCreate(telemetryRxTask, "TelRx", STACK_SIZE_RX_BYTES / 4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
+    xTaskCreate(telemetryTxTask,
+                "TelTx",
+                STACK_SIZE_TX_BYTES / 4,
+                &telemHandle,
+                TASK_PRIORITY_TX,
+                &telemHandle.telemetryTxTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX,
+                                   telemHandle.telemetryTxTaskHandle);
+    xTaskCreate(telemetryRxTask,
+                "TelRx",
+                STACK_SIZE_RX_BYTES / 4,
+                &telemHandle,
+                TASK_PRIORITY_RX,
+                &telemHandle.telemetryRxTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX,
+                                   telemHandle.telemetryRxTaskHandle);
 
-#ifdef PIOS_INCLUDE_RFM22B
-    xTaskCreate(radioRxTask, "RadioRx", STACK_SIZE_RADIO_RX_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
-#endif
+    xTaskCreate(telemetryTxTask,
+                "RadioTx",
+                STACK_SIZE_RADIO_TX_BYTES / 4,
+                &radioHandle,
+                TASK_PRIORITY_RADTX,
+                &radioHandle.telemetryTxTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX,
+                                   radioHandle.telemetryTxTaskHandle);
+    xTaskCreate(telemetryRxTask,
+                "RadioRx",
+                STACK_SIZE_RADIO_RX_BYTES / 4,
+                &radioHandle,
+                TASK_PRIORITY_RADRX,
+                &radioHandle.telemetryRxTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX,
+                                   radioHandle.telemetryRxTaskHandle);
 
     return 0;
 }
@@ -148,27 +212,41 @@ int32_t TelemetryInitialize(void)
     GCSTelemetryStatsInitialize();
 
     // Initialize vars
-    timeOfLastObjectUpdate = 0;
+    timeOfLastObjectUpdate    = 0;
 
     // Create object queues
-    queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+    telemHandle.mainQueue     = xQueueCreate(MAX_QUEUE_SIZE,
+                                             sizeof(UAVObjEvent));
+    radioHandle.mainQueue     = xQueueCreate(MAX_QUEUE_SIZE,
+                                             sizeof(UAVObjEvent));
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
-    priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-#endif
+    telemHandle.priorityQueue = xQueueCreate(MAX_QUEUE_SIZE,
+                                             sizeof(UAVObjEvent));
+    radioHandle.priorityQueue = xQueueCreate(MAX_QUEUE_SIZE,
+                                             sizeof(UAVObjEvent));
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     // Update telemetry settings
-    telemetryPort = PIOS_COM_TELEM_RF;
+    telemHandle.telemetryPort = PIOS_COM_TELEM_RF;
+
 #ifdef PIOS_INCLUDE_RFM22B
-    radioPort     = PIOS_COM_RF;
-#endif
+    radioHandle.telemetryPort = PIOS_COM_RF;
+#else /* PIOS_INCLUDE_RFM22B */
+    radioHandle.telemetryPort = 0;
+#endif /* PIOS_INCLUDE_RFM22B */
+#ifdef PIOS_INCLUDE_USB
+    // if USB is connected, USB takes precedence for telemetry
+    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
+        radioHandle.telemetryPort = PIOS_COM_TELEM_USB;
+    }
+#endif /* PIOS_INCLUDE_USB */
+
     HwSettingsInitialize();
     updateSettings();
 
     // Initialise UAVTalk
-    uavTalkCon = UAVTalkInitialize(&transmitData);
-#ifdef PIOS_INCLUDE_RFM22B
-    radioUavTalkCon = UAVTalkInitialize(&transmitRadioData);
-#endif
+    telemHandle.uavTalkCon = UAVTalkInitialize(&transmitData);
+    radioHandle.uavTalkCon = UAVTalkInitialize(&transmitRadioData);
 
     // Create periodic event that will be used to update the telemetry stats
     // FIXME STATS_UPDATE_PERIOD_MS is 4000ms while FlighTelemetryStats update period is 5000ms...
@@ -176,7 +254,22 @@ int32_t TelemetryInitialize(void)
     txRetries = 0;
     UAVObjEvent ev;
     memset(&ev, 0, sizeof(UAVObjEvent));
-    EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
+
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+    EventPeriodicQueueCreate(&ev,
+                             telemHandle.priorityQueue,
+                             STATS_UPDATE_PERIOD_MS);
+    EventPeriodicQueueCreate(&ev,
+                             radioHandle.priorityQueue,
+                             STATS_UPDATE_PERIOD_MS);
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+    EventPeriodicQueueCreate(&ev,
+                             telemHandle.mainQueue,
+                             STATS_UPDATE_PERIOD_MS);
+    EventPeriodicQueueCreate(&ev,
+                             radioHandle.mainQueue,
+                             STATS_UPDATE_PERIOD_MS);
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     return 0;
 }
@@ -188,14 +281,39 @@ MODULE_INITCALL(TelemetryInitialize, TelemetryStart);
  * telemetry settings.
  * \param[in] obj Object to connect
  */
-static void registerObject(UAVObjHandle obj)
+static void registerTelemObject(UAVObjHandle obj)
 {
     if (UAVObjIsMetaobject(obj)) {
         // Only connect change notifications for meta objects.  No periodic updates
-        UAVObjConnectQueue(obj, priorityQueue, EV_MASK_ALL_UPDATES);
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+        UAVObjConnectQueue(obj, telemHandle.priorityQueue, EV_MASK_ALL_UPDATES);
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+        UAVObjConnectQueue(obj, telemHandle.mainQueue, EV_MASK_ALL_UPDATES);
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
     } else {
         // Setup object for periodic updates
-        updateObject(obj, EV_NONE);
+        updateObject(
+            &telemHandle,
+            obj,
+            EV_NONE);
+    }
+}
+
+static void registerRadioObject(UAVObjHandle obj)
+{
+    if (UAVObjIsMetaobject(obj)) {
+        // Only connect change notifications for meta objects.  No periodic updates
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+        UAVObjConnectQueue(obj, radioHandle.priorityQueue, EV_MASK_ALL_UPDATES);
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+        UAVObjConnectQueue(obj, radioHandle.mainQueue, EV_MASK_ALL_UPDATES);
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
+    } else {
+        // Setup object for periodic updates
+        updateObject(
+            &radioHandle,
+            obj,
+            EV_NONE);
     }
 }
 
@@ -203,7 +321,10 @@ static void registerObject(UAVObjHandle obj)
  * Update object's queue connections and timer, depending on object's settings
  * \param[in] obj Object to updates
  */
-static void updateObject(UAVObjHandle obj, int32_t eventType)
+static void updateObject(
+    telemetryContext *telemetryHandle,
+    UAVObjHandle obj,
+    int32_t eventType)
 {
     UAVObjMetadata metadata;
     UAVObjUpdateMode updateMode, loggingMode;
@@ -226,13 +347,15 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
     switch (updateMode) {
     case UPDATEMODE_PERIODIC:
         // Set update period
-        setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
+        setUpdatePeriod(telemetryHandle,
+                        obj,
+                        metadata.telemetryUpdatePeriod);
         // Connect queue
         eventMask |= EV_UPDATED_PERIODIC | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
         break;
     case UPDATEMODE_ONCHANGE:
         // Set update period
-        setUpdatePeriod(obj, 0);
+        setUpdatePeriod(telemetryHandle, obj, 0);
         // Connect queue
         eventMask |= EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
         break;
@@ -242,7 +365,9 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
             eventMask |= EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
             // Set update period on initialization and metadata change
             if (eventType == EV_NONE) {
-                setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
+                setUpdatePeriod(telemetryHandle,
+                                obj,
+                                metadata.telemetryUpdatePeriod);
             }
         } else {
             // Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
@@ -251,7 +376,7 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
         break;
     case UPDATEMODE_MANUAL:
         // Set update period
-        setUpdatePeriod(obj, 0);
+        setUpdatePeriod(telemetryHandle, obj, 0);
         // Connect queue
         eventMask |= EV_UPDATED_MANUAL | EV_UPDATE_REQ;
         break;
@@ -259,13 +384,13 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
     switch (loggingMode) {
     case UPDATEMODE_PERIODIC:
         // Set update period
-        setLoggingPeriod(obj, metadata.loggingUpdatePeriod);
+        setLoggingPeriod(telemetryHandle, obj, metadata.loggingUpdatePeriod);
         // Connect queue
         eventMask |= EV_LOGGING_PERIODIC | EV_LOGGING_MANUAL;
         break;
     case UPDATEMODE_ONCHANGE:
         // Set update period
-        setLoggingPeriod(obj, 0);
+        setLoggingPeriod(telemetryHandle, obj, 0);
         // Connect queue
         eventMask |= EV_UPDATED | EV_LOGGING_MANUAL;
         break;
@@ -275,7 +400,9 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
             eventMask |= EV_UPDATED | EV_LOGGING_MANUAL;
             // Set update period on initialization and metadata change
             if (eventType == EV_NONE) {
-                setLoggingPeriod(obj, metadata.loggingUpdatePeriod);
+                setLoggingPeriod(telemetryHandle,
+                                 obj,
+                                 metadata.loggingUpdatePeriod);
             }
         } else {
             // Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
@@ -284,23 +411,28 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
         break;
     case UPDATEMODE_MANUAL:
         // Set update period
-        setLoggingPeriod(obj, 0);
+        setLoggingPeriod(telemetryHandle, obj, 0);
         // Connect queue
         eventMask |= EV_LOGGING_MANUAL;
         break;
     }
+
     // note that all setting objects have implicitly IsPriority=true
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
     if (UAVObjIsPriority(obj)) {
-        UAVObjConnectQueue(obj, priorityQueue, eventMask);
-    } else {
-        UAVObjConnectQueue(obj, queue, eventMask);
-    }
+        UAVObjConnectQueue(obj, telemetryHandle->priorityQueue, eventMask);
+    } else
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
+    UAVObjConnectQueue(obj, telemetryHandle->mainQueue, eventMask);
 }
+
 
 /**
  * Processes queue events
  */
-static void processObjEvent(UAVObjEvent *ev)
+static void processObjEvent(
+    telemetryContext *telemetryHandle,
+    UAVObjEvent *ev)
 {
     UAVObjMetadata metadata;
     UAVObjUpdateMode updateMode;
@@ -325,7 +457,10 @@ static void processObjEvent(UAVObjEvent *ev)
             // Send update to GCS (with retries)
             while (retries < MAX_RETRIES && success == -1) {
                 // call blocks until ack is received or timeout
-                success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, UAVObjGetTelemetryAcked(&metadata), REQ_TIMEOUT_MS);
+                success = UAVTalkSendObject(telemetryHandle->uavTalkCon,
+                                            ev->obj,
+                                            ev->instId,
+                                            UAVObjGetTelemetryAcked(&metadata), REQ_TIMEOUT_MS);
                 if (success == -1) {
                     ++retries;
                 }
@@ -339,7 +474,10 @@ static void processObjEvent(UAVObjEvent *ev)
             // Request object update from GCS (with retries)
             while (retries < MAX_RETRIES && success == -1) {
                 // call blocks until update is received or timeout
-                success = UAVTalkSendObjectRequest(uavTalkCon, ev->obj, ev->instId, REQ_TIMEOUT_MS);
+                success = UAVTalkSendObjectRequest(telemetryHandle->uavTalkCon,
+                                                   ev->obj,
+                                                   ev->instId,
+                                                   REQ_TIMEOUT_MS);
                 if (success == -1) {
                     ++retries;
                 }
@@ -353,11 +491,17 @@ static void processObjEvent(UAVObjEvent *ev)
         // If this is a metaobject then make necessary telemetry updates
         if (UAVObjIsMetaobject(ev->obj)) {
             // linked object will be the actual object the metadata are for
-            updateObject(UAVObjGetLinkedObj(ev->obj), EV_NONE);
+            updateObject(
+                telemetryHandle,
+                UAVObjGetLinkedObj(ev->obj),
+                EV_NONE);
         } else {
             if (updateMode == UPDATEMODE_THROTTLED) {
                 // If this is UPDATEMODE_THROTTLED, the event mask changes on every event.
-                updateObject(ev->obj, ev->event);
+                updateObject(
+                    telemetryHandle,
+                    ev->obj,
+                    ev->event);
             }
         }
     }
@@ -378,7 +522,10 @@ static void processObjEvent(UAVObjEvent *ev)
         }
         if (updateMode == UPDATEMODE_THROTTLED) {
             // If this is UPDATEMODE_THROTTLED, the event mask changes on every event.
-            updateObject(ev->obj, ev->event);
+            updateObject(
+                telemetryHandle,
+                ev->obj,
+                ev->event);
         }
     }
 }
@@ -386,37 +533,43 @@ static void processObjEvent(UAVObjEvent *ev)
 /**
  * Telemetry transmit task, regular priority
  */
-static void telemetryTxTask(__attribute__((unused)) void *parameters)
+static void telemetryTxTask(void *parameters)
 {
+    telemetryContext *telemetryHandle = (telemetryContext *)parameters;
     UAVObjEvent ev;
+
+    /* Check for a bad context */
+    if (!telemetryHandle) {
+        return;
+    }
 
     // Loop forever
     while (1) {
         /**
          * Tries to empty the high priority queue before handling any standard priority item
          */
-#if defined(PIOS_TELEM_PRIORITY_QUEUE)
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
         // empty priority queue, non-blocking
-        while (xQueueReceive(priorityQueue, &ev, 0) == pdTRUE) {
+        while (xQueueReceive(telemetryHandle->priorityQueue, &ev, 0) == pdTRUE) {
             // Process event
-            processObjEvent(&ev);
+            processObjEvent(telemetryHandle, &ev);
         }
         // check regular queue and process update - non-blocking
-        if (xQueueReceive(queue, &ev, 0) == pdTRUE) {
+        if (xQueueReceive(telemetryHandle->mainQueue, &ev, 0) == pdTRUE) {
             // Process event
-            processObjEvent(&ev);
+            processObjEvent(telemetryHandle, &ev);
             // if both queues are empty, wait on priority queue for updates (1 tick) then repeat cycle
-        } else if (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
+        } else if (xQueueReceive(telemetryHandle->priorityQueue, &ev, 1) == pdTRUE) {
             // Process event
-            processObjEvent(&ev);
+            processObjEvent(telemetryHandle, &ev);
         }
 #else
         // wait on queue for updates (1 tick) then repeat cycle
-        if (xQueueReceive(queue, &ev, 1) == pdTRUE) {
+        if (xQueueReceive(telemetryHandle->mainQueue, &ev, 1) == pdTRUE) {
             // Process event
-            processObjEvent(&ev);
+            processObjEvent(telemetryHandle, &ev);
         }
-#endif /* if defined(PIOS_TELEM_PRIORITY_QUEUE) */
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
     }
 }
 
@@ -424,11 +577,18 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
 /**
  * Telemetry receive task. Processes queue events and periodic updates.
  */
-static void telemetryRxTask(__attribute__((unused)) void *parameters)
+static void telemetryRxTask(void *parameters)
 {
+    telemetryContext *telemetryHandle = (telemetryContext *)parameters;
+
+    /* Check for a bad context */
+    if (!telemetryHandle) {
+        return;
+    }
+
     // Task loop
     while (1) {
-        uint32_t inputPort = getComPort(true);
+        uint32_t inputPort = telemetryHandle->telemetryPort;
 
         if (inputPort) {
             // Block until data are available
@@ -438,7 +598,7 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
             bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
                 for (uint8_t i = 0; i < bytes_to_process; i++) {
-                    UAVTalkProcessInputStream(uavTalkCon, serial_data[i]);
+                    UAVTalkProcessInputStream(telemetryHandle->uavTalkCon, serial_data[i]);
                 }
             }
         } else {
@@ -447,46 +607,6 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
     }
 }
 
-#ifdef PIOS_INCLUDE_RFM22B
-/**
- * Radio telemetry receive task. Processes queue events and periodic updates.
- */
-static void radioRxTask(__attribute__((unused)) void *parameters)
-{
-    // Task loop
-    while (1) {
-        if (radioPort) {
-            // Block until data are available
-            uint8_t serial_data[1];
-            uint16_t bytes_to_process;
-
-            bytes_to_process = PIOS_COM_ReceiveBuffer(radioPort, serial_data, sizeof(serial_data), 500);
-            if (bytes_to_process > 0) {
-                for (uint8_t i = 0; i < bytes_to_process; i++) {
-                    UAVTalkProcessInputStream(radioUavTalkCon, serial_data[i]);
-                }
-            }
-        } else {
-            vTaskDelay(5);
-        }
-    }
-}
-/**
- * Transmit data buffer to the radioport.
- * \param[in] data Data buffer to send
- * \param[in] length Length of buffer
- * \return -1 on failure
- * \return number of bytes transmitted on success
- */
-static int32_t transmitRadioData(uint8_t *data, int32_t length)
-{
-    if (radioPort) {
-        return PIOS_COM_SendBuffer(radioPort, data, length);
-    }
-
-    return -1;
-}
-#endif /* PIOS_INCLUDE_RFM22B */
 
 /**
  * Transmit data buffer to the modem or USB port.
@@ -497,7 +617,44 @@ static int32_t transmitRadioData(uint8_t *data, int32_t length)
  */
 static int32_t transmitData(uint8_t *data, int32_t length)
 {
-    uint32_t outputPort = getComPort(false);
+    uint32_t outputPort;
+
+    outputPort = PIOS_COM_TELEM_RF;
+
+    // Anticipate next input on the port on which this output occurs
+    telemHandle.telemetryPort = outputPort;
+
+    if (outputPort) {
+        return PIOS_COM_SendBuffer(outputPort, data, length);
+    }
+
+    return -1;
+}
+
+
+/**
+ * Transmit data buffer to the radioport.
+ * \param[in] data Data buffer to send
+ * \param[in] length Length of buffer
+ * \return -1 on failure
+ * \return number of bytes transmitted on success
+ */
+static int32_t transmitRadioData(uint8_t *data, int32_t length)
+{
+#ifdef PIOS_INCLUDE_RFM22B
+    uint32_t outputPort = PIOS_COM_RF;
+#else /* PIOS_INCLUDE_RFM22B */
+    uint32_t outputPort = 0;
+#endif /* PIOS_INCLUDE_RFM22B */
+#ifdef PIOS_INCLUDE_USB
+    // if USB is connected, USB takes precedence for telemetry
+    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
+        outputPort = PIOS_COM_TELEM_USB;
+    }
+#endif /* PIOS_INCLUDE_USB */
+
+    // Anticipate next input on the port on which this output occurs
+    radioHandle.telemetryPort = outputPort;
 
     if (outputPort) {
         return PIOS_COM_SendBuffer(outputPort, data, length);
@@ -513,7 +670,10 @@ static int32_t transmitData(uint8_t *data, int32_t length)
  * \return 0 Success
  * \return -1 Failure
  */
-static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
+static int32_t setUpdatePeriod(
+    telemetryContext *telemetryHandle,
+    UAVObjHandle obj,
+    int32_t updatePeriodMs)
 {
     UAVObjEvent ev;
     int32_t ret;
@@ -524,7 +684,12 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.event  = EV_UPDATED_PERIODIC;
     ev.lowPriority = true;
 
-    xQueueHandle targetQueue = UAVObjIsPriority(obj) ? priorityQueue : queue;
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+    xQueueHandle targetQueue = UAVObjIsPriority(obj) ? telemetryHandle->priorityQueue :
+                               telemetryHandle->mainQueue;
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+    xQueueHandle targetQueue = telemetryHandle->mainQueue;
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     ret = EventPeriodicQueueUpdate(&ev, targetQueue, updatePeriodMs);
     if (ret == -1) {
@@ -540,7 +705,10 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
  * \return 0 Success
  * \return -1 Failure
  */
-static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs)
+static int32_t setLoggingPeriod(
+    telemetryContext *telemetryHandle,
+    UAVObjHandle obj,
+    int32_t updatePeriodMs)
 {
     UAVObjEvent ev;
     int32_t ret;
@@ -551,7 +719,12 @@ static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.event  = EV_LOGGING_PERIODIC;
     ev.lowPriority = true;
 
-    xQueueHandle targetQueue = UAVObjIsPriority(obj) ? priorityQueue : queue;
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+    xQueueHandle targetQueue = UAVObjIsPriority(obj) ? telemetryHandle->priorityQueue :
+                               telemetryHandle->mainQueue;
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+    xQueueHandle targetQueue = telemetryHandle->mainQueue;
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     ret = EventPeriodicQueueUpdate(&ev, targetQueue, updatePeriodMs);
     if (ret == -1) {
@@ -590,10 +763,8 @@ static void updateTelemetryStats()
     uint32_t timeNow;
 
     // Get stats
-    UAVTalkGetStats(uavTalkCon, &utalkStats, true);
-#ifdef PIOS_INCLUDE_RFM22B
-    UAVTalkAddStats(radioUavTalkCon, &utalkStats, true);
-#endif
+    UAVTalkGetStats(telemHandle.uavTalkCon, &utalkStats, true);
+    UAVTalkAddStats(radioHandle.uavTalkCon, &utalkStats, true);
 
     // Get object data
     FlightTelemetryStatsGet(&flightStats);
@@ -685,7 +856,7 @@ static void updateTelemetryStats()
  */
 static void updateSettings()
 {
-    if (telemetryPort) {
+    if (telemHandle.telemetryPort) {
         // Retrieve settings
         uint8_t speed;
         HwSettingsTelemetrySpeedGet(&speed);
@@ -693,58 +864,30 @@ static void updateSettings()
         // Set port speed
         switch (speed) {
         case HWSETTINGS_TELEMETRYSPEED_2400:
-            PIOS_COM_ChangeBaud(telemetryPort, 2400);
+            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 2400);
             break;
         case HWSETTINGS_TELEMETRYSPEED_4800:
-            PIOS_COM_ChangeBaud(telemetryPort, 4800);
+            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 4800);
             break;
         case HWSETTINGS_TELEMETRYSPEED_9600:
-            PIOS_COM_ChangeBaud(telemetryPort, 9600);
+            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 9600);
             break;
         case HWSETTINGS_TELEMETRYSPEED_19200:
-            PIOS_COM_ChangeBaud(telemetryPort, 19200);
+            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 19200);
             break;
         case HWSETTINGS_TELEMETRYSPEED_38400:
-            PIOS_COM_ChangeBaud(telemetryPort, 38400);
+            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 38400);
             break;
         case HWSETTINGS_TELEMETRYSPEED_57600:
-            PIOS_COM_ChangeBaud(telemetryPort, 57600);
+            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 57600);
             break;
         case HWSETTINGS_TELEMETRYSPEED_115200:
-            PIOS_COM_ChangeBaud(telemetryPort, 115200);
+            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 115200);
             break;
         }
     }
 }
 
-/**
- * Determine input/output com port as highest priority available
- * @param[in] input Returns the approproate input com port if true, else the appropriate output com port
- */
-#ifdef PIOS_INCLUDE_RFM22B
-static uint32_t getComPort(bool input)
-#else
-static uint32_t getComPort(__attribute__((unused)) bool input)
-#endif
-{
-#if defined(PIOS_INCLUDE_USB)
-    // if USB is connected, USB takes precedence for telemetry
-    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
-        return PIOS_COM_TELEM_USB;
-    } else
-#endif /* PIOS_INCLUDE_USB */
-#ifdef PIOS_INCLUDE_RFM22B
-    // PIOS_COM_RF input is handled by a separate RX thread and therefore must be ignored
-    if (input && telemetryPort == PIOS_COM_RF) {
-        return 0;
-    } else
-#endif /* PIOS_INCLUDE_RFM22B */
-    if (PIOS_COM_Available(telemetryPort)) {
-        return telemetryPort;
-    } else {
-        return 0;
-    }
-}
 
 /**
  * @}

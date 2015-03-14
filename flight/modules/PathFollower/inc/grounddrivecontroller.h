@@ -67,7 +67,6 @@ private:
     uint8_t mMode;
 
     struct pid PIDposH[2];
-    struct pid PIDposV;
     // correct speed by measured airspeed
     struct pid PIDgndspeed;
 };

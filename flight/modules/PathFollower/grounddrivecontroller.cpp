@@ -110,7 +110,6 @@ void GroundDriveController::SettingsUpdated(void)
     // fixed wing PID only
     pid_configure(&PIDposH[0], groundSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
     pid_configure(&PIDposH[1], groundSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-    pid_configure(&PIDposV, 0.0f, 0.0f, 0.0f, 0.0f);
     pid_configure(&PIDgndspeed, groundSettings->SpeedPI.Kp, groundSettings->SpeedPI.Ki, 0.0f, groundSettings->SpeedPI.ILimit);
 }
 
@@ -136,7 +135,6 @@ void GroundDriveController::resetGlobals()
 {
     pid_zero(&PIDposH[0]);
     pid_zero(&PIDposH[1]);
-    pid_zero(&PIDposV);
     pid_zero(&PIDgndspeed);
     pathStatus->path_time = 0.0f;
 }
@@ -191,7 +189,7 @@ void GroundDriveController::updatePathVelocity(float kFF, bool limited)
     // calculate velocity - can be zero if waypoints are too close
     velocityDesired.North = progress.path_vector[0];
     velocityDesired.East  = progress.path_vector[1];
-    velocityDesired.Down  = progress.path_vector[2];
+    velocityDesired.Down  = 0.0f;
 
     if (limited &&
         // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
@@ -215,7 +213,8 @@ void GroundDriveController::updatePathVelocity(float kFF, bool limited)
         velocityDesired.North += pid_apply(&PIDposH[0], progress.correction_vector[0], dT);
         velocityDesired.East  += pid_apply(&PIDposH[1], progress.correction_vector[1], dT);
     }
-    velocityDesired.Down += pid_apply(&PIDposV, progress.correction_vector[2], dT);
+
+    // TODO Constrain max velocity
 
     // update pathstatus
     pathStatus->error     = progress.error;
@@ -262,9 +261,9 @@ uint8_t GroundDriveController::updateGroundDesiredAttitude()
 
     stabDesired.Thrust = boundf(speedCommand + groundSettings->ThrustLimit.Neutral, groundSettings->ThrustLimit.Min, groundSettings->ThrustLimit.Max);
 
-    stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Pitch  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Yaw    = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
+    stabDesired.StabilizationMode.Pitch  = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
+    stabDesired.StabilizationMode.Yaw    = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
     StabilizationDesiredSet(&stabDesired);
 

@@ -2,8 +2,8 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup LightTelemetryModule LightTelemetry Module
- * @brief Lightweight telemetry module UAVTalk protocol
+ * @addtogroup AuxTelemetryModule AuxTelemetry Module
+ * @brief Auxiliary telemetry module UAVTalk protocol
  * Implements output in UAVTalk format. Little more than a wrapper for
  * the UAVTalk library.
  * @{
@@ -33,7 +33,7 @@
 #include <openpilot.h>
 #include <pios_com.h>
 
-#include "lighttelemetry.h"
+#include "auxtelemetry.h"
 
 // Private constants
 
@@ -45,7 +45,7 @@ static UAVTalkConnection uavTalkCon;
 
 // Private functions
 static void initialize(uint32_t comPort);
-static void updateData(LightTelemetrySettingsUpdateIntervalsElem data);
+static void updateData(AuxTelemetrySettingsUpdateIntervalsElem data);
 static int32_t transmitData(uint8_t *data, int32_t length);
 
 protocolHandler_t uavtalkProtocolHandler = {
@@ -59,27 +59,27 @@ static void initialize(uint32_t comPort)
     uavTalkCon = UAVTalkInitialize(&transmitData);
 }
 
-static void updateData(LightTelemetrySettingsUpdateIntervalsElem data)
+static void updateData(AuxTelemetrySettingsUpdateIntervalsElem data)
 {
     UAVObjHandle obj1 = NULL;
     UAVObjHandle obj2 = NULL;
 
     switch (data) {
-    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_ATTITUDE:
+    case AUXTELEMETRYSETTINGS_UPDATEINTERVALS_ATTITUDE:
         obj1 = AttitudeStateHandle();
         break;
-    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_GPSDATA:
+    case AUXTELEMETRYSETTINGS_UPDATEINTERVALS_GPSDATA:
         obj1 = GPSPositionSensorHandle();
         obj2 = GPSVelocitySensorHandle();
         break;
-    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_MANUALCONTROL:
+    case AUXTELEMETRYSETTINGS_UPDATEINTERVALS_MANUALCONTROL:
         obj1 = ManualControlCommandHandle();
         break;
-    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_SYSTEMSTATUS:
+    case AUXTELEMETRYSETTINGS_UPDATEINTERVALS_SYSTEMSTATUS:
         obj1 = FlightStatusHandle();
         obj2 = SystemAlarmsHandle();
         break;
-    case LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_FLIGHTBATTERY:
+    case AUXTELEMETRYSETTINGS_UPDATEINTERVALS_FLIGHTBATTERY:
         obj1 = FlightBatteryStateHandle();
         break;
     }

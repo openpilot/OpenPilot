@@ -2,15 +2,15 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup LightTelemetryModule LightTelemetry Module
- * @brief Lightweight telemetry module
+ * @addtogroup AuxTelemetryModule AuxTelemetry Module
+ * @brief Auxiliary telemetry module
  * Exports basic telemetry data using a selectable serial protocol
  * to external devices such as on screen displays.
  * @{
  *
- * @file       lighttelemetry.h
+ * @file       auxtelemetry.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
- * @brief      Lightweight telemetry module, exports basic telemetry.
+ * @brief      Auxiliary telemetry module, exports basic telemetry.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -30,8 +30,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LIGHTTELEMETRY_H
-#define LIGHTTELEMETRY_H
+#ifndef AUXTELEMETRY_H
+#define AUXTELEMETRY_H
 
 #include <attitudestate.h>
 #include <flightstatus.h>
@@ -40,17 +40,17 @@
 #include <gpsvelocitysensor.h>
 #include <flightbatterystate.h>
 #include <manualcontrolcommand.h>
-#include <lighttelemetrysettings.h>
+#include <auxtelemetrysettings.h>
 #include <pios_com.h>
 
 typedef struct {
     void (*initialize)(uint32_t comPort);
-    void (*updateData)(LightTelemetrySettingsUpdateIntervalsElem data);
+    void (*updateData)(AuxTelemetrySettingsUpdateIntervalsElem data);
 } protocolHandler_t;
 
-int32_t LightTelemetryInitialize(void);
+int32_t AuxTelemetryInitialize(void);
 
-#endif // LIGHTTELEMETRY_H
+#endif // AUXTELEMETRY_H
 
 /**
  * @}

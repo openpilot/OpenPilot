@@ -45,14 +45,13 @@ extern "C" {
 #include "pidcontrolne.h"
 
 PIDControlNE::PIDControlNE()
-    : deltaTime(0), mNECommand(0), mFSM(0), mNeutral(0), mVelocityMax(0), mMinCommand(0), mMaxCommand(0), mVelocityFeedforward(0), mActive(false)
+    : deltaTime(0), mNECommand(0), mNeutral(0), mVelocityMax(0), mMinCommand(0), mMaxCommand(0), mVelocityFeedforward(0), mActive(false)
 {}
 
 PIDControlNE::~PIDControlNE() {}
 
-void PIDControlNE::Initialize(PathFollowerFSM *fsm)
+void PIDControlNE::Initialize()
 {
-    mFSM = fsm;
 }
 
 void PIDControlNE::Deactivate()
@@ -70,14 +69,19 @@ void PIDControlNE::Activate()
     mActive = true;
 }
 
-void PIDControlNE::UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax)
+void PIDControlNE::UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax)
 {
     // pid_configure(&PID, kp, ki, kd, ilimit);
     float Ti   = kp / ki;
     float Td   = kd / kp;
     float Tt   = (Ti + Td) / 2.0f;
     float kt   = 1.0f / Tt;
-    float beta = 1.0f; // 0 to 1
+    if (beta > 1.0f) {
+	beta = 1.0f;
+    }
+    else if (beta < 0.4f) {
+	beta = 0.4f;
+    }
     float u0   = 0.0f;
     float N    = 10.0f;
     float Tf   = Td / N;

@@ -31,6 +31,7 @@
 #ifndef GROUNDDRIVECONTROLLER_H
 #define GROUNDDRIVECONTROLLER_H
 #include "pathfollowercontrol.h"
+#include "pidcontrolne.h"
 
 class GroundDriveController : public PathFollowerControl {
 private:
@@ -59,16 +60,13 @@ public:
 private:
     void resetGlobals();
     uint8_t updateAutoPilotGround();
-    void updatePathVelocity(float kFF, bool limited);
+    void updatePathVelocity(float kFF);
     uint8_t updateGroundDesiredAttitude();
 
     GroundPathFollowerSettingsData *groundSettings;
     uint8_t mActive;
     uint8_t mMode;
-
-    struct pid PIDposH[2];
-    // correct speed by measured airspeed
-    struct pid PIDgndspeed;
+    PIDControlNE controlNE;
 };
 
 #endif // GROUNDDRIVECONTROLLER_H

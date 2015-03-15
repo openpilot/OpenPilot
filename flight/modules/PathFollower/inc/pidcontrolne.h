@@ -39,7 +39,7 @@ class PIDControlNE {
 public:
     PIDControlNE();
     ~PIDControlNE();
-    void Initialize(PathFollowerFSM *fsm);
+    void Initialize();
     void Deactivate();
     void Activate();
     void UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax);
@@ -69,7 +69,6 @@ private:
     float deltaTime;
     float mVelocitySetpointCurrent[2];
     float mNECommand;
-    PathFollowerFSM *mFSM;
     float mNeutral;
     float mVelocityMax;
     float mMinCommand;

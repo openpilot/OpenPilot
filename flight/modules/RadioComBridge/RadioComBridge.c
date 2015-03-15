@@ -595,12 +595,11 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
  */
 static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t *rxbuffer, uint8_t length)
 {
-    uint8_t position     = 0;
-    UAVTalkRxState state = UAVTALK_STATE_ERROR;
+    uint8_t position = 0;
 
     // Keep reading until we receive a completed packet.
     while (position < length) {
-        state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbuffer, length, &position);
+        UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbuffer, length, &position);
         if (state == UAVTALK_STATE_COMPLETE) {
             // We only want to unpack certain telemetry objects
             uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);

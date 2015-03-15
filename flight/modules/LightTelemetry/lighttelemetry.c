@@ -50,7 +50,6 @@ extern protocolHandler_t uavtalkProtocolHandler;
 // Private variables
 static uint32_t comPort;
 static xTaskHandle taskHandle;
-static bool modEnabled;
 static protocolHandler_t *activeProtocolHandler = NULL;
 static uint8_t updatePeriod;
 static uint8_t intervalCounts[LIGHTTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
@@ -68,7 +67,7 @@ static void updateSettings(UAVObjEvent *ev);
 int32_t LightTelemetryStart(void)
 {
     // Start telemetry tasks
-    if (modEnabled && comPort && activeProtocolHandler) {
+    if (comPort && activeProtocolHandler) {
         xTaskCreate(telemetryTask, "SecondTel", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     }
     return 0;
@@ -83,18 +82,7 @@ int32_t LightTelemetryInitialize(void)
 {
     comPort = PIOS_COM_SECOND_TELEM;
 
-    HwSettingsInitialize();
-    HwSettingsOptionalModulesData optionalModules;
-
-    HwSettingsOptionalModulesGet(&optionalModules);
-
-    if (optionalModules.LightTelemetry == HWSETTINGS_OPTIONALMODULES_ENABLED) {
-        modEnabled = true;
-    } else {
-        modEnabled = false;
-    }
-
-    if (modEnabled && comPort) {
+    if (comPort) {
         LightTelemetrySettingsInitialize();
         LightTelemetrySettingsConnectCallback(updateSettings);
         updateSettings(0);
@@ -137,7 +125,7 @@ static void telemetryTask(__attribute__((unused)) void *parameters)
  */
 static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
-    if (modEnabled && comPort) {
+    if (comPort) {
         uint8_t speed;
         // Retrieve settings
         LightTelemetrySettingsOutputSpeedGet(&speed);

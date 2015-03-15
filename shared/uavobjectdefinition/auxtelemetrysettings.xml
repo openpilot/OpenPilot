@@ -1,9 +1,13 @@
 <xml>
     <object name="AuxTelemetrySettings" singleinstance="true" settings="true" category="System">
-        <description>Settings for secondary telemetry output</description>
+        <description>Settings for auxiliary telemetry output</description>
+        <!-- Baud rate to set for the auxiliary telemetry port -->
         <field name="OutputSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
+        <!-- Protocol to output. Requires a reboot to change. -->
         <field name="OutputProtocol" units="" type="enum" elements="1" options="Off,UAVTalk" defaultvalue="UAVTalk"/>
-        <field name="UpdatePeriod" units="ms" type="uint8" elements="1" defaultvalue="100" />
+        <!-- Basic update period in milliseconds, this is the fastest rate that any data can be updated -->
+        <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="100" />
+        <!-- Configures the rate at which each category of data is updated, 0 turns it off, other values causes updates at the specified multiple of "UpdatePeriod" -->
         <field name="UpdateIntervals" units="" type="uint8" elementnames="Attitude,GPSData,ManualControl,SystemStatus,FlightBattery" defaultvalue="1,2,5,5,0" />
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

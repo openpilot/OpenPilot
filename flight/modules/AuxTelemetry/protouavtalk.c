@@ -48,17 +48,21 @@ static void initialize(uint32_t comPort);
 static void updateData(AuxTelemetrySettingsUpdateIntervalsElem data);
 static int32_t transmitData(uint8_t *data, int32_t length);
 
-protocolHandler_t uavtalkProtocolHandler = {
-    .initialize = initialize,
-    .updateData = updateData,
+AuxTelemetryProtocolHandler uavtalkProtocolHandler = {
+    .initialize  = initialize,
+    .updateData  = updateData,
+    .receiveData = NULL,
+    .periodTick  = NULL
 };
 
+/* Init function. Create a UAVTalk connection */
 static void initialize(uint32_t comPort)
 {
     outputPort = comPort;
     uavTalkCon = UAVTalkInitialize(&transmitData);
 }
 
+/* Transmit the appropriate UAVObjects for the specified telemetry category */
 static void updateData(AuxTelemetrySettingsUpdateIntervalsElem data)
 {
     UAVObjHandle obj1 = NULL;
@@ -93,6 +97,7 @@ static void updateData(AuxTelemetrySettingsUpdateIntervalsElem data)
     }
 }
 
+/* TX Callback function for the AUVTalk connection */
 static int32_t transmitData(uint8_t *data, int32_t length)
 {
     return PIOS_COM_SendBuffer(outputPort, data, length);

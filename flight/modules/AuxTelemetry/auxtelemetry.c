@@ -39,8 +39,6 @@
 #include "auxtelemetry.h"
 #include "auxtelemetry_priv.h"
 
-extern protocolHandler_t uavtalkProtocolHandler;
-
 // Private constants
 #define STACK_SIZE_BYTES PIOS_TELEM_STACK_SIZE
 
@@ -49,10 +47,10 @@ extern protocolHandler_t uavtalkProtocolHandler;
 // Private types
 
 // Private variables
-static uint32_t comPort;
+static uint32_t comPort = 0;
 static xTaskHandle taskHandle;
-static protocolHandler_t *activeProtocolHandler = NULL;
-static uint8_t updatePeriod;
+static AuxTelemetryProtocolHandler *activeProtocolHandler = NULL;
+static uint16_t updatePeriod;
 static uint8_t intervalCounts[AUXTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
 static uint8_t updateIntervals[AUXTELEMETRYSETTINGS_UPDATEINTERVALS_NUMELEM];
 
@@ -61,13 +59,13 @@ static void telemetryTask(void *parameters);
 static void updateSettings(UAVObjEvent *ev);
 
 /**
- * Initialise the telemetry module
- * \return -1 if initialisation failed
+ * Start the auxiliary telemetry module
+ * \return -1 if failed
  * \return 0 on success
  */
 int32_t AuxTelemetryStart(void)
 {
-    // Start telemetry tasks
+    // Start task, if valid configuration (port and protocol)
     if (comPort && activeProtocolHandler) {
         xTaskCreate(telemetryTask, "SecondTel", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     }
@@ -75,21 +73,36 @@ int32_t AuxTelemetryStart(void)
 }
 
 /**
- * Initialise the telemetry module
- * \return -1 if initialisation failed
+ * Initialise the auxiliary telemetry module
+ * \return -1 if failed
  * \return 0 on success
  */
 int32_t AuxTelemetryInitialize(void)
 {
+    uint8_t proto;
+
+    /* Initialize the settings object */
+    AuxTelemetrySettingsInitialize();
+    AuxTelemetrySettingsConnectCallback(updateSettings);
+
+    /* Serial port and protocol are only set at startup. */
     comPort = PIOS_COM_AUXTELEM;
 
-    if (comPort) {
-        AuxTelemetrySettingsInitialize();
-        AuxTelemetrySettingsConnectCallback(updateSettings);
+    AuxTelemetrySettingsOutputProtocolGet(&proto);
+
+    switch ((AuxTelemetrySettingsOutputProtocolOptions)proto) {
+    case AUXTELEMETRYSETTINGS_OUTPUTPROTOCOL_UAVTALK:
+        activeProtocolHandler = &uavtalkProtocolHandler;
+        break;
+    default:
+        // No handler, module will be disabled
+        break;
+    }
+
+    /* If there is a valid basic configuration (port and protocol), initialize */
+    if (comPort && activeProtocolHandler) {
         updateSettings(0);
-        if (activeProtocolHandler) {
-            activeProtocolHandler->initialize(comPort);
-        }
+        activeProtocolHandler->initialize(comPort);
     }
 
     return 0;
@@ -98,6 +111,8 @@ int32_t AuxTelemetryInitialize(void)
 MODULE_INITCALL(AuxTelemetryInitialize, AuxTelemetryStart);
 
 /**
+ * Main task. Handles the scheduling of updates and calls
+ * the protocol handler.
  */
 static void telemetryTask(__attribute__((unused)) void *parameters)
 {
@@ -118,15 +133,20 @@ static void telemetryTask(__attribute__((unused)) void *parameters)
                 }
             }
         }
+        /* Let protocol handler do background processing */
+        if (activeProtocolHandler->periodTick) {
+            activeProtocolHandler->periodTick();
+        }
     }
 }
 
 /**
- * Update the telemetry settings, called on startup.
+ * Update the auxiliary telemetry settings, called on startup and on change.
  */
 static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
-    if (comPort) {
+    /* Fetch and apply settings if there is a valid basic configuration (port and protocol) */
+    if (comPort && activeProtocolHandler) {
         uint8_t speed;
         // Retrieve settings
         AuxTelemetrySettingsOutputSpeedGet(&speed);
@@ -157,9 +177,6 @@ static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
             PIOS_COM_ChangeBaud(comPort, 115200);
             break;
         }
-
-        // TODO: Select between protocols
-        activeProtocolHandler = &uavtalkProtocolHandler;
     }
 }
 

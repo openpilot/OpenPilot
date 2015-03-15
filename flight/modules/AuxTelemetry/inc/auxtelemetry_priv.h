@@ -44,9 +44,17 @@
 #include <pios_com.h>
 
 typedef struct {
+    /* Initialize the protocol handler, bind to the specified COM port */
     void (*initialize)(uint32_t comPort);
+    /* Update/transmit telemetry data of the category specified */
     void (*updateData)(AuxTelemetrySettingsUpdateIntervalsElem data);
-} protocolHandler_t;
+    /* Process data received from the COM port. Optional, and not yet implemented */
+    void (*receiveData)(uint8_t *data, uint32_t len);
+    /* Do any background processing. Optional. If present, will be called at the basic update rate */
+    void (*periodTick)(void);
+} AuxTelemetryProtocolHandler;
+
+extern AuxTelemetryProtocolHandler uavtalkProtocolHandler;
 
 #endif // AUXTELEMETRY_PRIV_H
 

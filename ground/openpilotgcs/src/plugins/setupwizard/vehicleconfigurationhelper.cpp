@@ -779,17 +779,15 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
             mSettings->setMixerValueRoll(100);
             mSettings->setMixerValuePitch(100);
             mSettings->setMixerValueYaw(100);
-            // Set curve2 range from -0.926 to 1 : take in account 4% offset in Throttle input
-            // 0.5 / 0.54 = 0.926
             maxThrottle = 1;
-            minThrottle = -0.926;
+            minThrottle = 0;
             break;
         case VehicleConfigurationSource::GROUNDVEHICLE_DIFFERENTIAL:
             mSettings->setMixerValueRoll(100);
             mSettings->setMixerValuePitch(100);
             mSettings->setMixerValueYaw(100);
             maxThrottle = 0.8;
-            minThrottle = -0.8;
+            minThrottle = 0;
             break;
         default:
             break;
@@ -2076,8 +2074,8 @@ void VehicleConfigurationHelper::setupCar()
 
     // Motor (Chan 2)
     channels[1].type      = MIXER_TYPE_REVERSABLEMOTOR;
-    channels[1].throttle1 = 0;
-    channels[1].throttle2 = 100;
+    channels[1].throttle1 = 100;
+    channels[1].throttle2 = 0;
     channels[1].roll      = 0;
     channels[1].pitch     = 0;
     channels[1].yaw       = 0;
@@ -2101,16 +2099,16 @@ void VehicleConfigurationHelper::setupTank()
 
     // Left Motor (Chan 1)
     channels[0].type      = MIXER_TYPE_REVERSABLEMOTOR;
-    channels[0].throttle1 = 0;
-    channels[0].throttle2 = 100;
+    channels[0].throttle1 = 100;
+    channels[0].throttle2 = 0;
     channels[0].roll      = 0;
     channels[0].pitch     = 0;
     channels[0].yaw       = 100;
 
     // Right Motor (Chan 2)
     channels[1].type      = MIXER_TYPE_REVERSABLEMOTOR;
-    channels[1].throttle1 = 0;
-    channels[1].throttle2 = 100;
+    channels[1].throttle1 = 100;
+    channels[1].throttle2 = 0;
     channels[1].roll      = 0;
     channels[1].pitch     = 0;
     channels[1].yaw       = -100;
@@ -2140,7 +2138,7 @@ void VehicleConfigurationHelper::setupMotorcycle()
     channels[0].pitch     = 0;
     channels[0].yaw       = 100;
 
-    // Motor (Chan 2) : Curve1, no reverse
+    // Motor (Chan 2)
     channels[1].type      = MIXER_TYPE_MOTOR;
     channels[1].throttle1 = 100;
     channels[1].throttle2 = 0;

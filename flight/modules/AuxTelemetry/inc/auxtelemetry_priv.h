@@ -8,7 +8,7 @@
  * to external devices such as on screen displays.
  * @{
  *
- * @file       auxtelemetry.h
+ * @file       auxtelemetry_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      Auxiliary telemetry module, exports basic telemetry.
  * @see        The GNU Public License (GPL) Version 3
@@ -30,12 +30,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AUXTELEMETRY_H
-#define AUXTELEMETRY_H
+#ifndef AUXTELEMETRY_PRIV_H
+#define AUXTELEMETRY_PRIV_H
 
-int32_t AuxTelemetryInitialize(void);
+#include <attitudestate.h>
+#include <flightstatus.h>
+#include <systemalarms.h>
+#include <gpspositionsensor.h>
+#include <gpsvelocitysensor.h>
+#include <flightbatterystate.h>
+#include <manualcontrolcommand.h>
+#include <auxtelemetrysettings.h>
+#include <pios_com.h>
 
-#endif // AUXTELEMETRY_H
+typedef struct {
+    void (*initialize)(uint32_t comPort);
+    void (*updateData)(AuxTelemetrySettingsUpdateIntervalsElem data);
+} protocolHandler_t;
+
+#endif // AUXTELEMETRY_PRIV_H
 
 /**
  * @}

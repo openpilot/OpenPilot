@@ -37,6 +37,7 @@
 #include "hwsettings.h"
 
 #include "auxtelemetry.h"
+#include "auxtelemetry_priv.h"
 
 extern protocolHandler_t uavtalkProtocolHandler;
 

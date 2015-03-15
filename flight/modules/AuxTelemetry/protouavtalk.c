@@ -33,7 +33,7 @@
 #include <openpilot.h>
 #include <pios_com.h>
 
-#include "auxtelemetry.h"
+#include "auxtelemetry_priv.h"
 
 // Private constants
 

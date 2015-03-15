@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       boardrotation3dview.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @addtogroup
  * @{
  * @addtogroup BoardRotation3DView
@@ -56,7 +56,7 @@ BoardRotation3DView::BoardRotation3DView(QWidget *parent, QString fname)
     repColor.setRgbF(1.0, 0.11372, 0.11372, 1.0);
     m_glcMoverController = GLC_Factory::instance()->createDefaultMoverController(repColor, &m_glcView);
 
-    CreateScene();
+    createScene();
 }
 
 BoardRotation3DView::~BoardRotation3DView()
@@ -135,10 +135,10 @@ void BoardRotation3DView::resizeGL(int width, int height)
     }
 }
 
-void BoardRotation3DView::CreateScene()
+void BoardRotation3DView::createScene()
 {
     try {
-        m_glcView.loadBackGroundImage(QString(":/setupwizard/resources/vehicle_bg.svg"));
+        m_glcView.loadBackGroundImage(QString(":/setupwizard/resources/vehicle_bg.png"));
     } catch(GLC_Exception e) {
         qDebug("BoardRotation3DView::CreateScene() fail to load background image file.");
     }

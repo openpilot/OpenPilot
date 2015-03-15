@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       boardrotationpage.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @addtogroup
  * @{
  * @addtogroup BoardRotationPage

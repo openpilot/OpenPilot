@@ -109,6 +109,9 @@ int SetupWizard::nextId() const
         }
     }
     case PAGE_VEHICLES:
+        return PAGE_BOARD_ROTATION;
+
+    case PAGE_BOARD_ROTATION:
     {
         switch (getVehicleType()) {
         case VEHICLE_MULTI:
@@ -128,9 +131,6 @@ int SetupWizard::nextId() const
         }
     }
     case PAGE_MULTI:
-        return PAGE_BOARD_ROTATION;
-
-    case PAGE_BOARD_ROTATION:
         return PAGE_ESC;
 
     case PAGE_FIXEDWING:

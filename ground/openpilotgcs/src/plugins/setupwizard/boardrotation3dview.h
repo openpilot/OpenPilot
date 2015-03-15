@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       boardrotation3dview.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @addtogroup
  * @{
  * @addtogroup BoardRotation3DView
@@ -61,7 +61,7 @@ private:
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
-    void CreateScene();
+    void createScene();
     void wheelEvent(QWheelEvent *e);
 };
 

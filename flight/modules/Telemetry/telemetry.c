@@ -130,8 +130,10 @@ int32_t TelemetryStart(void)
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
 #ifdef PIOS_INCLUDE_RFM22B
-    xTaskCreate(radioRxTask, "RadioRx", STACK_SIZE_RADIO_RX_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
+    if (radioPort) {
+        xTaskCreate(radioRxTask, "RadioRx", STACK_SIZE_RADIO_RX_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
+        PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
+    }
 #endif
 
     return 0;

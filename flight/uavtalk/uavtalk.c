@@ -378,7 +378,7 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
     uint8_t processedBytes = (*position);
     uint8_t count = 0;
 
-    // stop processing as soon as a complete packet is received or buffer is processed entirely
+    // stop processing as soon as a complete packet is received, error is encountered or buffer is processed entirely
     while ((count = length - (*position)) > 0
            && iproc->state != UAVTALK_STATE_COMPLETE
            && iproc->state != UAVTALK_STATE_ERROR) {

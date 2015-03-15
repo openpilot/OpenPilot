@@ -23,6 +23,7 @@
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
 			<elementname>TelemetryRx</elementname>
+			<elementname>AuxTelemetry</elementname>
 			<!-- com -->
 			<elementname>RadioRx</elementname>
 			<elementname>Com2UsbBridge</elementname>
@@ -54,6 +55,7 @@
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
 			<elementname>TelemetryRx</elementname>
+			<elementname>AuxTelemetry</elementname>
 			<!-- com -->
 			<elementname>RadioRx</elementname>
 			<elementname>Com2UsbBridge</elementname>
@@ -89,6 +91,7 @@
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
 			<elementname>TelemetryRx</elementname>
+			<elementname>AuxTelemetry</elementname>
 			<!-- com -->
 			<elementname>RadioRx</elementname>
 			<elementname>Com2UsbBridge</elementname>

@@ -39,8 +39,10 @@
 #include "auxtelemetry.h"
 #include "auxtelemetry_priv.h"
 
+#include "taskinfo.h"
+
 // Private constants
-#define STACK_SIZE_BYTES PIOS_TELEM_STACK_SIZE
+#define STACK_SIZE_BYTES 512
 
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 2)
 
@@ -68,6 +70,7 @@ int32_t AuxTelemetryStart(void)
     // Start task, if valid configuration (port and protocol)
     if (comPort && activeProtocolHandler) {
         xTaskCreate(telemetryTask, "SecondTel", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+        PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_AUXTELEMETRY, taskHandle);
     }
     return 0;
 }

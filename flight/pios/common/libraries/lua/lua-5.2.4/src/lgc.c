@@ -1,5 +1,5 @@
 /*
-** $Id: lgc.c,v 2.140 2013/03/16 21:10:18 roberto Exp $
+** $Id: lgc.c,v 2.140.1.3 2014/09/01 16:55:08 roberto Exp $
 ** Garbage Collector
 ** See Copyright Notice in lua.h
 */
@@ -403,7 +403,7 @@ static int traverseephemeron (global_State *g, Table *h) {
       reallymarkobject(g, gcvalue(gval(n)));  /* mark it now */
     }
   }
-  if (prop)
+  if (g->gcstate != GCSatomic || prop)
     linktable(h, &g->ephemeron);  /* have to propagate again */
   else if (hasclears)  /* does table have white keys? */
     linktable(h, &g->allweak);  /* may have to clean white keys */
@@ -493,17 +493,24 @@ static lu_mem traverseLclosure (global_State *g, LClosure *cl) {
 
 
 static lu_mem traversestack (global_State *g, lua_State *th) {
+  int n = 0;
   StkId o = th->stack;
   if (o == NULL)
     return 1;  /* stack not completely built yet */
-  for (; o < th->top; o++)
+  for (; o < th->top; o++)  /* mark live elements in the stack */
     markvalue(g, o);
   if (g->gcstate == GCSatomic) {  /* final traversal? */
     StkId lim = th->stack + th->stacksize;  /* real end of stack */
     for (; o < lim; o++)  /* clear not-marked stack slice */
       setnilvalue(o);
   }
-  return sizeof(lua_State) + sizeof(TValue) * th->stacksize;
+  else {  /* count call infos to compute size */
+    CallInfo *ci;
+    for (ci = &th->base_ci; ci != th->ci; ci = ci->next)
+      n++;
+  }
+  return sizeof(lua_State) + sizeof(TValue) * th->stacksize +
+         sizeof(CallInfo) * n;
 }
 
 

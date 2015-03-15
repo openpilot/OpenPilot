@@ -40,6 +40,7 @@ extern "C" {
 #include <pathdesired.h>
 #include <paths.h>
 #include "plans.h"
+#include <pidstatus.h>
 }
 #include "pathfollowerfsm.h"
 #include "pidcontrolne.h"
@@ -223,6 +224,19 @@ void PIDControlNE::GetNECommand(float *northCommand, float *eastCommand)
     *northCommand = pid2_apply(&(PIDvel[0]), mVelocitySetpointCurrent[0], mVelocityState[0], mMinCommand, mMaxCommand);
     PIDvel[1].va  = mVelocitySetpointCurrent[1] * mVelocityFeedforward;
     *eastCommand  = pid2_apply(&(PIDvel[1]), mVelocitySetpointCurrent[1], mVelocityState[1], mMinCommand, mMaxCommand);
+
+    PIDStatusData pidStatus;
+    pidStatus.setpoint = mVelocitySetpointCurrent[0];
+    pidStatus.actual   = mVelocityState[0];
+    pidStatus.error    = mVelocitySetpointCurrent[0] - mVelocityState[0];
+    pidStatus.setpoint = mVelocitySetpointCurrent[0];
+    pidStatus.ulow     = mMinCommand;
+    pidStatus.uhigh    = mMaxCommand;
+    pidStatus.command  = *northCommand;
+    pidStatus.P  = PIDvel[0].P;
+    pidStatus.I  = PIDvel[0].I;
+    pidStatus.D  = PIDvel[0].D;
+    PIDStatusSet(&pidStatus);
 }
 
 void PIDControlNE::GetVelocityDesired(float *north, float *east)

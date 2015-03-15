@@ -182,6 +182,7 @@ void GroundDriveController::updatePathVelocity(float kFF)
     VelocityStateData velocityState;
     VelocityStateGet(&velocityState);
     VelocityDesiredData velocityDesired;
+    controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // look ahead kFF seconds
     float cur[3]   = { positionState.North + (velocityState.North * kFF),
@@ -192,7 +193,7 @@ void GroundDriveController::updatePathVelocity(float kFF)
 
     controlNE.ControlPositionWithPath(&progress);
     float north, east;
-    controlNE.GetVelocityDesired(&north, & east);
+    controlNE.GetVelocityDesired(&north, &east);
     velocityDesired.North = north;
     velocityDesired.East  = east;
     velocityDesired.Down  = 0.0f;

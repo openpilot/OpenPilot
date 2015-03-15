@@ -33,15 +33,11 @@
 #include <QCheckBox>
 #include <QDebug>
 #include <QMessageBox>
-#include <attitudesettings.h>
-#include <revosettings.h>
 #include <uavobjectutil/devicedescriptorstruct.h>
 #include <uavobjectutil/uavobjectutilmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "version_info/version_info.h"
 #include "coreplugin/icore.h"
-#include "qmainwindow.h"
-#include "manualcontrolsettings.h"
 
 UsageTrackerPlugin::UsageTrackerPlugin() :
     m_telemetryManager(NULL)
@@ -140,8 +136,10 @@ void UsageTrackerPlugin::trackUsage()
         iter.next();
         query.addQueryItem(iter.key(), iter.value());
     }
-    qDebug() << "Parameters unencoded:" << query.toString();
-    qDebug() << "Parameters encoded:" << query.toString(QUrl::FullyEncoded);
+
+    // Add checksum
+    query.addQueryItem("hash", getQueryHash(query.toString()));
+
     QUrl url("https://www.openpilot.org/opver?" + query.toString(QUrl::FullyEncoded));
     qDebug() << "Sending usage tracking as:" << url.toEncoded(QUrl::FullyEncoded);
     networkAccessManager->get(QNetworkRequest(QUrl(url.toEncoded(QUrl::FullyEncoded))));
@@ -163,19 +161,55 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         parameters["fw_tag"] = devDesc.gitTag;
         parameters["fw_hash"] = devDesc.gitHash;
         parameters["os_version"]   = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
+        parameters["os_threads"]   = QString::number(QThread::idealThreadCount());
         parameters["gcs_version"]  = VersionInfo::revision();
         parameters["localtime"]    = QDateTime::currentDateTime().toString(Qt::ISODate);
 
         // Configuration parameters
-        ExtensionSystem::PluginManager *pm     = ExtensionSystem::PluginManager::instance();
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-        ManualControlSettings *controlSettings = ManualControlSettings::GetInstance(objManager);
-        parameters["settings_receiver"] = controlSettings->getField("ChannelGroups")->getValue(ManualControlSettings::CHANNELGROUPS_THROTTLE).toString();
 
-        RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
-        // Only get this info if uavo is known by controller
-        if (revoSettings->isKnown()) {
-            parameters["settings_fusion"] = revoSettings->getField("FusionAlgorithm")->getValue().toString();
+        parameters["settings_receiver"] = getUAVFieldValue(objManager, "ManualControlSettings", "ChannelGroups", 0);
+        parameters["settings_vehicle"]  = getUAVFieldValue(objManager, "SystemSettings", "AirframeType");
+
+        if ((boardModel & 0xff00) == 0x0400) {
+            // CopterControl family
+            parameters["settings_rport"] = getUAVFieldValue(objManager, "HwSettings", "CC_RcvrPort");
+            parameters["settings_mport"] = getUAVFieldValue(objManager, "HwSettings", "CC_MainPort");
+            parameters["settings_fport"] = getUAVFieldValue(objManager, "HwSettings", "CC_FlexiPort");
+        } else if ((boardModel & 0xff00) == 0x0900) {
+            // Revolution family
+            parameters["settings_rport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_RcvrPort");
+            parameters["settings_mport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_MainPort");
+            parameters["settings_fport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_FlexiPort");
+            parameters["settings_fusion"] = getUAVFieldValue(objManager, "RevoSettings", "FusionAlgorithm");
+        }
+
+        parameters["settings_uport"]    = getUAVFieldValue(objManager, "HwSettings", "USB_HIDPort");
+        parameters["settings_vport"]    = getUAVFieldValue(objManager, "HwSettings", "USB_VCPPort");
+
+        parameters["settings_rotation"] = QString("%1:%2:%3")
+                                          .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 0))
+                                          .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 1))
+                                          .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 2));
+    }
+}
+
+QString UsageTrackerPlugin::getUAVFieldValue(UAVObjectManager *objManager, QString objectName, QString fieldName, int index) const
+{
+    UAVObject *object = objManager->getObject(objectName);
+
+    if (object != NULL) {
+        UAVObjectField *field = object->getField(fieldName);
+        if (field != NULL) {
+            return field->getValue(index).toString();
         }
     }
+    return tr("Unknown");
+}
+
+QString UsageTrackerPlugin::getQueryHash(QString source) const
+{
+    source += "OpenPilot Fuck Yeah!";
+    return QString(QCryptographicHash::hash(QByteArray(source.toStdString().c_str()), QCryptographicHash::Md5).toHex());
 }

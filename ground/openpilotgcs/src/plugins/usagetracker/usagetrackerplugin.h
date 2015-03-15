@@ -48,6 +48,8 @@ private slots:
 
 private:
     TelemetryManager *m_telemetryManager;
+    QString getUAVFieldValue(UAVObjectManager *objManager, QString objectName, QString fieldName, int index = 0) const;
+    QString getQueryHash(QString source) const;
 };
 
 #endif // USAGETRACKERPLUGIN_H

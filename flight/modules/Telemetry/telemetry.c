@@ -93,14 +93,14 @@
 
 // Private types
 typedef struct {
-    // Port on which to communicate telemetry information
-    uint32_t     telemetryPort;
+    // Determine port on which to communicate telemetry information
+    uint32_t (*telemetryPort)();
     // Main telemetry queue
     xQueueHandle mainQueue;
-        #ifdef PIOS_TELEM_PRIORITY_QUEUE
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
     // Priority telemetry queue
     xQueueHandle priorityQueue;
-        #endif /* PIOS_TELEM_PRIORITY_QUEUE */
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
     // Transmit/receive task handles
     xTaskHandle  telemetryTxTaskHandle;
     xTaskHandle  telemetryRxTaskHandle;
@@ -108,15 +108,17 @@ typedef struct {
     UAVTalkConnection uavTalkCon;
 } telemetryContext;
 
-// Main telemetry port
+// Main telemetry channel
 static telemetryContext telemHandle;
 static int32_t transmitData(uint8_t *data, int32_t length);
 static void registerTelemObject(UAVObjHandle obj);
+static uint32_t telemPort();
 
-// OPLink telemetry port
+// OPLink telemetry channel
 static telemetryContext radioHandle;
 static int32_t transmitRadioData(uint8_t *data, int32_t length);
 static void registerRadioObject(UAVObjHandle obj);
+static uint32_t radioPort();
 
 // Telemetry stats
 static uint32_t txErrors;
@@ -142,7 +144,7 @@ static int32_t setLoggingPeriod(
     int32_t updatePeriodMs);
 static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
-static void updateSettings();
+static void updateSettings(telemetryContext *telemetryHandle);
 
 /**
  * Initialise the telemetry module
@@ -226,23 +228,12 @@ int32_t TelemetryInitialize(void)
                                              sizeof(UAVObjEvent));
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
-    // Update telemetry settings
-    telemHandle.telemetryPort = PIOS_COM_TELEM_RF;
-
-#ifdef PIOS_INCLUDE_RFM22B
-    radioHandle.telemetryPort = PIOS_COM_RF;
-#else /* PIOS_INCLUDE_RFM22B */
-    radioHandle.telemetryPort = 0;
-#endif /* PIOS_INCLUDE_RFM22B */
-#ifdef PIOS_INCLUDE_USB
-    // if USB is connected, USB takes precedence for telemetry
-    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
-        radioHandle.telemetryPort = PIOS_COM_TELEM_USB;
-    }
-#endif /* PIOS_INCLUDE_USB */
+    // Set channel port handlers
+    telemHandle.telemetryPort = telemPort;
+    radioHandle.telemetryPort = radioPort;
 
     HwSettingsInitialize();
-    updateSettings();
+    updateSettings(&telemHandle);
 
     // Initialise UAVTalk
     telemHandle.uavTalkCon = UAVTalkInitialize(&transmitData);
@@ -319,6 +310,7 @@ static void registerRadioObject(UAVObjHandle obj)
 
 /**
  * Update object's queue connections and timer, depending on object's settings
+ * \param[in] telemetry channel context
  * \param[in] obj Object to updates
  */
 static void updateObject(
@@ -588,7 +580,7 @@ static void telemetryRxTask(void *parameters)
 
     // Task loop
     while (1) {
-        uint32_t inputPort = telemetryHandle->telemetryPort;
+        uint32_t inputPort = telemetryHandle->telemetryPort();
 
         if (inputPort) {
             // Block until data are available
@@ -609,6 +601,38 @@ static void telemetryRxTask(void *parameters)
 
 
 /**
+ * Determine the port to be used for communication on the  telemetry channel
+ * \return com port number
+ */
+static uint32_t telemPort()
+{
+    return PIOS_COM_TELEM_RF;
+}
+
+
+/**
+ * Determine the port to be used for communication on the radio channel
+ * \return com port number
+ */
+static uint32_t radioPort()
+{
+#ifdef PIOS_INCLUDE_RFM22B
+    uint32_t port = PIOS_COM_RF;
+#else /* PIOS_INCLUDE_RFM22B */
+    uint32_t port = 0;
+#endif /* PIOS_INCLUDE_RFM22B */
+#ifdef PIOS_INCLUDE_USB
+    // if USB is connected, USB takes precedence for telemetry
+    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
+        port = PIOS_COM_TELEM_USB;
+    }
+#endif /* PIOS_INCLUDE_USB */
+
+    return port;
+}
+
+
+/**
  * Transmit data buffer to the modem or USB port.
  * \param[in] data Data buffer to send
  * \param[in] length Length of buffer
@@ -617,12 +641,7 @@ static void telemetryRxTask(void *parameters)
  */
 static int32_t transmitData(uint8_t *data, int32_t length)
 {
-    uint32_t outputPort;
-
-    outputPort = PIOS_COM_TELEM_RF;
-
-    // Anticipate next input on the port on which this output occurs
-    telemHandle.telemetryPort = outputPort;
+    uint32_t outputPort = telemHandle.telemetryPort();
 
     if (outputPort) {
         return PIOS_COM_SendBuffer(outputPort, data, length);
@@ -641,20 +660,7 @@ static int32_t transmitData(uint8_t *data, int32_t length)
  */
 static int32_t transmitRadioData(uint8_t *data, int32_t length)
 {
-#ifdef PIOS_INCLUDE_RFM22B
-    uint32_t outputPort = PIOS_COM_RF;
-#else /* PIOS_INCLUDE_RFM22B */
-    uint32_t outputPort = 0;
-#endif /* PIOS_INCLUDE_RFM22B */
-#ifdef PIOS_INCLUDE_USB
-    // if USB is connected, USB takes precedence for telemetry
-    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
-        outputPort = PIOS_COM_TELEM_USB;
-    }
-#endif /* PIOS_INCLUDE_USB */
-
-    // Anticipate next input on the port on which this output occurs
-    radioHandle.telemetryPort = outputPort;
+    uint32_t outputPort = radioHandle.telemetryPort();
 
     if (outputPort) {
         return PIOS_COM_SendBuffer(outputPort, data, length);
@@ -665,6 +671,7 @@ static int32_t transmitRadioData(uint8_t *data, int32_t length)
 
 /**
  * Set update period of object (it must be already setup for periodic updates)
+ * \param[in] telemetry channel context
  * \param[in] obj The object to update
  * \param[in] updatePeriodMs The update period in ms, if zero then periodic updates are disabled
  * \return 0 Success
@@ -700,6 +707,7 @@ static int32_t setUpdatePeriod(
 
 /**
  * Set logging update period of object (it must be already setup for periodic updates)
+ * \param[in] telemetry channel context
  * \param[in] obj The object to update
  * \param[in] updatePeriodMs The update period in ms, if zero then periodic updates are disabled
  * \return 0 Success
@@ -854,9 +862,11 @@ static void updateTelemetryStats()
  * settings, etc. Thus the HwSettings object which contains the
  * telemetry port speed is used for now.
  */
-static void updateSettings()
+static void updateSettings(telemetryContext *telemetryHandle)
 {
-    if (telemHandle.telemetryPort) {
+    uint32_t port = telemetryHandle->telemetryPort();
+
+    if (port) {
         // Retrieve settings
         uint8_t speed;
         HwSettingsTelemetrySpeedGet(&speed);
@@ -864,25 +874,25 @@ static void updateSettings()
         // Set port speed
         switch (speed) {
         case HWSETTINGS_TELEMETRYSPEED_2400:
-            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 2400);
+            PIOS_COM_ChangeBaud(port, 2400);
             break;
         case HWSETTINGS_TELEMETRYSPEED_4800:
-            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 4800);
+            PIOS_COM_ChangeBaud(port, 4800);
             break;
         case HWSETTINGS_TELEMETRYSPEED_9600:
-            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 9600);
+            PIOS_COM_ChangeBaud(port, 9600);
             break;
         case HWSETTINGS_TELEMETRYSPEED_19200:
-            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 19200);
+            PIOS_COM_ChangeBaud(port, 19200);
             break;
         case HWSETTINGS_TELEMETRYSPEED_38400:
-            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 38400);
+            PIOS_COM_ChangeBaud(port, 38400);
             break;
         case HWSETTINGS_TELEMETRYSPEED_57600:
-            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 57600);
+            PIOS_COM_ChangeBaud(port, 57600);
             break;
         case HWSETTINGS_TELEMETRYSPEED_115200:
-            PIOS_COM_ChangeBaud(telemHandle.telemetryPort, 115200);
+            PIOS_COM_ChangeBaud(port, 115200);
             break;
         }
     }

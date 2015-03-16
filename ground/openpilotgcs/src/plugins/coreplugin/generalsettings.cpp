@@ -167,6 +167,7 @@ void GeneralSettings::readSettings(QSettings *qs)
     m_useExpertMode      = qs->value(QLatin1String("ExpertMode"), m_useExpertMode).toBool();
     m_collectUsageData   = qs->value(QLatin1String("CollectUsageData"), m_collectUsageData).toBool();
     m_showUsageDataDisclaimer = qs->value(QLatin1String("ShowUsageDataDisclaimer"), m_showUsageDataDisclaimer).toBool();
+    m_lastUsageHash      = qs->value(QLatin1String("LastUsageHash"), m_lastUsageHash).toString();
     qs->endGroup();
 }
 
@@ -187,6 +188,7 @@ void GeneralSettings::saveSettings(QSettings *qs)
     qs->setValue(QLatin1String("ExpertMode"), m_useExpertMode);
     qs->setValue(QLatin1String("CollectUsageData"), m_collectUsageData);
     qs->setValue(QLatin1String("ShowUsageDataDisclaimer"), m_showUsageDataDisclaimer);
+    qs->setValue(QLatin1String("LastUsageHash"), m_lastUsageHash);
     qs->endGroup();
 }
 
@@ -267,6 +269,11 @@ bool GeneralSettings::showUsageDataDisclaimer() const
     return m_showUsageDataDisclaimer;
 }
 
+QString GeneralSettings::lastUsageHash() const
+{
+    return m_lastUsageHash;
+}
+
 bool GeneralSettings::useExpertMode() const
 {
     return m_useExpertMode;
@@ -283,6 +290,11 @@ bool GeneralSettings::setCollectUsageData(bool collect)
 bool GeneralSettings::setShowUsageDataDisclaimer(bool show)
 {
     m_showUsageDataDisclaimer = show;
+}
+
+void GeneralSettings::setLastUsageHash(QString hash)
+{
+    m_lastUsageHash = hash;
 }
 
 void GeneralSettings::slotAutoConnect(int value)

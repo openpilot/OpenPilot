@@ -38,6 +38,7 @@
 #include <coreplugin/generalsettings.h>
 #include "version_info/version_info.h"
 #include "coreplugin/icore.h"
+#include <uavtalk/telemetrymanager.h>
 
 UsageTrackerPlugin::UsageTrackerPlugin() :
     m_telemetryManager(NULL)
@@ -82,27 +83,27 @@ void UsageTrackerPlugin::onAutopilotConnect()
             message.addButton(tr("Yes, count me in"), QMessageBox::AcceptRole);
             message.addButton(tr("No, I will not help"), QMessageBox::RejectRole);
             message.setText(tr("Openpilot GCS has a function to collect limited anonymous information about "
-                               "the usage of the application itself and the OpenPilot hardware connected to it.\n\n"
+                               "the usage of the application itself and the OpenPilot hardware connected to it.<p>"
                                "The intention is to not include anything that can be considered sensitive "
                                "or a threat to the users integrity. The collected information will be sent "
                                "using a secure protocol to an OpenPilot web service and stored in a database "
-                               "for later analysis and statistical purposes.\n"
+                               "for later analysis and statistical purposes.<br>"
                                "No information will be sold or given to any third party. The sole purpose is "
                                "to collect statistics about the usage of our software and hardware to enable us "
-                               "to make things better for you.\n\n"
-                               "The following things are collected:\n"
-                               "- Bootloader version\n"
-                               "- Firmware version, tag and git hash\n"
-                               "- OP Hardware type, revision and mcu serial number\n"
-                               "- Selected configuration parameters\n"
-                               "- GCS version\n"
-                               "- Operating system version and architecture\n"
-                               "- Current local time\n"
-                               "The information is collected only at the time when a board is connecting to GCS.\n\n"
+                               "to make things better for you.<p>"
+                               "The following things are collected:<ul>"
+                               "<li>Bootloader version</li>"
+                               "<li>Firmware version, tag and git hash</li>"
+                               "<li>OP Hardware type, revision and mcu serial number</li>"
+                               "<li>Selected configuration parameters</li>"
+                               "<li>GCS version</li>"
+                               "<li>Operating system version and architecture</li>"
+                               "<li>Current local time</li></ul>"
+                               "The information is collected only at the time when a board is connecting to GCS.<p>"
                                "It is possible to enable or disable this functionality in the general "
-                               "settings part of the options for the GCS application at any time.\n\n"
+                               "settings part of the options for the GCS application at any time.<p>"
                                "We need your help, with your feedback we know where to improve things and what "
-                               "platforms are in use. This is a community project that depends on people being involved.\n"
+                               "platforms are in use. This is a community project that depends on people being involved.<br>"
                                "Thank You for helping us making things better and for supporting OpenPilot!"));
             QCheckBox *disclaimerCb = new QCheckBox(tr("&Don't show this message again."));
             disclaimerCb->setChecked(true);
@@ -122,11 +123,6 @@ void UsageTrackerPlugin::onAutopilotConnect()
 
 void UsageTrackerPlugin::trackUsage()
 {
-    QNetworkAccessManager *networkAccessManager = new QNetworkAccessManager();
-
-    // This will delete the network access manager instance when we're done
-    connect(networkAccessManager, SIGNAL(finished(QNetworkReply *)), networkAccessManager, SLOT(deleteLater()));
-
     QMap<QString, QString> parameters;
     collectUsageParameters(parameters);
 
@@ -138,11 +134,24 @@ void UsageTrackerPlugin::trackUsage()
     }
 
     // Add checksum
-    query.addQueryItem("hash", getQueryHash(query.toString()));
+    QString hash = getQueryHash(query.toString());
 
-    QUrl url("https://www.openpilot.org/opver?" + query.toString(QUrl::FullyEncoded));
-    qDebug() << "Sending usage tracking as:" << url.toEncoded(QUrl::FullyEncoded);
-    networkAccessManager->get(QNetworkRequest(QUrl(url.toEncoded(QUrl::FullyEncoded))));
+    if (shouldSend(hash)) {
+        query.addQueryItem("hash", hash);
+
+        // Add local timestamp
+        query.addQueryItem("localtime", QDateTime::currentDateTime().toString(Qt::ISODate));
+
+        QUrl url("https://www.openpilot.org/opver?" + query.toString(QUrl::FullyEncoded));
+
+        QNetworkAccessManager *networkAccessManager = new QNetworkAccessManager();
+
+        // This will delete the network access manager instance when we're done
+        connect(networkAccessManager, SIGNAL(finished(QNetworkReply *)), networkAccessManager, SLOT(deleteLater()));
+
+        qDebug() << "Sending usage tracking as:" << url.toEncoded(QUrl::FullyEncoded);
+        networkAccessManager->get(QNetworkRequest(QUrl(url.toEncoded(QUrl::FullyEncoded))));
+    }
 }
 
 void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &parameters)
@@ -163,7 +172,6 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         parameters["os_version"]   = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
         parameters["os_threads"]   = QString::number(QThread::idealThreadCount());
         parameters["gcs_version"]  = VersionInfo::revision();
-        parameters["localtime"]    = QDateTime::currentDateTime().toString(Qt::ISODate);
 
         // Configuration parameters
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -212,4 +220,17 @@ QString UsageTrackerPlugin::getQueryHash(QString source) const
 {
     source += "OpenPilot Fuck Yeah!";
     return QString(QCryptographicHash::hash(QByteArray(source.toStdString().c_str()), QCryptographicHash::Md5).toHex());
+}
+
+bool UsageTrackerPlugin::shouldSend(const QString &hash)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+
+    if (settings->lastUsageHash() == hash) {
+        return false;
+    } else {
+        settings->setLastUsageHash(hash);
+        return true;
+    }
 }

@@ -28,7 +28,9 @@
 #define USAGETRACKERPLUGIN_H
 
 #include <extensionsystem/iplugin.h>
-#include <uavtalk/telemetrymanager.h>
+
+class TelemetryManager;
+class UAVObjectManager;
 
 class UsageTrackerPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
@@ -50,6 +52,7 @@ private:
     TelemetryManager *m_telemetryManager;
     QString getUAVFieldValue(UAVObjectManager *objManager, QString objectName, QString fieldName, int index = 0) const;
     QString getQueryHash(QString source) const;
+    bool shouldSend(const QString &hash);
 };
 
 #endif // USAGETRACKERPLUGIN_H

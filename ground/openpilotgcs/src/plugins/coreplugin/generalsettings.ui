@@ -157,7 +157,7 @@
       <item row="15" column="0">
        <widget class="QLabel" name="labelExpert_2">
         <property name="text">
-         <string>Gather and upload usage data:</string>
+         <string>Contribute usage statistics:</string>
         </property>
        </widget>
       </item>

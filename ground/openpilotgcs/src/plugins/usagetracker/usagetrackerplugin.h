@@ -28,9 +28,11 @@
 #define USAGETRACKERPLUGIN_H
 
 #include <extensionsystem/iplugin.h>
+#include <coreplugin/generalsettings.h>
 
 class TelemetryManager;
 class UAVObjectManager;
+class QNetworkReply;
 
 class UsageTrackerPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
@@ -47,11 +49,14 @@ private slots:
     void onAutopilotConnect();
     void trackUsage();
     void collectUsageParameters(QMap<QString, QString> &parameters);
+    void onFinished(QNetworkReply *reply);
 
 private:
     TelemetryManager *m_telemetryManager;
+    QString m_lastHash;
     QString getUAVFieldValue(UAVObjectManager *objManager, QString objectName, QString fieldName, int index = 0) const;
     QString getQueryHash(QString source) const;
+    Core::Internal::GeneralSettings * getGeneralSettings() const;
     bool shouldSend(const QString &hash);
 };
 

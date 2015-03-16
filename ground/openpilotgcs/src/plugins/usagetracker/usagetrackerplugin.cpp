@@ -168,7 +168,7 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         parameters["fw_hash"] = devDesc.gitHash;
         parameters["os_version"]   = QSysInfo::prettyProductName() + " " + QSysInfo::currentCpuArchitecture();
         parameters["os_threads"]   = QString::number(QThread::idealThreadCount());
-        parameters["os_timezone"]        = QTimeZone::systemTimeZoneId();
+        parameters["os_timezone"]  = QTimeZone::systemTimeZoneId();
         parameters["gcs_version"]  = VersionInfo::revision();
 
         // Configuration parameters
@@ -195,9 +195,9 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         parameters["conf_vport"]    = getUAVFieldValue(objManager, "HwSettings", "USB_VCPPort");
 
         parameters["conf_rotation"] = QString("%1:%2:%3")
-                                          .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 0))
-                                          .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 1))
-                                          .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 2));
+                                      .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 0))
+                                      .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 1))
+                                      .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 2));
     }
 }
 
@@ -230,10 +230,11 @@ QString UsageTrackerPlugin::getQueryHash(QString source) const
     return QString(QCryptographicHash::hash(QByteArray(source.toStdString().c_str()), QCryptographicHash::Md5).toHex());
 }
 
-Core::Internal::GeneralSettings * UsageTrackerPlugin::getGeneralSettings() const
+Core::Internal::GeneralSettings *UsageTrackerPlugin::getGeneralSettings() const
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+
     return settings;
 }
 

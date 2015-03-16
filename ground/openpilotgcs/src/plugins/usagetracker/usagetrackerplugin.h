@@ -56,7 +56,7 @@ private:
     QString m_lastHash;
     QString getUAVFieldValue(UAVObjectManager *objManager, QString objectName, QString fieldName, int index = 0) const;
     QString getQueryHash(QString source) const;
-    Core::Internal::GeneralSettings * getGeneralSettings() const;
+    Core::Internal::GeneralSettings *getGeneralSettings() const;
     bool shouldSend(const QString &hash);
 };
 

@@ -80,7 +80,7 @@ void GroundDriveController::Activate(void)
         SettingsUpdated();
         controlNE.Activate();
         resetGlobals();
-        mMode   = pathDesired->Mode;
+        mMode = pathDesired->Mode;
     }
 }
 
@@ -111,6 +111,7 @@ void GroundDriveController::Deactivate(void)
 void GroundDriveController::SettingsUpdated(void)
 {
     const float dT = groundSettings->UpdatePeriod / 1000.0f;
+
     controlNE.UpdatePositionalParameters(groundSettings->HorizontalPosP);
     controlNE.UpdateParameters(groundSettings->SpeedPI.Kp,
                                groundSettings->SpeedPI.Ki,
@@ -187,9 +188,9 @@ void GroundDriveController::updatePathVelocity(float kFF)
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // look ahead kFF seconds
-    float cur[3]   = { positionState.North + (velocityState.North * kFF),
-                       positionState.East + (velocityState.East * kFF),
-                       positionState.Down + (velocityState.Down * kFF) };
+    float cur[3] = { positionState.North + (velocityState.North * kFF),
+                     positionState.East + (velocityState.East * kFF),
+                     positionState.Down + (velocityState.Down * kFF) };
     struct path_status progress;
     path_progress(pathDesired, cur, &progress, false);
 
@@ -222,13 +223,12 @@ void GroundDriveController::updatePathVelocity(float kFF)
         ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
         ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
         ;
-
     }
 #endif
 
 
     // update pathstatus
-    pathStatus->error     = progress.error;
+    pathStatus->error = progress.error;
     pathStatus->fractional_progress  = progress.fractional_progress;
     // FOLLOWVECTOR: desired velocity vector
     pathStatus->path_direction_north = progress.path_vector[0];
@@ -250,14 +250,16 @@ uint8_t GroundDriveController::updateGroundDesiredAttitude()
 {
     StatusGroundDriveData statusGround;
     VelocityStateData velocityState;
+
     VelocityStateGet(&velocityState);
     AttitudeStateData attitudeState;
     AttitudeStateGet(&attitudeState);
     statusGround.State.Yaw = attitudeState.Yaw;
-    statusGround.State.Velocity = sqrtf(velocityState.North*velocityState.North + velocityState.East*velocityState.East);
+    statusGround.State.Velocity = sqrtf(velocityState.North * velocityState.North + velocityState.East * velocityState.East);
 
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
+
     // estimate a north/east command value to control the velocity error.
     // ThrustLimits.Max(+-) limits the range.  Think of this as a command unit vector
     // of the ultimate direction to reduce lateral error and achieve the target direction (desired angle).
@@ -265,48 +267,48 @@ uint8_t GroundDriveController::updateGroundDesiredAttitude()
     controlNE.GetNECommand(&northCommand, &eastCommand);
 
     // Get current vehicle orientation
-    float angle_radians = DEG2RAD(attitudeState.Yaw); //(+-pi)
-    float cos_angle     = cosf(angle_radians);
-    float sine_angle    = sinf(angle_radians);
+    float angle_radians  = DEG2RAD(attitudeState.Yaw); // (+-pi)
+    float cos_angle      = cosf(angle_radians);
+    float sine_angle     = sinf(angle_radians);
 
-    float courseCommand=0.0f;
-    float speedCommand=0.0f;
+    float courseCommand  = 0.0f;
+    float speedCommand   = 0.0f;
     float lateralCommand = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max);
     float forwardCommand = boundf(northCommand * cos_angle + eastCommand * sine_angle, -groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max);
     // +ve facing correct direction, lateral command should just correct angle,
-    if (forwardCommand >=0.0f) {
-	// if +ve forward command, -+ lateralCommand drives steering to manage lateral error and angular error
+    if (forwardCommand >= 0.1f) {
+        // if +ve forward command, -+ lateralCommand drives steering to manage lateral error and angular error
 
-	courseCommand = boundf(lateralCommand, -1.0f, 1.0f);
-	speedCommand  = boundf(forwardCommand, groundSettings->ThrustLimit.SlowForward, groundSettings->ThrustLimit.Max);
+        courseCommand = boundf(lateralCommand, -1.0f, 1.0f);
+        speedCommand  = boundf(forwardCommand, groundSettings->ThrustLimit.SlowForward, groundSettings->ThrustLimit.Max);
 
-	// reinstate max thrust
-	controlNE.UpdateCommandParameters(-groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max, groundSettings->VelocityFeedForward);
+        // reinstate max thrust
+        controlNE.UpdateCommandParameters(-groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max, groundSettings->VelocityFeedForward);
 
-	statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_ONTRACK;
-    }
-    else {
-	// -ve facing opposite direction, lateral command irrelevant, need to turn to change direction and do so slowly.
+        statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_ONTRACK;
+    } else {
+        // -ve facing opposite direction, lateral command irrelevant, need to turn to change direction and do so slowly.
 
-	// Reduce steering angle based on current velocity
-	float steeringReductionFactor = (groundSettings->HorizontalVelMax - statusGround.State.Velocity) / groundSettings->HorizontalVelMax;
-	steeringReductionFactor = boundf(steeringReductionFactor, 0.05, 0.8);
+        // Reduce steering angle based on current velocity
+        float steeringReductionFactor = 1.0f;
+        if (stabDesired.Thrust > 0.3f) {
+            steeringReductionFactor = (groundSettings->HorizontalVelMax - statusGround.State.Velocity) / groundSettings->HorizontalVelMax;
+            steeringReductionFactor = boundf(steeringReductionFactor, 0.05f, 1.0f);
+        }
 
-	// should we turn left or right?
-	if (lateralCommand >= 0.0f) {
-	    courseCommand = 1.0f * steeringReductionFactor;
-	    statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_TURNAROUNDRIGHT;
-	}
-	else {
-	    courseCommand = -1.0f * steeringReductionFactor;
-	    statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_TURNAROUNDLEFT;
-	}
+        // should we turn left or right?
+        if (lateralCommand >= 0.1f) {
+            courseCommand = 1.0f * steeringReductionFactor;
+            statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_TURNAROUNDRIGHT;
+        } else {
+            courseCommand = -1.0f * steeringReductionFactor;
+            statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_TURNAROUNDLEFT;
+        }
 
-	// Impose limits to slow down.
-	controlNE.UpdateCommandParameters(-groundSettings->ThrustLimit.SlowForward, groundSettings->ThrustLimit.SlowForward, 0.0f);
+        // Impose limits to slow down.
+        controlNE.UpdateCommandParameters(-groundSettings->ThrustLimit.SlowForward, groundSettings->ThrustLimit.SlowForward, 0.0f);
 
-	speedCommand = groundSettings->ThrustLimit.SlowForward;
-
+        speedCommand = groundSettings->ThrustLimit.SlowForward;
     }
 
     stabDesired.Roll   = 0.0f;
@@ -322,13 +324,13 @@ uint8_t GroundDriveController::updateGroundDesiredAttitude()
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
     StabilizationDesiredSet(&stabDesired);
 
-    statusGround.NECommand.North = northCommand;
-    statusGround.NECommand.East = eastCommand;
-    statusGround.State.Thrust = stabDesired.Thrust;
-    statusGround.BodyCommand.Forward = forwardCommand;
-    statusGround.BodyCommand.Right = lateralCommand;
+    statusGround.NECommand.North       = northCommand;
+    statusGround.NECommand.East        = eastCommand;
+    statusGround.State.Thrust          = stabDesired.Thrust;
+    statusGround.BodyCommand.Forward   = forwardCommand;
+    statusGround.BodyCommand.Right     = lateralCommand;
     statusGround.ControlCommand.Course = courseCommand;
-    statusGround.ControlCommand.Speed = speedCommand;
+    statusGround.ControlCommand.Speed  = speedCommand;
     StatusGroundDriveSet(&statusGround);
 
     return 1;

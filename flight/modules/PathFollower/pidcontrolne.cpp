@@ -52,8 +52,7 @@ PIDControlNE::PIDControlNE()
 PIDControlNE::~PIDControlNE() {}
 
 void PIDControlNE::Initialize()
-{
-}
+{}
 
 void PIDControlNE::Deactivate()
 {
@@ -73,19 +72,19 @@ void PIDControlNE::Activate()
 void PIDControlNE::UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax)
 {
     // pid_configure(&PID, kp, ki, kd, ilimit);
-    float Ti   = kp / ki;
-    float Td   = kd / kp;
-    float Tt   = (Ti + Td) / 2.0f;
-    float kt   = 1.0f / Tt;
+    float Ti = kp / ki;
+    float Td = kd / kp;
+    float Tt = (Ti + Td) / 2.0f;
+    float kt = 1.0f / Tt;
+
     if (beta > 1.0f) {
-	beta = 1.0f;
+        beta = 1.0f;
+    } else if (beta < 0.4f) {
+        beta = 0.4f;
     }
-    else if (beta < 0.4f) {
-	beta = 0.4f;
-    }
-    float u0   = 0.0f;
-    float N    = 10.0f;
-    float Tf   = Td / N;
+    float u0 = 0.0f;
+    float N  = 10.0f;
+    float Tf = Td / N;
 
     if (kd < 1e-6f) {
         // PI Controller
@@ -233,9 +232,9 @@ void PIDControlNE::GetNECommand(float *northCommand, float *eastCommand)
     pidStatus.ulow     = mMinCommand;
     pidStatus.uhigh    = mMaxCommand;
     pidStatus.command  = *northCommand;
-    pidStatus.P  = PIDvel[0].P;
-    pidStatus.I  = PIDvel[0].I;
-    pidStatus.D  = PIDvel[0].D;
+    pidStatus.P = PIDvel[0].P;
+    pidStatus.I = PIDvel[0].I;
+    pidStatus.D = PIDvel[0].D;
     PIDStatusSet(&pidStatus);
 }
 

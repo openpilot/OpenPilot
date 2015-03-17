@@ -104,8 +104,7 @@ uint8_t VtolFlyController::Mode(void)
 
 // Objective updated in pathdesired
 void VtolFlyController::ObjectiveUpdated(void)
-{
-}
+{}
 
 
 void VtolFlyController::Deactivate(void)

@@ -677,7 +677,7 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   else {
     lua_pushfstring(L, "@%s", filename);
 #if defined(CONFIG_BUILD_SPIFFS)
-    lf.f = PIOS_FLASHFS_Open(pios_external_flash_fs_id, filename, PIOS_FLASHFS_RDONLY);
+    lf.f = PIOS_FLASHFS_Open(pios_external_flash_fs_id, (char*)filename, PIOS_FLASHFS_RDONLY);
     if (lf.f < 0) {
         errno = LAUXLIB_ERROR_FILE_OPEN;
         return errfile(L, "open", fnameindex);

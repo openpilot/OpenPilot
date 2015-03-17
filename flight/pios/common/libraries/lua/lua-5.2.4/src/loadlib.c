@@ -330,7 +330,7 @@ static int readable (const char *filename) {
 #if defined(CONFIG_BUILD_SPIFFS)
   extern uintptr_t pios_external_flash_fs_id;
   int16_t fh;
-  fh =  PIOS_FLASHFS_Open(pios_external_flash_fs_id, filename, PIOS_FLASHFS_RDONLY);
+  fh =  PIOS_FLASHFS_Open(pios_external_flash_fs_id, (char*)filename, PIOS_FLASHFS_RDONLY);
   if (fh < 0) return 0;
   PIOS_FLASHFS_Close(pios_external_flash_fs_id, fh);
 #else

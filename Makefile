@@ -800,10 +800,6 @@ DIST_NAME := $(DIST_DIR)/$(subst dirty-,,$(PACKAGE_FULL_NAME)).tar
 include $(ROOT_DIR)/package/$(UNAME).mk
 
 package: all_fw all_ground uavobjects_matlab | $(PACKAGE_DIR)
-ifneq ($(GCS_BUILD_CONF),release)
-	# We can only package release builds
-	$(error Packaging is currently supported for release builds only)
-endif
 
 ##############################
 #

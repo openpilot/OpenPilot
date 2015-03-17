@@ -16,6 +16,10 @@ NSIS_HEADER   := $(OPGCSSYNTHDIR)/openpilotgcs.nsh
 
 .PHONY: package
 package:
+ifneq ($(GCS_BUILD_CONF),release)
+	# We can only package release builds
+	$(error Packaging is currently supported for release builds only)
+endif
 	$(V1) mkdir -p "$(dir $(NSIS_HEADER))"
 	$(VERSION_CMD) \
 		--template='$(NSIS_TEMPLATE)' \

@@ -531,49 +531,6 @@ uploader_clean:
 	$(V1) [ ! -d "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)"
 
 
-################################
-#
-# Android GCS related components
-#
-################################
-
-# Build the output directory for the Android GCS build
-ANDROIDGCS_OUT_DIR := $(BUILD_DIR)/androidgcs
-$(ANDROIDGCS_OUT_DIR):
-	$(V1) $(MKDIR) -p $@
-
-# Build the asset directory for the android assets
-ANDROIDGCS_ASSETS_DIR := $(ANDROIDGCS_OUT_DIR)/assets
-$(ANDROIDGCS_ASSETS_DIR)/uavos:
-	$(V1) $(MKDIR) -p $@
-
-ifeq ($(V), 1)
-    ANT_QUIET      :=
-    ANDROID_SILENT :=
-else
-    ANT_QUIET      := -q
-    ANDROID_SILENT := -s
-endif
-
-.PHONY: androidgcs
-androidgcs: uavo-collections_java
-	$(V0) @$(ECHO) " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
-	$(V1) $(MKDIR) -p $(ANDROIDGCS_OUT_DIR)
-	$(V1) $(ANDROID) $(ANDROID_SILENT) update project \
-		--target "Google Inc.:Google APIs:$(GOOGLE_API_VERSION)" \
-		--name androidgcs \
-		--path ./androidgcs
-	$(V1) $(ANT) -f ./androidgcs/build.xml \
-		$(ANT_QUIET) \
-		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \
-		-Dgen.absolute.dir="$(ANDROIDGCS_OUT_DIR)/gen" \
-		$(ANDROIDGCS_BUILD_CONF)
-
-.PHONY: androidgcs_clean
-androidgcs_clean:
-	@$(ECHO) " CLEAN      $(call toprel, $(ANDROIDGCS_OUT_DIR))"
-	$(V1) [ ! -d "$(ANDROIDGCS_OUT_DIR)" ] || $(RM) -r "$(ANDROIDGCS_OUT_DIR)"
-
 # We want to take snapshots of the UAVOs at each point that they change
 # to allow the GCS to be compatible with as many versions as possible.
 # We always include a pseudo collection called "srctree" which represents
@@ -928,7 +885,6 @@ help:
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
-	@$(ECHO) "     android_sdk_install  - Install the Android SDK tools"
 	@$(ECHO) "   Install all available tools:"
 	@$(ECHO) "     all_sdk_install      - Install all of above (platform-dependent)"
 	@$(ECHO) "     build_sdk_install    - Install only essential for build tools (platform-dependent)"
@@ -1013,12 +969,6 @@ help:
 	@$(ECHO) "     uploader_clean       - Remove the serial uploader tool (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)
-	@$(ECHO)
-	@$(ECHO) "   [AndroidGCS]"
-	@$(ECHO) "     androidgcs           - Build the Android Ground Control System (GCS) application"
-	@$(ECHO) "     androidgcs_install   - Use ADB to install the Android GCS application"
-	@$(ECHO) "     androidgcs_run       - Run the Android GCS application"
-	@$(ECHO) "     androidgcs_clean     - Remove the Android GCS application"
 	@$(ECHO)
 	@$(ECHO) "   [UAVObjects]"
 	@$(ECHO) "     uavobjects           - Generate source files from the UAVObject definition XML files"

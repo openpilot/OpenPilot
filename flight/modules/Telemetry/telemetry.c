@@ -100,7 +100,7 @@ typedef struct {
     // Determine port on which to communicate telemetry information
     uint32_t (*getPort)();
     // Main telemetry queue
-    xQueueHandle mainQueue;
+    xQueueHandle queue;
 #ifdef PIOS_TELEM_PRIORITY_QUEUE
     // Priority telemetry queue
     xQueueHandle priorityQueue;
@@ -165,8 +165,8 @@ int32_t TelemetryStart(void)
     GCSTelemetryStatsConnectQueue(localChannel.priorityQueue);
     GCSTelemetryStatsConnectQueue(radioChannel.priorityQueue);
 #else /* PIOS_TELEM_PRIORITY_QUEUE */
-    GCSTelemetryStatsConnectQueue(localChannel.mainQueue);
-    GCSTelemetryStatsConnectQueue(radioChannel.mainQueue);
+    GCSTelemetryStatsConnectQueue(localChannel.queue);
+    GCSTelemetryStatsConnectQueue(radioChannel.queue);
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     // Start telemetry tasks
@@ -221,9 +221,9 @@ int32_t TelemetryInitialize(void)
     timeOfLastObjectUpdate     = 0;
 
     // Create object queues
-    localChannel.mainQueue     = xQueueCreate(MAX_QUEUE_SIZE,
+    localChannel.queue     = xQueueCreate(MAX_QUEUE_SIZE,
                                               sizeof(UAVObjEvent));
-    radioChannel.mainQueue     = xQueueCreate(MAX_QUEUE_SIZE,
+    radioChannel.queue     = xQueueCreate(MAX_QUEUE_SIZE,
                                               sizeof(UAVObjEvent));
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
     localChannel.priorityQueue = xQueueCreate(MAX_QUEUE_SIZE,
@@ -259,10 +259,10 @@ int32_t TelemetryInitialize(void)
                              STATS_UPDATE_PERIOD_MS);
 #else /* PIOS_TELEM_PRIORITY_QUEUE */
     EventPeriodicQueueCreate(&ev,
-                             localChannel.mainQueue,
+                             localChannel.queue,
                              STATS_UPDATE_PERIOD_MS);
     EventPeriodicQueueCreate(&ev,
-                             radioChannel.mainQueue,
+                             radioChannel.queue,
                              STATS_UPDATE_PERIOD_MS);
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
@@ -283,7 +283,7 @@ static void registerLocalObject(UAVObjHandle obj)
 #ifdef PIOS_TELEM_PRIORITY_QUEUE
         UAVObjConnectQueue(obj, localChannel.priorityQueue, EV_MASK_ALL_UPDATES);
 #else /* PIOS_TELEM_PRIORITY_QUEUE */
-        UAVObjConnectQueue(obj, localChannel.mainQueue, EV_MASK_ALL_UPDATES);
+        UAVObjConnectQueue(obj, localChannel.queue, EV_MASK_ALL_UPDATES);
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
     } else {
         // Setup object for periodic updates
@@ -301,7 +301,7 @@ static void registerRadioObject(UAVObjHandle obj)
 #ifdef PIOS_TELEM_PRIORITY_QUEUE
         UAVObjConnectQueue(obj, radioChannel.priorityQueue, EV_MASK_ALL_UPDATES);
 #else /* PIOS_TELEM_PRIORITY_QUEUE */
-        UAVObjConnectQueue(obj, radioChannel.mainQueue, EV_MASK_ALL_UPDATES);
+        UAVObjConnectQueue(obj, radioChannel.queue, EV_MASK_ALL_UPDATES);
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
     } else {
         // Setup object for periodic updates
@@ -419,7 +419,7 @@ static void updateObject(
         UAVObjConnectQueue(obj, channel->priorityQueue, eventMask);
     } else
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
-    UAVObjConnectQueue(obj, channel->mainQueue, eventMask);
+    UAVObjConnectQueue(obj, channel->queue, eventMask);
 }
 
 
@@ -551,7 +551,7 @@ static void telemetryTxTask(void *parameters)
             processObjEvent(channel, &ev);
         }
         // check regular queue and process update - non-blocking
-        if (xQueueReceive(channel->mainQueue, &ev, 0) == pdTRUE) {
+        if (xQueueReceive(channel->queue, &ev, 0) == pdTRUE) {
             // Process event
             processObjEvent(channel, &ev);
             // if both queues are empty, wait on priority queue for updates (1 tick) then repeat cycle
@@ -561,7 +561,7 @@ static void telemetryTxTask(void *parameters)
         }
 #else
         // wait on queue for updates (1 tick) then repeat cycle
-        if (xQueueReceive(channel->mainQueue, &ev, 1) == pdTRUE) {
+        if (xQueueReceive(channel->queue, &ev, 1) == pdTRUE) {
             // Process event
             processObjEvent(channel, &ev);
         }
@@ -697,9 +697,9 @@ static int32_t setUpdatePeriod(
 
 #ifdef PIOS_TELEM_PRIORITY_QUEUE
     xQueueHandle targetQueue = UAVObjIsPriority(obj) ? channel->priorityQueue :
-                               channel->mainQueue;
+                               channel->queue;
 #else /* PIOS_TELEM_PRIORITY_QUEUE */
-    xQueueHandle targetQueue = channel->mainQueue;
+    xQueueHandle targetQueue = channel->queue;
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     ret = EventPeriodicQueueUpdate(&ev, targetQueue, updatePeriodMs);
@@ -733,9 +733,9 @@ static int32_t setLoggingPeriod(
 
 #ifdef PIOS_TELEM_PRIORITY_QUEUE
     xQueueHandle targetQueue = UAVObjIsPriority(obj) ? channel->priorityQueue :
-                               channel->mainQueue;
+                               channel->queue;
 #else /* PIOS_TELEM_PRIORITY_QUEUE */
-    xQueueHandle targetQueue = channel->mainQueue;
+    xQueueHandle targetQueue = channel->queue;
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     ret = EventPeriodicQueueUpdate(&ev, targetQueue, updatePeriodMs);

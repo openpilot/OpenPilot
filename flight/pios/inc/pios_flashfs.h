@@ -95,10 +95,10 @@ struct flashfs_cfg {
 int32_t PIOS_FLASHFS_Init(uintptr_t *fs_id, const struct flashfs_cfg *cfg, const struct pios_flash_driver *driver, uintptr_t flash_id);
 int32_t PIOS_FLASHFS_Format(uintptr_t fs_id);
 int32_t PIOS_FLASHFS_Close(uintptr_t fs_id, int16_t file_id);
-int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, const char *path, uint16_t flags);
+int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, char *path, uint16_t flags);
 int32_t PIOS_FLASHFS_Write(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size);
 int32_t PIOS_FLASHFS_Read(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size);
-int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path);
+int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, char *path);
 int32_t PIOS_FLASHFS_GetStats(uintptr_t fs_id, struct PIOS_FLASHFS_Stats *stats);
 int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags);
 int32_t PIOS_FLASHFS_Lseek(uintptr_t fs_id, int16_t fh, int32_t offset, enum pios_flashfs_lseek_flags flag);

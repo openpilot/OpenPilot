@@ -371,7 +371,7 @@ int32_t PIOS_FLASHFS_Destroy(__attribute__((unused)) uintptr_t fs_id)
  *                      SPIFFS_APPEND, SPIFFS_TRUNC, SPIFFS_CREAT, SPIFFS_RDONLY,
  *                      SPIFFS_WRONLY, SPIFFS_RDWR, SPIFFS_DIRECT
  */
-int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, const char *path, uint16_t flags)
+int16_t PIOS_FLASHFS_Open(uintptr_t fs_id, char *path, uint16_t flags)
 {
     int16_t file_id;
 
@@ -505,7 +505,7 @@ int32_t PIOS_FLASHFS_Lseek(uintptr_t fs_id, int16_t fh, int32_t offset, enum pio
  * @param[in] fs_id The filesystem to use for this action
  * @param[in] path name of the file to delete
  */
-int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, const char *path)
+int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, char *path)
 {
     int32_t rc = PIOS_FLASHFS_OK;
     struct flashfs_state *flashfs = (struct flashfs_state *)fs_id;

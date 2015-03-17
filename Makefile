@@ -799,7 +799,7 @@ DIST_NAME := $(DIST_DIR)/$(subst dirty-,,$(PACKAGE_FULL_NAME)).tar
 
 include $(ROOT_DIR)/package/$(UNAME).mk
 
-package: all_fw all_ground uavobjects_matlab | $(PACKAGE_DIR)
+package: all_fw all_ground uavobjects_matlab
 
 ##############################
 #

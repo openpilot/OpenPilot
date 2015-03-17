@@ -137,6 +137,10 @@ void VtolLandController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->LandVerticalVelPID.Beta,
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
+
+    // The following is not currently used in the landing control.
+    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
+
     // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
@@ -254,7 +258,7 @@ void VtolLandController::UpdateAutoPilot()
     UpdateVelocityDesired();
 
     // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
-    bool yaw_attitude = true;
+    bool yaw_attitude = false;
     float yaw = 0.0f;
 
     fsm->GetYaw(yaw_attitude, yaw);

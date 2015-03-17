@@ -138,8 +138,6 @@ void VtolBrakeController::SettingsUpdated(void)
                                vtolPathFollowerSettings->BrakeHorizontalVelPID.ILimit,
                                dT,
                                10.0f * vtolPathFollowerSettings->HorizontalVelMax); // avoid constraining initial fast entry into brake
-
-
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->BrakeMaxPitch, vtolPathFollowerSettings->BrakeMaxPitch, vtolPathFollowerSettings->BrakeVelocityFeedforward);
 
@@ -149,7 +147,7 @@ void VtolBrakeController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->LandVerticalVelPID.Beta,
                                  dT,
                                  10.0f * vtolPathFollowerSettings->VerticalVelMax); // avoid constraining initial fast entry into brake
-    controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
+    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
 
     // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;

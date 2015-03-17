@@ -130,8 +130,6 @@ void VtolFlyController::SettingsUpdated(void)
                                vtolPathFollowerSettings->HorizontalVelPID.ILimit,
                                dT,
                                vtolPathFollowerSettings->HorizontalVelMax);
-
-
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 
@@ -141,8 +139,7 @@ void VtolFlyController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->VerticalVelPID.ILimit, // TODO Change to BETA
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
-    controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
-
+    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
     // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);

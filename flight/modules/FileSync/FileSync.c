@@ -40,7 +40,7 @@
 extern uintptr_t pios_external_flash_fs_id;
 
 typedef int32_t (*funcForPtr)(uintptr_t);
-typedef int32_t (*funcDelPtr)(uintptr_t, const char *);
+typedef int32_t (*funcDelPtr)(uintptr_t, char *);
 
 // private variables
 static SyncData *filesync;

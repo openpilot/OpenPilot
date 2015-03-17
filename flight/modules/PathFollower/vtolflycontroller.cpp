@@ -176,6 +176,8 @@ void VtolFlyController::UpdateVelocityDesired()
 
     VelocityStateData velocityState;
     VelocityStateGet(&velocityState);
+    controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
+    controlDown.UpdateVelocityState(velocityState.Down);
 
     VelocityDesiredData velocityDesired;
 

@@ -82,6 +82,7 @@ extern "C" {
 #include <homelocation.h>
 #include <accelstate.h>
 #include <statusvtolland.h>
+#include <statusgrounddrive.h>
 }
 
 #include "pathfollowercontrol.h"
@@ -170,6 +171,7 @@ extern "C" int32_t PathFollowerInitialize()
     VtolSelfTuningStatsInitialize();
     PIDStatusInitialize();
     StatusVtolLandInitialize();
+    StatusGroundDriveInitialize();
 
     // VtolLandFSM additional objects
     HomeLocationInitialize();

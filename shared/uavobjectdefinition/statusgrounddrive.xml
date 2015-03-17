@@ -1,0 +1,14 @@
+<xml>
+    <object name="StatusGroundDrive" singleinstance="true" settings="false" category="Navigation">
+    <description>Status of a Ground drive sequence</description>
+	<field name="ControlState" units="" type="enum" elements="1" options="Inactive,OnTrack,TurnAroundRight,TurnAroundLeft,Brake" default="0"/>
+    <field name="NECommand" units="" type="float" elementnames="North,East" defaultvalue="0.0, 0.0"/>
+    <field name="State" units="" type="float" elementnames="Yaw,Velocity,Thrust" defaultvalue="0.0"/>
+    <field name="BodyCommand" units="" type="float" elementnames="Forward,Right" defaultvalue="0.0, 0.0"/>
+    <field name="ControlCommand" units="" type="float" elementnames="Speed,Course" defaultvalue="0.0, 0.0"/>
+    <access gcs="readwrite" flight="readwrite"/>
+    <telemetrygcs acked="false" updatemode="manual" period="0"/>
+    <telemetryflight acked="false" updatemode="onchange" period="100"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

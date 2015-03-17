@@ -349,6 +349,12 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         ManualControlSettings::CHANNELGROUPS_ACCESSORY1 <<
         ManualControlSettings::CHANNELGROUPS_ACCESSORY2;
 
+    groundChannelOrder << ManualControlSettings::CHANNELGROUPS_THROTTLE <<
+        ManualControlSettings::CHANNELGROUPS_YAW <<
+        ManualControlSettings::CHANNELGROUPS_ACCESSORY0 <<
+        ManualControlSettings::CHANNELGROUPS_ACCESSORY1 <<
+        ManualControlSettings::CHANNELGROUPS_ACCESSORY2;
+
     updateEnableControls();
 }
 
@@ -629,6 +635,8 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         wizardUi->wzBack->setEnabled(true);
         if (transmitterType == heli) {
             wizardUi->typeHeli->setChecked(true);
+        } else if (transmitterType == ground) {
+            wizardUi->typeGround->setChecked(true);
         } else {
             wizardUi->typeAcro->setChecked(true);
         }
@@ -687,6 +695,9 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
     case wizardIdentifyCenter:
         setTxMovement(centerAll);
         wizardUi->pagesStack->setCurrentWidget(wizardUi->identifyCenterPage);
+        if (transmitterType == ground) {
+            wizardUi->identifyCenterInstructions->setText(QString(tr("Please center all controls and trims and press Next when ready.")));
+        }
         break;
     case wizardIdentifyLimits:
     {
@@ -752,6 +763,8 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
     case wizardChooseType:
         if (wizardUi->typeAcro->isChecked()) {
             transmitterType = acro;
+        } else if (wizardUi->typeGround->isChecked()) {
+            transmitterType = ground;
         } else {
             transmitterType = heli;
         }
@@ -885,7 +898,14 @@ void ConfigInputWidget::setChannel(int newChan)
  */
 void ConfigInputWidget::nextChannel()
 {
-    QList <int> order = (transmitterType == heli) ? heliChannelOrder : acroChannelOrder;
+    QList <int> order;
+    if (transmitterType == heli) {
+        order = heliChannelOrder;
+    } else if (transmitterType == ground) {
+        order = groundChannelOrder;
+    } else {
+        order = acroChannelOrder;
+    }
 
     if (currentChannelNum == -1) {
         setChannel(order[0]);
@@ -906,7 +926,14 @@ void ConfigInputWidget::nextChannel()
  */
 void ConfigInputWidget::prevChannel()
 {
-    QList <int> order = transmitterType == heli ? heliChannelOrder : acroChannelOrder;
+    QList <int> order;
+    if (transmitterType == heli) {
+        order = heliChannelOrder;
+    } else if (transmitterType == ground) {
+        order = groundChannelOrder;
+    } else {
+        order = acroChannelOrder;
+    }
 
     // No previous from unset channel or next state
     if (currentChannelNum == -1) {
@@ -1672,6 +1699,12 @@ void ConfigInputWidget::adjustSpecialNeutrals()
         manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE] +
         ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] -
           manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) * 0.04);
+
+    if (transmitterType == ground) {
+        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
+            (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE] +
+              manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]) / 2;
+    }
 }
 
 void ConfigInputWidget::checkThrottleRange()

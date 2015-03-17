@@ -62,7 +62,7 @@ public:
     enum txMode { mode1, mode2, mode3, mode4 };
     enum txMovements { moveLeftVerticalStick, moveRightVerticalStick, moveLeftHorizontalStick, moveRightHorizontalStick, moveAccess0, moveAccess1, moveAccess2, moveFlightMode, centerAll, moveAll, nothing };
     enum txMovementType { vertical, horizontal, jump, mix };
-    enum txType { acro, heli };
+    enum txType { acro, heli, ground };
     void startInputWizard()
     {
         goToWizard();
@@ -111,6 +111,7 @@ private:
     int currentChannelNum;
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
+    QList<int> groundChannelOrder;
 
     UAVObject::Metadata manualControlMdata;
     ManualControlCommand *manualCommandObj;

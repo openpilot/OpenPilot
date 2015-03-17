@@ -14,7 +14,7 @@
    <item>
     <widget class="QStackedWidget" name="pagesStack">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="welcomePage">
       <layout class="QGridLayout" name="gridLayout">
@@ -65,6 +65,13 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
         </widget>
        </item>
        <item>
+        <widget class="QRadioButton" name="typeGround">
+         <property name="text">
+          <string>Ground vehicle: has at least two channels for throttle and steering (yaw)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QRadioButton" name="typeHeli">
          <property name="text">
           <string>Helicopter: has collective pitch and throttle input</string>
@@ -89,7 +96,7 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>23</height>
           </size>
          </property>
         </spacer>

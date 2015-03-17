@@ -367,13 +367,15 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             }
 
             if ((mixer_type == MIXERSETTINGS_MIXER1TYPE_MOTOR)) {
-                if (curve1 < 0.0f) {
-                    curve1 = 0.0f;
+                float nonreversible_curve1 = curve1;
+                float nonreversible_curve2 = curve2;
+                if (nonreversible_curve1 < 0.0f) {
+                    nonreversible_curve1 = 0.0f;
                 }
-                if (curve2 < 0.0f) {
-                    curve2 = 0.0f;
+                if (nonreversible_curve2 < 0.0f) {
+                    nonreversible_curve2 = 0.0f;
                 }
-                status[ct] = ProcessMixer(ct, curve1, curve2, &desired, dTSeconds);
+                status[ct] = ProcessMixer(ct, nonreversible_curve1, nonreversible_curve2, &desired, dTSeconds);
                 // If not armed or motors aren't meant to spin all the time
                 if (!armed ||
                     (!spinWhileArmed && !positiveThrottle)) {

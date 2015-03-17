@@ -81,8 +81,10 @@ $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),de
 
 # Make sure this isn't being run as root unless installing (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
-    ifeq ($(filter install all_clean,$(MAKECMDGOALS)),)
-        $(error You should not be running this as root)
+    ifeq ($(filter install,$(MAKECMDGOALS)),)
+        ifndef FAKEROOTKEY
+            $(error You should not be running this as root)
+        endif
     endif
 endif
 
@@ -785,15 +787,19 @@ endif
 #  - calls paltform-specific packaging script
 
 # Define some variables
-export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
-export PACKAGE_NAME := OpenPilot
-export PACKAGE_SEP  := -
+PACKAGE_LBL       := $(shell $(VERSION_INFO) --format=\$${LABEL})
+PACKAGE_NAME      := OpenPilot
+PACKAGE_SEP       := -
+PACKAGE_FULL_NAME := $(PACKAGE_NAME)$(PACKAGE_SEP)$(PACKAGE_LBL)
+
+# Source distribution is never dirty because it uses git archive
+DIST_NAME := $(DIST_DIR)/$(subst dirty-,,$(PACKAGE_FULL_NAME)).tar
 
 .PHONY: package
 
 include $(ROOT_DIR)/package/$(UNAME).mk
 
-package: all_fw all_ground uavobjects_matlab $(PACKAGE_DIR)
+package: all_fw all_ground uavobjects_matlab | $(PACKAGE_DIR)
 ifneq ($(GCS_BUILD_CONF),release)
 	# We can only package release builds
 	$(error Packaging is currently supported for release builds only)
@@ -882,20 +888,20 @@ build-info:
 
 DIST_VER_INFO := $(DIST_DIR)/version-info.json
 
-.PHONY: $(DIST_VER_INFO) # Because to many deps to list
-$(DIST_VER_INFO): $(DIST_DIR)
+$(DIST_VER_INFO): .git/index | $(DIST_DIR)
 	$(V1) $(VERSION_INFO) --jsonpath="$(DIST_DIR)"
 
-.PHONY: dist
-dist: $(DIST_DIR) $(DIST_VER_INFO)
-	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_DIR))"
-	$(eval DIST_NAME := $(call toprel, "$(DIST_DIR)/OpenPilot-$(shell git describe).tar"))
-	$(V1) git archive --prefix="OpenPilot/" -o "$(DIST_NAME)" HEAD
+
+$(DIST_NAME).gz: $(DIST_VER_INFO) .git/index | $(DIST_DIR)
+	@$(ECHO) " SOURCE FOR DISTRIBUTION $(call toprel, $(DIST_NAME).gz)"
+	$(V1) git archive --prefix="$(PACKAGE_NAME)/" -o "$(DIST_NAME)" HEAD
 	$(V1) tar --append --file="$(DIST_NAME)" \
-		--transform='s,.*version-info.json,OpenPilot/version-info.json,' \
+		--transform='s,.*version-info.json,$(PACKAGE_NAME)/version-info.json,' \
 		$(call toprel, "$(DIST_VER_INFO)")
 	$(V1) gzip -f "$(DIST_NAME)"
 
+.PHONY: dist
+dist: $(DIST_NAME).gz
 
 ##############################
 #

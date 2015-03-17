@@ -72,7 +72,7 @@ MSG_FLASH_IMG        = $(QUOTE) FLASH_IMG $(MSG_EXTRA) $(QUOTE)
 toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 
 # Function to replace special characters like is done for the symbols.
-replace_special_chars = $(subst ~,_,$(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1))))))
+replace_special_chars = $(subst +,_,$(subst ~,_,$(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1)))))))
 
 # Display compiler version information.
 .PHONY: gccversion

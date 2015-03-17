@@ -492,6 +492,9 @@ void SetupWizard::customBackClicked()
         static_cast<OutputCalibrationPage *>(currentPage())->customBackClicked();
     } else {
         back();
+        if (currentId() == PAGE_OUTPUT_CALIBRATION) {
+            static_cast<OutputCalibrationPage *>(currentPage())->customBackClicked();
+        }
     }
 }
 

@@ -15,7 +15,7 @@
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
         <!-- these coefficients control actual control outputs -->
 
-        <field name="SpeedPI" units="deg / (m/s)" type="float" elements="3" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.1, .1, 0.001, 0.8"/>
+        <field name="SpeedPI" units="deg / (m/s)" type="float" elements="4" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.1, .1, 0.001, 0.8"/>
                 <!-- coefficients for desired pitch
                      in relation to speed error IASerror -->
         <field name="ThrustLimit" units="" type="float" elements="2" elementnames="Min,SlowForward, Max" defaultvalue="-0.3,0.15,0.3" />

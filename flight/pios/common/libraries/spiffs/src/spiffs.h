@@ -9,6 +9,9 @@
 
 #ifndef SPIFFS_H_
 #define SPIFFS_H_
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 #include "spiffs_config.h"
 
@@ -36,6 +39,7 @@
 #define SPIFFS_ERR_INDEX_INVALID        -10020
 #define SPIFFS_ERR_NOT_WRITABLE         -10021
 #define SPIFFS_ERR_NOT_READABLE         -10022
+#define SPIFFS_ERR_CONFLICTING_NAME     -10023
 
 #define SPIFFS_ERR_INTERNAL             -10050
 
@@ -184,7 +188,7 @@ typedef struct {
   u32_t fd_count;
 
   // last error
-  s32_t errno;
+  s32_t err_code;
 
   // current number of free blocks
   u32_t free_blocks;
@@ -270,7 +274,7 @@ void SPIFFS_unmount(spiffs *fs);
  * @param path          the path of the new file
  * @param mode          ignored, for posix compliance
  */
-s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode);
+s32_t SPIFFS_creat(spiffs *fs, char *path, spiffs_mode mode);
 
 /**
  * Opens/creates a file.
@@ -281,7 +285,7 @@ s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode);
  *                      SPIFFS_WR_ONLY, SPIFFS_RDWR, SPIFFS_DIRECT
  * @param mode          ignored, for posix compliance
  */
-spiffs_file SPIFFS_open(spiffs *fs, const char *path, spiffs_flags flags, spiffs_mode mode);
+spiffs_file SPIFFS_open(spiffs *fs, char *path, spiffs_flags flags, spiffs_mode mode);
 
 
 /**
@@ -335,7 +339,7 @@ s32_t SPIFFS_lseek(spiffs *fs, spiffs_file fh, s32_t offs, int whence);
  * @param fs            the file system struct
  * @param path          the path of the file to remove
  */
-s32_t SPIFFS_remove(spiffs *fs, const char *path);
+s32_t SPIFFS_remove(spiffs *fs, char *path);
 
 /**
  * Removes a file by filehandle
@@ -350,7 +354,7 @@ s32_t SPIFFS_fremove(spiffs *fs, spiffs_file fh);
  * @param path          the path of the file to stat
  * @param s             the stat struct to populate
  */
-s32_t SPIFFS_stat(spiffs *fs, const char *path, spiffs_stat *s);
+s32_t SPIFFS_stat(spiffs *fs, char *path, spiffs_stat *s);
 
 /**
  * Gets file status by filehandle
@@ -375,10 +379,24 @@ s32_t SPIFFS_fflush(spiffs *fs, spiffs_file fh);
 void SPIFFS_close(spiffs *fs, spiffs_file fh);
 
 /**
+ * Renames a file
+ * @param fs            the file system struct
+ * @param old           path of file to rename
+ * @param newPath       new path of file
+ */
+s32_t SPIFFS_rename(spiffs *fs, char *old, char *newPath);
+
+/**
  * Returns last error of last file operation.
  * @param fs            the file system struct
  */
 s32_t SPIFFS_errno(spiffs *fs);
+
+/**
+ * Clears last error.
+ * @param fs            the file system struct
+ */
+void SPIFFS_clearerr(spiffs *fs);
 
 /**
  * Opens a directory stream corresponding to the given name.
@@ -389,7 +407,7 @@ s32_t SPIFFS_errno(spiffs *fs);
  * @param name          the name of the directory
  * @param d             pointer the directory stream to be populated
  */
-spiffs_DIR *SPIFFS_opendir(spiffs *fs, const char *name, spiffs_DIR *d);
+spiffs_DIR *SPIFFS_opendir(spiffs *fs, char *name, spiffs_DIR *d);
 
 /**
  * Closes a directory stream
@@ -410,6 +428,21 @@ struct spiffs_dirent *SPIFFS_readdir(spiffs_DIR *d, struct spiffs_dirent *e);
  * @param fs            the file system struct
  */
 s32_t SPIFFS_check(spiffs *fs);
+
+
+/**
+ * Returns number of total bytes available and number of used bytes.
+ * This is an estimation, and depends on if there a many files with little
+ * data or few files with much data.
+ * NB: If used number of bytes exceeds total bytes, a SPIFFS_check should
+ * run. This indicates a power loss in midst of things. In worst case
+ * (repeated powerlosses in mending or gc) you might have to delete some files.
+ *
+ * @param fs            the file system struct
+ * @param total         total number of bytes in filesystem
+ * @param used          used number of bytes in filesystem
+ */
+s32_t SPIFFS_info(spiffs *fs, u32_t *total, u32_t *used);
 
 #if SPIFFS_TEST_VISUALISATION
 /**
@@ -436,6 +469,9 @@ u32_t SPIFFS_buffer_bytes_for_cache(spiffs *fs, u32_t num_pages);
 #endif
 
 #if SPIFFS_CHACHE
+#endif
+#if defined(__cplusplus)
+}
 #endif
 
 #endif /* SPIFFS_H_ */

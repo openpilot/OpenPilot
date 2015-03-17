@@ -126,7 +126,7 @@
 
 #define SPIFFS_OBJ_ID_IX_FLAG           (1<<(8*sizeof(spiffs_obj_id)-1))
 
-#define SPIFFS_UNDEFINED_LEN            (-1)
+#define SPIFFS_UNDEFINED_LEN            (u32_t)(-1)
 
 #define SPIFFS_OBJ_ID_DELETED           ((spiffs_obj_id)0)
 #define SPIFFS_OBJ_ID_FREE              ((spiffs_obj_id)-1)
@@ -247,19 +247,19 @@
 
 #define SPIFFS_API_CHECK_MOUNT(fs) \
   if (!SPIFFS_CHECK_MOUNT((fs))) { \
-    (fs)->errno = SPIFFS_ERR_NOT_MOUNTED; \
+    (fs)->err_code = SPIFFS_ERR_NOT_MOUNTED; \
     return -1; \
   }
 
 #define SPIFFS_API_CHECK_RES(fs, res) \
   if ((res) < SPIFFS_OK) { \
-    (fs)->errno = (res); \
+    (fs)->err_code = (res); \
     return -1; \
   }
 
 #define SPIFFS_API_CHECK_RES_UNLOCK(fs, res) \
   if ((res) < SPIFFS_OK) { \
-    (fs)->errno = (res); \
+    (fs)->err_code = (res); \
     SPIFFS_UNLOCK(fs); \
     return -1; \
   }
@@ -485,7 +485,8 @@ s32_t spiffs_obj_lu_scan(
 
 s32_t spiffs_obj_lu_find_free_obj_id(
     spiffs *fs,
-    spiffs_obj_id *obj_id);
+    spiffs_obj_id *obj_id,
+    u8_t *conflicting_name);
 
 s32_t spiffs_obj_lu_find_free(
     spiffs *fs,

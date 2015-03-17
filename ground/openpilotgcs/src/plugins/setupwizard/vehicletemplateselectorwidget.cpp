@@ -54,9 +54,10 @@ VehicleTemplateSelectorWidget::~VehicleTemplateSelectorWidget()
     delete ui;
 }
 
-void VehicleTemplateSelectorWidget::setTemplateInfo(QString path, int vehicleType, int vehicleSubType) {
+void VehicleTemplateSelectorWidget::setTemplateInfo(QString path, int vehicleType, int vehicleSubType)
+{
     m_templateFolder = path;
-    m_vehicleType = vehicleType;
+    m_vehicleType    = vehicleType;
     m_vehicleSubType = vehicleSubType;
     updateTemplates();
 }

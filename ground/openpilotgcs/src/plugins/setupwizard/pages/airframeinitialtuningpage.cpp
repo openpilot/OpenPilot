@@ -47,7 +47,8 @@ AirframeInitialTuningPage::~AirframeInitialTuningPage()
 
 void AirframeInitialTuningPage::initializePage()
 {
-    const char* path;
+    const char *path;
+
     switch (getWizard()->getVehicleType()) {
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
         path = VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME;

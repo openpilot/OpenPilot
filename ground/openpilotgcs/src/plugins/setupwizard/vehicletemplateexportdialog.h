@@ -51,11 +51,14 @@ public:
     ~VehicleTemplateExportDialog();
 
 public slots:
-    void accept();
+    void exportTemplate();
+    void importTemplate();
     void updateStatus();
 
 private slots:
     void importImage();
+    void onAutoPilotConnect();
+    void onAutoPilotDisconnect();
 
 private:
     static const int IMAGE_SCALE_WIDTH  = 500;
@@ -64,6 +67,7 @@ private:
     UAVObjectManager *m_uavoManager;
     VehicleConfigurationSource::VEHICLE_TYPE m_type;
     VehicleConfigurationSource::VEHICLE_SUB_TYPE m_subType;
+    const char *m_dir;
     QPixmap m_image;
 
     QString fixFilenameString(QString input, int truncate = 100);

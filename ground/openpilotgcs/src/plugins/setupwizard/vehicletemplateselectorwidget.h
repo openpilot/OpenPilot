@@ -36,8 +36,7 @@ namespace Ui {
 class VehicleTemplateSelectorWidget;
 }
 
-class VehicleTemplateSelectorWidget : public QWidget
-{
+class VehicleTemplateSelectorWidget : public QWidget {
     Q_OBJECT
 
 public:

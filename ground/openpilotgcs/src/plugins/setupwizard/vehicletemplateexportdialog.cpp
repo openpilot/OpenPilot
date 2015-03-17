@@ -37,12 +37,15 @@
 #include <QUuid>
 #include <QDebug>
 #include <QMessageBox>
+#include <uavobjecthelper.h>
+#include <objectpersistence.h>
 #include "stabilizationsettings.h"
 #include "stabilizationsettingsbank1.h"
 #include "stabilizationsettingsbank2.h"
 #include "stabilizationsettingsbank3.h"
 #include "mixersettings.h"
 #include "ekfconfiguration.h"
+#include <uavtalk/telemetrymanager.h>
 
 const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
 const char *VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
@@ -61,12 +64,24 @@ VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     m_uavoManager = pm->getObject<UAVObjectManager>();
     ui->Photo->setScene(new QGraphicsScene(this));
     ui->Type->setText(setupVehicleType());
+    ui->selectionWidget->setTemplateInfo(m_dir, m_type, m_subType);
 
     connect(ui->Name, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->Owner, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->ForumNick, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->Size, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->Weight, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
+
+    connect(ui->exportBtn, SIGNAL(clicked()), this, SLOT(exportTemplate()));
+    connect(ui->importBtn, SIGNAL(clicked()), this, SLOT(importTemplate()));
+    connect(ui->cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->cancelBtn_2, SIGNAL(clicked()), this, SLOT(reject()));
+
+    TelemetryManager *telemManager = pm->getObject<TelemetryManager>();
+    ui->importBtn->setEnabled(telemManager->isConnected());
+
+    connect(telemManager, SIGNAL(connected()), this, SLOT(onAutoPilotConnect()));
+    connect(telemManager, SIGNAL(disconnected()), this, SLOT(onAutoPilotDisconnect()));
 }
 
 VehicleTemplateExportDialog::~VehicleTemplateExportDialog()
@@ -85,85 +100,102 @@ QString VehicleTemplateExportDialog::setupVehicleType()
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
         m_type    = VehicleConfigurationSource::VEHICLE_FIXEDWING;
         m_subType = VehicleConfigurationSource::FIXED_WING_AILERON;
+        m_dir     = EXPORT_FIXEDWING_NAME;
         return tr("Fixed Wing - Aileron");
 
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
         m_type    = VehicleConfigurationSource::VEHICLE_FIXEDWING;
         m_subType = VehicleConfigurationSource::FIXED_WING_ELEVON;
+        m_dir     = EXPORT_FIXEDWING_NAME;
         return tr("Fixed Wing - Elevon");
 
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
         m_type    = VehicleConfigurationSource::VEHICLE_FIXEDWING;
         m_subType = VehicleConfigurationSource::FIXED_WING_VTAIL;
+        m_dir     = EXPORT_FIXEDWING_NAME;
         return tr("Fixed Wing - V-Tail");
 
     case SystemSettings::AIRFRAMETYPE_HELICP:
         m_type    = VehicleConfigurationSource::VEHICLE_HELI;
         m_subType = VehicleConfigurationSource::HELI_CCPM;
+        m_dir     = EXPORT_HELI_NAME;
         return tr("Helicopter");
 
     case SystemSettings::AIRFRAMETYPE_TRI:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_TRI_Y;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Tricopter");
 
     case SystemSettings::AIRFRAMETYPE_QUADX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Quadrocopter X");
 
     case SystemSettings::AIRFRAMETYPE_QUADP:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Quadrocopter +");
 
     case SystemSettings::AIRFRAMETYPE_OCTOV:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_V;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter V");
 
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter X8X");
 
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter X8+");
 
     case SystemSettings::AIRFRAMETYPE_OCTO:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter +");
 
     case SystemSettings::AIRFRAMETYPE_OCTOX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_X;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter X");
 
     case SystemSettings::AIRFRAMETYPE_HEXAX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_X;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter X");
 
     case SystemSettings::AIRFRAMETYPE_HEXAH:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_H;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter H");
 
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter Y6");
 
     case SystemSettings::AIRFRAMETYPE_HEXA:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA;
+        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter +");
 
     default:
         m_type = VehicleConfigurationSource::VEHICLE_UNKNOWN;
+        m_dir  = "";
         return tr("Unsupported");
     }
 }
@@ -178,7 +210,7 @@ QString VehicleTemplateExportDialog::fixFilenameString(QString input, int trunca
            .left(truncate);
 }
 
-void VehicleTemplateExportDialog::accept()
+void VehicleTemplateExportDialog::exportTemplate()
 {
     QJsonObject exportObject;
 
@@ -257,6 +289,34 @@ void VehicleTemplateExportDialog::accept()
     }
 }
 
+void VehicleTemplateExportDialog::importTemplate()
+{
+    QJsonObject *tmpl = ui->selectionWidget->selectedTemplate();
+
+    if (tmpl != NULL) {
+        QList<UAVObject *> updatedObjects;
+        m_uavoManager->fromJson(*tmpl, &updatedObjects);
+        UAVObjectUpdaterHelper helper;
+        foreach(UAVObject * object, updatedObjects) {
+            UAVDataObject *dataObj = dynamic_cast<UAVDataObject *>(object);
+
+            if (dataObj != NULL && dataObj->isKnown()) {
+                helper.doObjectAndWait(dataObj);
+
+                ObjectPersistence *objper = ObjectPersistence::GetInstance(m_uavoManager);
+                ObjectPersistence::DataFields data;
+                data.Operation  = ObjectPersistence::OPERATION_SAVE;
+                data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
+                data.ObjectID   = dataObj->getObjID();
+                data.InstanceID = dataObj->getInstID();
+                objper->setData(data);
+
+                helper.doObjectAndWait(objper);
+            }
+        }
+    }
+}
+
 void VehicleTemplateExportDialog::importImage()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Image"), "", tr("Images (*.png *.jpg)"));
@@ -267,6 +327,16 @@ void VehicleTemplateExportDialog::importImage()
         ui->Photo->setSceneRect(ui->Photo->scene()->itemsBoundingRect());
         ui->Photo->fitInView(ui->Photo->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
+}
+
+void VehicleTemplateExportDialog::onAutoPilotConnect()
+{
+    ui->importBtn->setEnabled(true);
+}
+
+void VehicleTemplateExportDialog::onAutoPilotDisconnect()
+{
+    ui->importBtn->setEnabled(false);
 }
 
 QString VehicleTemplateExportDialog::getTypeDirectory()
@@ -291,7 +361,7 @@ QString VehicleTemplateExportDialog::getTypeDirectory()
 
 void VehicleTemplateExportDialog::updateStatus()
 {
-    ui->acceptBtn->setEnabled(ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
+    ui->exportBtn->setEnabled(ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
                               ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
                               ui->Weight->text().length() > 0);
 }

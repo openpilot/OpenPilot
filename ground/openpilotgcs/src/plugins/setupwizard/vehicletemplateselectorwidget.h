@@ -43,12 +43,8 @@ class VehicleTemplateSelectorWidget : public QWidget
 public:
     explicit VehicleTemplateSelectorWidget(QWidget *parent = 0);
     ~VehicleTemplateSelectorWidget();
-    void setTemplateInfo(QString path, int vehicleType, int vehicleSubType) {
-        m_templateFolder = path;
-        m_vehicleType = vehicleType;
-        m_vehicleSubType = vehicleSubType;
-        updateTemplates();
-    }
+    void setTemplateInfo(QString path, int vehicleType, int vehicleSubType);
+    QJsonObject *selectedTemplate() const;
 
 public slots:
     void templateSelectionChanged();

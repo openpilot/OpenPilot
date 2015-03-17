@@ -36,7 +36,7 @@
 
 VehicleTemplateSelectorWidget::VehicleTemplateSelectorWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::VehicleTemplateSelectorWidget)
+    ui(new Ui::VehicleTemplateSelectorWidget), m_photoItem(NULL)
 {
     ui->setupUi(this);
     ui->templateImage->setScene(new QGraphicsScene());
@@ -52,6 +52,21 @@ VehicleTemplateSelectorWidget::~VehicleTemplateSelectorWidget()
     m_templates.clear();
 
     delete ui;
+}
+
+void VehicleTemplateSelectorWidget::setTemplateInfo(QString path, int vehicleType, int vehicleSubType) {
+    m_templateFolder = path;
+    m_vehicleType = vehicleType;
+    m_vehicleSubType = vehicleSubType;
+    updateTemplates();
+}
+
+QJsonObject *VehicleTemplateSelectorWidget::selectedTemplate() const
+{
+    if (ui->templateList->currentRow() >= 0) {
+        return ui->templateList->item(ui->templateList->currentRow())->data(Qt::UserRole + 1).value<QJsonObject *>();
+    }
+    return NULL;
 }
 
 void VehicleTemplateSelectorWidget::updateTemplates()
@@ -111,7 +126,7 @@ void VehicleTemplateSelectorWidget::updateDescription(QJsonObject *templ)
 void VehicleTemplateSelectorWidget::templateSelectionChanged()
 {
     if (ui->templateList->currentRow() >= 0) {
-        QJsonObject *templ = ui->templateList->item(ui->templateList->currentRow())->data(Qt::UserRole + 1).value<QJsonObject *>();
+        QJsonObject *templ = selectedTemplate();
         updatePhoto(templ);
         updateDescription(templ);
     }

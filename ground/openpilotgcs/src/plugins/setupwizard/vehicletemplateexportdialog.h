@@ -52,6 +52,7 @@ public:
 
 public slots:
     void exportTemplate();
+    void saveAsTemplate();
     void importTemplate();
     void updateStatus();
 
@@ -68,10 +69,12 @@ private:
     VehicleConfigurationSource::VEHICLE_TYPE m_type;
     VehicleConfigurationSource::VEHICLE_SUB_TYPE m_subType;
     QPixmap m_image;
+    bool m_autopilotConnected;
 
     QString fixFilenameString(QString input, int truncate = 100);
     QString getTypeDirectory();
     QString setupVehicleType();
+    void saveTemplate(QString path);
 };
 
 #endif // VEHICLETEMPLATEEXPORTDIALOG_H

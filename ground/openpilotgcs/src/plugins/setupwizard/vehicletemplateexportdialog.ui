@@ -507,7 +507,20 @@
           <item>
            <widget class="QPushButton" name="cancelBtn">
             <property name="text">
-             <string>Cancel</string>
+             <string>Close</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveAsBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Save as</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -518,6 +531,9 @@
             </property>
             <property name="text">
              <string>Export</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -590,6 +606,12 @@
             <property name="text">
              <string>Import</string>
             </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -653,38 +675,5 @@
   <tabstop>Photo</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>cancelBtn</sender>
-   <signal>clicked()</signal>
-   <receiver>VehicleTemplateExportDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>458</x>
-     <y>668</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>304</x>
-     <y>349</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>exportBtn</sender>
-   <signal>clicked()</signal>
-   <receiver>VehicleTemplateExportDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>549</x>
-     <y>668</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>304</x>
-     <y>349</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

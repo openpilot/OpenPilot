@@ -46,6 +46,7 @@
 #include "mixersettings.h"
 #include "ekfconfiguration.h"
 #include <uavtalk/telemetrymanager.h>
+#include <utils/pathutils.h>
 
 const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
 const char *VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
@@ -56,7 +57,7 @@ const char *VehicleTemplateExportDialog::EXPORT_CUSTOM_NAME    = "custom";
 
 VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::VehicleTemplateExportDialog)
+    ui(new Ui::VehicleTemplateExportDialog), m_autopilotConnected(false)
 {
     ui->setupUi(this);
     connect(ui->ImportButton, SIGNAL(clicked()), this, SLOT(importImage()));
@@ -73,12 +74,17 @@ VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     connect(ui->Weight, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
 
     connect(ui->exportBtn, SIGNAL(clicked()), this, SLOT(exportTemplate()));
+    connect(ui->saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsTemplate()));
     connect(ui->importBtn, SIGNAL(clicked()), this, SLOT(importTemplate()));
     connect(ui->cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
     connect(ui->cancelBtn_2, SIGNAL(clicked()), this, SLOT(reject()));
 
     TelemetryManager *telemManager = pm->getObject<TelemetryManager>();
-    ui->importBtn->setEnabled(telemManager->isConnected());
+    if (telemManager->isConnected()) {
+        onAutoPilotConnect();
+    } else {
+        onAutoPilotDisconnect();
+    }
 
     connect(telemManager, SIGNAL(connected()), this, SLOT(onAutoPilotConnect()));
     connect(telemManager, SIGNAL(disconnected()), this, SLOT(onAutoPilotDisconnect()));
@@ -183,17 +189,7 @@ QString VehicleTemplateExportDialog::setupVehicleType()
     }
 }
 
-QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
-{
-    return input.replace(' ', "").replace('|', "").replace('/', "")
-           .replace('\\', "").replace(':', "").replace('"', "")
-           .replace('\'', "").replace('?', "").replace('*', "")
-           .replace('>', "").replace('<', "")
-           .replace('}', "").replace('{', "")
-           .left(truncate);
-}
-
-void VehicleTemplateExportDialog::exportTemplate()
+void VehicleTemplateExportDialog::saveTemplate(QString path)
 {
     QJsonObject exportObject;
 
@@ -242,19 +238,13 @@ void VehicleTemplateExportDialog::exportTemplate()
                            .arg(fixFilenameString(uuid.toString().right(12)))
                            .arg(fileType);
 
-    QString fullPath = QString("%1%2%3%4%5")
-                       .arg(EXPORT_BASE_NAME)
-                       .arg(QDir::separator())
-                       .arg(getTypeDirectory())
-                       .arg(QDir::separator())
-                       .arg(fileName);
-
-    QDir dir = QFileInfo(fullPath).absoluteDir();
-    if (!dir.exists()) {
-        fullPath = QString("%1%2%3").arg(QDir::homePath(), QDir::separator(), fileName);
+    QString fullPath;
+    if (path.isEmpty()) {
+        fullPath = QString("%1%2%3").arg(QDir::homePath()).arg(QDir::separator()).arg(fileName);
+        fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates"), fileType));
+    } else {
+        fullPath = QString("%1%2%3").arg(path).arg(QDir::separator()).arg(fileName);
     }
-
-    fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates", fileType)));
 
     if (!fullPath.isEmpty()) {
         if (!fullPath.endsWith(fileType)) {
@@ -268,8 +258,31 @@ void VehicleTemplateExportDialog::exportTemplate()
             QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1(%2).\nPlease try again.")
                                      .arg(QFileInfo(saveFile).absoluteFilePath(), saveFile.error()), QMessageBox::Ok);
         }
-        QDialog::accept();
     }
+}
+
+QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
+{
+    return input.replace(' ', "").replace('|', "").replace('/', "")
+           .replace('\\', "").replace(':', "").replace('"', "")
+           .replace('\'', "").replace('?', "").replace('*', "")
+           .replace('>', "").replace('<', "")
+           .replace('}', "").replace('{', "")
+           .left(truncate);
+}
+
+void VehicleTemplateExportDialog::exportTemplate()
+{
+    QString path = QString("%1%2%3%4").arg(Utils::PathUtils().InsertStoragePath("%%STOREPATH%%cloudconfig"))
+            .arg(QDir::separator()).arg(getTypeDirectory()).arg(QDir::separator());
+    QDir dir;
+    dir.mkpath(path);
+    saveTemplate(path);
+}
+
+void VehicleTemplateExportDialog::saveAsTemplate()
+{
+    saveTemplate(QString(""));
 }
 
 void VehicleTemplateExportDialog::importTemplate()
@@ -315,11 +328,15 @@ void VehicleTemplateExportDialog::importImage()
 void VehicleTemplateExportDialog::onAutoPilotConnect()
 {
     ui->importBtn->setEnabled(true);
+    m_autopilotConnected = true;
+    updateStatus();
 }
 
 void VehicleTemplateExportDialog::onAutoPilotDisconnect()
 {
     ui->importBtn->setEnabled(false);
+    m_autopilotConnected = false;
+    updateStatus();
 }
 
 QString VehicleTemplateExportDialog::getTypeDirectory()
@@ -344,7 +361,9 @@ QString VehicleTemplateExportDialog::getTypeDirectory()
 
 void VehicleTemplateExportDialog::updateStatus()
 {
-    ui->exportBtn->setEnabled(ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
-                              ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
-                              ui->Weight->text().length() > 0);
+    bool enabled = m_autopilotConnected && ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
+            ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
+            ui->Weight->text().length() > 0;
+    ui->exportBtn->setEnabled(enabled);
+    ui->saveAsBtn->setEnabled(enabled);
 }

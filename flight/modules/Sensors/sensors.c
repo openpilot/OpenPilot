@@ -591,8 +591,12 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 
     RevoSettingsBaroTempCorrectionPolynomialGet(&baroCorrection);
     RevoSettingsBaroTempCorrectionExtentGet(&baroCorrectionExtent);
-    baro_temp_correction_enabled = !(baroCorrectionExtent.max - baroCorrectionExtent.min < 0.1f ||
-                                     (baroCorrection.a < 1e-9f && baroCorrection.b < 1e-9f && baroCorrection.c < 1e-9f && baroCorrection.d < 1e-9f));
+    baro_temp_correction_enabled =
+        (baroCorrectionExtent.max - baroCorrectionExtent.min > 0.1f &&
+         (fabsf(baroCorrection.a) > 1e-9f ||
+          fabsf(baroCorrection.b) > 1e-9f ||
+          fabsf(baroCorrection.c) > 1e-9f ||
+          fabsf(baroCorrection.d) > 1e-9f));
 }
 /**
  * @}

@@ -193,6 +193,7 @@ private slots:
     void openHelp();
     void identifyControls();
     void identifyLimits();
+    void identifyCenters();
     void moveTxControls();
     void moveSticks();
     void dimOtherControls(bool value);

@@ -67,7 +67,7 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
        <item>
         <widget class="QRadioButton" name="typeGround">
          <property name="text">
-          <string>Ground vehicle: has at least two channels for throttle and steering (yaw)</string>
+          <string>Surface: has reversible motor controlled by throttle stick</string>
          </property>
         </widget>
        </item>

@@ -47,26 +47,7 @@ AirframeInitialTuningPage::~AirframeInitialTuningPage()
 
 void AirframeInitialTuningPage::initializePage()
 {
-    const char *path;
-
-    switch (getWizard()->getVehicleType()) {
-    case VehicleConfigurationSource::VEHICLE_FIXEDWING:
-        path = VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME;
-        break;
-    case VehicleConfigurationSource::VEHICLE_MULTI:
-        path = VehicleTemplateExportDialog::EXPORT_MULTI_NAME;
-        break;
-    case VehicleConfigurationSource::VEHICLE_HELI:
-        path = VehicleTemplateExportDialog::EXPORT_HELI_NAME;
-        break;
-    case VehicleConfigurationSource::VEHICLE_SURFACE:
-        path = VehicleTemplateExportDialog::EXPORT_SURFACE_NAME;
-        break;
-    default:
-        path = NULL;
-        break;
-    }
-    ui->selectorWidget->setTemplateInfo(path, getWizard()->getVehicleType(), getWizard()->getVehicleSubType());
+    ui->selectorWidget->setTemplateInfo(getWizard()->getVehicleType(), getWizard()->getVehicleSubType());
 }
 
 bool AirframeInitialTuningPage::validatePage()

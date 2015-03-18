@@ -54,9 +54,8 @@ VehicleTemplateSelectorWidget::~VehicleTemplateSelectorWidget()
     delete ui;
 }
 
-void VehicleTemplateSelectorWidget::setTemplateInfo(QString path, int vehicleType, int vehicleSubType)
+void VehicleTemplateSelectorWidget::setTemplateInfo(int vehicleType, int vehicleSubType)
 {
-    m_templateFolder = path;
     m_vehicleType    = vehicleType;
     m_vehicleSubType = vehicleSubType;
     updateTemplates();
@@ -142,6 +141,22 @@ bool VehicleTemplateSelectorWidget::airframeIsCompatible(int vehicleType, int ve
     return vehicleSubType == m_vehicleSubType;
 }
 
+QString VehicleTemplateSelectorWidget::getTemplatePath()
+{
+    switch (m_vehicleType) {
+    case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+        return VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME;
+    case VehicleConfigurationSource::VEHICLE_MULTI:
+        return VehicleTemplateExportDialog::EXPORT_MULTI_NAME;
+    case VehicleConfigurationSource::VEHICLE_HELI:
+        return VehicleTemplateExportDialog::EXPORT_HELI_NAME;
+    case VehicleConfigurationSource::VEHICLE_SURFACE:
+        return VehicleTemplateExportDialog::EXPORT_SURFACE_NAME;
+    default:
+        return NULL;
+    }
+}
+
 void VehicleTemplateSelectorWidget::loadFilesInDir(QString templateBasePath)
 {
     QDir templateDir(templateBasePath);
@@ -183,9 +198,9 @@ void VehicleTemplateSelectorWidget::loadValidFiles()
         delete templ;
     }
     m_templates.clear();
-
-    loadFilesInDir(QString("%1/%2/").arg(Utils::PathUtils().InsertDataPath("%%DATAPATH%%cloudconfig")).arg(m_templateFolder));
-    loadFilesInDir(QString("%1/%2/").arg(Utils::PathUtils().InsertStoragePath("%%STOREPATH%%cloudconfig")).arg(m_templateFolder));
+    QString path = getTemplatePath();
+    loadFilesInDir(QString("%1/%2/").arg(Utils::PathUtils().InsertDataPath("%%DATAPATH%%cloudconfig")).arg(path));
+    loadFilesInDir(QString("%1/%2/").arg(Utils::PathUtils().InsertStoragePath("%%STOREPATH%%cloudconfig")).arg(path));
 }
 
 void VehicleTemplateSelectorWidget::setupTemplateList()

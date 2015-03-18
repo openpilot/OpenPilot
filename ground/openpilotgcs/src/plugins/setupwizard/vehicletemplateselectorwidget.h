@@ -42,7 +42,7 @@ class VehicleTemplateSelectorWidget : public QWidget {
 public:
     explicit VehicleTemplateSelectorWidget(QWidget *parent = 0);
     ~VehicleTemplateSelectorWidget();
-    void setTemplateInfo(QString path, int vehicleType, int vehicleSubType);
+    void setTemplateInfo(int vehicleType, int vehicleSubType);
     QJsonObject *selectedTemplate() const;
 
 public slots:
@@ -54,7 +54,6 @@ protected:
 
 private:
     Ui::VehicleTemplateSelectorWidget *ui;
-    QString m_templateFolder;
     int m_vehicleType;
     int m_vehicleSubType;
 
@@ -68,6 +67,7 @@ private:
     void updatePhoto(QJsonObject *templ);
     void updateDescription(QJsonObject *templ);
     bool airframeIsCompatible(int vehicleType, int vehicleSubType);
+    QString getTemplatePath();
 
 private slots:
     void updateTemplates();

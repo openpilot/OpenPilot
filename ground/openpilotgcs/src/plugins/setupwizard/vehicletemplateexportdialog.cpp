@@ -64,7 +64,7 @@ VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     m_uavoManager = pm->getObject<UAVObjectManager>();
     ui->Photo->setScene(new QGraphicsScene(this));
     ui->Type->setText(setupVehicleType());
-    ui->selectionWidget->setTemplateInfo(m_dir, m_type, m_subType);
+    ui->selectionWidget->setTemplateInfo(m_type, m_subType);
 
     connect(ui->Name, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->Owner, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
@@ -100,102 +100,85 @@ QString VehicleTemplateExportDialog::setupVehicleType()
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
         m_type    = VehicleConfigurationSource::VEHICLE_FIXEDWING;
         m_subType = VehicleConfigurationSource::FIXED_WING_AILERON;
-        m_dir     = EXPORT_FIXEDWING_NAME;
         return tr("Fixed Wing - Aileron");
 
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
         m_type    = VehicleConfigurationSource::VEHICLE_FIXEDWING;
         m_subType = VehicleConfigurationSource::FIXED_WING_ELEVON;
-        m_dir     = EXPORT_FIXEDWING_NAME;
         return tr("Fixed Wing - Elevon");
 
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
         m_type    = VehicleConfigurationSource::VEHICLE_FIXEDWING;
         m_subType = VehicleConfigurationSource::FIXED_WING_VTAIL;
-        m_dir     = EXPORT_FIXEDWING_NAME;
         return tr("Fixed Wing - V-Tail");
 
     case SystemSettings::AIRFRAMETYPE_HELICP:
         m_type    = VehicleConfigurationSource::VEHICLE_HELI;
         m_subType = VehicleConfigurationSource::HELI_CCPM;
-        m_dir     = EXPORT_HELI_NAME;
         return tr("Helicopter");
 
     case SystemSettings::AIRFRAMETYPE_TRI:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_TRI_Y;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Tricopter");
 
     case SystemSettings::AIRFRAMETYPE_QUADX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Quadrocopter X");
 
     case SystemSettings::AIRFRAMETYPE_QUADP:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Quadrocopter +");
 
     case SystemSettings::AIRFRAMETYPE_OCTOV:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_V;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter V");
 
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter X8X");
 
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter X8+");
 
     case SystemSettings::AIRFRAMETYPE_OCTO:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter +");
 
     case SystemSettings::AIRFRAMETYPE_OCTOX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_OCTO_X;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Octocopter X");
 
     case SystemSettings::AIRFRAMETYPE_HEXAX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_X;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter X");
 
     case SystemSettings::AIRFRAMETYPE_HEXAH:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_H;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter H");
 
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter Y6");
 
     case SystemSettings::AIRFRAMETYPE_HEXA:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA;
-        m_dir     = EXPORT_MULTI_NAME;
         return tr("Multirotor - Hexacopter +");
 
     default:
         m_type = VehicleConfigurationSource::VEHICLE_UNKNOWN;
-        m_dir  = "";
         return tr("Unsupported");
     }
 }

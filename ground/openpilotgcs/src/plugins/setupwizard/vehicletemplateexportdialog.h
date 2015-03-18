@@ -67,7 +67,6 @@ private:
     UAVObjectManager *m_uavoManager;
     VehicleConfigurationSource::VEHICLE_TYPE m_type;
     VehicleConfigurationSource::VEHICLE_SUB_TYPE m_subType;
-    const char *m_dir;
     QPixmap m_image;
 
     QString fixFilenameString(QString input, int truncate = 100);

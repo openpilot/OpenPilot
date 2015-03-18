@@ -697,7 +697,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         wizardUi->pagesStack->setCurrentWidget(wizardUi->identifyCenterPage);
         if (transmitterType == ground) {
             wizardUi->identifyCenterInstructions->setText(QString(tr("Please center all controls and trims and press Next when ready.\n\n"
-                                                                    "For a ground vehicle, this center position will be used as neutral value of each channel.")));
+                                                                     "For a ground vehicle, this center position will be used as neutral value of each channel.")));
             connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(identifyCenters()));
         }
         break;
@@ -1046,12 +1046,13 @@ void ConfigInputWidget::identifyLimits()
 
 void ConfigInputWidget::identifyCenters()
 {
-    if (transmitterType != ground)
+    if (transmitterType != ground) {
         return;
+    }
 
     manualCommandData = manualCommandObj->getData();
-    manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_THROTTLE] = 
-                manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
+    manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_THROTTLE] =
+        manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
 
     manualSettingsObj->setData(manualSettingsData);
 }
@@ -1678,7 +1679,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         QMessageBox msgBox;
         QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
-        QPushButton *noButton = msgBox.addButton(tr("No"), QMessageBox::NoRole);
+        QPushButton *noButton  = msgBox.addButton(tr("No"), QMessageBox::NoRole);
         msgBox.setText(tr("<p>Are you configuring a transmitter for your <b>ground vehicle</b> with reversible motor<br>"
                           "controlled by throttle stick?</p>"
                           "<p>If so, please make sure you've centered throttle control and press <b>Yes</b> button. Otherwise, press No.</p>"));
@@ -1687,8 +1688,8 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         if (msgBox.clickedButton() == yesButton) {
             transmitterType = ground;
-            manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] = 
-                    manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
+            manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
+                manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
         }
 
         restoreMdataSingle(manualCommandObj, &manualControlMdata);
@@ -1726,8 +1727,9 @@ void ConfigInputWidget::adjustSpecialNeutrals()
 
     // A ground vehicle has a reversible motor, the center position of throttle is the neutral setting.
     // So do not have to set a special neutral value for it.
-    if (transmitterType == ground)
+    if (transmitterType == ground) {
         return;
+    }
 
     // Force throttle to be near min, add 4% from total range to avoid arming issues
     manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =

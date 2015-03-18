@@ -14,7 +14,7 @@
    <item>
     <widget class="QStackedWidget" name="pagesStack">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="welcomePage">
       <layout class="QGridLayout" name="gridLayout">

@@ -72,6 +72,7 @@ static uint32_t RawTemperature;
 static uint32_t RawPressure;
 static int64_t Pressure;
 static int64_t Temperature;
+static int64_t FilteredTemperature = INT32_MIN;
 static int32_t lastConversionStart;
 
 static uint32_t conversionDelayMs;
@@ -247,6 +248,11 @@ int32_t PIOS_MS5611_ReadADC(void)
         // Actual temperature (-40…85°C with 0.01°C resolution)
         // TEMP = 20°C + dT * TEMPSENS = 2000 + dT * C6 / 2^23
         Temperature = 2000l + ((deltaTemp * CalibData.C[5]) / POW2(23));
+        if(FilteredTemperature != INT32_MIN){
+            FilteredTemperature = (FilteredTemperature * 9 + Temperature) / 10;
+        } else {
+            FilteredTemperature = Temperature;
+        }
     } else {
         int64_t Offset;
         int64_t Sens;
@@ -259,21 +265,21 @@ int32_t PIOS_MS5611_ReadADC(void)
             return -2;
         }
         // check if temperature is less than 20°C
-        if (Temperature < 2000) {
+        if (FilteredTemperature < 2000) {
             // Apply compensation
             // T2 = dT^2 / 2^31
             // OFF2 = 5 ⋅ (TEMP – 2000)^2/2
             // SENS2 = 5 ⋅ (TEMP – 2000)^2/2^2
 
-            int64_t tcorr = (Temperature - 2000) * (Temperature - 2000);
+            int64_t tcorr = (FilteredTemperature - 2000) * (FilteredTemperature - 2000);
             Offset2 = (5 * tcorr) / 2;
             Sens2   = (5 * tcorr) / 4;
             compensation_t2 = (deltaTemp * deltaTemp) >> 31;
             // Apply the "Very low temperature compensation" when temp is less than -15°C
-            if (Temperature < -1500) {
+            if (FilteredTemperature < -1500) {
                 // OFF2 = OFF2 + 7 ⋅ (TEMP + 1500)^2
                 // SENS2 = SENS2 + 11 ⋅ (TEMP + 1500)^2 / 2
-                int64_t tcorr2 = (Temperature + 1500) * (Temperature + 1500);
+                int64_t tcorr2 = (FilteredTemperature + 1500) * (FilteredTemperature + 1500);
                 Offset2 += 7 * tcorr2;
                 Sens2   += (11 * tcorr2) / 2;
             }
@@ -302,7 +308,7 @@ int32_t PIOS_MS5611_ReadADC(void)
 static float PIOS_MS5611_GetTemperature(void)
 {
     // Apply the second order low and very low temperature compensation offset
-    return ((float)(Temperature - compensation_t2)) / 100.0f;
+    return ((float)(FilteredTemperature - compensation_t2)) / 100.0f;
 }
 
 /**

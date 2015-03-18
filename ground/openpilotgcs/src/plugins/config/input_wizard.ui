@@ -14,7 +14,7 @@
    <item>
     <widget class="QStackedWidget" name="pagesStack">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="welcomePage">
       <layout class="QGridLayout" name="gridLayout">
@@ -67,7 +67,7 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
        <item>
         <widget class="QRadioButton" name="typeGround">
          <property name="text">
-          <string>Surface: has reversible motor controlled by throttle stick</string>
+          <string>Surface: has reversible motor controlled by throttle stick, plus yaw control (2 channels)</string>
          </property>
         </widget>
        </item>
@@ -81,7 +81,7 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
        <item>
         <widget class="QLabel" name="typePageFooter">
          <property name="text">
-          <string>If selecting the Helicopter option, please engage throttle hold now.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If selecting the Helicopter option, please engage throttle hold now.&lt;/p&gt;&lt;p&gt;If selecting the Surface option, the flight mode will be set to be only one mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

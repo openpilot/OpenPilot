@@ -901,12 +901,16 @@ void ConfigInputWidget::setChannel(int newChan)
 void ConfigInputWidget::nextChannel()
 {
     QList <int> order;
-    if (transmitterType == heli) {
+    switch (transmitterType) {
+    case heli:
         order = heliChannelOrder;
-    } else if (transmitterType == ground) {
+        break;
+    case ground:
         order = groundChannelOrder;
-    } else {
+        break;
+    default:
         order = acroChannelOrder;
+        break;
     }
 
     if (currentChannelNum == -1) {
@@ -1677,16 +1681,15 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         manualCommandData  = manualCommandObj->getData();
         manualSettingsData = manualSettingsObj->getData();
 
-        QMessageBox msgBox;
-        QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
-        QPushButton *noButton  = msgBox.addButton(tr("No"), QMessageBox::NoRole);
-        msgBox.setText(tr("<p>Are you configuring a transmitter for your <b>ground vehicle</b> with reversible motor<br>"
-                          "controlled by throttle stick?</p>"
-                          "<p>If so, please make sure you've centered throttle control and press <b>Yes</b> button. Otherwise, press No.</p>"));
-        msgBox.setDefaultButton(noButton);
-        msgBox.exec();
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Ground vehicle"),
+                                      tr("<p>Are you configuring a transmitter for your <b>ground vehicle</b> with reversible motor<br>"
+                                         "controlled by throttle stick?</p>"
+                                         "<p>If so, please make sure you've centered throttle control and press <b>Yes</b> button. Otherwise, press No.</p>"
+                                         "<p>Attention, if you press <b>Yes</b>, then the flight modes will be set to 1.</p>"),
+                                      QMessageBox::Yes | QMessageBox::No);
 
-        if (msgBox.clickedButton() == yesButton) {
+        if (reply == QMessageBox::Yes) {
             transmitterType = ground;
             manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
                 manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];

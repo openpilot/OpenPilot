@@ -122,11 +122,9 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
     OPHID_TRACE("IN");
 
     // Print the list
-    qDebug() << "List off (" << knowndevices.length() << ") devices that are tracked:";
+    // qDebug() << "List off (" << knowndevices.length() << ") devices that are tracked:";
     foreach(USBPortInfo info, knowndevices /*thePortsWeWant*/) {
-        qDebug() << "product:" << info.product
-                 << " bcdDevice:" << info.bcdDevice
-                 << " devicePath:" << info.devicePath;
+        // qDebug() << "product:" << info.product << " bcdDevice:" << info.bcdDevice << " devicePath:" << info.devicePath;
 
         // Filter to return only the one request (if exists)
         if ((info.vendorID == vid || vid == -1) &&
@@ -249,7 +247,7 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
 {
     OPHID_TRACE("IN");
 
-    qDebug() << "[STATUS CHANGE] from device ID: " << deviceID;
+    // qDebug() << "[STATUS CHANGE] from device ID: " << deviceID;
     bool rc;
     SP_DEVINFO_DATA spDevInfoData;
     DWORD dwFlag = (DBT_DEVICEARRIVAL == wParam) ? DIGCF_PRESENT : 0 /*DIGCF_ALLCLASSES*/;
@@ -263,13 +261,13 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
             DWORD nSize = 0;
             TCHAR buf[MAX_PATH];
             rc = SetupDiGetDeviceInstanceId(devInfo, &spDevInfoData, buf, MAX_PATH, &nSize);
-            qDebug() << "Found:" << TCHARToQString(buf);
+            // qDebug() << "Found:" << TCHARToQString(buf);
             if (rc && deviceID.contains(TCHARToQString(buf))) {
-                qDebug() << "[MATCH] " << TCHARToQString(buf);
+                // qDebug() << "[MATCH] " << TCHARToQString(buf);
                 USBPortInfo info;
                 info.devicePath = deviceID;
                 if (wParam == DBT_DEVICEARRIVAL) {
-                    qDebug() << "[INSERTED]";
+                    // qDebug() << "[INSERTED]";
                     if (infoFromHandle(guid, info, devInfo, i) != OPHID_NO_ERROR) {
                         OPHID_ERROR("Not found");
                         break;
@@ -290,18 +288,14 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                         break;
                     }
                     knowndevices.append(info);
-                    qDebug() << "[SIGNAL] Device discovered on device:"
-                             << info.product
-                             << info.bcdDevice;
+                    // qDebug() << "[SIGNAL] Device discovered on device:" << info.product << info.bcdDevice;
                     emit deviceDiscovered(info);
                     break;
                 } else if (wParam == DBT_DEVICEREMOVECOMPLETE) {
                     for (int x = 0; x < knowndevices.count(); ++x) {
                         USBPortInfo temp = knowndevices.at(x);
                         knowndevices.removeAt(x);
-                        qDebug() << "[SIGNAL] Device removed on device:"
-                                 << temp.product
-                                 << temp.bcdDevice;
+                        // qDebug() << "[SIGNAL] Device removed on device:" << temp.product << temp.bcdDevice;
                     }
                     emit deviceRemoved(info);
                     break;
@@ -429,7 +423,7 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
         goto leave;
     }
 
-    qDebug() << "Found device with valid PATH: " << qDevicePath;
+    // qDebug() << "Found device with valid PATH: " << qDevicePath;
     h = CreateFile(details->DevicePath,
                    GENERIC_READ | GENERIC_WRITE,
                    FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -449,8 +443,7 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
             goto leave;
         }
 
-        qDebug() << "Problem opening handle, path: "
-                 << QString().fromWCharArray(details->DevicePath);
+        // qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
 
         free(details);
         ret = OPHID_ERROR_RET;

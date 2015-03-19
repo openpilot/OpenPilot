@@ -95,7 +95,7 @@ void RawHIDConnection::onDeviceConnected()
  */
 void RawHIDConnection::onDeviceDisconnected()
 {
-    qDebug() << "onDeviceDisconnected()";
+    // qDebug() << "onDeviceDisconnected()";
     if (enablePolling) {
         emit availableDevChanged(this);
     }

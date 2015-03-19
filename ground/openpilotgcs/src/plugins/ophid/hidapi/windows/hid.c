@@ -166,6 +166,7 @@ static void free_hid_device(hid_device *dev)
 
 static void register_error(hid_device *device, const char *op)
 {
+    (void)op; // avoid unused arg warning
 	WCHAR *ptr, *msg;
 
 	FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -232,7 +233,7 @@ static HANDLE open_device(const char *path, BOOL enumerate)
 		OPEN_EXISTING,
 		FILE_FLAG_OVERLAPPED,/*FILE_ATTRIBUTE_NORMAL,*/
 		0);
-	DWORD error = GetLastError();
+	/*DWORD error =*/ GetLastError();
 	return handle;
 }
 

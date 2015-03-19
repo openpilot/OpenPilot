@@ -42,7 +42,7 @@ void USBSignalFilter::m_deviceDiscovered(USBPortInfo port)
         (port.productID == m_pid || m_pid == -1) &&
         ((port.bcdDevice >> 8) == m_boardModel || m_boardModel == -1) &&
         ((port.bcdDevice & 0x00ff) == m_runState || m_runState == -1)) {
-        qDebug() << "USBSignalFilter emit device discovered";
+        // qDebug() << "USBSignalFilter emit device discovered";
         emit deviceDiscovered();
     }
 }

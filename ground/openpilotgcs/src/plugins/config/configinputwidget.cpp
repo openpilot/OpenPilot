@@ -558,6 +558,11 @@ void ConfigInputWidget::wzNext()
         throttleError = false;
         checkThrottleRange();
 
+        // Force flight mode number to be 1 if 2 CH ground vehicle was selected
+        if (transmitterType == ground) {
+            forceOneFlightMode();
+        }
+
         manualSettingsObj->setData(manualSettingsData);
         // move to Arming Settings tab
         ui->stackedWidget->setCurrentIndex(0);
@@ -698,7 +703,6 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         if (transmitterType == ground) {
             wizardUi->identifyCenterInstructions->setText(QString(tr("Please center all controls and trims and press Next when ready.\n\n"
                                                                      "For a ground vehicle, this center position will be used as neutral value of each channel.")));
-            connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(identifyCenters()));
         }
         break;
     case wizardIdentifyLimits:
@@ -933,12 +937,16 @@ void ConfigInputWidget::nextChannel()
 void ConfigInputWidget::prevChannel()
 {
     QList <int> order;
-    if (transmitterType == heli) {
+    switch (transmitterType) {
+    case heli:
         order = heliChannelOrder;
-    } else if (transmitterType == ground) {
+        break;
+    case ground:
         order = groundChannelOrder;
-    } else {
+        break;
+    default:
         order = acroChannelOrder;
+        break;
     }
 
     // No previous from unset channel or next state
@@ -1045,19 +1053,6 @@ void ConfigInputWidget::identifyLimits()
             }
         }
     }
-    manualSettingsObj->setData(manualSettingsData);
-}
-
-void ConfigInputWidget::identifyCenters()
-{
-    if (transmitterType != ground) {
-        return;
-    }
-
-    manualCommandData = manualCommandObj->getData();
-    manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_THROTTLE] =
-        manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
-
     manualSettingsObj->setData(manualSettingsData);
 }
 
@@ -1686,7 +1681,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
                                       tr("<p>Are you configuring a transmitter for your <b>ground vehicle</b> with reversible motor<br>"
                                          "controlled by throttle stick?</p>"
                                          "<p>If so, please make sure you've centered throttle control and press <b>Yes</b> button. Otherwise, press No.</p>"
-                                         "<p>Attention, if you press <b>Yes</b>, then the flight modes will be set to 1.</p>"),
+                                         "<p>Attention, if you press <b>Yes</b>, then the <b>Flight Mode Count</b> will be set to 1.</p>"),
                                       QMessageBox::Yes | QMessageBox::No);
 
         if (reply == QMessageBox::Yes) {
@@ -1696,6 +1691,11 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         }
 
         restoreMdataSingle(manualCommandObj, &manualControlMdata);
+
+        // Force flight mode number to be 1 if 2 channel ground vehicle was confirmed
+        if (transmitterType == ground) {
+            forceOneFlightMode();
+        }
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             if ((i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE) || (i == ManualControlSettings::CHANNELNUMBER_THROTTLE)) {
@@ -1803,4 +1803,11 @@ void ConfigInputWidget::resetActuatorSettings()
         }
         actuatorSettingsObj->setData(actuatorSettingsData);
     }
+}
+
+void ConfigInputWidget::forceOneFlightMode()
+{
+    manualCommandData = manualCommandObj->getData();
+    manualSettingsData.FlightModeNumber = 1;
+    manualSettingsObj->setData(manualSettingsData);
 }

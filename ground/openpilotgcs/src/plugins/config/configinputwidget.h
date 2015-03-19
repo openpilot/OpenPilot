@@ -193,7 +193,6 @@ private slots:
     void openHelp();
     void identifyControls();
     void identifyLimits();
-    void identifyCenters();
     void moveTxControls();
     void moveSticks();
     void dimOtherControls(bool value);
@@ -206,6 +205,7 @@ private slots:
     void updateCalibration();
     void resetChannelSettings();
     void resetActuatorSettings();
+    void forceOneFlightMode();
 
 protected:
     void resizeEvent(QResizeEvent *event);

@@ -41,6 +41,8 @@
  */
 void printPortInfo(struct udev_device *dev)
 {
+    Q_UNUSED(dev);
+
     OPHID_DEBUG("   Node: %s", udev_device_get_devnode(dev));
     OPHID_DEBUG("   Subsystem: %s", udev_device_get_subsystem(dev));
     OPHID_DEBUG("   Devtype: %s", udev_device_get_devtype(dev));

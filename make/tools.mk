@@ -774,6 +774,7 @@ $(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),,$(not
 
 ifeq ($(shell [ -d "$(OPENSSL_DIR)" ] && $(ECHO) "exists"), exists)
     export OPENSSL := "$(OPENSSL_DIR)/bin/openssl"    
+    export OPENSSL_CONF := $(OPENSSL_DIR)/bin/openssl.cfg
     export OPENSSL_DIR := "$(OPENSSL_DIR)"
 else
     # not installed, hope it's in the path...

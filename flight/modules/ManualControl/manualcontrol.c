@@ -397,9 +397,15 @@ static void manualControlTask(void)
         break;
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 
+    // During development the assistedcontrol implementation is optional and set
+    // set in stabi settings.  Once if we decide to always have this on, it can
+    // can be directly set here...i.e. set the flight mode assist as required.
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+    case FLIGHTSTATUS_FLIGHTMODE_LAND:
         newFlightModeAssist = isAssistedFlightMode(position, newMode, &modeSettings);
         if (newFlightModeAssist) {
+            // Set the default thrust state
             switch (newFlightModeAssist) {
             case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST:
                 newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
@@ -412,28 +418,14 @@ static void manualControlTask(void)
                 newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
                 break;
             }
-
-            switch (newAssistedControlState) {
-            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE:
-                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
-                break;
-            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
-                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
-                break;
-            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD:
-                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
-                break;
-            }
         }
         handler = &handler_PATHFOLLOWER;
         break;
 
     case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
     case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
     case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-    case FLIGHTSTATUS_FLIGHTMODE_LAND:
     case FLIGHTSTATUS_FLIGHTMODE_POI:
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         handler = &handler_PATHFOLLOWER;
@@ -528,10 +520,14 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
             thrustMode = modeSettings->Stabilization6Settings.Thrust;
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            // we hard code the "GPS Assisted" PostionHold to use alt-vario which
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+            // we hard code the "GPS Assisted" PostionHold/Roam to use alt-vario which
             // is a more appropriate throttle mode.  "GPSAssist" adds braking
             // and a better throttle management to the standard Position Hold.
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_LAND:
+            thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
             break;
 
             // other modes will use cruisecontrol as default

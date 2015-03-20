@@ -31,6 +31,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+extern "C" {
 #include "inc/openpilot.h"
 #include <systemmod.h>
 #include <uavobjectsinit.h>
@@ -74,6 +75,7 @@ static void initTask(void *parameters);
 
 /* Prototype of generated InitModules() function */
 extern void InitModules(void);
+}
 
 /**
  * OpenPilot Main function:

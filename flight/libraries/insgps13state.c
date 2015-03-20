@@ -376,35 +376,39 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 {
     float Z[10] = { 0 };
     float Y[10] = { 0 };
-    float invBmag;
 
     // GPS Position in meters and in local NED frame
-    Z[0]    = Pos[0];
-    Z[1]    = Pos[1];
-    Z[2]    = Pos[2];
+    Z[0] = Pos[0];
+    Z[1] = Pos[1];
+    Z[2] = Pos[2];
 
     // GPS Velocity in meters and in local NED frame
-    Z[3]    = Vel[0];
-    Z[4]    = Vel[1];
-    Z[5]    = Vel[2];
+    Z[3] = Vel[0];
+    Z[4] = Vel[1];
+    Z[5] = Vel[2];
     // magnetometer data in any units (use unit vector) and in body frame
-    invBmag = fast_invsqrtf(mag_data[0] * mag_data[0] + mag_data[1] * mag_data[1] + mag_data[2] * mag_data[2]);
-    Z[6]    = mag_data[0] * invBmag;
-    Z[7]    = mag_data[1] * invBmag;
-    Z[8]    = mag_data[2] * invBmag;
+
+
+    if (SensorsUsed & MAG_SENSORS) {
+        float invBmag = fast_invsqrtf(mag_data[0] * mag_data[0] + mag_data[1] * mag_data[1] + mag_data[2] * mag_data[2]);
+        Z[6] = mag_data[0] * invBmag;
+        Z[7] = mag_data[1] * invBmag;
+        Z[8] = mag_data[2] * invBmag;
+    }
+
     // barometric altimeter in meters and in local NED frame
-    Z[9]    = BaroAlt;
+    Z[9] = BaroAlt;
 
     // EKF correction step
     LinearizeH(ekf.X, ekf.Be, ekf.H);
     MeasurementEq(ekf.X, ekf.Be, Y);
     SerialUpdate(ekf.H, ekf.R, Z, Y, ekf.P, ekf.X, SensorsUsed);
 
-    invBmag    = fast_invsqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
-    ekf.X[6]  *= invBmag;
-    ekf.X[7]  *= invBmag;
-    ekf.X[8]  *= invBmag;
-    ekf.X[9]  *= invBmag;
+    float invqmag = fast_invsqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
+    ekf.X[6]  *= invqmag;
+    ekf.X[7]  *= invqmag;
+    ekf.X[8]  *= invqmag;
+    ekf.X[9]  *= invqmag;
     // Update Nav solution structure
     Nav.Pos[0] = ekf.X[0];
     Nav.Pos[1] = ekf.X[1];

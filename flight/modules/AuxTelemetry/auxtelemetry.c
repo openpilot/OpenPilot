@@ -69,14 +69,14 @@ int32_t AuxTelemetryStart(void)
 {
     // Start task, if valid configuration (port and protocol)
     if (comPort && activeProtocolHandler) {
-        xTaskCreate(telemetryTask, "SecondTel", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+        xTaskCreate(telemetryTask, "AuxTelemetry", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_AUXTELEMETRY, taskHandle);
     }
     return 0;
 }
 
 /**
- * Initialise the auxiliary telemetry module
+ * Initialize the auxiliary telemetry module
  * \return -1 if failed
  * \return 0 on success
  */

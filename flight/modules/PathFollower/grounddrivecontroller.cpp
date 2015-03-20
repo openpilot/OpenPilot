@@ -57,6 +57,7 @@ extern "C" {
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <pathsummary.h>
+#include <statusgrounddrive.h>
 }
 
 // C++ includes
@@ -68,7 +69,7 @@ extern "C" {
 GroundDriveController *GroundDriveController::p_inst = 0;
 
 GroundDriveController::GroundDriveController()
-    : groundSettings(0), mActive(false)
+    : groundSettings(0), mActive(false), mMode(0)
 {}
 
 // Called when mode first engaged
@@ -77,8 +78,8 @@ void GroundDriveController::Activate(void)
     if (!mActive) {
         mActive = true;
         SettingsUpdated();
-        resetGlobals();
-        mMode   = pathDesired->Mode;
+        controlNE.Activate();
+        mMode = pathDesired->Mode;
     }
 }
 
@@ -100,18 +101,26 @@ void GroundDriveController::Deactivate(void)
 {
     if (mActive) {
         mActive = false;
-        resetGlobals();
+        controlNE.Deactivate();
     }
 }
 
 
 void GroundDriveController::SettingsUpdated(void)
 {
-    // fixed wing PID only
-    pid_configure(&PIDposH[0], groundSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-    pid_configure(&PIDposH[1], groundSettings->HorizontalPosP, 0.0f, 0.0f, 0.0f);
-    pid_configure(&PIDposV, 0.0f, 0.0f, 0.0f, 0.0f);
-    pid_configure(&PIDgndspeed, groundSettings->SpeedPI.Kp, groundSettings->SpeedPI.Ki, 0.0f, groundSettings->SpeedPI.ILimit);
+    const float dT = groundSettings->UpdatePeriod / 1000.0f;
+
+    controlNE.UpdatePositionalParameters(groundSettings->HorizontalPosP);
+    controlNE.UpdateParameters(groundSettings->SpeedPI.Kp,
+                               groundSettings->SpeedPI.Ki,
+                               groundSettings->SpeedPI.Kd,
+                               groundSettings->SpeedPI.Beta,
+                               dT,
+                               groundSettings->HorizontalVelMax);
+
+
+    // max/min are NE command values equivalent to thrust but must be symmetrical as this is NE not forward/reverse.
+    controlNE.UpdateCommandParameters(-groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max, groundSettings->VelocityFeedForward);
 }
 
 /**
@@ -124,21 +133,7 @@ int32_t GroundDriveController::Initialize(GroundPathFollowerSettingsData *ptr_gr
 
     groundSettings = ptr_groundSettings;
 
-    resetGlobals();
-
     return 0;
-}
-
-/**
- * reset integrals
- */
-void GroundDriveController::resetGlobals()
-{
-    pid_zero(&PIDposH[0]);
-    pid_zero(&PIDposH[1]);
-    pid_zero(&PIDposV);
-    pid_zero(&PIDgndspeed);
-    pathStatus->path_time = 0.0f;
 }
 
 void GroundDriveController::UpdateAutoPilot()
@@ -163,14 +158,14 @@ void GroundDriveController::UpdateAutoPilot()
  */
 uint8_t GroundDriveController::updateAutoPilotGround()
 {
-    updatePathVelocity(groundSettings->CourseFeedForward, true);
+    updatePathVelocity(groundSettings->CourseFeedForward);
     return updateGroundDesiredAttitude();
 }
 
 /**
  * Compute desired velocity from the current position and path
  */
-void GroundDriveController::updatePathVelocity(float kFF, bool limited)
+void GroundDriveController::updatePathVelocity(float kFF)
 {
     PositionStateData positionState;
 
@@ -178,56 +173,38 @@ void GroundDriveController::updatePathVelocity(float kFF, bool limited)
     VelocityStateData velocityState;
     VelocityStateGet(&velocityState);
     VelocityDesiredData velocityDesired;
-
-    const float dT = groundSettings->UpdatePeriod / 1000.0f;
+    controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // look ahead kFF seconds
-    float cur[3]   = { positionState.North + (velocityState.North * kFF),
-                       positionState.East + (velocityState.East * kFF),
-                       positionState.Down + (velocityState.Down * kFF) };
+    float cur[3] = { positionState.North + (velocityState.North * kFF),
+                     positionState.East + (velocityState.East * kFF),
+                     positionState.Down + (velocityState.Down * kFF) };
     struct path_status progress;
     path_progress(pathDesired, cur, &progress, false);
 
-    // calculate velocity - can be zero if waypoints are too close
-    velocityDesired.North = progress.path_vector[0];
-    velocityDesired.East  = progress.path_vector[1];
-    velocityDesired.Down  = progress.path_vector[2];
+    // GOTOENDPOINT: correction_vector is distance array to endpoint, path_vector is velocity vector
+    // FOLLOWVECTOR:  correct_vector is distance to vector path, path_vector is the desired velocity vector
 
-    if (limited &&
-        // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
-        // it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
-        // once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
-        // leading to an S-shape snake course the wrong way
-        // this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
-        // turn steep unless there is enough space complete the turn before crossing the flightpath
-        // in this case the plane effectively needs to be turned around
-        // indicators:
-        // difference between correction_direction and velocitystate >90 degrees and
-        // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
-        // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
-        // calculating angles < 90 degrees through dot products
-        (vector_lengthf(progress.path_vector, 2) > 1e-6f) &&
-        ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
-        ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
-        ;
-    } else {
-        // calculate correction
-        velocityDesired.North += pid_apply(&PIDposH[0], progress.correction_vector[0], dT);
-        velocityDesired.East  += pid_apply(&PIDposH[1], progress.correction_vector[1], dT);
-    }
-    velocityDesired.Down += pid_apply(&PIDposV, progress.correction_vector[2], dT);
+    // Calculate the desired velocity from the lateral vector path errors (correct_vector) and the desired velocity vector (path_vector)
+    controlNE.ControlPositionWithPath(&progress);
+    float north, east;
+    controlNE.GetVelocityDesired(&north, &east);
+    velocityDesired.North = north;
+    velocityDesired.East  = east;
+    velocityDesired.Down  = 0.0f;
 
     // update pathstatus
-    pathStatus->error     = progress.error;
+    pathStatus->error = progress.error;
     pathStatus->fractional_progress  = progress.fractional_progress;
+    // FOLLOWVECTOR: desired velocity vector
     pathStatus->path_direction_north = progress.path_vector[0];
     pathStatus->path_direction_east  = progress.path_vector[1];
     pathStatus->path_direction_down  = progress.path_vector[2];
 
+    // FOLLOWVECTOR: correction distance to vector path
     pathStatus->correction_direction_north = progress.correction_vector[0];
     pathStatus->correction_direction_east  = progress.correction_vector[1];
     pathStatus->correction_direction_down  = progress.correction_vector[2];
-
 
     VelocityDesiredSet(&velocityDesired);
 }
@@ -237,36 +214,90 @@ void GroundDriveController::updatePathVelocity(float kFF, bool limited)
  */
 uint8_t GroundDriveController::updateGroundDesiredAttitude()
 {
-    const float dT = groundSettings->UpdatePeriod / 1000.0f;
-
-    VelocityDesiredData velocityDesired;
+    StatusGroundDriveData statusGround;
     VelocityStateData velocityState;
-    StabilizationDesiredData stabDesired;
 
     VelocityStateGet(&velocityState);
-    VelocityDesiredGet(&velocityDesired);
+    AttitudeStateData attitudeState;
+    AttitudeStateGet(&attitudeState);
+    statusGround.State.Yaw = attitudeState.Yaw;
+    statusGround.State.Velocity = sqrtf(velocityState.North * velocityState.North + velocityState.East * velocityState.East);
 
-    float courseCommand;
-    float speedError;
-    float speedCommand;
+    StabilizationDesiredData stabDesired;
+    StabilizationDesiredGet(&stabDesired);
 
-    courseCommand      = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North));
+    // estimate a north/east command value to control the velocity error.
+    // ThrustLimits.Max(+-) limits the range.  Think of this as a command unit vector
+    // of the ultimate direction to reduce lateral error and achieve the target direction (desired angle).
+    float northCommand, eastCommand;
+    controlNE.GetNECommand(&northCommand, &eastCommand);
 
-    speedError         = sqrtf(squaref(velocityDesired.East) + squaref(velocityDesired.North)) - sqrtf(squaref(velocityState.East) + squaref(velocityState.North));
+    // Get current vehicle orientation
+    float angle_radians  = DEG2RAD(attitudeState.Yaw); // (+-pi)
+    float cos_angle      = cosf(angle_radians);
+    float sine_angle     = sinf(angle_radians);
 
-    speedCommand       = pid_apply(&PIDgndspeed, speedError, dT);
+    float courseCommand  = 0.0f;
+    float speedCommand   = 0.0f;
+    float lateralCommand = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max);
+    float forwardCommand = boundf(northCommand * cos_angle + eastCommand * sine_angle, -groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max);
+    // +ve facing correct direction, lateral command should just correct angle,
+    if (forwardCommand > 0.0f) {
+        // if +ve forward command, -+ lateralCommand drives steering to manage lateral error and angular error
+
+        courseCommand = boundf(lateralCommand, -1.0f, 1.0f);
+        speedCommand  = boundf(forwardCommand, groundSettings->ThrustLimit.SlowForward, groundSettings->ThrustLimit.Max);
+
+        // reinstate max thrust
+        controlNE.UpdateCommandParameters(-groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max, groundSettings->VelocityFeedForward);
+
+        statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_ONTRACK;
+    } else {
+        // -ve facing opposite direction, lateral command irrelevant, need to turn to change direction and do so slowly.
+
+        // Reduce steering angle based on current velocity
+        float steeringReductionFactor = 1.0f;
+        if (stabDesired.Thrust > 0.3f) {
+            steeringReductionFactor = (groundSettings->HorizontalVelMax - statusGround.State.Velocity) / groundSettings->HorizontalVelMax;
+            steeringReductionFactor = boundf(steeringReductionFactor, 0.05f, 1.0f);
+        }
+
+        // should we turn left or right?
+        if (lateralCommand >= 0.1f) {
+            courseCommand = 1.0f * steeringReductionFactor;
+            statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_TURNAROUNDRIGHT;
+        } else {
+            courseCommand = -1.0f * steeringReductionFactor;
+            statusGround.ControlState = STATUSGROUNDDRIVE_CONTROLSTATE_TURNAROUNDLEFT;
+        }
+
+        // Impose limits to slow down.
+        controlNE.UpdateCommandParameters(-groundSettings->ThrustLimit.SlowForward, groundSettings->ThrustLimit.SlowForward, 0.0f);
+
+        speedCommand = groundSettings->ThrustLimit.SlowForward;
+    }
 
     stabDesired.Roll   = 0.0f;
     stabDesired.Pitch  = 0.0f;
     stabDesired.Yaw    = courseCommand;
 
-    stabDesired.Thrust = boundf(speedCommand + groundSettings->ThrustLimit.Neutral, groundSettings->ThrustLimit.Min, groundSettings->ThrustLimit.Max);
+    // Mix yaw into thrust limit TODO
+    stabDesired.Thrust = boundf(speedCommand, groundSettings->ThrustLimit.Min, groundSettings->ThrustLimit.Max);
 
-    stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Pitch  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode.Yaw    = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
+    stabDesired.StabilizationMode.Pitch  = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
+    stabDesired.StabilizationMode.Yaw    = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
     StabilizationDesiredSet(&stabDesired);
+
+    statusGround.NECommand.North       = northCommand;
+    statusGround.NECommand.East        = eastCommand;
+    statusGround.State.Thrust          = stabDesired.Thrust;
+    statusGround.BodyCommand.Forward   = forwardCommand;
+    statusGround.BodyCommand.Right     = lateralCommand;
+    statusGround.ControlCommand.Course = courseCommand;
+    statusGround.ControlCommand.Speed  = speedCommand;
+    StatusGroundDriveSet(&statusGround);
 
     return 1;
 }

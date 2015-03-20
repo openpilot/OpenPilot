@@ -143,12 +143,6 @@ int32_t configuration_check()
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
-            // Revo supports PathPlanner and that must be OK or we are not sane
-            // PathPlan alarm is uninitialized if not running
-            // PathPlan alarm is warning or error if the flightplan is invalid
-            SystemAlarmsAlarmData alarms;
-            SystemAlarmsAlarmGet(&alarms);
-            ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
             ADDSEVERITY(!gps_assisted);
         }
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:

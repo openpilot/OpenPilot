@@ -40,20 +40,19 @@ extern "C" {
 #include <pathdesired.h>
 #include <paths.h>
 #include "plans.h"
+#include <pidstatus.h>
 }
 #include "pathfollowerfsm.h"
 #include "pidcontrolne.h"
 
 PIDControlNE::PIDControlNE()
-    : deltaTime(0), mNECommand(0), mFSM(0), mNeutral(0), mVelocityMax(0), mMinCommand(0), mMaxCommand(0), mVelocityFeedforward(0), mActive(false)
+    : deltaTime(0), mNECommand(0), mNeutral(0), mVelocityMax(0), mMinCommand(0), mMaxCommand(0), mVelocityFeedforward(0), mActive(false)
 {}
 
 PIDControlNE::~PIDControlNE() {}
 
-void PIDControlNE::Initialize(PathFollowerFSM *fsm)
-{
-    mFSM = fsm;
-}
+void PIDControlNE::Initialize()
+{}
 
 void PIDControlNE::Deactivate()
 {
@@ -70,21 +69,34 @@ void PIDControlNE::Activate()
     mActive = true;
 }
 
-void PIDControlNE::UpdateParameters(float kp, float ki, float kd, __attribute__((unused)) float ilimit, float dT, float velocityMax)
+void PIDControlNE::UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax)
 {
     // pid_configure(&PID, kp, ki, kd, ilimit);
-    float Ti   = kp / ki;
-    float Td   = kd / kp;
-    float Tt   = (Ti + Td) / 2.0f;
-    float kt   = 1.0f / Tt;
-    float beta = 1.0f; // 0 to 1
-    float u0   = 0.0f;
-    float N    = 10.0f;
-    float Tf   = Td / N;
+    float Ti = kp / ki;
+    float Td = kd / kp;
+    float Tt = (Ti + Td) / 2.0f;
+    float kt = 1.0f / Tt;
+    float u0 = 0.0f;
+    float N  = 10.0f;
+    float Tf = Td / N;
+
+    if (ki < 1e-6f) {
+	// Avoid Ti being infinite
+	Ti = 1e6f;
+	// Tt antiwindup time constant - we don't need antiwindup with no I term
+	Tt = 1e6f;
+	kt = 0.0f;
+    }
 
     if (kd < 1e-6f) {
         // PI Controller
         Tf = Ti / N;
+    }
+
+    if (beta > 1.0f) {
+         beta = 1.0f;
+    } else if (beta < 0.4f) {
+         beta = 0.4f;
     }
 
     pid2_configure(&PIDvel[0], kp, ki, kd, Tf, kt, dT, beta, u0, 0.0f, 1.0f);
@@ -178,10 +190,8 @@ void PIDControlNE::UpdateVelocityStateWithBrake(float pvNorth, float pvEast, flo
     UpdateBrakeVelocity(mVelocitySetpointTarget[0], path_time, brakeRate, pvNorth, &velocitySetpointDesired[0]);
     UpdateBrakeVelocity(mVelocitySetpointTarget[1], path_time, brakeRate, pvEast, &velocitySetpointDesired[1]);
 
-    // Calculate the rate of change
+    // If rate of change limits required, add here
     for (int iaxis = 0; iaxis < 2; iaxis++) {
-        // RateLimit(velocitySetpointDesired[iaxis], mVelocitySetpointCurrent[iaxis], 2.0f );
-
         mVelocitySetpointCurrent[iaxis] = velocitySetpointDesired[iaxis];
     }
 }
@@ -196,10 +206,8 @@ void PIDControlNE::UpdateVelocityState(float pvNorth, float pvEast)
     velocitySetpointDesired[0] = mVelocitySetpointTarget[0];
     velocitySetpointDesired[1] = mVelocitySetpointTarget[1];
 
-    // Calculate the rate of change
+    // If rate of change limits required, add here
     for (int iaxis = 0; iaxis < 2; iaxis++) {
-        // RateLimit(velocitySetpointDesired[iaxis], mVelocitySetpointCurrent[iaxis], 2.0f );
-
         mVelocitySetpointCurrent[iaxis] = velocitySetpointDesired[iaxis];
     }
 }
@@ -219,6 +227,19 @@ void PIDControlNE::GetNECommand(float *northCommand, float *eastCommand)
     *northCommand = pid2_apply(&(PIDvel[0]), mVelocitySetpointCurrent[0], mVelocityState[0], mMinCommand, mMaxCommand);
     PIDvel[1].va  = mVelocitySetpointCurrent[1] * mVelocityFeedforward;
     *eastCommand  = pid2_apply(&(PIDvel[1]), mVelocitySetpointCurrent[1], mVelocityState[1], mMinCommand, mMaxCommand);
+
+    PIDStatusData pidStatus;
+    pidStatus.setpoint = mVelocitySetpointCurrent[0];
+    pidStatus.actual   = mVelocityState[0];
+    pidStatus.error    = mVelocitySetpointCurrent[0] - mVelocityState[0];
+    pidStatus.setpoint = mVelocitySetpointCurrent[0];
+    pidStatus.ulow     = mMinCommand;
+    pidStatus.uhigh    = mMaxCommand;
+    pidStatus.command  = *northCommand;
+    pidStatus.P = PIDvel[0].P;
+    pidStatus.I = PIDvel[0].I;
+    pidStatus.D = PIDvel[0].D;
+    PIDStatusSet(&pidStatus);
 }
 
 void PIDControlNE::GetVelocityDesired(float *north, float *east)

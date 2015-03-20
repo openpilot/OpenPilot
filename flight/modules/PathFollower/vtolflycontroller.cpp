@@ -37,7 +37,6 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-#include <homelocation.h>
 #include <accelstate.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
@@ -47,7 +46,6 @@ extern "C" {
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
 #include <takeofflocation.h>
 #include <poilocation.h>
@@ -68,12 +66,14 @@ extern "C" {
 // Private constants
 #define DEADBAND_HIGH 0.10f
 #define DEADBAND_LOW  -0.10f
+#define RTB_LAND_FRACTIONAL_PROGRESS_START_CHECKS 0.95f
+#define RTB_LAND_NE_DISTANCE_REQUIRED_TO_START_LAND_SEQUENCE 2.0f
 
 // pointer to a singleton instance
 VtolFlyController *VtolFlyController::p_inst = 0;
 
 VtolFlyController::VtolFlyController()
-    : vtolPathFollowerSettings(0), mActive(false), mManualThrust(false)
+    : vtolPathFollowerSettings(NULL), mActive(false), mManualThrust(false), mMode(0), vtolEmergencyFallback(0.0f), vtolEmergencyFallbackSwitch(false)
 {}
 
 // Called when mode first engaged
@@ -86,6 +86,9 @@ void VtolFlyController::Activate(void)
         controlDown.Activate();
         controlNE.Activate();
         mMode = pathDesired->Mode;
+
+        vtolEmergencyFallback = 0.0f;
+        vtolEmergencyFallbackSwitch = false;
     }
 }
 
@@ -101,9 +104,7 @@ uint8_t VtolFlyController::Mode(void)
 
 // Objective updated in pathdesired
 void VtolFlyController::ObjectiveUpdated(void)
-{
-    // if objective changes set new endpoint targets TODO
-}
+{}
 
 
 void VtolFlyController::Deactivate(void)
@@ -113,6 +114,8 @@ void VtolFlyController::Deactivate(void)
         mManualThrust = false;
         controlDown.Deactivate();
         controlNE.Deactivate();
+        vtolEmergencyFallback = 0.0f;
+        vtolEmergencyFallbackSwitch = false;
     }
 }
 
@@ -127,8 +130,6 @@ void VtolFlyController::SettingsUpdated(void)
                                vtolPathFollowerSettings->HorizontalVelPID.ILimit,
                                dT,
                                vtolPathFollowerSettings->HorizontalVelMax);
-
-
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->MaxRollPitch, vtolPathFollowerSettings->VelocityFeedforward);
 
@@ -138,12 +139,12 @@ void VtolFlyController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->VerticalVelPID.ILimit, // TODO Change to BETA
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
-    controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
+    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
 
-    // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
 }
 
 /**
@@ -155,7 +156,6 @@ int32_t VtolFlyController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPath
     PIOS_Assert(ptr_vtolPathFollowerSettings);
 
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    controlDown.Initialize(0);
 
     return 0;
 }
@@ -172,6 +172,8 @@ void VtolFlyController::UpdateVelocityDesired()
 
     VelocityStateData velocityState;
     VelocityStateGet(&velocityState);
+    controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
+    controlDown.UpdateVelocityState(velocityState.Down);
 
     VelocityDesiredData velocityDesired;
 
@@ -237,6 +239,7 @@ int8_t VtolFlyController::UpdateStabilizationDesired(bool yaw_attitude, float ya
     ManualControlCommandData manualControl;
     ManualControlCommandGet(&manualControl);
 
+    // TODO The below need to be rewritten because the PID implementation has changed.
 #if 0
     // DEBUG HACK: allow user to skew compass on purpose to see if emergency failsafe kicks in
     if (vtolPathFollowerSettings->FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DEBUGTEST) {
@@ -363,8 +366,8 @@ void VtolFlyController::UpdateAutoPilot()
     // can't manage this.  And pathplanner whilst similar does not manage this as it is not a
     // waypoint traversal and is not aware of flight modes other than path plan.
     if ((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND] == FLIGHTMODESETTINGS_RETURNTOBASENEXTCOMMAND_LAND) {
-        if (pathStatus->fractional_progress > 0.95f) {
-            if (fabsf(pathStatus->correction_direction_north) < 2.0f && fabsf(pathStatus->correction_direction_east) < 2.0f) {
+        if (pathStatus->fractional_progress > RTB_LAND_FRACTIONAL_PROGRESS_START_CHECKS) {
+            if (fabsf(pathStatus->correction_direction_north) < RTB_LAND_NE_DISTANCE_REQUIRED_TO_START_LAND_SEQUENCE && fabsf(pathStatus->correction_direction_east) < RTB_LAND_NE_DISTANCE_REQUIRED_TO_START_LAND_SEQUENCE) {
                 plan_setup_land();
             }
         }

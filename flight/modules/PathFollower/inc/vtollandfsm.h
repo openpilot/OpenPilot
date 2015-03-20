@@ -81,7 +81,7 @@ protected:
 
     // FSM instance data type
     typedef struct {
-        StatusVtolLandData   fsmLandStatus;
+        StatusVtolLandData  fsmLandStatus;
         PathFollowerFSM_LandState_T currentState;
         TakeOffLocationData takeOffLocation;
         uint32_t stateRunCount;

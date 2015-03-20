@@ -127,8 +127,8 @@ int32_t VtolLandFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollow
     PIOS_Assert(ptr_flightStatus);
 
     if (mLandData == 0) {
-	mLandData = (VtolLandFSMData_T *)pios_malloc(sizeof(VtolLandFSMData_T));
-      PIOS_Assert(mLandData);
+        mLandData = (VtolLandFSMData_T *)pios_malloc(sizeof(VtolLandFSMData_T));
+        PIOS_Assert(mLandData);
     }
     memset(mLandData, sizeof(VtolLandFSMData_T), 0);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;

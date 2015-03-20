@@ -41,6 +41,7 @@ public:
     PIDControlDown();
     ~PIDControlDown();
     void Initialize(PathFollowerFSM *fsm);
+    void SetThrustLimits(float min_thrust, float max_thrust);
     void Deactivate();
     void Activate();
     void UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax);
@@ -74,6 +75,8 @@ private:
     struct pid PIDpos;
     float mPositionSetpointTarget;
     float mPositionState;
+    float mMinThrust;
+    float mMaxThrust;
     uint8_t mActive;
 
     struct NeutralThrustEstimation {
@@ -81,7 +84,6 @@ private:
         float    sum;
         float    average;
         float    correction;
-        float    algo_erro_check;
         float    min;
         float    max;
         bool     start_sampling;

@@ -42,7 +42,6 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-#include <homelocation.h>
 #include <accelstate.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
@@ -52,10 +51,8 @@ extern "C" {
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
 #include <takeofflocation.h>
-#include <poilocation.h>
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
 #include <stabilizationbank.h>
@@ -138,8 +135,6 @@ void VtolBrakeController::SettingsUpdated(void)
                                vtolPathFollowerSettings->BrakeHorizontalVelPID.ILimit,
                                dT,
                                10.0f * vtolPathFollowerSettings->HorizontalVelMax); // avoid constraining initial fast entry into brake
-
-
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
     controlNE.UpdateCommandParameters(-vtolPathFollowerSettings->BrakeMaxPitch, vtolPathFollowerSettings->BrakeMaxPitch, vtolPathFollowerSettings->BrakeVelocityFeedforward);
 
@@ -149,9 +144,9 @@ void VtolBrakeController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->LandVerticalVelPID.Beta,
                                  dT,
                                  10.0f * vtolPathFollowerSettings->VerticalVelMax); // avoid constraining initial fast entry into brake
-    controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
+    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
+    controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
 
-    // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
@@ -166,10 +161,10 @@ int32_t VtolBrakeController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPa
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    if (fsm==0) {
-	VtolBrakeFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus, pathStatus);
-	fsm = (PathFollowerFSM *)VtolBrakeFSM::instance();
-	controlDown.Initialize(fsm);
+    if (fsm == 0) {
+        VtolBrakeFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus, pathStatus);
+        fsm = (PathFollowerFSM *)VtolBrakeFSM::instance();
+        controlDown.Initialize(fsm);
     }
     return 0;
 }
@@ -319,8 +314,10 @@ int8_t VtolBrakeController::UpdateStabilizationDesired(void)
             break;
         }
         stabDesired.StabilizationMode.Thrust = thrustMode;
-        stabDesired.Thrust = manualControl.Thrust;
-    } else if (mManualThrust) {
+    }
+
+    // set the thrust value
+    if (mManualThrust) {
         stabDesired.Thrust = manualControl.Thrust;
     } else {
         stabDesired.Thrust = controlDown.GetDownCommand();

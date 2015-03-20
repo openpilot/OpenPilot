@@ -37,7 +37,6 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-#include <homelocation.h>
 #include <accelstate.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
@@ -47,10 +46,8 @@ extern "C" {
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
 #include <takeofflocation.h>
-#include <poilocation.h>
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
 #include <stabilizationbank.h>
@@ -71,7 +68,7 @@ extern "C" {
 VtolLandController *VtolLandController::p_inst = 0;
 
 VtolLandController::VtolLandController()
-    : fsm(0), vtolPathFollowerSettings(0), mActive(false)
+    : fsm(NULL), vtolPathFollowerSettings(NULL), mActive(false)
 {}
 
 // Called when mode first engaged
@@ -137,10 +134,15 @@ void VtolLandController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->LandVerticalVelPID.Beta,
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
-    // TODO Add trigger for this
+
+    // The following is not currently used in the landing control.
+    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
+
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    // initialise limits on thrust but note the FSM can override.
+    controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
     fsm->SettingsUpdated();
 }
 
@@ -152,10 +154,10 @@ int32_t VtolLandController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPat
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
     if (fsm == 0) {
-    fsm = (PathFollowerFSM *)VtolLandFSM::instance();
-    VtolLandFSM::instance()->Initialize(ptr_vtolPathFollowerSettings, pathDesired, flightStatus);
-    vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    controlDown.Initialize(fsm);
+        fsm = (PathFollowerFSM *)VtolLandFSM::instance();
+        VtolLandFSM::instance()->Initialize(ptr_vtolPathFollowerSettings, pathDesired, flightStatus);
+        vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
+        controlDown.Initialize(fsm);
     }
 
     return 0;
@@ -254,7 +256,7 @@ void VtolLandController::UpdateAutoPilot()
     UpdateVelocityDesired();
 
     // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
-    bool yaw_attitude = true;
+    bool yaw_attitude = false;
     float yaw = 0.0f;
 
     fsm->GetYaw(yaw_attitude, yaw);

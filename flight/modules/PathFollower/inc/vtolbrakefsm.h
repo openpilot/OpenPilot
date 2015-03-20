@@ -95,11 +95,8 @@ protected:
     PathStatusData *pathStatus;
     FlightStatusData *flightStatus;
 
-    void setup_inactive(void);
     void setup_brake(void);
-    void setup_hold(void);
     void run_brake(uint8_t);
-    void run_hold(uint8_t);
     void initFSM(void);
     void setState(PathFollowerFSM_BrakeState_T newState, VtolBrakeFSMStatusStateExitReasonOptions reason);
     int32_t runState();

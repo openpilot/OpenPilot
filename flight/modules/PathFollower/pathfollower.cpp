@@ -180,7 +180,6 @@ extern "C" int32_t PathFollowerInitialize()
     // Init references to controllers
     PathFollowerControl::Initialize(&pathDesired, &flightStatus, &pathStatus);
 
-
     // Create object queue
     pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_PATHFOLLOWER, STACK_SIZE_BYTES);
     FixedWingPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
@@ -190,6 +189,7 @@ extern "C" int32_t PathFollowerInitialize()
     FlightStatusConnectCallback(&flightStatusUpdatedCb);
     SystemSettingsConnectCallback(&SettingsUpdatedCb);
     AirspeedStateConnectCallback(&airspeedStateUpdatedCb);
+    VtolSelfTuningStatsConnectCallback(&SettingsUpdatedCb);
 
     return 0;
 }

@@ -69,7 +69,7 @@ extern "C" {
 GroundDriveController *GroundDriveController::p_inst = 0;
 
 GroundDriveController::GroundDriveController()
-    : groundSettings(0), mActive(false)
+    : groundSettings(0), mActive(false), mMode(0)
 {}
 
 // Called when mode first engaged
@@ -79,7 +79,6 @@ void GroundDriveController::Activate(void)
         mActive = true;
         SettingsUpdated();
         controlNE.Activate();
-        resetGlobals();
         mMode = pathDesired->Mode;
     }
 }
@@ -102,7 +101,6 @@ void GroundDriveController::Deactivate(void)
 {
     if (mActive) {
         mActive = false;
-        resetGlobals();
         controlNE.Deactivate();
     }
 }
@@ -135,17 +133,7 @@ int32_t GroundDriveController::Initialize(GroundPathFollowerSettingsData *ptr_gr
 
     groundSettings = ptr_groundSettings;
 
-    resetGlobals();
-
     return 0;
-}
-
-/**
- * reset integrals
- */
-void GroundDriveController::resetGlobals()
-{
-    pathStatus->path_time = 0.0f;
 }
 
 void GroundDriveController::UpdateAutoPilot()
@@ -205,28 +193,6 @@ void GroundDriveController::updatePathVelocity(float kFF)
     velocityDesired.East  = east;
     velocityDesired.Down  = 0.0f;
 
-#if 0
-    if (limited &&
-        // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
-        // it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
-        // once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
-        // leading to an S-shape snake course the wrong way
-        // this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
-        // turn steep unless there is enough space complete the turn before crossing the flightpath
-        // in this case the plane effectively needs to be turned around
-        // indicators:
-        // difference between correction_direction and velocitystate >90 degrees and
-        // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
-        // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
-        // calculating angles < 90 degrees through dot products
-        (vector_lengthf(progress.path_vector, 2) > 1e-6f) &&
-        ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
-        ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
-        ;
-    }
-#endif
-
-
     // update pathstatus
     pathStatus->error = progress.error;
     pathStatus->fractional_progress  = progress.fractional_progress;
@@ -276,7 +242,7 @@ uint8_t GroundDriveController::updateGroundDesiredAttitude()
     float lateralCommand = boundf(-northCommand * sine_angle + eastCommand * cos_angle, -groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max);
     float forwardCommand = boundf(northCommand * cos_angle + eastCommand * sine_angle, -groundSettings->ThrustLimit.Max, groundSettings->ThrustLimit.Max);
     // +ve facing correct direction, lateral command should just correct angle,
-    if (forwardCommand >= 0.1f) {
+    if (forwardCommand > 0.0f) {
         // if +ve forward command, -+ lateralCommand drives steering to manage lateral error and angular error
 
         courseCommand = boundf(lateralCommand, -1.0f, 1.0f);

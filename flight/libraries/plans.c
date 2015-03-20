@@ -453,16 +453,6 @@ void plan_run_VelocityRoam()
     cmd.Pitch = applyExpo(cmd.Pitch, stabSettings.StickExpo.Pitch);
     cmd.Yaw   = applyExpo(cmd.Yaw, stabSettings.StickExpo.Yaw);
 
-#if 0
-    FlightModeSettingsVarioControlLowPassAlphaGet(&alpha);
-    vario_control_lowpass[0] = alpha * vario_control_lowpass[0] + (1.0f - alpha) * cmd.Roll;
-    vario_control_lowpass[1] = alpha * vario_control_lowpass[1] + (1.0f - alpha) * cmd.Pitch;
-    vario_control_lowpass[2] = alpha * vario_control_lowpass[2] + (1.0f - alpha) * cmd.Yaw;
-    cmd.Roll  = vario_control_lowpass[0];
-    cmd.Pitch = vario_control_lowpass[1];
-    cmd.Yaw   = vario_control_lowpass[2];
-#endif
-
     bool flagRollPitchHasInput = (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f);
 
     if (!flagRollPitchHasInput) {

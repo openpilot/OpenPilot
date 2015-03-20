@@ -58,7 +58,9 @@ extern "C" {
 
 
 PIDControlDown::PIDControlDown()
-    : deltaTime(0), mVelocitySetpointTarget(0), mVelocityState(0), mDownCommand(0.0f), mFSM(0), mNeutral(0.5f), mActive(false)
+    : deltaTime(0.0f), mVelocitySetpointTarget(0.0f), mVelocitySetpointCurrent(0.0f), mVelocityState(0.0f), mDownCommand(0.0f),
+    mFSM(NULL), mNeutral(0.5f), mVelocityMax(1.0f), mPositionSetpointTarget(0.0f), mPositionState(0.0f),
+    mMinThrust(0.1f), mMaxThrust(0.6f), mActive(false)
 {
     Deactivate();
 }
@@ -67,11 +69,10 @@ PIDControlDown::~PIDControlDown() {}
 
 void PIDControlDown::Initialize(PathFollowerFSM *fsm)
 {
-    PIOS_Assert(fsm);
     mFSM = fsm;
 }
 
-void PIDControlDown::Initialize(float min_thrust, float max_thrust)
+void PIDControlDown::SetThrustLimits(float min_thrust, float max_thrust)
 {
     mMinThrust = min_thrust;
     mMaxThrust = max_thrust;
@@ -103,10 +104,24 @@ void PIDControlDown::UpdateParameters(float kp, float ki, float kd, float beta, 
     float N  = 10.0f;
     float Tf = Td / N;
 
+    if (ki < 1e-6f) {
+	// Avoid Ti being infinite
+	Ti = 1e6f;
+	// Tt antiwindup time constant - we don't need antiwindup with no I term
+	Tt = 1e6f;
+	kt = 0.0f;
+    }
+
     if (kd < 1e-6f) {
-        // PI Controller
+        // PI Controller or P Controller
         Tf = Ti / N;
     }
+
+    if (beta > 1.0f) {
+         beta = 1.0f;
+     } else if (beta < 0.4f) {
+         beta = 0.4f;
+     }
 
     pid2_configure(&PID, kp, ki, kd, Tf, kt, dT, beta, mNeutral, mNeutral, -1.0f);
     deltaTime    = dT;

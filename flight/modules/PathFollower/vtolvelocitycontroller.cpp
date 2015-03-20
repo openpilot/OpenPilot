@@ -37,25 +37,19 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-#include <homelocation.h>
-#include <accelstate.h>
 #include <vtolpathfollowersettings.h>
-#include <flightstatus.h>
 #include <flightmodesettings.h>
 #include <pathstatus.h>
 #include <positionstate.h>
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
-#include <takeofflocation.h>
-#include <poilocation.h>
+#include <flightstatus.h>
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
-#include <vtolselftuningstats.h>
 #include <pathsummary.h>
 }
 

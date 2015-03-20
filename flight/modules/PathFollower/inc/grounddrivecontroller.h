@@ -58,7 +58,6 @@ public:
     uint8_t Mode(void);
 
 private:
-    void resetGlobals();
     uint8_t updateAutoPilotGround();
     void updatePathVelocity(float kFF);
     uint8_t updateGroundDesiredAttitude();

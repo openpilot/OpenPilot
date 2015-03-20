@@ -37,7 +37,6 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-#include <homelocation.h>
 #include <accelstate.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
@@ -47,7 +46,6 @@ extern "C" {
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
 #include <takeofflocation.h>
 #include <poilocation.h>
@@ -68,12 +66,14 @@ extern "C" {
 // Private constants
 #define DEADBAND_HIGH 0.10f
 #define DEADBAND_LOW  -0.10f
+#define RTB_LAND_FRACTIONAL_PROGRESS_START_CHECKS 0.95f
+#define RTB_LAND_NE_DISTANCE_REQUIRED_TO_START_LAND_SEQUENCE 2.0f
 
 // pointer to a singleton instance
 VtolFlyController *VtolFlyController::p_inst = 0;
 
 VtolFlyController::VtolFlyController()
-    : vtolPathFollowerSettings(0), mActive(false), mManualThrust(false), mMode(0), vtolEmergencyFallback(0.0f), vtolEmergencyFallbackSwitch(false)
+    : vtolPathFollowerSettings(NULL), mActive(false), mManualThrust(false), mMode(0), vtolEmergencyFallback(0.0f), vtolEmergencyFallbackSwitch(false)
 {}
 
 // Called when mode first engaged
@@ -140,10 +140,11 @@ void VtolFlyController::SettingsUpdated(void)
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
     controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
-    // TODO Add trigger for this
+
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
 }
 
 /**
@@ -155,7 +156,6 @@ int32_t VtolFlyController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPath
     PIOS_Assert(ptr_vtolPathFollowerSettings);
 
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
-    controlDown.Initialize(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
 
     return 0;
 }
@@ -366,8 +366,8 @@ void VtolFlyController::UpdateAutoPilot()
     // can't manage this.  And pathplanner whilst similar does not manage this as it is not a
     // waypoint traversal and is not aware of flight modes other than path plan.
     if ((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND] == FLIGHTMODESETTINGS_RETURNTOBASENEXTCOMMAND_LAND) {
-        if (pathStatus->fractional_progress > 0.95f) {
-            if (fabsf(pathStatus->correction_direction_north) < 2.0f && fabsf(pathStatus->correction_direction_east) < 2.0f) {
+        if (pathStatus->fractional_progress > RTB_LAND_FRACTIONAL_PROGRESS_START_CHECKS) {
+            if (fabsf(pathStatus->correction_direction_north) < RTB_LAND_NE_DISTANCE_REQUIRED_TO_START_LAND_SEQUENCE && fabsf(pathStatus->correction_direction_east) < RTB_LAND_NE_DISTANCE_REQUIRED_TO_START_LAND_SEQUENCE) {
                 plan_setup_land();
             }
         }

@@ -69,7 +69,7 @@ extern "C" {
 FixedWingFlyController *FixedWingFlyController::p_inst = 0;
 
 FixedWingFlyController::FixedWingFlyController()
-    : fixedWingSettings(0), mActive(false), indicatedAirspeedStateBias(0.0f)
+    : fixedWingSettings(NULL), mActive(false), mMode(0), indicatedAirspeedStateBias(0.0f)
 {}
 
 // Called when mode first engaged

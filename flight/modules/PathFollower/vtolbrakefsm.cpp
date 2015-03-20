@@ -61,11 +61,13 @@ extern "C" {
 
 // Private constants
 #define TIMER_COUNT_PER_SECOND (1000 / vtolPathFollowerSettings->UpdatePeriod)
+#define BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK 0.95f
+#define BRAKE_EXIT_VELOCITY_LIMIT                   0.2f
 
 VtolBrakeFSM::PathFollowerFSM_BrakeStateHandler_T VtolBrakeFSM::sBrakeStateTable[BRAKE_STATE_SIZE] = {
-    [BRAKE_STATE_INACTIVE] = { .setup = &VtolBrakeFSM::setup_inactive, .run = 0                        },
+    [BRAKE_STATE_INACTIVE] = { .setup = 0,			 .run = 0                        },
     [BRAKE_STATE_BRAKE]    = { .setup = &VtolBrakeFSM::setup_brake,    .run = &VtolBrakeFSM::run_brake },
-    [BRAKE_STATE_HOLD]     = { .setup = &VtolBrakeFSM::setup_hold,     .run = &VtolBrakeFSM::run_hold  }
+    [BRAKE_STATE_HOLD]     = { .setup = 0,     .run = 0  }
 };
 
 // pointer to a singleton instance
@@ -75,6 +77,7 @@ VtolBrakeFSM *VtolBrakeFSM::p_inst = 0;
 VtolBrakeFSM::VtolBrakeFSM()
     : mBrakeData(0), vtolPathFollowerSettings(0), pathDesired(0), flightStatus(0)
 {}
+
 
 // Private types
 
@@ -190,7 +193,6 @@ void VtolBrakeFSM::setState(PathFollowerFSM_BrakeState_T newState, __attribute__
         (this->*sBrakeStateTable[mBrakeData->currentState].setup)();
     }
 
-    // updateVtolBrakeFSMStatus();
 }
 
 
@@ -200,28 +202,7 @@ void VtolBrakeFSM::setStateTimeout(int32_t count)
     mBrakeData->stateTimeoutCount = count;
 }
 
-#if 0
-void VtolBrakeFSM::updateVtolBrakeFSMStatus()
-{
-    mBrakeData->fsmBrakeStatus.State = mBrakeData->currentState;
-    if (mBrakeData->flLowAltitude) {
-        mBrakeData->fsmBrakeStatus.AltitudeState = FSMBRAKESTATUS_ALTITUDESTATE_LOW;
-    } else {
-        mBrakeData->fsmBrakeStatus.AltitudeState = FSMBRAKESTATUS_ALTITUDESTATE_HIGH;
-    }
-    VtolBrakeFSMStatusSet(&mBrakeData->fsmBrakeStatus);
-}
-#endif
-
-
 // FSM Setup and Run method implementation
-
-// State: INACTIVE
-void VtolBrakeFSM::setup_inactive(void)
-{
-    // Re-initialise local variables
-}
-
 
 // State: WAITING FOR DESCENT RATE
 void VtolBrakeFSM::setup_brake(void)
@@ -231,12 +212,10 @@ void VtolBrakeFSM::setup_brake(void)
     mBrakeData->observation2Count = 0;
 }
 
-#define BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK 0.95f
-#define BRAKE_EXIT_VELOCITY_LIMIT                   0.2f
 
 void VtolBrakeFSM::run_brake(uint8_t flTimeout)
 {
-// Brake mode end condition checks
+  // Brake mode end condition checks
     bool exit_brake = false;
     VelocityStateData velocityState;
     PathSummaryData pathSummary;
@@ -276,15 +255,6 @@ void VtolBrakeFSM::run_brake(uint8_t flTimeout)
         setState(BRAKE_STATE_HOLD, FSMBRAKESTATUS_STATEEXITREASON_NONE);
     }
 }
-
-// abort repeatedly overwrites pathfollower's objective on a brakeing abort and
-// continues to do so until a flight mode change.
-void VtolBrakeFSM::setup_hold(void)
-{}
-
-void VtolBrakeFSM::run_hold(__attribute__((unused)) uint8_t flTimeout)
-{}
-
 
 uint8_t VtolBrakeFSM::PositionHoldState(void)
 {

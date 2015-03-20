@@ -76,19 +76,27 @@ void PIDControlNE::UpdateParameters(float kp, float ki, float kd, float beta, fl
     float Td = kd / kp;
     float Tt = (Ti + Td) / 2.0f;
     float kt = 1.0f / Tt;
-
-    if (beta > 1.0f) {
-        beta = 1.0f;
-    } else if (beta < 0.4f) {
-        beta = 0.4f;
-    }
     float u0 = 0.0f;
     float N  = 10.0f;
     float Tf = Td / N;
 
+    if (ki < 1e-6f) {
+	// Avoid Ti being infinite
+	Ti = 1e6f;
+	// Tt antiwindup time constant - we don't need antiwindup with no I term
+	Tt = 1e6f;
+	kt = 0.0f;
+    }
+
     if (kd < 1e-6f) {
         // PI Controller
         Tf = Ti / N;
+    }
+
+    if (beta > 1.0f) {
+         beta = 1.0f;
+    } else if (beta < 0.4f) {
+         beta = 0.4f;
     }
 
     pid2_configure(&PIDvel[0], kp, ki, kd, Tf, kt, dT, beta, u0, 0.0f, 1.0f);
@@ -182,10 +190,8 @@ void PIDControlNE::UpdateVelocityStateWithBrake(float pvNorth, float pvEast, flo
     UpdateBrakeVelocity(mVelocitySetpointTarget[0], path_time, brakeRate, pvNorth, &velocitySetpointDesired[0]);
     UpdateBrakeVelocity(mVelocitySetpointTarget[1], path_time, brakeRate, pvEast, &velocitySetpointDesired[1]);
 
-    // Calculate the rate of change
+    // If rate of change limits required, add here
     for (int iaxis = 0; iaxis < 2; iaxis++) {
-        // RateLimit(velocitySetpointDesired[iaxis], mVelocitySetpointCurrent[iaxis], 2.0f );
-
         mVelocitySetpointCurrent[iaxis] = velocitySetpointDesired[iaxis];
     }
 }
@@ -200,10 +206,8 @@ void PIDControlNE::UpdateVelocityState(float pvNorth, float pvEast)
     velocitySetpointDesired[0] = mVelocitySetpointTarget[0];
     velocitySetpointDesired[1] = mVelocitySetpointTarget[1];
 
-    // Calculate the rate of change
+    // If rate of change limits required, add here
     for (int iaxis = 0; iaxis < 2; iaxis++) {
-        // RateLimit(velocitySetpointDesired[iaxis], mVelocitySetpointCurrent[iaxis], 2.0f );
-
         mVelocitySetpointCurrent[iaxis] = velocitySetpointDesired[iaxis];
     }
 }

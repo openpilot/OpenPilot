@@ -37,7 +37,6 @@ extern "C" {
 #include "plans.h"
 #include <sanitycheck.h>
 
-#include <homelocation.h>
 #include <accelstate.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
@@ -47,10 +46,8 @@ extern "C" {
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
 #include <takeofflocation.h>
-#include <poilocation.h>
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
 #include <stabilizationbank.h>
@@ -71,7 +68,7 @@ extern "C" {
 VtolLandController *VtolLandController::p_inst = 0;
 
 VtolLandController::VtolLandController()
-    : fsm(0), vtolPathFollowerSettings(0), mActive(false)
+    : fsm(NULL), vtolPathFollowerSettings(NULL), mActive(false)
 {}
 
 // Called when mode first engaged
@@ -141,10 +138,11 @@ void VtolLandController::SettingsUpdated(void)
     // The following is not currently used in the landing control.
     controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
 
-    // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    // initialise limits on thrust but note the FSM can override.
+    controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
     fsm->SettingsUpdated();
 }
 

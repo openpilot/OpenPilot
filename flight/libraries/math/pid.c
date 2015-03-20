@@ -147,14 +147,17 @@ void pid_configure(struct pid *pid, float p, float i, float d, float iLim)
 
 /**
  * Configure the settings for a pid2 structure
- * @param[out] pid The PID structure to configure
+ * @param[out] pid The PID2 structure to configure
  * @param[in] kp proportional gain
  * @param[in] ki integral gain.  Time constant Ti = kp/ki
  * @param[in] kd derivative gain. Time constant Td = kd/kp
- * @param[in] kt tracking gain for anti-windup. Tt = √TiTd and Tt = (Ti + Td)/2
  * @param[in] Tf filtering time = (kd/k)/N, N is in the range of 2 to 20
- * @param[in] beta setpoint weight on setpoint in P component.  beta=1 error feedback. beta=0 smooths out response to changes in setpoint
+ * @param[in] kt tracking gain for anti-windup. Tt = √TiTd and Tt = (Ti + Td)/2
+ * @param[in] dt delta time increment
+ * @param[in] beta setpoint weight on setpoint in P component.  beta=1 error feedback. beta=0 smoothes out response to changes in setpoint
  * @param[in] u0 initial output for r=y at activation to achieve bumpless transfer
+ * @param[in] va constant for compute of actuator output for check against limits for antiwindup
+ * @param[in] vb multiplier for compute of actuator output for check against limits for anti-windup
  */
 void pid2_configure(struct pid2 *pid, float kp, float ki, float kd, float Tf, float kt, float dT, float beta, float u0, float va, float vb)
 {

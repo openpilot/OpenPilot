@@ -72,6 +72,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     accessoryDesiredObj1  = AccessoryDesired::GetInstance(getObjectManager(), 1);
     accessoryDesiredObj2  = AccessoryDesired::GetInstance(getObjectManager(), 2);
     actuatorSettingsObj   = ActuatorSettings::GetInstance(getObjectManager());
+    systemSettingsObj     = SystemSettings::GetInstance(getObjectManager());
 
     // Only instance 0 is present if the board is not connected.
     // The other instances are populated lazily.
@@ -351,9 +352,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
 
     groundChannelOrder << ManualControlSettings::CHANNELGROUPS_THROTTLE <<
         ManualControlSettings::CHANNELGROUPS_YAW <<
-        ManualControlSettings::CHANNELGROUPS_ACCESSORY0 <<
-        ManualControlSettings::CHANNELGROUPS_ACCESSORY1 <<
-        ManualControlSettings::CHANNELGROUPS_ACCESSORY2;
+        ManualControlSettings::CHANNELGROUPS_ACCESSORY0;
 
     updateEnableControls();
 }
@@ -770,7 +769,11 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         if (wizardUi->typeAcro->isChecked()) {
             transmitterType = acro;
         } else if (wizardUi->typeGround->isChecked()) {
-            transmitterType = ground;
+            transmitterType    = ground;
+            /* Make sure to tell controller, this is really a ground vehicle. */
+            systemSettingsData = systemSettingsObj->getData();
+            systemSettingsData.AirframeType = SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR;
+            systemSettingsObj->setData(systemSettingsData);
         } else {
             transmitterType = heli;
         }
@@ -1688,6 +1691,10 @@ void ConfigInputWidget::simpleCalibration(bool enable)
             transmitterType = ground;
             manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
                 manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
+            /* Make sure to tell controller, this is really a ground vehicle. */
+            systemSettingsData = systemSettingsObj->getData();
+            systemSettingsData.AirframeType = SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR;
+            systemSettingsObj->setData(systemSettingsData);
         }
 
         restoreMdataSingle(manualCommandObj, &manualControlMdata);

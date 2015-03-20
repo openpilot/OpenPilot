@@ -50,6 +50,7 @@
 #include "flightstatus.h"
 #include "accessorydesired.h"
 #include <QPointer>
+#include "systemsettings.h"
 
 class Ui_InputWidget;
 
@@ -138,6 +139,9 @@ private:
     FlightModeSettings::DataFields previousFlightModeSettingsData;
     ReceiverActivity *receiverActivityObj;
     ReceiverActivity::DataFields receiverActivityData;
+
+    SystemSettings *systemSettingsObj;
+    SystemSettings::DataFields systemSettingsData;
 
     QSvgRenderer *m_renderer;
 

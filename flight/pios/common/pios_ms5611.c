@@ -42,7 +42,9 @@
 #ifndef PIOS_MS5611_SLOW_TEMP_RATE
 #define PIOS_MS5611_SLOW_TEMP_RATE 1
 #endif
-
+// Running moving average smoothing factor
+#define PIOS_MS5611_TEMP_SMOOTHING 10
+//
 /* Local Types */
 typedef struct {
     uint16_t C[6];
@@ -248,8 +250,9 @@ int32_t PIOS_MS5611_ReadADC(void)
         // Actual temperature (-40…85°C with 0.01°C resolution)
         // TEMP = 20°C + dT * TEMPSENS = 2000 + dT * C6 / 2^23
         Temperature = 2000l + ((deltaTemp * CalibData.C[5]) / POW2(23));
-        if(FilteredTemperature != INT32_MIN){
-            FilteredTemperature = (FilteredTemperature * 9 + Temperature) / 10;
+        if (FilteredTemperature != INT32_MIN) {
+            FilteredTemperature = (FilteredTemperature * (PIOS_MS5611_TEMP_SMOOTHING - 1)
+                                   + Temperature) / PIOS_MS5611_TEMP_SMOOTHING;
         } else {
             FilteredTemperature = Temperature;
         }

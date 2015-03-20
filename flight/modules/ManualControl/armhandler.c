@@ -310,6 +310,8 @@ static bool okToArm(void)
         return true;
 
         break;
+    case FLIGHTSTATUS_FLIGHTMODE_LAND:
+        return false;
 
     default:
         return false;

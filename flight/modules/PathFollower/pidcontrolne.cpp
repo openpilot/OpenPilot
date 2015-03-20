@@ -81,11 +81,11 @@ void PIDControlNE::UpdateParameters(float kp, float ki, float kd, float beta, fl
     float Tf = Td / N;
 
     if (ki < 1e-6f) {
-	// Avoid Ti being infinite
-	Ti = 1e6f;
-	// Tt antiwindup time constant - we don't need antiwindup with no I term
-	Tt = 1e6f;
-	kt = 0.0f;
+        // Avoid Ti being infinite
+        Ti = 1e6f;
+        // Tt antiwindup time constant - we don't need antiwindup with no I term
+        Tt = 1e6f;
+        kt = 0.0f;
     }
 
     if (kd < 1e-6f) {
@@ -94,9 +94,9 @@ void PIDControlNE::UpdateParameters(float kp, float ki, float kd, float beta, fl
     }
 
     if (beta > 1.0f) {
-         beta = 1.0f;
+        beta = 1.0f;
     } else if (beta < 0.4f) {
-         beta = 0.4f;
+        beta = 0.4f;
     }
 
     pid2_configure(&PIDvel[0], kp, ki, kd, Tf, kt, dT, beta, u0, 0.0f, 1.0f);

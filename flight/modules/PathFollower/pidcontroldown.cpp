@@ -105,11 +105,11 @@ void PIDControlDown::UpdateParameters(float kp, float ki, float kd, float beta, 
     float Tf = Td / N;
 
     if (ki < 1e-6f) {
-	// Avoid Ti being infinite
-	Ti = 1e6f;
-	// Tt antiwindup time constant - we don't need antiwindup with no I term
-	Tt = 1e6f;
-	kt = 0.0f;
+        // Avoid Ti being infinite
+        Ti = 1e6f;
+        // Tt antiwindup time constant - we don't need antiwindup with no I term
+        Tt = 1e6f;
+        kt = 0.0f;
     }
 
     if (kd < 1e-6f) {
@@ -118,10 +118,10 @@ void PIDControlDown::UpdateParameters(float kp, float ki, float kd, float beta, 
     }
 
     if (beta > 1.0f) {
-         beta = 1.0f;
-     } else if (beta < 0.4f) {
-         beta = 0.4f;
-     }
+        beta = 1.0f;
+    } else if (beta < 0.4f) {
+        beta = 0.4f;
+    }
 
     pid2_configure(&PID, kp, ki, kd, Tf, kt, dT, beta, mNeutral, mNeutral, -1.0f);
     deltaTime    = dT;

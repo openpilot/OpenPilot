@@ -60,14 +60,14 @@ extern "C" {
 
 
 // Private constants
-#define TIMER_COUNT_PER_SECOND (1000 / vtolPathFollowerSettings->UpdatePeriod)
+#define TIMER_COUNT_PER_SECOND                      (1000 / vtolPathFollowerSettings->UpdatePeriod)
 #define BRAKE_FRACTIONALPROGRESS_STARTVELOCITYCHECK 0.95f
 #define BRAKE_EXIT_VELOCITY_LIMIT                   0.2f
 
 VtolBrakeFSM::PathFollowerFSM_BrakeStateHandler_T VtolBrakeFSM::sBrakeStateTable[BRAKE_STATE_SIZE] = {
-    [BRAKE_STATE_INACTIVE] = { .setup = 0,			 .run = 0                        },
-    [BRAKE_STATE_BRAKE]    = { .setup = &VtolBrakeFSM::setup_brake,    .run = &VtolBrakeFSM::run_brake },
-    [BRAKE_STATE_HOLD]     = { .setup = 0,     .run = 0  }
+    [BRAKE_STATE_INACTIVE] = { .setup = 0,                          .run = 0                        },
+    [BRAKE_STATE_BRAKE]    = { .setup = &VtolBrakeFSM::setup_brake, .run = &VtolBrakeFSM::run_brake },
+    [BRAKE_STATE_HOLD]     = { .setup = 0,                          .run = 0                        }
 };
 
 // pointer to a singleton instance
@@ -215,7 +215,7 @@ void VtolBrakeFSM::setup_brake(void)
 
 void VtolBrakeFSM::run_brake(uint8_t flTimeout)
 {
-  // Brake mode end condition checks
+    // Brake mode end condition checks
     bool exit_brake = false;
     VelocityStateData velocityState;
     PathSummaryData pathSummary;

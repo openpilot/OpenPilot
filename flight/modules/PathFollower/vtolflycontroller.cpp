@@ -64,9 +64,9 @@ extern "C" {
 #include "pidcontrolne.h"
 
 // Private constants
-#define DEADBAND_HIGH 0.10f
-#define DEADBAND_LOW  -0.10f
-#define RTB_LAND_FRACTIONAL_PROGRESS_START_CHECKS 0.95f
+#define DEADBAND_HIGH                                        0.10f
+#define DEADBAND_LOW                                         -0.10f
+#define RTB_LAND_FRACTIONAL_PROGRESS_START_CHECKS            0.95f
 #define RTB_LAND_NE_DISTANCE_REQUIRED_TO_START_LAND_SEQUENCE 2.0f
 
 // pointer to a singleton instance

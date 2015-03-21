@@ -194,10 +194,41 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         parameters["conf_uport"]    = getUAVFieldValue(objManager, "HwSettings", "USB_HIDPort");
         parameters["conf_vport"]    = getUAVFieldValue(objManager, "HwSettings", "USB_VCPPort");
 
-        parameters["conf_rotation"] = QString("%1:%2:%3")
+        parameters["conf_rotation"] = QString("[%1:%2:%3]")
                                       .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 0))
                                       .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 1))
                                       .arg(getUAVFieldValue(objManager, "AttitudeSettings", "BoardRotation", 2));
+        parameters["conf_pidr"] = QString("[%1:%2:%3:%4][%5:%6:%7:%8][%9:%10:%11:%12]")
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "RollRatePID", 0))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "RollRatePID", 1))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "RollRatePID", 2))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "RollRatePID", 3))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "PitchRatePID", 0))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "PitchRatePID", 1))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "PitchRatePID", 2))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "PitchRatePID", 3))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "YawRatePID", 0))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "YawRatePID", 1))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "YawRatePID", 2))
+                                  .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "YawRatePID", 3));
+        parameters["conf_pia"] = QString("[%1:%2:%3][%4:%5:%6][%7:%8:%9]")
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "RollPI", 0))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "RollPI", 1))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "RollPI", 2))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "PitchPI", 0))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "PitchPI", 1))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "PitchPI", 2))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "YawPI", 0))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "YawPI", 1))
+                                 .arg(getUAVFieldValue(objManager, "StabilizationSettingsBank1", "YawPI", 2));
+
+        parameters["conf_tps"]     = getUAVFieldValue(objManager, "StabilizationSettingsBank1", "EnableThrustPIDScaling");
+        parameters["conf_piro"]    = getUAVFieldValue(objManager, "StabilizationSettingsBank1", "EnablePiroComp");
+
+        parameters["conf_fmcount"] = getUAVFieldValue(objManager, "ManualControlSettings", "FlightModeNumber");
+        parameters["conf_fmodes"]  = QString("[%1:%2:%3]").arg(getUAVFieldValue(objManager, "FlightModeSettings", "FlightModePosition", 0))
+                                     .arg(getUAVFieldValue(objManager, "FlightModeSettings", "FlightModePosition", 1))
+                                     .arg(getUAVFieldValue(objManager, "FlightModeSettings", "FlightModePosition", 2));
     }
 }
 

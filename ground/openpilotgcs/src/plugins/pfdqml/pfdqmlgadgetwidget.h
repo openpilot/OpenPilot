@@ -18,14 +18,30 @@
 #define PFDQMLGADGETWIDGET_H_
 
 #include "pfdqmlgadgetconfiguration.h"
-#include <QQuickView>
 
-class PfdQmlGadgetWidget : public QQuickView {
+#include <QQuickWidget>
+
+/*
+ * Note: QQuickWidget is an alternative to using QQuickView and QWidget::createWindowContainer().
+ * The restrictions on stacking order do not apply, making QQuickWidget the more flexible alternative,
+ * behaving more like an ordinary widget. This comes at the expense of performance.
+ * Unlike QQuickWindow and QQuickView, QQuickWidget involves rendering into OpenGL framebuffer objects.
+ * This will naturally carry a minor performance hit.
+ *
+ * Note: Using QQuickWidget disables the threaded render loop on all platforms.
+ * This means that some of the benefits of threaded rendering, for example Animator classes
+ * and vsync driven animations, will not be available.
+ *
+ * Note: Avoid calling winId() on a QQuickWidget. This function triggers the creation of a native window,
+ * resulting in reduced performance and possibly rendering glitches.
+ * The entire purpose of QQuickWidget is to render Quick scenes without a separate native window,
+ * hence making it a native widget should always be avoided.
+ */
+class PfdQmlGadgetWidget : public QQuickWidget {
     Q_OBJECT Q_PROPERTY(QString earthFile READ earthFile WRITE setEarthFile NOTIFY earthFileChanged)
     Q_PROPERTY(bool terrainEnabled READ terrainEnabled WRITE setTerrainEnabled NOTIFY terrainEnabledChanged)
 
     Q_PROPERTY(bool actualPositionUsed READ actualPositionUsed WRITE setActualPositionUsed NOTIFY actualPositionUsedChanged)
-
     Q_PROPERTY(QString speedUnit READ speedUnit WRITE setSpeedUnit NOTIFY speedUnitChanged)
     Q_PROPERTY(double speedFactor READ speedFactor WRITE setSpeedFactor NOTIFY speedFactorChanged)
     Q_PROPERTY(QString altitudeUnit READ altitudeUnit WRITE setAltitudeUnit NOTIFY altitudeUnitChanged)
@@ -37,8 +53,9 @@ class PfdQmlGadgetWidget : public QQuickView {
     Q_PROPERTY(double altitude READ altitude WRITE setAltitude NOTIFY altitudeChanged)
 
 public:
-    PfdQmlGadgetWidget(QWindow *parent = 0);
-    ~PfdQmlGadgetWidget();
+    PfdQmlGadgetWidget(QWidget *parent = 0);
+    virtual ~PfdQmlGadgetWidget();
+
     void setQmlFile(QString fn);
 
     QString earthFile() const
@@ -115,8 +132,6 @@ signals:
     void altitudeUnitChanged(QString arg);
     void altitudeFactorChanged(double arg);
 
-protected:
-    void mouseReleaseEvent(QMouseEvent *event);
 
 private:
     QString m_qmlFileName;

@@ -37,4 +37,4 @@ public:
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 
-#endif // PfdQmlGADGETFACTORY_H_
+#endif // PFDQMLGADGETFACTORY_H_

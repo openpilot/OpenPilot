@@ -32,8 +32,8 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 
-PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
-    QQuickView(parent),
+PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
+    QQuickWidget(parent),
     m_openGLEnabled(false),
     m_terrainEnabled(false),
     m_actualPositionUsed(false),
@@ -189,16 +189,6 @@ void PfdQmlGadgetWidget::setActualPositionUsed(bool arg)
         m_actualPositionUsed = arg;
         emit actualPositionUsedChanged(arg);
     }
-}
-
-void PfdQmlGadgetWidget::mouseReleaseEvent(QMouseEvent *event)
-{
-    // Reload the schene on the middle mouse button click.
-    if (event->button() == Qt::MiddleButton) {
-        setQmlFile(m_qmlFileName);
-    }
-
-    QQuickView::mouseReleaseEvent(event);
 }
 
 void PfdQmlGadgetWidget::setLatitude(double arg)

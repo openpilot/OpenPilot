@@ -50,4 +50,4 @@ private:
 private slots:
 };
 
-#endif // PfdQmlGADGETOPTIONSPAGE_H
+#endif // PFDQMLGADGETOPTIONSPAGE_H

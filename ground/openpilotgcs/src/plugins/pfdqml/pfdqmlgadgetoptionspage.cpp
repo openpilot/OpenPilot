@@ -27,8 +27,7 @@
 #include <QStringList>
 
 PfdQmlGadgetOptionsPage::PfdQmlGadgetOptionsPage(PfdQmlGadgetConfiguration *config, QObject *parent) :
-    IOptionsPage(parent),
-    m_config(config)
+    IOptionsPage(parent), options_page(NULL), m_config(config)
 {}
 
 // creates options page widget (uses the UI file)

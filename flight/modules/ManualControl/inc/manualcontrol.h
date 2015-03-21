@@ -32,6 +32,7 @@
 
 #include <openpilot.h>
 #include <flightstatus.h>
+#include <sanitycheck.h>
 
 typedef void (*handlerFunc)(bool newinit);
 
@@ -45,7 +46,7 @@ typedef struct controlHandlerStruct {
  * @input: ManualControlCommand, AccessoryDesired
  * @output: FlightStatus.Arming
  */
-void armHandler(bool newinit);
+void armHandler(bool newinit, FrameType_t frameType);
 
 /**
  * @brief Handler to control Manual flightmode - input directly steers actuators

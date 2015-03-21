@@ -137,10 +137,10 @@ void VtolAutoTakeoffController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->AutoTakeoffVerticalVelPID.Beta,
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
-    // TODO Add trigger for this
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
     fsm->SettingsUpdated();
 }
 
@@ -148,11 +148,11 @@ void VtolAutoTakeoffController::SettingsUpdated(void)
 int32_t VtolAutoTakeoffController::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollowerSettings)
 {
     PIOS_Assert(ptr_vtolPathFollowerSettings);
+    vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
 
     if (fsm == 0) {
 	fsm = (PathFollowerFSM *)VtolAutoTakeoffFSM::instance();
 	VtolAutoTakeoffFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus);
-	vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
 	controlDown.Initialize(fsm);
     }
     return 0;

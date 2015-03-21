@@ -40,8 +40,6 @@ extern "C" {
 
 #include <homelocation.h>
 #include <accelstate.h>
-#include <fixedwingpathfollowersettings.h>
-#include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>

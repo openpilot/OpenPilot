@@ -31,8 +31,6 @@ extern "C" {
 
 #include <math.h>
 #include <pid.h>
-#include <CoordinateConversions.h>
-#include <sin_lookup.h>
 #include <pathdesired.h>
 #include <paths.h>
 #include "plans.h"
@@ -40,8 +38,6 @@ extern "C" {
 
 #include <homelocation.h>
 #include <accelstate.h>
-#include <fixedwingpathfollowersettings.h>
-#include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
@@ -50,16 +46,14 @@ extern "C" {
 #include <velocitystate.h>
 #include <velocitydesired.h>
 #include <stabilizationdesired.h>
-#include <airspeedstate.h>
 #include <attitudestate.h>
 #include <takeofflocation.h>
-#include <poilocation.h>
 #include <manualcontrolcommand.h>
 #include <systemsettings.h>
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <vtolselftuningstats.h>
-#include <statusvtolland.h>
+#include <statusvtolautotakeoff.h>
 #include <pathsummary.h>
 }
 
@@ -149,7 +143,7 @@ void VtolAutoTakeoffFSM::Activate()
     mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
     TakeOffLocationGet(&(mAutoTakeoffData->takeOffLocation));
     mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeAtState[AUTOTAKEOFF_STATE_INACTIVE] = 0.0f;
-    // assessAltitude();
+    assessAltitude();
 
     if (pathDesired->Mode == PATHDESIRED_MODE_AUTOTAKEOFF) {
         setState(AUTOTAKEOFF_STATE_CHECKSTATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);

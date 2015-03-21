@@ -34,7 +34,6 @@
 
 #include <coreplugin/imode.h>
 
-
 QT_BEGIN_NAMESPACE
 class QWidget;
 class QUrl;
@@ -42,8 +41,6 @@ class QNetworkReply;
 QT_END_NAMESPACE
 
 namespace Welcome {
-struct WelcomeModePrivate;
-
 class WELCOME_EXPORT WelcomeMode : public Core::IMode {
     Q_OBJECT Q_PROPERTY(QString versionString READ versionString CONSTANT)
     Q_PROPERTY(QString newVersionText READ newVersionText NOTIFY newVersionTextChanged)
@@ -86,8 +83,7 @@ public slots:
     void triggerAction(const QString &actionId);
 
 private:
-    QWidget *m_container;
-    WelcomeModePrivate *m_d;
+    QWidget *m_widget;
     int m_priority;
     QString m_newVersionText;
 

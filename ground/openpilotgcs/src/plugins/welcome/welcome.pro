@@ -1,14 +1,18 @@
 TEMPLATE = lib
 TARGET = Welcome
-QT += network qml quick
+
+QT += network qml quick quickwidgets
 
 include(../../openpilotgcsplugin.pri)
 include(welcome_dependencies.pri)
 
-HEADERS += welcomeplugin.h \
+HEADERS += \
+    welcomeplugin.h \
     welcomemode.h \
     welcome_global.h
-SOURCES += welcomeplugin.cpp \
+
+SOURCES += \
+    welcomeplugin.cpp \
     welcomemode.cpp \
 
 RESOURCES += welcome.qrc

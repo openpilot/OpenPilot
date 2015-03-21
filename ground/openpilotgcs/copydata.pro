@@ -5,7 +5,29 @@ TEMPLATE = subdirs
 # Copy Qt runtime libraries into the build directory (to run or package)
 equals(copyqt, 1) {
 
-GCS_LIBRARY_PATH
+    # Copy QtQuick2 complete directories
+    # Some of these directories have a lot of files
+    # Easier to copy everything
+    QT_QUICK2_DIRS = QtQuick/Controls \
+                     QtQuick/Dialogs \
+                     QtQuick/Layouts \
+                     QtQuick/LocalStorage \
+                     QtQuick/Particles.2 \
+                     QtQuick/PrivateWidgets \
+                     QtQuick/Window.2 \
+                     QtQuick/XmlListModel \
+                     QtQuick.2
+
+    # create QtQuick directory
+    data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/QtQuick\") $$addNewline()
+
+    for(dir, QT_QUICK2_DIRS) {
+        data_copy.commands += @rm -rf $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
+        data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
+    }
+
+    data_copy.target = FORCE
+    QMAKE_EXTRA_TARGETS += data_copy
 
     linux {
 
@@ -63,30 +85,6 @@ GCS_LIBRARY_PATH
         for(lib, QT_PLUGIN_LIBS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/$$lib\") $$targetPath(\"$$GCS_QT_PLUGINS_PATH/$$lib\") $$addNewline()
         }
-
-        # Copy QtQuick2 complete directories
-        # Some of these directories have a lot of files
-        # Easier to copy everything
-        QT_QUICK2_DIRS = QtQuick/Controls \
-                         QtQuick/Dialogs \
-                         QtQuick/Layouts \
-                         QtQuick/LocalStorage \
-                         QtQuick/Particles.2 \
-                         QtQuick/PrivateWidgets \
-                         QtQuick/Window.2 \
-                         QtQuick/XmlListModel \
-                         QtQuick.2
-
-        # create QtQuick directory
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/QtQuick\") $$addNewline()
-
-        for(dir, QT_QUICK2_DIRS) {
-            data_copy.commands += @rm -rf $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
-            data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
-        }
-
-        data_copy.target = FORCE
-        QMAKE_EXTRA_TARGETS += data_copy
     }
 
     win32 {
@@ -151,27 +149,6 @@ GCS_LIBRARY_PATH
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
-        # Copy QtQuick2 complete directories
-        # Some of these directories have a lot of files
-        # Easier to copy everything
-        QT_QUICK2_DIRS = qtquick/controls \
-                         qtquick/dialogs \
-                         qtquick/layouts \
-                         qtquick/localstorage \
-                         qtquick/particles.2 \
-                         qtquick/privatewidgets \
-                         qtquick/window.2 \
-                         qtquick/xmllistmodel \
-                         qtquick.2
-
-        # create QtQuick directory
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/qtquick\") $$addNewline()
-
-        for(dir, QT_QUICK2_DIRS) {
-            data_copy.commands += @rm -rf $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
-            data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
-        }
-
         # copy OpenSSL DLLs
         OPENSSL_DLLS = \
             ssleay32.dll \
@@ -186,37 +163,5 @@ GCS_LIBRARY_PATH
         for(dll, OPENGL_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$${MESAWIN_DIR}/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
-
-        data_copy.target = FORCE
-        QMAKE_EXTRA_TARGETS += data_copy
-    }
-
-
-    macx {
-        #NOTE: debug dylib can be copied as they will be cleaned out with packaging scripts
-
-        # Copy QtQuick2 complete directories
-        # Some of these directories have a lot of files
-        # Easier to copy everything
-        QT_QUICK2_DIRS = QtQuick/Controls \
-                         QtQuick/Dialogs \
-                         QtQuick/Layouts \
-                         QtQuick/LocalStorage \
-                         QtQuick/Particles.2 \
-                         QtQuick/PrivateWidgets \
-                         QtQuick/Window.2 \
-                         QtQuick/XmlListModel \
-                         QtQuick.2
-
-        # create QtQuick directory
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/QtQuick\") $$addNewline()
-
-        for(dir, QT_QUICK2_DIRS) {
-            data_copy.commands += -@rm -rf $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
-            data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
-        }
-
-        data_copy.target = FORCE
-        QMAKE_EXTRA_TARGETS += data_copy
     }
 }

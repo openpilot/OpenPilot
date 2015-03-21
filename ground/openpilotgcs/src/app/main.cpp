@@ -260,6 +260,8 @@ void systemInit()
 #ifdef Q_OS_LINUX
     QApplication::setAttribute(Qt::AA_X11InitThreads, true);
 #endif
+    // protect QQuickWidget from native widgets like GLC ModelView
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
 }
 
 static QTextStream *logStream;

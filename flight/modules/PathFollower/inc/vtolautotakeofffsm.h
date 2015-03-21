@@ -43,6 +43,7 @@ typedef enum {
     AUTOTAKEOFF_STATE_SLOWSTART, // Slow start motors
     AUTOTAKEOFF_STATE_THRUSTUP, // Ramp motors up to neutral thrust
     AUTOTAKEOFF_STATE_TAKEOFF, // Ascend to target velocity
+    AUTOTAKEOFF_STATE_HOLD, // Hold position as completion of the sequence
     AUTOTAKEOFF_STATE_THRUSTDOWN, // Thrust down sequence
     AUTOTAKEOFF_STATE_THRUSTOFF, // Thrust is now off
     AUTOTAKEOFF_STATE_DISARMED, // Disarmed
@@ -119,6 +120,10 @@ protected:
 
     void setup_takeoff(void);
     void run_takeoff(uint8_t);
+
+    void setup_hold(void);
+    void run_hold(uint8_t);
+    uint8_t PositionHoldState(void);
 
     void setup_thrustup(void);
     void run_thrustup(uint8_t);

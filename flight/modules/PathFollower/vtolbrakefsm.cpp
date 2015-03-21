@@ -192,7 +192,6 @@ void VtolBrakeFSM::setState(PathFollowerFSM_BrakeState_T newState, __attribute__
     if (sBrakeStateTable[mBrakeData->currentState].setup) {
         (this->*sBrakeStateTable[mBrakeData->currentState].setup)();
     }
-
 }
 
 

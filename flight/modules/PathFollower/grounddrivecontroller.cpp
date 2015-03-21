@@ -79,7 +79,7 @@ void GroundDriveController::Activate(void)
         mActive = true;
         SettingsUpdated();
         controlNE.Activate();
-        mMode = pathDesired->Mode;
+        mMode   = pathDesired->Mode;
     }
 }
 
@@ -194,7 +194,7 @@ void GroundDriveController::updatePathVelocity(float kFF)
     velocityDesired.Down  = 0.0f;
 
     // update pathstatus
-    pathStatus->error = progress.error;
+    pathStatus->error     = progress.error;
     pathStatus->fractional_progress  = progress.fractional_progress;
     // FOLLOWVECTOR: desired velocity vector
     pathStatus->path_direction_north = progress.path_vector[0];

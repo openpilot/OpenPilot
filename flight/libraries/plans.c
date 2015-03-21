@@ -167,6 +167,8 @@ void plan_setup_returnToBase()
     PathDesiredSet(&pathDesired);
 }
 
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT 5.0f
+
 static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
 {
     PositionStateData positionState;
@@ -186,7 +188,7 @@ static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
 
     pathDesired->End.North = positionState.North;
     pathDesired->End.East  = positionState.East;
-    pathDesired->End.Down  = positionState.Down - 5.0f;
+    pathDesired->End.Down  = positionState.Down - AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT;
 
     pathDesired->StartingVelocity = 0.0f;
     pathDesired->EndingVelocity   = 0.0f;
@@ -211,6 +213,7 @@ typedef enum {
 } AutoTakeoffPlanState_T;
 static AutoTakeoffPlanState_T autotakeoffState = STATE_AUTOTAKEOFF_NONE;
 
+#define AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT 0.2f
 void plan_setup_AutoTakeoff()
 {
     autotakeoffState = STATE_AUTOTAKEOFF_WAITFORMIDTHROTTLE;
@@ -222,7 +225,7 @@ void plan_setup_AutoTakeoff()
     StabilizationDesiredGet(&stabiDesired);
 
     // Are we inflight?
-    if (flightStatus.Armed && stabiDesired.Thrust > 0.2f) {
+    if (flightStatus.Armed && stabiDesired.Thrust > AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT) {
         // ok assume already in flight and just enter position hold
         // if we are not actually inflight this will just be a violent autotakeoff
         autotakeoffState = STATE_AUTOTAKEOFF_POSITIONHOLD;
@@ -231,10 +234,12 @@ void plan_setup_AutoTakeoff()
         autotakeoffState = STATE_AUTOTAKEOFF_REQUIRE_UNARMED_FIRST;
         // Note that if this mode was invoked unintentionally whilst in flight, effectively
         // all inputs get ignored and the vtol continues to fly to its previous
-        // stabi command.    Can we detect motors running?
+        // stabi command.
     }
 }
 
+#define AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START 0.5f
+#define AUTOTAKEOFF_THROTTLE_ABORT_LIMIT                  0.1f
 void plan_run_AutoTakeoff()
 {
     switch (autotakeoffState) {
@@ -261,7 +266,7 @@ void plan_run_AutoTakeoff()
         ManualControlCommandData cmd;
         ManualControlCommandGet(&cmd);
 
-        if (cmd.Throttle > 0.5f) { // TODO make this vtol neutral thrust
+        if (cmd.Throttle > AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START) {
             autotakeoffState = STATE_AUTOTAKEOFF_INITIATED;
             PathDesiredData pathDesired;
             plan_setup_AutoTakeoff_helper(&pathDesired);
@@ -274,7 +279,7 @@ void plan_run_AutoTakeoff()
         ManualControlCommandData cmd;
         ManualControlCommandGet(&cmd);
 
-        if (cmd.Throttle < 0.1f) {
+        if (cmd.Throttle < AUTOTAKEOFF_THROTTLE_ABORT_LIMIT) {
             autotakeoffState = STATE_AUTOTAKEOFF_ABORT;
             plan_setup_land();
         }

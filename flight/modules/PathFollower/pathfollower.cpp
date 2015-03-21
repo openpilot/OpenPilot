@@ -209,7 +209,7 @@ void pathFollowerInitializeControllersForFrameType()
     case FRAME_TYPE_HELI:
         if (!multirotor_initialised) {
             VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
-        VtolAutoTakeoffController::instance()->Initialize(&vtolPathFollowerSettings);
+            VtolAutoTakeoffController::instance()->Initialize(&vtolPathFollowerSettings);
             VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
             VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
             VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);

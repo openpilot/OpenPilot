@@ -137,6 +137,7 @@ void VtolAutoTakeoffController::SettingsUpdated(void)
                                  vtolPathFollowerSettings->AutoTakeoffVerticalVelPID.Beta,
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
+    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
@@ -151,9 +152,9 @@ int32_t VtolAutoTakeoffController::Initialize(VtolPathFollowerSettingsData *ptr_
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
 
     if (fsm == 0) {
-	fsm = (PathFollowerFSM *)VtolAutoTakeoffFSM::instance();
-	VtolAutoTakeoffFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus);
-	controlDown.Initialize(fsm);
+        fsm = (PathFollowerFSM *)VtolAutoTakeoffFSM::instance();
+        VtolAutoTakeoffFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus);
+        controlDown.Initialize(fsm);
     }
     return 0;
 }
@@ -165,13 +166,18 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
 
     VelocityStateGet(&velocityState);
     VelocityDesiredData velocityDesired;
+    PositionStateData positionState;
+    PositionStateGet(&positionState);
+
+    if (fsm->PositionHoldState()) {
+        controlDown.UpdatePositionState(positionState.Down);
+        controlDown.ControlPosition();
+    }
 
     controlDown.UpdateVelocityState(velocityState.Down);
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // autotakeoff flight mode has stored original horizontal position in pathdesired
-    PositionStateData positionState;
-    PositionStateGet(&positionState);
     controlNE.UpdatePositionState(positionState.North, positionState.East);
     controlNE.ControlPosition();
 
@@ -183,8 +189,10 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
 
     // update pathstatus
     pathStatus->error     = 0.0f;
-    pathStatus->fractional_progress  = 0.0f;
-    // TODO Change to 1.0 when completed
+    pathStatus->fractional_progress = 0.0f;
+    if (fsm->PositionHoldState()) {
+        pathStatus->fractional_progress = 1.0f;
+    }
     pathStatus->path_direction_north = velocityDesired.North;
     pathStatus->path_direction_east  = velocityDesired.East;
     pathStatus->path_direction_down  = velocityDesired.Down;
@@ -192,7 +200,6 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
     pathStatus->correction_direction_north = velocityDesired.North - velocityState.North;
     pathStatus->correction_direction_east  = velocityDesired.East - velocityState.East;
     pathStatus->correction_direction_down  = velocityDesired.Down - velocityState.Down;
-
 
     VelocityDesiredSet(&velocityDesired);
 }

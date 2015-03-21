@@ -74,6 +74,7 @@ VtolAutoTakeoffFSM::PathFollowerFSM_AutoTakeoffStateHandler_T VtolAutoTakeoffFSM
     [AUTOTAKEOFF_STATE_SLOWSTART]  = { .setup = &VtolAutoTakeoffFSM::setup_slowstart,  .run = &VtolAutoTakeoffFSM::run_slowstart  },
     [AUTOTAKEOFF_STATE_THRUSTUP]   = { .setup = &VtolAutoTakeoffFSM::setup_thrustup,   .run = &VtolAutoTakeoffFSM::run_thrustup   },
     [AUTOTAKEOFF_STATE_TAKEOFF]    = { .setup = &VtolAutoTakeoffFSM::setup_takeoff,    .run = &VtolAutoTakeoffFSM::run_takeoff    },
+    [AUTOTAKEOFF_STATE_HOLD] =       { .setup = &VtolAutoTakeoffFSM::setup_hold,       .run = &VtolAutoTakeoffFSM::run_hold       },
     [AUTOTAKEOFF_STATE_THRUSTDOWN] = { .setup = &VtolAutoTakeoffFSM::setup_thrustdown, .run = &VtolAutoTakeoffFSM::run_thrustdown },
     [AUTOTAKEOFF_STATE_THRUSTOFF]  = { .setup = &VtolAutoTakeoffFSM::setup_thrustoff,  .run = &VtolAutoTakeoffFSM::run_thrustoff  },
     [AUTOTAKEOFF_STATE_DISARMED]   = { .setup = &VtolAutoTakeoffFSM::setup_disarmed,   .run = &VtolAutoTakeoffFSM::run_disarmed   },
@@ -105,8 +106,8 @@ int32_t VtolAutoTakeoffFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPat
     PIOS_Assert(ptr_flightStatus);
 
     if (mAutoTakeoffData == 0) {
-	mAutoTakeoffData = (VtolAutoTakeoffFSMData_T *)pios_malloc(sizeof(VtolAutoTakeoffFSMData_T));
-      PIOS_Assert(mAutoTakeoffData);
+        mAutoTakeoffData = (VtolAutoTakeoffFSMData_T *)pios_malloc(sizeof(VtolAutoTakeoffFSMData_T));
+        PIOS_Assert(mAutoTakeoffData);
     }
     memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
@@ -401,7 +402,7 @@ void VtolAutoTakeoffFSM::run_thrustup(__attribute__((unused)) uint8_t flTimeout)
 }
 
 
-// STATE: GROUNDEFFET
+// STATE: TAKEOFF
 void VtolAutoTakeoffFSM::setup_takeoff(void)
 {
     mAutoTakeoffData->flZeroStabiHorizontal = false;
@@ -421,11 +422,30 @@ void VtolAutoTakeoffFSM::run_takeoff(__attribute__((unused)) uint8_t flTimeout)
     PositionStateGet(&positionState);
     float north_error   = mAutoTakeoffData->expectedAutoTakeoffPositionNorth - positionState.North;
     float east_error    = mAutoTakeoffData->expectedAutoTakeoffPositionEast - positionState.East;
+    float down_error    = pathDesired->End.Down - positionState.Down;
     float positionError = sqrtf(north_error * north_error + east_error * east_error);
     if (positionError > 3.0f) {
         setState(AUTOTAKEOFF_STATE_THRUSTDOWN, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_POSITIONERROR);
         return;
     }
+    if (fabsf(down_error) < 0.5f) {
+        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ARRIVEDATALT);
+        return;
+    }
+}
+
+// STATE: HOLD
+void VtolAutoTakeoffFSM::setup_hold(void)
+{
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
+    mAutoTakeoffData->flAltitudeHold = true;
+}
+void VtolAutoTakeoffFSM::run_hold(__attribute__((unused)) uint8_t flTimeout)
+{}
+
+uint8_t VtolAutoTakeoffFSM::PositionHoldState(void)
+{
+    return mAutoTakeoffData->flAltitudeHold;
 }
 
 // STATE: THRUSTDOWN

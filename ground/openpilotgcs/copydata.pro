@@ -83,6 +83,7 @@ GCS_LIBRARY_PATH
         QTQ_WHOLE_DIRS = QtQuick/Controls \
                          QtQuick/Dialogs
         for(dir, QTQ_WHOLE_DIRS) {
+            data_copy.commands += @rm -rf $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
             data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
         }
 
@@ -198,6 +199,7 @@ GCS_LIBRARY_PATH
         QTQ_WHOLE_DIRS = qtquick/controls \
                          qtquick/dialogs
         for(dir, QTQ_WHOLE_DIRS) {
+            data_copy.commands += @rm -rf $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
             data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
         }
 
@@ -259,7 +261,7 @@ GCS_LIBRARY_PATH
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/QtQuick\") $$addNewline()
 
         for(dir, QT_QUICK2_FULL_DIRS) {
-            #data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
+            data_copy.commands += -@rm -rf $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
             data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
         }
 

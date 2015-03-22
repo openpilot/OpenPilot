@@ -209,10 +209,10 @@ void UAVGadgetManager::emptyView(Core::Internal::UAVGadgetView *view)
     }
 
     IUAVGadget *uavGadget = view->gadget();
-    //emit uavGadgetAboutToClose(uavGadget);
+    // emit uavGadgetAboutToClose(uavGadget);
     removeGadget(uavGadget);
     view->removeGadget();
-    //emit uavGadgetsClosed(uavGadgets);
+    // emit uavGadgetsClosed(uavGadgets);
 }
 
 
@@ -225,7 +225,7 @@ void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
     IUAVGadget *gadget = view->gadget();
 
     // find SplitterOrView splitter that contains the view to delete
-    SplitterOrView *splitter     = m_splitterOrView->findSplitter(gadget);
+    SplitterOrView *splitter = m_splitterOrView->findSplitter(gadget);
     if (!splitter) {
         return;
     }
@@ -236,7 +236,7 @@ void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     im->removeGadget(gadget);
 
-    SplitterOrView *newCurrent = splitter->findFirstView();
+    SplitterOrView *newCurrent   = splitter->findFirstView();
     Q_ASSERT(newCurrent);
     if (newCurrent) {
         setCurrentGadget(newCurrent->gadget());
@@ -249,7 +249,7 @@ void UAVGadgetManager::addGadgetToContext(IUAVGadget *gadget)
         return;
     }
     m_core->addContextObject(gadget);
-    //emit uavGadgetOpened(uavGadget);
+    // emit uavGadgetOpened(uavGadget);
 }
 
 void UAVGadgetManager::removeGadget(IUAVGadget *gadget)

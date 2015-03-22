@@ -45,7 +45,7 @@ SplitterOrView::SplitterOrView(Core::UAVGadgetManager *uavGadgetManager, Core::I
     m_uavGadgetManager(uavGadgetManager),
     m_splitter(0)
 {
-    m_view   = new UAVGadgetView(m_uavGadgetManager, uavGadget, this);
+    m_view = new UAVGadgetView(m_uavGadgetManager, uavGadget, this);
     setLayout(new QStackedLayout());
     layout()->addWidget(m_view);
 }
@@ -60,15 +60,13 @@ SplitterOrView::SplitterOrView(SplitterOrView &splitterOrView, QWidget *parent) 
     setLayout(new QStackedLayout());
     if (m_view) {
         layout()->addWidget(m_view);
-    }
-    else if (m_splitter) {
+    } else if (m_splitter) {
         layout()->addWidget(m_splitter);
     }
 }
 
 SplitterOrView::~SplitterOrView()
-{
-}
+{}
 
 void SplitterOrView::mousePressEvent(QMouseEvent *e)
 {
@@ -292,7 +290,7 @@ void SplitterOrView::split(Qt::Orientation orientation)
     splitter->addWidget(new SplitterOrView(*this, splitter));
     splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
 
-    m_view = 0;
+    m_view     = 0;
     m_splitter = splitter;
 
     connect(m_splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(onSplitterMoved(int, int)));
@@ -320,8 +318,7 @@ void SplitterOrView::unsplit(IUAVGadget *gadget)
     if (splitterOrView) {
         if (splitterOrView->isView()) {
             layout()->addWidget(splitterOrView->m_view);
-        }
-        else {
+        } else {
             layout()->addWidget(splitterOrView->m_splitter);
         }
         layout()->removeWidget(m_splitter);
@@ -330,7 +327,7 @@ void SplitterOrView::unsplit(IUAVGadget *gadget)
         delete view;
         delete m_splitter;
 
-        m_view = splitterOrView->m_view;
+        m_view     = splitterOrView->m_view;
         m_splitter = splitterOrView->m_splitter;
     }
 }
@@ -367,7 +364,7 @@ void SplitterOrView::unsplitAll_helper(UAVGadgetManager *uavGadgetManager, QSpli
                 uavGadgetManager->emptyView(splitterOrView->m_view);
             }
             if (splitterOrView->m_splitter) {
-                unsplitAll_helper(uavGadgetManager,splitterOrView->m_splitter);
+                unsplitAll_helper(uavGadgetManager, splitterOrView->m_splitter);
             }
             delete splitterOrView;
         }

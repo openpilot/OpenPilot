@@ -127,7 +127,7 @@
           </palette>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the SNR for each detected sat. Satellite number (PRN) is displayed inside the green bar (GPS) or orange bar (SBAS). Sat SNR is displayed above (in dBHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the SNR for each detected sat. GPS satellites are shown in green, GLONASS in cyan, BeiDou in red and SBAS/QZSS in orange. Satellite number (PRN) is displayed inside the bar. Sat SNR is displayed above (in dBHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="autoFillBackground">
           <bool>false</bool>

@@ -30,13 +30,17 @@
  */
 
 #include "inc/stateestimation.h"
-
+// Fake pos rate in uS
+#define FILTERSTATIONARY_FAKEPOSRATE 100000
 // Private constants
 
-#define STACK_REQUIRED 64
+#define STACK_REQUIRED               64
 
 // Private types
-
+// Private types
+struct data {
+    uint32_t lastUpdate;
+};
 // Private variables
 
 // Private functions
@@ -49,27 +53,34 @@ int32_t filterStationaryInitialize(stateFilter *handle)
 {
     handle->init      = &init;
     handle->filter    = &filter;
-    handle->localdata = NULL;
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
 static int32_t init(__attribute__((unused)) stateFilter *self)
 {
+    struct data *this = (struct data *)self->localdata;
+
+    this->lastUpdate = PIOS_DELAY_GetRaw();
     return 0;
 }
 
 static filterResult filter(__attribute__((unused)) stateFilter *self, stateEstimation *state)
 {
-    state->pos[0]   = 0.0f;
-    state->pos[1]   = 0.0f;
-    state->pos[2]   = 0.0f;
-    state->updated |= SENSORUPDATES_pos;
+    struct data *this = (struct data *)self->localdata;
 
-    state->vel[0]   = 0.0f;
-    state->vel[1]   = 0.0f;
-    state->vel[2]   = 0.0f;
-    state->updated |= SENSORUPDATES_vel;
+    if (PIOS_DELAY_DiffuS(this->lastUpdate) > FILTERSTATIONARY_FAKEPOSRATE) {
+        this->lastUpdate = PIOS_DELAY_GetRaw();
+        state->pos[0]    = 0.0f;
+        state->pos[1]    = 0.0f;
+        state->pos[2]    = 0.0f;
+        state->updated  |= SENSORUPDATES_pos;
 
+        state->vel[0]    = 0.0f;
+        state->vel[1]    = 0.0f;
+        state->vel[2]    = 0.0f;
+        state->updated  |= SENSORUPDATES_vel;
+    }
     return FILTERRESULT_OK;
 }
 

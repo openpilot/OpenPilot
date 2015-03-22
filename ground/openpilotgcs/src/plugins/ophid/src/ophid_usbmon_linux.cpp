@@ -74,7 +74,7 @@ void USBMonitor::deviceEventReceived()
         // this->monitorNotifier->setEnabled(0);
         QString action  = QString(udev_device_get_action(dev));
         QString devtype = QString(udev_device_get_devtype(dev));
-        OPHID_DEBUG("[DEBUG] Action: " << action << " device: " << devtype);
+        OPHID_DEBUG("Action: %s device: %s", qPrintable(action), qPrintable(devtype));
         if (action == "add" && devtype == "usb_device") {
             printPortInfo(dev);
             emit deviceDiscovered(makePortInfo(dev));

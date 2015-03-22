@@ -121,9 +121,9 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
     OPHID_TRACE("IN");
 
     // Print the list
-    OPHID_DEBUG("List off (" << knowndevices.length() << ") devices that are tracked:");
+    OPHID_DEBUG("List off (%d) devices that are tracked:", knowndevices.length());
     foreach(USBPortInfo info, knowndevices /*thePortsWeWant*/) {
-        OPHID_DEBUG("product:" << info.product << " bcdDevice:" << info.bcdDevice << " devicePath:" << info.devicePath);
+        OPHID_DEBUG("product: %s bcdDevice: %d devicePath: %s", qPrintable(info.product), info.bcdDevice, qPrintable(info.devicePath));
 
         // Filter to return only the one request (if exists)
         if ((info.vendorID == vid || vid == -1) &&
@@ -246,7 +246,7 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
 {
     OPHID_TRACE("IN");
 
-    OPHID_DEBUG("[STATUS CHANGE] from device ID: " << deviceID);
+    OPHID_DEBUG("[STATUS CHANGE] from device ID: %s", qPrintable(deviceID));
     bool rc;
     SP_DEVINFO_DATA spDevInfoData;
     DWORD dwFlag = (DBT_DEVICEARRIVAL == wParam) ? DIGCF_PRESENT : 0 /*DIGCF_ALLCLASSES*/;
@@ -260,9 +260,9 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
             DWORD nSize = 0;
             TCHAR buf[MAX_PATH];
             rc = SetupDiGetDeviceInstanceId(devInfo, &spDevInfoData, buf, MAX_PATH, &nSize);
-            OPHID_DEBUG("Found:" << TCHARToQString(buf));
+            OPHID_DEBUG("Found: %s", qPrintable(TCHARToQString(buf)));
             if (rc && deviceID.contains(TCHARToQString(buf))) {
-                OPHID_DEBUG("[MATCH] " << TCHARToQString(buf));
+                OPHID_DEBUG("[MATCH] %s", qPrintable(TCHARToQString(buf)));
                 USBPortInfo info;
                 info.devicePath = deviceID;
                 if (wParam == DBT_DEVICEARRIVAL) {
@@ -287,14 +287,14 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                         break;
                     }
                     knowndevices.append(info);
-                    OPHID_DEBUG("[SIGNAL] Device discovered on device:" << info.product << info.bcdDevice);
+                    OPHID_DEBUG("[SIGNAL] Device discovered on device: %s %d", qPrintable(info.product), info.bcdDevice);
                     emit deviceDiscovered(info);
                     break;
                 } else if (wParam == DBT_DEVICEREMOVECOMPLETE) {
                     for (int x = 0; x < knowndevices.count(); ++x) {
                         USBPortInfo temp = knowndevices.at(x);
                         knowndevices.removeAt(x);
-                        OPHID_DEBUG("[SIGNAL] Device removed on device:" << temp.product << temp.bcdDevice);
+                        OPHID_DEBUG("[SIGNAL] Device removed on device: %s %d", qPrintable(temp.product), temp.bcdDevice);
                     }
                     emit deviceRemoved(info);
                     break;
@@ -355,7 +355,7 @@ void USBMonitor::enumerateDevicesWin(const GUID & guid)
         }
         SetupDiDestroyDeviceInfoList(devInfo);
     }
-    OPHID_DEBUG("Added %d device(s).", j);
+    OPHID_DEBUG("Added %lu device(s).", j);
     OPHID_TRACE("OUT");
 }
 
@@ -422,7 +422,7 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
         goto leave;
     }
 
-    OPHID_DEBUG("Found device with valid PATH: " << qDevicePath);
+    OPHID_DEBUG("Found device with valid PATH: %s", qPrintable(qDevicePath));
     h = CreateFile(details->DevicePath,
                    GENERIC_READ | GENERIC_WRITE,
                    FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -442,7 +442,7 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
             goto leave;
         }
 
-        OPHID_DEBUG("Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath));
+        OPHID_DEBUG("Problem opening handle, path: %s", qPrintable(QString::fromWCharArray(details->DevicePath)));
 
         free(details);
         ret = OPHID_ERROR_RET;

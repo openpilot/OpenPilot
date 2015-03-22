@@ -3,6 +3,8 @@ TARGET = opHID
 
 DEFINES += OPHID_LIBRARY
 
+//DEFINES += OPHID_DEBUG_ON
+
 include(../../openpilotgcsplugin.pri)
 include(ophid_dependencies.pri)
 

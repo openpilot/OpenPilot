@@ -1376,7 +1376,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
         }
 
         // Wait 1ms if not.
-        vTaskDelay(1 + (1/(portTICK_RATE_MS+1)));
+        vTaskDelay(1 + (1 / (portTICK_RATE_MS + 1)));
     }
 
     // ****************
@@ -1485,7 +1485,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22_releaseBus(rfm22b_dev);
 
     // Yield the CPU.
-    vTaskDelay(1 + (1/(portTICK_RATE_MS+1)));
+    vTaskDelay(1 + (1 / (portTICK_RATE_MS + 1)));
 
     // Claim the SPI bus.
     rfm22_claimBus(rfm22b_dev);
@@ -1540,7 +1540,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22_releaseBus(rfm22b_dev);
 
     // Yield the CPU.
-    vTaskDelay(1 + (1/(portTICK_RATE_MS+1)));
+    vTaskDelay(1 + (1 / (portTICK_RATE_MS + 1)));
 
     // Initialize the frequency and datarate to te default.
     rfm22_setNominalCarrierFrequency(rfm22b_dev, 0);

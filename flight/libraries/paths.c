@@ -44,33 +44,27 @@ static void path_circle(PathDesiredData *path, float *cur_point, struct path_sta
  * @param[in] cur_point Current location
  * @param[out] status Structure containing progress along path and deviation
  */
-void path_progress(PathDesiredData *path, float *cur_point, struct path_status *status)
+void path_progress(PathDesiredData *path, float *cur_point, struct path_status *status, bool mode3D)
 {
     switch (path->Mode) {
-    case PATHDESIRED_MODE_BRAKE: // should never get here...
-    case PATHDESIRED_MODE_FLYVECTOR:
-        return path_vector(path, cur_point, status, true);
+    case PATHDESIRED_MODE_BRAKE:
+    case PATHDESIRED_MODE_FOLLOWVECTOR:
+        return path_vector(path, cur_point, status, mode3D);
 
         break;
-    case PATHDESIRED_MODE_DRIVEVECTOR:
-        return path_vector(path, cur_point, status, false);
+    case PATHDESIRED_MODE_CIRCLERIGHT:
+        return path_circle(path, cur_point, status, mode3D);
 
         break;
-    case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-    case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
-        return path_circle(path, cur_point, status, 1);
+    case PATHDESIRED_MODE_CIRCLELEFT:
+        return path_circle(path, cur_point, status, mode3D);
 
         break;
-    case PATHDESIRED_MODE_FLYCIRCLELEFT:
-    case PATHDESIRED_MODE_DRIVECIRCLELEFT:
-        return path_circle(path, cur_point, status, 0);
+    case PATHDESIRED_MODE_GOTOENDPOINT:
+        return path_endpoint(path, cur_point, status, mode3D);
 
         break;
-    case PATHDESIRED_MODE_FLYENDPOINT:
-        return path_endpoint(path, cur_point, status, true);
-
-        break;
-    case PATHDESIRED_MODE_DRIVEENDPOINT:
+    case PATHDESIRED_MODE_LAND:
     default:
         // use the endpoint as default failsafe if called in unknown modes
         return path_endpoint(path, cur_point, status, false);

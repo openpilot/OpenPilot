@@ -35,7 +35,6 @@
 #include "ophid_hidapi.h"
 #include "ophid_const.h"
 
-
 /**
  * \brief Constructor
  *
@@ -95,7 +94,7 @@ void RawHIDConnection::onDeviceConnected()
  */
 void RawHIDConnection::onDeviceDisconnected()
 {
-    // qDebug() << "onDeviceDisconnected()";
+    OPHID_DEBUG("onDeviceDisconnected()");
     if (enablePolling) {
         emit availableDevChanged(this);
     }

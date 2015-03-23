@@ -300,7 +300,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
             settings.FlightModeNumber < 1 || settings.FlightModeNumber > FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM
             ||
             // Similar checks for FlightMode channel but only if more than one flight mode has been set. Otherwise don't care
-            ((settings.FlightModeNumber > 1)
+            ((settings.FlightModeNumber > 1) && (frameType != FRAME_TYPE_GROUND)
              && (settings.ChannelGroups.FlightMode >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
                  || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_INVALID
                  || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_NODRIVER))) {

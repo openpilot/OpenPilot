@@ -269,7 +269,7 @@ static void stabilizationOuterloopTask()
         float throttleDesired;
         ManualControlCommandThrottleGet(&throttleDesired);
         if (armed != FLIGHTSTATUS_ARMED_ARMED ||
-            ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0)) {
+            ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0.0f)) {
             // Force all axes to reinitialize when engaged
             for (t = 0; t < AXES; t++) {
                 previous_mode[t] = 255;
@@ -282,8 +282,6 @@ static void stabilizationOuterloopTask()
     stabSettings.monitor.rateupdates = 0;
 }
 
-
-// TODO Also if stabdesired changes do a callback.
 
 static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {

@@ -138,7 +138,7 @@ void VtolAutoTakeoffFSM::Activate()
 {
     memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
     mAutoTakeoffData->currentState   = AUTOTAKEOFF_STATE_INACTIVE;
-    mAutoTakeoffData->flLowAltitude  = false;
+    mAutoTakeoffData->flLowAltitude  = true;
     mAutoTakeoffData->flAltitudeHold = false;
     mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
     mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;

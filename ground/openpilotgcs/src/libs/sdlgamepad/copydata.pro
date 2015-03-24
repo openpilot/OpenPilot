@@ -8,11 +8,9 @@ equals(copydata, 1) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$${SDL_DIR}/bin/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
-        # add make target
-        POST_TARGETDEPS += copydata
-
-        data_copy.target = copydata
+        data_copy.depends = FORCE
         QMAKE_EXTRA_TARGETS += data_copy
+        PRE_TARGETDEPS += data_copy
     }
 
 }

@@ -3,7 +3,7 @@
 # Copyright (c) 2009-2013, The OpenPilot Team, http://www.openpilot.org
 #
 
-TEMPLATE  = subdirs
+TEMPLATE = aux
 
 # Some handy defines
 defineReplace(targetPath) {
@@ -64,5 +64,6 @@ win32 {
     uavobjects.commands +=   -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r $$addNewline()
 }
 
-uavobjects.target = FORCE
+uavobjects.depends = FORCE
 QMAKE_EXTRA_TARGETS += uavobjects
+PRE_TARGETDEPS += uavobjects

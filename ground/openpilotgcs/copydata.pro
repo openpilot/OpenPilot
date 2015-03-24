@@ -1,6 +1,6 @@
 include(openpilotgcs.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = aux
 
 # Copy Qt runtime libraries into the build directory (to run or package)
 equals(copyqt, 1) {
@@ -26,8 +26,9 @@ equals(copyqt, 1) {
         data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
     }
 
-    data_copy.target = FORCE
+    data_copy.depends = FORCE
     QMAKE_EXTRA_TARGETS += data_copy
+    PRE_TARGETDEPS += data_copy
 
     linux {
 

@@ -65,7 +65,8 @@ equals(copydata, 1) {
         #    data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$SIM_DIR/$$dll\") $$addNewline()
         #}
 
-        data_copy.target = FORCE
+        data_copy.depends = FORCE
         QMAKE_EXTRA_TARGETS += data_copy
+        PRE_TARGETDEPS += data_copy
     }
 }

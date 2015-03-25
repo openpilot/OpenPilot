@@ -7,20 +7,7 @@ DATACOLLECTIONS = cloudconfig default_configurations dials models pfd sounds dia
 equals(copydata, 1) {
     for(dir, DATACOLLECTIONS) {
         exists($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir) {
-            # Qt make macros (CHK_DIR_EXISTS, COPY_DIR, etc) have different syntax. They cannot be used
-            # reliably to copy subdirectories in two different Windows environments (bash and cmd/QtCreator).
-            # So undocumented QMAKE_SH variable is used to find out the real environment.
-            !isEmpty(QMAKE_SH) {
-                # sh environment (including Windows bash)
-                data_copy.commands += $(MKDIR) $$targetPath(\"$$GCS_DATA_PATH/$$dir\") $$addNewline()
-                data_copy.commands += $(COPY_DIR) $$targetPath(\"$$GCS_SOURCE_TREE/share/openpilotgcs/$$dir\") $$targetPath(\"$$GCS_DATA_PATH/\") $$addNewline()
-            } else {
-                # native Windows cmd environment
-                data_copy.commands += $(COPY_DIR) $$targetPath(\"$$GCS_SOURCE_TREE/share/openpilotgcs/$$dir\") $$targetPath(\"$$GCS_DATA_PATH/$$dir\") $$addNewline()
-            }
+            addCopyDirTarget($$dir, $$GCS_SOURCE_TREE/share/openpilotgcs, $$GCS_DATA_PATH)
         }
     }
-    data_copy.depends = FORCE
-    QMAKE_EXTRA_TARGETS += data_copy
-    PRE_TARGETDEPS += data_copy
 }

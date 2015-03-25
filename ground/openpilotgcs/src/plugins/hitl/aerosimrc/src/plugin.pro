@@ -35,8 +35,6 @@ equals(copydata, 1) {
     # Windows release only
     win32:CONFIG(release, debug|release) {
 
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$PLUGIN_DIR\") $$addNewline()
-
         # resources and sample configuration
         PLUGIN_RESOURCES = \
                 cc_off.tga \
@@ -46,7 +44,7 @@ equals(copydata, 1) {
                 cc_plugin.ini \
                 plugin.txt
         for(res, PLUGIN_RESOURCES) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$RES_DIR/$$res\") $$targetPath(\"$$PLUGIN_DIR/$$res\") $$addNewline()
+            addCopyFileTarget($${res},$${RES_DIR},$${PLUGIN_DIR})
         }
 
         # Qt DLLs
@@ -54,7 +52,7 @@ equals(copydata, 1) {
                   Qt5Core.dll \
                   Qt5Network.dll
         for(dll, QT_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/$$dll\") $$targetPath(\"$$SIM_DIR/$$dll\") $$addNewline()
+            addCopyFileTarget($${dll},$$[QT_INSTALL_BINS],$${SIM_DIR})
         }
 
         # MinGW DLLs
@@ -62,11 +60,7 @@ equals(copydata, 1) {
         #             libgcc_s_dw2-1.dll \
         #             mingwm10.dll
         #for(dll, MINGW_DLLS) {
-        #    data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$SIM_DIR/$$dll\") $$addNewline()
+        #    addCopyFileTarget($${dll},$$(QTMINGW),$${SIM_DIR})
         #}
-
-        data_copy.depends = FORCE
-        QMAKE_EXTRA_TARGETS += data_copy
-        PRE_TARGETDEPS += data_copy
     }
 }

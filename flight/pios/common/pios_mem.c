@@ -29,17 +29,22 @@
 
 #ifdef PIOS_TARGET_PROVIDES_FAST_HEAP
 // relies on pios_general_malloc to perform the allocation (i.e. pios_msheap.c)
-extern void *pios_general_malloc(size_t size, bool fastheap);
+extern void *pios_general_malloc(void *ptr, size_t size, bool fastheap);
 
 void *pios_fastheapmalloc(size_t size)
 {
-    return pios_general_malloc(size, true);
+    return pios_general_malloc(NULL, size, true);
 }
 
 
 void *pios_malloc(size_t size)
 {
-    return pios_general_malloc(size, false);
+    return pios_general_malloc(NULL, size, false);
+}
+
+void *pios_realloc(void *ptr, size_t size)
+{
+    return pios_general_malloc(ptr, size, false);
 }
 
 void pios_free(void *p)
@@ -57,6 +62,12 @@ void *pios_fastheapmalloc(size_t size)
 
 void *pios_malloc(size_t size)
 {
+    return pvPortMalloc(size);
+}
+
+void *pios_realloc(void *ptr, size_t size)
+{
+    (void)ptr;
     return pvPortMalloc(size);
 }
 

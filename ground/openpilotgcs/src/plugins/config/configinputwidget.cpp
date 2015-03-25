@@ -425,6 +425,10 @@ void ConfigInputWidget::goToWizard()
     actuatorSettingsData           = actuatorSettingsObj->getData();
     previousActuatorSettingsData   = actuatorSettingsData;
 
+    // Stash systemSettings
+    systemSettingsData             = systemSettingsObj->getData();
+    previousSystemSettingsData     = systemSettingsData;
+
     // Now reset channel and actuator settings (disable outputs)
     resetChannelSettings();
     resetActuatorSettings();
@@ -468,6 +472,7 @@ void ConfigInputWidget::wzCancel()
     manualSettingsObj->setData(previousManualSettingsData);
     flightModeSettingsObj->setData(previousFlightModeSettingsData);
     actuatorSettingsObj->setData(previousActuatorSettingsData);
+    systemSettingsObj->setData(previousSystemSettingsData);
 }
 
 void ConfigInputWidget::registerControlActivity()

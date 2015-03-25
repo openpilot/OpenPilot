@@ -142,6 +142,7 @@ private:
 
     SystemSettings *systemSettingsObj;
     SystemSettings::DataFields systemSettingsData;
+    SystemSettings::DataFields previousSystemSettingsData;
 
     QSvgRenderer *m_renderer;
 

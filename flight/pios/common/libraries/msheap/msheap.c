@@ -222,6 +222,8 @@ msheap_alloc(heap_handle_t *heap, void *ptr, uint32_t size)
         ASSERT(0, region_check(heap, best));
         ASSERT(3, msheap_check(heap));
 
+#ifdef PIOS_REALLOC_FREE_UNUSED_AREA
+
         if (best->next.size == size)
             goto done;
 
@@ -237,7 +239,10 @@ msheap_alloc(heap_handle_t *heap, void *ptr, uint32_t size)
 
             goto split;
         }
-
+#else
+        if (best->next.size >= size)
+            goto done;
+#endif
         old_size = best->next.size;
         msheap_free(heap, ptr);
         copy_data = 1;
@@ -275,8 +280,10 @@ restart:
         /* no space */
         return 0;
     }
-
+#ifdef PIOS_REALLOC_FREE_UNUSED_AREA
 split:
+#endif
+
     /* split the free region to make space */
     split_region(heap, best, size);
 

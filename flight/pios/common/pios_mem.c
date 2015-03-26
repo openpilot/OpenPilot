@@ -42,9 +42,15 @@ void *pios_malloc(size_t size)
     return pios_general_malloc(NULL, size, false);
 }
 
-void *pios_realloc(void *ptr, size_t size)
+void *pios_realloc(__attribute__((unused)) void *ptr, __attribute__((unused)) size_t size)
 {
+#ifdef PIOS_INCLUDE_REALLOC
     return pios_general_malloc(ptr, size, false);
+#else
+    // Not allowed to use realloc without the proper define PIOS_INCLUDE_REALLOC set
+    while(1);
+    return NULL;
+#endif
 }
 
 void pios_free(void *p)
@@ -65,10 +71,15 @@ void *pios_malloc(size_t size)
     return pvPortMalloc(size);
 }
 
-void *pios_realloc(void *ptr, size_t size)
+void *pios_realloc(__attribute__((deprecated)) void *ptr, size_t size)
 {
-    (void)ptr;
+#ifdef PIOS_INCLUDE_REALLOC
     return pvPortMalloc(size);
+#else
+    // Not allowed to use realloc without the proper define PIOS_INCLUDE_REALLOC set
+    while(1);
+    return NULL;
+#endif
 }
 
 void pios_free(void *p)

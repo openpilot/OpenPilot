@@ -275,6 +275,12 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             ubx_autoconfig_run(&buffer, &count, status != GPSPOSITIONSENSOR_STATUS_NOGPS);
             // Something to send?
             if (count) {
+                // clear ack/nak
+                ubxLastAck.clsID = 0x00;
+                ubxLastAck.msgID = 0x00;
+                ubxLastNak.clsID = 0x00;
+                ubxLastNak.msgID = 0x00;
+
                 PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
             }
         }
@@ -479,6 +485,7 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
     uint8_t ubxSbasMode;
     ubx_autoconfig_settings_t newconfig;
     uint8_t ubxSbasSats;
+    uint8_t ubxGnssMode;
 
     GPSSettingsUbxRateGet(&newconfig.navRate);
 
@@ -540,6 +547,41 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_MSAS ? UBX_SBAS_SATS_MSAS :
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_GAGAN ? UBX_SBAS_SATS_GAGAN :
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_SDCM ? UBX_SBAS_SATS_SDCM : UBX_SBAS_SATS_AUTOSCAN;
+
+    GPSSettingsUbxGNSSModeGet(&ubxGnssMode);
+
+    switch (ubxGnssMode) {
+    case GPSSETTINGS_UBXGNSSMODE_GPSGLONASS:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GLONASS:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GPS:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GPSBEIDOU:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = true;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GLONASSBEIDOU:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = true;
+        break;
+    default:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
+        break;
+    }
 
     ubx_autoconfig_set(newconfig);
 }

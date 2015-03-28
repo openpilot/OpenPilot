@@ -7,7 +7,11 @@ ifndef OPENPILOT_IS_COOL
 endif
 
 .PHONY: package
-package:
+package: openpilotgcs uavobjects_matlab | $(PACKAGE_DIR)
+ifneq ($(GCS_BUILD_CONF),release)
+	# We can only package release builds
+	$(error Packaging is currently supported for release builds only)
+endif
 	( \
 	  ROOT_DIR="$(ROOT_DIR)" \
 	  BUILD_DIR="$(BUILD_DIR)" \

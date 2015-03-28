@@ -15,7 +15,11 @@ NSIS_TEMPLATE := $(NSIS_WINX86)/openpilotgcs.tpl
 NSIS_HEADER   := $(OPGCSSYNTHDIR)/openpilotgcs.nsh
 
 .PHONY: package
-package:
+package: openpilotgcs uavobjects_matlab | $(PACKAGE_DIR)
+ifneq ($(GCS_BUILD_CONF),release)
+	# We can only package release builds
+	$(error Packaging is currently supported for release builds only)
+endif
 	$(V1) mkdir -p "$(dir $(NSIS_HEADER))"
 	$(VERSION_CMD) \
 		--template='$(NSIS_TEMPLATE)' \

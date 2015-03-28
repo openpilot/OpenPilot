@@ -53,11 +53,11 @@ void path_progress(PathDesiredData *path, float *cur_point, struct path_status *
 
         break;
     case PATHDESIRED_MODE_CIRCLERIGHT:
-        return path_circle(path, cur_point, status, mode3D);
+        return path_circle(path, cur_point, status, true);
 
         break;
     case PATHDESIRED_MODE_CIRCLELEFT:
-        return path_circle(path, cur_point, status, mode3D);
+        return path_circle(path, cur_point, status, false);
 
         break;
     case PATHDESIRED_MODE_GOTOENDPOINT:

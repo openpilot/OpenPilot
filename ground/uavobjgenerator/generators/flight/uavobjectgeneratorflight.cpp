@@ -68,7 +68,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     // Write the flight object inialization files
     flightInitTemplate.replace(QString("$(OBJINC)"), objInc);
     flightInitTemplate.replace(QString("$(OBJINIT)"), flightObjInit);
-    bool res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/uavobjectsinit.c",
+    bool res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/uavobjectsinit.c",
                                    flightInitTemplate);
     if (!res) {
         cout << "Error: Could not write flight object init file" << endl;
@@ -77,7 +77,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
 
     // Write the flight object initialization header
     flightInitIncludeTemplate.replace(QString("$(SIZECALCULATION)"), QString().setNum(sizeCalc));
-    res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/uavobjectsinit.h",
+    res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/uavobjectsinit.h",
                               flightInitIncludeTemplate);
     if (!res) {
         cout << "Error: Could not write flight object init header file" << endl;
@@ -87,7 +87,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     // Write the flight object Makefile
     flightMakeTemplate.replace(QString("$(UAVOBJFILENAMES)"), objFileNames);
     flightMakeTemplate.replace(QString("$(UAVOBJNAMES)"), objNames);
-    res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/Makefile.inc",
+    res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/Makefile.inc",
                               flightMakeTemplate);
     if (!res) {
         cout << "Error: Could not write flight Makefile" << endl;
@@ -394,13 +394,13 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     outInclude.replace(QString("$(SETGETFIELDSEXTERN)"), setgetfieldsextern);
 
     // Write the flight code
-    bool res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/" + info->namelc + ".c", outCode);
+    bool res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/" + info->namelc + ".c", outCode);
     if (!res) {
         cout << "Error: Could not write flight code files" << endl;
         return false;
     }
 
-    res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude);
+    res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude);
     if (!res) {
         cout << "Error: Could not write flight include files" << endl;
         return false;

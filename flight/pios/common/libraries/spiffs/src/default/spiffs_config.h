@@ -30,19 +30,19 @@ extern xSemaphoreHandle flashfs_mutex;
 
 // Set generic spiffs debug output call.
 #ifndef SPIFFS_DGB
-#define SPIFFS_DBG(...)
+#define SPIFFS_DBG(...) //printf(__VA_ARGS__)
 #endif
 // Set spiffs debug output call for garbage collecting.
 #ifndef SPIFFS_GC_DGB
-#define SPIFFS_GC_DBG(...)
+#define SPIFFS_GC_DBG(...) //printf(__VA_ARGS__)
 #endif
 // Set spiffs debug output call for caching.
 #ifndef SPIFFS_CACHE_DGB
-#define SPIFFS_CACHE_DBG(...)
+#define SPIFFS_CACHE_DBG(...) //printf(__VA_ARGS__)
 #endif
 // Set spiffs debug output call for system consistency checks.
 #ifndef SPIFFS_CHECK_DGB
-#define SPIFFS_CHECK_DBG(...)
+#define SPIFFS_CHECK_DBG(...) //printf(__VA_ARGS__)
 #endif
 
 // Enable/disable API functions to determine exact number of bytes
@@ -119,14 +119,22 @@ extern xSemaphoreHandle flashfs_mutex;
 #define SPIFFS_COPY_BUFFER_STACK        (256)
 #endif
 
+// Enable this to have an identifiable spiffs filesystem. This will look for
+// a magic in all sectors to determine if this is a valid spiffs system or
+// not on mount point. If not, SPIFFS_format must be called prior to mounting
+// again.
+#ifndef SPIFFS_USE_MAGIC
+#define SPIFFS_USE_MAGIC                (1)
+#endif
+
 // SPIFFS_LOCK and SPIFFS_UNLOCK protects spiffs from reentrancy on api level
 // These should be defined on a multithreaded system
 
-// define this to entering a mutex if you're running on a multithreaded system
+// define this to enter a mutex if you're running on a multithreaded system
 #ifndef SPIFFS_LOCK
 #define SPIFFS_LOCK(fs)
 #endif
-// define this to exiting a mutex if you're running on a multithreaded system
+// define this to exit a mutex if you're running on a multithreaded system
 #ifndef SPIFFS_UNLOCK
 #define SPIFFS_UNLOCK(fs)
 #endif
@@ -136,7 +144,7 @@ extern xSemaphoreHandle flashfs_mutex;
 // on the target. This will reduce calculations, flash and memory accesses.
 // Parts of configuration must be defined below instead of at time of mount.
 #ifndef SPIFFS_SINGLETON
-//#define SPIFFS_SINGLETON 1
+#define SPIFFS_SINGLETON 0
 #endif
 
 #if SPIFFS_SINGLETON
@@ -159,7 +167,12 @@ extern xSemaphoreHandle flashfs_mutex;
 #endif
 #endif
 
-// Set SPFIFS_TEST_VISUALISATION to non-zero to enable SPIFFS_vis function
+// Enable this if your target needs aligned data for index tables
+#ifndef SPIFFS_ALIGNED_OBJECT_INDEX_TABLES
+#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES       0
+#endif
+
+// Set SPIFFS_TEST_VISUALISATION to non-zero to enable SPIFFS_vis function
 // in the api. This function will visualize all filesystem using given printf
 // function.
 #ifndef SPIFFS_TEST_VISUALISATION

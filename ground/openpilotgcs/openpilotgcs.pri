@@ -119,6 +119,8 @@ macx {
 
         contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
         GCS_APP_TARGET   = openpilotgcs
+        GCS_QT_QML_PATH = $$GCS_APP_PATH
+
         copyqt = $$copydata
     } else {
         GCS_APP_TARGET   = openpilotgcs

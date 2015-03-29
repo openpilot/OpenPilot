@@ -274,8 +274,9 @@ QString VehicleTemplateExportDialog::fixFilenameString(QString input, int trunca
 void VehicleTemplateExportDialog::exportTemplate()
 {
     QString path = QString("%1%2%3%4").arg(Utils::PathUtils().InsertStoragePath("%%STOREPATH%%cloudconfig"))
-            .arg(QDir::separator()).arg(getTypeDirectory()).arg(QDir::separator());
+                   .arg(QDir::separator()).arg(getTypeDirectory()).arg(QDir::separator());
     QDir dir;
+
     dir.mkpath(path);
     saveTemplate(path);
 }
@@ -362,8 +363,9 @@ QString VehicleTemplateExportDialog::getTypeDirectory()
 void VehicleTemplateExportDialog::updateStatus()
 {
     bool enabled = m_autopilotConnected && ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
-            ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
-            ui->Weight->text().length() > 0;
+                   ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
+                   ui->Weight->text().length() > 0;
+
     ui->exportBtn->setEnabled(enabled);
     ui->saveAsBtn->setEnabled(enabled);
 }

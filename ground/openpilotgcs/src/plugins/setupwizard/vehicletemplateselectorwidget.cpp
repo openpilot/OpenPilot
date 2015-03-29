@@ -146,12 +146,16 @@ QString VehicleTemplateSelectorWidget::getTemplatePath()
     switch (m_vehicleType) {
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
         return VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME;
+
     case VehicleConfigurationSource::VEHICLE_MULTI:
         return VehicleTemplateExportDialog::EXPORT_MULTI_NAME;
+
     case VehicleConfigurationSource::VEHICLE_HELI:
         return VehicleTemplateExportDialog::EXPORT_HELI_NAME;
+
     case VehicleConfigurationSource::VEHICLE_SURFACE:
         return VehicleTemplateExportDialog::EXPORT_SURFACE_NAME;
+
     default:
         return NULL;
     }

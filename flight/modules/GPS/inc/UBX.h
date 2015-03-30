@@ -102,6 +102,7 @@ typedef enum {
     UBX_ID_CFG_MSG  = 0x01,
     UBX_ID_CFG_CFG  = 0x09,
     UBX_ID_CFG_SBAS = 0x16,
+    UBX_ID_CFG_GNSS = 0x3E
 } ubx_class_cfg_id;
 
 typedef enum {
@@ -310,7 +311,7 @@ struct UBX_NAV_SVINFO_SV {
 };
 
 // SV information message
-#define MAX_SVS 16
+#define MAX_SVS 32
 
 struct UBX_NAV_SVINFO {
     uint32_t iTOW; // GPS Millisecond Time of Week (ms)
@@ -404,7 +405,7 @@ extern struct UBX_ACK_NAK ubxLastNak;
 bool checksum_ubx_message(struct UBXPacket *);
 uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionSensorData *);
 
-int parse_ubx_stream(uint8_t *rx, uint8_t len, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
+int parse_ubx_stream(uint8_t *rx, uint16_t len, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
 void load_mag_settings();
 
 #endif /* UBX_H */

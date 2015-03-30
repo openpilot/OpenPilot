@@ -30,7 +30,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <QDebug>
 #include <QString>
 #include <QMutex>
 #include "../hidapi/hidapi.h"

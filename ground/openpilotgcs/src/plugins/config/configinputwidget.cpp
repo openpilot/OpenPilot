@@ -416,18 +416,18 @@ void ConfigInputWidget::goToWizard()
     // chooses a different TX type (which could otherwise result in
     // unexpected TX channels being enabled)
     manualSettingsData             = manualSettingsObj->getData();
-    previousManualSettingsData     = manualSettingsData;
+    memento.manualSettingsData     = manualSettingsData;
     flightModeSettingsData         = flightModeSettingsObj->getData();
-    previousFlightModeSettingsData = flightModeSettingsData;
+    memento.flightModeSettingsData = flightModeSettingsData;
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
     // Stash actuatorSettings
     actuatorSettingsData           = actuatorSettingsObj->getData();
-    previousActuatorSettingsData   = actuatorSettingsData;
+    memento.actuatorSettingsData   = actuatorSettingsData;
 
     // Stash systemSettings
     systemSettingsData             = systemSettingsObj->getData();
-    previousSystemSettingsData     = systemSettingsData;
+    memento.systemSettingsData     = systemSettingsData;
 
     // Now reset channel and actuator settings (disable outputs)
     resetChannelSettings();
@@ -469,10 +469,10 @@ void ConfigInputWidget::wzCancel()
     ui->stackedWidget->setCurrentIndex(0);
 
     // Load settings back from beginning of wizard
-    manualSettingsObj->setData(previousManualSettingsData);
-    flightModeSettingsObj->setData(previousFlightModeSettingsData);
-    actuatorSettingsObj->setData(previousActuatorSettingsData);
-    systemSettingsObj->setData(previousSystemSettingsData);
+    manualSettingsObj->setData(memento.manualSettingsData);
+    flightModeSettingsObj->setData(memento.flightModeSettingsData);
+    actuatorSettingsObj->setData(memento.actuatorSettingsData);
+    systemSettingsObj->setData(memento.systemSettingsData);
 }
 
 void ConfigInputWidget::registerControlActivity()
@@ -555,7 +555,7 @@ void ConfigInputWidget::wzNext()
         restoreMdata();
 
         // Load actuator settings back from beginning of wizard
-        actuatorSettingsObj->setData(previousActuatorSettingsData);
+        actuatorSettingsObj->setData(memento.actuatorSettingsData);
 
         // Force flight mode neutral to middle and Throttle neutral at 4%
         adjustSpecialNeutrals();
@@ -802,6 +802,12 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(identifyControls()));
         wizardUi->wzNext->setEnabled(true);
         setTxMovement(nothing);
+        /* If flight mode stick isn't identified, force flight mode number to be 1 */
+        manualSettingsData = manualSettingsObj->getData();
+        if (manualSettingsData.ChannelGroups[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] ==
+            ManualControlSettings::CHANNELGROUPS_NONE) {
+            forceOneFlightMode();
+        }
         break;
     case wizardIdentifyCenter:
         manualCommandData  = manualCommandObj->getData();
@@ -882,21 +888,32 @@ void ConfigInputWidget::restoreMdata()
  */
 void ConfigInputWidget::setChannel(int newChan)
 {
+    bool canBeSkipped(false);
+
     if (newChan == ManualControlSettings::CHANNELGROUPS_COLLECTIVE) {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please enable throttle hold mode.\n\nMove the Collective Pitch stick.")));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please enable throttle hold mode.</p>"
+                                                                "<p>Move the Collective Pitch stick.</p>")));
     } else if (newChan == ManualControlSettings::CHANNELGROUPS_FLIGHTMODE) {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please toggle the Flight Mode switch.\n\nFor switches you may have to repeat this rapidly.")));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please toggle the Flight Mode switch.</p>"
+                                                                "<p>For switches you may have to repeat this rapidly.</p>"
+                                                                "<p>Alternatively, you can click Next to skip this channel, but you will get only <b>ONE</b> Flight Mode.</p>")));
+        canBeSkipped = true;
     } else if ((transmitterType == heli) && (newChan == ManualControlSettings::CHANNELGROUPS_THROTTLE)) {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please disable throttle hold mode.\n\nMove the Throttle stick.")));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please disable throttle hold mode.</p>"
+                                                                "<p>Move the Throttle stick.</p>")));
     } else {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please move each control one at a time according to the instructions and picture below.\n\n"
-                                                                "Move the %1 stick.")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please move each control one at a time according to the instructions and picture below.</p>"
+                                                                "<p>Move the %1 stick.</p>")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
     }
 
     if (manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory")) {
+        wizardUi->identifyStickInstructions->setText(wizardUi->identifyStickInstructions->text() + tr("<p>Alternatively, click Next to skip this channel.</p>"));
+        canBeSkipped = true;
+    }
+
+    if (true == canBeSkipped) {
         wizardUi->wzNext->setEnabled(true);
         wizardUi->wzNext->setText(tr("Next / Skip"));
-        wizardUi->identifyStickInstructions->setText(wizardUi->identifyStickInstructions->text() + tr(" Alternatively, click Next to skip this channel."));
     } else {
         wizardUi->wzNext->setEnabled(false);
     }
@@ -1674,7 +1691,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         // Stash actuatorSettings
         actuatorSettingsData = actuatorSettingsObj->getData();
-        previousActuatorSettingsData = actuatorSettingsData;
+        memento.actuatorSettingsData = actuatorSettingsData;
 
         // Disable all actuators
         resetActuatorSettings();
@@ -1720,7 +1737,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         manualSettingsObj->setData(manualSettingsData);
 
         // Load actuator settings back from beginning of manual calibration
-        actuatorSettingsObj->setData(previousActuatorSettingsData);
+        actuatorSettingsObj->setData(memento.actuatorSettingsData);
 
         ui->configurationWizard->setEnabled(true);
         ui->saveRCInputToRAM->setEnabled(true);
@@ -1781,6 +1798,7 @@ void ConfigInputWidget::resetChannelSettings()
     for (unsigned int channel = 0; channel < 9; channel++) {
         manualSettingsData.ChannelGroups[channel] = ManualControlSettings::CHANNELGROUPS_NONE;
         manualSettingsData.ChannelNumber[channel] = 0;
+        manualSettingsData.FlightModeNumber = 3;
         manualSettingsObj->setData(manualSettingsData);
     }
 }
@@ -1819,7 +1837,7 @@ void ConfigInputWidget::resetActuatorSettings()
 
 void ConfigInputWidget::forceOneFlightMode()
 {
-    manualCommandData = manualCommandObj->getData();
+    manualSettingsData = manualSettingsObj->getData();
     manualSettingsData.FlightModeNumber = 1;
     manualSettingsObj->setData(manualSettingsData);
 }

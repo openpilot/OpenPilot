@@ -66,7 +66,6 @@ equals(copyqt, 1) {
                   Qt5Script$${DS}.dll \
                   Qt5Concurrent$${DS}.dll \
                   Qt5PrintSupport$${DS}.dll \
-                  Qt5OpenGL$${DS}.dll \
                   Qt5SerialPort$${DS}.dll \
                   Qt5Multimedia$${DS}.dll \
                   Qt5MultimediaWidgets$${DS}.dll \

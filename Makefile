@@ -451,8 +451,9 @@ sim_osx_%: uavobjects_flight
 all_ground: openpilotgcs uploader
 
 # Convenience target for the GCS
-.PHONY: gcs gcs_clean
+.PHONY: gcs gcs_qmake gcs_clean
 gcs: openpilotgcs
+gcs_qmake: openpilotgcs_qmake
 gcs_clean: openpilotgcs_clean
 
 ifeq ($(V), 1)
@@ -461,25 +462,19 @@ else
     GCS_SILENT := silent
 endif
 
-.NOTPARALLEL:
-.PHONY: openpilotgcs
-openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
-
 OPENPILOTGCS_DIR := $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
 DIRS += $(OPENPILOTGCS_DIR)
 
+OPENPILOTGCS_MAKEFILE := $(OPENPILOTGCS_DIR)/Makefile
+
 .PHONY: openpilotgcs_qmake
-openpilotgcs_qmake: | $(OPENPILOTGCS_DIR)
-ifeq ($(QMAKE_SKIP),)
+openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
 	$(V1) ( cd $(OPENPILOTGCS_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
 	)
-else
-	@$(ECHO) "skipping qmake"
-endif
 
-.PHONY: openpilotgcs_make
-openpilotgcs_make:
+.PHONY: openpilotgcs
+openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
 	$(V1) $(MAKE) -w -C $(OPENPILOTGCS_DIR)/$(MAKE_DIR);
 
 .PHONY: openpilotgcs_clean
@@ -493,25 +488,19 @@ openpilotgcs_clean:
 #
 ################################
 
-.NOTPARALLEL:
-.PHONY: uploader
-uploader: uploader_qmake uploader_make
-
 UPLOADER_DIR := $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
 DIRS += $(UPLOADER_DIR)
 
+UPLOADER_MAKEFILE := $(UPLOADER_DIR)/Makefile
+
 .PHONY: uploader_qmake
-uploader_qmake: | $(UPLOADER_DIR)
-ifeq ($(QMAKE_SKIP),)
+uploader_qmake $(UPLOADER_MAKEFILE): | $(UPLOADER_DIR)
 	$(V1) ( cd $(UPLOADER_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
 	) 
-else
-	@$(ECHO) "skipping qmake"
-endif
 
-.PHONY: uploader_make
-uploader_make:
+.PHONY: uploader
+uploader: $(UPLOADER_MAKEFILE)
 	$(V1) $(MAKE) -w -C $(UPLOADER_DIR)
 
 .PHONY: uploader_clean
@@ -953,16 +942,15 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   [GCS]"
 	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application (debug|release)"
-	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
 	@$(ECHO) "                            Compile specific directory: MAKE_DIR=<dir>"
-	@$(ECHO) "                            Example: make gcs QMAKE_SKIP=1 MAKE_DIR=src/plugins/coreplugin"
+	@$(ECHO) "                            Example: make gcs MAKE_DIR=src/plugins/coreplugin"
+	@$(ECHO) "     gcs_qmake            - Run qmake for the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)
 	@$(ECHO) "   [Uploader Tool]"
 	@$(ECHO) "     uploader             - Build the serial uploader tool (debug|release)"
-	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
-	@$(ECHO) "                            Example: make uploader QMAKE_SKIP=1"
+	@$(ECHO) "     uploader_qmake       - Run qmake for the serial uploader tool (debug|release)"
 	@$(ECHO) "     uploader_clean       - Remove the serial uploader tool (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)

@@ -49,6 +49,8 @@ export BUILD_DIR   := $(ROOT_DIR)/build
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
 export DIST_DIR    := $(ROOT_DIR)/build/dist
 
+DIRS = $(DL_DIR) $(TOOLS_DIR) $(BUILD_DIR) $(PACKAGE_DIR) $(DIST_DIR)
+
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
 UAVOGEN_BUILD_CONF	:= release
@@ -140,20 +142,6 @@ all_clean:
 .PONY: clean
 clean: all_clean
 
-$(DL_DIR):
-	$(MKDIR) -p $@
-
-$(TOOLS_DIR):
-	$(MKDIR) -p $@
-
-$(BUILD_DIR):
-	$(MKDIR) -p $@
-
-$(PACKAGE_DIR):
-	$(MKDIR) -p $@
-
-$(DIST_DIR):
-	$(MKDIR) -p $@
 
 ##############################
 #
@@ -167,10 +155,12 @@ else
     UAVOGEN_SILENT := silent
 endif
 
+UAVOBJGENERATOR_DIR = $(BUILD_DIR)/uavobjgenerator
+DIRS += $(UAVOBJGENERATOR_DIR)
+
 .PHONY: uavobjgenerator
-uavobjgenerator:
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@
-	$(V1) ( cd $(BUILD_DIR)/$@ && \
+uavobjgenerator: | $(UAVOBJGENERATOR_DIR)
+	$(V1) ( cd $(UAVOBJGENERATOR_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="$(UAVOGEN_BUILD_CONF) $(UAVOGEN_SILENT)" && \
 	    $(MAKE) --no-print-directory -w ; \
 	)
@@ -183,8 +173,7 @@ uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
 UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
 
-$(UAVOBJ_OUT_DIR):
-	$(V1) $(MKDIR) -p $@
+DIRS += $(UAVOBJ_OUT_DIR)
 
 uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
@@ -213,6 +202,8 @@ export OPUAVOBJ      := $(ROOT_DIR)/flight/uavobjects
 export OPUAVTALK     := $(ROOT_DIR)/flight/uavtalk
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
+
+DIRS += $(OPGCSSYNTHDIR)
 
 # Define supported board lists
 ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare gpsplatinum
@@ -474,11 +465,13 @@ endif
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
 
+OPENPILOTGCS_DIR := $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
+DIRS += $(OPENPILOTGCS_DIR)
+
 .PHONY: openpilotgcs_qmake
-openpilotgcs_qmake:
+openpilotgcs_qmake: | $(OPENPILOTGCS_DIR)
 ifeq ($(QMAKE_SKIP),)
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF) && \
+	$(V1) ( cd $(OPENPILOTGCS_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
 	)
 else
@@ -487,15 +480,12 @@ endif
 
 .PHONY: openpilotgcs_make
 openpilotgcs_make:
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/$(MAKE_DIR) && \
-	    $(MAKE) -w ; \
-	)
+	$(V1) $(MAKE) -w -C $(OPENPILOTGCS_DIR)/$(MAKE_DIR);
 
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
-	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF))"
-	$(V1) [ ! -d "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)"
+	@$(ECHO) " CLEAN      $(call toprel, $(OPENPILOTGCS_DIR))"
+	$(V1) [ ! -d "$(OPENPILOTGCS_DIR)" ] || $(RM) -r "$(OPENPILOTGCS_DIR)"
 
 ################################
 #
@@ -507,11 +497,13 @@ openpilotgcs_clean:
 .PHONY: uploader
 uploader: uploader_qmake uploader_make
 
+UPLOADER_DIR := $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
+DIRS += $(UPLOADER_DIR)
+
 .PHONY: uploader_qmake
-uploader_qmake:
+uploader_qmake: | $(UPLOADER_DIR)
 ifeq ($(QMAKE_SKIP),)
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF) && \
+	$(V1) ( cd $(UPLOADER_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
 	) 
 else
@@ -520,15 +512,12 @@ endif
 
 .PHONY: uploader_make
 uploader_make:
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)/$(MAKE_DIR) && \
-	    $(MAKE) -w ; \
-	)
+	$(V1) $(MAKE) -w -C $(UPLOADER_DIR)
 
 .PHONY: uploader_clean
 uploader_clean:
-	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF))"
-	$(V1) [ ! -d "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)"
+	@$(ECHO) " CLEAN      $(call toprel, $(UPLOADER_DIR))"
+	$(V1) [ ! -d "$(UPLOADER_DIR)" ] || $(RM) -r "$(UPLOADER_DIR)"
 
 
 # We want to take snapshots of the UAVOs at each point that they change
@@ -652,8 +641,7 @@ ALL_UNITTESTS := logfs math lednotification
 
 # Build the directory for the unit tests
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests
-$(UT_OUT_DIR):
-	$(V1) $(MKDIR) -p $@
+DIRS += $(UT_OUT_DIR)
 
 .PHONY: all_ut
 all_ut: $(addsuffix _elf, $(addprefix ut_, $(ALL_UNITTESTS)))
@@ -728,9 +716,8 @@ OPFW_CONTENTS := \
 .PHONY: opfw_resource
 opfw_resource: $(OPFW_RESOURCE)
 
-$(OPFW_RESOURCE): $(FW_TARGETS)
+$(OPFW_RESOURCE): $(FW_TARGETS) | $(OPGCSSYNTHDIR)
 	@$(ECHO) Generating OPFW resource file $(call toprel, $@)
-	$(V1) $(MKDIR) -p $(dir $@)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
@@ -821,9 +808,8 @@ docs_all_clean:
 ##############################
 
 .PHONY: build-info
-build-info:
+build-info: | $(BUILD_DIR)
 	@$(ECHO) " BUILD-INFO $(call toprel, $(BUILD_DIR)/$@.txt)"
-	$(V1) $(MKDIR) -p $(BUILD_DIR)
 	$(V1) $(VERSION_INFO) \
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
 		--template="make/templates/$@.txt" \
@@ -851,6 +837,17 @@ $(DIST_NAME).gz: $(DIST_VER_INFO) .git/index | $(DIST_DIR)
 
 .PHONY: dist
 dist: $(DIST_NAME).gz
+
+
+##############################
+#
+# Directories
+#
+##############################
+
+$(DIRS):
+	$(V1) $(MKDIR) -p $@
+
 
 ##############################
 #

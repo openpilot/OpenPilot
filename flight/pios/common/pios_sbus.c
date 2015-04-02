@@ -48,7 +48,7 @@ static uint8_t PIOS_SBus_Quality_Get(uint32_t rcvr_id);
 
 /* Local Variables */
 const struct pios_rcvr_driver pios_sbus_rcvr_driver = {
-    .read = PIOS_SBus_Get,
+    .read        = PIOS_SBus_Get,
     .get_quality = PIOS_SBus_Quality_Get
 };
 
@@ -129,7 +129,7 @@ static void PIOS_SBus_ResetState(struct pios_sbus_state *state)
     state->receive_timer  = 0;
     state->failsafe_timer = 0;
     state->frame_found    = 0;
-    state->quality        = 0;
+    state->quality = 0;
     PIOS_SBus_ResetChannels(state);
 }
 
@@ -261,29 +261,29 @@ static void PIOS_SBus_UpdateState(struct pios_sbus_state *state, uint8_t b)
         state->byte_count++;
     } else {
         if (b == SBUS_EOF_BYTE || (b & SBUS_R7008SB_EOF_COUNTER_MASK) == 0) {
-	    uint8_t quality_trend;
+            uint8_t quality_trend;
 
             /* full frame received */
             uint8_t flags = state->received_data[SBUS_FRAME_LENGTH - 3];
             if (flags & SBUS_FLAG_FL) {
                 /* frame lost, do not update */
                 /* Quality trend is towards 0% */
-	        quality_trend = 0;
+                quality_trend = 0;
             } else {
                 /* Quality trend is towards 100% */
-	        quality_trend = 100;
-		if (flags & SBUS_FLAG_FS) {
-		    /* failsafe flag active */
-		    PIOS_SBus_ResetChannels(state);
-		} else {
-		    /* data looking good */
-		    PIOS_SBus_UnrollChannels(state);
-		    state->failsafe_timer = 0;
-		}
-	    }
-	    /* Present quality as a weighted average of good frames */
-	    state->quality = ((state->quality * (SBUS_FL_WEIGHTED_AVE - 1)) +
-		       quality_trend) / SBUS_FL_WEIGHTED_AVE;
+                quality_trend = 100;
+                if (flags & SBUS_FLAG_FS) {
+                    /* failsafe flag active */
+                    PIOS_SBus_ResetChannels(state);
+                } else {
+                    /* data looking good */
+                    PIOS_SBus_UnrollChannels(state);
+                    state->failsafe_timer = 0;
+                }
+            }
+            /* Present quality as a weighted average of good frames */
+            state->quality = ((state->quality * (SBUS_FL_WEIGHTED_AVE - 1)) +
+                              quality_trend) / SBUS_FL_WEIGHTED_AVE;
         } else {
             /* discard whole frame */
         }

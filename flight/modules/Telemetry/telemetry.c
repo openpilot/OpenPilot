@@ -221,9 +221,9 @@ int32_t TelemetryInitialize(void)
     timeOfLastObjectUpdate     = 0;
 
     // Create object queues
-    localChannel.queue     = xQueueCreate(MAX_QUEUE_SIZE,
+    localChannel.queue         = xQueueCreate(MAX_QUEUE_SIZE,
                                               sizeof(UAVObjEvent));
-    radioChannel.queue     = xQueueCreate(MAX_QUEUE_SIZE,
+    radioChannel.queue         = xQueueCreate(MAX_QUEUE_SIZE,
                                               sizeof(UAVObjEvent));
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
     localChannel.priorityQueue = xQueueCreate(MAX_QUEUE_SIZE,

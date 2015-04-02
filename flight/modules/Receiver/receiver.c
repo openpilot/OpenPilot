@@ -99,13 +99,17 @@ static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel
 struct rcvr_activity_fsm {
     ManualControlSettingsChannelGroupsOptions group;
     uint16_t prev[RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP];
-    uint8_t sample_count;
-    uint8_t quality;
+    uint8_t  sample_count;
+    uint8_t  quality;
 };
 static struct rcvr_activity_fsm activity_fsm;
 
 static void resetRcvrActivity(struct rcvr_activity_fsm *fsm);
 static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm);
+static void resetRcvrStatus(struct rcvr_activity_fsm *fsm);
+static bool updateRcvrStatus(
+    struct rcvr_activity_fsm *fsm,
+    ManualControlSettingsChannelGroupsOptions group);
 
 #define assumptions \
     ( \
@@ -140,6 +144,7 @@ int32_t ReceiverInitialize()
     AccessoryDesiredInitialize();
     ManualControlCommandInitialize();
     ReceiverActivityInitialize();
+    ReceiverStatusInitialize();
     ManualControlSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     StabilizationSettingsInitialize();
@@ -149,18 +154,6 @@ int32_t ReceiverInitialize()
     return 0;
 }
 MODULE_INITCALL(ReceiverInitialize, ReceiverStart);
-
-static void updateRcvrStatus(uint32_t rcvr_id)
-{
-    extern uint32_t pios_rcvr_group_map[];
-
-    uint8_t quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[rcvr_id]);
-#if 1
-    ReceiverStatusQualitySet(&quality);
-#else
-    quality = quality * 100 / 255;
-#endif
-}
 
 /**
  * Module task
@@ -187,6 +180,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
     /* Initialize the RcvrActivty FSM */
     portTickType lastActivityTime = xTaskGetTickCount();
     resetRcvrActivity(&activity_fsm);
+    resetRcvrStatus(&activity_fsm);
 
     // Main task loop
     lastSysTime = xTaskGetTickCount();
@@ -211,9 +205,13 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 /* Reset the aging timer because activity was detected */
                 lastActivityTime = lastSysTime;
             }
+            /* Read signal quality from the group used for the throttle */
+            (void)updateRcvrStatus(&activity_fsm,
+                                   settings.ChannelGroups.Throttle);
         }
         if (timeDifferenceMs(lastActivityTime, lastSysTime) > 5000) {
             resetRcvrActivity(&activity_fsm);
+            resetRcvrStatus(&activity_fsm);
             lastActivityTime = lastSysTime;
         }
 
@@ -256,13 +254,6 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                                                 ManualControlSettingsChannelNeutralToArray(settings.ChannelNeutral)[n]);
             }
         }
-
-	/* Update the receiver status, specifically signal quality, for the
-	 * receiver used for flight mode control.
-	 *
-	 * SCEDEBUG Fixed to use S.Bus for now
-	 */
-	updateRcvrStatus(MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS);
 
         // Check settings, if error raise alarm
         if (settings.ChannelGroups.Roll >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
@@ -529,6 +520,12 @@ static void resetRcvrActivity(struct rcvr_activity_fsm *fsm)
     fsm->sample_count = 0;
 }
 
+static void resetRcvrStatus(struct rcvr_activity_fsm *fsm)
+{
+    /* Reset the state */
+    fsm->quality = 0;
+}
+
 static void updateRcvrActivitySample(uint32_t rcvr_id, uint16_t samples[], uint8_t max_channels)
 {
     for (uint8_t channel = 1; channel <= max_channels; channel++) {
@@ -599,6 +596,7 @@ static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm)
     if (fsm->group >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
         /* We're out of range, reset things */
         resetRcvrActivity(fsm);
+        resetRcvrStatus(fsm);
     }
 
     extern uint32_t pios_rcvr_group_map[];
@@ -639,6 +637,27 @@ group_completed:
             fsm->sample_count++;
             break;
         }
+    }
+
+    return activity_updated;
+}
+
+/* Read signal quality from the specified group */
+static bool updateRcvrStatus(
+    struct rcvr_activity_fsm *fsm,
+    ManualControlSettingsChannelGroupsOptions group)
+{
+    extern uint32_t pios_rcvr_group_map[];
+    bool activity_updated = false;
+    uint8_t quality;
+
+    quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[group]);
+
+    /* Compare with previous sample */
+    if (quality != fsm->quality) {
+        fsm->quality     = quality;
+        ReceiverStatusQualitySet(&quality);
+        activity_updated = true;
     }
 
     return activity_updated;

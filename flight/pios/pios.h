@@ -267,6 +267,7 @@ extern "C" {
 #include <pios_flash.h>
 #include <pios_flashfs.h>
 #endif
+#include <pios_fs.h>
 
 /* driver for storage on internal flash */
 /* #define PIOS_INCLUDE_FLASH_INTERNAL */

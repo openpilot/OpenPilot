@@ -34,13 +34,11 @@
 #include "sync.h"
 #include "flightstatus.h"
 
-/* Mathieu TODO: there is probably a macro that does this already somewhere */
-//#define ALIGN4(x)       ((~(3))&((x)+(3)))
+#define FILESYNC_READ_FLAG (PIOS_FS_RDONLY)
+#define FILESYNC_WRITE_FLAG (PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_APPEND)
 
-extern uintptr_t pios_external_flash_fs_id;
+extern uintptr_t pios_fs_filesync_id;
 
-typedef int32_t (*funcForPtr)(uintptr_t);
-typedef int32_t (*funcDelPtr)(uintptr_t, char *);
 
 // private variables
 static SyncData *filesync;
@@ -48,27 +46,6 @@ static SyncData *filesync;
 // private functions
 static void FileSyncCb(UAVObjEvent *ev);
 
-struct DeviceSyncStruct {
-    uint32_t filename_size;
-    uintptr_t fs_id;
-    uint32_t lseek_flags;
-    uint32_t read_flags;
-    uint32_t write_flags;
-    funcForPtr format;
-    funcDelPtr delete;
-};
-
-/* Mathieu TODO: Use the enum from Sync uavo */
-enum device_sync_enum {
-    EXTERNAL_FLASH,
-    INTERNAL_FLASH,
-    MICROSD_CARD,
-    USB_STICK,
-    DEVICE_SYNC_SUPPORTED_NUM_MAX
-};
-
-/* Mathieu TODO: use heap instead */
-struct DeviceSyncStruct deviceSync[DEVICE_SYNC_SUPPORTED_NUM_MAX];
 
 int32_t FileSyncInitialize(void)
 {
@@ -80,14 +57,6 @@ int32_t FileSyncInitialize(void)
         return -1;
     }
 
-    /* Mathieu TODO: move device's filesystem specific to pios_board.c since this is platform dependent */
-    deviceSync[EXTERNAL_FLASH].filename_size = FLASHFS_FILENAME_LEN;
-    deviceSync[EXTERNAL_FLASH].fs_id = pios_external_flash_fs_id;
-    deviceSync[EXTERNAL_FLASH].lseek_flags = FLASHFS_SEEK_SET;
-    deviceSync[EXTERNAL_FLASH].read_flags = PIOS_FLASHFS_RDONLY;
-    deviceSync[EXTERNAL_FLASH].write_flags = PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | SPIFFS_APPEND;
-    deviceSync[EXTERNAL_FLASH].format = PIOS_FLASHFS_Format;
-    deviceSync[EXTERNAL_FLASH].delete = PIOS_FLASHFS_Remove;
     return 0;
 }
 
@@ -126,7 +95,6 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
         return;
     }
 
-    struct DeviceSyncStruct *deviceSyncPtr = &deviceSync[filesync->Device];
     filesync->Status = SYNC_STATUS_ERROR;
 
     if (filesync->Sync == SYNC_SYNC_ENABLED) {
@@ -135,60 +103,59 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
             switch (filesync->Command) {
                 /* Download a file from board to host.*/
                 case SYNC_COMMAND_DOWNLOAD:
-                    fh = PIOS_FLASHFS_Open(deviceSyncPtr->fs_id, (char*)filesync->Name, deviceSyncPtr->read_flags);
+                    fh = PIOS_FS_Open(pios_fs_filesync_id, (char*)filesync->Name, FILESYNC_READ_FLAG);
                     if (fh >= 0) {
                         if (filesync->Offset) {
-                            if (PIOS_FLASHFS_Lseek(deviceSyncPtr->fs_id, fh, filesync->Offset, deviceSyncPtr->lseek_flags) == 0) {
-                                if (PIOS_FLASHFS_Read(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == filesync->DataSize) {
+                            if (PIOS_FS_Lseek(pios_fs_filesync_id, fh, filesync->Offset, PIOS_FS_SEEK_SET) == 0) {
+                                if (PIOS_FS_Read(pios_fs_filesync_id, fh, filesync->Data, filesync->DataSize) == filesync->DataSize) {
                                     filesync->Status = SYNC_STATUS_OK;
                                 }
                             }
                         }
                         else {
-                            if (PIOS_FLASHFS_Read(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == filesync->DataSize) {
+                            if (PIOS_FS_Read(pios_fs_filesync_id, fh, filesync->Data, filesync->DataSize) == filesync->DataSize) {
                                 filesync->Status = SYNC_STATUS_OK;
                             }
                         }
-                        PIOS_FLASHFS_Close(deviceSyncPtr->fs_id, fh);
+                        PIOS_FS_Close(pios_fs_filesync_id, fh);
                     }
                     filesync->Command = SYNC_COMMAND_DOWNLOAD_RESPONSE;
                     break;
                 /* UPload a file from host to board. */
                 case SYNC_COMMAND_UPLOAD:
-                    fh = PIOS_FLASHFS_Open(deviceSyncPtr->fs_id, (char*)filesync->Name, deviceSyncPtr->write_flags);
+                    fh = PIOS_FS_Open(pios_fs_filesync_id, (char*)filesync->Name, FILESYNC_WRITE_FLAG);
                     if (fh >= 0) {
                         if (filesync->Offset) {
-                            if (PIOS_FLASHFS_Lseek(deviceSyncPtr->fs_id, fh, filesync->Offset, deviceSyncPtr->lseek_flags) == 0) {
-                                if (PIOS_FLASHFS_Write(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == 0) {
+                            if (PIOS_FS_Lseek(pios_fs_filesync_id, fh, filesync->Offset, PIOS_FS_SEEK_SET) == 0) {
+                                if (PIOS_FS_Write(pios_fs_filesync_id, fh, filesync->Data, filesync->DataSize) == 0) {
                                     filesync->Status = SYNC_STATUS_OK;
                                 }
                             }
                         }
                         else {
-                            if (PIOS_FLASHFS_Write(deviceSyncPtr->fs_id, fh, filesync->Data, filesync->DataSize) == 0) {
+                            if (PIOS_FS_Write(pios_fs_filesync_id, fh, filesync->Data, filesync->DataSize) == 0) {
                                 filesync->Status = SYNC_STATUS_OK;
                             }
                         }
-                        PIOS_FLASHFS_Close(deviceSyncPtr->fs_id, fh);
+                        PIOS_FS_Close(pios_fs_filesync_id, fh);
                     }
                     filesync->Command = SYNC_COMMAND_UPLOAD_RESPONSE;
                     break;
                 /* Get a list of files stored on the board's filesystem. */
                 case SYNC_COMMAND_LIST:
                     /* Find out how many file there is on file system */
-                    if ((file_count = PIOS_FLASHFS_Find(deviceSyncPtr->fs_id, "*", 1, 0)) >= 0)
+                    file_count = PIOS_FS_Find(pios_fs_filesync_id, "*", 1, 0);
+                    if (file_count >= 0)
                     {
                         /* how much data we have to send? */
                         /* Fill object's data. */
-                        int file_size = deviceSyncPtr->filename_size;
+                        int file_size = FS_FILENAME_LEN;
                         int file_info_size = file_size + sizeof(filesync->TotalSize);
                         data_size = file_count * file_info_size;
 
-                        /* Requester does not know how much data we have to send back. */
-
                         /* we may have less data than requested (will fit into one packet). */
-                        if (data_size <= filesync->DataSize)
-                        {
+                        if (data_size <= filesync->DataSize) {
+
                             filesync->DataSize = data_size;
                             filesync->TotalSize = data_size;
 
@@ -198,9 +165,8 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
                                 filesync->DataSize = 0;
                             }
                         }
-
                         /* we may have more data than requested, split into multiple objects */
-                        if (data_size > filesync->DataSize)
+                        else if (data_size > filesync->DataSize)
                         {
                             /* find out if there has been a change on the file system (any writes) */
                             /* for now, simplify to a file count change */
@@ -215,32 +181,38 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
                             }
                         }
 
-                        if (filesync->DataSize) {
+                        memset(filesync->Data, 0, filesync->DataSize);
 
-                            memset(filesync->Data, 0, filesync->DataSize);
+                        if (filesync->DataSize) {
 
                             for (i = (filesync->Offset / file_info_size);
                                  i < ((filesync->Offset + filesync->DataSize) / file_info_size);
                                  i++) {
-                                 PIOS_FLASHFS_Info(deviceSyncPtr->fs_id,
-                                                   (char*)&filesync->Data[i*file_info_size],
-                                                   (uint32_t*)&filesync->Data[i*file_info_size + file_size],
-                                                   i,
-                                                   0);
+                                 PIOS_FS_Info(pios_fs_filesync_id,
+                                              (char*)&filesync->Data[i*file_info_size],
+                                              (uint32_t*)&filesync->Data[i*file_info_size + file_size],
+                                              i,
+                                              0);
                             }
                         }
+                    }
+                    else
+                    {
+                        filesync->DataSize = 0;
+                        filesync->TotalSize = 0;
+                        filesync->Offset = 0;
                     }
                     filesync->Command = SYNC_COMMAND_LIST_RESPONSE;
                     break;
                 /* Delete a file on the board. */
                 case SYNC_COMMAND_DELETE:
-                    if (!deviceSyncPtr->delete(deviceSyncPtr->fs_id, (char*)filesync->Name))
+                    if (!PIOS_FS_Remove(pios_fs_filesync_id, (char*)filesync->Name))
                         filesync->Status = SYNC_STATUS_OK;
                     filesync->Command = SYNC_COMMAND_DELETE_RESPONSE;
                     break;
                 /* Format a file system on the board. */
                 case SYNC_COMMAND_FORMAT:
-                    if (!deviceSyncPtr->format(deviceSyncPtr->fs_id))
+                    if (!PIOS_FS_Format(pios_fs_filesync_id))
                         filesync->Status = SYNC_STATUS_OK;
                     filesync->Command = SYNC_COMMAND_FORMAT_RESPONSE;
                     break;

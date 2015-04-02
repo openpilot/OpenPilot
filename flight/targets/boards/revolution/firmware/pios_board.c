@@ -257,7 +257,7 @@ uintptr_t pios_uavo_settings_fs_id = 0;
 uintptr_t pios_user_fs_id = 0;
 uintptr_t pios_external_flash_fs_id = 0;
 uintptr_t pios_flashfs_id = 0;
-
+uintptr_t pios_fs_filesync_id = 0;
 /*
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
  */
@@ -386,25 +386,41 @@ void PIOS_Board_Init(void)
         PIOS_DEBUG_Assert(0);
     }
 
-#if defined(PIOS_INCLUDE_FLASH)
+#if defined(PIOS_INCLUDE_SPI_FLASH)
+
     /* Connect flash to the appropriate interface and configure it */
     uintptr_t flash_id;
 
-    // Initialize the external USER flash
+    /* Initialize the external spi flash */
     if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_telem_flash_id, 1)) {
         PIOS_DEBUG_Assert(0);
     }
 
+    /* Initialize the Filesystem(s) */
     if (PIOS_FLASHFS_Init(&pios_external_flash_fs_id, &flashfs_external_cfg, &pios_jedec_flash_driver, flash_id)) {
             PIOS_DEBUG_Assert(0);
     }
-    /* Settings and log are on the same file system */
-    pios_uavo_settings_fs_id = pios_external_flash_fs_id;
-    pios_user_fs_id = pios_external_flash_fs_id;
-    /* We currently only have one filesystem. */
-    pios_flashfs_id = pios_external_flash_fs_id;
+
+    /* Register the filesystem to the filesystem manager (common filesystem api). */
+    //PIOS_FS_Register(pios_external_flash_fs_id, FS_EXTERNAL_FLASH);
 
 #endif /* if defined(PIOS_INCLUDE_FLASH) */
+
+#if defined(PIOS_INCLUDE_INTERNAL_FLASH)
+    /* Initialize internal flash */
+    if (PIOS_FLASHFS_Init(&pios_internal_flash_fs_id, &flashfs_internal_cfg, NULL, NULL)) {
+            PIOS_DEBUG_Assert(0);
+    }
+
+    /* Register the filesystem to the filesystem manager (common filesystem api). */
+    PIOS_FS_Register(pios_internal_flash_fs_id, FS_INTERNAL_FLASH);
+#endif
+
+    /* mux */
+    pios_uavo_settings_fs_id = pios_external_flash_fs_id;
+    pios_user_fs_id = pios_external_flash_fs_id;
+    pios_flashfs_id = pios_external_flash_fs_id;
+    pios_fs_filesync_id = pios_external_flash_fs_id;
 
 #if defined(PIOS_INCLUDE_RTC)
     PIOS_RTC_Init(&pios_rtc_main_cfg);
@@ -417,7 +433,7 @@ void PIOS_Board_Init(void)
         PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
 #if defined(PIOS_INCLUDE_FLASH)
         // Format (chip erase): All content of external flash will be destroyed including file system info
-        PIOS_FLASHFS_Format(pios_external_flash_fs_id);
+        PIOS_FS_Format(pios_external_flash_fs_id);
 #endif
         PIOS_IAP_WriteBootCmd(0, 0);
         PIOS_IAP_WriteBootCmd(1, 0);

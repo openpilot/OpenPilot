@@ -24,6 +24,10 @@
 #include "lauxlib.h"
 
 #if defined(CONFIG_BUILD_SPIFFS)
+// File system that holds the scripts.
+extern uintptr_t pios_flashfs_id;
+#define LUA_LOG_FILE_NAME "lua_error.log"
+#define LUA_LOG_FILE_FLAG (PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_APPEND)
 static int errno;
 #define LAUXLIB_ERROR_FILE_DOES_NOT_EXIST -1
 #define LAUXLIB_ERROR_FILE_OPEN -2
@@ -46,7 +50,7 @@ extern uintptr_t pios_external_flash_fs_id;
 int lua__getc(FIL *f)
 {
   char c;
-  if (PIOS_FLASHFS_Read(pios_external_flash_fs_id, *f, (uint8_t*)&c, 1) == 1)
+  if (PIOS_FS_Read(pios_external_flash_fs_id, *f, (uint8_t*)&c, 1) == 1)
     return c;
   else
     return -1;
@@ -54,6 +58,25 @@ int lua__getc(FIL *f)
 #endif
 
 
+void _exit(int status) {
+    (void)status;
+    while(1);
+}
+
+void _kill(int status) {
+    (void)status;
+    while(1);
+}
+
+void _getpid(int status) {
+    (void)status;
+    while(1);
+}
+
+void _sbrk(int status) {
+    (void)status;
+    while(1);
+}
 /*
 ** search for 'objidx' in table at index -1.
 ** return 1 + string at top if find a good name.
@@ -599,7 +622,7 @@ static const char *getF (lua_State *L, void *ud, size_t *size) {
 
 #if defined(CONFIG_BUILD_SPIFFS)
     int rc;
-    rc = PIOS_FLASHFS_Read(pios_external_flash_fs_id, lf->f, (uint8_t*)lf->buff, sizeof(lf->buff));
+    rc = PIOS_FS_Read(pios_external_flash_fs_id, lf->f, (uint8_t*)lf->buff, sizeof(lf->buff));
     if (rc < 0)
         return NULL;
     else
@@ -677,7 +700,7 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   else {
     lua_pushfstring(L, "@%s", filename);
 #if defined(CONFIG_BUILD_SPIFFS)
-    lf.f = PIOS_FLASHFS_Open(pios_external_flash_fs_id, (char*)filename, PIOS_FLASHFS_RDONLY);
+    lf.f = PIOS_FS_Open(pios_external_flash_fs_id, (char*)filename, PIOS_FS_RDONLY);
     if (lf.f < 0) {
         errno = LAUXLIB_ERROR_FILE_OPEN;
         return errfile(L, "open", fnameindex);
@@ -701,7 +724,7 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode);
 #if defined(CONFIG_BUILD_SPIFFS)
   readstatus = 0;
-  if (filename) PIOS_FLASHFS_Close(pios_external_flash_fs_id, lf.f);
+  if (filename) PIOS_FS_Close(pios_external_flash_fs_id, lf.f);
 #else
   readstatus = ferror(lf.f);
   if (filename) fclose(lf.f);  /* close file (even in case of errors) */
@@ -974,19 +997,40 @@ void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
   if (nsize == 0) {
     if (ptr) {   // avoid a bunch of NULL pointer free calls
       // TRACE("free %p", ptr); FLUSH();
+#if defined(PIOS_INCLUDE_FREERTOS)
+     pios_free(ptr);
+#else
       free(ptr);
+#endif
     }
     return NULL;
   }
-  else
+  else{
+#if defined(PIOS_INCLUDE_FREERTOS)
+    return pios_realloc(ptr, nsize);
+#else
     return realloc(ptr, nsize);
+#endif
+  }
 }
 
 
 static int panic (__attribute__((unused)) lua_State *L) {
-  //luai_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
-  //                 lua_tostring(L, -1));
-  while(1);
+#if defined(CONFIG_BUILD_SPIFFS)
+    while(1);
+    char opstderr[256];
+    int16_t fh;
+    sprintf(opstderr, "PANIC: %s\n", lua_tostring(L, -1));
+    fh = PIOS_FS_Open(pios_flashfs_id, LUA_LOG_FILE_NAME, LUA_LOG_FILE_FLAG);
+    if (fh >=0)
+        PIOS_FS_Write(pios_flashfs_id, fh, (uint8_t*)opstderr, sizeof(opstderr));
+    PIOS_FS_Close(pios_flashfs_id, fh);
+    /* TODO: Stay here for now (debug) but would return to Lua to abort */
+    while(1);
+#else
+  luai_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
+                         lua_tostring(L, -1));
+#endif
   return 0;  /* return to Lua to abort */
 }
 

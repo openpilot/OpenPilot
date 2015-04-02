@@ -53,7 +53,7 @@ static bool logging_enabled = false;
 static uint16_t flightnum = 0;
 static uint16_t lognum = 0;
 static int16_t fh = -1;
-static char filename[FLASHFS_FILENAME_LEN];
+static char filename[FS_FILENAME_LEN];
 static DebugLogEntryData *buffer = 0;
 #if !defined(PIOS_INCLUDE_FREERTOS)
 static DebugLogEntryData staticbuffer;
@@ -74,14 +74,14 @@ static void PIOS_DEBUGLOG_FilenameCreate(uintptr_t fs_id, uint32_t obj_id, uint1
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    snprintf((char *)tmp_filename, FLASHFS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
+    snprintf((char *)tmp_filename, FS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
 }
 
 
 /* Get prefix of all uavObj files */
 static void PIOS_DEBUGLOG_PrefixGet(uintptr_t fs_id, char *devicename)
 {
-    snprintf((char *)devicename, FLASHFS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u", (unsigned)fs_id);
+    snprintf((char *)devicename, FS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u", (unsigned)fs_id);
 }
 
 
@@ -107,7 +107,7 @@ static void PIOS_DEBUGLOG_Add(uint32_t objid, uint16_t instid, size_t size, uint
     if (fh < 0)
         return;
 
-    PIOS_FLASHFS_Write(pios_user_fs_id, fh, (uint8_t*)buffer, (uint16_t)(LOG_ENTRY_HEADER_SIZE + size));
+    PIOS_FS_Write(pios_user_fs_id, fh, (uint8_t*)buffer, (uint16_t)(LOG_ENTRY_HEADER_SIZE + size));
 }
 
 
@@ -139,7 +139,7 @@ void PIOS_DEBUGLOG_Initialize()
     PIOS_DEBUGLOG_PrefixGet(pios_user_fs_id, filename);
 
     /* Get the number of log files present in the file system ("find / -name prefix* | wc -l") */
-    rc = PIOS_FLASHFS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, 0);
+    rc = PIOS_FS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, 0);
 
     if (rc > 0)
         flightnum = (uint16_t)rc;
@@ -159,7 +159,7 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
     // Stop log.
     if (logging_enabled && !enabled) {
         // Close log file, flush cached file chunks.
-        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_user_fs_id, fh);
     }
 
     // Start log.
@@ -167,12 +167,12 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
         lognum = 0;
         flightnum++;
 
-        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_user_fs_id, fh);
 
         // Create a new log file.
         PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
 
-        fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
+        fh = PIOS_FS_Open(pios_user_fs_id, filename, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_TRUNC);
     }
 
     // Update flag.
@@ -254,11 +254,11 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, __attribute__((unuse
     {
 
 
-        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_user_fs_id, fh);
 
         PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), 0, filename);
 
-        if ((fh = PIOS_FLASHFS_Open(pios_user_fs_id, filename, PIOS_FLASHFS_RDONLY)) < 0) {
+        if ((fh = PIOS_FS_Open(pios_user_fs_id, filename, PIOS_FS_RDONLY)) < 0) {
             mutexunlock();
             return -1;
         }
@@ -266,18 +266,18 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, __attribute__((unuse
         current_flight_opened = flight;
     }
 
-    if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, LOG_ENTRY_HEADER_SIZE) != LOG_ENTRY_HEADER_SIZE) {
+    if (PIOS_FS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, LOG_ENTRY_HEADER_SIZE) != LOG_ENTRY_HEADER_SIZE) {
         rc = -1;
     }
     else
     {
-        if (PIOS_FLASHFS_Read(pios_user_fs_id, fh, (uint8_t *)(mybuffer + LOG_ENTRY_HEADER_SIZE), ((DebugLogEntryData*)mybuffer)->Size) != ((DebugLogEntryData*)mybuffer)->Size) {
+        if (PIOS_FS_Read(pios_user_fs_id, fh, (uint8_t *)(mybuffer + LOG_ENTRY_HEADER_SIZE), ((DebugLogEntryData*)mybuffer)->Size) != ((DebugLogEntryData*)mybuffer)->Size) {
             rc = -1;
         }
     }
 
     if (rc)
-        PIOS_FLASHFS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_user_fs_id, fh);
 
     mutexunlock();
     return rc;
@@ -311,7 +311,7 @@ void PIOS_DEBUGLOG_DeleteAll(void)
 
     PIOS_DEBUGLOG_PrefixGet(pios_user_fs_id, filename);
 
-    PIOS_FLASHFS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, PIOS_FLASHFS_REMOVE);
+    PIOS_FS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, PIOS_FS_REMOVE);
 
     lognum = 0;
     flightnum = 0;

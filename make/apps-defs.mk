@@ -105,6 +105,7 @@ SRC += $(MATHLIB)/pid.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_flashfs_spiffs.c
+SRC += $(PIOSCOMMON)/pios_fs.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_debuglog.c
 endif

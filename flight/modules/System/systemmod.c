@@ -102,7 +102,7 @@ static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_C
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
 static FrameType_t bootFrameType;
-static struct PIOS_FLASHFS_Stats fsStats;
+static pios_fs_Stats fsStats;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent *ev);
@@ -545,7 +545,7 @@ static void updateStats()
 
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
     if (pios_external_flash_fs_id) {
-            PIOS_FLASHFS_GetStats(pios_external_flash_fs_id, &fsStats);
+            PIOS_FS_Stats(pios_external_flash_fs_id, (void*)&fsStats);
             flashfs.BlockFree   = fsStats.block_free;
             flashfs.BlockUsed = fsStats.block_used;
             flashfs.CacheHits = fsStats.cache_hits;

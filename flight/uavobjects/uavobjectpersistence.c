@@ -37,14 +37,14 @@ static void UAVObjFilenameCreate(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    snprintf((char *)filename, FLASHFS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
+    snprintf((char *)filename, FS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
 }
 
 
 /* Get prefix of all uavObj files */
 static void UAVObjPrefixGet(uintptr_t fs_id, char *devicename)
 {
-    snprintf((char *)devicename, FLASHFS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u", (unsigned)fs_id);
+    snprintf((char *)devicename, FS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u", (unsigned)fs_id);
 }
 
 
@@ -62,7 +62,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
     int32_t rc = 0;
     int16_t fh;
     uint8_t *obj_data;
-    char filename[FLASHFS_FILENAME_LEN];
+    char filename[FS_FILENAME_LEN];
 
     PIOS_Assert(obj_handle);
 
@@ -88,15 +88,15 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 
     UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
 
-    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_CREAT | PIOS_FLASHFS_WRONLY | PIOS_FLASHFS_TRUNC);
+    fh = PIOS_FS_Open(pios_uavo_settings_fs_id, filename, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_TRUNC);
 
     if (fh < 0)
         return -1;
 
-    if (PIOS_FLASHFS_Write(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle)) != 0)
+    if (PIOS_FS_Write(pios_uavo_settings_fs_id, fh, obj_data, UAVObjGetNumBytes(obj_handle)) != 0)
         rc = -1;
 
-    PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh);
+    PIOS_FS_Close(pios_uavo_settings_fs_id, fh);
 
     return rc;
 }
@@ -115,7 +115,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
     int32_t rc = 0;
     uint8_t *obj_data;
     int16_t fh;
-    char filename[FLASHFS_FILENAME_LEN];
+    char filename[FS_FILENAME_LEN];
 
     PIOS_Assert(obj_handle);
 
@@ -138,16 +138,16 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 
     UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
 
-    fh = PIOS_FLASHFS_Open(pios_uavo_settings_fs_id, filename, PIOS_FLASHFS_RDONLY);
+    fh = PIOS_FS_Open(pios_uavo_settings_fs_id, filename, PIOS_FS_RDONLY);
 
     if (fh < 0)
         return -1;
 
     int32_t size = UAVObjGetNumBytes(obj_handle);
-    if (PIOS_FLASHFS_Read(pios_uavo_settings_fs_id, fh, obj_data, (uint16_t)size) != size)
+    if (PIOS_FS_Read(pios_uavo_settings_fs_id, fh, obj_data, (uint16_t)size) != size)
 	    rc = -1;
 
-    PIOS_FLASHFS_Close(pios_uavo_settings_fs_id, fh);
+    PIOS_FS_Close(pios_uavo_settings_fs_id, fh);
 
     if (!rc)
         sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
@@ -163,13 +163,13 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
  */
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 {
-    char filename[FLASHFS_FILENAME_LEN];
+    char filename[FS_FILENAME_LEN];
 
     PIOS_Assert(obj_handle);
 
     UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
 
-    PIOS_FLASHFS_Remove(pios_uavo_settings_fs_id, filename);
+    PIOS_FS_Remove(pios_uavo_settings_fs_id, filename);
 
     return 0;
 }
@@ -181,12 +181,12 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
  */
 int32_t UAVObjDeleteAll()
 {
-    char filename[FLASHFS_FILENAME_LEN];
+    char filename[FS_FILENAME_LEN];
 
     UAVObjPrefixGet(pios_uavo_settings_fs_id, filename);
 
-    // Delete settings files from external flash (rm settings*)
-    if (PIOS_FLASHFS_Find(pios_uavo_settings_fs_id, filename, UAVO_PREFIX_SIZE, PIOS_FLASHFS_REMOVE) < 0)
+    // Delete settings files
+    if (PIOS_FS_Find(pios_uavo_settings_fs_id, filename, UAVO_PREFIX_SIZE, PIOS_FS_REMOVE) < 0)
 		return -1;
 
     return 0;

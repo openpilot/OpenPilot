@@ -32,6 +32,8 @@
 
 #ifdef PIOS_INCLUDE_SBUS
 
+#include <uavobjectmanager.h>
+#include <sbusstatus.h>
 #include "pios_sbus_priv.h"
 
 /* Forward Declarations */
@@ -42,11 +44,12 @@ static uint16_t PIOS_SBus_RxInCallback(uint32_t context,
                                        uint16_t *headroom,
                                        bool *need_yield);
 static void PIOS_SBus_Supervisor(uint32_t sbus_id);
-
+static uint8_t PIOS_SBus_Quality_Get(uint32_t rcvr_id);
 
 /* Local Variables */
 const struct pios_rcvr_driver pios_sbus_rcvr_driver = {
     .read = PIOS_SBus_Get,
+    .get_quality = PIOS_SBus_Quality_Get
 };
 
 enum pios_sbus_dev_magic {
@@ -60,7 +63,13 @@ struct pios_sbus_state {
     uint8_t  failsafe_timer;
     uint8_t  frame_found;
     uint8_t  byte_count;
+    uint8_t  quality;
 };
+
+/* With an S.Bus frame rate of 7ms (130Hz) averaging over 26 samples
+ * gives about a 200ms response.
+ */
+#define SBUS_FL_WEIGHTED_AVE 26
 
 struct pios_sbus_dev {
     enum pios_sbus_dev_magic   magic;
@@ -120,6 +129,7 @@ static void PIOS_SBus_ResetState(struct pios_sbus_state *state)
     state->receive_timer  = 0;
     state->failsafe_timer = 0;
     state->frame_found    = 0;
+    state->quality        = 0;
     PIOS_SBus_ResetChannels(state);
 }
 
@@ -251,18 +261,29 @@ static void PIOS_SBus_UpdateState(struct pios_sbus_state *state, uint8_t b)
         state->byte_count++;
     } else {
         if (b == SBUS_EOF_BYTE || (b & SBUS_R7008SB_EOF_COUNTER_MASK) == 0) {
+	    uint8_t quality_trend;
+
             /* full frame received */
             uint8_t flags = state->received_data[SBUS_FRAME_LENGTH - 3];
             if (flags & SBUS_FLAG_FL) {
                 /* frame lost, do not update */
-            } else if (flags & SBUS_FLAG_FS) {
-                /* failsafe flag active */
-                PIOS_SBus_ResetChannels(state);
+                /* Quality trend is towards 0% */
+	        quality_trend = 0;
             } else {
-                /* data looking good */
-                PIOS_SBus_UnrollChannels(state);
-                state->failsafe_timer = 0;
-            }
+                /* Quality trend is towards 100% */
+	        quality_trend = 100;
+		if (flags & SBUS_FLAG_FS) {
+		    /* failsafe flag active */
+		    PIOS_SBus_ResetChannels(state);
+		} else {
+		    /* data looking good */
+		    PIOS_SBus_UnrollChannels(state);
+		    state->failsafe_timer = 0;
+		}
+	    }
+	    /* Present quality as a weighted average of good frames */
+	    state->quality = ((state->quality * (SBUS_FL_WEIGHTED_AVE - 1)) +
+		       quality_trend) / SBUS_FL_WEIGHTED_AVE;
         } else {
             /* discard whole frame */
         }
@@ -339,6 +360,19 @@ static void PIOS_SBus_Supervisor(uint32_t sbus_id)
         PIOS_SBus_ResetChannels(state);
         state->failsafe_timer = 0;
     }
+}
+
+static uint8_t PIOS_SBus_Quality_Get(uint32_t sbus_id)
+{
+    struct pios_sbus_dev *sbus_dev = (struct pios_sbus_dev *)sbus_id;
+
+    bool valid = PIOS_SBus_Validate(sbus_dev);
+
+    PIOS_Assert(valid);
+
+    struct pios_sbus_state *state = &(sbus_dev->state);
+
+    return state->quality;
 }
 
 #endif /* PIOS_INCLUDE_SBUS */

@@ -37,6 +37,7 @@
 #include <manualcontrolsettings.h>
 #include <manualcontrolcommand.h>
 #include <receiveractivity.h>
+#include <receiverstatus.h>
 #include <flightstatus.h>
 #include <flighttelemetrystats.h>
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
@@ -99,6 +100,7 @@ struct rcvr_activity_fsm {
     ManualControlSettingsChannelGroupsOptions group;
     uint16_t prev[RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP];
     uint8_t sample_count;
+    uint8_t quality;
 };
 static struct rcvr_activity_fsm activity_fsm;
 
@@ -147,6 +149,18 @@ int32_t ReceiverInitialize()
     return 0;
 }
 MODULE_INITCALL(ReceiverInitialize, ReceiverStart);
+
+static void updateRcvrStatus(uint32_t rcvr_id)
+{
+    extern uint32_t pios_rcvr_group_map[];
+
+    uint8_t quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[rcvr_id]);
+#if 1
+    ReceiverStatusQualitySet(&quality);
+#else
+    quality = quality * 100 / 255;
+#endif
+}
 
 /**
  * Module task
@@ -242,6 +256,13 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                                                 ManualControlSettingsChannelNeutralToArray(settings.ChannelNeutral)[n]);
             }
         }
+
+	/* Update the receiver status, specifically signal quality, for the
+	 * receiver used for flight mode control.
+	 *
+	 * SCEDEBUG Fixed to use S.Bus for now
+	 */
+	updateRcvrStatus(MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS);
 
         // Check settings, if error raise alarm
         if (settings.ChannelGroups.Roll >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE

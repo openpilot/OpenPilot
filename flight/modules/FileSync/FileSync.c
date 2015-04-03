@@ -82,6 +82,7 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
     int32_t i;
     uint32_t data_size;
     int32_t file_count;
+    uint32_t flags = 0;
     static int in_progress = 0;
 
     if (in_progress)
@@ -144,7 +145,7 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
                 /* Get a list of files stored on the board's filesystem. */
                 case SYNC_COMMAND_LIST:
                     /* Find out how many file there is on file system */
-                    file_count = PIOS_FS_Find(pios_fs_filesync_id, "*", 1, 0);
+                    file_count = PIOS_FS_Find(pios_fs_filesync_id, "*", 1, 0, 0);
                     if (file_count >= 0)
                     {
                         /* how much data we have to send? */
@@ -212,7 +213,9 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
                     break;
                 /* Format a file system on the board. */
                 case SYNC_COMMAND_FORMAT:
-                    if (!PIOS_FS_Format(pios_fs_filesync_id))
+                    if (filesync->Device == SYNC_DEVICE_EXTERNALFLASH)
+                        flags = PIOS_FS_FORMAT_FLAG_CHIP_ERASE;
+                    if (!PIOS_FS_Format(pios_fs_filesync_id, flags))
                         filesync->Status = SYNC_STATUS_OK;
                     filesync->Command = SYNC_COMMAND_FORMAT_RESPONSE;
                     break;

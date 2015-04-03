@@ -152,15 +152,16 @@ int32_t PIOS_FS_Remove(uintptr_t fs_id, char *path)
  * @brief Helper function: find file
  * @param[in] fs_id The filesystem to use for this action
  * @param[in] path string to use for the search
- * @param[in] size number of bytes to use as a prefix for the search
+ * @param[in] size number of bytes to use as a pattern for the search
+ * @param[in] offset offset of pattern to use for the search
  * @param[in] flags the flags for the find command, can be combinations of REMOVE
  */
-int32_t PIOS_FS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags)
+int32_t PIOS_FS_Find(uintptr_t fs_id, const char *path, uint16_t pattern_size, uint32_t pattern_offset, uint32_t flags)
 {
     struct fs_state *fs = (struct fs_state *)fs_id;
 
     if (fs->fops->find)
-        return fs->fops->find(fs_id, path, prefix_size, flags);
+        return fs->fops->find(fs_id, path, pattern_size, pattern_offset, flags);
     else
         return -1;
 }
@@ -189,12 +190,12 @@ int32_t PIOS_FS_Info(uintptr_t fs_id, char *path, uint32_t *size, uint32_t file_
  * @brief Format the filesystem
  * @param[in] fs_id The filesystem to use for this action
  */
-int32_t PIOS_FS_Format(uintptr_t fs_id)
+int32_t PIOS_FS_Format(uintptr_t fs_id, uint32_t flags)
 {
     struct fs_state *fs = (struct fs_state *)fs_id;
 
     if (fs->fops->format)
-        return fs->fops->format(fs_id);
+        return fs->fops->format(fs_id, flags);
     else
         return -1;
 }

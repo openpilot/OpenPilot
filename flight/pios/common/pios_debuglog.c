@@ -63,25 +63,15 @@ static DebugLogEntryData staticbuffer;
 #define LOG_ENTRY_HEADER_SIZE   (sizeof(DebugLogEntryData) - LOG_ENTRY_MAX_DATA_SIZE)
 // build the obj_id as a DEBUGLOGENTRY ID with least significant byte zeroed and filled with flight number
 #define LOG_GET_FLIGHT_OBJID(x) ((DEBUGLOGENTRY_OBJID & ~0xFF) | (x & 0xFF))
-#define PIOS_DEBUGLOG_PREFIX_STRING "dlog"
-#define PIOS_DEBUGLOG_PREFIX_SIZE 5
+#define PIOS_DEBUGLOG_EXT_STRING "dlog"
+#define PIOS_DEBUGLOG_PATTERN_SIZE 4
+#define PIOS_DEBUGLOG_PATTERN_OFFSET 9
 
 
 /* This is for testing right now: Need to find a better unique name generator with module as a prefix */
-static void PIOS_DEBUGLOG_FilenameCreate(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *tmp_filename)
+static void PIOS_DEBUGLOG_FilenameCreate(uint32_t obj_id, uint16_t obj_inst_id, char *tmp_filename)
 {
-    uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
-                                                         // skip least sig nibble since that is used for meta object id
-    uint8_t suffix  = obj_inst_id & 0xff;
-
-    snprintf((char *)tmp_filename, FS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
-}
-
-
-/* Get prefix of all uavObj files */
-static void PIOS_DEBUGLOG_PrefixGet(uintptr_t fs_id, char *devicename)
-{
-    snprintf((char *)devicename, FS_FILENAME_LEN, PIOS_DEBUGLOG_PREFIX_STRING"%01u", (unsigned)fs_id);
+    snprintf((char *)tmp_filename, FS_FILENAME_LEN, "%08X-%02X."PIOS_DEBUGLOG_EXT_STRING, (unsigned)obj_id, obj_inst_id & 0xff);
 }
 
 
@@ -135,11 +125,8 @@ void PIOS_DEBUGLOG_Initialize()
     lognum = 0;
     flightnum = 0;
 
-    /* Check number of file in the file system */
-    PIOS_DEBUGLOG_PrefixGet(pios_user_fs_id, filename);
-
     /* Get the number of log files present in the file system ("find / -name prefix* | wc -l") */
-    rc = PIOS_FS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, 0);
+    rc = PIOS_FS_Find(pios_user_fs_id, PIOS_DEBUGLOG_EXT_STRING, PIOS_DEBUGLOG_PATTERN_SIZE, PIOS_DEBUGLOG_PATTERN_OFFSET, 0);
 
     if (rc > 0)
         flightnum = (uint16_t)rc;
@@ -170,7 +157,7 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
         PIOS_FS_Close(pios_user_fs_id, fh);
 
         // Create a new log file.
-        PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
+        PIOS_DEBUGLOG_FilenameCreate(LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
 
         fh = PIOS_FS_Open(pios_user_fs_id, filename, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_TRUNC);
     }
@@ -256,7 +243,7 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, __attribute__((unuse
 
         PIOS_FS_Close(pios_user_fs_id, fh);
 
-        PIOS_DEBUGLOG_FilenameCreate(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), 0, filename);
+        PIOS_DEBUGLOG_FilenameCreate(LOG_GET_FLIGHT_OBJID(flight), 0, filename);
 
         if ((fh = PIOS_FS_Open(pios_user_fs_id, filename, PIOS_FS_RDONLY)) < 0) {
             mutexunlock();
@@ -309,9 +296,7 @@ void PIOS_DEBUGLOG_DeleteAll(void)
 {
     mutexlock();
 
-    PIOS_DEBUGLOG_PrefixGet(pios_user_fs_id, filename);
-
-    PIOS_FS_Find(pios_user_fs_id, filename, PIOS_DEBUGLOG_PREFIX_SIZE, PIOS_FS_REMOVE);
+    PIOS_FS_Find(pios_user_fs_id, PIOS_DEBUGLOG_EXT_STRING, PIOS_DEBUGLOG_PATTERN_SIZE, PIOS_DEBUGLOG_PATTERN_OFFSET, PIOS_FS_REMOVE);
 
     lognum = 0;
     flightnum = 0;

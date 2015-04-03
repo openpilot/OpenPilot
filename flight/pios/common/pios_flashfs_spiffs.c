@@ -210,6 +210,8 @@ static int32_t PIOS_FLASHFS_Mount(__attribute__((unused)) uintptr_t fs_id)
 
     memset(flashfs->cache_buf, 0, flashfs->cfg->cache_buffer_size);
 
+    flashfs->mounted  = false;
+
     if (SPIFFS_mount(&flashfs->fs,
                         &flashfs->cfg_spiffs,
                         flashfs->work_buf,
@@ -434,10 +436,11 @@ int32_t PIOS_FLASHFS_Remove(uintptr_t fs_id, char *path)
  * @brief Helper function: 'find / -name "prefix*" | wc -l'
  * @param[in] fs_id The filesystem to use for this action
  * @param[in] path string to use for the search
- * @param[in] size number of bytes to use as a prefix for the search
+ * @param[in] size number of bytes to use as a patter for the search
+ * @param[in] offset offset of pattern to use for the search
  * @param[in] flags the flags for the find command, can be combinations of REMOVE
  */
-int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags)
+int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t pattern_size, uint32_t pattern_offset, uint32_t flags)
 {
     int32_t filecount = 0;
     int16_t file_id;
@@ -447,8 +450,8 @@ int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_siz
     if (!PIOS_FLASHFS_Validate(flashfs))
         return PIOS_FS_ERROR_FS_INVALID;
 
-    if (prefix_size > FS_FILENAME_LEN)
-        return PIOS_FS_ERROR_PREFIX_SIZE;
+    if ((pattern_size > FS_FILENAME_LEN) || (pattern_offset > FS_FILENAME_LEN))
+        return PIOS_FS_ERROR_PARAMETER;
 
     spiffs_DIR d;
     struct spiffs_dirent e;
@@ -456,14 +459,14 @@ int32_t PIOS_FLASHFS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_siz
 
     SPIFFS_opendir(&flashfs->fs, "/", &d);
 
-    if ((strcmp(path, "*") == 0) && (prefix_size == 1)) {
+    if ((strcmp(path, "*") == 0) && (pattern_size == 1)) {
         while ((pe = SPIFFS_readdir(&d, pe)))
             filecount++;
     }
     else
     {
         while ((pe = SPIFFS_readdir(&d, pe))) {
-            if (strncmp(path, (char*)pe->name, prefix_size) == 0) {
+            if (strncmp(path, (char*)(pe->name + pattern_offset), pattern_size) == 0) {
                 if (flags & PIOS_FS_REMOVE) {
                     file_id = SPIFFS_open_by_dirent(&flashfs->fs, pe, SPIFFS_RDWR, 0);
                     SPIFFS_fremove(&flashfs->fs, file_id);
@@ -519,7 +522,7 @@ int32_t PIOS_FLASHFS_Info(uintptr_t fs_id, char *path, uint32_t *size, uint32_t 
  * @brief Erases all filesystem arenas and activate the first arena
  * @param[in] fs_id The filesystem to use for this action
  */
-int32_t PIOS_FLASHFS_Format(uintptr_t fs_id)
+int32_t PIOS_FLASHFS_Format(uintptr_t fs_id, uint32_t flags)
 {
     int32_t rc = PIOS_FS_OK;
     bool previous_mount_status;
@@ -545,6 +548,7 @@ int32_t PIOS_FLASHFS_Format(uintptr_t fs_id)
     }
 #endif
 
+    if (flags & PIOS_FS_FORMAT_FLAG_CHIP_ERASE)
     flashfs->driver->erase_chip(flashfs->flash_id);
     SPIFFS_format(&flashfs->fs);
 
@@ -675,8 +679,12 @@ int32_t PIOS_FLASHFS_Init(__attribute__((unused)) uintptr_t *fs_id,
         flashfs->fops = &pios_fs_spiffs_fops;
     }
 
-    if (PIOS_FLASHFS_Mount((uintptr_t)flashfs) == PIOS_FS_OK)
+    if ((rc = PIOS_FLASHFS_Mount((uintptr_t)flashfs)) == PIOS_FS_OK) {
         *fs_id = (uintptr_t)flashfs;
+    } else {
+        SPIFFS_format(&flashfs->fs);
+        rc = PIOS_FLASHFS_Mount((uintptr_t)flashfs);
+    }
 #if 0
     /* File system should have one file (the "ID" file) */
     /* Currently that's the only integrity scheme available */

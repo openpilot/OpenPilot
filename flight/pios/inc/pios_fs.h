@@ -62,6 +62,8 @@ typedef struct _pios_fs_Stats {
 /* Remove matching file */
 #define PIOS_FS_REMOVE 1
 
+#define PIOS_FS_FORMAT_FLAG_CHIP_ERASE 0x1
+
 /* Errors */
 #define PIOS_FS_OK 0
 #define PIOS_FS_ERROR_FS_INVALID -1
@@ -71,7 +73,7 @@ typedef struct _pios_fs_Stats {
 #define PIOS_FS_ERROR_FS_MOUNT -5
 #define PIOS_FS_ERROR_FS_ALLOC -6
 #define PIOS_FS_ERROR_REMOVE_FILE -7
-#define PIOS_FS_ERROR_PREFIX_SIZE -8
+#define PIOS_FS_ERROR_PARAMETER -8
 #define PIOS_FS_ERROR_EOF -9
 
 /* File name */
@@ -83,23 +85,23 @@ typedef struct _fs_operations {
     int32_t (*write)(uintptr_t, int16_t, uint8_t*, uint16_t);
     int16_t (*open)(uintptr_t, char*, uint16_t);
     int32_t (*remove)(uintptr_t, char*);
-    int32_t (*format)(uintptr_t);
+    int32_t (*format)(uintptr_t, uint32_t);
     int32_t (*stats)(uintptr_t, pios_fs_Stats*);
     int32_t (*close)(uintptr_t, int16_t);
-    int32_t (*find)(uintptr_t, const char *, uint16_t, uint32_t);
+    int32_t (*find)(uintptr_t, const char *, uint16_t, uint32_t, uint32_t);
     int32_t (*info)(uintptr_t, char *, uint32_t *, uint32_t, uint32_t);
 } fs_operations;
 
 
 /* API */
-int32_t PIOS_FS_Format(uintptr_t fs_id);
+int32_t PIOS_FS_Format(uintptr_t fs_id, uint32_t flags);
 int32_t PIOS_FS_Close(uintptr_t fs_id, int16_t file_id);
 int16_t PIOS_FS_Open(uintptr_t fs_id, char *path, uint16_t flags);
 int32_t PIOS_FS_Write(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size);
 int32_t PIOS_FS_Read(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size);
 int32_t PIOS_FS_Remove(uintptr_t fs_id, char *path);
 int32_t PIOS_FS_Stats(uintptr_t fs_id, pios_fs_Stats *stats);
-int32_t PIOS_FS_Find(uintptr_t fs_id, const char *path, uint16_t prefix_size, uint32_t flags);
+int32_t PIOS_FS_Find(uintptr_t fs_id, const char *path, uint16_t pattern_size, uint32_t pattern_offset, uint32_t flags);
 int32_t PIOS_FS_Lseek(uintptr_t fs_id, int16_t fh, int32_t offset, uint32_t flag);
 int32_t PIOS_FS_Info(uintptr_t fs_id, char *path, uint32_t *size, uint32_t file_number, uint32_t flags);
 

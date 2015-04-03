@@ -30,21 +30,14 @@
 
 extern uintptr_t pios_uavo_settings_fs_id;
 
+#define UAVO_EXT_SIZE 4
+#define UAVO_EXT_STRING "uavo"
+#define UAVO_EXT_OFFSET 9
+
 /* Generate file name */
-static void UAVObjFilenameCreate(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *filename)
+static void UAVObjFilenameCreate(uint32_t obj_id, uint16_t obj_inst_id, char *filename)
 {
-    uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
-                                                         // skip least sig nibble since that is used for meta object id
-    uint8_t suffix  = obj_inst_id & 0xff;
-
-    snprintf((char *)filename, FS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u/%08X.o%02X", (unsigned)fs_id, (unsigned int)prefix, suffix);
-}
-
-
-/* Get prefix of all uavObj files */
-static void UAVObjPrefixGet(uintptr_t fs_id, char *devicename)
-{
-    snprintf((char *)devicename, FS_FILENAME_LEN, UAVO_PREFIX_STRING"%01u", (unsigned)fs_id);
+    snprintf((char *)filename, FS_FILENAME_LEN, "%08X-%02X."UAVO_EXT_STRING, (unsigned)obj_id, obj_inst_id & 0xff);
 }
 
 
@@ -86,7 +79,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 
     }
 
-    UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+    UAVObjFilenameCreate(UAVObjGetID(obj_handle), instId, filename);
 
     fh = PIOS_FS_Open(pios_uavo_settings_fs_id, filename, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_TRUNC);
 
@@ -136,7 +129,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
         obj_data = InstanceData(instEntry);
     }
 
-    UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+    UAVObjFilenameCreate(UAVObjGetID(obj_handle), instId, filename);
 
     fh = PIOS_FS_Open(pios_uavo_settings_fs_id, filename, PIOS_FS_RDONLY);
 
@@ -167,7 +160,7 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 
     PIOS_Assert(obj_handle);
 
-    UAVObjFilenameCreate(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, filename);
+    UAVObjFilenameCreate(UAVObjGetID(obj_handle), instId, filename);
 
     PIOS_FS_Remove(pios_uavo_settings_fs_id, filename);
 
@@ -181,12 +174,8 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
  */
 int32_t UAVObjDeleteAll()
 {
-    char filename[FS_FILENAME_LEN];
-
-    UAVObjPrefixGet(pios_uavo_settings_fs_id, filename);
-
     // Delete settings files
-    if (PIOS_FS_Find(pios_uavo_settings_fs_id, filename, UAVO_PREFIX_SIZE, PIOS_FS_REMOVE) < 0)
+    if (PIOS_FS_Find(pios_uavo_settings_fs_id, UAVO_EXT_STRING, UAVO_EXT_SIZE, UAVO_EXT_OFFSET, PIOS_FS_REMOVE) < 0)
 		return -1;
 
     return 0;

@@ -36,7 +36,6 @@
 #undef SBUS_GOOD_FRAME_COUNT
 
 #include <uavobjectmanager.h>
-#include <sbusstatus.h>
 #include "pios_sbus_priv.h"
 
 /* Forward Declarations */

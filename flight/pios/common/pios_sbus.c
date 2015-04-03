@@ -65,7 +65,7 @@ struct pios_sbus_state {
     uint8_t  failsafe_timer;
     uint8_t  frame_found;
     uint8_t  byte_count;
-    uint8_t  quality;
+    float    quality;
 #ifdef SBUS_GOOD_FRAME_COUNT
     uint8_t  frame_count;
 #endif /* SBUS_GOOD_FRAME_COUNT */
@@ -134,7 +134,7 @@ static void PIOS_SBus_ResetState(struct pios_sbus_state *state)
     state->receive_timer  = 0;
     state->failsafe_timer = 0;
     state->frame_found    = 0;
-    state->quality = 0;
+    state->quality = 0.0f;
 #ifdef SBUS_GOOD_FRAME_COUNT
     state->frame_count = 0;
 #endif /* SBUS_GOOD_FRAME_COUNT */
@@ -394,7 +394,7 @@ static uint8_t PIOS_SBus_Quality_Get(uint32_t sbus_id)
 
     struct pios_sbus_state *state = &(sbus_dev->state);
 
-    return state->quality;
+    return (uint8_t)(state->quality + 0.5f);
 }
 
 #endif /* PIOS_INCLUDE_SBUS */

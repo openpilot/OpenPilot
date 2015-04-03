@@ -255,6 +255,10 @@ static void receiverTask(__attribute__((unused)) void *parameters)
             }
         }
 
+        /* Read signal quality from the group used for the throttle */
+        (void)updateRcvrStatus(&activity_fsm,
+                               settings.ChannelGroups.Throttle);
+
         // Check settings, if error raise alarm
         if (settings.ChannelGroups.Roll >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
             || settings.ChannelGroups.Pitch >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE

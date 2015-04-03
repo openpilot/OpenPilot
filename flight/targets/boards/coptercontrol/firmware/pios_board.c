@@ -886,8 +886,8 @@ SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook()
     case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
         if ((recmode == HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT ||
              flexiMode == HWSETTINGS_CC_FLEXIPORT_PPM) &&
-            (modes[3] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
-             modes[3] == ACTUATORSETTINGS_BANKMODE_ONESHOT125)) {
+            (modes[2] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
+             modes[2] == ACTUATORSETTINGS_BANKMODE_ONESHOT125)) {
             return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;
         } else {
             return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;

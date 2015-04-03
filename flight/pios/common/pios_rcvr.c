@@ -116,7 +116,7 @@ int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
 /**
  * @brief Reads input quality from the appropriate driver
  * @param[in] rcvr_id driver to read from
- * @returns Unitless input value
+ * @returns received signal quality expressed as a %
  *  @retval PIOS_RCVR_NODRIVER driver was not initialized
  */
 uint8_t PIOS_RCVR_GetQuality(uint32_t rcvr_id)

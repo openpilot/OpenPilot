@@ -136,7 +136,7 @@ static void PIOS_SBus_ResetState(struct pios_sbus_state *state)
     state->frame_found    = 0;
     state->quality = 0.0f;
 #ifdef SBUS_GOOD_FRAME_COUNT
-    state->frame_count = 0;
+    state->frame_count    = 0;
 #endif /* SBUS_GOOD_FRAME_COUNT */
     PIOS_SBus_ResetChannels(state);
 }
@@ -270,7 +270,7 @@ static void PIOS_SBus_UpdateState(struct pios_sbus_state *state, uint8_t b)
     } else {
         if (b == SBUS_EOF_BYTE || (b & SBUS_R7008SB_EOF_COUNTER_MASK) == 0) {
 #ifndef SBUS_GOOD_FRAME_COUNT
-	    /* Quality trend is towards 0% by default*/
+            /* Quality trend is towards 0% by default*/
             uint8_t quality_trend = 0;
 #endif /* SBUS_GOOD_FRAME_COUNT */
 
@@ -279,15 +279,14 @@ static void PIOS_SBus_UpdateState(struct pios_sbus_state *state, uint8_t b)
             if (flags & SBUS_FLAG_FL) {
                 /* frame lost, do not update */
 #ifdef SBUS_GOOD_FRAME_COUNT
-		state->quality = state->frame_count;
-		state->frame_count = 0;
+                state->quality     = state->frame_count;
+                state->frame_count = 0;
 #endif /* SBUS_GOOD_FRAME_COUNT */
             } else {
 #ifdef SBUS_GOOD_FRAME_COUNT
-		if (++state->frame_count == 255)
-		{
-		    state->quality = state->frame_count--;
-		}
+                if (++state->frame_count == 255) {
+                    state->quality = state->frame_count--;
+                }
 #else /* SBUS_GOOD_FRAME_COUNT */
                 /* Quality trend is towards 100% */
                 quality_trend = 100;

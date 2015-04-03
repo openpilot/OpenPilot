@@ -32,6 +32,9 @@
 
 #ifdef PIOS_INCLUDE_SBUS
 
+// Define to report number of frames since last dropped instead of weighted ave
+#undef SBUS_GOOD_FRAME_COUNT
+
 #include <uavobjectmanager.h>
 #include <sbusstatus.h>
 #include "pios_sbus_priv.h"
@@ -64,6 +67,9 @@ struct pios_sbus_state {
     uint8_t  frame_found;
     uint8_t  byte_count;
     uint8_t  quality;
+#ifdef SBUS_GOOD_FRAME_COUNT
+    uint8_t  frame_count;
+#endif /* SBUS_GOOD_FRAME_COUNT */
 };
 
 /* With an S.Bus frame rate of 7ms (130Hz) averaging over 26 samples
@@ -130,6 +136,9 @@ static void PIOS_SBus_ResetState(struct pios_sbus_state *state)
     state->failsafe_timer = 0;
     state->frame_found    = 0;
     state->quality = 0;
+#ifdef SBUS_GOOD_FRAME_COUNT
+    state->frame_count = 0;
+#endif /* SBUS_GOOD_FRAME_COUNT */
     PIOS_SBus_ResetChannels(state);
 }
 
@@ -261,17 +270,29 @@ static void PIOS_SBus_UpdateState(struct pios_sbus_state *state, uint8_t b)
         state->byte_count++;
     } else {
         if (b == SBUS_EOF_BYTE || (b & SBUS_R7008SB_EOF_COUNTER_MASK) == 0) {
-            uint8_t quality_trend;
+#ifndef SBUS_GOOD_FRAME_COUNT
+	    /* Quality trend is towards 0% by default*/
+            uint8_t quality_trend = 0;
+#endif /* SBUS_GOOD_FRAME_COUNT */
 
             /* full frame received */
             uint8_t flags = state->received_data[SBUS_FRAME_LENGTH - 3];
             if (flags & SBUS_FLAG_FL) {
                 /* frame lost, do not update */
-                /* Quality trend is towards 0% */
-                quality_trend = 0;
+#ifdef SBUS_GOOD_FRAME_COUNT
+		state->quality = state->frame_count;
+		state->frame_count = 0;
+#endif /* SBUS_GOOD_FRAME_COUNT */
             } else {
+#ifdef SBUS_GOOD_FRAME_COUNT
+		if (++state->frame_count == 255)
+		{
+		    state->quality = state->frame_count--;
+		}
+#else /* SBUS_GOOD_FRAME_COUNT */
                 /* Quality trend is towards 100% */
                 quality_trend = 100;
+#endif /* SBUS_GOOD_FRAME_COUNT */
                 if (flags & SBUS_FLAG_FS) {
                     /* failsafe flag active */
                     PIOS_SBus_ResetChannels(state);
@@ -281,9 +302,11 @@ static void PIOS_SBus_UpdateState(struct pios_sbus_state *state, uint8_t b)
                     state->failsafe_timer = 0;
                 }
             }
+#ifndef SBUS_GOOD_FRAME_COUNT
             /* Present quality as a weighted average of good frames */
             state->quality = ((state->quality * (SBUS_FL_WEIGHTED_AVE - 1)) +
                               quality_trend) / SBUS_FL_WEIGHTED_AVE;
+#endif /* SBUS_GOOD_FRAME_COUNT */
         } else {
             /* discard whole frame */
         }

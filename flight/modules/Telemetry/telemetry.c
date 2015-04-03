@@ -32,7 +32,7 @@
 
 /* Telemetry uses four tasks. Two are created for the main telemetry
  * stream called "TelTx" and "TelRx". Two are created to handle the OPLink
- * radio connection, called "RadioTx" and "Radio Rx", the latter being
+ * radio connection, called "RadioTx" and "RadioRx", the latter being
  * overridden by USB if connected.
  *
  * The following code uses a "local" prefix to refer to the telemetry channel
@@ -193,7 +193,7 @@ int32_t TelemetryStart(void)
                 &radioChannel,
                 TASK_PRIORITY_RADTX,
                 &radioChannel.txTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX,
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIOTX,
                                    radioChannel.txTaskHandle);
     xTaskCreate(telemetryRxTask,
                 "RadioRx",

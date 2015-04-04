@@ -134,7 +134,7 @@ uint8_t PIOS_RCVR_GetQuality(uint32_t rcvr_id)
 
     if (!rcvr_dev->driver->get_quality) {
         /* If no quality is available assume max */
-        return 255;
+        return 100;
     }
 
     return rcvr_dev->driver->get_quality(rcvr_dev->lower_id);

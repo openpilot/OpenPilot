@@ -533,6 +533,13 @@ Item {
             anchors.fill: parent
             //color: panels.batColors[SystemAlarms.Alarm_Battery]
 
+            MouseArea { 
+               id: reset_panel_consumed_energy_mouseArea2; 
+               anchors.fill: parent;
+               cursorShape: Qt.PointingHandCursor; 
+               onClicked: qmlWidget.resetConsumedEnergy();
+            }
+
             // Alarm based on FlightBatteryState.EstimatedFlightTime < 120s orange, < 60s red
             color: (FlightBatteryState.EstimatedFlightTime <= 120 && FlightBatteryState.EstimatedFlightTime > 60 ? "orange" :
                    (FlightBatteryState.EstimatedFlightTime <= 60 ? "red": panels.batColors[SystemAlarms.Alarm_Battery]))

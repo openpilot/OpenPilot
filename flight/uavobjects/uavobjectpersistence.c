@@ -53,7 +53,7 @@ static void UAVObjFilenameCreate(uint32_t obj_id, uint16_t obj_inst_id, char *fi
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 {
     int32_t rc = 0;
-    int16_t fh;
+    int32_t fh;
     uint8_t *obj_data;
     char filename[FS_FILENAME_LEN];
 
@@ -107,7 +107,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 {
     int32_t rc = 0;
     uint8_t *obj_data;
-    int16_t fh;
+    int32_t fh;
     char filename[FS_FILENAME_LEN];
 
     PIOS_Assert(obj_handle);
@@ -168,15 +168,3 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 }
 
 
-/**
- * Delete all object from the file system.
- * @return 0 if success or -1 if failure
- */
-int32_t UAVObjDeleteAll()
-{
-    // Delete settings files
-    if (PIOS_FS_Find(pios_uavo_settings_fs_id, UAVO_EXT_STRING, UAVO_EXT_SIZE, UAVO_EXT_OFFSET, PIOS_FS_REMOVE) < 0)
-		return -1;
-
-    return 0;
-}

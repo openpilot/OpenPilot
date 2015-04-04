@@ -71,7 +71,7 @@ void *pios_malloc(size_t size)
     return pvPortMalloc(size);
 }
 
-void *pios_realloc(__attribute__((deprecated)) void *ptr, size_t size)
+void *pios_realloc(__attribute__((unused)) void *ptr, __attribute__((unused)) size_t size)
 {
 #ifdef PIOS_INCLUDE_REALLOC
     return pvPortMalloc(size);

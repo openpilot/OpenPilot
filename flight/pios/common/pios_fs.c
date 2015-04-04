@@ -52,7 +52,7 @@ struct fs_state {
  *                      SPIFFS_APPEND, SPIFFS_TRUNC, SPIFFS_CREAT, SPIFFS_RDONLY,
  *                      SPIFFS_WRONLY, SPIFFS_RDWR, SPIFFS_DIRECT
  */
-int16_t PIOS_FS_Open(uintptr_t fs_id, char *path, uint16_t flags)
+int32_t PIOS_FS_Open(uintptr_t fs_id, char *path, uint16_t flags)
 {
     struct fs_state *fs = (struct fs_state *)fs_id;
 
@@ -68,7 +68,7 @@ int16_t PIOS_FS_Open(uintptr_t fs_id, char *path, uint16_t flags)
  * @param[in] fs_id The filesystem to use for this action
  * @param[in] the filehandle of the file to close
  */
-int32_t PIOS_FS_Close(uintptr_t fs_id, int16_t file_id)
+int32_t PIOS_FS_Close(uintptr_t fs_id, int32_t file_id)
 {
     struct fs_state *fs = (struct fs_state *)fs_id;
 
@@ -86,7 +86,7 @@ int32_t PIOS_FS_Close(uintptr_t fs_id, int16_t file_id)
  * @param[in] data Contents of the object being written
  * @param[in] size Size of the object being saved
  */
-int32_t PIOS_FS_Write(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size)
+int32_t PIOS_FS_Write(uintptr_t fs_id, int32_t fh, uint8_t *data, uint16_t size)
 {
     struct fs_state *fs = (struct fs_state *)fs_id;
 
@@ -103,7 +103,7 @@ int32_t PIOS_FS_Write(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size)
  * @param[in] data Buffer to hold the contents of the loaded object
  * @param[in] size Size of the object to be loaded
  */
-int32_t PIOS_FS_Read(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size)
+int32_t PIOS_FS_Read(uintptr_t fs_id, int32_t fh, uint8_t *data, uint16_t size)
 {
     struct fs_state *fs = (struct fs_state *)fs_id;
 
@@ -121,7 +121,7 @@ int32_t PIOS_FS_Read(uintptr_t fs_id, int16_t fh, uint8_t *data, uint16_t size)
  * @param[in] how much/where to move the offset
  * @param[in] flags
  */
-int32_t PIOS_FS_Lseek(uintptr_t fs_id, int16_t fh, int32_t offset, uint32_t flags)
+int32_t PIOS_FS_Lseek(uintptr_t fs_id, int32_t fh, int32_t offset, uint32_t flags)
 {
     struct fs_state *fs = (struct fs_state *)fs_id;
 

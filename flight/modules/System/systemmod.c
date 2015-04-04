@@ -57,7 +57,7 @@
 #include <watchdogstatus.h>
 #include <callbackinfo.h>
 #include <hwsettings.h>
-#include <pios_flashfs.h>
+#include <pios_fs.h>
 #include <pios_notify.h>
 #include <flashfsstats.h>
 
@@ -119,6 +119,7 @@ static void updateI2Cstats();
 static void updateWDGstats();
 #endif
 
+extern uintptr_t pios_uavo_settings_fs_id;
 extern uintptr_t pios_external_flash_fs_id;
 
 /**
@@ -381,7 +382,7 @@ static void objectUpdatedCb(UAVObjEvent *ev)
         } else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_FULLERASE) {
 #if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
             // Delete obj from external flash
-            retval = UAVObjDeleteAll();
+            retval = PIOS_FS_Format(pios_uavo_settings_fs_id, 0);
 #else
             retval = -1;
 #endif

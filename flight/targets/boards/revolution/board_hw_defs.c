@@ -677,14 +677,14 @@ const struct pios_rfm22b_cfg *PIOS_BOARD_HW_DEFS_GetRfm22Cfg(uint32_t board_revi
 #endif /* PIOS_INCLUDE_SPI */
 
 #if defined(PIOS_INCLUDE_FLASH)
-#include "pios_flashfs_logfs_priv.h"
+#include "pios_fs_spiffs.h"
 #include "pios_flash_jedec_priv.h"
 #include "pios_flash_internal_priv.h"
 
 
 static const struct pios_flash_internal_cfg flash_internal_cfg = {};
 
-static const struct flashfs_cfg flashfs_external_cfg = {
+static const struct pios_fs_spiffs_cfg flashfs_external_cfg = {
     .flashfs_magic          = 0x99abcfef,
     .physical_size          = (1024*1024*2),
     .physical_erase_block   = (65536),
@@ -695,7 +695,7 @@ static const struct flashfs_cfg flashfs_external_cfg = {
     .cache_buffer_size      = (256+32)*8,
 };
 
-static const struct flashfs_cfg flashfs_internal_cfg = {
+static const struct pios_fs_spiffs_cfg flashfs_internal_cfg = {
     .flashfs_magic          = 0x99abcfef,
     .physical_size          = EE_BANK_SIZE, /* 32KBytes */
     .physical_erase_block   = 0x4000,

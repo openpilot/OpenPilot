@@ -37,8 +37,9 @@
 #define FILESYNC_READ_FLAG (PIOS_FS_RDONLY)
 #define FILESYNC_WRITE_FLAG (PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_APPEND)
 
-extern uintptr_t pios_fs_filesync_id;
-
+// List of the devices supported
+extern uintptr_t pios_external_flash_fs_id;
+extern uintptr_t pios_internal_flash_fs_id;
 
 // private variables
 static SyncData *filesync;
@@ -83,6 +84,7 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
     uint32_t data_size;
     int32_t file_count;
     uint32_t flags = 0;
+    uintptr_t pios_fs_filesync_id = 0;
     static int in_progress = 0;
 
     if (in_progress)
@@ -101,6 +103,14 @@ static void FileSyncCb(__attribute__((unused)) UAVObjEvent *ev)
     if (filesync->Sync == SYNC_SYNC_ENABLED) {
         FlightStatusArmedGet(&armed);
         if (armed == FLIGHTSTATUS_ARMED_DISARMED) {
+
+            /* Use the right device */
+            if (filesync->Device == SYNC_DEVICE_EXTERNALFLASH)
+                pios_fs_filesync_id = pios_external_flash_fs_id;
+            if (filesync->Device == SYNC_DEVICE_INTERNALFLASH)
+                pios_fs_filesync_id = pios_internal_flash_fs_id;
+
+            if (pios_fs_filesync_id)
             switch (filesync->Command) {
                 /* Download a file from board to host.*/
                 case SYNC_COMMAND_DOWNLOAD:

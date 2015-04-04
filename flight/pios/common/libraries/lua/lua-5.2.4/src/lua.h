@@ -418,7 +418,6 @@ struct lua_Debug {
 };
 
 #if defined(CONFIG_BUILD_SPIFFS)
-  #include "pios_flashfs.h"
   #include "pios_fs.h"
   #define FIL int16_t
   int lua__getc(FIL *f);

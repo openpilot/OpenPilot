@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
- * @file       pios_flashfs_logfs_priv.h
- * @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
+ * @file       pios_fs_spiffs.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @see        The GNU Public License (GPL) Version 3
  * @{
- * @addtogroup PIOS_FLASHFS Flash Filesystem Function
+ * @addtogroup PIOS_FS spiffs Filesystem API Definition
  * @{
- * @brief Log Structured Filesystem for internal or external NOR Flash
+ * @brief PIOS API for internal or onboard filesystem.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,14 +25,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_FLASHFS_LOGFS_PRIV_H
-#define PIOS_FLASHFS_LOGFS_PRIV_H
+#ifndef PIOS_FS_SPIFFS_H
+#define PIOS_FS_SPIFFS_H
 
 #include <stdint.h>
-#include "pios_flash.h" /* struct pios_flash_driver */
+#include <spiffs.h>
 
 
+struct pios_fs_spiffs_cfg {
+    uint32_t flashfs_magic;
+    uint32_t physical_size; /* Max size used file system partition. */
+    uint32_t physical_addr; /* Start address of the file system partition. */
+    uint32_t physical_erase_block; /* Flash device specific: size affected during erase process*/
+    uint32_t logical_block_size;
+    uint32_t logical_page_size;
+    uint32_t work_buffer_size;
+    uint32_t cache_buffer_size;
+};
 
+/* API */
+int32_t PIOS_FS_SPIFFS_Init(uintptr_t *fs_id, const struct pios_fs_spiffs_cfg *cfg, const struct pios_flash_driver *driver, uintptr_t flash_id);
 
-
-#endif /* PIOS_FLASHFS_LOGFS_PRIV_H */
+#endif /* PIOS_FS_SPIFFS_H */

@@ -37,7 +37,7 @@
 
 
 // Global variables
-extern uintptr_t pios_user_fs_id; // flash filesystem for logging
+extern uintptr_t pios_log_fs_id; // flash filesystem for logging
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 static xSemaphoreHandle mutex = 0;
@@ -97,7 +97,7 @@ static void PIOS_DEBUGLOG_Add(uint32_t objid, uint16_t instid, size_t size, uint
     if (fh < 0)
         return;
 
-    PIOS_FS_Write(pios_user_fs_id, fh, (uint8_t*)buffer, (uint16_t)(LOG_ENTRY_HEADER_SIZE + size));
+    PIOS_FS_Write(pios_log_fs_id, fh, (uint8_t*)buffer, (uint16_t)(LOG_ENTRY_HEADER_SIZE + size));
 }
 
 
@@ -126,7 +126,7 @@ void PIOS_DEBUGLOG_Initialize()
     flightnum = 0;
 
     /* Get the number of log files present in the file system ("find / -name prefix* | wc -l") */
-    rc = PIOS_FS_Find(pios_user_fs_id, PIOS_DEBUGLOG_EXT_STRING, PIOS_DEBUGLOG_PATTERN_SIZE, PIOS_DEBUGLOG_PATTERN_OFFSET, 0);
+    rc = PIOS_FS_Find(pios_log_fs_id, PIOS_DEBUGLOG_EXT_STRING, PIOS_DEBUGLOG_PATTERN_SIZE, PIOS_DEBUGLOG_PATTERN_OFFSET, 0);
 
     if (rc > 0)
         flightnum = (uint16_t)rc;
@@ -146,7 +146,7 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
     // Stop log.
     if (logging_enabled && !enabled) {
         // Close log file, flush cached file chunks.
-        PIOS_FS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_log_fs_id, fh);
     }
 
     // Start log.
@@ -154,12 +154,12 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
         lognum = 0;
         flightnum++;
 
-        PIOS_FS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_log_fs_id, fh);
 
         // Create a new log file.
         PIOS_DEBUGLOG_FilenameCreate(LOG_GET_FLIGHT_OBJID(flightnum), lognum, filename);
 
-        fh = PIOS_FS_Open(pios_user_fs_id, filename, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_TRUNC);
+        fh = PIOS_FS_Open(pios_log_fs_id, filename, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_TRUNC);
     }
 
     // Update flag.
@@ -241,11 +241,11 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, __attribute__((unuse
     {
 
 
-        PIOS_FS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_log_fs_id, fh);
 
         PIOS_DEBUGLOG_FilenameCreate(LOG_GET_FLIGHT_OBJID(flight), 0, filename);
 
-        if ((fh = PIOS_FS_Open(pios_user_fs_id, filename, PIOS_FS_RDONLY)) < 0) {
+        if ((fh = PIOS_FS_Open(pios_log_fs_id, filename, PIOS_FS_RDONLY)) < 0) {
             mutexunlock();
             return -1;
         }
@@ -253,18 +253,18 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, __attribute__((unuse
         current_flight_opened = flight;
     }
 
-    if (PIOS_FS_Read(pios_user_fs_id, fh, (uint8_t *)mybuffer, LOG_ENTRY_HEADER_SIZE) != LOG_ENTRY_HEADER_SIZE) {
+    if (PIOS_FS_Read(pios_log_fs_id, fh, (uint8_t *)mybuffer, LOG_ENTRY_HEADER_SIZE) != LOG_ENTRY_HEADER_SIZE) {
         rc = -1;
     }
     else
     {
-        if (PIOS_FS_Read(pios_user_fs_id, fh, (uint8_t *)(mybuffer + LOG_ENTRY_HEADER_SIZE), ((DebugLogEntryData*)mybuffer)->Size) != ((DebugLogEntryData*)mybuffer)->Size) {
+        if (PIOS_FS_Read(pios_log_fs_id, fh, (uint8_t *)(mybuffer + LOG_ENTRY_HEADER_SIZE), ((DebugLogEntryData*)mybuffer)->Size) != ((DebugLogEntryData*)mybuffer)->Size) {
             rc = -1;
         }
     }
 
     if (rc)
-        PIOS_FS_Close(pios_user_fs_id, fh);
+        PIOS_FS_Close(pios_log_fs_id, fh);
 
     mutexunlock();
     return rc;
@@ -296,7 +296,7 @@ void PIOS_DEBUGLOG_DeleteAll(void)
 {
     mutexlock();
 
-    PIOS_FS_Find(pios_user_fs_id, PIOS_DEBUGLOG_EXT_STRING, PIOS_DEBUGLOG_PATTERN_SIZE, PIOS_DEBUGLOG_PATTERN_OFFSET, PIOS_FS_REMOVE);
+    PIOS_FS_Find(pios_log_fs_id, PIOS_DEBUGLOG_EXT_STRING, PIOS_DEBUGLOG_PATTERN_SIZE, PIOS_DEBUGLOG_PATTERN_OFFSET, PIOS_FS_REMOVE);
 
     lognum = 0;
     flightnum = 0;

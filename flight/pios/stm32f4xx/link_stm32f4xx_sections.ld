@@ -39,18 +39,6 @@ SECTIONS
 		__module_initcall_end   = .;
     } >FLASH
 
-    /*
-     * Filesystem ops section
-     */
-    .filesystem.ops :
-    {
-        . = ALIGN(4);
-        __filesystem_start = .;
-        KEEP(*(.filesystem.ops))
-        . = ALIGN(4);
-        __filesystem_end   = .;
-    } >FLASH
-
 	/*
 	 * C++ exception handling.
 	 */

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
- * @file       pios_flashfs.h
+ * @file       pios_fs_logfs.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @see        The GNU Public License (GPL) Version 3
  * @{
- * @addtogroup PIOS_FLASHFS Flash Filesystem API Definition
+ * @addtogroup PIOS_FS logfs Filesystem API Definition
  * @{
  * @brief PIOS API for internal or onboard filesystem.
  *****************************************************************************/
@@ -25,25 +25,24 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_FLASHFS_H
-#define PIOS_FLASHFS_H
+#ifndef PIOS_FS_LOGFS_H
+#define PIOS_FS_LOGFS_H
 
 #include <stdint.h>
-#include <spiffs.h>
 
 
-struct flashfs_cfg {
-    uint32_t flashfs_magic;
-    uint32_t physical_size; /* Max size used file system partition. */
-    uint32_t physical_addr; /* Start address of the file system partition. */
-    uint32_t physical_erase_block; /* Flash device specific: size affected during erase process*/
-    uint32_t logical_block_size;
-    uint32_t logical_page_size;
-    uint32_t work_buffer_size;
-    uint32_t cache_buffer_size;
+struct pios_fs_logfs_cfg {
+    uint32_t fs_magic;
+    uint32_t total_fs_size; /* Total size of all generations of the filesystem */
+    uint32_t arena_size; /* Max size of one generation of the filesystem */
+    uint32_t slot_size; /* Max size of a "file" */
+
+    uint32_t start_offset; /* Offset into flash where this filesystem starts */
+    uint32_t sector_size; /* Size of a flash erase block */
+    uint32_t page_size; /* Maximum flash burst write size */
 };
 
 /* API */
-int32_t PIOS_FLASHFS_Init(uintptr_t *fs_id, const struct flashfs_cfg *cfg, const struct pios_flash_driver *driver, uintptr_t flash_id);
+int32_t PIOS_FS_LOGFS_Init(uintptr_t *fs_id, const struct pios_fs_logfs_cfg *cfg, const struct pios_flash_driver *driver, uintptr_t flash_id);
 
-#endif /* PIOS_FLASHFS_H */
+#endif /* PIOS_FS_LOGFS_H */

@@ -265,7 +265,9 @@ extern "C" {
 /* #define PIOS_INCLUDE_FLASH_LOGFS_SETTINGS */
 /* #define FLASH_FREERTOS */
 #include <pios_flash.h>
-#include <pios_flashfs.h>
+#ifdef PIOS_INCLUDE_FS_SPIFFS
+#include <pios_fs_spiffs.h>
+#endif
 #endif
 #include <pios_fs.h>
 

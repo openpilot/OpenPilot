@@ -98,7 +98,7 @@ void PIOS_Board_Init(void)
 #ifdef PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
     uintptr_t flash_id;
     PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg);
-    PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
+    PIOS_FS_LOGFS_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
 #endif
 
     /* Initialize the task monitor */
@@ -138,7 +138,7 @@ void PIOS_Board_Init(void)
     if (PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
         PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
         PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
-        PIOS_FLASHFS_Format(pios_uavo_settings_fs_id);
+        PIOS_FS_Format(pios_uavo_settings_fs_id, 0);
         PIOS_IAP_WriteBootCmd(0, 0);
         PIOS_IAP_WriteBootCmd(1, 0);
         PIOS_IAP_WriteBootCmd(2, 0);

@@ -21,14 +21,14 @@
 #define LUA_PRINT_FILE_NAME "output.lua"
 
 // File system that holds the log script.
-extern uintptr_t pios_flashfs_id;
+extern uintptr_t pios_lua_fs_id;
 
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
   int i;
 #if defined(CONFIG_BUILD_SPIFFS)
   int16_t fh;
-  fh = PIOS_FS_Open(pios_flashfs_id, LUA_PRINT_FILE_NAME, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_APPEND);
+  fh = PIOS_FS_Open(pios_lua_fs_id, LUA_PRINT_FILE_NAME, PIOS_FS_CREAT | PIOS_FS_WRONLY | PIOS_FS_APPEND);
 #endif
   lua_getglobal(L, "tostring");
   for (i=1; i<=n; i++) {
@@ -44,8 +44,8 @@ static int luaB_print (lua_State *L) {
 #if defined(CONFIG_BUILD_SPIFFS)
     if (fh >=0) {
         if (i>1)
-            PIOS_FS_Write(pios_flashfs_id, fh, (uint8_t*)"\t", 1);
-        PIOS_FS_Write(pios_flashfs_id, fh, (uint8_t*)s, l);
+            PIOS_FS_Write(pios_lua_fs_id, fh, (uint8_t*)"\t", 1);
+        PIOS_FS_Write(pios_lua_fs_id, fh, (uint8_t*)s, l);
     }
 #else
     if (i>1) luai_writestring("\t", 1);
@@ -55,8 +55,8 @@ static int luaB_print (lua_State *L) {
   }
 #if defined(CONFIG_BUILD_SPIFFS)
   if (fh >=0)
-      PIOS_FS_Write(pios_flashfs_id, fh, (uint8_t*)"\n", 1);
-  PIOS_FS_Close(pios_flashfs_id, fh);
+      PIOS_FS_Write(pios_lua_fs_id, fh, (uint8_t*)"\n", 1);
+  PIOS_FS_Close(pios_lua_fs_id, fh);
 #else
   luai_writeline();
 #endif

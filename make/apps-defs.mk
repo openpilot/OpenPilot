@@ -45,8 +45,6 @@ include $(FREERTOS_DIR)/library.mk
 ifeq ($(USE_SPIFFS),YES)
 SPIFFS_DIR	= $(PIOSCOMMON)/libraries/spiffs
 include $(SPIFFS_DIR)/library.mk
-else
-$(error Filesystem (SPIFFS) is only supported on revo! Other targets are now broken probably intentionnaly :p)
 endif
 
 ## Lua support
@@ -104,7 +102,8 @@ SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
 ## PIOS Hardware (Common)
-SRC += $(PIOSCOMMON)/pios_flashfs_spiffs.c
+SRC += $(PIOSCOMMON)/pios_fs_spiffs.c
+SRC += $(PIOSCOMMON)/pios_fs_logfs.c
 SRC += $(PIOSCOMMON)/pios_fs.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_debuglog.c

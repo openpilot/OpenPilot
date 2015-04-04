@@ -21,9 +21,9 @@
 // ----------- 8< ------------
 // Following has been added by OpenPilot
 #include <openpilot.h>
-extern xSemaphoreHandle flashfs_mutex;
-#define SPIFFS_LOCK(unused)   xSemaphoreTakeRecursive(flashfs_mutex, portMAX_DELAY)
-#define SPIFFS_UNLOCK(unused) xSemaphoreGiveRecursive(flashfs_mutex)
+extern xSemaphoreHandle fs_spiffs_mutex;
+#define SPIFFS_LOCK(unused)   xSemaphoreTakeRecursive(fs_spiffs_mutex, portMAX_DELAY)
+#define SPIFFS_UNLOCK(unused) xSemaphoreGiveRecursive(fs_spiffs_mutex)
 // ----------- >8 ------------
 
 // compile time switches

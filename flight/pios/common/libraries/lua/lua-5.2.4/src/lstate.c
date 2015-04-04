@@ -47,11 +47,13 @@
 ** created; the seed is used to randomize hashes.
 */
 #if !defined(luai_makeseed)
-//#include <time.h>
-/* TODO: do not call time(timeofday). thinking of using rng block but only on stm32f4? */
-//unsigned int lua_fakeseed = 0;
-//#define luai_makeseed()		cast(unsigned int, ++lua_fakeseed/*time(NULL)*/)
+#if 1 //defined(PIOS_INCLUDE_RTC)
+#include <pios_rtc.h>
 #define luai_makeseed()     cast(unsigned int, PIOS_RTC_Counter())
+#else
+#include <time.h>
+#define luai_makeseed()       cast(unsigned int, time(NULL))
+#endif
 #endif
 
 

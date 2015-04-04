@@ -30,6 +30,7 @@
 			<!-- optional -->
 			<elementname>GPS</elementname>
 			<elementname>OSDGen</elementname>
+			<elementname>Lua</elementname>
 		</elementnames>
 	</field> 
 	<field name="Running" units="bool" type="enum">
@@ -61,6 +62,7 @@
 			<!-- optional -->
 			<elementname>GPS</elementname>
 			<elementname>OSDGen</elementname>
+			<elementname>Lua</elementname>
 		</elementnames>
 		<options>
 			<option>False</option>
@@ -96,6 +98,7 @@
 			<!-- optional -->
 			<elementname>GPS</elementname>
 			<elementname>OSDGen</elementname>
+			<elementname>Lua</elementname>
 		</elementnames>
 	</field> 
         <access gcs="readonly" flight="readwrite"/>

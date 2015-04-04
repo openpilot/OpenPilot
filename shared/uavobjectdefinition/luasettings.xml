@@ -1,0 +1,14 @@
+<xml>
+    <object name="Luasettings" singleinstance="true" settings="false" category="System">
+        <description>Lua Object - Hold the script information to be run in a loop. </description>
+        <field name="Command" units="" type="enum" elements="1" options="Stop, Once, Loop" defaultvalue="Stop" />
+        <field name="Trigger" units="" type="enum" elements="1" options="Disabled, Armed" defaultvalue="Disabled" />
+        <field name="Script" units="" type="uint8" elements="26" defaultvalue="115,99,114,105,112,116,46,108,117,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" />
+        <field name="Iteration" units="" type="uint32" elements="1" />
+        <field name="Status" units="" type="enum" elements="1" options="Disabled, Stopped, Running, Error, Finished" defaultvalue="Disabled"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
+        <telemetryflight acked="true" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

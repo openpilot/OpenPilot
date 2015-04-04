@@ -51,6 +51,7 @@ MODULES += Logging
 MODULES += Telemetry
 MODULES += Notify
 MODULES += FileSync
+MODULES += Lua
 
 OPTMODULES += ComUsbBridge
 

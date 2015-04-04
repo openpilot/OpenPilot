@@ -136,7 +136,8 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.h \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h \
     $$UAVOBJECT_SYNTHETICS/flashfsstats.h \
-    $$UAVOBJECT_SYNTHETICS/sync.h
+    $$UAVOBJECT_SYNTHETICS/sync.h \
+    $$UAVOBJECT_SYNTHETICS/luasettings.h
 
 SOURCES += \
     $$UAVOBJECT_SYNTHETICS/statusgrounddrive.cpp \
@@ -249,5 +250,6 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/perfcounter.cpp \
     $$UAVOBJECT_SYNTHETICS/flashfsstats.cpp \
-    $$UAVOBJECT_SYNTHETICS/sync.cpp
+    $$UAVOBJECT_SYNTHETICS/sync.cpp \
+    $$UAVOBJECT_SYNTHETICS/luasettings.cpp
 

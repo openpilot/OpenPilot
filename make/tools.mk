@@ -118,6 +118,7 @@ else ifeq ($(UNAME), Windows)
     OPENSSL_DIR  := $(TOOLS_DIR)/openssl-1.0.1e-win32
     MESAWIN_DIR  := $(TOOLS_DIR)/mesawin
     CMAKE_DIR    := $(TOOLS_DIR)/cmake-2.8.12.2-win32-x86
+    MSYS_DIR     := $(TOOLS_DIR)/msys
 endif
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
@@ -920,6 +921,28 @@ endif
 .PHONY: cmake_version
 cmake_version:
 	-$(V1) $(ECHO) "`$(CMAKE) --version`"
+
+##############################
+#
+# MSYS
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,msys,$(MSYS_DIR),$(MSYS_URL),,$(notdir $(MSYS_URL))))
+
+ifeq ($(shell [ -d "$(MSYS_DIR)" ] && $(ECHO) "exists"), exists)
+    export MSYS_DIR := $(MSYS_DIR)
+else
+    # not installed, hope it's in the path...
+    #$(info $(EMPTY) WARNING     $(call toprel, $(MSYS_DIR)) not found (make msys_install), using system PATH)
+endif
+
+.PHONY: msys_version
+msys_version:
+
+endif
 
 
 

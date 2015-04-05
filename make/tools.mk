@@ -166,6 +166,7 @@ GIT			:= git
 CURL		:= curl
 TAR			:= tar
 UNZIP		:= unzip
+ZIP			:= gzip
 OPENSSL		:= openssl
 ANT			:= ant
 JAVAC		:= javac

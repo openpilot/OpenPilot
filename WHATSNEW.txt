@@ -1,4 +1,4 @@
---- RELEASE-15.02.01-RC1 ---
+--- RELEASE-15.02.01 ---
 This release fixes an in important bug that may prevent failsafe to work correctly using CC3D/CC with a PWM receiver.
 
 The full list of bugfixes in this release is accessible here:

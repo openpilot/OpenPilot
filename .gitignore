@@ -2,6 +2,7 @@
 /downloads
 /tools
 /build
+/3rdparty
 
 # Exclude temporary and system files
 Thumbs.db

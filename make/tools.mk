@@ -269,6 +269,27 @@ endef
 
 ##############################
 #
+# Cross-platform MD5 generation template
+#  $(1) = file name without quotes
+#
+##############################
+
+ifeq ($(UNAME), Darwin)
+
+define MD5_GEN_TEMPLATE
+md5 -r $(1) > $(1).md5
+endef
+
+else
+
+define MD5_GEN_TEMPLATE
+$(OPENSSL) dgst -r -md5 $(1) > $(1).md5
+endef
+
+endif
+
+##############################
+#
 # Cross platform download template
 #  $(1) = Package URL
 #  $(2) = Package file

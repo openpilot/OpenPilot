@@ -251,7 +251,7 @@ static void stabilizationInnerloopTask()
         if (t < STABILIZATIONSTATUS_INNERLOOP_THRUST) {
             if (reinit) {
                 stabSettings.innerPids[t].iAccumulator = 0;
-                if(frame_is_multirotor) {
+                if (frame_is_multirotor) {
                     // Multirotors should dump axis lock accumulators when unarmed or throttle is low.
                     // Fixed wing or ground vehicles can fly/drive with low throttle.
                     axis_lock_accum[t] = 0;

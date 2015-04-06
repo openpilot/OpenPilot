@@ -42,10 +42,13 @@
 #include <utils/stylehelper.h>
 #include <QMessageBox>
 
-#define ACCESS_MIN_MOVE -3
-#define ACCESS_MAX_MOVE 3
-#define STICK_MIN_MOVE  -8
-#define STICK_MAX_MOVE  8
+#define ACCESS_MIN_MOVE            -3
+#define ACCESS_MAX_MOVE            3
+#define STICK_MIN_MOVE             -8
+#define STICK_MAX_MOVE             8
+
+#define CHANNEL_NUMBER_NONE        0
+#define DEFAULT_FLIGHT_MODE_NUMBER 3
 
 ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
@@ -888,7 +891,7 @@ void ConfigInputWidget::restoreMdata()
  */
 void ConfigInputWidget::setChannel(int newChan)
 {
-    bool canBeSkipped(false);
+    bool canBeSkipped = false;
 
     if (newChan == ManualControlSettings::CHANNELGROUPS_COLLECTIVE) {
         wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please enable throttle hold mode.</p>"
@@ -911,7 +914,7 @@ void ConfigInputWidget::setChannel(int newChan)
         canBeSkipped = true;
     }
 
-    if (true == canBeSkipped) {
+    if (canBeSkipped) {
         wizardUi->wzNext->setEnabled(true);
         wizardUi->wzNext->setText(tr("Next / Skip"));
     } else {
@@ -1795,10 +1798,10 @@ void ConfigInputWidget::resetChannelSettings()
 {
     manualSettingsData = manualSettingsObj->getData();
     // Clear all channel data : Channel Type (PPM,PWM..) and Number
-    for (unsigned int channel = 0; channel < 9; channel++) {
+    for (unsigned int channel = 0; channel < ManualControlSettings::CHANNELNUMBER_NUMELEM; channel++) {
         manualSettingsData.ChannelGroups[channel] = ManualControlSettings::CHANNELGROUPS_NONE;
-        manualSettingsData.ChannelNumber[channel] = 0;
-        manualSettingsData.FlightModeNumber = 3;
+        manualSettingsData.ChannelNumber[channel] = CHANNEL_NUMBER_NONE;
+        manualSettingsData.FlightModeNumber = DEFAULT_FLIGHT_MODE_NUMBER;
         manualSettingsObj->setData(manualSettingsData);
     }
 }

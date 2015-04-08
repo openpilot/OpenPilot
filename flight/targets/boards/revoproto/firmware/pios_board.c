@@ -925,6 +925,17 @@ void PIOS_Board_Init(void)
     default:
         PIOS_DEBUG_Assert(0);
     }
+#ifdef PIOS_INCLUDE_ADC
+    {
+        uint8_t adc_config[HWSETTINGS_ADCROUTING_NUMELEM];
+        HwSettingsADCRoutingArrayGet(adc_config);
+        for (uint32_t i = 0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {
+            if (adc_config[i] != HWSETTINGS_ADCROUTING_DISABLED) {
+                PIOS_ADC_PinSetup(i);
+            }
+        }
+    }
+#endif // PIOS_INCLUDE_ADC
 }
 
 /**

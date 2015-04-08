@@ -283,10 +283,10 @@ extern uint32_t pios_packet_handler;
 // -------------------------
 #define PIOS_DMA_PIN_CONFIG                                                                 \
     {                                                                                           \
-        { GPIOC, GPIO_Pin_1, ADC_Channel_11 },                                                \
-        { GPIOC, GPIO_Pin_2, ADC_Channel_12 },                                                \
-        { NULL, 0, ADC_Channel_Vrefint }, /* Voltage reference */         \
-        { NULL, 0, ADC_Channel_TempSensor }, /* Temperature sensor */        \
+        { GPIOC, GPIO_Pin_1, ADC_Channel_11, false },                                                \
+        { GPIOC, GPIO_Pin_2, ADC_Channel_12, false },                                                \
+        { NULL, 0, ADC_Channel_Vrefint, false }, /* Voltage reference */         \
+        { NULL, 0, ADC_Channel_TempSensor, false }, /* Temperature sensor */        \
     }
 
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */

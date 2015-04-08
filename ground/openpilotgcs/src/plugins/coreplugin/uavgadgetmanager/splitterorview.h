@@ -43,7 +43,11 @@ public:
     ~SplitterOrView();
 
     void split(Qt::Orientation orientation);
-    void unsplit();
+
+    void unsplit(IUAVGadget *gadget);
+
+    // un-split all and keep only the specified gadget
+    void unsplitAll(IUAVGadget *gadget);
 
     inline bool isView() const
     {
@@ -95,10 +99,7 @@ public:
     }
     QSize minimumSizeHint() const;
 
-    void unsplitAll(IUAVGadget *currentGadget);
-
 protected:
-// void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *e);
 
 private slots:
@@ -106,19 +107,19 @@ private slots:
     void onSplitterMoved(int pos, int index);
 
 private:
-    void unsplitAll_helper();
+    // private "copy" constructor
+    SplitterOrView(SplitterOrView &splitterOrView, QWidget *parent);
+
+    static void unsplitAll_helper(UAVGadgetManager *uavGadgetManager, QSplitter *splitter);
     SplitterOrView *findNextView_helper(SplitterOrView *view, bool *found);
 
     // The gadget manager that controls us.
     QPointer<UAVGadgetManager> m_uavGadgetManager;
 
-    // Our layout, we use stacked so we can change stuff without visual artifacts (I think...)
-    QPointer<QStackedLayout> m_layout;
-
     // Our view, if we are a view (showing 1 gadget) and not a splitter.
     QPointer<UAVGadgetView> m_view;
 
-    // Out splitter, if we are a splitter.
+    // Our splitter, if we are a splitter.
     QPointer<QSplitter> m_splitter;
 
     // The splitter sizes. We keep our own copy of these, since after loading they can't realiably be retrieved.

@@ -34,7 +34,6 @@
 
 #include <QtCore/QDebug>
 
-
 #ifdef Q_WS_MAC
 #include <qmacstyle_mac.h>
 #endif
@@ -46,22 +45,28 @@ SplitterOrView::SplitterOrView(Core::UAVGadgetManager *uavGadgetManager, Core::I
     m_uavGadgetManager(uavGadgetManager),
     m_splitter(0)
 {
-    m_view   = new UAVGadgetView(m_uavGadgetManager, uavGadget, this);
-    m_layout = new QStackedLayout(this);
-    m_layout->addWidget(m_view);
+    m_view = new UAVGadgetView(m_uavGadgetManager, uavGadget, this);
+    setLayout(new QStackedLayout());
+    layout()->addWidget(m_view);
+}
+
+SplitterOrView::SplitterOrView(SplitterOrView &splitterOrView, QWidget *parent) :
+    QWidget(parent),
+    m_uavGadgetManager(splitterOrView.m_uavGadgetManager),
+    m_view(splitterOrView.m_view),
+    m_splitter(splitterOrView.m_splitter)
+{
+    Q_ASSERT((m_view || m_splitter) && !(m_view && m_splitter));
+    setLayout(new QStackedLayout());
+    if (m_view) {
+        layout()->addWidget(m_view);
+    } else if (m_splitter) {
+        layout()->addWidget(m_splitter);
+    }
 }
 
 SplitterOrView::~SplitterOrView()
-{
-    if (m_view) {
-        delete m_view;
-        m_view = 0;
-    }
-    if (m_splitter) {
-        delete m_splitter;
-        m_splitter = 0;
-    }
-}
+{}
 
 void SplitterOrView::mousePressEvent(QMouseEvent *e)
 {
@@ -221,7 +226,7 @@ QSplitter *SplitterOrView::takeSplitter()
     QSplitter *oldSplitter = m_splitter;
 
     if (m_splitter) {
-        m_layout->removeWidget(m_splitter);
+        layout()->removeWidget(m_splitter);
     }
     m_splitter = 0;
     return oldSplitter;
@@ -232,7 +237,7 @@ UAVGadgetView *SplitterOrView::takeView()
     UAVGadgetView *oldView = m_view;
 
     if (m_view) {
-        m_layout->removeWidget(m_view);
+        layout()->removeWidget(m_splitter);
     }
     m_view = 0;
     return oldView;
@@ -255,35 +260,6 @@ QList<IUAVGadget *> SplitterOrView::gadgets()
     return g;
 }
 
-void SplitterOrView::split(Qt::Orientation orientation)
-{
-    Q_ASSERT(m_view);
-    Q_ASSERT(!m_splitter);
-    m_splitter = new MiniSplitter(this);
-    m_splitter->setOrientation(orientation);
-    connect(m_splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(onSplitterMoved(int, int)));
-    m_layout->addWidget(m_splitter);
-    Core::IUAVGadget *ourGadget = m_view->gadget();
-
-    if (ourGadget) {
-        // Give our gadget to the new left or top SplitterOrView.
-        m_view->removeGadget();
-        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager, ourGadget));
-        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
-    } else {
-        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
-        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
-    }
-
-    m_layout->setCurrentWidget(m_splitter);
-
-    if (m_view) {
-        m_uavGadgetManager->emptyView(m_view);
-        delete m_view;
-        m_view = 0;
-    }
-}
-
 void SplitterOrView::onSplitterMoved(int pos, int index)
 {
     Q_UNUSED(pos);
@@ -292,66 +268,107 @@ void SplitterOrView::onSplitterMoved(int pos, int index)
     m_sizes = m_splitter->sizes();
 }
 
-void SplitterOrView::unsplitAll(IUAVGadget *currentGadget)
+void SplitterOrView::split(Qt::Orientation orientation)
 {
-    Q_ASSERT(m_splitter);
-    Q_ASSERT(!m_view);
-    m_splitter->hide();
-    m_layout->removeWidget(m_splitter); // workaround Qt bug
-    unsplitAll_helper();
-    delete m_splitter;
-    m_splitter = 0;
+    Q_ASSERT(m_view);
+    Q_ASSERT(!m_splitter);
 
-    m_view     = new UAVGadgetView(m_uavGadgetManager, currentGadget, this);
-    m_layout->addWidget(m_view);
+    MiniSplitter *splitter = new MiniSplitter(this);
+    splitter->setOrientation(orientation);
+    layout()->addWidget(splitter);
+
+    // [OP-1586] make sure that the view never becomes parent less otherwise a rendering bug happens
+    // in osgearth QML views (not all kind of scenes are affected but those containing terrain are)
+    // Making the view parent less will destroy the OpenGL context used by the QQuickFramebufferObject used OSGViewport
+    // A new OpenGL context will be created but for some reason, osgearth does not switch to it gracefully.
+    // Enabling the stats overlay (by pressing the 's' key in the view) will restore proper rendering (?).
+    // Note : avoiding to make the view parent less is a workaround... the real cause of the rendering bug needs to be
+    // understood and fixed (the same workaround is also need in unsplit and unsplitAll)
+    // Important : the changes also apparently make splitting and un-splitting more reactive and less jumpy!
+
+    // Give our view to the new left or top SplitterOrView.
+    splitter->addWidget(new SplitterOrView(*this, splitter));
+    splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
+
+    m_view     = 0;
+    m_splitter = splitter;
+
+    connect(m_splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(onSplitterMoved(int, int)));
 }
 
-void SplitterOrView::unsplitAll_helper()
-{
-    if (m_view) {
-        m_uavGadgetManager->emptyView(m_view);
-    }
-    if (m_splitter) {
-        for (int i = 0; i < m_splitter->count(); ++i) {
-            if (SplitterOrView * splitterOrView = qobject_cast<SplitterOrView *>(m_splitter->widget(i))) {
-                splitterOrView->unsplitAll_helper();
-            }
-        }
-    }
-}
-
-void SplitterOrView::unsplit()
+void SplitterOrView::unsplit(IUAVGadget *gadget)
 {
     if (!m_splitter) {
         return;
     }
-    Q_ASSERT(m_splitter->count() == 1);
-    SplitterOrView *childSplitterOrView = qobject_cast<SplitterOrView *>(m_splitter->widget(0));
-    QSplitter *oldSplitter = m_splitter;
-    m_splitter = 0;
-
-    if (childSplitterOrView->isSplitter()) {
-        Q_ASSERT(childSplitterOrView->view() == 0);
-        m_splitter = childSplitterOrView->takeSplitter();
-        m_layout->addWidget(m_splitter);
-        m_layout->setCurrentWidget(m_splitter);
-    } else {
-        UAVGadgetView *childView = childSplitterOrView->view();
-        Q_ASSERT(childView);
-        if (m_view) {
-            if (IUAVGadget * e = childView->gadget()) {
-                childView->removeGadget();
-                m_view->setGadget(e);
-            }
-            m_uavGadgetManager->emptyView(childView);
-        } else {
-            m_view = childSplitterOrView->takeView();
-            m_layout->addWidget(m_view);
-        }
-        m_layout->setCurrentWidget(m_view);
+    SplitterOrView *view = findView(gadget);
+    if (!view || view == this) {
+        return;
     }
-    delete oldSplitter;
-    m_uavGadgetManager->setCurrentGadget(findFirstView()->gadget());
+
+    // find the other gadgets
+    // TODO handle case where m_splitter->count() > 2
+    SplitterOrView *splitterOrView = NULL;
+    for (int i = 0; i < m_splitter->count(); ++i) {
+        splitterOrView = qobject_cast<SplitterOrView *>(m_splitter->widget(i));
+        if (splitterOrView && (splitterOrView != view)) {
+            break;
+        }
+    }
+    if (splitterOrView) {
+        if (splitterOrView->isView()) {
+            layout()->addWidget(splitterOrView->m_view);
+        } else {
+            layout()->addWidget(splitterOrView->m_splitter);
+        }
+        layout()->removeWidget(m_splitter);
+
+        m_uavGadgetManager->emptyView(view->m_view);
+        delete view;
+        delete m_splitter;
+
+        m_view     = splitterOrView->m_view;
+        m_splitter = splitterOrView->m_splitter;
+    }
+}
+
+void SplitterOrView::unsplitAll(Core::IUAVGadget *gadget)
+{
+    Q_ASSERT(m_splitter);
+    Q_ASSERT(!m_view);
+
+    SplitterOrView *splitterOrView = findView(gadget);
+    if (!splitterOrView || splitterOrView == this) {
+        return;
+    }
+
+    // first re-parent the gadget (see split for an explanation)
+    m_view = splitterOrView->m_view;
+    layout()->addWidget(m_view);
+    layout()->removeWidget(m_splitter);
+    // make sure the old m_view is not emptied...
+    splitterOrView->m_view = NULL;
+
+    // cleanup
+    unsplitAll_helper(m_uavGadgetManager, m_splitter);
+
+    delete m_splitter;
+    m_splitter = 0;
+}
+
+void SplitterOrView::unsplitAll_helper(UAVGadgetManager *uavGadgetManager, QSplitter *splitter)
+{
+    for (int i = 0; i < splitter->count(); ++i) {
+        if (SplitterOrView * splitterOrView = qobject_cast<SplitterOrView *>(splitter->widget(i))) {
+            if (splitterOrView->m_view) {
+                uavGadgetManager->emptyView(splitterOrView->m_view);
+            }
+            if (splitterOrView->m_splitter) {
+                unsplitAll_helper(uavGadgetManager, splitterOrView->m_splitter);
+            }
+            delete splitterOrView;
+        }
+    }
 }
 
 void SplitterOrView::saveState(QSettings *qSettings) const

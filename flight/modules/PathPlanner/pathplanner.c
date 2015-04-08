@@ -148,17 +148,22 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         switch (TreatCustomCraftAs) {
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
             frameType = FRAME_TYPE_FIXED_WING;
-            mode3D    = true;
             break;
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
             frameType = FRAME_TYPE_MULTIROTOR;
-            mode3D    = true;
             break;
         case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
             frameType = FRAME_TYPE_GROUND;
-            mode3D    = false;
             break;
         }
+    }
+
+    switch (frameType) {
+    case FRAME_TYPE_GROUND:
+        mode3D = false;
+        break;
+    default:
+        mode3D = true;
     }
 }
 

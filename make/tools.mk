@@ -932,10 +932,9 @@ gtest_version:
 $(eval $(call TOOL_INSTALL_TEMPLATE,cmake,$(CMAKE_DIR),$(CMAKE_URL),$(CMAKE_MD5_URL),$(notdir $(CMAKE_URL))))
 
 ifeq ($(shell [ -d "$(CMAKE_DIR)" ] && $(ECHO) "exists"), exists)
-    export CMAKE := "$(CMAKE_DIR)/bin/cmake"
+    export CMAKE := $(CMAKE_DIR)/bin/cmake
     export PATH := $(CMAKE_DIR)/bin:$(PATH)
 else
-    export CMAKE := "cmake"
     # not installed, hope it's in the path...
     #$(info $(EMPTY) WARNING     $(call toprel, $(CMAKE_DIR)) not found (make cmake_install), using system PATH)
     export CMAKE := cmake
@@ -943,7 +942,7 @@ endif
 
 .PHONY: cmake_version
 cmake_version:
-	-$(V1) $(ECHO) "`$(CMAKE) --version`"
+	-$(V1) $(CMAKE) --version
 
 ##############################
 #
@@ -956,7 +955,7 @@ ifeq ($(UNAME), Windows)
 $(eval $(call TOOL_INSTALL_TEMPLATE,msys,$(MSYS_DIR),$(MSYS_URL),,$(notdir $(MSYS_URL))))
 
 ifeq ($(shell [ -d "$(MSYS_DIR)" ] && $(ECHO) "exists"), exists)
-    export MSYS_DIR := $(MSYS_DIR)
+    export MSYS_DIR
 else
     # not installed, hope it's in the path...
     #$(info $(EMPTY) WARNING     $(call toprel, $(MSYS_DIR)) not found (make msys_install), using system PATH)

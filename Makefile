@@ -792,18 +792,10 @@ PACKAGE_NAME      := OpenPilot
 PACKAGE_SEP       := -
 PACKAGE_FULL_NAME := $(PACKAGE_NAME)$(PACKAGE_SEP)$(PACKAGE_LBL)
 
-# Source distribution is never dirty because it uses git archive
-DIST_NAME := $(DIST_DIR)/$(subst dirty-,,$(PACKAGE_FULL_NAME)).tar
-
-.PHONY: package
-
 include $(ROOT_DIR)/package/$(UNAME).mk
 
-package: all_fw all_ground uavobjects_matlab | $(PACKAGE_DIR)
-ifneq ($(GCS_BUILD_CONF),release)
-	# We can only package release builds
-	$(error Packaging is currently supported for release builds only)
-endif
+# Source distribution is never dirty because it uses git archive
+DIST_NAME := $(DIST_DIR)/$(subst dirty-,,$(PACKAGE_FULL_NAME)).tar
 
 ##############################
 #

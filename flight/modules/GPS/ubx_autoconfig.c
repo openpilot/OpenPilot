@@ -224,6 +224,65 @@ void config_sbas(uint16_t *bytes_to_send)
     status->requiredAck.msgID = UBX_ID_CFG_SBAS;
 }
 
+void config_gnss(uint16_t *bytes_to_send)
+{
+    int32_t i;
+
+    memset(status->working_packet.buffer, 0, sizeof(UBXSentHeader_t) + sizeof(ubx_cfg_gnss_t));
+
+    status->working_packet.message.payload.cfg_gnss.numConfigBlocks = UBX_GNSS_ID_MAX;
+    status->working_packet.message.payload.cfg_gnss.numTrkChHw = (ubxHwVersion > UBX_HW_VERSION_7) ? UBX_CFG_GNSS_NUMCH_VER8 : UBX_CFG_GNSS_NUMCH_VER7;
+    status->working_packet.message.payload.cfg_gnss.numTrkChUse     = status->working_packet.message.payload.cfg_gnss.numTrkChHw;
+
+    for (i = 0; i < UBX_GNSS_ID_MAX; i++) {
+        status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].gnssId = i;
+
+        switch (i) {
+        case UBX_GNSS_ID_GPS:
+            if (status->currentSettings.enableGPS) {
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].flags    = UBX_CFG_GNSS_FLAGS_ENABLED | UBX_CFG_GNSS_FLAGS_GPS_L1CA;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].maxTrkCh = 16;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].resTrkCh = 8;
+            }
+            break;
+        case UBX_GNSS_ID_QZSS:
+            if (status->currentSettings.enableGPS) {
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].flags    = UBX_CFG_GNSS_FLAGS_ENABLED | UBX_CFG_GNSS_FLAGS_QZSS_L1CA;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].maxTrkCh = 3;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].resTrkCh = 0;
+            }
+            break;
+        case UBX_GNSS_ID_SBAS:
+            if (status->currentSettings.SBASCorrection || status->currentSettings.SBASIntegrity || status->currentSettings.SBASRanging) {
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].flags    = UBX_CFG_GNSS_FLAGS_ENABLED | UBX_CFG_GNSS_FLAGS_SBAS_L1CA;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].maxTrkCh = status->currentSettings.SBASChannelsUsed < 4 ? status->currentSettings.SBASChannelsUsed : 3;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].resTrkCh = 1;
+            }
+            break;
+        case UBX_GNSS_ID_GLONASS:
+            if (status->currentSettings.enableGLONASS) {
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].flags    = UBX_CFG_GNSS_FLAGS_ENABLED | UBX_CFG_GNSS_FLAGS_GLONASS_L1OF;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].maxTrkCh = 14;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].resTrkCh = 8;
+            }
+            break;
+        case UBX_GNSS_ID_BEIDOU:
+            if (status->currentSettings.enableBeiDou) {
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].flags    = UBX_CFG_GNSS_FLAGS_ENABLED | UBX_CFG_GNSS_FLAGS_BEIDOU_B1I;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].maxTrkCh = 14;
+                status->working_packet.message.payload.cfg_gnss.cfgBlocks[i].resTrkCh = 8;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    *bytes_to_send = prepare_packet(&status->working_packet, UBX_CLASS_CFG, UBX_ID_CFG_GNSS, sizeof(ubx_cfg_gnss_t));
+    status->requiredAck.clsID = UBX_CLASS_CFG;
+    status->requiredAck.msgID = UBX_ID_CFG_GNSS;
+}
+
 void config_save(uint16_t *bytes_to_send)
 {
     memset(status->working_packet.buffer, 0, sizeof(UBXSentHeader_t) + sizeof(ubx_cfg_cfg_t));
@@ -244,13 +303,21 @@ static void configure(uint16_t *bytes_to_send)
         config_nav(bytes_to_send);
         break;
     case LAST_CONFIG_SENT_START + 2:
+        if (status->currentSettings.enableGLONASS || status->currentSettings.enableGPS) {
+            config_gnss(bytes_to_send);
+            break;
+        } else {
+            // Skip and fall through to next step
+            status->lastConfigSent++;
+        }
+    case LAST_CONFIG_SENT_START + 3:
         config_sbas(bytes_to_send);
         if (!status->currentSettings.storeSettings) {
             // skips saving
             status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
         }
         break;
-    case LAST_CONFIG_SENT_START + 3:
+    case LAST_CONFIG_SENT_START + 4:
         config_save(bytes_to_send);
         status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
         return;
@@ -308,22 +375,12 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
 
     switch (status->currentStep) {
     case INIT_STEP_ERROR:
-        if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_ERROR_RETRY_TIMEOUT) {
-            status->currentStep = INIT_STEP_START;
-            status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
-        }
-        return;
-
     case INIT_STEP_DISABLED:
     case INIT_STEP_DONE:
         return;
 
     case INIT_STEP_START:
     case INIT_STEP_ASK_VER:
-        // clear ack
-        ubxLastAck.clsID = 0x00;
-        ubxLastAck.msgID = 0x00;
-
         status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
         build_request(&status->working_packet, UBX_CLASS_MON, UBX_ID_MON_VER, bytes_to_send);
         status->currentStep = INIT_STEP_WAIT_VER;
@@ -366,15 +423,12 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
     {
         bool step_configure = (status->currentStep == INIT_STEP_CONFIGURE_WAIT_ACK);
         if (ubxLastAck.clsID == status->requiredAck.clsID && ubxLastAck.msgID == status->requiredAck.msgID) {
-            // clear ack
-            ubxLastAck.clsID   = 0x00;
-            ubxLastAck.msgID   = 0x00;
-
             // Continue with next configuration option
             status->retryCount = 0;
             status->lastConfigSent++;
-        } else if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_REPLY_TIMEOUT) {
-            // timeout, resend the message or abort
+        } else if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_REPLY_TIMEOUT ||
+                   (ubxLastNak.clsID == status->requiredAck.clsID && ubxLastNak.msgID == status->requiredAck.msgID)) {
+            // timeout or NAK, resend the message or abort
             status->retryCount++;
             if (status->retryCount > UBX_MAX_RETRIES) {
                 status->currentStep = INIT_STEP_ERROR;

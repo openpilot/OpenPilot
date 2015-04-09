@@ -65,6 +65,13 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
         </widget>
        </item>
        <item>
+        <widget class="QRadioButton" name="typeGround">
+         <property name="text">
+          <string>Surface: has reversible motor controlled by throttle stick, plus yaw control (2 channels)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QRadioButton" name="typeHeli">
          <property name="text">
           <string>Helicopter: has collective pitch and throttle input</string>
@@ -74,7 +81,7 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
        <item>
         <widget class="QLabel" name="typePageFooter">
          <property name="text">
-          <string>If selecting the Helicopter option, please engage throttle hold now.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If selecting the Helicopter option, please engage throttle hold now.&lt;/p&gt;&lt;p&gt;If selecting the Surface option, the &lt;b&gt;Flight Mode Count&lt;/b&gt; will be set to be 1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -89,7 +96,7 @@ You can press 'back' at any time to return to the previous screen or press 'Canc
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>23</height>
           </size>
          </property>
         </spacer>

@@ -312,6 +312,8 @@ int8_t VtolBrakeController::UpdateStabilizationDesired(void)
             // and a better throttle management to the standard Position Hold.
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
             break;
+        default:
+        	break;
         }
         stabDesired.StabilizationMode.Thrust = thrustMode;
     }

@@ -179,6 +179,8 @@ void armHandler(bool newinit, FrameType_t frameType)
     case FLIGHTMODESETTINGS_ARMING_ACCESSORY2:
         armingInputLevel = -1.0f * acc.AccessoryVal;
         break;
+    default:
+        break;
     }
 
     bool manualArm    = false;

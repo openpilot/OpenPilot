@@ -149,16 +149,16 @@ void VtolLandFSM::Inactive(void)
 void VtolLandFSM::initFSM(void)
 {
     if (vtolPathFollowerSettings != 0) {
-        setState(LAND_STATE_INACTIVE, STATUSVTOLLAND_STATEEXITREASON_NONE);
+        setState(STATUSVTOLLAND_STATE_INACTIVE, STATUSVTOLLAND_STATEEXITREASON_NONE);
     } else {
-        mLandData->currentState = LAND_STATE_INACTIVE;
+        mLandData->currentState = STATUSVTOLLAND_STATE_INACTIVE;
     }
 }
 
 void VtolLandFSM::Activate()
 {
     memset(mLandData, sizeof(VtolLandFSMData_T), 0);
-    mLandData->currentState   = LAND_STATE_INACTIVE;
+    mLandData->currentState   = STATUSVTOLLAND_STATE_INACTIVE;
     mLandData->flLowAltitude  = false;
     mLandData->flAltitudeHold = false;
     mLandData->fsmLandStatus.averageDescentRate      = MIN_LANDRATE;
@@ -167,38 +167,38 @@ void VtolLandFSM::Activate()
     mLandData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
     mLandData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
     TakeOffLocationGet(&(mLandData->takeOffLocation));
-    mLandData->fsmLandStatus.AltitudeAtState[LAND_STATE_INACTIVE] = 0.0f;
+    mLandData->fsmLandStatus.AltitudeAtState[STATUSVTOLLAND_STATE_INACTIVE] = 0.0f;
     assessAltitude();
 
     if (pathDesired->Mode == PATHDESIRED_MODE_LAND) {
 #ifndef DEBUG_GROUNDIMPACT
-        setState(LAND_STATE_INIT_ALTHOLD, STATUSVTOLLAND_STATEEXITREASON_NONE);
+        setState(STATUSVTOLLAND_STATE_INITALTHOLD, STATUSVTOLLAND_STATEEXITREASON_NONE);
 #else
-        setState(LAND_STATE_WTG_FOR_GROUNDEFFECT, STATUSVTOLLAND_STATEEXITREASON_NONE);
+        setState(STATUSVTOLLAND_STATE_WTGFORGROUNDEFFECT, STATUSVTOLLAND_STATEEXITREASON_NONE);
 #endif
     } else {
         // move to error state and callback to position hold
-        setState(LAND_STATE_ABORT, STATUSVTOLLAND_STATEEXITREASON_NONE);
+        setState(STATUSVTOLLAND_STATE_ABORT, STATUSVTOLLAND_STATEEXITREASON_NONE);
     }
 }
 
 void VtolLandFSM::Abort(void)
 {
-    setState(LAND_STATE_ABORT, STATUSVTOLLAND_STATEEXITREASON_NONE);
+    setState(STATUSVTOLLAND_STATE_ABORT, STATUSVTOLLAND_STATEEXITREASON_NONE);
 }
 
 PathFollowerFSMState_T VtolLandFSM::GetCurrentState(void)
 {
     switch (mLandData->currentState) {
-    case LAND_STATE_INACTIVE:
+    case STATUSVTOLLAND_STATE_INACTIVE:
         return PFFSM_STATE_INACTIVE;
 
         break;
-    case LAND_STATE_ABORT:
+    case STATUSVTOLLAND_STATE_ABORT:
         return PFFSM_STATE_ABORT;
 
         break;
-    case LAND_STATE_DISARMED:
+    case STATUSVTOLLAND_STATE_DISARMED:
         return PFFSM_STATE_DISARMED;
 
         break;
@@ -278,7 +278,7 @@ void VtolLandFSM::CheckPidScaler(pid_scaler *local_scaler)
 // Set the new state and perform setup for subsequent state run calls
 // This is called by state run functions on event detection that drive
 // state transitions.
-void VtolLandFSM::setState(PathFollowerFSM_LandState_T newState, StatusVtolLandStateExitReasonOptions reason)
+void VtolLandFSM::setState(StatusVtolLandStateOptions newState, StatusVtolLandStateExitReasonOptions reason)
 {
     mLandData->fsmLandStatus.StateExitReason[mLandData->currentState] = reason;
 
@@ -287,7 +287,7 @@ void VtolLandFSM::setState(PathFollowerFSM_LandState_T newState, StatusVtolLandS
     }
     mLandData->currentState = newState;
 
-    if (newState != LAND_STATE_INACTIVE) {
+    if (newState != STATUSVTOLLAND_STATE_INACTIVE) {
         PositionStateData positionState;
         PositionStateGet(&positionState);
         float takeOffDown = 0.0f;

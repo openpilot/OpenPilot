@@ -740,7 +740,10 @@ void PIOS_Board_Init(void)
                           tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
             PIOS_Assert(0);
         }
-
+        /* Set Telemetry to use OPLinkMini if no other telemetry is configured (USB always overrides anyway) */
+        if (!pios_com_telem_rf_id) {
+            pios_com_telem_rf_id = pios_com_rf_id;
+        }
         oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_ENABLED;
 
         // Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.

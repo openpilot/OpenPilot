@@ -169,6 +169,8 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
                     imu_airspeedInitialize(&airspeedSettings);
                 }
                 break;
+            default:
+            	break;
             }
         }
         switch (airspeedSettings.AirspeedSensorType) {

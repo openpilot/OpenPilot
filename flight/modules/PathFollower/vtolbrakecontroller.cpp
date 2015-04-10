@@ -315,7 +315,7 @@ int8_t VtolBrakeController::UpdateStabilizationDesired(void)
         default:
         	break;
         }
-        stabDesired.StabilizationMode.Thrust = thrustMode;
+        stabDesired.StabilizationMode.Thrust = (StabilizationDesiredStabilizationModeOptions) thrustMode;
     }
 
     // set the thrust value

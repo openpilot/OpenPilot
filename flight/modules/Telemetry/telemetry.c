@@ -157,35 +157,44 @@ static void updateSettings(channelContext *channel);
  */
 int32_t TelemetryStart(void)
 {
-    UAVObjIterate(&registerLocalObject);
+    // Only start the local telemetry tasks if needed
+    if (localPort()) {
+        UAVObjIterate(&registerLocalObject);
+
+        // Listen to objects of interest
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+        GCSTelemetryStatsConnectQueue(localChannel.priorityQueue);
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+        GCSTelemetryStatsConnectQueue(localChannel.queue);
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
+        // Start telemetry tasks
+        xTaskCreate(telemetryTxTask,
+                    "TelTx",
+                    STACK_SIZE_TX_BYTES / 4,
+                    &localChannel,
+                    TASK_PRIORITY_TX,
+                    &localChannel.txTaskHandle);
+        PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX,
+                                       localChannel.txTaskHandle);
+        xTaskCreate(telemetryRxTask,
+                    "TelRx",
+                    STACK_SIZE_RX_BYTES / 4,
+                    &localChannel,
+                    TASK_PRIORITY_RX,
+                    &localChannel.rxTaskHandle);
+        PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX,
+                                       localChannel.rxTaskHandle);
+    }
+
+    // Start the telemetry tasks associated with Radio/USB
     UAVObjIterate(&registerRadioObject);
 
     // Listen to objects of interest
 #ifdef PIOS_TELEM_PRIORITY_QUEUE
-    GCSTelemetryStatsConnectQueue(localChannel.priorityQueue);
     GCSTelemetryStatsConnectQueue(radioChannel.priorityQueue);
 #else /* PIOS_TELEM_PRIORITY_QUEUE */
-    GCSTelemetryStatsConnectQueue(localChannel.queue);
     GCSTelemetryStatsConnectQueue(radioChannel.queue);
 #endif /* PIOS_TELEM_PRIORITY_QUEUE */
-
-    // Start telemetry tasks
-    xTaskCreate(telemetryTxTask,
-                "TelTx",
-                STACK_SIZE_TX_BYTES / 4,
-                &localChannel,
-                TASK_PRIORITY_TX,
-                &localChannel.txTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX,
-                                   localChannel.txTaskHandle);
-    xTaskCreate(telemetryRxTask,
-                "TelRx",
-                STACK_SIZE_RX_BYTES / 4,
-                &localChannel,
-                TASK_PRIORITY_RX,
-                &localChannel.rxTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX,
-                                   localChannel.rxTaskHandle);
 
     xTaskCreate(telemetryTxTask,
                 "RadioTx",
@@ -207,6 +216,35 @@ int32_t TelemetryStart(void)
     return 0;
 }
 
+/* Intialise a telemetry channel */
+void TelemetryInitializeChannel(channelContext *channel)
+{
+    // Create object queues
+    channel->queue = xQueueCreate(MAX_QUEUE_SIZE,
+                                  sizeof(UAVObjEvent));
+#if defined(PIOS_TELEM_PRIORITY_QUEUE)
+    channel->priorityQueue = xQueueCreate(MAX_QUEUE_SIZE,
+                                          sizeof(UAVObjEvent));
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
+
+    // Initialise UAVTalk
+    channel->uavTalkCon = UAVTalkInitialize(&transmitLocalData);
+
+    // Create periodic event that will be used to update the telemetry stats
+    UAVObjEvent ev;
+    memset(&ev, 0, sizeof(UAVObjEvent));
+
+#ifdef PIOS_TELEM_PRIORITY_QUEUE
+    EventPeriodicQueueCreate(&ev,
+                             channel->priorityQueue,
+                             STATS_UPDATE_PERIOD_MS);
+#else /* PIOS_TELEM_PRIORITY_QUEUE */
+    EventPeriodicQueueCreate(&ev,
+                             channel->queue,
+                             STATS_UPDATE_PERIOD_MS);
+#endif /* PIOS_TELEM_PRIORITY_QUEUE */
+}
+
 /**
  * Initialise the telemetry module
  * \return -1 if initialisation failed
@@ -214,57 +252,37 @@ int32_t TelemetryStart(void)
  */
 int32_t TelemetryInitialize(void)
 {
+    HwSettingsInitialize();
+
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
 
     // Initialize vars
-    timeOfLastObjectUpdate     = 0;
+    timeOfLastObjectUpdate = 0;
 
-    // Create object queues
-    localChannel.queue         = xQueueCreate(MAX_QUEUE_SIZE,
-                                              sizeof(UAVObjEvent));
-    radioChannel.queue         = xQueueCreate(MAX_QUEUE_SIZE,
-                                              sizeof(UAVObjEvent));
-#if defined(PIOS_TELEM_PRIORITY_QUEUE)
-    localChannel.priorityQueue = xQueueCreate(MAX_QUEUE_SIZE,
-                                              sizeof(UAVObjEvent));
-    radioChannel.priorityQueue = xQueueCreate(MAX_QUEUE_SIZE,
-                                              sizeof(UAVObjEvent));
-#endif /* PIOS_TELEM_PRIORITY_QUEUE */
+    // Reset link stats
+    txErrors  = 0;
+    txRetries = 0;
 
     // Set channel port handlers
     localChannel.getPort = localPort;
     radioChannel.getPort = radioPort;
 
-    HwSettingsInitialize();
+    // Set the local telemetry baud rate
     updateSettings(&localChannel);
 
+    // Only initialise local channel if telemetry port enabled
+    if (localPort()) {
+        // Initialise channel
+        TelemetryInitializeChannel(&localChannel);
+        // Initialise UAVTalk
+        localChannel.uavTalkCon = UAVTalkInitialize(&transmitLocalData);
+    }
+
+    // Initialise channel
+    TelemetryInitializeChannel(&radioChannel);
     // Initialise UAVTalk
-    localChannel.uavTalkCon = UAVTalkInitialize(&transmitLocalData);
     radioChannel.uavTalkCon = UAVTalkInitialize(&transmitRadioData);
-
-    // Create periodic event that will be used to update the telemetry stats
-    // FIXME STATS_UPDATE_PERIOD_MS is 4000ms while FlighTelemetryStats update period is 5000ms...
-    txErrors  = 0;
-    txRetries = 0;
-    UAVObjEvent ev;
-    memset(&ev, 0, sizeof(UAVObjEvent));
-
-#ifdef PIOS_TELEM_PRIORITY_QUEUE
-    EventPeriodicQueueCreate(&ev,
-                             localChannel.priorityQueue,
-                             STATS_UPDATE_PERIOD_MS);
-    EventPeriodicQueueCreate(&ev,
-                             radioChannel.priorityQueue,
-                             STATS_UPDATE_PERIOD_MS);
-#else /* PIOS_TELEM_PRIORITY_QUEUE */
-    EventPeriodicQueueCreate(&ev,
-                             localChannel.queue,
-                             STATS_UPDATE_PERIOD_MS);
-    EventPeriodicQueueCreate(&ev,
-                             radioChannel.queue,
-                             STATS_UPDATE_PERIOD_MS);
-#endif /* PIOS_TELEM_PRIORITY_QUEUE */
 
     return 0;
 }

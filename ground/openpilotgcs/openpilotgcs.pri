@@ -63,6 +63,8 @@ defineTest(addCopyDirTarget) {
 
     $${dir}.target    = $$dest
     $${dir}.depends   = $$src
+    # Windows does not update directory timestamp if files are modified
+    win32: $${dir}.depends += FORCE
 
     $${dir}.commands  = @rm -rf \"$$targetPath($$dest)\" $$addNewline()
     # create directory. Better would be an order only dependency

@@ -127,6 +127,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/oplinkreceiver.h \
     $$UAVOBJECT_SYNTHETICS/radiocombridgestats.h \
     $$UAVOBJECT_SYNTHETICS/osdsettings.h \
+    $$UAVOBJECT_SYNTHETICS/osdsettings2.h \
     $$UAVOBJECT_SYNTHETICS/waypoint.h \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h \
@@ -238,6 +239,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/oplinkreceiver.cpp \
     $$UAVOBJECT_SYNTHETICS/radiocombridgestats.cpp \
     $$UAVOBJECT_SYNTHETICS/osdsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/osdsettings2.cpp \
     $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
     $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp \

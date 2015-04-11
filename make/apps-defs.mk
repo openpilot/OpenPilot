@@ -119,7 +119,7 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 
 SRC += $(MATHLIB)/mathmisc.c
 SRC += $(MATHLIB)/butterworth.c
-SRC += $(FLIGHTLIB)/printf-stdarg.c
+# Choose between printf-stdarg.c and printf2.c in the appropriate board Makefile
 SRC += $(FLIGHTLIB)/optypes.c
 
 ## Modules

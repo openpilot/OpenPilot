@@ -28,6 +28,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#if 0
 #include "openpilot.h"
 
 #if FLIGHTBATTERYSTATE_SUPPORTED
@@ -292,3 +293,4 @@ MODULE_INITCALL(osdoutputInitialize, osdoutputStart);
  * @}
  * @}
  */
+#endif /* if 0 */

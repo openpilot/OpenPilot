@@ -35,8 +35,29 @@
 #include <pios_stm32.h>
 #include <pios_spi_priv.h>
 
+// PAL/NTSC specific boundary values
+struct pios_video_type_boundary {
+    uint16_t graphics_left;
+    uint16_t graphics_top;
+    uint16_t graphics_right;
+    uint16_t graphics_bottom;
+};
+
+// PAL/NTSC specific config values
+struct pios_video_type_cfg {
+    uint16_t graphics_width_real;
+    uint16_t graphics_hight_real;
+    uint8_t  graphics_column_start;
+    uint8_t  graphics_line_start;
+    uint8_t  dma_buffer_length;
+    uint8_t  period;
+    uint8_t  dc;
+};
+
 struct pios_video_cfg {
-    const struct pios_spi_cfg  mask;
+    DMA_TypeDef *mask_dma;
+    const struct pios_spi_cfg mask;
+    DMA_TypeDef *level_dma;
     const struct pios_spi_cfg  level;
 
     const struct pios_exti_cfg *hsync;
@@ -48,55 +69,39 @@ struct pios_video_cfg {
     TIM_OCInitTypeDef tim_oc_init;
 };
 
-// Time vars
-typedef struct {
-    uint8_t sec;
-    uint8_t min;
-    uint8_t hour;
-} TTime;
-
-extern TTime timex;
-
-extern void PIOS_Video_Init(const struct pios_video_cfg *cfg);
-uint16_t PIOS_Video_GetOSDLines(void);
-extern bool PIOS_Hsync_ISR();
 extern bool PIOS_Vsync_ISR();
-
-// First OSD line
-#define GRAPHICS_LINE      25
-
-// top/left deadband
-#define GRAPHICS_HDEADBAND 80
-#define GRAPHICS_VDEADBAND 0
-
-#define PAL
-
-// Real OSD size
-#ifdef PAL
-// #define GRAPHICS_WIDTH_REAL (352+GRAPHICS_HDEADBAND)
-#define GRAPHICS_WIDTH_REAL   416
- #define GRAPHICS_HEIGHT_REAL (270 + GRAPHICS_VDEADBAND)
-#else
- #define GRAPHICS_WIDTH_REAL  (312 + GRAPHICS_HDEADBAND)
- #define GRAPHICS_HEIGHT_REAL (225 + GRAPHICS_VDEADBAND)
-#endif
-
-// draw area
-#define GRAPHICS_TOP          0
-#define GRAPHICS_LEFT         0
-#define GRAPHICS_BOTTOM       (GRAPHICS_HEIGHT_REAL - GRAPHICS_VDEADBAND - 1)
-#define GRAPHICS_RIGHT        (GRAPHICS_WIDTH_REAL - GRAPHICS_HDEADBAND - 1)
+extern bool PIOS_Hsync_ISR();
+extern void PIOS_Video_Init(const struct pios_video_cfg *cfg);
+extern void PIOS_Pixel_Init(void);
+uint16_t PIOS_Video_GetLines(void);
+uint16_t PIOS_Video_GetType(void);
+void PIOS_Video_BoundaryReset(void);
+void PIOS_Video_BoundaryLimit(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
 
 
-#define GRAPHICS_WIDTH        (GRAPHICS_WIDTH_REAL / 8)
-#define GRAPHICS_HEIGHT       GRAPHICS_HEIGHT_REAL
+// video boundary values
+extern const struct pios_video_type_boundary *pios_video_type_boundary_act;
+#define GRAPHICS_LEFT        pios_video_type_boundary_act->graphics_left
+#define GRAPHICS_TOP         pios_video_type_boundary_act->graphics_top
+#define GRAPHICS_RIGHT       pios_video_type_boundary_act->graphics_right
+#define GRAPHICS_BOTTOM      pios_video_type_boundary_act->graphics_bottom
 
-// dma lenght
-#define BUFFER_LINE_LENGTH    (GRAPHICS_WIDTH)  // Yes, in bytes.
+#define GRAPHICS_X_MIDDLE	((GRAPHICS_RIGHT + 1) / 2)
+#define GRAPHICS_Y_MIDDLE	((GRAPHICS_BOTTOM + 1) / 2)
 
-// line types
-#define LINE_TYPE_UNKNOWN     0
-#define LINE_TYPE_GRAPHICS    2
+
+// video type defs for autodetect
+#define VIDEO_TYPE_NTSC      0
+#define VIDEO_TYPE_PAL       1
+#define VIDEO_TYPE_PAL_ROWS  300
+
+
+// draw area buffer values, for memory allocation, access and calculations we suppose the larger values for PAL, this also works for NTSC
+#define GRAPHICS_WIDTH_REAL  400                            // max columns
+#define GRAPHICS_HEIGHT_REAL 288                            // max lines
+#define BUFFER_WIDTH         (GRAPHICS_WIDTH_REAL / 8 + 1)  // Bytes plus one byte for SPI
+#define BUFFER_HEIGHT        (GRAPHICS_HEIGHT_REAL)
+
 
 // Macro to swap buffers given a temporary pointer.
 #define SWAP_BUFFS(tmp, a, b) { tmp = a; a = b; b = tmp; }

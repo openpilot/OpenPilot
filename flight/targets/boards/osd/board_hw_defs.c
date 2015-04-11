@@ -230,9 +230,9 @@ void PIOS_SPI_sdcard_irq_handler(void)
 /*
  * GPS USART
  */
-static const struct pios_usart_cfg pios_usart_gps_cfg = {
-    .regs  = USART1,
-    .remap = GPIO_AF_USART1,
+static const struct pios_usart_cfg pios_usart_gps_flexi_io_cfg = {
+    .regs  = USART6,
+    .remap = GPIO_AF_USART6,
     .init  = {
         .USART_BaudRate   = 57600,
         .USART_WordLength = USART_WordLength_8b,
@@ -244,16 +244,16 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
     },
     .irq                                       = {
         .init                                  = {
-            .NVIC_IRQChannel    = USART1_IRQn,
+            .NVIC_IRQChannel    = USART6_IRQn,
             .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
             .NVIC_IRQChannelSubPriority        = 0,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
     .rx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOC,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -261,9 +261,9 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
         },
     },
     .tx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOC,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Pin   = GPIO_Pin_6,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -323,9 +323,9 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 
 #ifdef PIOS_INCLUDE_COM_TELEM
 /*
- * Telemetry on main USART
+ * Telemetry on FltCtrl UART
  */
-static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
+static const struct pios_usart_cfg pios_usart_telem_fltctrl_cfg = {
     .regs  = UART4,
     .remap = GPIO_AF_UART4,
     .init  = {
@@ -487,7 +487,7 @@ void PIOS_RTC_IRQ_Handler(void)
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"
 
-static const struct pios_usb_cfg pios_usb_main_cfg = {
+static const struct pios_usb_cfg pios_usb_main_osd_r1_cfg = {
     .irq                                       = {
         .init                                  = {
             .NVIC_IRQChannel    = OTG_FS_IRQn,
@@ -508,6 +508,44 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
     .vsense_active_low                         = false
 };
 
+static const struct pios_usb_cfg pios_usb_main_osd_r2_cfg = {
+    .irq                                       = {
+        .init                                  = {
+            .NVIC_IRQChannel    = OTG_FS_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+    .vsense                                    = {
+        .gpio = GPIOA,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_IN,
+            .GPIO_OType = GPIO_OType_OD,
+        },
+    },
+    .vsense_active_low                         = false
+};
+
+const struct pios_usb_cfg *PIOS_BOARD_HW_DEFS_GetUsbCfg(uint32_t board_revision)
+{
+    switch (board_revision) {
+    case 1:
+        return &pios_usb_main_osd_r1_cfg;
+
+        break;
+    case 2:
+        return &pios_usb_main_osd_r2_cfg;
+
+        break;
+    default:
+        PIOS_DEBUG_Assert(0);
+    }
+    return NULL;
+}
+
 #include "pios_usb_board_data_priv.h"
 #include "pios_usb_desc_hid_cdc_priv.h"
 #include "pios_usb_desc_hid_only_priv.h"
@@ -521,17 +559,17 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 
 #endif /* PIOS_INCLUDE_COM_MSG */
 
-#if defined(PIOS_INCLUDE_USB_HID)
+#if defined(PIOS_INCLUDE_USB_HID) && !defined(PIOS_INCLUDE_USB_CDC)
 #include <pios_usb_hid_priv.h>
 
 const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
-    .data_if    = 2,
+    .data_if    = 0,
     .data_rx_ep = 1,
     .data_tx_ep = 1,
 };
-#endif /* PIOS_INCLUDE_USB_HID */
+#endif /* PIOS_INCLUDE_USB_HID && !PIOS_INCLUDE_USB_CDC */
 
-#if defined(PIOS_INCLUDE_USB_CDC)
+#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_USB_CDC)
 #include <pios_usb_cdc_priv.h>
 
 const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
@@ -542,7 +580,15 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
     .data_rx_ep = 3,
     .data_tx_ep = 3,
 };
-#endif /* PIOS_INCLUDE_USB_CDC */
+
+#include <pios_usb_hid_priv.h>
+
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
+    .data_if    = 2,
+    .data_rx_ep = 1,
+    .data_tx_ep = 1,
+};
+#endif /* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_USB_CDC */
 
 #if defined(PIOS_INCLUDE_VIDEO)
 
@@ -648,9 +694,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
         .init                                  = {
             .EXTI_Line    = EXTI_Line7, // matches above GPIO pin
             .EXTI_Mode    = EXTI_Mode_Interrupt,
-            // .EXTI_Trigger = EXTI_Trigger_Rising_Falling,
-            .EXTI_Trigger = EXTI_Trigger_Falling,
-            // .EXTI_Trigger = EXTI_Trigger_Rising,
+            .EXTI_Trigger = EXTI_Trigger_Rising,
             .EXTI_LineCmd = ENABLE,
         },
     },
@@ -688,7 +732,8 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 
 
 static const struct pios_video_cfg pios_video_cfg = {
-    .mask                                              = {
+    .mask_dma = DMA1,
+    .mask     = {
         .regs  = SPI3,
         .remap = GPIO_AF_SPI3,
         .init  = {
@@ -721,11 +766,11 @@ static const struct pios_video_cfg pios_video_cfg = {
                     .DMA_Channel            = DMA_Channel_0,
                     .DMA_PeripheralBaseAddr = (uint32_t)&(SPI3->DR),
                     .DMA_DIR                = DMA_DIR_MemoryToPeripheral,
-                    .DMA_BufferSize         = BUFFER_LINE_LENGTH,
+                    .DMA_BufferSize         = BUFFER_WIDTH,
                     .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
                     .DMA_MemoryInc          = DMA_MemoryInc_Enable,
                     .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
+                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
                     .DMA_Mode               = DMA_Mode_Normal,
                     .DMA_Priority           = DMA_Priority_VeryHigh,
                     .DMA_FIFOMode           = DMA_FIFOMode_Enable,
@@ -742,7 +787,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .GPIO_Speed = GPIO_Speed_100MHz,
                 .GPIO_Mode  = GPIO_Mode_AF,
                 .GPIO_OType = GPIO_OType_PP,
-                .GPIO_PuPd  = GPIO_PuPd_NOPULL
+                .GPIO_PuPd  = GPIO_PuPd_NOPULL          // JR_HINT or GPIO_PuPd_UP ?
             },
         },
         .miso                                          = {
@@ -758,7 +803,8 @@ static const struct pios_video_cfg pios_video_cfg = {
         /*.mosi = {},*/
         .slave_count                                   = 1,
     },
-    .level                                             = {
+    .level_dma = DMA2,
+    .level     = {
         .regs  = SPI1,
         .remap = GPIO_AF_SPI1,
         .init  = {
@@ -778,7 +824,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .flags = (DMA_IT_TCIF5),
                 .init  = {
                     .NVIC_IRQChannel    = DMA2_Stream5_IRQn,
-                    .NVIC_IRQChannelPreemptionPriority = 0,
+                    .NVIC_IRQChannelPreemptionPriority = 0,                // JR_HINT or PIOS_IRQ_PRIO_HIGH ?
                     .NVIC_IRQChannelSubPriority        = 0,
                     .NVIC_IRQChannelCmd = ENABLE,
                 },
@@ -790,11 +836,11 @@ static const struct pios_video_cfg pios_video_cfg = {
                     .DMA_Channel            = DMA_Channel_3,
                     .DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
                     .DMA_DIR                = DMA_DIR_MemoryToPeripheral,
-                    .DMA_BufferSize         = BUFFER_LINE_LENGTH,
+                    .DMA_BufferSize         = BUFFER_WIDTH,
                     .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
                     .DMA_MemoryInc          = DMA_MemoryInc_Enable,
                     .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
+                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
                     .DMA_Mode               = DMA_Mode_Normal,
                     .DMA_Priority           = DMA_Priority_VeryHigh,
                     .DMA_FIFOMode           = DMA_FIFOMode_Enable,
@@ -811,7 +857,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .GPIO_Speed = GPIO_Speed_100MHz,
                 .GPIO_Mode  = GPIO_Mode_AF,
                 .GPIO_OType = GPIO_OType_PP,
-                .GPIO_PuPd  = GPIO_PuPd_UP
+                .GPIO_PuPd  = GPIO_PuPd_UP                      // JR_HINT or GPIO_PuPd_NOPULL ?
             },
         },
         .miso                                          = {
@@ -970,3 +1016,88 @@ static const struct pios_dac_cfg pios_dac_cfg = {
     },
 };
 #endif /* if defined(PIOS_INCLUDE_WAVE) */
+
+#if defined(PIOS_INCLUDE_TSLRSDEBUG)
+#include "pios_tslrsdebug_priv.h"
+
+static const struct pios_usart_cfg pios_usart_tslrsdebug_flexi_cfg = {
+    .regs  = USART3,
+    .remap = GPIO_AF_USART3,
+    .init  = {
+        .USART_BaudRate   = 9600,
+        .USART_WordLength = USART_WordLength_8b,
+        .USART_Parity     = USART_Parity_No,
+        .USART_StopBits   = USART_StopBits_1,
+        .USART_HardwareFlowControl             = USART_HardwareFlowControl_None,
+        .USART_Mode                            = USART_Mode_Rx,
+    },
+    .irq                                       = {
+        .init                                  = {
+            .NVIC_IRQChannel    = USART3_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+    .rx                                        = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_11,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+    },
+    .tx                                        = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+    },
+};
+
+static const struct pios_tslrsdebug_cfg pios_tslrsdebug_flexi_cfg = {
+    .bind               = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_11,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_NOPULL
+        },
+    },
+};
+
+#endif /* #if defined(PIOS_INCLUDE_TSLRSDEBUG) */
+
+#if defined(PIOS_INCLUDE_PACKETRXOK)
+#include "pios_packetrxok_priv.h"
+
+static const struct pios_gpio pios_io_packetrxok_flexi[] = {
+    [PIOS_PACKETRXOK_IN] = {
+        .pin                =             {
+            .gpio = GPIOB,
+            .init =             {
+                    .GPIO_Pin   = GPIO_Pin_11,
+                    .GPIO_Speed = GPIO_Speed_25MHz,
+                    .GPIO_Mode  = GPIO_Mode_IN,
+                    .GPIO_OType = GPIO_OType_OD,
+                    .GPIO_PuPd  = GPIO_PuPd_NOPULL,
+            },
+        },
+        .active_low         = true
+    },
+};
+
+static const struct pios_gpio_cfg pios_io_packetrxok_flexi_cfg = {
+    .gpios     = pios_io_packetrxok_flexi,
+    .num_gpios = NELEMENTS(pios_io_packetrxok_flexi),
+};
+
+#endif /* #if defined(PIOS_INCLUDE_PACKETRXOK) */

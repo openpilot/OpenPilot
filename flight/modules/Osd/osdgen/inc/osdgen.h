@@ -36,6 +36,17 @@
 
 int32_t osdgenInitialize(void);
 
+// Needed till someone fixes the black/white hardware problem
+//#define ONLY_WHITE_PIXEL
+#ifdef ONLY_WHITE_PIXEL
+#define GCS_LEVEL_ONLY_WHITE_PIXEL      4095
+#define CHECK_ONLY_WHITE_PIXEL          if (only_white_pixel) mmode = (lmode & 1);
+#define CHECK_ONLY_WHITE_PIXEL_CHAR     if (only_white_pixel) mask = level;
+#else
+#define CHECK_ONLY_WHITE_PIXEL
+#define CHECK_ONLY_WHITE_PIXEL_CHAR
+#endif
+
 // Size of an array (num items.)
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -43,21 +54,20 @@ int32_t osdgenInitialize(void);
 #define HUD_VSCALE_FLAG_NO_NEGATIVE 2
 
 // Macros for computing addresses and bit positions.
-// NOTE: /16 in y is because we are addressing by word not byte.
-#define CALC_BUFF_ADDR(x, y) (((x) / 8) + ((y) * (GRAPHICS_WIDTH_REAL / 8)))
-#define CALC_BIT_IN_WORD(x)  ((x) & 7)
-#define DEBUG_DELAY
-// Macro for writing a word with a mode (NAND = clear, OR = set, XOR = toggle)
-// at a given position
-#define WRITE_WORD_MODE(buff, addr, mask, mode) \
-    switch (mode) { \
-    case 0: buff[addr] &= ~mask; break; \
-    case 1: buff[addr] |= mask; break; \
-    case 2: buff[addr] ^= mask; break; }
+#define CALC_BUFF_ADDR(x, y) (((x) / 8) + ((y) * BUFFER_WIDTH))
+#define CALC_BIT_IN_BYTE(x)  ((x) & 7)
 
-#define WRITE_WORD_NAND(buff, addr, mask) { buff[addr] &= ~mask; DEBUG_DELAY; }
-#define WRITE_WORD_OR(buff, addr, mask)   { buff[addr] |= mask; DEBUG_DELAY; }
-#define WRITE_WORD_XOR(buff, addr, mask)  { buff[addr] ^= mask; DEBUG_DELAY; }
+// Macro for writing a byte with a mode (NAND = clear, OR = set, XOR = toggle) at a given position
+#define WRITE_BYTE_MODE(buff, addr, mask, mode) \
+    switch (mode) { \
+    case 0: buff[addr] &= ~(mask); break; \
+    case 1: buff[addr] |= (mask); break; \
+    case 2: buff[addr] ^= (mask); break; }
+
+// Macros for writing a byte nand, or, xor at a given position
+#define WRITE_BYTE_NAND(buff, addr, mask) { buff[addr] &= ~(mask); }
+#define WRITE_BYTE_OR(buff, addr, mask)   { buff[addr] |= (mask); }
+#define WRITE_BYTE_XOR(buff, addr, mask)  { buff[addr] ^= (mask); }
 
 // Horizontal line calculations.
 // Edge cases.
@@ -117,91 +127,95 @@ struct FontDimensions {
     int width, height;
 };
 
+// to convert metric -> imperial
+// for speeds see http://en.wikipedia.org/wiki/Miles_per_hour
+typedef struct {                    // from		metric			imperial
+    float   m_to_m_feet;            // m		m		1.0		feet	3.280840
+    float   ms_to_ms_fts;           // m/s		m/s		1.0		ft/s	3.280840
+    float   ms_to_kmh_mph;          // m/s		km/h	3.6		mph		2.236936
+    uint8_t char_m_feet;            // char		'm'				'f'
+    uint8_t char_ms_fts;            // char		'm/s'			'ft/s'
+} Unit;
+
+// Home position for calculations
+typedef struct {
+    int32_t  Latitude;
+    int32_t  Longitude;
+    float    Altitude;
+    uint8_t  GotHome;
+    uint32_t Distance;
+    uint16_t Direction;
+} HomePosition;
+
+// ADC values filtered
+typedef struct {
+    double rssi;
+    double flight;
+    double video;
+    double volt;
+    double curr;
+} ADCfiltered;
+
 // Max/Min macros.
-#define MAX(a, b)            ((a) > (b) ? (a) : (b))
-#define MIN(a, b)            ((a) < (b) ? (a) : (b))
-#define MAX3(a, b, c)        MAX(a, MAX(b, c))
-#define MIN3(a, b, c)        MIN(a, MIN(b, c))
+#define MAX(a, b)                    ((a) > (b) ? (a) : (b))
+#define MIN(a, b)                    ((a) < (b) ? (a) : (b))
+#define MAX3(a, b, c)                MAX(a, MAX(b, c))
+#define MIN3(a, b, c)                MIN(a, MIN(b, c))
 
-// Apply DeadBand
-#define APPLY_DEADBAND(x, y) { x = (x) + GRAPHICS_HDEADBAND; y = (y) + GRAPHICS_VDEADBAND; }
-#define APPLY_VDEADBAND(y)   ((y) + GRAPHICS_VDEADBAND)
-#define APPLY_HDEADBAND(x)   ((x) + GRAPHICS_HDEADBAND)
+// Check if coordinates are valid. If not, return. Assumes signed coordinates for working correct also with values lesser than 0.
+#define CHECK_COORDS(x, y)           if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT || y < GRAPHICS_TOP || y > GRAPHICS_BOTTOM) { return; }
+#define CHECK_COORD_X(x)             if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT) { return; }
+#define CHECK_COORD_Y(y)             if (y < GRAPHICS_TOP  || y > GRAPHICS_BOTTOM) { return; }
 
-// Check if coordinates are valid. If not, return. Assumes unsigned coordinate
-#define CHECK_COORDS(x, y)   if (x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) { return; }
-#define CHECK_COORD_X(x)     if (x >= GRAPHICS_WIDTH_REAL) { return; }
-#define CHECK_COORD_Y(y)     if (y >= GRAPHICS_HEIGHT_REAL) { return; }
-
-// Clip coordinates out of range - assumes unsigned coordinate
-#define CLIP_COORD_X(x)      { x = MIN(x, GRAPHICS_WIDTH_REAL); }
-#define CLIP_COORD_Y(y)      { y = MIN(y, GRAPHICS_HEIGHT_REAL); }
-#define CLIP_COORDS(x, y)    { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
+// Clip coordinates out of range. Assumes signed coordinates for working correct also with values lesser than 0.
+#define CLIP_COORDS(x, y)            { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
+#define CLIP_COORD_X(x)              { x = x < GRAPHICS_LEFT ? GRAPHICS_LEFT : x > GRAPHICS_RIGHT ? GRAPHICS_RIGHT : x; }
+#define CLIP_COORD_Y(y)              { y = y < GRAPHICS_TOP ? GRAPHICS_TOP : y > GRAPHICS_BOTTOM ? GRAPHICS_BOTTOM : y; }
 
 // Macro to swap two variables using XOR swap.
-#define SWAP(a, b)           { a ^= b; b ^= a; a ^= b; }
-
-// Line triggering
-#define LAST_LINE 312 // 625/2 //PAL
-// #define LAST_LINE 525/2 //NTSC
-
-// Global vars
-
-#define DELAY_1_NOP()  asm ("nop\r\n")
-#define DELAY_2_NOP()  asm ("nop\r\nnop\r\n")
-#define DELAY_3_NOP()  asm ("nop\r\nnop\r\nnop\r\n")
-#define DELAY_4_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_5_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_6_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_7_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_8_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_9_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_10_NOP() asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
+#define SWAP(a, b)                   { a ^= b; b ^= a; a ^= b; }
 
 uint8_t getCharData(uint16_t charPos);
-void introText();
 
 void clearGraphics();
-uint8_t validPos(uint16_t x, uint16_t y);
-void setPixel(uint16_t x, uint16_t y, uint8_t state);
-void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius);
-void swap(uint16_t *a, uint16_t *b);
-void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
-void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size);
-void drawAttitude(uint16_t x, uint16_t y, int16_t pitch, int16_t roll, uint16_t size);
-void introGraphics();
-void updateGraphics();
-void drawGraphicsLine();
 
-void write_char16(char ch, unsigned int x, unsigned int y, int font);
-void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode);
-void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode);
-void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode);
-void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode, int mmode);
-void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int endcap0, int endcap1, int mode, int mmode);
-void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode);
-void write_vline_lm(unsigned int x, unsigned int y0, unsigned int y1, int lmode, int mmode);
-void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int endcap0, int endcap1, int mode, int mmode);
-void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode);
-void write_filled_rectangle_lm(unsigned int x, unsigned int y, unsigned int width, unsigned int height, int lmode, int mmode);
-void write_rectangle_outlined(unsigned int x, unsigned int y, int width, int height, int mode, int mmode);
-void write_circle(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int mode);
-void write_circle_outlined(unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int bmode, int mode, int mmode);
-void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, int mode);
-void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode);
-void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mmode, int lmode);
-void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int endcap0, int endcap1, int mode, int mmode);
+void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size);
+void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+
+void write_pixel(uint8_t *buff, int x, int y, int mode);
+void write_pixel_lm(int x, int y, int mmode, int lmode);
+
+void write_hline(uint8_t *buff, int x0, int x1, int y, int mode);
+void write_hline_lm(int x0, int x1, int y, int lmode, int mmode);
+void write_hline_outlined(int x0, int x1, int y, int endcap0, int endcap1, int mode, int mmode);
+
+void write_vline(uint8_t *buff, int x, int y0, int y1, int mode);
+void write_vline_lm(int x, int y0, int y1, int lmode, int mmode);
+void write_vline_outlined(int x, int y0, int y1, int endcap0, int endcap1, int mode, int mmode);
+
+void write_filled_rectangle(uint8_t *buff, int x, int y, int width, int height, int mode);
+void write_filled_rectangle_lm(int x, int y, int width, int height, int lmode, int mmode);
+void write_rectangle_outlined(int x, int y, int width, int height, int mode, int mmode);
+
+void write_circle(uint8_t *buff, int cx, int cy, int r, int dashp, int mode);
+void write_circle_outlined(int cx, int cy, int r, int dashp, int bmode, int mode, int mmode);
+void write_circle_filled(uint8_t *buff, int cx, int cy, int r, int mode);
+
+void write_line(uint8_t *buff, int x0, int y0, int x1, int y1, int mode);
+void write_line_lm(int x0, int y0, int x1, int y1, int mmode, int lmode);
+void write_line_outlined(int x0, int y0, int x1, int y1, int endcap0, int endcap1, int mode, int mmode);
+void write_line_outlined_dashed(int x0, int y0, int x1, int y1, int endcap0, int endcap1, int mode, int mmode, int dots);
+
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode);
 void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
-void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr, unsigned int xoff, int lmode, int mmode);
-// int fetch_font_info(char ch, int font, struct FontEntry *font_info, char *lookup);
-void write_char(char ch, unsigned int x, unsigned int y, int flags, int font);
-// void calc_text_dimensions(char *str, struct FontEntry font, int xs, int ys, struct FontDimensions *dim);
-void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags, int font);
-void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags);
 
-void updateOnceEveryFrame();
+void write_byte_misaligned_NAND(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff);
+void write_byte_misaligned_OR(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff);
+
+void write_char16(char ch, int x, int y, int font);
+void write_char(char ch, int x, int y, int flags, int font);
+
+void write_string(char *str, int x, int y, int xs, int ys, int va, int ha, int flags, int font);
 
 #endif /* OSDGEN_H_ */

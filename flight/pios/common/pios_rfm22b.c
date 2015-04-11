@@ -1766,7 +1766,6 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
     uint8_t *p  = radio_dev->tx_packet;
     uint8_t len = 0;
     uint8_t max_data_len = radio_dev->max_packet_len - (radio_dev->ppm_only_mode ? 0 : RS_ECC_NPARITY);
-
     // Don't send if it's not our turn, or if we're receiving a packet.
     if (!rfm22_timeToSend(radio_dev) || !PIOS_RFM22B_InRxWait((uint32_t)radio_dev)) {
         return RADIO_EVENT_RX_MODE;

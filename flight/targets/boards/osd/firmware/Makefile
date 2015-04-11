@@ -28,8 +28,8 @@ override USE_DSP_LIB := NO
 
 # List of mandatory modules to include
 MODULES += Osd/osdgen
-MODULES += Osd/osdinput
-MODULES += Osd/WavPlayer
+#MODULES += Osd/osdinput
+#MODULES += Osd/WavPlayer
 MODULES += GPS
 #MODULES += Extensions/MagBaro
 MODULES += FirmwareIAP
@@ -63,6 +63,11 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/fonts.c
     SRC += $(OPSYSTEM)/font_outlined8x14.c
     SRC += $(OPSYSTEM)/font_outlined8x8.c
+    
+	## OSD specials 
+	SRC += $(PIOSCOMMON)/pios_tslrsdebug.c
+	SRC += $(PIOSCOMMON)/pios_packetrxok.c
+	SRC += $(PIOSCOMMON)/pios_msp.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c
@@ -70,6 +75,7 @@ ifndef TESTAPP
     #endif
 
     ## Misc library functions
+    SRC += $(FLIGHTLIB)/printf2.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/auxmagsupport.c
 
@@ -78,8 +84,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
     SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
     SRC += $(OPUAVSYNTHDIR)/flightstatus.c
-    SRC += $(OPUAVSYNTHDIR)/flightmodesettings.c
-    SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
+    SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
     SRC += $(OPUAVSYNTHDIR)/systemstats.c
     SRC += $(OPUAVSYNTHDIR)/systemalarms.c
     SRC += $(OPUAVSYNTHDIR)/systemsettings.c
@@ -98,10 +103,11 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gpstime.c
     SRC += $(OPUAVSYNTHDIR)/gpssettings.c
     SRC += $(OPUAVSYNTHDIR)/osdsettings.c
+    SRC += $(OPUAVSYNTHDIR)/osdsettings2.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/magsensor.c
-    SRC += $(OPUAVSYNTHDIR)/auxmagsensor.c
-    SRC += $(OPUAVSYNTHDIR)/gpsextendedstatus.c
+    SRC += $(OPUAVSYNTHDIR)/accelsensor.c
+    SRC += $(OPUAVSYNTHDIR)/accelstate.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c
@@ -109,7 +115,7 @@ else
 endif
 	
 # Optional component libraries
-include $(PIOS)/common/libraries/dosfs/library.mk
+#include $(PIOS)/common/libraries/dosfs/library.mk
 
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

@@ -81,9 +81,9 @@
 /* #define PIOS_INCLUDE_MPU6000 */
 /* #define PIOS_MPU6000_ACCEL */
 /* #define PIOS_INCLUDE_HMC5843 */
-#define PIOS_INCLUDE_HMC5X83
-/* #define PIOS_HMC5X83_HAS_GPIOS */
-#define PIOS_INCLUDE_BMP085
+/* #define PIOS_INCLUDE_HMC5883 */
+/* #define PIOS_HMC5883_HAS_GPIOS */
+/* #define PIOS_INCLUDE_BMP085 */
 /* #define PIOS_INCLUDE_MS5611 */
 /* #define PIOS_INCLUDE_MPXV */
 /* #define PIOS_INCLUDE_ETASV3 */
@@ -108,7 +108,7 @@
 /* #define PIOS_INCLUDE_I2C_ESC */
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */
-#define PIOS_INCLUDE_SDCARD
+//#define PIOS_INCLUDE_SDCARD
 /* #define PIOS_USE_SETTINGS_ON_SDCARD */
 #define LOG_FILENAME "startup.log"
 #define PIOS_INCLUDE_FLASH
@@ -142,7 +142,18 @@
 #define PIOS_GPS_SETS_HOMELOCATION
 
 /* Stabilization options */
-#define PIOS_QUATERNION_STABILIZATION
+// #define PIOS_QUATERNION_STABILIZATION
+
+/* special OPLM-OPOSD options */
+//#define PIOS_INCLUDE_OPLM_OPOSD
+#ifdef PIOS_INCLUDE_OPLM_OPOSD
+#define PIOS_INCLUDE_TSLRSDEBUG
+#endif
+
+/* special OSD options */
+#define PIOS_INCLUDE_TSLRSDEBUG
+#define PIOS_INCLUDE_PACKETRXOK
+//#define PIOS_INCLUDE_MSP
 
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 8379692
@@ -166,8 +177,8 @@
 /* This can't be too high to stop eventdispatcher thread overflowing */
 /* #define PIOS_EVENTDISAPTCHER_QUEUE	10 */
 
-/* Revolution series */
-/* #define REVOLUTION */
+/* OP-OSD */
+#define OP_OSD
 
 #endif /* PIOS_CONFIG_H */
 

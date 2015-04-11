@@ -38,8 +38,13 @@
 #include "gcstelemetrystats.h"
 #include "hwsettings.h"
 #include "taskinfo.h"
+#ifdef PIOS_INCLUDE_MSP
+#include "pios_msp.h"
+#endif
 
 // Private constants
+#define TELEMETRY_FLIGHT          0
+#define TELEMETRY_OSDGCS          1
 #define MAX_QUEUE_SIZE            TELEM_QUEUE_SIZE
 // Three different stack size parameter are accepted for Telemetry(RX PIOS_TELEM_RX_STACK_SIZE)
 // Tx(PIOS_TELEM_TX_STACK_SIZE) and Radio RX(PIOS_TELEM_RADIO_RX_STACK_SIZE)
@@ -67,6 +72,7 @@
 // Private types
 
 // Private variables
+static uint8_t role = TELEMETRY_FLIGHT;
 static uint32_t telemetryPort;
 #ifdef PIOS_INCLUDE_RFM22B
 static uint32_t radioPort;
@@ -106,6 +112,8 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 static void processObjEvent(UAVObjEvent *ev);
 static void updateTelemetryStats();
+static void updateFlightTelemetryStats();
+static void updateGCSTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
 static uint32_t getComPort(bool input);
@@ -220,7 +228,7 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
 
     // Get metadata
     UAVObjGetMetadata(obj, &metadata);
-    updateMode  = UAVObjGetTelemetryUpdateMode(&metadata);
+    updateMode  = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata) : UAVObjGetGcsTelemetryUpdateMode(&metadata);
     loggingMode = UAVObjGetLoggingUpdateMode(&metadata);
 
     // Setup object depending on update mode
@@ -309,14 +317,36 @@ static void processObjEvent(UAVObjEvent *ev)
     int32_t retries;
     int32_t success;
 
+#ifdef PIOS_INCLUDE_MSP
+    uint32_t outputPort = getComPort(false);
+    if (outputPort != PIOS_COM_TELEM_USB) {
+        MSPRequests(outputPort);
+        return;
+    }
+#endif
+
+#ifdef OP_OSD
+    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
+        role = TELEMETRY_FLIGHT; // if connected via USB then behave like flight
+    } else {
+        role = TELEMETRY_OSDGCS; // else behave like GCS
+    }
+#else
+    role = TELEMETRY_FLIGHT;
+#endif
+
     if (ev->obj == 0) {
         updateTelemetryStats();
-    } else if (ev->obj == GCSTelemetryStatsHandle()) {
+    } else if (role == TELEMETRY_FLIGHT && ev->obj == GCSTelemetryStatsHandle()) { // role is flight and we have normal behavior
         gcsTelemetryStatsUpdated();
+    } else if (role == TELEMETRY_OSDGCS && ev->obj == FlightTelemetryStatsHandle()) { // role is osdgcs and we only send ...
+        gcsTelemetryStatsUpdated();
+    } else if (role == TELEMETRY_OSDGCS && ev->obj != GCSTelemetryStatsHandle()) { // ... GCSTelemetryStats packets for connection handling
+        return;
     } else {
         // Get object metadata
         UAVObjGetMetadata(ev->obj, &metadata);
-        updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
+        updateMode = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata) : UAVObjGetGcsTelemetryUpdateMode(&metadata);
 
         // Act on event
         retries    = 0;
@@ -439,7 +469,18 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
 
             bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
+#ifdef PIOS_INCLUDE_MSP
+                    if (inputPort == PIOS_COM_TELEM_USB)
                 UAVTalkProcessInputStream(uavTalkCon, serial_data, bytes_to_process);
+                    else{
+		        for (uint8_t i = 0; i < bytes_to_process; i++) {
+		            MSPInputStream(serial_data[i]);
+		        }
+		    }
+#else
+                UAVTalkProcessInputStream(uavTalkCon, serial_data, bytes_to_process);
+#endif
+
             }
         } else {
             vTaskDelay(5);
@@ -580,6 +621,18 @@ static void gcsTelemetryStatsUpdated()
  */
 static void updateTelemetryStats()
 {
+    if (role == TELEMETRY_FLIGHT) { // role is flight and we have normal behavior
+        updateFlightTelemetryStats();
+    } else { // role is osdgcs and we behave like GCS
+        updateGCSTelemetryStats();
+    }
+}
+
+/**
+ * Update telemetry statistics and handle connection handshake
+ */
+static void updateFlightTelemetryStats()
+{
     UAVTalkStats utalkStats;
     FlightTelemetryStatsData flightStats;
     GCSTelemetryStatsData gcsStats;
@@ -671,6 +724,103 @@ static void updateTelemetryStats()
     // Force telemetry update if not connected
     if (forceUpdate) {
         FlightTelemetryStatsUpdated();
+    }
+}
+
+/**
+ * Update telemetry statistics and handle connection handshake
+ */
+static void updateGCSTelemetryStats()
+{
+    UAVTalkStats utalkStats;
+    FlightTelemetryStatsData flightStats;
+    GCSTelemetryStatsData gcsStats;
+    uint8_t forceUpdate;
+    uint8_t connectionTimeout;
+    uint32_t timeNow;
+
+    // Get stats
+    UAVTalkGetStats(uavTalkCon, &utalkStats, true);
+#ifdef PIOS_INCLUDE_RFM22B
+    UAVTalkAddStats(radioUavTalkCon, &utalkStats, true);
+    UAVTalkResetStats(radioUavTalkCon);
+#endif
+    UAVTalkResetStats(uavTalkCon);
+
+    // Get object data
+    FlightTelemetryStatsGet(&flightStats);
+    GCSTelemetryStatsGet(&gcsStats);
+
+    // Update stats object
+    if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
+        gcsStats.TxDataRate    = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        gcsStats.TxBytes      += utalkStats.txBytes;
+        gcsStats.TxFailures   += txErrors;
+        gcsStats.TxRetries    += txRetries;
+
+        gcsStats.RxDataRate    = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        gcsStats.RxBytes      += utalkStats.rxBytes;
+        gcsStats.RxFailures   += utalkStats.rxErrors;
+        gcsStats.RxSyncErrors += utalkStats.rxSyncErrors;
+        gcsStats.RxCrcErrors  += utalkStats.rxCrcErrors;
+    } else {
+        gcsStats.TxDataRate   = 0;
+        gcsStats.TxBytes      = 0;
+        gcsStats.TxFailures   = 0;
+        gcsStats.TxRetries    = 0;
+
+        gcsStats.RxDataRate   = 0;
+        gcsStats.RxBytes      = 0;
+        gcsStats.RxFailures   = 0;
+        gcsStats.RxSyncErrors = 0;
+        gcsStats.RxCrcErrors  = 0;
+    }
+    txErrors = 0;
+    txRetries = 0;
+
+    // Check for connection timeout
+    timeNow = xTaskGetTickCount() * portTICK_RATE_MS;
+    if (utalkStats.rxObjects > 0) {
+        timeOfLastObjectUpdate = timeNow;
+    }
+    if ((timeNow - timeOfLastObjectUpdate) > CONNECTION_TIMEOUT_MS) {
+        connectionTimeout = 1;
+    } else {
+        connectionTimeout = 0;
+    }
+
+    // Update connection state
+    forceUpdate = 1;
+    if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_DISCONNECTED) {
+        // Request connection
+        gcsStats.Status = GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ;
+    } else if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ) {
+        // Check for connection acknowledge
+        if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK) {
+            gcsStats.Status = GCSTELEMETRYSTATS_STATUS_CONNECTED;
+        }
+    } else if (gcsStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
+        // Check if the connection is still active and the autopilot is still connected
+        if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED || connectionTimeout) {
+            gcsStats.Status = GCSTELEMETRYSTATS_STATUS_DISCONNECTED;
+        } else {
+            forceUpdate = 0;
+        }
+    }
+
+    // Update the telemetry alarm
+    if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
+        AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
+    } else {
+        AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
+    }
+
+    // Update object
+    GCSTelemetryStatsSet(&gcsStats);
+
+    // Force telemetry update if not connected
+    if (forceUpdate) {
+        GCSTelemetryStatsUpdated();
     }
 }
 

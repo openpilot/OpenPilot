@@ -81,10 +81,6 @@ void PIOS_ADC_DMC_irq_handler(void)
 
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
-
-static void Clock(uint32_t spektrum_id);
-
-
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN  128
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN  128
 
@@ -118,36 +114,13 @@ uintptr_t pios_user_fs_id = 0;
  *  or we will need to configure the DMA task per line
  */
 #include "pios_tim_priv.h"
-#define NTSC_PX_CLOCK 6797088
-#define PAL_PX_CLOCK  6750130
-#define PX_PERIOD     ((PIOS_PERIPHERAL_APB1_CLOCK / NTSC_PX_CLOCK) + 1)
-#define LINE_PERIOD   PX_PERIOD * GRAPHICS_WIDTH
-
-static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
-    .TIM_Prescaler         = 0, // PIOS_PERIPHERAL_APB1_CLOCK,
-    .TIM_ClockDivision     = TIM_CKD_DIV1,
-    .TIM_CounterMode       = TIM_CounterMode_Up,
-    .TIM_Period            = LINE_PERIOD - 1,
-    .TIM_RepetitionCounter = 0x0000,
-};
-
-static const struct pios_tim_clock_cfg pios_tim4_cfg = {
-    .timer = TIM4,
-    .time_base_init                            = &tim_4_time_base,
-    .irq   = {
-        .init                                  = {
-            .NVIC_IRQChannel    = TIM4_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-            .NVIC_IRQChannelSubPriority        = 0,
-            .NVIC_IRQChannelCmd = ENABLE,
-        },
-    }
-};
 
 void PIOS_Board_Init(void)
 {
     // Delay system
     PIOS_DELAY_Init();
+
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
     PIOS_LED_Init(&pios_led_cfg);
 
@@ -210,9 +183,6 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_RTC)
     /* Initialize the real-time clock and its associated tick */
     PIOS_RTC_Init(&pios_rtc_main_cfg);
-    if (!PIOS_RTC_RegisterTickCallback(Clock, 0)) {
-        PIOS_DEBUG_Assert(0);
-    }
 #endif
 
 #if defined(PIOS_INCLUDE_USB)
@@ -237,7 +207,7 @@ void PIOS_Board_Init(void)
 #endif
 
     uint32_t pios_usb_id;
-    PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+    PIOS_USB_Init(&pios_usb_id, PIOS_BOARD_HW_DEFS_GetUsbCfg(bdinfo->board_rev));
 
 #if defined(PIOS_INCLUDE_USB_CDC)
 
@@ -339,7 +309,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_GPS)
 
     uint32_t pios_usart_gps_id;
-    if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
+    if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_flexi_io_cfg)) {
         PIOS_Assert(0);
     }
 
@@ -379,7 +349,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_COM_TELEM)
     { /* Eventually add switch for this port function */
         uint32_t pios_usart_telem_rf_id;
-        if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
+        if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_fltctrl_cfg)) {
             PIOS_Assert(0);
         }
 
@@ -399,16 +369,15 @@ void PIOS_Board_Init(void)
 
 #endif /* PIOS_INCLUDE_COM */
 
-
     /* Configure FlexiPort */
+    uint8_t hwsettings_osd_flexiport;
+    HwSettingsOSD_FlexiPortGet(&hwsettings_osd_flexiport);
 
-/*	uint8_t hwsettings_rv_flexiport;
-        HwSettingsRV_FlexiPortGet(&hwsettings_rv_flexiport);
-
-        switch (hwsettings_rv_flexiport) {
-                case HWSETTINGS_RV_FLEXIPORT_DISABLED:
-                        break;
-                case HWSETTINGS_RV_FLEXIPORT_I2C:*/
+    switch (hwsettings_osd_flexiport) {
+    case HWSETTINGS_OSD_FLEXIPORT_DISABLED:
+        break;
+#if 0
+    case HWSETTINGS_OSD_FLEXIPORT_I2C:
 #if defined(PIOS_INCLUDE_I2C)
     {
         if (PIOS_I2C_Init(&pios_i2c_flexiport_adapter_id, &pios_i2c_flexiport_adapter_cfg)) {
@@ -416,22 +385,37 @@ void PIOS_Board_Init(void)
         }
     }
 #endif /* PIOS_INCLUDE_I2C */
-/*			break;
-
-                case HWSETTINGS_RV_FLEXIPORT_DSM:
-                        //TODO: Define the various Channelgroup for Revo dsm inputs and handle here
-                        PIOS_Board_configure_dsm(&pios_usart_dsm_flexi_cfg, &pios_dsm_flexi_cfg,
-                                                                                         &pios_usart_com_driver, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
-                        break;
-                case HWSETTINGS_RV_FLEXIPORT_COMAUX:
-                        PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
-                        break;
-                case HWSETTINGS_RV_FLEXIPORT_COMBRIDGE:
-                        PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
-                        break;
-        }*/
-    /* hwsettings_rv_flexiport */
-
+        break;
+#endif
+    case HWSETTINGS_OSD_FLEXIPORT_TSLRSDEBUG:
+#if defined(PIOS_INCLUDE_TSLRSDEBUG)
+    {
+        uint32_t pios_usart_tslrsdebug_id;
+        if (PIOS_USART_Init(&pios_usart_tslrsdebug_id, &pios_usart_tslrsdebug_flexi_cfg)) {
+            PIOS_Assert(0);
+        }
+        uint32_t pios_tslrsdebug_id;
+        if (PIOS_TSLRSdebug_Init(&pios_tslrsdebug_id, &pios_tslrsdebug_flexi_cfg, &pios_usart_com_driver, pios_usart_tslrsdebug_id)) {
+            PIOS_Assert(0);
+        }
+    }
+#endif /* PIOS_INCLUDE_TSLRSDEBUG */
+        break;
+    case HWSETTINGS_OSD_FLEXIPORT_PACKETRXOK:
+#if defined(PIOS_INCLUDE_PACKETRXOK)
+    {
+        uint32_t pios_gpio_packetrxok_id;
+        if (PIOS_GPIO_Init(&pios_gpio_packetrxok_id, &pios_io_packetrxok_flexi_cfg)) {
+            PIOS_Assert(0);
+        }
+        uint32_t pios_packetrxok_id;
+        if (PIOS_PacketRxOk_Init(&pios_packetrxok_id, pios_gpio_packetrxok_id, pios_io_packetrxok_flexi[PIOS_PACKETRXOK_IN].pin.gpio, pios_io_packetrxok_flexi[PIOS_PACKETRXOK_IN].pin.init.GPIO_Pin)) {
+            PIOS_Assert(0);
+        }
+    }
+#endif /* PIOS_INCLUDE_PACKETRXOK */
+        break;
+    }
 
 #if defined(PIOS_INCLUDE_WAVE)
     PIOS_WavPlay_Init(&pios_dac_cfg);
@@ -443,33 +427,25 @@ void PIOS_Board_Init(void)
 #endif
 
 #if defined(PIOS_INCLUDE_VIDEO)
-    PIOS_TIM_InitClock(&tim_8_cfg);
-    PIOS_Servo_Init(&pios_servo_cfg);
-    // Start the pixel and line clock counter
-    // PIOS_TIM_InitClock(&pios_tim4_cfg);
+    switch (bdinfo->board_rev) {
+    case 1:
+        PIOS_TIM_InitClock(&tim_8_cfg);
+        PIOS_Servo_Init(&pios_servo_cfg);
+        break;
+    case 2:
+        PIOS_Pixel_Init();
+        break;
+    default:
+        PIOS_DEBUG_Assert(0);
+    }
     PIOS_Video_Init(&pios_video_cfg);
 #endif
 }
 
-uint16_t supv_timer = 0;
 
-static void Clock(__attribute__((unused)) uint32_t spektrum_id)
+uint8_t PIOS_Board_Revision(void)
 {
-    /* 125hz */
-    ++supv_timer;
-    if (supv_timer >= 625) {
-        supv_timer = 0;
-        timex.sec++;
-    }
-    if (timex.sec >= 60) {
-        timex.sec = 0;
-        timex.min++;
-    }
-    if (timex.min >= 60) {
-        timex.min = 0;
-        timex.hour++;
-    }
-    if (timex.hour >= 99) {
-        timex.hour = 0;
-    }
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+
+    return bdinfo->board_rev;
 }

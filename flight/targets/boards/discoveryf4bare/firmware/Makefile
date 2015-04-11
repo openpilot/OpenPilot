@@ -91,6 +91,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/insgps13state.c
     SRC += $(FLIGHTLIB)/auxmagsupport.c
     SRC += $(FLIGHTLIB)/lednotification.c    
+    SRC += $(FLIGHTLIB)/printf-stdarg.c
 
     ## UAVObjects
     include ./UAVObjects.inc

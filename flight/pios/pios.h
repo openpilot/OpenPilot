@@ -228,6 +228,10 @@ extern "C" {
 #include <pios_sbus.h>
 #endif
 
+#ifdef PIOS_INCLUDE_TSLRSDEBUG
+#include <pios_tslrsdebug.h>
+#endif
+
 /* PIOS abstract receiver interface */
 #ifdef PIOS_INCLUDE_RCVR
 #include <pios_rcvr.h>

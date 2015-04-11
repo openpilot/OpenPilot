@@ -84,6 +84,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
     SRC += $(FLIGHTLIB)/auxmagsupport.c
+    SRC += $(FLIGHTLIB)/printf-stdarg.c
 
     ## UAVObjects
     include ./UAVObjects.inc

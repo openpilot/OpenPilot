@@ -63,6 +63,9 @@ else
     SRC += $(OPTESTS)/$(TESTAPP).c
 endif
 
+    ## Misc library functions
+    SRC += $(FLIGHTLIB)/printf-stdarg.c
+
 # Optional component libraries
 include $(FLIGHTLIB)/rscode/library.mk
 

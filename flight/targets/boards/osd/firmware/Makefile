@@ -108,6 +108,8 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/magsensor.c
     SRC += $(OPUAVSYNTHDIR)/accelsensor.c
     SRC += $(OPUAVSYNTHDIR)/accelstate.c
+    SRC += $(OPUAVSYNTHDIR)/gpsextendedstatus.c
+    SRC += $(OPUAVSYNTHDIR)/auxmagsensor.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

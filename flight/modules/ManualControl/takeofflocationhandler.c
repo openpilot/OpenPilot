@@ -42,8 +42,8 @@ void takeOffLocationHandlerInit()
 {
     TakeOffLocationInitialize();
     // check whether there is a preset/valid takeoff location
-    uint8_t mode;
-    uint8_t status;
+    TakeOffLocationModeOptions mode;
+    TakeOffLocationStatusOptions status;
     TakeOffLocationModeGet(&mode);
     TakeOffLocationStatusGet(&status);
     // preset with invalid location will actually behave like FirstTakeoff
@@ -61,8 +61,8 @@ void takeOffLocationHandlerInit()
  */
 void takeOffLocationHandler()
 {
-    uint8_t armed;
-    uint8_t status;
+    FlightStatusArmedOptions armed;
+    TakeOffLocationStatusOptions status;
 
     FlightStatusArmedGet(&armed);
 
@@ -77,7 +77,7 @@ void takeOffLocationHandler()
     case FLIGHTSTATUS_ARMED_ARMING:
     case FLIGHTSTATUS_ARMED_ARMED:
         if (!locationSet || status != TAKEOFFLOCATION_STATUS_VALID) {
-            uint8_t mode;
+            TakeOffLocationModeOptions mode;
             TakeOffLocationModeGet(&mode);
 
             if ((mode != TAKEOFFLOCATION_MODE_PRESET) || (status == TAKEOFFLOCATION_STATUS_INVALID)) {
@@ -91,7 +91,7 @@ void takeOffLocationHandler()
     case FLIGHTSTATUS_ARMED_DISARMED:
         // unset if location is to be acquired at each arming
         if (locationSet) {
-            uint8_t mode;
+            TakeOffLocationModeOptions mode;
             TakeOffLocationModeGet(&mode);
             if (mode == TAKEOFFLOCATION_MODE_ARMINGLOCATION) {
                 locationSet = false;

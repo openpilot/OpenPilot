@@ -685,7 +685,7 @@ static void updateSettings()
 {
     if (telemetryPort) {
         // Retrieve settings
-        uint8_t speed;
+        HwSettingsTelemetrySpeedOptions speed;
         HwSettingsTelemetrySpeedGet(&speed);
 
         // Set port speed

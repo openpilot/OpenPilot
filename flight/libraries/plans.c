@@ -154,7 +154,7 @@ void plan_setup_returnToBase()
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
 
-    uint8_t ReturnToBaseNextCommand;
+    FlightModeSettingsReturnToBaseNextCommandOptions ReturnToBaseNextCommand;
     FlightModeSettingsReturnToBaseNextCommandGet(&ReturnToBaseNextCommand);
     pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND] = (float)ReturnToBaseNextCommand;
     pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED1]     = 0.0f;

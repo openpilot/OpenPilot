@@ -182,7 +182,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     frameType = GetCurrentFrameType();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsOptions TreatCustomCraftAs;
     VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
 
@@ -485,7 +485,7 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
 {
     uint8_t flightModeAssistOption = STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE;
     uint8_t isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
-    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
+    StabilizationSettingsFlightModeAssistMapOptions FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
 
     StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
     if (position < STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM) {

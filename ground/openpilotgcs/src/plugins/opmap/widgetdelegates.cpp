@@ -114,6 +114,7 @@ void MapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDa
         combo->addItem("Set Accessory", MODE_SETACCESSORY);
         combo->addItem("Disarm Alarm", MODE_DISARMALARM);
         combo->addItem("Land", MODE_LAND);
+        combo->addItem("AutoTakeoff", MODE_AUTOTAKEOFF);
         combo->addItem("Brake", MODE_BRAKE);
         combo->addItem("Velocity", MODE_VELOCITY);
 

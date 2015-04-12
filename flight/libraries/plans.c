@@ -240,7 +240,7 @@ void plan_setup_AutoTakeoff()
 #define AUTOTAKEOFF_THROTTLE_ABORT_LIMIT                  0.1f
 void plan_run_AutoTakeoff()
 {
-  StatusVtolAutoTakeoffControlStateOptions priorState = autotakeoffState;
+    StatusVtolAutoTakeoffControlStateOptions priorState = autotakeoffState;
 
     switch (autotakeoffState) {
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST:
@@ -290,10 +290,13 @@ void plan_run_AutoTakeoff()
         break;
     }
 
-    if (autotakeoffState != STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT && priorState != autotakeoffState) {
-        PathDesiredData pathDesired;
-        plan_setup_AutoTakeoff_helper(&pathDesired);
-        PathDesiredSet(&pathDesired);
+    if (autotakeoffState != STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT &&
+        autotakeoffState != STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD) {
+        if (priorState != autotakeoffState) {
+            PathDesiredData pathDesired;
+            plan_setup_AutoTakeoff_helper(&pathDesired);
+            PathDesiredSet(&pathDesired);
+        }
     }
 }
 

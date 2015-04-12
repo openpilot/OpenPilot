@@ -49,7 +49,7 @@
 #include <stabilization.h>
 #include <virtualflybar.h>
 #include <cruisecontrol.h>
-
+#include <sanitycheck.h>
 // Private constants
 
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_CRITICAL
@@ -66,6 +66,7 @@ static float axis_lock_accum[3] = { 0, 0, 0 };
 static uint8_t previous_mode[AXES] = { 255, 255, 255, 255 };
 static PiOSDeltatimeConfig timeval;
 static float speedScaleFactor = 1.0f;
+static bool frame_is_multirotor;
 
 // Private functions
 static void stabilizationInnerloopTask();
@@ -95,6 +96,8 @@ void stabilizationInnerloopInit()
 
     // schedule dead calls every FAILSAFE_TIMEOUT_MS to have the watchdog cleared
     PIOS_CALLBACKSCHEDULER_Schedule(callbackHandle, FAILSAFE_TIMEOUT_MS, CALLBACK_UPDATEMODE_LATER);
+
+    frame_is_multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR);
 }
 
 static float get_pid_scale_source_value()
@@ -248,6 +251,11 @@ static void stabilizationInnerloopTask()
         if (t < STABILIZATIONSTATUS_INNERLOOP_THRUST) {
             if (reinit) {
                 stabSettings.innerPids[t].iAccumulator = 0;
+                if (frame_is_multirotor) {
+                    // Multirotors should dump axis lock accumulators when unarmed or throttle is low.
+                    // Fixed wing or ground vehicles can fly/drive with low throttle.
+                    axis_lock_accum[t] = 0;
+                }
             }
             switch (StabilizationStatusInnerLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:

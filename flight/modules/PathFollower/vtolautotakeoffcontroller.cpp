@@ -100,10 +100,13 @@ uint8_t VtolAutoTakeoffController::Mode(void)
 void VtolAutoTakeoffController::ObjectiveUpdated(void)
 {
     // Set the objective's target velocity
-    controlDown.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]);
-    controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH],
-                                     pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]);
+    controlDown.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]);
+    controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH],
+                                     pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]);
     controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
+    controlDown.UpdatePositionSetpoint(pathDesired->End.Down);
+
+    fsm->setControlState((StatusVtolAutoTakeoffControlStateOptions)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE]);
 }
 void VtolAutoTakeoffController::Deactivate(void)
 {
@@ -152,7 +155,7 @@ int32_t VtolAutoTakeoffController::Initialize(VtolPathFollowerSettingsData *ptr_
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
 
     if (fsm == 0) {
-        fsm = (PathFollowerFSM *)VtolAutoTakeoffFSM::instance();
+        fsm = VtolAutoTakeoffFSM::instance();
         VtolAutoTakeoffFSM::instance()->Initialize(vtolPathFollowerSettings, pathDesired, flightStatus);
         controlDown.Initialize(fsm);
     }

@@ -95,7 +95,7 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred);
 #define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH               0
 #define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST                1
 #define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN                2
-#define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_UNUSED3             3
+#define PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE        3
 
 /**
  * @brief setup pathfollower for positionvario

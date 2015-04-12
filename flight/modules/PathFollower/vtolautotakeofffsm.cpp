@@ -63,7 +63,7 @@ extern "C" {
 
 // Private constants
 #define TIMER_COUNT_PER_SECOND         (1000 / vtolPathFollowerSettings->UpdatePeriod)
-#define TIMEOUT_SLOWSTART              (5 * TIMER_COUNT_PER_SECOND)
+#define TIMEOUT_SLOWSTART              (2 * TIMER_COUNT_PER_SECOND)
 #define TIMEOUT_THRUSTUP               (1 * TIMER_COUNT_PER_SECOND)
 #define TIMEOUT_THRUSTDOWN             (2 * TIMER_COUNT_PER_SECOND)
 #define AUTOTAKEOFFING_SLOWDOWN_HEIGHT -5.0f
@@ -140,18 +140,15 @@ void VtolAutoTakeoffFSM::Activate()
     mAutoTakeoffData->currentState   = AUTOTAKEOFF_STATE_INACTIVE;
     mAutoTakeoffData->flLowAltitude  = true;
     mAutoTakeoffData->flAltitudeHold = false;
-    mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
-    mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->boundThrustMin = 0.0f;
+    mAutoTakeoffData->boundThrustMax = 0.0f;
+    mAutoTakeoffData->flZeroStabiHorizontal = true; // turn off positional controllers
     TakeOffLocationGet(&(mAutoTakeoffData->takeOffLocation));
     mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeAtState[AUTOTAKEOFF_STATE_INACTIVE] = 0.0f;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.ControlState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
     assessAltitude();
 
-    if (pathDesired->Mode == PATHDESIRED_MODE_AUTOTAKEOFF) {
-        setState(AUTOTAKEOFF_STATE_CHECKSTATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
-    } else {
-        // move to error state and callback to position hold
-        setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
-    }
+    setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 }
 
 void VtolAutoTakeoffFSM::Abort(void)
@@ -310,6 +307,33 @@ void VtolAutoTakeoffFSM::assessAltitude(void)
     }
 }
 
+// Action the required state from plans.c
+void VtolAutoTakeoffFSM::setControlState(StatusVtolAutoTakeoffControlStateOptions controlState)
+{
+    mAutoTakeoffData->fsmAutoTakeoffStatus.ControlState = controlState;
+
+    switch (controlState) {
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED:
+        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE:
+        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST:
+        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE:
+        setState(AUTOTAKEOFF_STATE_SLOWSTART, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD:
+        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT:
+        setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        break;
+    }
+}
+
 
 // State: INACTIVE
 void VtolAutoTakeoffFSM::setup_inactive(void)
@@ -342,7 +366,7 @@ void VtolAutoTakeoffFSM::setup_checkstate(void)
     setState(AUTOTAKEOFF_STATE_SLOWSTART, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
 }
 
-// STATE: SLOWSTART spools up motors to vtol min over 5 seconds for effect.
+// STATE: SLOWSTART spools up motors to vtol min over 2 seconds for effect.
 // PID loops may be cumulating I terms but that problem needs to be solved
 void VtolAutoTakeoffFSM::setup_slowstart(void)
 {
@@ -350,8 +374,8 @@ void VtolAutoTakeoffFSM::setup_slowstart(void)
     mAutoTakeoffData->flZeroStabiHorizontal = true; // turn off positional controllers
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
-    mAutoTakeoffData->sum1 = (0.5f * vtolPathFollowerSettings->ThrustLimits.Neutral) / (float)TIMEOUT_SLOWSTART;
-    mAutoTakeoffData->boundThrustMin = 0.00f;
+    mAutoTakeoffData->sum1 = (vtolPathFollowerSettings->ThrustLimits.Min - 0.05f) / (float)TIMEOUT_SLOWSTART;
+    mAutoTakeoffData->boundThrustMin = 0.05f;
     mAutoTakeoffData->boundThrustMax = 0.05f;
     PositionStateData positionState;
     PositionStateGet(&positionState);
@@ -366,8 +390,8 @@ void VtolAutoTakeoffFSM::run_slowstart(__attribute__((unused)) uint8_t flTimeout
         mAutoTakeoffData->boundThrustMin += mAutoTakeoffData->sum1;
     }
     mAutoTakeoffData->boundThrustMax += mAutoTakeoffData->sum1;
-    if (mAutoTakeoffData->boundThrustMax > (0.5f * vtolPathFollowerSettings->ThrustLimits.Neutral)) {
-        mAutoTakeoffData->boundThrustMax = (0.5f * vtolPathFollowerSettings->ThrustLimits.Neutral);
+    if (mAutoTakeoffData->boundThrustMax > vtolPathFollowerSettings->ThrustLimits.Min) {
+        mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Min;
     }
 
     if (flTimeout) {
@@ -375,12 +399,12 @@ void VtolAutoTakeoffFSM::run_slowstart(__attribute__((unused)) uint8_t flTimeout
     }
 }
 
-// STATE: SLOWSTART spools up motors to vtol min over 5 seconds for effect.
+// STATE: THRUSTUP spools up motors to vtol min over 5 seconds for effect.
 // PID loops may be cumulating I terms but that problem needs to be solved
 void VtolAutoTakeoffFSM::setup_thrustup(void)
 {
     setStateTimeout(TIMEOUT_THRUSTUP);
-    mAutoTakeoffData->flZeroStabiHorizontal = true; // turn off positional controllers
+    mAutoTakeoffData->flZeroStabiHorizontal = false;
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
     mAutoTakeoffData->sum1 = (0.8f * vtolPathFollowerSettings->ThrustLimits.Max - mAutoTakeoffData->boundThrustMax) / (float)TIMEOUT_THRUSTUP;

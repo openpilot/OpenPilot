@@ -561,7 +561,7 @@ void VtolLandFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTim
 void VtolLandFSM::setup_groundeffect(void)
 {
     setStateTimeout(TIMEOUT_GROUNDEFFECT);
-    mLandData->flZeroStabiHorizontal     = true;
+    mLandData->flZeroStabiHorizontal     = false;
     PositionStateData positionState;
     PositionStateGet(&positionState);
     mLandData->expectedLandPositionNorth = positionState.North;

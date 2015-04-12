@@ -205,7 +205,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
         if (radio_stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
             rx_good += oplinkStatus.RxGood;
             rx_bad  += oplinkStatus.RxErrors;
-            rssi = -1 * oplinkStatus.PairSignalStrengths[0];
+            rssi     = -1 * oplinkStatus.PairSignalStrengths[0];
             link_quality = oplinkStatus.LinkQuality;
         } else {
             rssi = 200;
@@ -213,17 +213,17 @@ static void systemTask(__attribute__((unused)) void *parameters)
         }
 
         len = sprintf(temp, "G:%d%c%c", rx_good, 0x0D, 0x0A);
-        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t*) temp, len);
+        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t *)temp, len);
 
         len = sprintf(temp, "B:%d%c%c", rx_bad, 0x0D, 0x0A);
-        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t*) temp, len);
+        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t *)temp, len);
 
         len = sprintf(temp, "r:%d%c%c", rssi, 0x0D, 0x0A);
-        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t*) temp, len);
+        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t *)temp, len);
 
         len = sprintf(temp, "l:%d%c%c", link_quality, 0x0D, 0x0A);
-        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t*) temp, len);
-#endif   // PIOS_INCLUDE_OPLM_OPOSD
+        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t *)temp, len);
+#endif // PIOS_INCLUDE_OPLM_OPOSD
 
         // Update the object
         OPLinkStatusSet(&oplinkStatus);

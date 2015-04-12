@@ -174,12 +174,12 @@ void copyimage(uint16_t offsetx, uint16_t offsety, int image)
         uint16_t x1 = offsetx;
         for (uint16_t x = offsetx; x < (((splash_info.width) / 16) + offsetx); x++) {
             level = splash_info.level[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)];
-            mask  = splash_info.mask [(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)];
+            mask  = splash_info.mask[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)];
             CHECK_ONLY_WHITE_PIXEL_CHAR
-            draw_buffer_level[y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(mirror(level) >> 8);
-            draw_buffer_level[y * BUFFER_WIDTH + x1]     = (uint8_t)(mirror(level) & 0xFF);
-            draw_buffer_mask [y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(mirror(mask)  >> 8);
-            draw_buffer_mask [y * BUFFER_WIDTH + x1]     = (uint8_t)(mirror(mask)  & 0xFF);
+                draw_buffer_level[y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(mirror(level) >> 8);
+            draw_buffer_level[y * BUFFER_WIDTH + x1]    = (uint8_t)(mirror(level) & 0xFF);
+            draw_buffer_mask[y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(mirror(mask) >> 8);
+            draw_buffer_mask[y * BUFFER_WIDTH + x1]     = (uint8_t)(mirror(mask) & 0xFF);
             x1 += 2;
         }
     }
@@ -321,8 +321,7 @@ void write_pixel_lm(int x, int y, int lmode, int mmode)
     int bytenum   = CALC_BUFF_ADDR(x, y);
     // Apply the masks.
     uint16_t mask = 1 << (7 - bitnum);
-    CHECK_ONLY_WHITE_PIXEL
-    WRITE_BYTE_MODE(draw_buffer_level, bytenum, mask, lmode);
+    CHECK_ONLY_WHITE_PIXEL WRITE_BYTE_MODE(draw_buffer_level, bytenum, mask, lmode);
     WRITE_BYTE_MODE(draw_buffer_mask, bytenum, mask, mmode);
 }
 
@@ -347,7 +346,7 @@ void write_hline(uint8_t *buff, int x0, int x1, int y, int mode)
         return;
     }
     /* This is an optimised algorithm for writing horizontal lines.
-     * We begin by finding the addresses of the x0 and x1 points. */
+    * We begin by finding the addresses of the x0 and x1 points. */
     int addr0     = CALC_BUFF_ADDR(x0, y);
     int addr1     = CALC_BUFF_ADDR(x1, y);
     int addr0_bit = CALC_BIT_IN_BYTE(x0);
@@ -384,8 +383,7 @@ void write_hline_lm(int x0, int x1, int y, int lmode, int mmode)
 {
     // TODO: an optimisation would compute the masks and apply to
     // both buffers simultaneously.
-    CHECK_ONLY_WHITE_PIXEL
-    write_hline(draw_buffer_level, x0, x1, y, lmode);
+    CHECK_ONLY_WHITE_PIXEL write_hline(draw_buffer_level, x0, x1, y, lmode);
     write_hline(draw_buffer_mask, x0, x1, y, mmode);
 }
 
@@ -440,10 +438,10 @@ void write_vline(uint8_t *buff, int x, int y0, int y1, int mode)
     }
     /* This is an optimised algorithm for writing vertical lines.
      * We begin by finding the addresses of the x,y0 and x,y1 points. */
-    int addr0  = CALC_BUFF_ADDR(x, y0);
-    int addr1  = CALC_BUFF_ADDR(x, y1);
+    int addr0     = CALC_BUFF_ADDR(x, y0);
+    int addr1     = CALC_BUFF_ADDR(x, y1);
     /* Then we calculate the pixel data to be written. */
-    int bitnum = CALC_BIT_IN_BYTE(x);
+    int bitnum    = CALC_BIT_IN_BYTE(x);
     uint16_t mask = 1 << (7 - bitnum);
     /* Run from addr0 to addr1 placing pixels. Increment by the number
      * of bytes n each graphics line. */
@@ -465,8 +463,7 @@ void write_vline_lm(int x, int y0, int y1, int lmode, int mmode)
 {
     // TODO: an optimisation would compute the masks and apply to
     // both buffers simultaneously.
-    CHECK_ONLY_WHITE_PIXEL
-    write_vline(draw_buffer_level, x, y0, y1, lmode);
+    CHECK_ONLY_WHITE_PIXEL write_vline(draw_buffer_level, x, y0, y1, lmode);
     write_vline(draw_buffer_mask, x, y0, y1, mmode);
 }
 
@@ -579,8 +576,7 @@ void write_filled_rectangle(uint8_t *buff, int x, int y, int width, int height, 
  */
 void write_filled_rectangle_lm(int x, int y, int width, int height, int lmode, int mmode)
 {
-    CHECK_ONLY_WHITE_PIXEL
-    write_filled_rectangle(draw_buffer_level, x, y, width, height, lmode);
+    CHECK_ONLY_WHITE_PIXEL write_filled_rectangle(draw_buffer_level, x, y, width, height, lmode);
     write_filled_rectangle(draw_buffer_mask, x, y, width, height, mmode);
 }
 
@@ -759,9 +755,9 @@ void write_line(uint8_t *buff, int x0, int y0, int x1, int y1, int mode)
         SWAP(x0, x1);
         SWAP(y0, y1);
     }
-    int deltax     = x1 - x0;
+    int deltax = x1 - x0;
     int deltay = abs(y1 - y0);
-    int error      = deltax / 2;
+    int error  = deltax / 2;
     int ystep;
     int y = y0;
     int x; // , lasty = y, stox = 0;
@@ -796,8 +792,7 @@ void write_line(uint8_t *buff, int x0, int y0, int x1, int y1, int mode)
  */
 void write_line_lm(int x0, int y0, int x1, int y1, int lmode, int mmode)
 {
-    CHECK_ONLY_WHITE_PIXEL
-    write_line(draw_buffer_level, x0, y0, x1, y1, lmode);
+    CHECK_ONLY_WHITE_PIXEL write_line(draw_buffer_level, x0, y0, x1, y1, lmode);
     write_line(draw_buffer_mask, x0, y0, x1, y1, mmode);
 }
 
@@ -837,9 +832,9 @@ void write_line_outlined(int x0, int y0, int x1, int y1,
         SWAP(x0, x1);
         SWAP(y0, y1);
     }
-    int deltax     = x1 - x0;
+    int deltax = x1 - x0;
     int deltay = abs(y1 - y0);
-    int error      = deltax / 2;
+    int error  = deltax / 2;
     int ystep;
     int y = y0;
     int x;
@@ -898,8 +893,8 @@ void write_line_outlined(int x0, int y0, int x1, int y1,
  * @param       dots			0 = not dashed, > 0 = # of set/unset dots for the dashed innards
  */
 void write_line_outlined_dashed(int x0, int y0, int x1, int y1,
-                                          __attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
-                                          int mode, int mmode, int dots)
+                                __attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
+                                int mode, int mmode, int dots)
 {
     // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     // This could be improved for speed.
@@ -988,7 +983,9 @@ void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsi
 {
     WRITE_BYTE_MODE(buff, addr++, word >> (8 + xoff), mode);
     WRITE_BYTE_MODE(buff, addr++, word >> xoff, mode);
-    if (xoff > 0) WRITE_BYTE_MODE(buff, addr, word << (8 - xoff), mode);
+    if (xoff > 0) {
+        WRITE_BYTE_MODE(buff, addr, word << (8 - xoff), mode);
+    }
 }
 
 /**
@@ -1006,7 +1003,9 @@ void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr,
 {
     WRITE_BYTE_NAND(buff, addr++, word >> (8 + xoff));
     WRITE_BYTE_NAND(buff, addr++, word >> xoff);
-    if (xoff > 0) WRITE_BYTE_NAND(buff, addr, word << (8 - xoff));
+    if (xoff > 0) {
+        WRITE_BYTE_NAND(buff, addr, word << (8 - xoff));
+    }
 }
 
 /**
@@ -1024,7 +1023,9 @@ void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, u
 {
     WRITE_BYTE_OR(buff, addr++, word >> (8 + xoff));
     WRITE_BYTE_OR(buff, addr++, word >> xoff);
-    if (xoff > 0) WRITE_BYTE_OR(buff, addr, word << (8 - xoff));
+    if (xoff > 0) {
+        WRITE_BYTE_OR(buff, addr, word << (8 - xoff));
+    }
 }
 
 /**
@@ -1038,7 +1039,9 @@ void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, u
 void write_byte_misaligned_NAND(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff)
 {
     WRITE_BYTE_NAND(buff, addr++, byte >> xoff);
-    if (xoff > 0) WRITE_BYTE_NAND(buff, addr, byte << (8 - xoff));
+    if (xoff > 0) {
+        WRITE_BYTE_NAND(buff, addr, byte << (8 - xoff));
+    }
 }
 
 /**
@@ -1052,7 +1055,9 @@ void write_byte_misaligned_NAND(uint8_t *buff, uint8_t byte, unsigned int addr, 
 void write_byte_misaligned_OR(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff)
 {
     WRITE_BYTE_OR(buff, addr++, byte >> xoff);
-    if (xoff > 0) WRITE_BYTE_OR(buff, addr, byte << (8 - xoff));
+    if (xoff > 0) {
+        WRITE_BYTE_OR(buff, addr, byte << (8 - xoff));
+    }
 }
 
 /**
@@ -1354,13 +1359,13 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     mintick_start   = x;
     boundtick_start = x;
     if (halign == -1) {
-        majtick_end     = x + majtick_len;
-        mintick_end     = x + mintick_len;
-        boundtick_end   = x + boundtick_len;
+        majtick_end   = x + majtick_len;
+        mintick_end   = x + mintick_len;
+        boundtick_end = x + boundtick_len;
     } else if (halign == +1) {
-        majtick_end     = x - majtick_len;
-        mintick_end     = x - mintick_len;
-        boundtick_end   = x - boundtick_len;
+        majtick_end   = x - majtick_len;
+        mintick_end   = x - mintick_len;
+        boundtick_end = x - boundtick_len;
     }
     // Retrieve width of large font (font #0); from this calculate the x spacing.
     fetch_font_info(0, 0, &font_info, NULL);
@@ -1963,7 +1968,7 @@ void check_gps_home(HomePosition *homePos, GPSPositionSensorData *gpsData)
         } else {
             if (current_time - stable_time > CHECK_HOME_STABLE) {
                 homePos->Latitude  = gpsData->Latitude;     // take this Latitude as home Latitude
-                homePos->Longitude = gpsData->Longitude;    // take this Longitude as home Longitude
+                homePos->Longitude = gpsData->Longitude; // take this Longitude as home Longitude
                 homePos->Altitude  = gpsData->Altitude;     // take this stable Altitude as home Altitude
                 homePos->GotHome   = TRUE;                  // we got home
             }
@@ -2114,7 +2119,7 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
     }
 
     if (WarnMask && current_time - on_off_time < WARN_ON_TIME) {
-        if (0) {    // show some systemalarms if > SYSTEMALARMS_ALARM_OK
+        if (0) { // show some systemalarms if > SYSTEMALARMS_ALARM_OK
             char tmp[10] = { 0 };
             SystemAlarmsAlarmOptions alarm;
             alarm = AlarmsGet(SYSTEMALARMS_ALARM_MAGNETOMETER);
@@ -2160,42 +2165,42 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
                     sprintf(temp, "%02u:%02u:%02u UTC", gpsTime.Hour, gpsTime.Minute, gpsTime.Second);
                     write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
                     d_y += v_spacing;
-#else                                   // TODO make configurable
-#define TIME_ZONE_WET       0           // TODO make configurable
-#define TIME_ZONE_MET       1           // TODO make configurable
-#define DAYLIGHT_SAVING     1           // TODO make configurable and calculate
+#else // TODO make configurable
+#define TIME_ZONE_WET   0           // TODO make configurable
+#define TIME_ZONE_MET   1           // TODO make configurable
+#define DAYLIGHT_SAVING 1 // TODO make configurable and calculate
                     sprintf(temp, "%02u:%02u:%02u UTC ", gpsTime.Hour, gpsTime.Minute, gpsTime.Second);
                     write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
                     d_y += v_spacing;
                     int8_t Hour;
 #if 0
                     Hour = TIME_ZONE_WET + DAYLIGHT_SAVING + gpsTime.Hour;
-                    Hour = Hour <  0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
+                    Hour = Hour < 0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
                     sprintf(temp, "%02u:%02u:%02u WEST", Hour, gpsTime.Minute, gpsTime.Second);
                     write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
                     d_y += v_spacing;
 #endif
                     Hour = TIME_ZONE_MET + DAYLIGHT_SAVING + gpsTime.Hour;
-                    Hour = Hour <  0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
+                    Hour = Hour < 0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
                     sprintf(temp, "%02u:%02u:%02u MEST", Hour, gpsTime.Minute, gpsTime.Second);
                     write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
                     d_y += v_spacing;
-#endif
+#endif /* if 1 */
                 }
             }
-#endif
+#endif /* ifndef PIOS_GPS_MINIMAL */
         }
-#define CRC_CRITICAL_PERCENT         75
+#define CRC_CRITICAL_PERCENT 75
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
         if (WarnMask & WARN_BAD_TSLRS_PKT) {
             uint8_t percent;
             uint16_t delta;
             if (DEBUG_CHAN_ACTIVE) {
                 percent = tslrsdebug_packet_window_percent();
-                delta = tslrsdebug_state->BadChannelDelta;
+                delta   = tslrsdebug_state->BadChannelDelta;
             } else {
                 percent = tslrsdebug_state->scan_value_percent;
-                delta = tslrsdebug_state->BadPacketsDelta;
+                delta   = tslrsdebug_state->BadPacketsDelta;
             }
             if (DEBUG_CHAN_ACTIVE || tslrsdebug_state->BadPacketsDelta) {
                 if (percent < CRC_CRITICAL_PERCENT) {
@@ -2213,7 +2218,7 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
             write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
             d_y += v_spacing;
         }
-#endif
+#endif /* ifdef PIOS_INCLUDE_TSLRSDEBUG */
 #ifdef PIOS_INCLUDE_PACKETRXOK
         if (WarnMask & WARN_BAD_LEDRX_PKT) {
             if (PacketRxOk < CRC_CRITICAL_PERCENT) {
@@ -2332,23 +2337,23 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
 
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
 // show TSLRS debug status
-#define TSLRS_ROTARY_2_CHAR             0xDC
-#define TSLRS_ROTARY_3_CHAR             0xC0
-#define TSLRS_RADIORSSI_2_CHAR          0x14
-#define TSLRS_RADIORSSI_3_CHAR          0x14
-#define TSLRS_RADIOCRC_2_CHAR           0x15
-#define TSLRS_RADIOCRC_3_CHAR           0x15
-#define TSLRS_FAILSAFES_2_CHAR          0x46
-#define TSLRS_FAILSAFES_3_CHAR          0xCC
-#define TSLRS_BADCHANNEL_2_CHAR         0x42
-#define TSLRS_BADCHANNEL_3_CHAR         0xCD
+#define TSLRS_ROTARY_2_CHAR     0xDC
+#define TSLRS_ROTARY_3_CHAR     0xC0
+#define TSLRS_RADIORSSI_2_CHAR  0x14
+#define TSLRS_RADIORSSI_3_CHAR  0x14
+#define TSLRS_RADIOCRC_2_CHAR   0x15
+#define TSLRS_RADIOCRC_3_CHAR   0x15
+#define TSLRS_FAILSAFES_2_CHAR  0x46
+#define TSLRS_FAILSAFES_3_CHAR  0xCC
+#define TSLRS_BADCHANNEL_2_CHAR 0x42
+#define TSLRS_BADCHANNEL_3_CHAR 0xCD
 void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size, bool GCSconnected)
 {
-    char temp[10] = { 0 };
+    char temp[10]   = { 0 };
     uint8_t y_delta = (char_size == 2 ? 10 : 18);
     char rotary;
-    char radiocrc = (char_size == 2 ? TSLRS_RADIOCRC_2_CHAR : TSLRS_RADIOCRC_3_CHAR);
-    char failsafes = (char_size == 2 ? TSLRS_FAILSAFES_2_CHAR : TSLRS_FAILSAFES_3_CHAR);
+    char radiocrc   = (char_size == 2 ? TSLRS_RADIOCRC_2_CHAR : TSLRS_RADIOCRC_3_CHAR);
+    char failsafes  = (char_size == 2 ? TSLRS_FAILSAFES_2_CHAR : TSLRS_FAILSAFES_3_CHAR);
     char badchannel = (char_size == 2 ? TSLRS_BADCHANNEL_2_CHAR : TSLRS_BADCHANNEL_3_CHAR);
 
     if (GCSconnected) {
@@ -2394,22 +2399,22 @@ void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size, bool GCSconn
             }
             if (tslrsdebug_state->LinkQuality != 255) {
                 static uint32_t good_previous = 0;
-                static uint8_t rotary_offset = 0;
+                static uint8_t rotary_offset  = 0;
                 if (good_previous != tslrsdebug_state->GoodPackets) {
                     good_previous = tslrsdebug_state->GoodPackets;
                     rotary_offset++;
                     rotary_offset = rotary_offset % 12;
                 }
                 rotary = (char_size == 2 ? TSLRS_ROTARY_2_CHAR : TSLRS_ROTARY_3_CHAR) + rotary_offset;
-                //sprintf(temp, "%c  %3u %c", radiocrc, tslrsdebug_state->LinkQuality, rotary);                            // 0-128
-                sprintf(temp, "%c  %3u%%%c", radiocrc, (uint8_t) (tslrsdebug_state->LinkQuality / 1.28f + 0.5f), rotary);  // percent
+                // sprintf(temp, "%c  %3u %c", radiocrc, tslrsdebug_state->LinkQuality, rotary);                            // 0-128
+                sprintf(temp, "%c  %3u%%%c", radiocrc, (uint8_t)(tslrsdebug_state->LinkQuality / 1.28f + 0.5f), rotary); // percent
                 write_string(temp, x, y + 1 * y_delta, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             }
             if (tslrsdebug_state->BadPackets) {
                 sprintf(temp, "%6u%c", tslrsdebug_state->BadPackets, badchannel);
                 write_string(temp, x, y + 2 * y_delta, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             }
-#else
+#else /* ifdef PIOS_INCLUDE_OPLM_OPOSD */
             sprintf(temp, "%c  %3u%%", radiocrc, tslrsdebug_state->scan_value_percent);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             if (tslrsdebug_state->BadPackets) {
@@ -2420,14 +2425,14 @@ void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size, bool GCSconn
                 sprintf(temp, "%6u%c", tslrsdebug_state->Failsafes, failsafes);
                 write_string(temp, x, y + 2 * y_delta, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             }
-#endif   // PIOS_INCLUDE_OPLM_OPOSD
+#endif // PIOS_INCLUDE_OPLM_OPOSD
         }
     }
 }
 
 // show TSLRS debug channel
-#define TSLRS_CHANNEL_NORM_HEIGHT       15
-#define TSLRS_CHANNEL_NORM_WIDTH        TSRX_CHANNEL_MAX
+#define TSLRS_CHANNEL_NORM_HEIGHT 15
+#define TSLRS_CHANNEL_NORM_WIDTH  TSRX_CHANNEL_MAX
 void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size, bool GCSconnected)
 {
     if (GCSconnected || tslrsdebug_state->BadChannelDelta) {
@@ -2435,7 +2440,9 @@ void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size, bool GCSconnecte
         write_vline_outlined(x, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
         write_vline_outlined(x + size * TSLRS_CHANNEL_NORM_WIDTH + 1, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
 
-        if (GCSconnected) return;
+        if (GCSconnected) {
+            return;
+        }
 
         int h, xx, xxx;
         float height_factor = (float)(TSLRS_CHANNEL_NORM_HEIGHT * size) / (float)tslrsdebug_state->ChannelFailsMax;
@@ -2452,8 +2459,8 @@ void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size, bool GCSconnecte
 
 #ifdef PIOS_INCLUDE_PACKETRXOK
 // show PacketRxOk status
-#define PACKETRXOK_RADIOCRC_2_CHAR           0x15
-#define PACKETRXOK_RADIOCRC_3_CHAR           0x15
+#define PACKETRXOK_RADIOCRC_2_CHAR 0x15
+#define PACKETRXOK_RADIOCRC_3_CHAR 0x15
 void draw_packetrxok_status(int16_t x, int16_t y, int8_t char_size, bool GCSconnected)
 {
     char temp[10] = { 0 };
@@ -2472,6 +2479,7 @@ void draw_packetrxok_status(int16_t x, int16_t y, int8_t char_size, bool GCSconn
 void updateGraphics()
 {
     OsdSettingsData OsdSettings;
+
     OsdSettingsGet(&OsdSettings);
     OsdSettings2Data OsdSettings2;
     OsdSettings2Get(&OsdSettings2);
@@ -2539,23 +2547,24 @@ void updateGraphics()
             uint8_t y_delta = 0;
             for (int i = 0; i < page.Rows; i++) {
                 write_string(page.Text + i * page.Cols, 20, 20 + y_delta, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
-                if (i == 0 || i == 8)
+                if (i == 0 || i == 8) {
                     y_delta += 40;
-                else
+                } else {
                     y_delta += 20;
+                }
             }
             break;
         }
 
-        MSPProfile = MSPGetProfile();
-        status.Armed = MSPGetArmed() ? FLIGHTSTATUS_ARMED_ARMED : FLIGHTSTATUS_ARMED_DISARMED;
+        MSPProfile        = MSPGetProfile();
+        status.Armed      = MSPGetArmed() ? FLIGHTSTATUS_ARMED_ARMED : FLIGHTSTATUS_ARMED_DISARMED;
         status.FlightMode = MSPGetMode() + FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
-        mcc.Throttle = (float)(MSPGetRC(MSP_THROTTLE) - 968) / 1103.0f;                                 // TODO assumes channel 3 and 968 - 2071 µs
-        mcc.Connected = 1;
-        mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] = MSPGetRC(MSP_AUX2);                    // TODO assumes channel 5
-        attitude.Roll  =  0.1f * ((int16_t)MSPGetAngle(0));
-        attitude.Pitch = -0.1f * ((int16_t)MSPGetAngle(1));
-#endif
+        mcc.Throttle      = (float)(MSPGetRC(MSP_THROTTLE) - 968) / 1103.0f;                                 // TODO assumes channel 3 and 968 - 2071 ï¿½s
+        mcc.Connected     = 1;
+        mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] = MSPGetRC(MSP_AUX2); // TODO assumes channel 5
+        attitude.Roll     = 0.1f * ((int16_t)MSPGetAngle(0));
+        attitude.Pitch    = -0.1f * ((int16_t)MSPGetAngle(1));
+#endif /* ifdef PIOS_INCLUDE_MSP */
 
 #ifdef TEMP_GPS_STATUS_WORKAROUND
         static uint8_t gps_status = 0;
@@ -2674,7 +2683,7 @@ void updateGraphics()
                 if (gpsData.Groundspeed > 0.2777778f) {
                     td += (gpsData.Groundspeed * (current_ms - callTimer) / 1000.0f);
                 }
-                int d = (int)((uint32_t) td * convert->m_to_m_feet);
+                int d = (int)((uint32_t)td * convert->m_to_m_feet);
                 sprintf(temp, "TD%5d%c", d <= 99999 ? d : 99999, convert->char_m_feet);
             } else {
                 sprintf(temp, "TD  ---%c", convert->char_m_feet);
@@ -2682,7 +2691,7 @@ void updateGraphics()
             callTimer = current_ms;
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
-#endif
+#endif /* if 1 */
         // Flight mode
         if (check_enable_and_srceen(OsdSettings.FlightMode, (OsdSettingsWarningsSetupData *)&OsdSettings.FlightModeSetup, screen, &x, &y)) {
             draw_flight_mode(status.FlightMode, x, y, OsdSettings.FlightModeSetup.CharSize);
@@ -2698,10 +2707,10 @@ void updateGraphics()
         if (check != OSDSETTINGS_TIME_DISABLED) {
             int flight_time = (int)((xTaskGetTickCount() - airborne) / 1000);
             if (check == OSDSETTINGS_TIME_HOURMINSEC) {
-                sprintf(temp, "%02d:%02d:%02d", flight_time/3600, flight_time/60%60, flight_time%60);
+                sprintf(temp, "%02d:%02d:%02d", flight_time / 3600, flight_time / 60 % 60, flight_time % 60);
             }
             if (check == OSDSETTINGS_TIME_MINSEC) {
-                sprintf(temp, "FT%02d:%02d", flight_time/60%60, flight_time%60);
+                sprintf(temp, "FT%02d:%02d", flight_time / 60 % 60, flight_time % 60);
             }
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.TimeSetup.CharSize);
         }
@@ -2767,7 +2776,7 @@ void updateGraphics()
                 if (cell_count < 100) {
                     WarnMask |= filteredADC.volt < (double)(OsdSettings2.SensorVoltageCalibration.Warning * (float)cell_count) ? WARN_BATT_SVOLT_LOW : 0x00;
                     sprintf(temp, "%ds", cell_count);
-                    sprintf(&temp[2], "%5.2fV", filteredADC.volt);  // workaround for not working sprintf(temp, "%ds%5.2fV", cell_count, filteredADC.volt);
+                    sprintf(&temp[2], "%5.2fV", filteredADC.volt); // workaround for not working sprintf(temp, "%ds%5.2fV", cell_count, filteredADC.volt);
                 } else if (cell_count == 100) {
                     cell_count = (int)(filteredADC.volt / (double)4.2f) + 1;
                     sprintf(temp, " ");
@@ -2786,7 +2795,7 @@ void updateGraphics()
                 }
             }
         }
-#endif
+#endif /* ifndef AUTO_DETECT_3S_4S */
         // ADC Sensor current or ADC Sensor current consumed
         if (OsdSettings2.SensorCurrent || OsdSettings2.SensorCurrentConsumed || OsdSettings2.AirborneResetTime) {
             filteredADC.curr = filteredADC.curr * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset) * ADC_FILTER;
@@ -2830,11 +2839,11 @@ void updateGraphics()
 #endif
 
 #ifdef PIOS_INCLUDE_PACKETRXOK
-#define PACKETRXOK_WARN_THRESHOLD   95
+#define PACKETRXOK_WARN_THRESHOLD 95
         // Show PacketRxOk status data
         if (OsdSettings2.PacketRxOk) {
             PacketRxOk = PacketRxOk_read();
-            WarnMask |= (PacketRxOk <= PACKETRXOK_WARN_THRESHOLD) ? WARN_BAD_LEDRX_PKT : 0x00;
+            WarnMask  |= (PacketRxOk <= PACKETRXOK_WARN_THRESHOLD) ? WARN_BAD_LEDRX_PKT : 0x00;
             if (check_enable_and_srceen(OsdSettings2.PacketRxOk, (OsdSettingsWarningsSetupData *)&OsdSettings2.PacketRxOkSetup, screen, &x, &y)) {
                 draw_packetrxok_status(x, y, OsdSettings2.PacketRxOkSetup.CharSize, GCSconnected);
             }
@@ -2931,9 +2940,9 @@ void updateGraphics()
 #define DEBUG_ACCEL_SENSOR
 #define DEBUG_ACCEL_STATE
 #define DEBUG_ACCEL_X   270
-#define DEBUG_ACCEL_Y    30
-#define DEBUG_ACCEL_D_X 8*7
-#define DEBUG_ACCEL_D_Y  10
+#define DEBUG_ACCEL_Y   30
+#define DEBUG_ACCEL_D_X 8 * 7
+#define DEBUG_ACCEL_D_Y 10
         x = DEBUG_ACCEL_X;
         y = DEBUG_ACCEL_Y;
 #ifdef DEBUG_ACCEL_SENSOR
@@ -2949,7 +2958,7 @@ void updateGraphics()
         x += DEBUG_ACCEL_D_X;
 #endif // DEBUG_ACCEL_SENSOR
 #ifdef DEBUG_ACCEL_STATE
-        y = DEBUG_ACCEL_Y;
+        y  = DEBUG_ACCEL_Y;
         sprintf(temp, "X%5.2f", (double)accelState.x);
         write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         y += DEBUG_ACCEL_D_Y;

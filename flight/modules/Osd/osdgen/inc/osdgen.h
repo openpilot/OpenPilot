@@ -37,11 +37,11 @@
 int32_t osdgenInitialize(void);
 
 // Needed till someone fixes the black/white hardware problem
-//#define ONLY_WHITE_PIXEL
+// #define ONLY_WHITE_PIXEL
 #ifdef ONLY_WHITE_PIXEL
-#define GCS_LEVEL_ONLY_WHITE_PIXEL      4095
-#define CHECK_ONLY_WHITE_PIXEL          if (only_white_pixel) mmode = (lmode & 1);
-#define CHECK_ONLY_WHITE_PIXEL_CHAR     if (only_white_pixel) mask = level;
+#define GCS_LEVEL_ONLY_WHITE_PIXEL  4095
+#define CHECK_ONLY_WHITE_PIXEL      if (only_white_pixel) { mmode = (lmode & 1); }
+#define CHECK_ONLY_WHITE_PIXEL_CHAR if (only_white_pixel) { mask = level; }
 #else
 #define CHECK_ONLY_WHITE_PIXEL
 #define CHECK_ONLY_WHITE_PIXEL_CHAR
@@ -129,12 +129,12 @@ struct FontDimensions {
 
 // to convert metric -> imperial
 // for speeds see http://en.wikipedia.org/wiki/Miles_per_hour
-typedef struct {                    // from		metric			imperial
+typedef struct { // from		metric			imperial
     float   m_to_m_feet;            // m		m		1.0		feet	3.280840
     float   ms_to_ms_fts;           // m/s		m/s		1.0		ft/s	3.280840
     float   ms_to_kmh_mph;          // m/s		km/h	3.6		mph		2.236936
-    uint8_t char_m_feet;            // char		'm'				'f'
-    uint8_t char_ms_fts;            // char		'm/s'			'ft/s'
+    uint8_t char_m_feet; // char		'm'				'f'
+    uint8_t char_ms_fts; // char		'm/s'			'ft/s'
 } Unit;
 
 // Home position for calculations
@@ -157,23 +157,23 @@ typedef struct {
 } ADCfiltered;
 
 // Max/Min macros.
-#define MAX(a, b)                    ((a) > (b) ? (a) : (b))
-#define MIN(a, b)                    ((a) < (b) ? (a) : (b))
-#define MAX3(a, b, c)                MAX(a, MAX(b, c))
-#define MIN3(a, b, c)                MIN(a, MIN(b, c))
+#define MAX(a, b)          ((a) > (b) ? (a) : (b))
+#define MIN(a, b)          ((a) < (b) ? (a) : (b))
+#define MAX3(a, b, c)      MAX(a, MAX(b, c))
+#define MIN3(a, b, c)      MIN(a, MIN(b, c))
 
 // Check if coordinates are valid. If not, return. Assumes signed coordinates for working correct also with values lesser than 0.
-#define CHECK_COORDS(x, y)           if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT || y < GRAPHICS_TOP || y > GRAPHICS_BOTTOM) { return; }
-#define CHECK_COORD_X(x)             if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT) { return; }
-#define CHECK_COORD_Y(y)             if (y < GRAPHICS_TOP  || y > GRAPHICS_BOTTOM) { return; }
+#define CHECK_COORDS(x, y) if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT || y < GRAPHICS_TOP || y > GRAPHICS_BOTTOM) { return; }
+#define CHECK_COORD_X(x)   if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT) { return; }
+#define CHECK_COORD_Y(y)   if (y < GRAPHICS_TOP || y > GRAPHICS_BOTTOM) { return; }
 
 // Clip coordinates out of range. Assumes signed coordinates for working correct also with values lesser than 0.
-#define CLIP_COORDS(x, y)            { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
-#define CLIP_COORD_X(x)              { x = x < GRAPHICS_LEFT ? GRAPHICS_LEFT : x > GRAPHICS_RIGHT ? GRAPHICS_RIGHT : x; }
-#define CLIP_COORD_Y(y)              { y = y < GRAPHICS_TOP ? GRAPHICS_TOP : y > GRAPHICS_BOTTOM ? GRAPHICS_BOTTOM : y; }
+#define CLIP_COORDS(x, y)  { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
+#define CLIP_COORD_X(x)    { x = x < GRAPHICS_LEFT ? GRAPHICS_LEFT : x > GRAPHICS_RIGHT ? GRAPHICS_RIGHT : x; }
+#define CLIP_COORD_Y(y)    { y = y < GRAPHICS_TOP ? GRAPHICS_TOP : y > GRAPHICS_BOTTOM ? GRAPHICS_BOTTOM : y; }
 
 // Macro to swap two variables using XOR swap.
-#define SWAP(a, b)                   { a ^= b; b ^= a; a ^= b; }
+#define SWAP(a, b)         { a ^= b; b ^= a; a ^= b; }
 
 uint8_t getCharData(uint16_t charPos);
 

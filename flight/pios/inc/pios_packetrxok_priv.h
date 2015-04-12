@@ -37,7 +37,7 @@
 #include <pios.h>
 #include <pios_stm32.h>
 
-extern int32_t PIOS_PacketRxOk_Init(uint32_t *pios_packetrxok_id, uint32_t pios_gpio_packetrxok_id, GPIO_TypeDef* GPIO, uint16_t GPIO_Pin);
+extern int32_t PIOS_PacketRxOk_Init(uint32_t *pios_packetrxok_id, uint32_t pios_gpio_packetrxok_id, GPIO_TypeDef *GPIO, uint16_t GPIO_Pin);
 
 #endif /* PIOS_INCLUDE_PACKETRXOK */
 

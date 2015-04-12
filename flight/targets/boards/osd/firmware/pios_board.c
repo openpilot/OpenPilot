@@ -379,40 +379,40 @@ void PIOS_Board_Init(void)
 #if 0
     case HWSETTINGS_OSD_FLEXIPORT_I2C:
 #if defined(PIOS_INCLUDE_I2C)
-    {
-        if (PIOS_I2C_Init(&pios_i2c_flexiport_adapter_id, &pios_i2c_flexiport_adapter_cfg)) {
-            PIOS_Assert(0);
+        {
+            if (PIOS_I2C_Init(&pios_i2c_flexiport_adapter_id, &pios_i2c_flexiport_adapter_cfg)) {
+                PIOS_Assert(0);
+            }
         }
-    }
 #endif /* PIOS_INCLUDE_I2C */
         break;
 #endif
     case HWSETTINGS_OSD_FLEXIPORT_TSLRSDEBUG:
 #if defined(PIOS_INCLUDE_TSLRSDEBUG)
-    {
-        uint32_t pios_usart_tslrsdebug_id;
-        if (PIOS_USART_Init(&pios_usart_tslrsdebug_id, &pios_usart_tslrsdebug_flexi_cfg)) {
-            PIOS_Assert(0);
+        {
+            uint32_t pios_usart_tslrsdebug_id;
+            if (PIOS_USART_Init(&pios_usart_tslrsdebug_id, &pios_usart_tslrsdebug_flexi_cfg)) {
+                PIOS_Assert(0);
+            }
+            uint32_t pios_tslrsdebug_id;
+            if (PIOS_TSLRSdebug_Init(&pios_tslrsdebug_id, &pios_tslrsdebug_flexi_cfg, &pios_usart_com_driver, pios_usart_tslrsdebug_id)) {
+                PIOS_Assert(0);
+            }
         }
-        uint32_t pios_tslrsdebug_id;
-        if (PIOS_TSLRSdebug_Init(&pios_tslrsdebug_id, &pios_tslrsdebug_flexi_cfg, &pios_usart_com_driver, pios_usart_tslrsdebug_id)) {
-            PIOS_Assert(0);
-        }
-    }
 #endif /* PIOS_INCLUDE_TSLRSDEBUG */
         break;
     case HWSETTINGS_OSD_FLEXIPORT_PACKETRXOK:
 #if defined(PIOS_INCLUDE_PACKETRXOK)
-    {
-        uint32_t pios_gpio_packetrxok_id;
-        if (PIOS_GPIO_Init(&pios_gpio_packetrxok_id, &pios_io_packetrxok_flexi_cfg)) {
-            PIOS_Assert(0);
+        {
+            uint32_t pios_gpio_packetrxok_id;
+            if (PIOS_GPIO_Init(&pios_gpio_packetrxok_id, &pios_io_packetrxok_flexi_cfg)) {
+                PIOS_Assert(0);
+            }
+            uint32_t pios_packetrxok_id;
+            if (PIOS_PacketRxOk_Init(&pios_packetrxok_id, pios_gpio_packetrxok_id, pios_io_packetrxok_flexi[PIOS_PACKETRXOK_IN].pin.gpio, pios_io_packetrxok_flexi[PIOS_PACKETRXOK_IN].pin.init.GPIO_Pin)) {
+                PIOS_Assert(0);
+            }
         }
-        uint32_t pios_packetrxok_id;
-        if (PIOS_PacketRxOk_Init(&pios_packetrxok_id, pios_gpio_packetrxok_id, pios_io_packetrxok_flexi[PIOS_PACKETRXOK_IN].pin.gpio, pios_io_packetrxok_flexi[PIOS_PACKETRXOK_IN].pin.init.GPIO_Pin)) {
-            PIOS_Assert(0);
-        }
-    }
 #endif /* PIOS_INCLUDE_PACKETRXOK */
         break;
     }

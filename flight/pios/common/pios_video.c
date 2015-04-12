@@ -58,20 +58,20 @@ static const struct pios_video_type_boundary pios_video_type_boundary_ntsc = {
     .graphics_left   = 0,
     .graphics_top    = 0,
     .graphics_right  = 367,         // must be: graphics_width_real - 1
-    .graphics_bottom = 240,         // must be: graphics_hight_real - 1
+    .graphics_bottom = 240, // must be: graphics_hight_real - 1
 };
 
 static const struct pios_video_type_boundary pios_video_type_boundary_pal = {
     .graphics_left   = 0,
     .graphics_top    = 0,
     .graphics_right  = 399,         // must be: graphics_width_real - 1
-    .graphics_bottom = 287,         // must be: graphics_hight_real - 1
+    .graphics_bottom = 287, // must be: graphics_hight_real - 1
 };
 
 static const struct pios_video_type_cfg pios_video_type_cfg_ntsc = {
     .graphics_width_real   = 368,   // Real visible columns		currently unused, just for info
     .graphics_hight_real   = 241,   // Real visible lines
-    .graphics_column_start = 60,    // First visible OSD column (after Hsync)
+    .graphics_column_start = 60,      // First visible OSD column (after Hsync)
     .graphics_line_start   = 16,    // First visible OSD line
     .dma_buffer_length     = 47,    // DMA buffer byte length	must be: graphics_width_real / 8 + 1
     .period = 11,
@@ -81,7 +81,7 @@ static const struct pios_video_type_cfg pios_video_type_cfg_ntsc = {
 static const struct pios_video_type_cfg pios_video_type_cfg_pal = {
     .graphics_width_real   = 400,   // Real visible columns		currently unused, just for info
     .graphics_hight_real   = 288,   // Real visible lines
-    .graphics_column_start = 70,    // First visible OSD column (after Hsync)
+    .graphics_column_start = 70,      // First visible OSD column (after Hsync)
     .graphics_line_start   = 20,    // First visible OSD line
     .dma_buffer_length     = 51,    // DMA buffer byte length	must be: graphics_width_real / 8 + 1
     .period = 10,
@@ -499,9 +499,9 @@ void PIOS_Video_BoundaryReset(void)
  */
 void PIOS_Video_BoundaryLimit(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
 {
-    pios_video_type_boundary_temp.graphics_left   = left   >= GRAPHICS_LEFT   ? left   : GRAPHICS_LEFT;
-    pios_video_type_boundary_temp.graphics_top    = top    >= GRAPHICS_TOP    ? top    : GRAPHICS_TOP;
-    pios_video_type_boundary_temp.graphics_right  = right  <= GRAPHICS_RIGHT  ? right  : GRAPHICS_RIGHT;
+    pios_video_type_boundary_temp.graphics_left   = left >= GRAPHICS_LEFT ? left : GRAPHICS_LEFT;
+    pios_video_type_boundary_temp.graphics_top    = top >= GRAPHICS_TOP ? top : GRAPHICS_TOP;
+    pios_video_type_boundary_temp.graphics_right  = right <= GRAPHICS_RIGHT ? right : GRAPHICS_RIGHT;
     pios_video_type_boundary_temp.graphics_bottom = bottom <= GRAPHICS_BOTTOM ? bottom : GRAPHICS_BOTTOM;
 
     pios_video_type_boundary_act = &pios_video_type_boundary_temp;

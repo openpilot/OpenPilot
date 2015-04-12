@@ -36,10 +36,10 @@
 #include "pios_packetrxok.h"
 #include "pios_packetrxok_priv.h"
 
-#define MIN_READ_DELAY      100     // [ms]
+#define MIN_READ_DELAY 100 // [ms]
 
 
-GPIO_TypeDef* PacketRxOk_GPIO;
+GPIO_TypeDef *PacketRxOk_GPIO;
 uint16_t PacketRxOk_GPIO_Pin;
 
 volatile int packet_ok  = 0;
@@ -52,24 +52,24 @@ static void PIOS_PacketRxOk_Supervisor(uint32_t pios_gpio_packetrxok_id);
 uint8_t PacketRxOk_read(void)
 {
     static portTickType last_read = 0;
-    static float last_percent = 100.0f;
+    static float last_percent     = 100.0f;
 
-    portTickType current_time = xTaskGetTickCount();
+    portTickType current_time     = xTaskGetTickCount();
 
     if (current_time >= last_read + MIN_READ_DELAY) {
-        last_read = current_time;
+        last_read    = current_time;
         last_percent = (float)(10 * packet_ok / (packet_ok + packet_nok)) + 0.05f + last_percent * .9f;
-        packet_ok = 0;
-        packet_nok = 0;
+        packet_ok    = 0;
+        packet_nok   = 0;
     }
-    return (uint8_t) last_percent;
+    return (uint8_t)last_percent;
 }
 
 /* Initialise PacketRxOk interface */
-int32_t PIOS_PacketRxOk_Init(uint32_t *pios_packetrxok_id, uint32_t pios_gpio_packetrxok_id, GPIO_TypeDef* GPIO, uint16_t GPIO_Pin)
+int32_t PIOS_PacketRxOk_Init(uint32_t *pios_packetrxok_id, uint32_t pios_gpio_packetrxok_id, GPIO_TypeDef *GPIO, uint16_t GPIO_Pin)
 {
     *pios_packetrxok_id = (uint32_t)pios_gpio_packetrxok_id;
-    PacketRxOk_GPIO = GPIO;
+    PacketRxOk_GPIO     = GPIO;
     PacketRxOk_GPIO_Pin = GPIO_Pin;
 
     if (!PIOS_RTC_RegisterTickCallback(PIOS_PacketRxOk_Supervisor, *pios_packetrxok_id)) {

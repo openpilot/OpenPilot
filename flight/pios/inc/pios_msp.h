@@ -37,19 +37,19 @@ typedef struct {
     uint8_t Mode;
     uint8_t Rows;
     uint8_t Cols;
-    char* Text;
+    char    *Text;
 } MSPPage;
 
 
 // RX channel in MwRcData array
-#define MSP_ROLL            0
-#define MSP_PITCH           1
-#define MSP_YAW             2
-#define MSP_THROTTLE        3
-#define MSP_AUX1            4
-#define MSP_AUX2            5
-#define MSP_AUX3            6
-#define MSP_AUX4            7
+#define MSP_ROLL     0
+#define MSP_PITCH    1
+#define MSP_YAW      2
+#define MSP_THROTTLE 3
+#define MSP_AUX1     4
+#define MSP_AUX2     5
+#define MSP_AUX3     6
+#define MSP_AUX4     7
 
 
 /* Public Functions */

@@ -470,17 +470,16 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
             bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
 #ifdef PIOS_INCLUDE_MSP
-                    if (inputPort == PIOS_COM_TELEM_USB)
-                UAVTalkProcessInputStream(uavTalkCon, serial_data, bytes_to_process);
-                    else{
-		        for (uint8_t i = 0; i < bytes_to_process; i++) {
-		            MSPInputStream(serial_data[i]);
-		        }
-		    }
+                if (inputPort == PIOS_COM_TELEM_USB) {
+                    UAVTalkProcessInputStream(uavTalkCon, serial_data, bytes_to_process);
+                } else {
+                    for (uint8_t i = 0; i < bytes_to_process; i++) {
+                        MSPInputStream(serial_data[i]);
+                    }
+                }
 #else
                 UAVTalkProcessInputStream(uavTalkCon, serial_data, bytes_to_process);
 #endif
-
             }
         } else {
             vTaskDelay(5);
@@ -775,11 +774,11 @@ static void updateGCSTelemetryStats()
         gcsStats.RxSyncErrors = 0;
         gcsStats.RxCrcErrors  = 0;
     }
-    txErrors = 0;
+    txErrors  = 0;
     txRetries = 0;
 
     // Check for connection timeout
-    timeNow = xTaskGetTickCount() * portTICK_RATE_MS;
+    timeNow   = xTaskGetTickCount() * portTICK_RATE_MS;
     if (utalkStats.rxObjects > 0) {
         timeOfLastObjectUpdate = timeNow;
     }

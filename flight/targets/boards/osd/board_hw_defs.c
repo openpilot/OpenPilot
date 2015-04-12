@@ -1084,11 +1084,11 @@ static const struct pios_gpio pios_io_packetrxok_flexi[] = {
         .pin                =             {
             .gpio = GPIOB,
             .init =             {
-                    .GPIO_Pin   = GPIO_Pin_11,
-                    .GPIO_Speed = GPIO_Speed_25MHz,
-                    .GPIO_Mode  = GPIO_Mode_IN,
-                    .GPIO_OType = GPIO_OType_OD,
-                    .GPIO_PuPd  = GPIO_PuPd_NOPULL,
+                .GPIO_Pin   = GPIO_Pin_11,
+                .GPIO_Speed = GPIO_Speed_25MHz,
+                .GPIO_Mode  = GPIO_Mode_IN,
+                .GPIO_OType = GPIO_OType_OD,
+                .GPIO_PuPd  = GPIO_PuPd_NOPULL,
             },
         },
         .active_low         = true

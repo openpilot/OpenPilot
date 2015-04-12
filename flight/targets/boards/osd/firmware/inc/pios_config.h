@@ -108,7 +108,7 @@
 /* #define PIOS_INCLUDE_I2C_ESC */
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */
-//#define PIOS_INCLUDE_SDCARD
+// #define PIOS_INCLUDE_SDCARD
 /* #define PIOS_USE_SETTINGS_ON_SDCARD */
 #define LOG_FILENAME "startup.log"
 #define PIOS_INCLUDE_FLASH
@@ -145,7 +145,7 @@
 // #define PIOS_QUATERNION_STABILIZATION
 
 /* special OPLM-OPOSD options */
-//#define PIOS_INCLUDE_OPLM_OPOSD
+// #define PIOS_INCLUDE_OPLM_OPOSD
 #ifdef PIOS_INCLUDE_OPLM_OPOSD
 #define PIOS_INCLUDE_TSLRSDEBUG
 #endif
@@ -153,7 +153,7 @@
 /* special OSD options */
 #define PIOS_INCLUDE_TSLRSDEBUG
 #define PIOS_INCLUDE_PACKETRXOK
-//#define PIOS_INCLUDE_MSP
+// #define PIOS_INCLUDE_MSP
 
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 8379692

@@ -53,38 +53,44 @@ struct pios_tslrsdebug_dev {
 };
 
 
-//---------------------------------
+// ---------------------------------
 
-static portTickType     LastPacketTime = 0;
-static uint8_t          PacketTimeout = 37;
-static uint8_t          PacketsPerSecond = 30;
-static uint8_t          PacketWindow[PACKET_WINDOW_MAX];
-static uint32_t         scan_value;
+static portTickType LastPacketTime = 0;
+static uint8_t PacketTimeout = 37;
+static uint8_t PacketsPerSecond    = 30;
+static uint8_t PacketWindow[PACKET_WINDOW_MAX];
+static uint32_t scan_value;
 
 
-uint8_t tslrsdebug_packet_window_percent(void) {
+uint8_t tslrsdebug_packet_window_percent(void)
+{
     int i;
     uint8_t bads = 0;
 
     for (i = 0; i < PacketsPerSecond; i++) {
-        if (PacketWindow[i] == PACKED_BAD) bads++;
+        if (PacketWindow[i] == PACKED_BAD) {
+            bads++;
+        }
     }
 
-    return (uint8_t) ((1.0f - (float) bads / (float) PacketsPerSecond) * 100.0f + 0.5f);
+    return (uint8_t)((1.0f - (float)bads / (float)PacketsPerSecond) * 100.0f + 0.5f);
 }
 
 
-static void scan_value_clear(void) {
+static void scan_value_clear(void)
+{
     scan_value = 0;
 }
 
 
-static void scan_value_add(char c) {
+static void scan_value_add(char c)
+{
     scan_value = scan_value * 10 + c - '0';
 }
 
 
-static void packet_window_set(uint8_t good_bad, uint8_t cnt) {
+static void packet_window_set(uint8_t good_bad, uint8_t cnt)
+{
     static uint8_t index = 0;
     int i;
 
@@ -95,43 +101,54 @@ static void packet_window_set(uint8_t good_bad, uint8_t cnt) {
 }
 
 
-static int detect_str_eeprom(uint8_t c) {
+static int detect_str_eeprom(uint8_t c)
+{
     static char detect_str[] = " EEPROM";
-    static int detect_cnt = 0;
+    static int detect_cnt    = 0;
 
-    if (detect_cnt == 7) return 1;
+    if (detect_cnt == 7) {
+        return 1;
+    }
 
-    if (c == detect_str[detect_cnt]) detect_cnt++;
-    else detect_cnt = 0;
+    if (c == detect_str[detect_cnt]) {
+        detect_cnt++;
+    } else { detect_cnt = 0; }
 
     return 0;
 }
 
 
-static int detect_str_contact(uint8_t c) {
+static int detect_str_contact(uint8_t c)
+{
     static char detect_str[] = "Contact";
-    static int detect_cnt = 0;
+    static int detect_cnt    = 0;
 
-    if (detect_cnt == 7) return 1;
+    if (detect_cnt == 7) {
+        return 1;
+    }
 
-    if (c == detect_str[detect_cnt]) detect_cnt++;
-    else detect_cnt = 0;
+    if (c == detect_str[detect_cnt]) {
+        detect_cnt++;
+    } else { detect_cnt = 0; }
 
     return 0;
 }
 
 
-static uint16_t detect_frameduration(uint8_t c) {
-    #define RATE_STR_LEN    6
+static uint16_t detect_frameduration(uint8_t c)
+{
+    #define RATE_STR_LEN 6
     static char detect_str[] = "Rate: ";
-    static int detect_cnt = 0;
+    static int detect_cnt    = 0;
     static uint16_t frameduration = 0;
 
-    if (detect_cnt == RATE_STR_LEN + 6) return frameduration;
+    if (detect_cnt == RATE_STR_LEN + 6) {
+        return frameduration;
+    }
 
     if (detect_cnt == RATE_STR_LEN + 5) {
-        PacketTimeout = (uint8_t) ((frameduration * PACKET_TIMEOUT_FACTOR + 500.0f) / 1000.0f);
-        PacketsPerSecond = (uint8_t) (1000.0f / (frameduration / 1000.0f));
+        PacketTimeout    = (uint8_t)((frameduration * PACKET_TIMEOUT_FACTOR + 500.0f) / 1000.0f);
+        PacketsPerSecond = (uint8_t)(1000.0f / (frameduration / 1000.0f));
         PacketsPerSecond = PacketsPerSecond > PACKET_WINDOW_MAX ? PACKET_WINDOW_MAX : PacketsPerSecond;
         detect_cnt++;
         return 0;
@@ -143,36 +160,38 @@ static uint16_t detect_frameduration(uint8_t c) {
         return 0;
     }
 
-    if (c == detect_str[detect_cnt]) detect_cnt++;
-    else detect_cnt = 0;
+    if (c == detect_str[detect_cnt]) {
+        detect_cnt++;
+    } else { detect_cnt = 0; }
 
     return 0;
 }
 
 
-static void scan_value_set(struct pios_tslrsdebug_state *state) {
+static void scan_value_set(struct pios_tslrsdebug_state *state)
+{
     switch (state->state) {
-        case TSRX_FAILSAVE_SCAN:
-            state->FailsafesDelta = scan_value - state->Failsafes;
-            state->Failsafes = scan_value;
+    case TSRX_FAILSAVE_SCAN:
+        state->FailsafesDelta = scan_value - state->Failsafes;
+        state->Failsafes = scan_value;
         break;
-        case TSRX_GOOD_SCAN:
-            state->GoodPacketsDelta = scan_value - state->GoodPackets;
-            state->GoodPackets = scan_value;
+    case TSRX_GOOD_SCAN:
+        state->GoodPacketsDelta = scan_value - state->GoodPackets;
+        state->GoodPackets     = scan_value;
         break;
-        case TSRX_BAD_SCAN:
-            state->BadPacketsDelta = scan_value - state->BadPackets;
-            state->BadPackets = scan_value;
+    case TSRX_BAD_SCAN:
+        state->BadPacketsDelta = scan_value - state->BadPackets;
+        state->BadPackets = scan_value;
         break;
-        case TSRX_RSSI_SCAN:
-            state->RSSI = scan_value;
+    case TSRX_RSSI_SCAN:
+        state->RSSI = scan_value;
         break;
-        case TSRX_LINKQUALITY_SCAN:
-            state->LinkQuality = scan_value;
+    case TSRX_LINKQUALITY_SCAN:
+        state->LinkQuality = scan_value;
         break;
     }
     if ((state->GoodPacketsDelta + state->BadPacketsDelta) != 0) {
-        state->scan_value_percent = (uint8_t) ((1.0f - (float) state->BadPacketsDelta / (float) (state->GoodPacketsDelta + state->BadPacketsDelta)) * 100.0f + 0.5f);
+        state->scan_value_percent = (uint8_t)((1.0f - (float)state->BadPacketsDelta / (float)(state->GoodPacketsDelta + state->BadPacketsDelta)) * 100.0f + 0.5f);
     } else {
         state->scan_value_percent = 0;
     }
@@ -182,156 +201,163 @@ static void scan_value_set(struct pios_tslrsdebug_state *state) {
 static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
 {
     static uint16_t new_chan_fails_val;
-    static int8_t   channel_cnt = -100;
+    static int8_t channel_cnt = -100;
     int i;
 
     switch (state->state) {
-        case TSRX_BOOT:
-            if (detect_str_eeprom(c) && !detect_str_contact(c)) {
-                detect_frameduration(c);
-#if 0   // TODO write TSLRS start message to buffer
-                if (c == '\n' || c == '\r') {
-                    if (c == '\n') osd.write('|');
-                } else {
-                    if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
-                    osd.write(c);
+    case TSRX_BOOT:
+        if (detect_str_eeprom(c) && !detect_str_contact(c)) {
+            detect_frameduration(c);
+#if 0 // TODO write TSLRS start message to buffer
+            if (c == '\n' || c == '\r') {
+                if (c == '\n') {
+                    osd.write('|');
                 }
-#endif
+            } else {
+                if (c >= 'A' && c <= 'Z') {
+                    c += 'a' - 'A';
+                }
+                osd.write(c);
             }
+#endif
+        }
         break;
-        case TSRX_VERSION_CHECK:
+    case TSRX_VERSION_CHECK:
 // TODO needs refactoring, make it configurable, currently on hold
 #ifdef PIOS_INCLUDE_OPLM_OPOSD
-            state->version = TSRX_IDLE_FROM_V25;
+        state->version = TSRX_IDLE_FROM_V25;
 #else
-            if (detect_str_eeprom(c) && detect_str_contact(c)) {
-                state->version = TSRX_IDLE_FROM_V25;
-            }
+        if (detect_str_eeprom(c) && detect_str_contact(c)) {
+            state->version = TSRX_IDLE_FROM_V25;
+        }
 #endif
-            state->state = state->version;
-            tsrxtalk_parse(state, c);
+        state->state = state->version;
+        tsrxtalk_parse(state, c);
         break;
-        case TSRX_IDLE_OLDER:
-            if (c < FIRST_CHANNEL)          // lower than known channels
-                i = 0;
-            else if (c > LAST_CHANNEL)      // higher than known channels
-                i = TSRX_CHANNEL_MAX - 1;
-            else                            // known channel
-                i = c - FIRST_CHANNEL + 1;
-            state->BadChannel++;
-            state->BadChannelDelta++;
-            state->BadChannelTime = xTaskGetTickCount();
-            state->ChannelFails[i]++;
-            state->ChannelFailsMax = state->ChannelFails[i] > state->ChannelFailsMax ? state->ChannelFails[i] : state->ChannelFailsMax;
+    case TSRX_IDLE_OLDER:
+        if (c < FIRST_CHANNEL) { // lower than known channels
+            i = 0;
+        } else if (c > LAST_CHANNEL) { // higher than known channels
+            i = TSRX_CHANNEL_MAX - 1;
+        } else { // known channel
+            i = c - FIRST_CHANNEL + 1;
+        }
+        state->BadChannel++;
+        state->BadChannelDelta++;
+        state->BadChannelTime  = xTaskGetTickCount();
+        state->ChannelFails[i]++;
+        state->ChannelFailsMax = state->ChannelFails[i] > state->ChannelFailsMax ? state->ChannelFails[i] : state->ChannelFailsMax;
         break;
-        case TSRX_IDLE_FROM_V25:
-            switch (c) {
-                case TOKEN_FAILSAVE:
-                    state->state = TSRX_FAILSAVE_START;
-                break;
-                case TOKEN_GOOD:
-                    state->state = TSRX_GOOD_START;
-                break;
-                case TOKEN_BAD:
-                    state->state = TSRX_BAD_START;
-                break;
-                case TOKEN_RSSI:
-                    state->state = TSRX_RSSI_START;
-                break;
-                case TOKEN_LINKQUALITY:
-                    state->state = TSRX_LINKQUALITY_START;
-                break;
-                case TOKEN_VALUE:
-                    state->state = TSRX_VALUE_START;
-                break;
-            }
+    case TSRX_IDLE_FROM_V25:
+        switch (c) {
+        case TOKEN_FAILSAVE:
+            state->state = TSRX_FAILSAVE_START;
+            break;
+        case TOKEN_GOOD:
+            state->state = TSRX_GOOD_START;
+            break;
+        case TOKEN_BAD:
+            state->state = TSRX_BAD_START;
+            break;
+        case TOKEN_RSSI:
+            state->state = TSRX_RSSI_START;
+            break;
+        case TOKEN_LINKQUALITY:
+            state->state = TSRX_LINKQUALITY_START;
+            break;
+        case TOKEN_VALUE:
+            state->state = TSRX_VALUE_START;
+            break;
+        }
         break;
-        case TSRX_FAILSAVE_START:
-        case TSRX_GOOD_START:
-        case TSRX_BAD_START:
-        case TSRX_RSSI_START:
-        case TSRX_LINKQUALITY_START:
-            switch (c) {
-                case SUBTOKEN_FGB:
-                    state->state++;
-                    scan_value_clear();
-                break;
-                default:
-                    state->state = state->version;
-            }
-        break;
-        case TSRX_FAILSAVE_SCAN:
-        case TSRX_GOOD_SCAN:
-        case TSRX_BAD_SCAN:
-        case TSRX_RSSI_SCAN:
-        case TSRX_LINKQUALITY_SCAN:
-            if (c >= '0' && c <= '9') {
-                scan_value_add(c);
-            } else {
-                scan_value_set(state);
-                state->state = state->version;
-                tsrxtalk_parse(state, c);
-            }
-        break;
-        case TSRX_VALUE_START:
-            switch (c) {
-                case SUBTOKEN_VALUE_ZERO:
-                    channel_cnt = 0;
-                    state->state = state->version;
-                break;
-                case SUBTOKEN_VALUE_DATA_1:
-                    if (channel_cnt >= 0) channel_cnt++;
-                    state->state++;
-                break;
-                default:
-                    state->state = state->version;
-            }
-        break;
-        case TSRX_VALUE_READ_1:                 // hi byte
-            new_chan_fails_val = c<<8;
+    case TSRX_FAILSAVE_START:
+    case TSRX_GOOD_START:
+    case TSRX_BAD_START:
+    case TSRX_RSSI_START:
+    case TSRX_LINKQUALITY_START:
+        switch (c) {
+        case SUBTOKEN_FGB:
             state->state++;
-        break;
-        case TSRX_VALUE_NEXT:
-            switch (c) {
-                case SUBTOKEN_VALUE_DATA_2:
-                    state->state++;
-                break;
-                default:
-                    state->state = state->version;
-            }
-        break;
-        case TSRX_VALUE_READ_2:                 // lo byte
-            new_chan_fails_val += c;
-            state->state++;
-        break;
-        case TSRX_VALUE_PLOT:                   // plot marker
-            LastPacketTime = xTaskGetTickCount();
-            if (channel_cnt >= TSRX_CHANNEL_MAX) {
-                channel_cnt = TSRX_CHANNEL_MAX - 1;
-            }
-            if (channel_cnt >= 0 && channel_cnt < TSRX_CHANNEL_MAX) {
-                state->ChannelCount++;
-                if (state->ChannelFails[channel_cnt] != new_chan_fails_val) {
-                    uint16_t delta_channel_fails = new_chan_fails_val - state->ChannelFails[channel_cnt];
-                    packet_window_set(PACKED_BAD, delta_channel_fails);
-                    state->BadChannel += delta_channel_fails;
-                    state->BadChannelDelta += delta_channel_fails;
-                    state->BadChannelTime = xTaskGetTickCount();
-                    state->ChannelFails[channel_cnt] = new_chan_fails_val;
-                    state->ChannelFailsMax = state->ChannelFails[channel_cnt] > state->ChannelFailsMax ? state->ChannelFails[channel_cnt] : state->ChannelFailsMax;
-                } else {
-                    packet_window_set(PACKED_GOOD, 1);
-                }
-            }
-            state->state = state->version;
-        break;
-
+            scan_value_clear();
+            break;
         default:
             state->state = state->version;
+        }
+        break;
+    case TSRX_FAILSAVE_SCAN:
+    case TSRX_GOOD_SCAN:
+    case TSRX_BAD_SCAN:
+    case TSRX_RSSI_SCAN:
+    case TSRX_LINKQUALITY_SCAN:
+        if (c >= '0' && c <= '9') {
+            scan_value_add(c);
+        } else {
+            scan_value_set(state);
+            state->state = state->version;
+            tsrxtalk_parse(state, c);
+        }
+        break;
+    case TSRX_VALUE_START:
+        switch (c) {
+        case SUBTOKEN_VALUE_ZERO:
+            channel_cnt  = 0;
+            state->state = state->version;
+            break;
+        case SUBTOKEN_VALUE_DATA_1:
+            if (channel_cnt >= 0) {
+                channel_cnt++;
+            }
+            state->state++;
+            break;
+        default:
+            state->state = state->version;
+        }
+        break;
+    case TSRX_VALUE_READ_1: // hi byte
+        new_chan_fails_val = c << 8;
+        state->state++;
+        break;
+    case TSRX_VALUE_NEXT:
+        switch (c) {
+        case SUBTOKEN_VALUE_DATA_2:
+            state->state++;
+            break;
+        default:
+            state->state = state->version;
+        }
+        break;
+    case TSRX_VALUE_READ_2: // lo byte
+        new_chan_fails_val += c;
+        state->state++;
+        break;
+    case TSRX_VALUE_PLOT: // plot marker
+        LastPacketTime = xTaskGetTickCount();
+        if (channel_cnt >= TSRX_CHANNEL_MAX) {
+            channel_cnt = TSRX_CHANNEL_MAX - 1;
+        }
+        if (channel_cnt >= 0 && channel_cnt < TSRX_CHANNEL_MAX) {
+            state->ChannelCount++;
+            if (state->ChannelFails[channel_cnt] != new_chan_fails_val) {
+                uint16_t delta_channel_fails = new_chan_fails_val - state->ChannelFails[channel_cnt];
+                packet_window_set(PACKED_BAD, delta_channel_fails);
+                state->BadChannel      += delta_channel_fails;
+                state->BadChannelDelta += delta_channel_fails;
+                state->BadChannelTime   = xTaskGetTickCount();
+                state->ChannelFails[channel_cnt] = new_chan_fails_val;
+                state->ChannelFailsMax  = state->ChannelFails[channel_cnt] > state->ChannelFailsMax ? state->ChannelFails[channel_cnt] : state->ChannelFailsMax;
+            } else {
+                packet_window_set(PACKED_GOOD, 1);
+            }
+        }
+        state->state = state->version;
+        break;
+
+    default:
+        state->state = state->version;
     }
 }
 
-//---------------------------------
+// ---------------------------------
 
 /* Allocate device descriptor */
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -376,29 +402,30 @@ static bool PIOS_TSLRSdebug_Validate(struct pios_tslrsdebug_dev *tslrsdebug_dev)
 static void PIOS_TSLRSdebug_ResetState(struct pios_tslrsdebug_state *state)
 {
     int i;
+
     for (i = 0; i < PACKET_WINDOW_MAX; i++) {
         PacketWindow[i] = PACKED_GOOD;
     }
     for (i = 0; i < TSRX_CHANNEL_MAX; i++) {
         state->ChannelFails[i] = 0;
     }
-    state->state = TSRX_BOOT;
+    state->state   = TSRX_BOOT;
     state->version = TSRX_IDLE_OLDER;
     state->scan_value_percent = 0;
-    state->ChannelFailsMax = 0;
+    state->ChannelFailsMax    = 0;
     state->ChannelCount = 0;
-    state->BadChannelTime = 0;
+    state->BadChannelTime     = 0;
     state->BadChannel = 0;
-    state->BadChannelDelta = 0;
+    state->BadChannelDelta    = 0;
     state->Failsafes = 0;
-    state->FailsafesDelta = 0;
+    state->FailsafesDelta     = 0;
     state->BadPackets = 0;
-    state->BadPacketsDelta = 0;
+    state->BadPacketsDelta    = 0;
     state->GoodPackets = 0;
-    state->GoodPacketsDelta = 0;
-    state->RSSI = 255;
+    state->GoodPacketsDelta   = 0;
+    state->RSSI        = 255;
     state->LinkQuality = 255;
-    LastPacketTime = xTaskGetTickCount();
+    LastPacketTime     = xTaskGetTickCount();
 }
 
 /* Initialise TSLRSdebug interface */
@@ -430,6 +457,7 @@ int32_t PIOS_TSLRSdebug_Init(uint32_t *tslrsdebug_id, const struct pios_tslrsdeb
     }
 
     return 0;
+
 out_fail:
     return -1;
 }

@@ -69,7 +69,7 @@
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
-#define PIOS_INCLUDE_WDG
+//#define PIOS_INCLUDE_WDG
 
 /* PIOS USB functions */
 #define PIOS_INCLUDE_USB

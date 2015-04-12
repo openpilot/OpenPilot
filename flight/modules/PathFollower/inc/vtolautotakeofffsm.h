@@ -74,6 +74,8 @@ public:
     PathFollowerFSMState_T GetCurrentState(void);
     void ConstrainStabiDesired(StabilizationDesiredData *stabDesired);
     void Abort(void);
+    uint8_t PositionHoldState(void);
+    void setControlState(StatusVtolAutoTakeoffControlStateOptions controlState);
 
 protected:
 
@@ -123,7 +125,6 @@ protected:
 
     void setup_hold(void);
     void run_hold(uint8_t);
-    uint8_t PositionHoldState(void);
 
     void setup_thrustup(void);
     void run_thrustup(uint8_t);

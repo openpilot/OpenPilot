@@ -34,7 +34,7 @@
 #include "pidcontroldown.h"
 #include "pidcontrolne.h"
 // forward decl
-class PathFollowerFSM;
+class VtolAutoTakeoffFSM;
 class VtolAutoTakeoffController : public PathFollowerControl {
 private:
     static VtolAutoTakeoffController *p_inst;
@@ -66,7 +66,7 @@ private:
     int8_t UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction);
     void setArmedIfChanged(uint8_t val);
 
-    PathFollowerFSM *fsm;
+    VtolAutoTakeoffFSM *fsm;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
     PIDControlDown controlDown;
     PIDControlNE controlNE;

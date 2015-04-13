@@ -235,7 +235,16 @@ class Repo:
         with open(json_path, 'w') as json_file:
            json.dump(json_data, json_file)
 
-def file_from_template(tpl_name, out_name, dict):
+def escape_dict(dictionary):
+    """Escapes dictionary values for C"""
+
+    # We need to escape the strings for C
+    for key in dictionary:
+        # Using json.dumps and removing the surounding quotes escapes for C
+        dictionary[key] = json.dumps(dictionary[key])[1:-1]
+
+
+def file_from_template(tpl_name, out_name, dictionary):
     """Create or update file from template using dictionary
 
     This function reads the template, performs placeholder replacement
@@ -269,7 +278,7 @@ def file_from_template(tpl_name, out_name, dict):
     tf.close()
 
     # Replace placeholders using dictionary
-    out = Template(tpl).substitute(dict)
+    out = Template(tpl).substitute(dictionary)
 
     # Check if output file already exists
     try:
@@ -422,6 +431,10 @@ string given.
                         help='name of template file');
     parser.add_option('--outfile',
                         help='name of output file');
+    parser.add_option('--escape', action="store_true",
+                        help='do escape strings for C (default based on file ext)');
+    parser.add_option('--no-escape', action="store_false", dest="escape",
+                        help='do not escape strings for C');
     parser.add_option('--image',
                         help='name of image file for sha1 calculation');
     parser.add_option('--type', default="",
@@ -476,6 +489,12 @@ string given.
 
     if args.info:
         r.info()
+
+    files_to_escape = ['.c', '.cpp']
+
+    if (args.escape == None and args.outfile != None and
+            os.path.splitext(args.outfile)[1] in files_to_escape) or args.escape:
+        escape_dict(dictionary)
 
     if args.format != None:
         print Template(args.format).substitute(dictionary)

@@ -153,7 +153,7 @@ int32_t GPSStart(void)
 int32_t GPSInitialize(void)
 {
     gpsPort = PIOS_COM_GPS;
-    uint8_t gpsProtocol;
+    GPSSettingsDataProtocolOptions gpsProtocol;
 
 #ifdef MODULE_GPS_BUILTIN
     gpsEnabled = true;
@@ -275,6 +275,12 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             ubx_autoconfig_run(&buffer, &count, status != GPSPOSITIONSENSOR_STATUS_NOGPS);
             // Something to send?
             if (count) {
+                // clear ack/nak
+                ubxLastAck.clsID = 0x00;
+                ubxLastAck.msgID = 0x00;
+                ubxLastNak.clsID = 0x00;
+                ubxLastNak.msgID = 0x00;
+
                 PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
             }
         }
@@ -332,7 +338,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX && gpspositionsensor.AutoConfigStatus == GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR)) {
             // we have not received any valid GPS sentences for a while.
             // either the GPS is not plugged in or a hardware problem or the GPS has locked up.
-            uint8_t status = GPSPOSITIONSENSOR_STATUS_NOGPS;
+            GPSPositionSensorStatusOptions status = GPSPOSITIONSENSOR_STATUS_NOGPS;
             GPSPositionSensorStatusSet(&status);
             AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
         } else {
@@ -433,7 +439,7 @@ static void updateHwSettings()
 {
     if (gpsPort) {
         // Retrieve settings
-        uint8_t speed;
+        HwSettingsGPSSpeedOptions speed;
         HwSettingsGPSSpeedGet(&speed);
 
         // Set port speed
@@ -479,6 +485,7 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
     uint8_t ubxSbasMode;
     ubx_autoconfig_settings_t newconfig;
     uint8_t ubxSbasSats;
+    uint8_t ubxGnssMode;
 
     GPSSettingsUbxRateGet(&newconfig.navRate);
 
@@ -540,6 +547,41 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_MSAS ? UBX_SBAS_SATS_MSAS :
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_GAGAN ? UBX_SBAS_SATS_GAGAN :
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_SDCM ? UBX_SBAS_SATS_SDCM : UBX_SBAS_SATS_AUTOSCAN;
+
+    GPSSettingsUbxGNSSModeGet(&ubxGnssMode);
+
+    switch (ubxGnssMode) {
+    case GPSSETTINGS_UBXGNSSMODE_GPSGLONASS:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GLONASS:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GPS:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GPSBEIDOU:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = true;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GLONASSBEIDOU:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = true;
+        break;
+    default:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
+        break;
+    }
 
     ubx_autoconfig_set(newconfig);
 }

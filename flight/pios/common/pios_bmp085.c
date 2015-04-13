@@ -29,7 +29,7 @@
  */
 
 #include "pios.h"
-
+#include <pios_bmp085.h>
 #ifdef PIOS_INCLUDE_BMP085
 
 #ifndef PIOS_INCLUDE_EXTI

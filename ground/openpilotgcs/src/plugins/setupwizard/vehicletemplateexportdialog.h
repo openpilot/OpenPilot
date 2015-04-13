@@ -51,11 +51,15 @@ public:
     ~VehicleTemplateExportDialog();
 
 public slots:
-    void accept();
+    void exportTemplate();
+    void saveAsTemplate();
+    void importTemplate();
     void updateStatus();
 
 private slots:
     void importImage();
+    void onAutoPilotConnect();
+    void onAutoPilotDisconnect();
 
 private:
     static const int IMAGE_SCALE_WIDTH  = 500;
@@ -65,10 +69,12 @@ private:
     VehicleConfigurationSource::VEHICLE_TYPE m_type;
     VehicleConfigurationSource::VEHICLE_SUB_TYPE m_subType;
     QPixmap m_image;
+    bool m_autopilotConnected;
 
     QString fixFilenameString(QString input, int truncate = 100);
     QString getTypeDirectory();
     QString setupVehicleType();
+    void saveTemplate(QString path);
 };
 
 #endif // VEHICLETEMPLATEEXPORTDIALOG_H

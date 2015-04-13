@@ -32,7 +32,6 @@
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFArray.h>
 #include <QMutexLocker>
-#include <QDebug>
 #include "ophid_const.h"
 
 // Local helper functions
@@ -72,7 +71,7 @@ USBMonitor::~USBMonitor()
  */
 void USBMonitor::deviceEventReceived()
 {
-    qDebug() << "Device event";
+    OPHID_DEBUG("Device event");
 }
 
 /**
@@ -119,7 +118,7 @@ void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
     Q_UNUSED(r);
     Q_UNUSED(hid_mgr);
 
-    qDebug() << "USBMonitor: Device detached event";
+    OPHID_DEBUG("USBMonitor: Device detached event");
     instance()->removeDevice(dev);
 }
 
@@ -156,7 +155,7 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
 
     deviceInfo.dev_handle = dev;
 
-    qDebug() << "USBMonitor: Device attached event";
+    OPHID_DEBUG("USBMonitor: Device attached event");
 
     // Populate the device info structure
     got_properties &= HID_GetIntProperty(dev, CFSTR(kIOHIDVendorIDKey), &deviceInfo.vendorID);
@@ -171,7 +170,7 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
 
     // Currently only enumerating objects that have the complete list of properties
     if (got_properties) {
-        qDebug() << "USBMonitor: Adding device";
+        OPHID_DEBUG("USBMonitor: Adding device");
         instance()->addDevice(deviceInfo);
     }
 }

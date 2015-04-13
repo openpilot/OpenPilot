@@ -29,7 +29,7 @@
  */
 
 #include "pios.h"
-
+#include <pios_adxl345.h>
 #ifdef PIOS_INCLUDE_ADXL345
 
 enum pios_adxl345_dev_magic {

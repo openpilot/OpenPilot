@@ -98,7 +98,7 @@ int32_t AirspeedInitialize()
 #else
 
     HwSettingsInitialize();
-    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+    HwSettingsOptionalModulesOptions optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
     HwSettingsOptionalModulesArrayGet(optionalModules);
 
 
@@ -110,7 +110,7 @@ int32_t AirspeedInitialize()
     }
 #endif
 
-    uint8_t adcRouting[HWSETTINGS_ADCROUTING_NUMELEM];
+    HwSettingsADCRoutingOptions adcRouting[HWSETTINGS_ADCROUTING_NUMELEM];
     HwSettingsADCRoutingArrayGet(adcRouting);
 
     // Determine if the barometric airspeed sensor is routed to an ADC pin
@@ -169,6 +169,8 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
                     imu_airspeedInitialize(&airspeedSettings);
                 }
                 break;
+            default:
+            	break;
             }
         }
         switch (airspeedSettings.AirspeedSensorType) {

@@ -28,6 +28,7 @@
 #define CONFIGINPUTWIDGET_H
 
 #include "ui_input.h"
+#include "ui_input_wizard.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -49,6 +50,7 @@
 #include "flightstatus.h"
 #include "accessorydesired.h"
 #include <QPointer>
+#include "systemsettings.h"
 
 class Ui_InputWidget;
 
@@ -61,7 +63,7 @@ public:
     enum txMode { mode1, mode2, mode3, mode4 };
     enum txMovements { moveLeftVerticalStick, moveRightVerticalStick, moveLeftHorizontalStick, moveRightHorizontalStick, moveAccess0, moveAccess1, moveAccess2, moveFlightMode, centerAll, moveAll, nothing };
     enum txMovementType { vertical, horizontal, jump, mix };
-    enum txType { acro, heli };
+    enum txType { acro, heli, ground };
     void startInputWizard()
     {
         goToWizard();
@@ -70,12 +72,15 @@ public:
     bool shouldObjectBeSaved(UAVObject *object);
 
 private:
+    bool throttleError;
     bool growing;
     bool reverse[ManualControlSettings::CHANNELNEUTRAL_NUMELEM];
     txMovements currentMovement;
     int movePos;
     void setTxMovement(txMovements movement);
     Ui_InputWidget *ui;
+    Ui_InputWizardWidget *wizardUi;
+
     wizardSteps wizardStep;
     QList<QPointer<QWidget> > extraWidgets;
     txMode transmitterMode;
@@ -107,6 +112,7 @@ private:
     int currentChannelNum;
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
+    QList<int> groundChannelOrder;
 
     UAVObject::Metadata manualControlMdata;
     ManualControlCommand *manualCommandObj;
@@ -133,6 +139,10 @@ private:
     FlightModeSettings::DataFields previousFlightModeSettingsData;
     ReceiverActivity *receiverActivityObj;
     ReceiverActivity::DataFields receiverActivityData;
+
+    SystemSettings *systemSettingsObj;
+    SystemSettings::DataFields systemSettingsData;
+    SystemSettings::DataFields previousSystemSettingsData;
 
     QSvgRenderer *m_renderer;
 
@@ -196,9 +206,11 @@ private slots:
     void invertControls();
     void simpleCalibration(bool state);
     void adjustSpecialNeutrals();
+    void checkThrottleRange();
     void updateCalibration();
     void resetChannelSettings();
     void resetActuatorSettings();
+    void forceOneFlightMode();
 
 protected:
     void resizeEvent(QResizeEvent *event);

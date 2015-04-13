@@ -63,7 +63,7 @@
         <field name="Stabilization6Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
 		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,AltitudeHold,AltitudeVario,CruiseControl"
-		defaultvalue="Rate,Rate,Rate,CruiseControl"
+		defaultvalue="Rate,Rate,Rate,Manual"
 		limits="%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
@@ -83,34 +83,35 @@
                limits="\
                        %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0903NE:POI:PathPlanner:AutoCruise:Land;\
+                       %0903NE:POI:PathPlanner:AutoCruise;\
                        \
                        %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0903NE:POI:PathPlanner:AutoCruise:Land;\
+                       %0903NE:POI:PathPlanner:AutoCruise;\
                        \
                        %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0903NE:POI:PathPlanner:AutoCruise:Land;\
+                       %0903NE:POI:PathPlanner:AutoCruise;\
                        \
                        %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0903NE:POI:PathPlanner:AutoCruise:Land;\
+                       %0903NE:POI:PathPlanner:AutoCruise;\
                        \
                        %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0903NE:POI:PathPlanner:AutoCruise:Land;\
+                       %0903NE:POI:PathPlanner:AutoCruise;\
                        \
                        %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0903NE:POI:PathPlanner:AutoCruise:Land;"/>
+                       %0903NE:POI:PathPlanner:AutoCruise;"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
         <field name="ArmingSequenceTime" units="ms" type="uint16" elements="1" defaultvalue="1000"/>
         <field name="DisarmingSequenceTime" units="ms" type="uint16" elements="1" defaultvalue="1000"/>
 	<field name="DisableSanityChecks" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <field name="ReturnToBaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="10"/>
-        <field name="LandingVelocity" units="m" type="float" elements="1" defaultvalue="0.4"/>
+        <field name="ReturnToBaseNextCommand" units="" type="enum" elements="1" options="Hold,Land" defaultvalue="Hold"/>
+        <field name="LandingVelocity" units="m" type="float" elements="1" defaultvalue="0.6"/>
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="30,15" description="stick sensitivity for position roam modes"/>
 	<field name="VarioControlLowPassAlpha" units="" type="float" elements="1" defaultvalue="0.98" description="stick low pass filter for position roam modes"/>
         <access gcs="readwrite" flight="readwrite"/>

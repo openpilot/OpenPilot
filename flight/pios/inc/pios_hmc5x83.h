@@ -31,6 +31,7 @@
 #ifndef PIOS_HMC5x83_H
 #define PIOS_HMC5x83_H
 #include <stdint.h>
+#include <pios_sensors.h>
 /* HMC5x83 Addresses */
 #define PIOS_HMC5x83_I2C_ADDR           0x1E
 #define PIOS_HMC5x83_I2C_READ_ADDR      0x3D
@@ -123,11 +124,15 @@ struct pios_hmc5x83_cfg {
 
 /* Public Functions */
 extern pios_hmc5x83_dev_t PIOS_HMC5x83_Init(const struct pios_hmc5x83_cfg *cfg, uint32_t port_id, uint8_t device_num);
+extern void PIOS_HMC5x83_Register(pios_hmc5x83_dev_t handler);
+
 extern bool PIOS_HMC5x83_NewDataAvailable(pios_hmc5x83_dev_t handler);
 extern int32_t PIOS_HMC5x83_ReadMag(pios_hmc5x83_dev_t handler, int16_t out[3]);
 extern uint8_t PIOS_HMC5x83_ReadID(pios_hmc5x83_dev_t handler, uint8_t out[4]);
 extern int32_t PIOS_HMC5x83_Test(pios_hmc5x83_dev_t handler);
 extern bool PIOS_HMC5x83_IRQHandler(pios_hmc5x83_dev_t handler);
+
+extern const PIOS_SENSORS_Driver PIOS_HMC5x83_Driver;
 
 #endif /* PIOS_HMC5x83_H */
 

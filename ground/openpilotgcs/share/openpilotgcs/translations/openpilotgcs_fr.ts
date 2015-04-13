@@ -3792,9 +3792,8 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Flot Données GPS</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the SNR for each detected sat. Satellite number (PRN) is displayed inside the green bar (GPS) or orange bar (SBAS). Sat SNR is displayed above (in dBHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Affiche le SNR pour chaque satellite détecté. Le numéro du satellite (PRN) est affiché sur une barre verte (GPS) ou orange (SBAS). Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Affiche le SNR pour chaque satellite détecté. Le numéro du satellite (PRN) est affiché sur une barre verte (GPS) ou orange (SBAS). Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
     </message>
     <message>
         <location/>
@@ -3806,6 +3805,11 @@ uniquement lorsque les valeurs changent</translation>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Location of GCS on the Earth&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <extracomment>Location of GCS on the Earth</extracomment>
         <translation>Position sur la terre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the SNR for each detected sat. GPS satellites are shown in green, GLONASS in cyan, BeiDou in red and SBAS/QZSS in orange. Satellite number (PRN) is displayed inside the bar. Sat SNR is displayed above (in dBHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Affiche le SNR pour chaque satellite détecté. Les satellites GPS sont affichés en vert, GLONASS en bleu clair, Beidou en rouge et SBAS/QZSS en orange. Le numéro du satellite (PRN) est affiché sur la barre Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
     </message>
 </context>
 <context>
@@ -5629,22 +5633,7 @@ La même valeur est utilisé pour tous les axes.</translation>
     </message>
     <message>
         <location/>
-        <source>MainPort</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>FlexiPort</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>USB VCP Port</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>RcvrPort</source>
         <translation></translation>
     </message>
     <message>
@@ -5680,6 +5669,21 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <location/>
         <source>GPS protocol :</source>
         <translation>Protocole GPS :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Port</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flexi Port</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Receiver Port</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6162,19 +6166,16 @@ p, li { white-space: pre-wrap; }
         <translation>Zone morte du manche en pourcentage du débattement maxi (0-10), zéro pour désactiver</translation>
     </message>
     <message>
-        <location/>
         <source>Back</source>
-        <translation>Précédent</translation>
+        <translation type="vanished">Précédent</translation>
     </message>
     <message>
-        <location/>
         <source>Next</source>
-        <translation>Suivant</translation>
+        <translation type="vanished">Suivant</translation>
     </message>
     <message>
-        <location/>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="vanished">Annuler</translation>
     </message>
     <message>
         <location/>
@@ -6521,6 +6522,12 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translatorcomment>Do not translate !</translatorcomment>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>haslimits:yes</source>
+        <translatorcomment>Do not translate !</translatorcomment>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>MixerCurve</name>
@@ -6669,41 +6676,6 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>50</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>60</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>125</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>165</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>270</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>330</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>400</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Motors spin at neutral output when armed and throttle below zero (be careful)</source>
         <translation>Armés, les moteurs tournent avec la sortie au neutre et les gaz à zéro (soyez prudent)</translation>
     </message>
@@ -6767,51 +6739,32 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>490</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Output configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Bank(Channels):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Setup output mode. Use PWM or OneShot with Standard ESCs.\nSeveral other ESCs like BLHeli 13+ can use the more advanced OneShot125.\nWhen using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Setup PWM rate here: usual value is 490 Hz for multirotor airframes. OneShot and OneShot125 does not use this value
-</source>
-        <translation type="unfinished"></translation>
+        <translation>Banque (Canaux) :</translation>
     </message>
     <message>
         <location/>
         <source>Mode:</source>
-        <translation type="unfinished">Mode :</translation>
+        <translation>Mode :</translation>
     </message>
     <message>
-        <location/>
-        <source>Setup output mode. Use PWM or OneShot with Standard ESCs.
-Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.
-When using OneShot125 all values set in min/max and idle are divided by eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Calibration status</source>
-        <translation type="unfinished">Statut de l&apos;étalonnage</translation>
+        <translation type="obsolete">Statut de l&apos;étalonnage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Configuration</source>
+        <translation>Configuration Sorties</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Setup PWM rate here: usual value is 490 Hz for multirotor airframes.&lt;br/&gt;PWMSync and OneShot125 does not use this value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionnez ici la vitesse PWM : une valeur usuelle est 490 Hz pour les multirotors.&lt;br/&gt;PWMSync et OneShot125 n&apos;utilisent pas cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Setup output mode. Use PWM or PWMSync with Standard ESCs.&lt;br/&gt;Several other ESCs like BLHeli 13+ can use the more advanced OneShot125.&lt;br/&gt;When using OneShot125 all values set in min/max and idle are divided by &lt;br/&gt;eight before being sent to esc (i.e. 1000 = 125, 2000 = 250).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Configuration du mode de sortie. Utilisez PWM ou PWMSync avec des ESC Standard.&lt;br/&gt;D&apos;autres contrôleurs comme les BLHeli 13+ peuvent utiliser le mode avancé OneShot125.&lt;br/&gt;Lorsque vous utilisez OneShot125 toutes les valeurs min/max et neutre sont divisées par &lt;br/&gt;huit avant d&apos;être envoyées vers le contrôleur (ex. 1000 = 125, 2000 = 250).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -6882,34 +6835,27 @@ When using OneShot125 all values set in min/max and idle are divided by eight be
     <message>
         <location/>
         <source> # - Bank</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Minimum PWM value, beware of not overdriving your servo.
-Using OneShot125 a value of 1000(uS) here will produce a pulse of 125(uS).</source>
-        <translation type="unfinished"></translation>
+        <translation> # - Banque</translation>
     </message>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Bank number</source>
-        <translation type="unfinished"></translation>
+        <translation>Numéro banque</translation>
     </message>
     <message>
         <location/>
         <source> 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Maximum value, beware of not overdriving your servo.
-Using OneShot125 a value of 2000(uS) here will produce a pulse of 250(uS).</source>
-        <translation type="unfinished"></translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum PWM value, beware of not overdriving your servo.&lt;br/&gt;Using OneShot125 a value of 1000(µs) here will produce a pulse of 125(µs).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Valeur minimum PWM, attention de respecter les limites de votre servo.&lt;br/&gt;En utilisant OneShot125 une valeur de 1000(µs) ici produit une impulsion de 125(µs).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -7221,7 +7167,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translatorcomment>Blank text ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9187,7 +9133,7 @@ les données en cache</translation>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+213"/>
+        <location line="+230"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -9669,38 +9615,48 @@ Veuillez sélectionner le type de multirotor désiré pour la configuration ci-d
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+435"/>
-        <location line="+104"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+561"/>
+        <location line="+131"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-198"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-268"/>
         <location line="+8"/>
-        <location line="+178"/>
-        <location line="+25"/>
+        <location line="+243"/>
+        <location line="+38"/>
         <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs</source>
         <translation>Valeur de sortie : &lt;b&gt;%1&lt;/b&gt; µs</translation>
     </message>
     <message>
-        <location line="-206"/>
+        <location line="-284"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this reversable motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right or left until you find the value where the motor doesn&apos;t start. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour trouver &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;la valeur de neutre de ce moteur inversable&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, appuyez sur le bouton Démarrer et bouger le curseur à gauche ou à droite jusqu&apos;à trouver la position centrale où le moteur ne démarre pas. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est terminé, appuyer à nouveau sur le bouton pour arrêter.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location line="+89"/>
-        <location line="+104"/>
+        <location line="+132"/>
+        <location line="+131"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location line="-43"/>
+        <location line="-59"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
         <translation>Le module de sortie est dans un état d&apos;erreur.
 
 Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&apos;assistant et essayez à nouveau. Si le problème persiste, consultez le forum openpilot.org.</translation>
+    </message>
+    <message>
+        <location line="+132"/>
+        <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs (Min)</source>
+        <translation>Valeur de sortie : &lt;b&gt;%1&lt;/b&gt; µs (Min)</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs (Max)</source>
+        <translation>Valeur de sortie : &lt;b&gt;%1&lt;/b&gt; µs (Max)</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
@@ -9792,6 +9748,11 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Output value: 1000µs</source>
         <translation>Valeur de sortie : &lt;b&gt;1000&lt;/b&gt; µs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibrate all motor outputs at the same time</source>
+        <translation>Calibrer toutes les sorties moteurs en même temps</translation>
     </message>
 </context>
 <context>
@@ -9975,7 +9936,7 @@ Veuillez sélectionner le type de véhicule terrestre dont vous voulez créer la
     <message>
         <location line="+1"/>
         <source>This setup currently expects a motorcyle setup, using one motor and one servo for steering.</source>
-        <translation type="unfinished">Cette configuration correspond à une moto utilisant un moteur et un servo pour la direction.</translation>
+        <translation>Cette configuration correspond à une moto utilisant un moteur et un servo pour la direction.</translation>
     </message>
 </context>
 <context>
@@ -10634,7 +10595,7 @@ p, li { white-space: pre-wrap; }
         <translation>Sortie</translation>
     </message>
     <message>
-        <location line="+419"/>
+        <location line="+420"/>
         <location line="+24"/>
         <location line="+31"/>
         <location line="+31"/>
@@ -10738,7 +10699,7 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+385"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+393"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
         <translation></translation>
     </message>
@@ -10755,12 +10716,11 @@ Voulez-vous toujours continuer ?</translation>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+211"/>
+        <location line="+222"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -10768,7 +10728,7 @@ Make sure you already configured your hardware settings on the proper tab and re
 
 You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
 </source>
-        <translation>Bienvenu(e) dans l&apos;assistant de configuration des entrées.
+        <translation type="vanished">Bienvenu(e) dans l&apos;assistant de configuration des entrées.
 
 Veuillez suivre les instructions à l&apos;écran et bouger les commandes uniquement lorsque demandé.
 Vérifiez que vous avez déjà bien configuré vos paramètres matériels dans l&apos;onglet correspondant et redémarré votre carte.
@@ -10776,33 +10736,28 @@ Vérifiez que vous avez déjà bien configuré vos paramètres matériels dans l
 Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l&apos;écran précédent ou appuyer sur &apos;Annuler&apos; pour quitter l&apos;assistant.</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Please choose your transmitter type:</source>
-        <translation>Veuillez choisir votre type d&apos;émetteur :</translation>
+        <translation type="vanished">Veuillez choisir votre type d&apos;émetteur :</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Acro: normal transmitter for fixed-wing or quad</source>
         <translatorcomment>[Platypus]mettre quadicopter ?</translatorcomment>
-        <translation>Acro : émetteur normal pour une aile ou un quad</translation>
+        <translation type="vanished">Acro : émetteur normal pour une aile ou un quad</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Helicopter: has collective pitch and throttle input</source>
-        <translation>Hélicoptère : avec pas collectif et commande des gaz</translation>
+        <translation type="vanished">Hélicoptère : avec pas collectif et commande des gaz</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>If selecting the Helicopter option, please engage throttle hold now.</source>
-        <translation>Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
+        <translation type="vanished">Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>Please choose your transmitter mode:</source>
-        <translation>Veuillez sélectionner votre mode de pilotage :</translation>
+        <translation type="vanished">Veuillez sélectionner votre mode de pilotage :</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+47"/>
         <source>Mode 1: Fore/Aft Cyclic and Yaw on the left, Throttle/Collective and Left/Right Cyclic on the right</source>
         <translatorcomment>Mode pilotage Hélicoptères: (Notice Graupner)
 1: Longitudinal, Anti-couple, à gauche et Moteur/Pas, Latéral, à droite
@@ -10840,7 +10795,7 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
         <translation>Mode 4 : Gaz/Pas et Rotation Droite/Gauche, Rotation Avant/Arrière et Anti-couple à droite</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Mode 1: Elevator and Rudder on the left, Throttle and Ailerons on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
         <translation>Mode 1 : Profondeur et Dérive à gauche, Gaz et Ailerons à droite</translation>
@@ -10870,40 +10825,45 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
         <translation>Pour un Quadricoptère : Profondeur correspond à la Rotation Avant, Ailerons à Roulis et Dérive correspond à Lacet.</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
         <translatorcomment>compensateur (me parle pas bcp) Laisser Trim ? Répétition &apos;et&apos;.</translatorcomment>
-        <translation>Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
+        <translation type="vanished">Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
 
 Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position.</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Please move all controls to their maximum extents on both directions.
 
 Press Next when ready.</source>
-        <translation>Veuillez bouger les manches et les commandes d&apos;accessoires au maximum, dans toutes les directions.
+        <translation type="vanished">Veuillez bouger les manches et les commandes d&apos;accessoires au maximum, dans toutes les directions.
 
 Appuyez sur Suivant lorsque vous êtes prêt.</translation>
     </message>
     <message>
-        <location line="+36"/>
         <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
-        <translation>Veuillez vérifier l&apos;image ci-dessous et corriger les manches qui s&apos;affichent en sens inverse. Appuyer sur Suivant lorsque vous êtes prêt.</translation>
+        <translation type="vanished">Veuillez vérifier l&apos;image ci-dessous et corriger les manches qui s&apos;affichent en sens inverse. Appuyer sur Suivant lorsque vous êtes prêt.</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
 
 IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
-        <translation>Vous avez terminé cet assistant, veuillez vérifier ci-dessous si l&apos;image correspond à vos mouvements de manches
+        <translation type="vanished">Vous avez terminé cet assistant, veuillez vérifier ci-dessous si l&apos;image correspond à vos mouvements de manches
 
 IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la carte. Après avoir appuyé sur Suivant vous serez dirigé vers l&apos;onglet Paramètres d&apos;Armement où vous pourrez choisir votre séquence d&apos;armement et enregistrer la configuration.</translation>
     </message>
     <message>
-        <location line="+124"/>
+        <location line="+23"/>
+        <source>Please center all controls and trims and press Next when ready.
+
+For a ground vehicle, this center position will be used as neutral value of each channel.</source>
+        <translation>Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
+
+Pour un véhicule terrestre, ces positions centrales seront utilisées comme neutre de chaque canal.</translation>
+    </message>
+    <message>
+        <location line="+178"/>
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
@@ -10951,12 +10911,12 @@ Bougez le manche %1.</translation>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+725"/>
+        <location line="+748"/>
         <source>Stop Manual Calibration</source>
         <translation>Arrêter Calibration Manuelle</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>&lt;p&gt;Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.&lt;/p&gt;&lt;p&gt;Be sure your receiver is powered with an external source and Transmitter is on.&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;&lt;b&gt;Stop Manual Calibration&lt;/b&gt; when done&lt;/p&gt;</source>
         <translation>&lt;p&gt;Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.&lt;/p&gt;&lt;p&gt;Veuillez vérifier que votre récepteur est alimenté avec une source externe et que la radio Rx est allumée. &lt;p align=&apos;center&apos;&gt;&lt;b&gt;Arrêter Calibration Manuelle&lt;/b&gt; à la fin&lt;/p&gt;</translation>
     </message>
@@ -10966,9 +10926,29 @@ Bougez le manche %1.</translation>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque la calibration manuelle sera terminée.</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+34"/>
+        <source>Ground vehicle</source>
+        <translation>Véhicule terrestre</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;p&gt;Are you configuring a transmitter for your &lt;b&gt;ground vehicle&lt;/b&gt; with reversible motor&lt;br&gt;controlled by throttle stick?&lt;/p&gt;&lt;p&gt;If so, please make sure you&apos;ve centered throttle control and press &lt;b&gt;Yes&lt;/b&gt; button. Otherwise, press No.&lt;/p&gt;&lt;p&gt;Attention, if you press &lt;b&gt;Yes&lt;/b&gt;, then the &lt;b&gt;Flight Mode Count&lt;/b&gt; will be set to 1.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Confirmez-vous que vous utilisez une radio pour votre &lt;b&gt;véhicule terrestre&lt;/b&gt; avec un moteur inversable contrôlé avec le manche Throttle ?&lt;/p&gt;Si c&apos;est le cas, soyez certain d&apos;avoir centré le manche throttle et appuyez sur le bouton &lt;b&gt;Oui&lt;/b&gt;, sinon appuyez sur Non&lt;/p&gt;&lt;p&gt;Attention, si vous appuyez sur &lt;b&gt;Oui&lt;/b&gt;, le nombre de &lt;b&gt;Modes de Vol&lt;/b&gt; sera fixé à 1.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+39"/>
         <source>Start Manual Calibration</source>
         <translation>Démarrer Calibration Manuelle</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Warning</source>
+        <translation>Attention</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>&lt;p&gt;There is something wrong with Throttle range. Please redo calibration and move &lt;b&gt;ALL sticks&lt;/b&gt;, Throttle stick included.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Quelque chose ne va pas avec la plage du manche de Gaz. Veuillez relancer la calibration Tx et bouger &lt;b&gt;TOUS les manches&lt;/b&gt;, manche des gaz inclus&lt;/p&gt;</translation>
     </message>
     <message>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
@@ -11323,14 +11303,14 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <location line="+24"/>
         <location line="+6"/>
         <location line="+19"/>
-        <location line="+13"/>
+        <location line="+19"/>
         <location line="+16"/>
         <location line="+38"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-179"/>
+        <location line="-185"/>
         <source>Vehicle type: </source>
         <translation>Type de véhicule : </translation>
     </message>
@@ -11491,6 +11471,16 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Contrôleur Rapide (%1 Hz)</translation>
     </message>
     <message>
+        <location line="+3"/>
+        <source>Synched ESC</source>
+        <translation>Contrôleur Synchronisé</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Oneshot ESC</source>
+        <translation>Contrôleur OneShot</translation>
+    </message>
+    <message>
         <location line="+10"/>
         <source>Servo type: </source>
         <translation>Type Servo : </translation>
@@ -11554,14 +11544,22 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>SetupWizardPlugin</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+62"/>
         <source>Vehicle Setup Wizard</source>
-        <translation>Assistant Configuration Véhicule</translation>
+        <translation type="vanished">Assistant Configuration Véhicule</translation>
+    </message>
+    <message>
+        <source>Export Wizard Vehicle Template</source>
+        <translation type="vanished">Exporter Modèle Assistant Véhicule</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+61"/>
+        <source>Vehicle Setup Wizard...</source>
+        <translation>Assistant Configuration Véhicule...</translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Export Wizard Vehicle Template</source>
-        <translation>Exporter Modèle Assistant Véhicule</translation>
+        <source>Export/Import Vehicle Template...</source>
+        <translation>Export / Import Modèle Assistant Véhicule...</translation>
     </message>
 </context>
 <context>
@@ -11579,7 +11577,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Échoué !</translation>
     </message>
     <message>
-        <location line="+136"/>
+        <location line="+141"/>
         <source>Writing External Mag sensor settings</source>
         <translation>Écriture paramètres Compas Externe</translation>
     </message>
@@ -11599,9 +11597,9 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
-        <location line="+172"/>
-        <location line="+31"/>
-        <location line="+36"/>
+        <location line="+196"/>
+        <location line="+32"/>
+        <location line="+37"/>
         <source>Writing actuator settings</source>
         <translation>Écriture paramètres actionneurs</translation>
     </message>
@@ -11632,7 +11630,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+146"/>
+        <location line="+144"/>
         <source>Writing mixer settings</source>
         <translation>Écriture paramètres mixeur</translation>
     </message>
@@ -12433,6 +12431,11 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <location/>
         <source>-</source>
         <translation>-</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Prev</source>
+        <translation>Précédent</translation>
     </message>
 </context>
 <context>
@@ -13627,7 +13630,18 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+160"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+111"/>
+        <source>-</source>
+        <translation>-</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+261"/>
+        <source>%1 Hz</source>
+        <translation>%1 Hz</translation>
+    </message>
+    <message>
+        <location line="-201"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuillez corriger cela avant de tester les sorties.</translation>
     </message>
@@ -13642,15 +13656,23 @@ p, li { white-space: pre-wrap; }
         <translation>Vous pouvez enregistrer vos changements des réglages de neutre.</translation>
     </message>
     <message>
-        <location line="+238"/>
+        <location line="+219"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+32"/>
+        <source>OneShot and PWMSync output only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN8+OneShot&apos; &lt;b&gt;&lt;font color=&apos;%1&apos;&gt;Bank %2&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>
+        <translation>OneShot et PWMSync fonctionnent uniquement avec les ports récepteur marqués avec &apos;+OneShot&apos;&lt;br&gt;Lors de l&apos;utilisation de la configuration &apos;PPM_PIN8+OneShot&apos; &lt;b&gt;&lt;font color=&apos;%1&apos;&gt;la Banque %2&lt;/font&gt;&lt;/b&gt; doit être réglée sur PWM</translation>
+    </message>
+    <message>
+        <source>OneShot only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN8+OneShot&apos; &lt;b&gt;&lt;font color=&apos;%1&apos;&gt;Bank %2&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>
+        <translation type="vanished">OneShot fonctionne uniquement avec les ports récepteur marqués avec &apos;+OneShot&apos;&lt;br&gt;Lors de l&apos;utilisation de la configuration &apos;PPM_PIN8+OneShot&apos; &lt;b&gt;&lt;font color=&apos;%1&apos;&gt;la Banque %2&lt;/font&gt;&lt;/b&gt; doit être réglée sur PWM</translation>
+    </message>
+    <message>
         <source>OneShot only works with MainPort settings marked with &quot;+OneShot&quot;
 Using &quot;PPM_PIN6+OneShot&quot; bank 4 (output 6) must be set to PWM</source>
-        <translation type="unfinished">OneShot fonctionne uniquement avec les réglages de Mainport marqués avec &quot;+OneShot&quot;
+        <translation type="obsolete">OneShot fonctionne uniquement avec les réglages de Mainport marqués avec &quot;+OneShot&quot;
 En utilisant &quot;PPM_PIN6+OneShot&quot; la banque 4 (sortie 6) doit être réglée sur PWM
 </translation>
     </message>
@@ -14694,7 +14716,7 @@ pas seulement les champs visibles à l&apos;écran.</translation>
     <message>
         <location/>
         <source>RT</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -14783,7 +14805,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/inputchannelform.ui"/>
         <source>Text</source>
-        <translation type="unfinished">Texte</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -15126,81 +15148,67 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>Information about the Vehicle in short.</source>
-        <translation>Résumé d&apos;informations sur le Véhicule.</translation>
+        <translation type="vanished">Résumé d&apos;informations sur le Véhicule.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.cpp" line="+120"/>
         <source>Name of Vehicle: </source>
-        <translation>Nom du Véhicule : </translation>
+        <translation type="vanished">Nom du Véhicule : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Name of Owner: </source>
-        <translation>Nom du Propriétaire : </translation>
+        <translation type="vanished">Nom du Propriétaire : </translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Size: </source>
-        <translation>Taille : </translation>
+        <translation type="vanished">Taille : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Weight: </source>
-        <translation>Masse : </translation>
+        <translation type="vanished">Masse : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Motor(s): </source>
-        <translation>Moteur(s) : </translation>
+        <translation type="vanished">Moteur(s) : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>ESC(s): </source>
-        <translation>Esc(s) : </translation>
+        <translation type="vanished">Esc(s) : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Servo(s): </source>
-        <translation>Servo(s) : </translation>
+        <translation type="vanished">Servo(s) : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Battery: </source>
-        <translation>Batterie : </translation>
+        <translation type="vanished">Batterie : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Propellers(s): </source>
-        <translation>Hélice(s) : </translation>
+        <translation type="vanished">Hélice(s) : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Controller: </source>
-        <translation>Carte Contrôleur : </translation>
+        <translation type="vanished">Carte Contrôleur : </translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Comments: </source>
-        <translation>Commentaires : </translation>
+        <translation type="vanished">Commentaires : </translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>This option will use the current tuning settings saved on the controller, if your controller is currently unconfigured, then the OpenPilot firmware defaults will be used.
 
 It is suggested that if this is a first time configuration of your controller, rather than use this option, instead select a tuning set that matches your own airframe as close as possible from the list above or if you are not able to fine one, then select the generic item from the list.</source>
-        <translation>Cette option utilise les paramètres de réglage actuels enregistrés dans la carte, si votre contrôleur n&apos;est pas actuellement configuré, alors les paramètres par défaut du firmware OpenPilot seront utilisés.
+        <translation type="vanished">Cette option utilise les paramètres de réglage actuels enregistrés dans la carte, si votre contrôleur n&apos;est pas actuellement configuré, alors les paramètres par défaut du firmware OpenPilot seront utilisés.
 
 Il est suggéré que si cela est une première configuration de votre contrôleur, plutôt que d&apos;utiliser cette option, sélectionnez à la place un ensemble de réglages qui correspond le mieux à votre propre appareil dans la liste ci-dessus. Si vous n&apos;êtes pas en mesure d&apos;en choisir un, sélectionnez l&apos;élément générique de la liste.</translation>
     </message>
     <message>
-        <location line="+85"/>
         <source>Current Tuning</source>
-        <translation>Réglages Actuels</translation>
+        <translation type="vanished">Réglages Actuels</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.ui"/>
+        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -15259,6 +15267,11 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Configuration OpenPilot des Signaux de Sortie&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Afin de régler de manière optimale la configuration des signaux de sortie qui pilotent vos moteurs, l&apos;assistant doit connaître le type de contrôleur de vitesse (ESC) utilisé et leurs capacités.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Veuillez sélectionner une des options ci-dessous. En cas de doute sur les possibilités de vos ESC, laissez l&apos;option sélectionnée par défaut et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>OneShot ESC</source>
+        <translation>ESC OneShot</translation>
     </message>
 </context>
 <context>
@@ -15334,12 +15347,11 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>VehicleTemplateExportDialog</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.ui"/>
         <source>Vehicle Template Export</source>
-        <translation>Exportation Modèle Véhicule</translation>
+        <translation type="vanished">Exportation Modèle Véhicule</translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.ui"/>
         <source>Weight:</source>
         <translation>Masse :</translation>
     </message>
@@ -15494,12 +15506,11 @@ p, li { white-space: pre-wrap; }
         <translation>Sélectionner image...</translation>
     </message>
     <message>
-        <location/>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="vanished">Annuler</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.cpp" line="+88"/>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.cpp" line="+109"/>
         <source>Fixed Wing - Aileron</source>
         <translation>Voilure Fixe - Aileron</translation>
     </message>
@@ -15588,25 +15599,26 @@ p, li { white-space: pre-wrap; }
         <translation>Non Supporté</translation>
     </message>
     <message>
-        <location line="+75"/>
+        <location line="+56"/>
         <source>Export settings</source>
         <translation>Exporter réglages</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>OPTemplates</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+14"/>
         <source>Settings could not be exported to 
 %1(%2).
 Please try again.</source>
         <translation>Les réglages ne peuvent être exportés vers
-%1(%2).</translation>
+%1(%2).
+Veuillez essayer à nouveau.</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+61"/>
         <source>Import Image</source>
         <translation>Importer Image</translation>
     </message>
@@ -15623,7 +15635,37 @@ Please try again.</source>
     <message>
         <location/>
         <source>Put comments here that don&apos;t fit in the categories above</source>
-        <translation>Indiquez ici les commentaires  ne correspondant pas aux catégories ci-dessus</translation>
+        <translation>Indiquez ici les commentaires ne correspondant pas aux catégories ci-dessus</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vehicle Templates</source>
+        <translation>Modèles Véhicules</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Export template</source>
+        <translation>Export modèle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save as</source>
+        <translation>Enregistrer sous</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Import template</source>
+        <translation>Import modèle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Import</source>
+        <translation>Importer</translation>
     </message>
 </context>
 <context>
@@ -15770,7 +15812,7 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+49"/>
-        <location line="+49"/>
+        <location line="+58"/>
         <location line="+42"/>
         <location line="+7"/>
         <location line="+9"/>
@@ -15996,6 +16038,286 @@ p, li { white-space: pre-wrap; }
         <location line="+0"/>
         <source>To apply the changes when binding/unbinding the board must be rebooted or power cycled.</source>
         <translation>Pour appliquer les changements d&apos;association/dissociation la carte doit être redémarrée ou débranchée/rebranchée.</translation>
+    </message>
+</context>
+<context>
+    <name>InputWizardWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/input_wizard.ui"/>
+        <source>Welcome to the inputs configuration wizard.
+
+Please follow the instructions on the screen and only move your controls when asked to.
+Make sure you already configured your hardware settings on the proper tab and restarted your board.
+
+You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
+</source>
+        <translation>Bienvenu(e) dans l&apos;assistant de configuration des entrées.
+
+Veuillez suivre les instructions à l&apos;écran et bouger les commandes uniquement lorsque demandé.
+Vérifiez que vous avez déjà bien configuré vos paramètres matériels dans l&apos;onglet correspondant et redémarré votre carte.
+
+Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l&apos;écran précédent ou appuyer sur &apos;Annuler&apos; pour quitter l&apos;assistant.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Please choose your transmitter type:</source>
+        <translation>Veuillez choisir votre type d&apos;émetteur :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Acro: normal transmitter for fixed-wing or quad</source>
+        <translation>Acro : émetteur normal pour une aile ou un quad</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Helicopter: has collective pitch and throttle input</source>
+        <translation>Hélicoptère : avec pas collectif et commande des gaz</translation>
+    </message>
+    <message>
+        <source>If selecting the Helicopter option, please engage throttle hold now.</source>
+        <translation type="vanished">Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Please choose your transmitter mode:</source>
+        <translation>Veuillez sélectionner votre mode de pilotage :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 3</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 4</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
+        <translation>Pour un Quadricoptère : Profondeur correspond à la Rotation Avant, Ailerons à Roulis et Dérive correspond à Lacet.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Identify sticks instructions</source>
+        <translation>Identifiez les instructions de manches</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Please center all controls and trims and press Next when ready.
+
+If your FlightMode switch has only two positions, leave it in either position.</source>
+        <translation>Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
+
+Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Please move all controls to their maximum extents on both directions.
+
+Press Next when ready.</source>
+        <translation>Veuillez bouger les manches et les commandes d&apos;accessoires au maximum, dans toutes les directions.
+
+Appuyez sur Suivant lorsque vous êtes prêt.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
+        <translation>Veuillez vérifier l&apos;image ci-dessous et corriger les manches qui s&apos;affichent en sens inverse. Appuyer sur Suivant lorsque vous êtes prêt.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
+
+IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
+        <translation>Vous avez terminé cet assistant, veuillez vérifier ci-dessous si l&apos;image correspond à vos mouvements de manches
+
+IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la carte. Après avoir appuyé sur Suivant vous serez dirigé vers l&apos;onglet Paramètres d&apos;Armement où vous pourrez choisir votre séquence d&apos;armement et enregistrer la configuration.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Back</source>
+        <translation>Précédent</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Surface: has reversible motor controlled by throttle stick, plus yaw control (2 channels)</source>
+        <translation>Terrestre : A un moteur inversable contrôlé par le manche des gaz plus une direction Yaw (2 canaux)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If selecting the Helicopter option, please engage throttle hold now.&lt;/p&gt;&lt;p&gt;If selecting the Surface option, the &lt;b&gt;Flight Mode Count&lt;/b&gt; will be set to be 1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si l&apos;option Hélicoptère est sélectionnée, veuillez maintenir le manche des gaz maintenant.&lt;/p&gt;&lt;p&gt;Si l&apos;option Terrestre est sélectionnée, le nombre de &lt;b&gt;Modes de Vol&lt;/b&gt; sera fixé à 1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigCcpmWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget.cpp" line="+1081"/>
+        <source>&lt;h1&gt;Swashplate Leveling Routine&lt;/h1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;b&gt;You are about to start the Swashplate levelling routine.&lt;/b&gt;&lt;p&gt;This process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.&lt;p&gt;The final state of your system should match the current configuration in the GCS config gadget.&lt;/p&gt;&lt;p&gt;Please ensure all ccpm settings in the GCS are correct before continuing.&lt;/p&gt;&lt;p&gt;If this process is interrupted, then the state of your OP board may not match the GCS configuration.&lt;/p&gt;&lt;p&gt;&lt;i&gt;After completing this process, please check all settings before attempting to fly.&lt;/i&gt;&lt;/p&gt;&lt;p&gt;&lt;font color=red&gt;&lt;b&gt;Please disconnect your motor to ensure it will not spin up.&lt;/b&gt;&lt;/font&gt;&lt;p&gt;&lt;hr&gt;&lt;i&gt;Do you wish to proceed?&lt;/i&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+128"/>
+        <source>&lt;h2&gt;Neutral levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Servo horns,&lt;/li&gt;&lt;li&gt;Link lengths,&lt;/li&gt;&lt;li&gt;Neutral triming spinboxes to the right&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is in the center of desired travel range and is level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>&lt;h2&gt;Max levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Max triming spinboxes to the right ONLY&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is at the top of desired travel range and is level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>&lt;h2&gt;Min levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Min triming spinboxes to the right ONLY&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is at the bottom of desired travel range and is level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>&lt;h2&gt;Levelling verification&lt;/h2&gt;&lt;p&gt;Adjust the slider to the right over it&apos;s full range and observe the swashplate motion. It should remain level over the entire range of travel.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>&lt;h2&gt;Levelling complete&lt;/h2&gt;&lt;p&gt;Press the Finish button to save these settings to the SD card&lt;/p&gt;&lt;p&gt;Press the cancel button to return to the pre-levelling settings&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+68"/>
+        <source>&lt;h2&gt;Levelling Cancelled&lt;/h2&gt;&lt;p&gt;Previous settings have been restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+43"/>
+        <source>&lt;h2&gt;Levelling Completed&lt;/h2&gt;&lt;p&gt;New settings have been saved to the SD card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>&lt;font color=red&gt;&lt;h1&gt;Warning!!!&lt;/h2&gt;&lt;/font&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&lt;h2&gt;This code has many configurations.&lt;/h2&gt;&lt;p&gt;Please double check all settings before attempting flight!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>&lt;h2&gt;The CCPM mixer code needs more testing!&lt;/h2&gt;&lt;p&gt;&lt;font color=red&gt;Use it at your own risk!&lt;/font&gt;&lt;p&gt;Do you wish to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>&lt;h2&gt;The CCPM swashplate levelling code is NOT complete!&lt;/h2&gt;&lt;p&gt;&lt;font color=red&gt;DO NOT use it for flight!&lt;/font&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VehicleTemplateSelectorWidget</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateselectorwidget.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Information about the Vehicle in short.</source>
+        <translation>Résumé d&apos;informations sur le Véhicule.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateselectorwidget.cpp" line="+100"/>
+        <source>Name of Vehicle: </source>
+        <translation>Nom du Véhicule : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name of Owner: </source>
+        <translation>Nom du Propriétaire : </translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Size: </source>
+        <translation>Taille : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Weight: </source>
+        <translation>Masse : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Motor(s): </source>
+        <translation>Moteur(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>ESC(s): </source>
+        <translation>Esc(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Servo(s): </source>
+        <translation>Servo(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Battery: </source>
+        <translation>Batterie : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Propellers(s): </source>
+        <translation>Hélice(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Controller: </source>
+        <translation>Carte Contrôleur : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Comments: </source>
+        <translation>Commentaires : </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>This option will use the current tuning settings saved on the controller, if your controller is currently unconfigured, then the OpenPilot firmware defaults will be used.
+
+It is suggested that if this is a first time configuration of your controller, rather than use this option, instead select a tuning set that matches your own airframe as close as possible from the list above or if you are not able to fine one, then select the generic item from the list.</source>
+        <translation>Cette option utilise les paramètres de réglage actuels enregistrés dans la carte, si votre contrôleur n&apos;est pas actuellement configuré, alors les paramètres par défaut du firmware OpenPilot seront utilisés.
+
+Il est suggéré que si cela est une première configuration de votre contrôleur, plutôt que d&apos;utiliser cette option, sélectionnez à la place un ensemble de réglages qui correspond le mieux à votre propre appareil dans la liste ci-dessus. Si vous n&apos;êtes pas en mesure d&apos;en choisir un, sélectionnez l&apos;élément générique de la liste.</translation>
+    </message>
+    <message>
+        <location line="+105"/>
+        <source>Current Tuning</source>
+        <translation>Réglages Actuels</translation>
     </message>
 </context>
 </TS>

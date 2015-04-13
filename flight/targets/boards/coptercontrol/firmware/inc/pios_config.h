@@ -162,7 +162,7 @@
 
 /* Task stack sizes */
 #define PIOS_ACTUATOR_STACK_SIZE        820
-#define PIOS_MANUAL_STACK_SIZE          635
+#define PIOS_MANUAL_STACK_SIZE          735
 #define PIOS_RECEIVER_STACK_SIZE        620
 #define PIOS_STABILIZATION_STACK_SIZE   400
 

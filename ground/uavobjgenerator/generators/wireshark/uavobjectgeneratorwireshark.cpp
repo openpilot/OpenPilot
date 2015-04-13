@@ -93,7 +93,7 @@ bool UAVObjectGeneratorWireshark::generate(UAVObjectParser *parser, QString temp
 
     /* Write the uavobject dissector's Makefile.common */
     wiresharkMakeTemplate.replace(QString("$(UAVOBJFILENAMES)"), objFileNames);
-    bool res = writeFileIfDiffrent(uavobjectsOutputPath.absolutePath() + "/Makefile.common",
+    bool res = writeFileIfDifferent(uavobjectsOutputPath.absolutePath() + "/Makefile.common",
                                    wiresharkMakeTemplate);
     if (!res) {
         cout << "Error: Could not write wireshark Makefile" << endl;
@@ -279,7 +279,7 @@ bool UAVObjectGeneratorWireshark::process_object(ObjectInfo *info, QDir outputpa
     outCode.replace(QString("$(HEADERFIELDS)"), headerfields);
 
     // Write the flight code
-    bool res = writeFileIfDiffrent(outputpath.absolutePath() + "/packet-op-uavobjects-" + info->namelc + ".c", outCode);
+    bool res = writeFileIfDifferent(outputpath.absolutePath() + "/packet-op-uavobjects-" + info->namelc + ".c", outCode);
     if (!res) {
         cout << "Error: Could not write wireshark code files" << endl;
         return false;

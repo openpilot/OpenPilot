@@ -34,6 +34,6 @@ struct path_status {
     float correction_vector[3];
 };
 
-void path_progress(PathDesiredData *path, float *cur_point, struct path_status *status);
+void path_progress(PathDesiredData *path, float *cur_point, struct path_status *status, bool mode3D);
 
 #endif

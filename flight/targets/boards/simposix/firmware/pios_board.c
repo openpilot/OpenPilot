@@ -152,7 +152,7 @@ void PIOS_Board_Init(void)
     /* Configure IO ports */
 
     /* Configure Telemetry port */
-    uint8_t hwsettings_rv_telemetryport;
+    HwSettingsRV_TelemetryPortOptions hwsettings_rv_telemetryport;
     HwSettingsRV_TelemetryPortGet(&hwsettings_rv_telemetryport);
 
     switch (hwsettings_rv_telemetryport) {
@@ -164,10 +164,12 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_TELEMETRYPORT_COMAUX:
         PIOS_Board_configure_com(&pios_udp_telem_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_udp_com_driver, &pios_com_aux_id);
         break;
+    default:
+        break;
     } /*        hwsettings_rv_telemetryport */
 
     /* Configure GPS port */
-    uint8_t hwsettings_rv_gpsport;
+    HwSettingsRV_GPSPortOptions hwsettings_rv_gpsport;
     HwSettingsRV_GPSPortGet(&hwsettings_rv_gpsport);
     switch (hwsettings_rv_gpsport) {
     case HWSETTINGS_RV_GPSPORT_DISABLED:
@@ -184,10 +186,12 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_GPSPORT_COMAUX:
         PIOS_Board_configure_com(&pios_udp_gps_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_udp_com_driver, &pios_com_aux_id);
         break;
+    default:
+        break;
     } /* hwsettings_rv_gpsport */
 
     /* Configure AUXPort */
-    uint8_t hwsettings_rv_auxport;
+    HwSettingsRV_AuxPortOptions hwsettings_rv_auxport;
     HwSettingsRV_AuxPortGet(&hwsettings_rv_auxport);
 
     switch (hwsettings_rv_auxport) {
@@ -201,6 +205,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_AUXPORT_COMAUX:
         PIOS_Board_configure_com(&pios_udp_aux_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_udp_com_driver, &pios_com_aux_id);
         break;
+    default:
         break;
     } /* hwsettings_rv_auxport */
 }

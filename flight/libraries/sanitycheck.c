@@ -43,7 +43,8 @@
 #include <taskinfo.h>
 
 // a number of useful macros
-#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+#define ADDSEVERITY(check)                                  severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+#define ADDEXTENDEDALARMSTATUS(error_code, error_substatus) if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) { alarmstatus = (error_code); alarmsubstatus = (error_substatus); }
 
 // private types
 typedef struct SANITYCHECK_CustomHookInstance {
@@ -73,7 +74,7 @@ int32_t configuration_check()
     // Classify navigation capability
 #ifdef REVOLUTION
     RevoSettingsInitialize();
-    uint8_t revoFusion;
+    RevoSettingsFusionAlgorithmOptions revoFusion;
     RevoSettingsFusionAlgorithmGet(&revoFusion);
     bool navCapableFusion;
     switch (revoFusion) {
@@ -103,8 +104,8 @@ int32_t configuration_check()
     // For each available flight mode position sanity check the available
     // modes
     uint8_t num_modes;
-    uint8_t modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
-    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
+    FlightModeSettingsFlightModePositionOptions modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
+    StabilizationSettingsFlightModeAssistMapOptions FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
     ManualControlSettingsFlightModeNumberGet(&num_modes);
     StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
     FlightModeSettingsFlightModePositionGet(modes);
@@ -117,7 +118,7 @@ int32_t configuration_check()
             ADDSEVERITY(navCapableFusion);
         }
 
-        switch (modes[i]) {
+        switch ((FlightModeSettingsFlightModePositionOptions)modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
             ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!multirotor);
@@ -142,24 +143,18 @@ int32_t configuration_check()
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
-            // Revo supports PathPlanner and that must be OK or we are not sane
-            // PathPlan alarm is uninitialized if not running
-            // PathPlan alarm is warning or error if the flightplan is invalid
-            SystemAlarmsAlarmData alarms;
-            SystemAlarmsAlarmGet(&alarms);
-            ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
             ADDSEVERITY(!gps_assisted);
         }
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(navCapableFusion);
             break;
 
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_COURSELOCK:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_HOMELEASH:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ABSOLUTEPOSITION:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
@@ -178,6 +173,27 @@ int32_t configuration_check()
         }
     }
 
+
+    // Check throttle/collective channel range for valid configuration of input for critical control
+    SystemSettingsThrustControlOptions thrustType;
+    SystemSettingsThrustControlGet(&thrustType);
+    ManualControlSettingsChannelMinData channelMin;
+    ManualControlSettingsChannelMaxData channelMax;
+    ManualControlSettingsChannelMinGet(&channelMin);
+    ManualControlSettingsChannelMaxGet(&channelMax);
+    switch (thrustType) {
+    case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+        ADDSEVERITY(fabsf(channelMax.Throttle - channelMin.Throttle) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+        ADDSEVERITY(fabsf(channelMax.Collective - channelMin.Collective) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    default:
+        break;
+    }
+
     // query sanity check hooks
     if (severity < SYSTEMALARMS_ALARM_CRITICAL) {
         SANITYCHECK_CustomHookInstance *instance = NULL;
@@ -192,7 +208,7 @@ int32_t configuration_check()
         }
     }
 
-    uint8_t checks_disabled;
+    FlightModeSettingsDisableSanityChecksOptions checks_disabled;
     FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
     if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
         severity = SYSTEMALARMS_ALARM_WARNING;
@@ -220,22 +236,22 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     // Get the different axis modes for this switch position
     switch (index) {
     case 1:
-        FlightModeSettingsStabilization1SettingsArrayGet(modes);
+        FlightModeSettingsStabilization1SettingsArrayGet((FlightModeSettingsStabilization1SettingsOptions*) modes);
         break;
     case 2:
-        FlightModeSettingsStabilization2SettingsArrayGet(modes);
+        FlightModeSettingsStabilization2SettingsArrayGet((FlightModeSettingsStabilization2SettingsOptions*) modes);
         break;
     case 3:
-        FlightModeSettingsStabilization3SettingsArrayGet(modes);
+        FlightModeSettingsStabilization3SettingsArrayGet((FlightModeSettingsStabilization3SettingsOptions*) modes);
         break;
     case 4:
-        FlightModeSettingsStabilization4SettingsArrayGet(modes);
+        FlightModeSettingsStabilization4SettingsArrayGet((FlightModeSettingsStabilization4SettingsOptions*) modes);
         break;
     case 5:
-        FlightModeSettingsStabilization5SettingsArrayGet(modes);
+        FlightModeSettingsStabilization5SettingsArrayGet((FlightModeSettingsStabilization5SettingsOptions*) modes);
         break;
     case 6:
-        FlightModeSettingsStabilization6SettingsArrayGet(modes);
+        FlightModeSettingsStabilization6SettingsArrayGet((FlightModeSettingsStabilization6SettingsOptions*) modes);
         break;
     default:
         return false;
@@ -309,7 +325,7 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
 
 FrameType_t GetCurrentFrameType()
 {
-    uint8_t airframe_type;
+    SystemSettingsAirframeTypeOptions airframe_type;
 
     SystemSettingsAirframeTypeGet(&airframe_type);
     switch ((SystemSettingsAirframeTypeOptions)airframe_type) {

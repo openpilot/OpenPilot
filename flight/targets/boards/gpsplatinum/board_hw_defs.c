@@ -205,8 +205,9 @@ void PIOS_SPI_mag_flash_irq_handler(void)
 #endif /* PIOS_INCLUDE_FLASH */
 
 #if defined(PIOS_INCLUDE_HMC5X83)
-pios_hmc5x83_dev_t onboard_mag;
 #include "pios_hmc5x83.h"
+pios_hmc5x83_dev_t onboard_mag;
+
 #ifdef PIOS_HMC5X83_HAS_GPIOS
 bool pios_board_mag_handler()
 {

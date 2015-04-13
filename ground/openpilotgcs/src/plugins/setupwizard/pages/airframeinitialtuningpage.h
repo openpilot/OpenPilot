@@ -45,27 +45,8 @@ public:
     bool validatePage();
     bool isComplete() const;
 
-public slots:
-    void templateSelectionChanged();
-
-protected:
-    void resizeEvent(QResizeEvent *);
-    void showEvent(QShowEvent *);
-
 private:
     Ui::AirframeInitialTuningPage *ui;
-    const char *m_dir;
-    QMap<QString, QJsonObject *> m_templates;
-    QGraphicsPixmapItem *m_photoItem;
-
-    void loadValidFiles();
-    void setupTemplateList();
-    QString getTemplateKey(QJsonObject *templ);
-    void updatePhoto(QJsonObject *templ);
-    void updateDescription(QJsonObject *templ);
-    bool airframeIsCompatible(int vehicleType, int vehicleSubType);
 };
-
-Q_DECLARE_METATYPE(QJsonObject *)
 
 #endif // AIRFRAMEINITIALTUNINGPAGE_H

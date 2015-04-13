@@ -30,7 +30,7 @@
  */
 
 #include "pios.h"
-
+#include <pios_bma180.h>
 #ifdef PIOS_INCLUDE_BMA180
 
 #include "fifo_buffer.h"

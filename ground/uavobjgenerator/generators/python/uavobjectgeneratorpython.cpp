@@ -110,7 +110,7 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo *info)
     outCode.replace(QString("$(DATAFIELDINIT)"), fields);
 
     // Write the Python code
-    bool res = writeFileIfDiffrent(pythonOutputPath.absolutePath() + "/" + info->namelc + ".py", outCode);
+    bool res = writeFileIfDifferent(pythonOutputPath.absolutePath() + "/" + info->namelc + ".py", outCode);
     if (!res) {
         cout << "Error: Could not write Python output files" << endl;
         return false;

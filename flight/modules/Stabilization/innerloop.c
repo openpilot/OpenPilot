@@ -243,7 +243,7 @@ static void stabilizationInnerloopTask()
 
     StabilizationStatusOuterLoopData outerLoop;
     StabilizationStatusOuterLoopGet(&outerLoop);
-    bool allowPiroComp =  true;
+    bool allowPiroComp = true;
 
     for (t = 0; t < AXES; t++) {
         bool reinit = (StabilizationStatusInnerLoopToArray(enabled)[t] != previous_mode[t]);
@@ -253,9 +253,9 @@ static void stabilizationInnerloopTask()
             if (reinit) {
                 stabSettings.innerPids[t].iAccumulator = 0;
             }
-            // Any self leveling on roll or pitch must prevent pirouette compenstation
-            if(t < STABILIZATIONSTATUS_INNERLOOP_YAW && StabilizationStatusOuterLoopToArray(outerLoop)[t] !=STABILIZATIONSTATUS_OUTERLOOP_DIRECT) {
-                 allowPiroComp = false;
+            // Any self leveling on roll or pitch must prevent pirouette compensation
+            if (t < STABILIZATIONSTATUS_INNERLOOP_YAW && StabilizationStatusOuterLoopToArray(outerLoop)[t] != STABILIZATIONSTATUS_OUTERLOOP_DIRECT) {
+                allowPiroComp = false;
             }
             switch (StabilizationStatusInnerLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:

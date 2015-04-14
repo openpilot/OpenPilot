@@ -109,7 +109,7 @@ int32_t VtolAutoTakeoffFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPat
         mAutoTakeoffData = (VtolAutoTakeoffFSMData_T *)pios_malloc(sizeof(VtolAutoTakeoffFSMData_T));
         PIOS_Assert(mAutoTakeoffData);
     }
-    memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
+    memset(mAutoTakeoffData, 0, sizeof(VtolAutoTakeoffFSMData_T));
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;
     flightStatus = ptr_flightStatus;
@@ -120,7 +120,7 @@ int32_t VtolAutoTakeoffFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPat
 
 void VtolAutoTakeoffFSM::Inactive(void)
 {
-    memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
+    memset(mAutoTakeoffData, 0, sizeof(VtolAutoTakeoffFSMData_T));
     initFSM();
 }
 
@@ -136,7 +136,7 @@ void VtolAutoTakeoffFSM::initFSM(void)
 
 void VtolAutoTakeoffFSM::Activate()
 {
-    memset(mAutoTakeoffData, sizeof(VtolAutoTakeoffFSMData_T), 0);
+    memset(mAutoTakeoffData, 0, sizeof(VtolAutoTakeoffFSMData_T));
     mAutoTakeoffData->currentState   = AUTOTAKEOFF_STATE_INACTIVE;
     mAutoTakeoffData->flLowAltitude  = true;
     mAutoTakeoffData->flAltitudeHold = false;
@@ -368,15 +368,21 @@ void VtolAutoTakeoffFSM::setup_checkstate(void)
 
 // STATE: SLOWSTART spools up motors to vtol min over 2 seconds for effect.
 // PID loops may be cumulating I terms but that problem needs to be solved
+#define SLOWSTART_INITIAL_THRUST 0.05f // assumed to be less than vtol min
 void VtolAutoTakeoffFSM::setup_slowstart(void)
 {
     setStateTimeout(TIMEOUT_SLOWSTART);
     mAutoTakeoffData->flZeroStabiHorizontal = true; // turn off positional controllers
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
-    mAutoTakeoffData->sum1 = (vtolPathFollowerSettings->ThrustLimits.Min - 0.05f) / (float)TIMEOUT_SLOWSTART;
-    mAutoTakeoffData->boundThrustMin = 0.05f;
-    mAutoTakeoffData->boundThrustMax = 0.05f;
+    float vtol_thrust_min = vtolPathFollowerSettings->ThrustLimits.Min;
+    if (vtol_thrust_min < SLOWSTART_INITIAL_THRUST) {
+        vtol_thrust_min = SLOWSTART_INITIAL_THRUST;
+    }
+    mAutoTakeoffData->sum1 = (vtol_thrust_min - SLOWSTART_INITIAL_THRUST) / (float)TIMEOUT_SLOWSTART;
+    mAutoTakeoffData->sum2 = vtol_thrust_min;
+    mAutoTakeoffData->boundThrustMin = SLOWSTART_INITIAL_THRUST;
+    mAutoTakeoffData->boundThrustMax = SLOWSTART_INITIAL_THRUST;
     PositionStateData positionState;
     PositionStateGet(&positionState);
     mAutoTakeoffData->expectedAutoTakeoffPositionNorth = positionState.North;
@@ -386,12 +392,12 @@ void VtolAutoTakeoffFSM::setup_slowstart(void)
 void VtolAutoTakeoffFSM::run_slowstart(__attribute__((unused)) uint8_t flTimeout)
 {
     // increase thrust setpoint step by step
-    if (mAutoTakeoffData->boundThrustMin < vtolPathFollowerSettings->ThrustLimits.Min) {
+    if (mAutoTakeoffData->boundThrustMin < mAutoTakeoffData->sum2) {
         mAutoTakeoffData->boundThrustMin += mAutoTakeoffData->sum1;
     }
     mAutoTakeoffData->boundThrustMax += mAutoTakeoffData->sum1;
-    if (mAutoTakeoffData->boundThrustMax > vtolPathFollowerSettings->ThrustLimits.Min) {
-        mAutoTakeoffData->boundThrustMax = vtolPathFollowerSettings->ThrustLimits.Min;
+    if (mAutoTakeoffData->boundThrustMax > mAutoTakeoffData->sum2) {
+        mAutoTakeoffData->boundThrustMax = mAutoTakeoffData->sum2;
     }
 
     if (flTimeout) {
@@ -401,14 +407,15 @@ void VtolAutoTakeoffFSM::run_slowstart(__attribute__((unused)) uint8_t flTimeout
 
 // STATE: THRUSTUP spools up motors to vtol min over 5 seconds for effect.
 // PID loops may be cumulating I terms but that problem needs to be solved
+#define THRUSTUP_FINAL_THRUST_AS_RATIO_OF_VTOLMAX 0.8f
 void VtolAutoTakeoffFSM::setup_thrustup(void)
 {
     setStateTimeout(TIMEOUT_THRUSTUP);
     mAutoTakeoffData->flZeroStabiHorizontal = false;
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
-    mAutoTakeoffData->sum1 = (0.8f * vtolPathFollowerSettings->ThrustLimits.Max - mAutoTakeoffData->boundThrustMax) / (float)TIMEOUT_THRUSTUP;
-    mAutoTakeoffData->sum2 = 0.8f * vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->sum2 = THRUSTUP_FINAL_THRUST_AS_RATIO_OF_VTOLMAX * vtolPathFollowerSettings->ThrustLimits.Max;
+    mAutoTakeoffData->sum1 = (mAutoTakeoffData->sum2 - mAutoTakeoffData->boundThrustMax) / (float)TIMEOUT_THRUSTUP;
     mAutoTakeoffData->boundThrustMin = vtolPathFollowerSettings->ThrustLimits.Min;
 }
 

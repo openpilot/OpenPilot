@@ -128,7 +128,7 @@ int32_t VtolLandFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollow
         mLandData = (VtolLandFSMData_T *)pios_malloc(sizeof(VtolLandFSMData_T));
         PIOS_Assert(mLandData);
     }
-    memset(mLandData, sizeof(VtolLandFSMData_T), 0);
+    memset(mLandData, 0, sizeof(VtolLandFSMData_T));
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;
     flightStatus = ptr_flightStatus;
@@ -139,7 +139,7 @@ int32_t VtolLandFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollow
 
 void VtolLandFSM::Inactive(void)
 {
-    memset(mLandData, sizeof(VtolLandFSMData_T), 0);
+    memset(mLandData, 0, sizeof(VtolLandFSMData_T));
     initFSM();
 }
 
@@ -155,7 +155,7 @@ void VtolLandFSM::initFSM(void)
 
 void VtolLandFSM::Activate()
 {
-    memset(mLandData, sizeof(VtolLandFSMData_T), 0);
+    memset(mLandData, 0, sizeof(VtolLandFSMData_T));
     mLandData->currentState   = LAND_STATE_INACTIVE;
     mLandData->flLowAltitude  = false;
     mLandData->flAltitudeHold = false;

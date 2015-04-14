@@ -241,6 +241,10 @@ static void stabilizationInnerloopTask()
     float dT;
     dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
 
+    StabilizationStatusOuterLoopData outerLoop;
+    StabilizationStatusOuterLoopGet(&outerLoop);
+    bool allowPiroComp =  true;
+
     for (t = 0; t < AXES; t++) {
         bool reinit = (StabilizationStatusInnerLoopToArray(enabled)[t] != previous_mode[t]);
         previous_mode[t] = StabilizationStatusInnerLoopToArray(enabled)[t];
@@ -248,6 +252,10 @@ static void stabilizationInnerloopTask()
         if (t < STABILIZATIONSTATUS_INNERLOOP_THRUST) {
             if (reinit) {
                 stabSettings.innerPids[t].iAccumulator = 0;
+            }
+            // Any self leveling on roll or pitch must prevent pirouette compenstation
+            if(t < STABILIZATIONSTATUS_INNERLOOP_YAW && StabilizationStatusOuterLoopToArray(outerLoop)[t] !=STABILIZATIONSTATUS_OUTERLOOP_DIRECT) {
+                 allowPiroComp = false;
             }
             switch (StabilizationStatusInnerLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:
@@ -322,7 +330,7 @@ static void stabilizationInnerloopTask()
         }
     }
 
-    if (stabSettings.stabBank.EnablePiroComp == STABILIZATIONBANK_ENABLEPIROCOMP_TRUE && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
+    if (allowPiroComp && stabSettings.stabBank.EnablePiroComp == STABILIZATIONBANK_ENABLEPIROCOMP_TRUE && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
         // attempted piro compensation - rotate pitch and yaw integrals (experimental)
         float angleYaw = DEG2RAD(gyro_filtered[2] * dT);
         float sinYaw   = sinf(angleYaw);

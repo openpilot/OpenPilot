@@ -88,6 +88,7 @@ static volatile bool mixer_settings_updated;
 // Private functions
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor);
 static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const MixerSettingsData *mixerSettings);
 static float MixerCurve(const float throttle, const float *curve, uint8_t elements);
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData *actuatorSettings);
@@ -426,13 +427,40 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         // Set real actuator output values scaling them from mixers. All channels
         // will be set except explicitly disabled (which will have PWM pulse = 0).
+        float maxMotor = -1;
+        float minMotor = 1;
         for (int i = 0; i < MAX_MIX_ACTUATORS; i++) {
-            if (command.Channel[i]) {
-                command.Channel[i] = scaleChannel(status[i],
-                                                  actuatorSettings.ChannelMax[i],
-                                                  actuatorSettings.ChannelMin[i],
-                                                  actuatorSettings.ChannelNeutral[i]);
-            }
+        	if (command.Channel[i]) {
+				//If mixer is for a motor we need to find the highest value of all motors
+				if (mixers[i].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
+						if (maxMotor < status[i]) {
+							maxMotor = status[i];
+						}
+						if (minMotor > status[i]) {
+							minMotor = status[i];
+						}
+				} else { //else we scale the channel
+						command.Channel[i] = scaleChannel(status[i],
+														  actuatorSettings.ChannelMax[i],
+														  actuatorSettings.ChannelMin[i],
+														  actuatorSettings.ChannelNeutral[i]);
+				}
+        	}
+        }
+
+        //we need to run through the actuators again now that we know min and max motors
+        //TODO: need to do something about ChannelMax and Min for motors. Right now we'll ignore this.
+        for (int i = 0; i < MAX_MIX_ACTUATORS; i++) {
+        	if (mixers[i].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
+				if (command.Channel[i]) {
+					command.Channel[i] = scaleMotor(status[i],
+													  actuatorSettings.ChannelMax[i],
+													  actuatorSettings.ChannelMin[i],
+													  actuatorSettings.ChannelNeutral[i],
+													  maxMotor,
+													  minMotor);
+				}
+        	}
         }
 
         // Store update time
@@ -579,6 +607,63 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
             valueScaled = min;
         }
     } else {
+        if (valueScaled < max) {
+            valueScaled = max;
+        }
+        if (valueScaled > min) {
+            valueScaled = min;
+        }
+    }
+
+    return valueScaled;
+}
+
+/**
+ * Convert channel from -1/+1 to servo pulse duration in microseconds
+ */
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor)
+{
+	//This function assumes all motors have equal min, max and neutrals
+
+	//throttle going too high
+	// max  motor   2100
+	// max  allowed 2000
+	// min  motor   1800
+	// this motor   1850
+
+	//throttle going too low
+	// max  motor   1400
+	// min  allowed 1200
+	// min  motor   1100
+	// this motor   1200
+
+    int16_t valueScaled;
+    int16_t maxMotorScaled;
+    int16_t minMotorScaled;
+    int16_t diff;
+
+    // Scale
+    if (value >= 0.0f) {
+        valueScaled    = (int16_t)(value * ((float)(max - neutral))) + neutral; //1850
+        maxMotorScaled = (int16_t)(maxMotor * ((float)(max - neutral))) + neutral; //2100
+        minMotorScaled = (int16_t)(minMotor * ((float)(max - neutral))) + neutral; //1800
+    } else {
+        valueScaled    = (int16_t)(value * ((float)(neutral - min))) + neutral;
+        maxMotorScaled = (int16_t)(maxMotor * ((float)(neutral - min))) + neutral;
+        minMotorScaled = (int16_t)(minMotor * ((float)(neutral - min))) + neutral;
+    }
+
+    if (max > min) {
+    	diff = max - maxMotorScaled; //difference between max allowed and actual max motor
+    	if (diff < 0) { //if the difference is smaller than 0 we add it to the scaled value
+    		valueScaled += diff;
+    	}
+    	diff = min - minMotorScaled; //difference between min allowed and actual min motor
+    	if (diff > 0) { //if the difference is larger than 0 we add it to the scaled value
+    		valueScaled += diff;
+    	}
+    } else {
+    	//not sure what to do about revered polarity right now. Why would anyone do this?
         if (valueScaled < max) {
             valueScaled = max;
         }

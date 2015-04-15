@@ -29,6 +29,7 @@
  * Finally update all pios_config.h files for every board in the same order
  * as in this file. Include new definition and all options, but comment
  * out unused ones.
+ *
  */
 
 #ifndef PIOS_H

@@ -13,7 +13,7 @@ Starting
 
 $ vagrant up
 
-Once your machine has started up you can ssh into it or log into Xfce (assuing you set vb.gui = true). Any changes you make persist in the Vagrant VM, when you are done run 'vagrant halt', this will turn off the vm and persist your changes.
+Once your machine has started up you can ssh into it or log into Xfce (assuming you set vb.gui = true). Any changes you make persist in the Vagrant VM, when you are done run 'vagrant halt', this will turn off the vm and persist your changes.
 
 $ vagrant ssh
 

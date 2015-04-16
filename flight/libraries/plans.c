@@ -179,15 +179,25 @@ void plan_setup_returnToBase()
 
 static StatusVtolAutoTakeoffControlStateOptions autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
 
-#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT 2.5f
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN 2.0f
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX 50.0f
 static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
 {
     PositionStateData positionState;
 
     PositionStateGet(&positionState);
     float velocity_down;
+    float autotakeoff_height;
 
     FlightModeSettingsAutoTakeOffVelocityGet(&velocity_down);
+    FlightModeSettingsAutoTakeOffHeightGet(&autotakeoff_height);
+    autotakeoff_height = fabsf(autotakeoff_height);
+    if (autotakeoff_height < AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN) {
+        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN;
+    } else if (autotakeoff_height > AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX) {
+        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX;
+    }
+
 
     pathDesired->Start.North = positionState.North;
     pathDesired->Start.East  = positionState.East;
@@ -199,7 +209,7 @@ static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
 
     pathDesired->End.North = positionState.North;
     pathDesired->End.East  = positionState.East;
-    pathDesired->End.Down  = positionState.Down - AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT;
+    pathDesired->End.Down  = positionState.Down - autotakeoff_height;
 
     pathDesired->StartingVelocity = 0.0f;
     pathDesired->EndingVelocity   = 0.0f;

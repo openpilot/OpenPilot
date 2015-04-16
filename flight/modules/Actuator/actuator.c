@@ -630,6 +630,10 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
         valueScaled    = (int16_t)(value * ((float)(max - neutral))) + neutral;
         maxMotorScaled = (int16_t)(maxMotor * ((float)(max - neutral))) + neutral;
         minMotorScaled = (int16_t)(minMotor * ((float)(max - neutral))) + neutral;
+    } else {
+        valueScaled    = (int16_t)(value * ((float)(neutral - min))) + neutral;
+        maxMotorScaled = (int16_t)(maxMotor * ((float)(neutral - min))) + neutral;
+        minMotorScaled = (int16_t)(minMotor * ((float)(neutral - min))) + neutral;
     }
 
     if (max > min) {

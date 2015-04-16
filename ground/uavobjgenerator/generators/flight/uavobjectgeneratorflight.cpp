@@ -137,7 +137,6 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     QString dataStructures;
     for (int n = 0; n < info->fields.length(); ++n) {
         // Determine type
-        //type = fieldTypeStrC[info->fields[n]->type];  // RHV TODO: remove
         type = typeList[n];
         // Append field
         // Check if it a named set and creates structures accordingly

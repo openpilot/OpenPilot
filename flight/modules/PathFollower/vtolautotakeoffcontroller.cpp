@@ -117,8 +117,15 @@ void VtolAutoTakeoffController::ObjectiveUpdated(void)
         // often be waypoint 0, in which case the starting location is the current location, and the end location
         // is the waypoint location which really needs to be the same as the end in north and east. If it is not,
         // it will fly to that location the during ascent.
-        controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
-        controlDown.UpdatePositionSetpoint(pathDesired->End.Down);
+        // Note in pathplanner mode we use the start location which is the current initial location as the
+        // target NE to control.  Takeoff only ascends vertically.
+        controlNE.UpdatePositionSetpoint(pathDesired->Start.North, pathDesired->Start.East);
+        // Sanity check that the end location is at least a reasonable height above the start location in the down direction
+        float autotakeoff_height = pathDesired->Start.Down - pathDesired->End.Down;
+        if (autotakeoff_height < 2.0f) {
+            pathDesired->End.Down = pathDesired->Start.Down - 2.0f;
+        }
+        controlDown.UpdatePositionSetpoint(pathDesired->End.Down); // the altitude is set by the end location.
         fsm->setControlState(STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE);
     }
 }
@@ -194,7 +201,6 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
     controlDown.UpdateVelocityState(velocityState.Down);
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
-    // autotakeoff flight mode has stored original horizontal position in pathdesired
     controlNE.UpdatePositionState(positionState.North, positionState.East);
     controlNE.ControlPosition();
 

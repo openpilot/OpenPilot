@@ -403,6 +403,8 @@ void updatePathDesired()
         /*pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
            pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
            pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
+        // note takeoff relies on the start being the current location as it merely ascends and using
+        // the start as assumption current NE location
         pathDesired.Start.North = positionState.North;
         pathDesired.Start.East  = positionState.East;
         pathDesired.Start.Down  = positionState.Down;

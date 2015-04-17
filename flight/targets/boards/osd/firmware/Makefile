@@ -84,9 +84,8 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
     SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
     SRC += $(OPUAVSYNTHDIR)/flightstatus.c
-##    SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
+    SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
     SRC += $(OPUAVSYNTHDIR)/flightmodesettings.c
-    SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
     SRC += $(OPUAVSYNTHDIR)/systemstats.c
     SRC += $(OPUAVSYNTHDIR)/systemalarms.c
     SRC += $(OPUAVSYNTHDIR)/systemsettings.c
@@ -108,8 +107,6 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/osdsettings2.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/magsensor.c
-##    SRC += $(OPUAVSYNTHDIR)/accelsensor.c
-##    SRC += $(OPUAVSYNTHDIR)/accelstate.c
     SRC += $(OPUAVSYNTHDIR)/auxmagsensor.c
     SRC += $(OPUAVSYNTHDIR)/gpsextendedstatus.c
 else

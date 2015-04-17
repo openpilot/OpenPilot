@@ -14,7 +14,16 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_10">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -33,7 +42,68 @@
        <property name="title">
         <string>Curve 1</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_7">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Source:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>The source of Curve 1 will always be Throttle</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Throttle</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
         <item>
          <widget class="MixerCurve" name="customThrottle1Curve" native="true">
           <property name="sizePolicy">
@@ -77,6 +147,59 @@
         <string>Curve 2</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_17">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Source:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="curve2SourceCombo">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
         <item>
          <widget class="MixerCurve" name="customThrottle2Curve" native="true">
           <property name="sizePolicy">
@@ -132,8 +255,14 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
        </property>
        <property name="columnCount">
         <number>12</number>
@@ -824,8 +953,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../coreplugin/core.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

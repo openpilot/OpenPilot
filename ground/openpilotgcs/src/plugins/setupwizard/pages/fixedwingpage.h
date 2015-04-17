@@ -28,21 +28,19 @@
 #ifndef FIXEDWINGPAGE_H
 #define FIXEDWINGPAGE_H
 
-#include "abstractwizardpage.h"
+#include "selectionpage.h"
 
-namespace Ui {
-class FixedWingPage;
-}
-
-class FixedWingPage : public AbstractWizardPage {
+class FixedWingPage : public SelectionPage {
     Q_OBJECT
 
 public:
     explicit FixedWingPage(SetupWizard *wizard, QWidget *parent = 0);
     ~FixedWingPage();
 
-private:
-    Ui::FixedWingPage *ui;
+protected:
+    void initializePage(VehicleConfigurationSource *settings);
+    bool validatePage(SelectionItem *selectedItem);
+    void setupSelection(Selection *selection);
 };
 
 #endif // FIXEDWINGPAGE_H

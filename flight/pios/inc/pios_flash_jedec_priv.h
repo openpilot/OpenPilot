@@ -36,15 +36,19 @@
 extern const struct pios_flash_driver pios_jedec_flash_driver;
 
 #define JEDEC_MANUFACTURER_ST       0x20
+#define JEDEC_MANUFACTURER_MICRON   0x20
+#define JEDEC_MANUFACTURER_NUMORIX  0x20
 #define JEDEC_MANUFACTURER_MACRONIX 0xC2
 #define JEDEC_MANUFACTURER_WINBOND  0xEF
 
 struct pios_flash_jedec_cfg {
-    uint8_t  expect_manufacturer;
-    uint8_t  expect_memorytype;
-    uint8_t  expect_capacity;
-    uint32_t sector_erase;
-    uint32_t chip_erase;
+    uint8_t expect_manufacturer;
+    uint8_t expect_memorytype;
+    uint8_t expect_capacity;
+    uint8_t sector_erase;
+    uint8_t chip_erase;
+    uint8_t fast_read;
+    uint8_t fast_read_dummy_bytes;
 };
 
 int32_t PIOS_Flash_Jedec_Init(uintptr_t *flash_id, uint32_t spi_id, uint32_t slave_num);

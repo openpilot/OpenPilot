@@ -34,6 +34,10 @@
 #ifndef PIOS_H
 #define PIOS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <pios_helpers.h>
 #include <pios_math.h>
 #include <pios_constants.h>
@@ -45,6 +49,7 @@
 
 /* C Lib includes */
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -56,6 +61,10 @@
 #elif defined(STM32F4XX)
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
+#elif defined(STM32F0)
+#include <stm32f0xx.h>
+#else
+#error "No Architecture defined"
 #endif
 
 /* PIOS board specific feature selection */
@@ -175,49 +184,6 @@
 #ifdef PIOS_INCLUDE_USB_RCTX
 #include <pios_usb_rctx.h>
 #endif
-#endif
-
-/* PIOS sensor interfaces */
-#ifdef PIOS_INCLUDE_ADXL345
-/* ADXL345 3-Axis Accelerometer */
-#include <pios_adxl345.h>
-#endif
-
-#ifdef PIOS_INCLUDE_BMA180
-/* BMA180 3-Axis Accelerometer */
-#include <pios_bma180.h>
-#endif
-
-#ifdef PIOS_INCLUDE_L3GD20
-/* L3GD20 3-Axis Gyro */
-#include <pios_l3gd20.h>
-#endif
-
-#ifdef PIOS_INCLUDE_MPU6000
-/* MPU6000 3-Axis Gyro/Accelerometer */
-/* #define PIOS_MPU6000_ACCEL */
-#include <pios_mpu6000.h>
-#endif
-
-#ifdef PIOS_INCLUDE_HMC5843
-/* HMC5843 3-Axis Digital Compass */
-#include <pios_hmc5843.h>
-#endif
-
-#ifdef PIOS_INCLUDE_HMC5883
-/* HMC5883 3-Axis Digital Compass */
-/* #define PIOS_HMC5883_HAS_GPIOS */
-#include <pios_hmc5883.h>
-#endif
-
-#ifdef PIOS_INCLUDE_BMP085
-/* BMP085 Barometric Pressure Sensor */
-#include <pios_bmp085.h>
-#endif
-
-#ifdef PIOS_INCLUDE_MS5611
-/* MS5611 Barometric Pressure Sensor */
-#include <pios_ms5611.h>
 #endif
 
 #ifdef PIOS_INCLUDE_MPXV
@@ -359,4 +325,10 @@
 /* #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 */
 
 #endif /* USE_SIM_POSIX */
+
+
+#ifdef __cplusplus
+} // closing brace for extern "C"
+#endif
+
 #endif /* PIOS_H */

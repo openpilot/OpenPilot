@@ -29,13 +29,9 @@ USE_DSP_LIB ?= NO
 
 # List of mandatory modules to include
 MODULES += Sensors
-#MODULES += Attitude/revolution
-MODULES += StateEstimation # use instead of Attitude
-MODULES += Altitude/revolution
+MODULES += StateEstimation
 MODULES += Airspeed
-#MODULES += AltitudeHold # now integrated in Stabilization
 MODULES += Stabilization
-MODULES += VtolPathFollower
 MODULES += ManualControl
 MODULES += Receiver
 MODULES += Actuator
@@ -45,7 +41,7 @@ MODULES += CameraStab
 MODULES += Battery
 MODULES += FirmwareIAP
 MODULES += PathPlanner
-MODULES += FixedWingPathFollower
+MODULES += PathFollower
 MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
@@ -74,6 +70,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/alarms.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
+    SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
 
     #ifeq ($(DEBUG), YES)
@@ -86,6 +83,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
     SRC += $(FLIGHTLIB)/printf-stdarg.c
 
     ## UAVObjects

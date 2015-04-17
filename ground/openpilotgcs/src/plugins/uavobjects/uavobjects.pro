@@ -27,6 +27,10 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/statusgrounddrive.h \
+    $$UAVOBJECT_SYNTHETICS/pidstatus.h \
+    $$UAVOBJECT_SYNTHETICS/statusvtolland.h \
+    $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.h \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
@@ -82,6 +86,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pathplan.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
+    $$UAVOBJECT_SYNTHETICS/pathsummary.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.h \
     $$UAVOBJECT_SYNTHETICS/positionstate.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.h \
@@ -94,8 +99,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.h \
-    $$UAVOBJECT_SYNTHETICS/relaytuning.h \
-    $$UAVOBJECT_SYNTHETICS/relaytuningsettings.h \
+    $$UAVOBJECT_SYNTHETICS/groundpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/ratedesired.h \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.h \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
@@ -128,9 +132,16 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.h \
+    $$UAVOBJECT_SYNTHETICS/auxmagsensor.h \
+    $$UAVOBJECT_SYNTHETICS/auxmagsettings.h \
+    $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.h \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/statusgrounddrive.cpp \
+    $$UAVOBJECT_SYNTHETICS/pidstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/statusvtolland.cpp \
+    $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.cpp \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
@@ -186,6 +197,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathplan.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathsummary.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.cpp \
     $$UAVOBJECT_SYNTHETICS/positionstate.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.cpp \
@@ -198,8 +210,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/relaytuningsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/relaytuning.cpp \
+    $$UAVOBJECT_SYNTHETICS/groundpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/ratedesired.cpp \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.cpp \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \
@@ -233,5 +244,8 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.cpp \
+    $$UAVOBJECT_SYNTHETICS/auxmagsensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/auxmagsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/perfcounter.cpp
-    
+

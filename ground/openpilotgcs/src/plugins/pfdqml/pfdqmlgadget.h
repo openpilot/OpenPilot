@@ -15,7 +15,7 @@
  */
 
 #ifndef PFDQMLGADGET_H_
-#define PFDQMLQMLGADGET_H_
+#define PFDQMLGADGET_H_
 
 #include <coreplugin/iuavgadget.h>
 #include "pfdqmlgadgetwidget.h"
@@ -51,4 +51,4 @@ private:
 };
 
 
-#endif // PFDQMLQMLGADGET_H_
+#endif // PFDQMLGADGET_H_

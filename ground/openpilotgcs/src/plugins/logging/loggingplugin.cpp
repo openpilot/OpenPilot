@@ -76,8 +76,10 @@ QIODevice *LoggingConnection::openDevice(const QString &deviceName)
     QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open file"), QString(""), tr("OpenPilot Log (*.opl)"));
     if (!fileName.isNull()) {
         startReplay(fileName);
+        return &logFile;
     }
-    return &logFile;
+
+    return NULL;
 }
 
 void LoggingConnection::startReplay(QString file)

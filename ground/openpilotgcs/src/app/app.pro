@@ -10,7 +10,6 @@ QT += xml widgets
 SOURCES += main.cpp \
     gcssplashscreen.cpp
 
-include(../rpath.pri)
 include(../libs/utils/utils.pri)
 include(../libs/version_info/version_info.pri)
 
@@ -27,9 +26,17 @@ win32 {
     FILETYPES.files = profile.icns prifile.icns
     FILETYPES.path = Contents/Resources
     QMAKE_BUNDLE_DATA += FILETYPES
+    QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
 } else {
     target.path  = /bin
     INSTALLS    += target
+    QMAKE_RPATHDIR = \'\$$ORIGIN\'/$$relative_path($$GCS_LIBRARY_PATH, $$GCS_APP_PATH)
+    QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_QT_LIBRARY_PATH, $$GCS_APP_PATH)
+    include(../rpath.pri)
+
+    equals(copyqt, 1) {
+        RESOURCES += qtconf.qrc
+    }
 }
 
 OTHER_FILES += openpilotgcs.rc

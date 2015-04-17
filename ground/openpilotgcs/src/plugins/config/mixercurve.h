@@ -68,6 +68,9 @@ public:
     double getCurveStep();
     double setRange(double min, double max);
 
+    void setXAxisLabel(QString label);
+    void setYAxisLabel(QString label);
+
     MixerCurveWidget *getCurveWidget()
     {
         return m_curve;

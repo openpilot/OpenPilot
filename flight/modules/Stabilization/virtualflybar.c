@@ -32,7 +32,6 @@
 
 #include "openpilot.h"
 #include <pios_math.h>
-#include <pios_struct_helper.h>
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 
@@ -78,7 +77,7 @@ int stabilization_virtual_flybar(float gyro, float command, float *output, float
     }
 
     // Command signal is composed of stick input added to the gyro and virtual flybar
-    *output = command * cast_struct_to_array(settings->VbarSensitivity, settings->VbarSensitivity.Roll)[axis] -
+    *output = command * StabilizationSettingsVbarSensitivityToArray(settings->VbarSensitivity)[axis] -
               gyro_gain * (vbar_integral[axis] * ki + gyro * kp);
 
     return 0;

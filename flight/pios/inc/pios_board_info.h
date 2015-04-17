@@ -21,4 +21,16 @@ struct pios_board_info {
 
 extern const struct pios_board_info pios_board_info_blob;
 
+struct __attribute__((packed)) fw_version_info {
+    uint8_t magic[4];
+    uint32_t commit_hash_prefix;
+    uint32_t timestamp;
+    uint8_t board_type;
+    uint8_t board_revision;
+    uint8_t commit_tag_name[26];
+    uint8_t sha1sum[20];
+    uint8_t uavosha1[20];
+    uint8_t pad[20];
+};
+
 #endif /* PIOS_BOARD_INFO_H */

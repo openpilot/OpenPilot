@@ -36,9 +36,43 @@
 #include "cfg_vehicletypes/vehicleconfig.h"
 #include <QWidget>
 #include <QList>
+#include <QSignalMapper>
+
+#include "systemalarms.h"
 
 class Ui_OutputWidget;
 class OutputChannelForm;
+class MixerSettings;
+
+class OutputBankControls {
+public:
+    OutputBankControls(MixerSettings *mixer, QLabel *label, QColor color, QComboBox *rateCombo, QComboBox *modeCombo);
+    virtual ~OutputBankControls();
+
+    QLabel *label() const
+    {
+        return m_label;
+    }
+    QColor color() const
+    {
+        return m_color;
+    }
+    QComboBox *rateCombo() const
+    {
+        return m_rateCombo;
+    }
+    QComboBox *modeCombo() const
+    {
+        return m_modeCombo;
+    }
+
+private:
+    MixerSettings *m_mixer;
+    QLabel *m_label;
+    QColor m_color;
+    QComboBox *m_rateCombo;
+    QComboBox *m_modeCombo;
+};
 
 class ConfigOutputWidget : public ConfigTaskWidget {
     Q_OBJECT
@@ -49,30 +83,30 @@ public:
 
 protected:
     void enableControls(bool enable);
+    void setWarning(QString message);
 
 private:
-    Ui_OutputWidget *ui;
+    Ui_OutputWidget *m_ui;
+    QList<QSlider> m_sliders;
+    int m_mccDataRate;
+    UAVObject::Metadata m_accInitialData;
+    QList<OutputBankControls> m_banks;
 
-    QList<QSlider> sliders;
-
-    void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
-
-    void assignOutputChannel(UAVDataObject *obj, QString &str);
     OutputChannelForm *getOutputChannelForm(const int index) const;
-    int mccDataRate;
-
-    UAVObject::Metadata accInitialData;
-
-    bool wasItMe;
+    void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
+    void assignOutputChannel(UAVDataObject *obj, QString &str);
+    void setColor(QWidget *widget, const QColor color);
+    void sendAllChannelTests();
 
 private slots:
+    void updateWarnings(UAVObject *);
     void stopTests();
-    void disableIfNotMe(UAVObject *obj);
     virtual void refreshWidgetsValues(UAVObject *obj = NULL);
     void updateObjectsFromWidgets();
     void runChannelTests(bool state);
     void sendChannelTest(int index, int value);
     void openHelp();
+    void onBankTypeChange();
 };
 
 #endif // CONFIGOUTPUTWIDGET_H

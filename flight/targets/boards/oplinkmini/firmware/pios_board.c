@@ -78,6 +78,7 @@ uint8_t *pios_uart_rx_buffer;
 uint8_t *pios_uart_tx_buffer;
 
 uintptr_t pios_uavo_settings_fs_id;
+uintptr_t pios_user_fs_id = 0;
 
 uint8_t servo_count = 0;
 
@@ -437,11 +438,11 @@ void PIOS_Board_Init(void)
         }
 
         // Set the radio configuration parameters.
-        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet, is_coordinator, is_oneway, ppm_mode, ppm_only);
         PIOS_RFM22B_SetCoordinatorID(pios_rfm22b_id, oplinkSettings.CoordID);
+        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, is_coordinator, is_oneway, ppm_mode, ppm_only);
 
         /* Set the PPM callback if we should be receiving PPM. */
-        if (ppm_mode) {
+        if (ppm_mode || (ppm_only && !is_coordinator)) {
             PIOS_RFM22B_SetPPMCallback(pios_rfm22b_id, PIOS_Board_PPM_callback);
         }
 

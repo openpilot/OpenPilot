@@ -32,6 +32,57 @@ defineReplace(qtLibraryName) {
    return($$RET)
 }
 
+defineTest(addCopyFileTarget) {
+    file = $$1
+    src  = $$2/$$1
+    dest = $$3/$$1
+
+    $${file}.target    = $$dest
+    $${file}.depends   = $$src
+
+    # create directory. Better would be an order only dependency
+    $${file}.commands  = -@$(MKDIR) \"$$targetPath($$dirname(dest))\" $$addNewline()
+    $${file}.commands += $(COPY_FILE) \"$$targetPath($$src)\" \"$$targetPath($$dest)\"
+
+    QMAKE_EXTRA_TARGETS += $$file
+    POST_TARGETDEPS += $$eval($${file}.target)
+
+    export($${file}.target)
+    export($${file}.depends)
+    export($${file}.commands)
+    export(QMAKE_EXTRA_TARGETS)
+    export(POST_TARGETDEPS)
+
+    return(true)
+}
+
+defineTest(addCopyDirTarget) {
+    dir  = $$1
+    src  = $$2/$$1
+    dest = $$3/$$1
+
+    $${dir}.target    = $$dest
+    $${dir}.depends   = $$src
+    # Windows does not update directory timestamp if files are modified
+    win32: $${dir}.depends += FORCE
+
+    $${dir}.commands  = @rm -rf \"$$targetPath($$dest)\" $$addNewline()
+    # create directory. Better would be an order only dependency
+    $${dir}.commands += -@$(MKDIR) \"$$targetPath($$dirname(dest))\" $$addNewline()
+    $${dir}.commands += $(COPY_DIR) \"$$targetPath($$src)\" \"$$targetPath($$dest)\"
+
+    QMAKE_EXTRA_TARGETS += $$dir
+    POST_TARGETDEPS += $$eval($${dir}.target)
+
+    export($${dir}.target)
+    export($${dir}.depends)
+    export($${dir}.commands)
+    export(QMAKE_EXTRA_TARGETS)
+    export(POST_TARGETDEPS)
+
+    return(true)
+}
+
 # For use in custom compilers which just copy files
 win32:i_flag = i
 defineReplace(stripSrcDir) {
@@ -66,12 +117,25 @@ equals(TEST, 1) {
 win32:!isEmpty(QMAKE_SH):QMAKE_COPY_DIR = cp -r -f
 
 GCS_SOURCE_TREE = $$PWD
+ROOT_DIR = $$GCS_SOURCE_TREE/../..
+
 isEmpty(GCS_BUILD_TREE) {
     sub_dir = $$_PRO_FILE_PWD_
     sub_dir ~= s,^$$re_escape($$PWD),,
     GCS_BUILD_TREE = $$cleanPath($$OUT_PWD)
     GCS_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 }
+
+# Find the tools directory,
+# try from Makefile (not run by Qt Creator),
+TOOLS_DIR = $$(TOOLS_DIR)
+isEmpty(TOOLS_DIR) {
+    # check for custom enviroment variable,
+    TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
+    # fallback to default location.
+    isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$ROOT_DIR/tools)
+}
+
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
     GCS_APP_TARGET   = "OpenPilot GCS"
@@ -83,24 +147,48 @@ macx {
     GCS_DATA_BASENAME = Resources
     GCS_DOC_PATH     = $$GCS_DATA_PATH/doc
     copydata = 1
+    copyqt = 1
 } else {
-    win32 {
-        contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
-        GCS_APP_TARGET   = openpilotgcs
-    } else {
-        GCS_APP_WRAPPER  = openpilotgcs
-        GCS_APP_TARGET   = openpilotgcs.bin
-        GCS_QT_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5
-        GCS_QT_PLUGINS_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/plugins
-        GCS_QT_QML_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/qml
-    }
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH # FIXME
     GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
     GCS_DATA_BASENAME = share/openpilotgcs
     GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc
+
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
+
+    win32 {
+        SDL_DIR = $$(SDL_DIR)
+        isEmpty(SDL_DIR):SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
+
+        OPENSSL_DIR = $$(OPENSSL_DIR)
+        isEmpty(OPENSSL_DIR):OPENSSL_DIR = $${TOOLS_DIR}/openssl-1.0.1e-win32
+
+        MESAWIN_DIR = $$(MESAWIN_DIR)
+        isEmpty(MESAWIN_DIR):MESAWIN_DIR = $${TOOLS_DIR}/mesawin
+
+        contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
+        GCS_APP_TARGET   = openpilotgcs
+
+        GCS_QT_PLUGINS_PATH = $$GCS_APP_PATH
+        GCS_QT_QML_PATH = $$GCS_APP_PATH
+
+        copyqt = $$copydata
+    } else {
+        GCS_APP_TARGET   = openpilotgcs
+        GCS_QT_BASEPATH = $$GCS_LIBRARY_PATH/qt5
+        GCS_QT_LIBRARY_PATH = $$GCS_QT_BASEPATH/lib
+        GCS_QT_PLUGINS_PATH = $$GCS_QT_BASEPATH/plugins
+        GCS_QT_QML_PATH = $$GCS_QT_BASEPATH/qml
+
+        QT_INSTALL_DIR = $$clean_path($$[QT_INSTALL_LIBS]/../../../..)
+        equals(QT_INSTALL_DIR, $$TOOLS_DIR) {
+            copyqt = 1
+        } else {
+            copyqt = 0
+        }
+    }
 }
 
 

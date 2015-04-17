@@ -1,3 +1,29 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qssp.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup Uploader Serial and USB Uploader Plugin
+ * @{
+ * @brief The USB and Serial protocol uploader plugin
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 #include "qssp.h"
 
 
@@ -21,7 +47,7 @@
 // Make larger sized integers from smaller sized integers
 #define MAKEWORD16(ub, lb)          ((uint16_t)0x0000 | ((uint16_t)(ub) << 8) | (uint16_t)(lb))
 #define MAKEWORD32(uw, lw)          ((uint32_t)(0x0UL | ((uint32_t)(uw) << 16) | (uint32_t)(lw)))
-#define MAKEWORD32B(b3, b2, b1, b0) ((uint32_t)((uint32_t)(b3) << 24) | ((uint32_t)(b2) << 16) | ((uint32_t)(b1) << 8) | ((uint32_t)(b0))
+#define MAKEWORD32B(b3, b2, b1, b0) ((uint32_t)((uint32_t)(b3) << 24) | ((uint32_t)(b2) << 16) | ((uint32_t)(b1) << 8) | ((uint32_t)(b0)))
 
 
 // Used to extract smaller integers from larger sized intergers
@@ -497,9 +523,18 @@ void qssp::sf_write_byte(uint8_t c)
 
 uint16_t qssp::sf_crc16(uint16_t crc, uint8_t data)
 {
+#ifdef SPP_USES_CRC
     return (crc >> 8) ^ CRC_TABLE[(crc ^ data) & 0x00FF];
-}
 
+#else
+    uint8_t cka = crc & 0xff;
+    uint8_t ckb = (crc >> 8) & 0xff;
+    cka += data;
+    ckb += cka;
+    return cka | ckb << 8;
+
+#endif
+}
 
 /*!
  * \brief   sets the timeout for the given packet
@@ -538,7 +573,7 @@ uint16_t qssp::sf_CheckTimeout()
     }
     if (retval) {
         if (debug) {
-            qDebug() << "timeout" << current_time << thisport->timeout;
+            qDebug() << "timeout " << current_time << thisport->timeout;
         }
     }
     return retval;
@@ -782,6 +817,8 @@ qssp::qssp(port *info, bool debug) : debug(debug)
 }
 void qssp::pfCallBack(uint8_t *buf, uint16_t size)
 {
+    Q_UNUSED(size);
+
     if (debug) {
         qDebug() << "receive callback" << buf[0] << buf[1] << buf[2] << buf[3] << buf[4];
     }

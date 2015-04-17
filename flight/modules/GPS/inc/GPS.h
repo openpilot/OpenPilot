@@ -38,6 +38,7 @@
 #include "gpssatellites.h"
 #include "gpspositionsensor.h"
 #include "gpstime.h"
+#include "auxmagsettings.h"
 
 #define NO_PARSER         -3 // no parser available
 #define PARSER_OVERRUN    -2 // message buffer overrun before completing the message

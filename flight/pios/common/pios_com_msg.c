@@ -176,6 +176,30 @@ uint16_t PIOS_COM_MSG_Receive(uint32_t com_id, uint8_t *msg, uint16_t msg_len)
     return 0;
 }
 
+/**
+ * Change the port speed without re-initializing
+ * \param[in] port COM port
+ * \param[in] baud Requested baud rate
+ * \return -1 if port not available
+ * \return 0 on success
+ */
+int32_t PIOS_COM_MSG_ChangeBaud(uint32_t com_id, uint32_t baud)
+{
+    struct pios_com_msg_dev *com_dev = (struct pios_com_msg_dev *)com_id;
+
+    if (!com_dev) {
+        /* Undefined COM port for this board (see pios_board.c) */
+        return -1;
+    }
+
+    /* Invoke the driver function if it exists */
+    if (com_dev->driver->set_baud) {
+        com_dev->driver->set_baud(com_dev->lower_id, baud);
+    }
+
+    return 0;
+}
+
 #endif /* PIOS_INCLUDE_COM_MSG */
 
 /**

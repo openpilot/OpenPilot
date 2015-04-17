@@ -44,7 +44,7 @@
 #include "baro_airspeed_ms4525do.h"
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
-#include "gps_airspeed.h"
+#include "imu_airspeed.h"
 #include "airspeedalarm.h"
 #include "taskinfo.h"
 
@@ -99,7 +99,7 @@ int32_t AirspeedInitialize()
 
     HwSettingsInitialize();
     uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-    HwSettingsOptionalModulesGet(optionalModules);
+    HwSettingsOptionalModulesArrayGet(optionalModules);
 
 
     if (optionalModules[HWSETTINGS_OPTIONALMODULES_AIRSPEED] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
@@ -136,7 +136,7 @@ MODULE_INITCALL(AirspeedInitialize, AirspeedStart);
 static void airspeedTask(__attribute__((unused)) void *parameters)
 {
     AirspeedSettingsUpdatedCb(AirspeedSettingsHandle());
-    bool gpsAirspeedInitialized = false;
+    bool imuAirspeedInitialized = false;
     AirspeedSensorData airspeedData;
     AirspeedSensorGet(&airspeedData);
 
@@ -164,9 +164,9 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
                 AirspeedSensorSet(&airspeedData);
                 break;
             case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
-                if (!gpsAirspeedInitialized) {
-                    gpsAirspeedInitialized = true;
-                    gps_airspeedInitialize();
+                if (!imuAirspeedInitialized) {
+                    imuAirspeedInitialized = true;
+                    imu_airspeedInitialize(&airspeedSettings);
                 }
                 break;
             }
@@ -192,7 +192,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             break;
 #endif
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
-            gps_airspeedGet(&airspeedData, &airspeedSettings);
+            imu_airspeedGet(&airspeedData, &airspeedSettings);
             break;
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
             // no need to check so often until a sensor is enabled

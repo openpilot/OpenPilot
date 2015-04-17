@@ -248,6 +248,8 @@ extern uint32_t pios_com_telem_usb_id;
 // --------------------------
 #define PIOS_TIM_MAX_DEVS     6
 
+#define PIOS_SERVO_BANKS      6
+
 // -------------------------
 // USB
 // -------------------------

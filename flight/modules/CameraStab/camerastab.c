@@ -52,7 +52,6 @@
 #include "camerastabsettings.h"
 #include "cameradesired.h"
 #include "hwsettings.h"
-#include <pios_struct_helper.h>
 
 //
 // Configuration
@@ -172,22 +171,22 @@ static void attitudeUpdated(UAVObjEvent *ev)
     // process axes
     for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUT_NUMELEM; i++) {
         // read and process control input
-        if (cast_struct_to_array(cameraStab.Input, cameraStab.Input.Roll)[i] != CAMERASTABSETTINGS_INPUT_NONE) {
-            if (AccessoryDesiredInstGet(cast_struct_to_array(cameraStab.Input, cameraStab.Input.Roll)[i] -
+        if (CameraStabSettingsInputToArray(cameraStab.Input)[i] != CAMERASTABSETTINGS_INPUT_NONE) {
+            if (AccessoryDesiredInstGet(CameraStabSettingsInputToArray(cameraStab.Input)[i] -
                                         CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
                 float input_rate;
-                switch (cast_struct_to_array(cameraStab.StabilizationMode, cameraStab.StabilizationMode.Roll)[i]) {
+                switch (CameraStabSettingsStabilizationModeToArray(cameraStab.StabilizationMode)[i]) {
                 case CAMERASTABSETTINGS_STABILIZATIONMODE_ATTITUDE:
                     csd->inputs[i] = accessory.AccessoryVal *
-                                     cast_struct_to_array(cameraStab.InputRange, cameraStab.InputRange.Roll)[i];
+                                     CameraStabSettingsInputRangeToArray(cameraStab.InputRange)[i];
                     break;
                 case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
                     input_rate = accessory.AccessoryVal *
-                                 cast_struct_to_array(cameraStab.InputRate, cameraStab.InputRate.Roll)[i];
+                                 CameraStabSettingsInputRateToArray(cameraStab.InputRate)[i];
                     if (fabsf(input_rate) > cameraStab.MaxAxisLockRate) {
                         csd->inputs[i] = boundf(csd->inputs[i] + input_rate * 0.001f * dT_millis,
-                                                -cast_struct_to_array(cameraStab.InputRange, cameraStab.InputRange.Roll)[i],
-                                                cast_struct_to_array(cameraStab.InputRange, cameraStab.InputRange.Roll)[i]);
+                                                -CameraStabSettingsInputRangeToArray(cameraStab.InputRange)[i],
+                                                CameraStabSettingsInputRangeToArray(cameraStab.InputRange)[i]);
                     }
                     break;
                 default:
@@ -214,14 +213,14 @@ static void attitudeUpdated(UAVObjEvent *ev)
         }
 
 #ifdef USE_GIMBAL_LPF
-        if (cast_struct_to_array(cameraStab.ResponseTime, cameraStab.ResponseTime.Roll)[i]) {
-            float rt = (float)cast_struct_to_array(cameraStab.ResponseTime, cameraStab.ResponseTime.Roll)[i];
+        if (CameraStabSettingsResponseTimeToArray(cameraStab.ResponseTime)[i]) {
+            float rt = (float)CameraStabSettingsResponseTimeToArray(cameraStab.ResponseTime)[i];
             attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT_millis * attitude)) / (rt + dT_millis);
         }
 #endif
 
 #ifdef USE_GIMBAL_FF
-        if (cast_struct_to_array(cameraStab.FeedForward, cameraStab.FeedForward.Roll)[i]) {
+        if (CameraStabSettingsFeedForwardToArray(cameraStab.FeedForward)[i]) {
             applyFeedForward(i, dT_millis, &attitude, &cameraStab);
         }
 #endif
@@ -229,7 +228,7 @@ static void attitudeUpdated(UAVObjEvent *ev)
         // bounding for elevon mixing occurs on the unmixed output
         // to limit the range of the mixed output you must limit the range
         // of both the unmixed pitch and unmixed roll
-        float output = boundf((attitude + csd->inputs[i]) / cast_struct_to_array(cameraStab.OutputRange, cameraStab.OutputRange.Roll)[i], -1.0f, 1.0f);
+        float output = boundf((attitude + csd->inputs[i]) / CameraStabSettingsOutputRangeToArray(cameraStab.OutputRange)[i], -1.0f, 1.0f);
 
         // set output channels
         switch (i) {
@@ -316,12 +315,12 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
     // apply feed forward
     float accumulator = csd->ffFilterAccumulator[index];
     accumulator += (*attitude - csd->ffLastAttitude[index]) *
-                   (float)cast_struct_to_array(cameraStab->FeedForward, cameraStab->FeedForward.Roll)[index] * gimbalTypeCorrection;
+                   (float)CameraStabSettingsFeedForwardToArray(cameraStab->FeedForward)[index] * gimbalTypeCorrection;
     csd->ffLastAttitude[index] = *attitude;
     *attitude   += accumulator;
 
-    float filter = (float)((accumulator > 0.0f) ? cast_struct_to_array(cameraStab->AccelTime, cameraStab->AccelTime.Roll)[index] :
-                           cast_struct_to_array(cameraStab->DecelTime, cameraStab->DecelTime.Roll)[index]) / dT_millis;
+    float filter = (float)((accumulator > 0.0f) ? CameraStabSettingsAccelTimeToArray(cameraStab->AccelTime)[index] :
+                           CameraStabSettingsDecelTimeToArray(cameraStab->DecelTime)[index]) / dT_millis;
     if (filter < 1.0f) {
         filter = 1.0f;
     }

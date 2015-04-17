@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>923</width>
-    <height>51</height>
+    <height>57</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,6 +120,9 @@ margin:1px;</string>
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::UpDownArrows</enum>
      </property>
+     <property name="keyboardTracking">
+      <bool>false</bool>
+     </property>
      <property name="maximum">
       <number>9999</number>
      </property>
@@ -212,7 +215,7 @@ margin:1px;</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="9">
+   <item row="1" column="11">
     <widget class="QSpinBox" name="channelResponseTime">
      <property name="enabled">
       <bool>true</bool>
@@ -308,7 +311,7 @@ margin:1px;</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="7">
+   <item row="0" column="9">
     <spacer name="horizontalSpacer_4">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -340,7 +343,7 @@ margin:1px;</string>
      </property>
     </spacer>
    </item>
-   <item row="1" column="7">
+   <item row="1" column="9">
     <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -356,8 +359,8 @@ margin:1px;</string>
      </property>
     </spacer>
    </item>
-   <item row="0" column="8">
-    <widget class="QLabel" name="legend6">
+   <item row="0" column="10">
+    <widget class="QLabel" name="legend7">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -405,8 +408,8 @@ margin:1px;</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="9">
-    <widget class="QLabel" name="legend7">
+   <item row="0" column="11">
+    <widget class="QLabel" name="legend8">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -454,8 +457,8 @@ margin:1px;</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="6">
-    <widget class="QLabel" name="legend5">
+   <item row="0" column="8">
+    <widget class="QLabel" name="legend6">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -497,52 +500,6 @@ margin:1px;</string>
      </property>
      <property name="text">
       <string>Max</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="5">
-    <widget class="QLabel" name="legend4">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>-1</pointsize>
-       <weight>75</weight>
-       <italic>false</italic>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Channel neutral</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="text">
-      <string>Neutral</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -641,7 +598,7 @@ margin:1px;</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="6">
+   <item row="1" column="8">
     <widget class="QSpinBox" name="channelMax">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -670,6 +627,9 @@ margin:1px;</string>
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::UpDownArrows</enum>
      </property>
+     <property name="keyboardTracking">
+      <bool>false</bool>
+     </property>
      <property name="maximum">
       <number>9999</number>
      </property>
@@ -678,102 +638,7 @@ margin:1px;</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
-    <widget class="QFrame" name="frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="leftMargin">
-       <number>2</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>2</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QSlider" name="channelNeutral">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="neutralValue">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-        <property name="value">
-         <number>1000</number>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="8">
+   <item row="1" column="10">
     <widget class="QFrame" name="frame_1">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -835,6 +700,143 @@ margin:1px;</string>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="1" column="7">
+    <widget class="QSpinBox" name="neutralValue">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="keyboardTracking">
+      <bool>false</bool>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
+     <property name="value">
+      <number>1000</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5">
+    <widget class="QSlider" name="channelNeutral">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>50</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
+     <property name="accessibleName">
+      <string/>
+     </property>
+     <property name="accessibleDescription">
+      <string/>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBothSides</enum>
+     </property>
+     <property name="tickInterval">
+      <number>50</number>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <widget class="QLabel" name="legend4">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>-1</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Channel value</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="text">
+      <string>Channel Value</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="7">
+    <widget class="QLabel" name="legend5">
+     <property name="toolTip">
+      <string>Channel neutral</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+     </property>
+     <property name="text">
+      <string>Neutral</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
    </item>
   </layout>

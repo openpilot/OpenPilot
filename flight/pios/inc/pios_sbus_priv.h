@@ -66,8 +66,7 @@
 #define SBUS_FLAG_FL                  0x04
 #define SBUS_FLAG_FS                  0x08
 
-#define SBUS_R7008SB_EOF_COUNTER_MASK 0xCF
-#define SBUS_R7008SB_EOF_BYTE         0x04
+#define SBUS_R7008SB_EOF_COUNTER_MASK 0xCB
 
 /*
  * S.Bus protocol provides 16 proportional and 2 discrete channels.

@@ -14,6 +14,8 @@ from string import Template
 import optparse
 import hashlib
 import sys
+import os.path
+import json
 
 class Repo:
     """A simple git repository HEAD commit info class
@@ -66,12 +68,15 @@ class Repo:
         if self._rc == 0:
             self._time = self._out
 
-    def _get_tag(self):
+    def _get_last_tag(self):
         """Get and store git tag for the HEAD commit"""
-        self._tag = None
-        self._exec('describe --tags --exact-match HEAD')
+        self._last_tag = None
+        self._num_commits_past_tag = None
+        self._exec('describe --tags --long')
         if self._rc == 0:
-            self._tag = self._out.strip(' \t\n\r')
+            descriptions = self._out.rsplit('-', 2)
+            self._last_tag = descriptions[-3]
+            self._num_commits_past_tag = descriptions[-2]
 
     def _get_branch(self):
         """Get and store current branch containing the HEAD commit"""
@@ -90,22 +95,43 @@ class Repo:
         if self._rc:
             self._dirty = True
 
+    def _load_json(self):
+        """Loads the repo data from version-info.json"""
+        json_path = os.path.join(self._path, 'version-info.json')
+        if os.path.isfile(json_path):
+            with open(json_path) as json_file:
+               json_data = json.load(json_file)
+
+            self._hash = json_data['hash']
+            self._origin = json_data['origin']
+            self._time = json_data['time']
+            self._last_tag = json_data['last_tag']
+            self._num_commits_past_tag = json_data['num_commits_past_tag']
+            self._branch = json_data['branch']
+            self._dirty = json_data['dirty']
+
+            return True
+        return False
+
     def __init__(self, path = "."):
         """Initialize object instance and read repo info"""
         self._path = path
         self._exec('rev-parse --verify HEAD')
-        if self._rc == 0:
+        if self._load_json():
+            pass
+        elif self._rc == 0:
             self._hash = self._out.strip(' \t\n\r')
             self._get_origin()
             self._get_time()
-            self._get_tag()
+            self._get_last_tag()
             self._get_branch()
             self._get_dirty()
         else:
             self._hash = None
             self._origin = None
             self._time = None
-            self._tag = None
+            self._last_tag = None
+            self._num_commits_past_tag = None
             self._branch = None
             self._dirty = None
 
@@ -139,10 +165,10 @@ class Repo:
 
     def tag(self, none = None):
         """Return git tag for the HEAD commit or given string if none"""
-        if self._tag == None:
+        if self._last_tag == None or self._num_commits_past_tag != 0:
             return none
         else:
-            return self._tag
+            return self._last_tag
 
     def branch(self, none = None):
         """Return git branch containing the HEAD or given string if none"""
@@ -159,22 +185,22 @@ class Repo:
             return clean
 
     def label(self):
-        """Return package label (tag if defined, or date-hash if no tag)"""
+        """Return package label (similar to git describe)"""
         try:
-            if self._tag == None:
-                return ''.join([self.time('%Y%m%d'), "-", self.hash(8, 'untagged'), self.dirty()])
+            if self._num_commits_past_tag == 0:
+                return self._last_tag + self.dirty()
             else:
-                return ''.join([self.tag(''), self.dirty()])
+                return self._last_tag + "+r" + self._num_commits_past_tag + "-g" + self.hash(7, '') + self.dirty()
         except:
             return None
 
     def revision(self):
         """Return full revison string (tag if defined, or branch:hash date time if no tag)"""
         try:
-            if self._tag == None:
-                return ''.join([self.branch('no-branch'), ":", self.hash(8, 'no-hash'), self.dirty(), self.time(' %Y%m%d %H:%M')])
+            if self._num_commits_past_tag == 0:
+                return self.tag('') + self.dirty()
             else:
-                return ''.join([self.tag(''), self.dirty()])
+                return self.branch('no-branch') + ":" + self.hash(8, 'no-hash') + self.dirty() + self.time(' %Y%m%d %H:%M')
         except:
             return None
 
@@ -191,6 +217,23 @@ class Repo:
         print "dirty:      ", self.dirty('yes', 'no')
         print "label:      ", self.label()
         print "revision:   ", self.revision()
+
+    def save_to_json(self, path):
+        """Saves the repo data to version-info.json"""
+
+        json_data = dict()
+        json_data['hash'] = self._hash
+        json_data['origin'] = self._origin
+        json_data['time'] = self._time
+        json_data['last_tag'] = self._last_tag
+        json_data['num_commits_past_tag'] = self._num_commits_past_tag
+        json_data['branch'] = self._branch
+        # version-info.json is for use with git archive which doesn't take in dirty changes
+        json_data['dirty'] = False
+
+        json_path = os.path.join(path, 'version-info.json')
+        with open(json_path, 'w') as json_file:
+           json.dump(json_data, json_file)
 
 def file_from_template(tpl_name, out_name, dict):
     """Create or update file from template using dictionary
@@ -387,6 +430,8 @@ string given.
                         help='board revision, for example, 0x01');
     parser.add_option('--uavodir', default = "",
                         help='uav object definition directory');
+    parser.add_option('--jsonpath',
+                        help='path to save version info');
     (args, positional_args) = parser.parse_args()
 
     # Process arguments.  No advanced error handling is here.
@@ -437,6 +482,9 @@ string given.
 
     if args.outfile != None:
         file_from_template(args.template, args.outfile, dictionary)
+
+    if args.jsonpath != None:
+        r.save_to_json(args.jsonpath)
 
     return 0
 

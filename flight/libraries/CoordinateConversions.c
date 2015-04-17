@@ -180,7 +180,7 @@ void RPY2Quaternion(const float rpy[3], float q[4])
 // ** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
 void Quaternion2R(float q[4], float Rbe[3][3])
 {
-    float q0s = q[0] * q[0], q1s = q[1] * q[1], q2s = q[2] * q[2], q3s = q[3] * q[3];
+    const float q0s = q[0] * q[0], q1s = q[1] * q[1], q2s = q[2] * q[2], q3s = q[3] * q[3];
 
     Rbe[0][0] = q0s + q1s - q2s - q3s;
     Rbe[0][1] = 2 * (q[1] * q[2] + q[0] * q[3]);
@@ -192,6 +192,61 @@ void Quaternion2R(float q[4], float Rbe[3][3])
     Rbe[2][1] = 2 * (q[2] * q[3] - q[0] * q[1]);
     Rbe[2][2] = q0s - q1s - q2s + q3s;
 }
+
+
+// ** Find first row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the fuselage/roll vector xB **
+void QuaternionC2xB(const float q0, const float q1, const float q2, const float q3, float x[3])
+{
+    const float q0s = q0 * q0, q1s = q1 * q1, q2s = q2 * q2, q3s = q3 * q3;
+
+    x[0] = q0s + q1s - q2s - q3s;
+    x[1] = 2 * (q1 * q2 + q0 * q3);
+    x[2] = 2 * (q1 * q3 - q0 * q2);
+}
+
+
+void Quaternion2xB(const float q[4], float x[3])
+{
+    QuaternionC2xB(q[0], q[1], q[2], q[3], x);
+}
+
+
+// ** Find second row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the spanwise/pitch vector yB **
+void QuaternionC2yB(const float q0, const float q1, const float q2, const float q3, float y[3])
+{
+    const float q0s = q0 * q0, q1s = q1 * q1, q2s = q2 * q2, q3s = q3 * q3;
+
+    y[0] = 2 * (q1 * q2 - q0 * q3);
+    y[1] = q0s - q1s + q2s - q3s;
+    y[2] = 2 * (q2 * q3 + q0 * q1);
+}
+
+
+void Quaternion2yB(const float q[4], float y[3])
+{
+    QuaternionC2yB(q[0], q[1], q[2], q[3], y);
+}
+
+
+// ** Find third row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the vertical/yaw vector zB **
+void QuaternionC2zB(const float q0, const float q1, const float q2, const float q3, float z[3])
+{
+    const float q0s = q0 * q0, q1s = q1 * q1, q2s = q2 * q2, q3s = q3 * q3;
+
+    z[0] = 2 * (q1 * q3 + q0 * q2);
+    z[1] = 2 * (q2 * q3 - q0 * q1);
+    z[2] = q0s - q1s - q2s + q3s;
+}
+
+
+void Quaternion2zB(const float q[4], float z[3])
+{
+    QuaternionC2zB(q[0], q[1], q[2], q[3], z);
+}
+
 
 // ****** Express LLA in a local NED Base Frame ********
 void LLA2Base(int32_t LLAi[3], double BaseECEF[3], float Rne[3][3], float NED[3])

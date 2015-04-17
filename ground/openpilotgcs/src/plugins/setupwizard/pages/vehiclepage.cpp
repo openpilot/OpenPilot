@@ -46,12 +46,20 @@ bool VehiclePage::validatePage()
         getWizard()->setVehicleType(SetupWizard::VEHICLE_MULTI);
     } else if (ui->fixedwingButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_FIXEDWING);
+        getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     } else if (ui->heliButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_HELI);
     } else if (ui->surfaceButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_SURFACE);
+        getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     } else {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_UNKNOWN);
     }
     return true;
+}
+
+void VehiclePage::initializePage()
+{
+    // ui->fixedwingButton->setEnabled(getWizard()->getControllerType() == SetupWizard::CONTROLLER_REVO ||
+    // getWizard()->getControllerType() == SetupWizard::CONTROLLER_NANO);
 }

@@ -6,7 +6,7 @@
         <field name="Yaw" units="degrees" type="float" elements="1"/>
         <field name="Thrust" units="%" type="float" elements="1"/>
 	<!-- These values should match those in FlightModeSettings.Stabilization{1,2,3}Settings -->
-        <field name="StabilizationMode" units="" type="enum" elementnames="Roll,Pitch,Yaw,Thrust" options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"/>
+        <field name="StabilizationMode" units="" type="enum" elementnames="Roll,Pitch,Yaw,Thrust" options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,AltitudeHold,AltitudeVario,CruiseControl"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

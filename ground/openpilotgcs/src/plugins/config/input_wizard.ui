@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>InputWizardWidget</class>
+ <widget class="QWidget" name="InputWizardWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>644</width>
+    <height>529</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QStackedWidget" name="pagesStack">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="welcomePage">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="welcomeText">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Welcome to the inputs configuration wizard.
+
+Please follow the instructions on the screen and only move your controls when asked to.
+Make sure you already configured your hardware settings on the proper tab and restarted your board.
+
+You can press 'back' at any time to return to the previous screen or press 'Cancel' to quit the wizard.
+</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="chooseTypePage">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="typePageHeader">
+         <property name="text">
+          <string>Please choose your transmitter type:</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="typeAcro">
+         <property name="text">
+          <string>Acro: normal transmitter for fixed-wing or quad</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="typeGround">
+         <property name="text">
+          <string>Surface: has reversible motor controlled by throttle stick, plus yaw control (2 channels)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="typeHeli">
+         <property name="text">
+          <string>Helicopter: has collective pitch and throttle input</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="typePageFooter">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If selecting the Helicopter option, please engage throttle hold now.&lt;/p&gt;&lt;p&gt;If selecting the Surface option, the &lt;b&gt;Flight Mode Count&lt;/b&gt; will be set to be 1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>23</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="chooseModePage">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="modePageHeader">
+         <property name="text">
+          <string>Please choose your transmitter mode:</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="mode1Button">
+         <property name="text">
+          <string>Mode 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="mode2Button">
+         <property name="text">
+          <string>Mode 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="mode3Button">
+         <property name="text">
+          <string>Mode 3</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="mode4Button">
+         <property name="text">
+          <string>Mode 4</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="modePageFooter">
+         <property name="text">
+          <string>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="identifySticksPage">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="identifyStickInstructions">
+         <property name="text">
+          <string>Identify sticks instructions</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="identifyCenterPage">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="identifyCenterInstructions">
+         <property name="text">
+          <string>Please center all controls and trims and press Next when ready.
+
+If your FlightMode switch has only two positions, leave it in either position.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="identifyLimitsPage">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QLabel" name="identifyLimitsInstructions">
+         <property name="text">
+          <string>Please move all controls to their maximum extents on both directions.
+
+Press Next when ready.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="identifyInvertedPage">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <layout class="QGridLayout" name="checkBoxesLayout"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="identifyInvertedInstructions">
+         <property name="text">
+          <string>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="finishPage">
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>You have completed this wizard, please check below if the picture mimics your sticks movement.
+
+IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="wzBack">
+       <property name="text">
+        <string>Back</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="wzNext">
+       <property name="text">
+        <string>Next</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="wzCancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

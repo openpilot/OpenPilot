@@ -15,9 +15,9 @@
         <field name="ReverseCourseOverlap" units="deg" type="float" elements="1" defaultvalue="20.0"/>
 		<!-- how big the overlapping area behind the plane is, where, if the desired course lies behind, the current bank angle will determine if the plane goes left or right -->
 
-        <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
+        <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.2"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
-        <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.2"/>
+        <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.4"/>
                 <!-- proportional coefficient for desired vertical speed in relation to altitude displacement-->
 
         <!-- these coefficients control actual control outputs -->
@@ -38,7 +38,7 @@
                      in relation to vertical speed error (absolute but including crossfeed) -->
 
         <!-- output limits -->
-        <field name="RollLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-35,0,35" />
+        <field name="RollLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-45,0,45" />
                 <!-- maximum allowed bank angles in navigates flight -->
         <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,20" />
                 <!-- maximum allowed pitch angles and setpoint for neutral pitch -->
@@ -46,7 +46,7 @@
                 <!-- minimum and maximum allowed thrust and setpoint for cruise speed -->
         <field name="Safetymargins" units="" type="float"
                 elementnames="Wind, Stallspeed, Lowspeed, Highspeed, Overspeed, Lowpower, Highpower, Pitchcontrol"
-                defaultvalue="90, 1.0, 0.5, 1.5, 1.0, 1, 1, 1" />
+                defaultvalue="90, 1.0, 0.5, 1.5, 1.0, 1, 0, 1" />
                 <!-- Wind: degrees of crabbing allowed
                      Speeds: percentage (1.0=100%) of the limit to be over/onder
                      Power & Control: flag to turn on/off 0.0 =off 1.0 = on -->

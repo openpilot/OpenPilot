@@ -43,8 +43,12 @@ public:
     friend class ConfigOutputWidget;
 
     virtual QString name();
-    virtual void setName(const QString &name);
+    virtual QString bank();
 
+    virtual void setName(const QString &name);
+    virtual void setBank(const QString &bank);
+
+    virtual void setColor(const QColor &color);
 public slots:
     int min() const;
     void setMin(int minimum);
@@ -54,6 +58,7 @@ public slots:
     void setNeutral(int value);
     void setRange(int minimum, int maximum);
     void enableChannelTest(bool state);
+    QString outputMixerType();
 
 signals:
     void channelChanged(int index, int value);
@@ -61,6 +66,7 @@ signals:
 private:
     Ui::outputChannelForm ui;
     bool m_inChannelTest;
+    QString m_mixerType;
 
 private slots:
     void linkToggled(bool state);

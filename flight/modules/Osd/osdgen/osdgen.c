@@ -56,7 +56,11 @@
 #include "barosensor.h"
 #include "taskinfo.h"
 #include "flightstatus.h"
-#include "manualcontrolcommand.h"
+
+// TODO Änderungen umsetzen
+//#include "manualcontrolcommand.h"
+#include "manualcontrolsettings.h"
+
 #include "gpsvelocitysensor.h"
 #ifdef DEBUG_TELEMETRY
 #include "flighttelemetrystats.h"
@@ -2292,21 +2296,23 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
         sprintf(temp, "Stab6");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
-        sprintf(temp, "Tune");
-        break;
+// TODO neue defines umsetzen
+//    case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
+//        sprintf(temp, "Tune");
+//        break;
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
         sprintf(temp, "PH");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV	:
-        sprintf(temp, "PVFPV");
-        break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
-        sprintf(temp, "PVLOS");
-        break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
-        sprintf(temp, "PVNSEW");
-        break;
+// TODO neue defines umsetzen
+//    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
+//        sprintf(temp, "PVFPV");
+//        break;
+//    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
+//        sprintf(temp, "PVLOS");
+//        break;
+//    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
+//        sprintf(temp, "PVNSEW");
+//        break;
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
         sprintf(temp, "RTB");
         break;
@@ -2319,7 +2325,7 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
     case FLIGHTSTATUS_FLIGHTMODE_POI:
         sprintf(temp, "POI");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE	:
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         sprintf(temp, "AutoCruise");
         break;
     default:
@@ -2487,8 +2493,8 @@ void updateGraphics()
     BaroSensorGet(&baro);
     FlightStatusData status;
     FlightStatusGet(&status);
-    ManualControlCommandData mcc;
-    ManualControlCommandGet(&mcc);
+    ManualControlSettingsData mcs;
+    ManualControlSettingsGet(&mcs);
 #ifdef DEBUG_TELEMETRY
     FlightTelemetryStatsData f_telemetry;
     FlightTelemetryStatsGet(&f_telemetry);
@@ -2550,9 +2556,10 @@ void updateGraphics()
         MSPProfile = MSPGetProfile();
         status.Armed = MSPGetArmed() ? FLIGHTSTATUS_ARMED_ARMED : FLIGHTSTATUS_ARMED_DISARMED;
         status.FlightMode = MSPGetMode() + FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
-        mcc.Throttle = (float)(MSPGetRC(MSP_THROTTLE) - 968) / 1103.0f;                                 // TODO assumes channel 3 and 968 - 2071 µs
-        mcc.Connected = 1;
-        mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] = MSPGetRC(MSP_AUX2);                    // TODO assumes channel 5
+// TODO 15.02
+//        mcs.Throttle = (float)(MSPGetRC(MSP_THROTTLE) - 968) / 1103.0f;                                 // TODO assumes channel 3 and 968 - 2071 µs
+//        mcs.Connected = 1;
+//        mcs.Channel[OsdSettings.ScreenSwitching.SwitchChannel] = MSPGetRC(MSP_AUX2);                    // TODO assumes channel 5
         attitude.Roll  =  0.1f * ((int16_t)MSPGetAngle(0));
         attitude.Pitch = -0.1f * ((int16_t)MSPGetAngle(1));
 #endif
@@ -2572,16 +2579,21 @@ void updateGraphics()
         // use homePos.Altitude for baro.Altitude correction?
 
         // Screen switching via RC-RX or GCS
-        if (mcc.Connected) {
-            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] < OsdSettings.ScreenSwitching.Switch1Pulse) {
+// TODO 15.02
+#if 1
+	screen = 1;
+#else
+        if (mcs.Connected) {
+            if (mcs.Channel[OsdSettings.ScreenSwitching.SwitchChannel] < OsdSettings.ScreenSwitching.Switch1Pulse) {
                 screen = 1;
             }
-            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] > OsdSettings.ScreenSwitching.Switch3Pulse) {
+            if (mcs.Channel[OsdSettings.ScreenSwitching.SwitchChannel] > OsdSettings.ScreenSwitching.Switch3Pulse) {
                 screen = 3;
             }
         } else {
             screen = OsdSettings.ScreenSwitching.UnconnectedScreen;
         }
+#endif
 
         // Set the units to metric or imperial
         convert = OsdSettings.Units == OSDSETTINGS_UNITS_METRIC ? &Convert[0] : &Convert[1];
@@ -2689,7 +2701,9 @@ void updateGraphics()
         }
         // Throttle
         if (check_enable_and_srceen(OsdSettings.Throttle, (OsdSettingsWarningsSetupData *)&OsdSettings.ThrottleSetup, screen, &x, &y)) {
-            int throttle = (int)(mcc.Throttle * 100.0f);
+// TODO 15.02
+//            int throttle = (int)(mcs.Throttle * 100.0f);
+            int throttle = 0;
             sprintf(temp, "Thr%4d%%", throttle < 0 ? 0 : throttle);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.ThrottleSetup.CharSize);
         }
@@ -3067,7 +3081,7 @@ int32_t osdgenInitialize(void)
     OsdSettings2Initialize();
     BaroSensorInitialize();
     FlightStatusInitialize();
-    ManualControlCommandInitialize();
+    ManualControlSettingsInitialize();
     TaskInfoInitialize();
 
 #if 0 // JR_HINT an idea
@@ -3092,7 +3106,7 @@ int32_t osdgenInitialize(void)
     GPSSatellitesSetMetadata(&metadata);
     HomeLocationSetMetadata(&metadata);
     BaroSensorSetMetadata(&metadata);
-    ManualControlCommandSetMetadata(&metadata);
+    ManualControlSettingsSetMetadata(&metadata);
     TaskInfoSetMetadata(&metadata);
 #endif /* if 0 */
 

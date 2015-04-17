@@ -57,6 +57,17 @@ Rectangle {
                     }
                 }
             }
+            AnimatedImage {
+                id: opie
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                anchors.top: logo.bottom
+                anchors.topMargin: 10
+                source: "../images/opie_90x120.gif"
+                z: 100
+                fillMode: Image.PreserveAspectFit
+                visible: false
+            }
 
             Rectangle {
                 anchors.left: logo.right
@@ -76,7 +87,15 @@ Rectangle {
                         Layout.fillWidth: true
                         font.pixelSize: 14
                         font.bold: true
-
+                        MouseArea {
+                            id: easter_egg
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                opie.visible = !opie.visible
+                            }
+                        }
                     }
                     Text {
                         id: versionLabel

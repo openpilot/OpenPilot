@@ -52,6 +52,43 @@ typedef void *UAVObjHandle;
 #define MetaObjectId(id) ((id) + 1)
 
 /**
+ * helper macro to access multi-element fields as array
+ */
+#define UAVObjectFieldToArray(type, var) \
+    (*({ type *const dummy = &(var); \
+         &(((type##Array *)dummy)->array); } \
+       ))
+
+// we have limited trust in our compiler
+// make sure this macro actually works on all platforms
+
+typedef struct __attribute__((__packed__)) {
+    uint16_t element1;
+    uint16_t element2;
+    uint16_t element3;
+}
+__DummyUAVObjectFieldData;
+
+typedef struct __attribute__((__packed__)) {
+    uint16_t array[3];
+}
+__DummyUAVObjectFieldDataArray;
+
+#define __DummyTA(var) UAVObjectFieldToArray(__DummyUAVObjectFieldData, var)
+
+__attribute__((unused)) static void __DummyTAtest(void)
+{
+    __DummyUAVObjectFieldData t;
+
+    PIOS_STATIC_ASSERT(sizeof(t) == sizeof(__DummyTA(t)));
+    PIOS_STATIC_ASSERT(sizeof(t.element1) == sizeof(__DummyTA(t)[0]));
+    PIOS_STATIC_ASSERT((void *)&t == (void *)&__DummyTA(t));
+    PIOS_STATIC_ASSERT((void *)&t.element1 == (void *)&__DummyTA(t)[0]);
+    PIOS_STATIC_ASSERT((void *)&t.element2 == (void *)&__DummyTA(t)[1]);
+    PIOS_STATIC_ASSERT((void *)&t.element3 == (void *)&__DummyTA(t)[2]);
+}
+
+/**
  * Object update mode, used by multiple modules (e.g. telemetry and logger)
  */
 typedef enum {
@@ -165,10 +202,6 @@ uint8_t UAVObjUpdateCRC(UAVObjHandle obj_handle, uint16_t instId, uint8_t crc);
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId);
-#if defined(PIOS_INCLUDE_SDCARD)
-int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId, FILEINFO *file);
-int32_t UAVObjLoadFromFile(UAVObjHandle obj_handle, FILEINFO *file);
-#endif
 int32_t UAVObjSaveSettings();
 int32_t UAVObjLoadSettings();
 int32_t UAVObjDeleteSettings();

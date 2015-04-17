@@ -37,8 +37,8 @@ macx {
 }
 
 win32 {
-    INCLUDEPATH += $(SDL_DIR)/include
-    LIBS += -L$(SDL_DIR)/lib
+    INCLUDEPATH += $${SDL_DIR}/include
+    LIBS += -L$${SDL_DIR}/lib
 }
 
 !mac:LIBS += -lSDL

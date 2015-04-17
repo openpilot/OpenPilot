@@ -34,6 +34,7 @@ ground/openpilotgcs/.settings
 /ground/uavobjgenerator/uavobjgenerator.pro.user
 /ground/uavobjects/uavobjects.pro.user
 /ground/ground.pro.user
+/ground/openpilotgcs/src/libs/sdlgamepad.pro.user
 
 # Misc artifacts
 /ground/openpilotgcs/share/openpilotgcs/sounds/normalize.exe

@@ -30,4 +30,6 @@
 #ifndef PIOS_PWM_H
 #define PIOS_PWM_H
 
+#define PIOS_PWM_VALID_RANGE_MAX 2250
+#define PIOS_PWM_VALID_RANGE_MIN 750
 #endif /* PIOS_PWM_H */

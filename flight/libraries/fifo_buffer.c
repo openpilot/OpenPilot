@@ -148,14 +148,18 @@ uint16_t fifoBuf_getDataPeek(t_fifo_buffer *buf, void *data, uint16_t len)
     uint16_t i = 0;
 
     while (num_bytes > 0) {
-        uint16_t j = buf_size - rd;
-        if (j > num_bytes) {
-            j = num_bytes;
+        uint16_t block_len = buf_size - rd;
+        if (block_len > num_bytes) {
+            block_len = num_bytes;
         }
-        memcpy(p + i, buff + rd, j);
-        i  += j;
-        num_bytes -= j;
-        rd += j;
+        if (block_len == 1) {
+            *((uint8_t *)(p + i)) = *((uint8_t *)(buff + rd));
+        } else {
+            memcpy(p + i, buff + rd, block_len);
+        }
+        i  += block_len;
+        num_bytes -= block_len;
+        rd += block_len;
         if (rd >= buf_size) {
             rd = 0;
         }
@@ -184,14 +188,18 @@ uint16_t fifoBuf_getData(t_fifo_buffer *buf, void *data, uint16_t len)
     uint16_t i = 0;
 
     while (num_bytes > 0) {
-        uint16_t j = buf_size - rd;
-        if (j > num_bytes) {
-            j = num_bytes;
+        uint16_t block_len = buf_size - rd;
+        if (block_len > num_bytes) {
+            block_len = num_bytes;
         }
-        memcpy(p + i, buff + rd, j);
-        i  += j;
-        num_bytes -= j;
-        rd += j;
+        if (block_len == 1) {
+            *((uint8_t *)(p + i)) = *((uint8_t *)(buff + rd));
+        } else {
+            memcpy(p + i, buff + rd, block_len);
+        }
+        i  += block_len;
+        num_bytes -= block_len;
+        rd += block_len;
         if (rd >= buf_size) {
             rd = 0;
         }
@@ -243,14 +251,18 @@ uint16_t fifoBuf_putData(t_fifo_buffer *buf, const void *data, uint16_t len)
     uint16_t i = 0;
 
     while (num_bytes > 0) {
-        uint16_t j = buf_size - wr;
-        if (j > num_bytes) {
-            j = num_bytes;
+        uint16_t block_len = buf_size - wr;
+        if (block_len > num_bytes) {
+            block_len = num_bytes;
         }
-        memcpy(buff + wr, p + i, j);
-        i  += j;
-        num_bytes -= j;
-        wr += j;
+        if (block_len == 1) {
+            *((uint8_t *)(buff + wr)) = *((uint8_t *)(p + i));
+        } else {
+            memcpy(buff + wr, p + i, block_len);
+        }
+        i  += block_len;
+        num_bytes -= block_len;
+        wr += block_len;
         if (wr >= buf_size) {
             wr = 0;
         }

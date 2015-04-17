@@ -59,6 +59,8 @@ typedef struct {
     }     monitor;
     float rattitude_mode_transition_stick_position;
     struct pid innerPids[3], outerPids[3];
+    // TPS [Roll,Pitch,Yaw][P,I,D]
+    bool  thrust_pid_scaling_enabled[3][3];
 } StabilizationData;
 
 
@@ -76,7 +78,7 @@ extern StabilizationData stabSettings;
 // must be same as eventdispatcher to avoid needing additional mutexes
 #define CBTASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
 
-// outer loop only executes every 4th uavobject update to safe CPU
+// outer loop only executes every 4th uavobject update to save CPU
 #define OUTERLOOP_SKIPCOUNT 4
 
 #endif // STABILIZATION_H

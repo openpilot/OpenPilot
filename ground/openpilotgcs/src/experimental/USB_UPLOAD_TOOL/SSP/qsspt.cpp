@@ -1,3 +1,29 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qsspt.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup Uploader Serial and USB Uploader Plugin
+ * @{
+ * @brief The USB and Serial protocol uploader plugin
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 #include "qsspt.h"
 
 qsspt::qsspt(port *info, bool debug) : qssp(info, debug), endthread(false), datapending(false), debug(debug)
@@ -21,6 +47,13 @@ void qsspt::run()
 }
 bool qsspt::sendData(uint8_t *buf, uint16_t size)
 {
+    if (debug) {
+        QByteArray data;
+        for (int i = 0; i < size; i++) {
+            data.append((uint8_t)buf[i]);
+        }
+        qDebug() << "SSP TX " << data.toHex();
+    }
     if (datapending) {
         return false;
     }
@@ -30,7 +63,7 @@ bool qsspt::sendData(uint8_t *buf, uint16_t size)
     msize = size;
     sendbufmutex.unlock();
     msendwait.lock();
-    sendwait.wait(&msendwait, 100000);
+    sendwait.wait(&msendwait, 10000);
     msendwait.unlock();
     return true;
 }
@@ -62,6 +95,9 @@ int qsspt::read_Packet(void *data)
     }
     QByteArray arr = queue.dequeue();
     memcpy(data, (uint8_t *)arr.data(), arr.length());
+    if (debug) {
+        qDebug() << "SSP RX " << arr.toHex();
+    }
     mutex.unlock();
     return arr.length();
 }

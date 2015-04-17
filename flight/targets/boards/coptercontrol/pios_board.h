@@ -75,7 +75,7 @@
 // ------------------------
 // TELEMETRY
 // ------------------------
-#define TELEM_QUEUE_SIZE         20
+#define TELEM_QUEUE_SIZE         10
 
 // ------------------------
 // PIOS_LED
@@ -251,6 +251,7 @@ extern uint32_t pios_com_hkosd_id;
 // -------------------------
 #define PIOS_SERVO_UPDATE_HZ         50
 #define PIOS_SERVOS_INITIAL_POSITION 0 /* dont want to start motors, have no pulse till settings loaded */
+#define PIOS_SERVO_BANKS             6
 
 // --------------------------
 // Timer controller settings

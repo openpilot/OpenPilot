@@ -36,23 +36,27 @@
 #include <manualcontrolsettings.h>
 #include <flightmodesettings.h>
 #include <systemsettings.h>
+#include <stabilizationsettings.h>
 #include <systemalarms.h>
 #include <revosettings.h>
 #include <positionstate.h>
 #include <taskinfo.h>
 
 // a number of useful macros
-#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+#define ADDSEVERITY(check)                                  severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+#define ADDEXTENDEDALARMSTATUS(error_code, error_substatus) if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) { alarmstatus = (error_code); alarmsubstatus = (error_substatus); }
 
-
-/****************************
-* Current checks:
-* 1. If a flight mode switch allows autotune and autotune module not running
-* 2. If airframe is a multirotor and either manual is available or a stabilization mode uses "none"
-****************************/
+// private types
+typedef struct SANITYCHECK_CustomHookInstance {
+    SANITYCHECK_CustomHook_function *hook;
+    struct SANITYCHECK_CustomHookInstance *next;
+    bool enabled;
+} SANITYCHECK_CustomHookInstance;
 
 // ! Check a stabilization mode switch position for safety
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol);
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted);
+
+SANITYCHECK_CustomHookInstance *hooks = 0;
 
 /**
  * Run a preflight check over the hardware configuration
@@ -75,7 +79,7 @@ int32_t configuration_check()
     bool navCapableFusion;
     switch (revoFusion) {
     case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
-    case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
+    case REVOSETTINGS_FUSIONALGORITHM_GPSNAVIGATIONINS13:
         navCapableFusion = true;
         break;
     default:
@@ -101,55 +105,61 @@ int32_t configuration_check()
     // modes
     uint8_t num_modes;
     uint8_t modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
+    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
     ManualControlSettingsFlightModeNumberGet(&num_modes);
+    StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
     FlightModeSettingsFlightModePositionGet(modes);
 
     for (uint32_t i = 0; i < num_modes; i++) {
-        switch (modes[i]) {
+        uint8_t gps_assisted = FlightModeAssistMap[i];
+        if (gps_assisted) {
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(multirotor);
+            ADDSEVERITY(navCapableFusion);
+        }
+
+        switch ((FlightModeSettingsFlightModePositionOptions)modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
+            ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!multirotor);
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED4:
-            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED5:
-            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol));
+            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
-            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol));
-            break;
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
+            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol, gps_assisted));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
-            // Revo supports PathPlanner and that must be OK or we are not sane
-            // PathPlan alarm is uninitialized if not running
-            // PathPlan alarm is warning or error if the flightplan is invalid
-            SystemAlarmsAlarmData alarms;
-            SystemAlarmsAlarmGet(&alarms);
-            ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
+            ADDSEVERITY(!gps_assisted);
         }
-        // intentionally no break as this also needs pathfollower
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOFPV:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOLOS:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIONSEW:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(navCapableFusion);
+            break;
+
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_COURSELOCK:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_HOMELEASH:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ABSOLUTEPOSITION:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
+            ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!coptercontrol);
-            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER));
             ADDSEVERITY(navCapableFusion);
             break;
         default:
@@ -160,6 +170,41 @@ int32_t configuration_check()
         if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) {
             alarmstatus    = SYSTEMALARMS_EXTENDEDALARMSTATUS_FLIGHTMODE;
             alarmsubstatus = i;
+        }
+    }
+
+
+    // Check throttle/collective channel range for valid configuration of input for critical control
+    SystemSettingsThrustControlOptions thrustType;
+    SystemSettingsThrustControlGet(&thrustType);
+    ManualControlSettingsChannelMinData channelMin;
+    ManualControlSettingsChannelMaxData channelMax;
+    ManualControlSettingsChannelMinGet(&channelMin);
+    ManualControlSettingsChannelMaxGet(&channelMax);
+    switch (thrustType) {
+    case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+        ADDSEVERITY(fabsf(channelMax.Throttle - channelMin.Throttle) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+        ADDSEVERITY(fabsf(channelMax.Collective - channelMin.Collective) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    default:
+        break;
+    }
+
+    // query sanity check hooks
+    if (severity < SYSTEMALARMS_ALARM_CRITICAL) {
+        SANITYCHECK_CustomHookInstance *instance = NULL;
+        LL_FOREACH(hooks, instance) {
+            if (instance->enabled) {
+                alarmstatus = instance->hook();
+                if (alarmstatus != SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE) {
+                    severity = SYSTEMALARMS_ALARM_CRITICAL;
+                    break;
+                }
+            }
         }
     }
 
@@ -184,7 +229,7 @@ int32_t configuration_check()
  * @param[in] index Which stabilization mode to check
  * @returns true or false
  */
-static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol)
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted)
 {
     uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
@@ -222,6 +267,17 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
         }
     }
 
+    if (gpsassisted) {
+        // For multirotors verify that roll/pitch are either attitude or rattitude
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if (!(modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ATTITUDE ||
+                  modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATTITUDE)) {
+                return false;
+            }
+        }
+    }
+
+
     // coptercontrol cannot do altitude holding
     if (coptercontrol) {
         if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
@@ -247,10 +303,22 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
         return false;
     }
 
+
+    // if cruise control, ensure rate or acro are not set
+    if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL) {
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if ((modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATE ||
+                 modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ACRO)) {
+                return false;
+            }
+        }
+    }
+
     // Warning: This assumes that certain conditions in the XML file are met.  That
     // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL has the same numeric value for each channel
     // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
     // (this is checked at compile time by static constraint manualcontrol.h)
+
 
     return true;
 }
@@ -294,4 +362,40 @@ FrameType_t GetCurrentFrameType()
     }
     // anyway it should not reach here
     return FRAME_TYPE_CUSTOM;
+}
+
+void SANITYCHECK_AttachHook(SANITYCHECK_CustomHook_function *hook)
+{
+    PIOS_Assert(hook);
+    SANITYCHECK_CustomHookInstance *instance = NULL;
+
+    // Check whether there is an existing instance and enable it
+    LL_FOREACH(hooks, instance) {
+        if (instance->hook == hook) {
+            instance->enabled = true;
+            return;
+        }
+    }
+
+    // No existing instance found, attach this new one
+    instance = (SANITYCHECK_CustomHookInstance *)pios_malloc(sizeof(SANITYCHECK_CustomHookInstance));
+    PIOS_Assert(instance);
+    instance->hook    = hook;
+    instance->next    = NULL;
+    instance->enabled = true;
+    LL_APPEND(hooks, instance);
+}
+
+void SANITYCHECK_DetachHook(SANITYCHECK_CustomHook_function *hook)
+{
+    if (!hooks) {
+        return;
+    }
+    SANITYCHECK_CustomHookInstance *instance = NULL;
+    LL_FOREACH(hooks, instance) {
+        if (instance->hook == hook) {
+            instance->enabled = false;
+            return;
+        }
+    }
 }

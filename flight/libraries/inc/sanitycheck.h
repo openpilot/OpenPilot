@@ -32,6 +32,9 @@
 
 #include <systemalarms.h>
 
+#include <stdint.h>
+#include <utlist.h>
+
 typedef enum {
     FRAME_TYPE_MULTIROTOR,
     FRAME_TYPE_HELI,
@@ -39,6 +42,8 @@ typedef enum {
     FRAME_TYPE_GROUND,
     FRAME_TYPE_CUSTOM,
 } FrameType_t;
+
+typedef SystemAlarmsExtendedAlarmStatusOptions (SANITYCHECK_CustomHook_function)();
 
 #define SANITYCHECK_STATUS_ERROR_NONE         SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE
 #define SANITYCHECK_STATUS_ERROR_FLIGHTMODE   SYSTEMALARMS_EXTENDEDALARMSTATUS_FLIGHTMODE
@@ -53,6 +58,18 @@ typedef enum {
 
 extern int32_t configuration_check();
 
-FrameType_t GetCurrentFrameType();
+extern FrameType_t GetCurrentFrameType();
+
+/**
+ * Attach a custom hook to the sanity check process
+ * @param hook a custom hook function
+ */
+extern void SANITYCHECK_AttachHook(SANITYCHECK_CustomHook_function *hook);
+
+/**
+ * Detach a custom hook to the sanity check process
+ * @param hook a custom hook function
+ */
+extern void SANITYCHECK_DetachHook(SANITYCHECK_CustomHook_function *hook);
 
 #endif /* SANITYCHECK_H */

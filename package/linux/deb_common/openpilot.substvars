@@ -1,2 +1,0 @@
-shlibs:Depends=libc6, libgcc1, libgl1-mesa-glx | libgl1, libglu1-mesa | libglu1, libsdl1.2debian, libstdc++6, libudev0 | libudev1, libusb-1.0-0
-misc:Depends=

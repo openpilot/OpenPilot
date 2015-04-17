@@ -20,8 +20,10 @@ Item {
         property double pitch1DegHeight: sceneItem.height*pitch1DegScaledHeight
 
         gradient: Gradient {
+            GradientStop { position: 0.4000;   color: "#013163" }
             GradientStop { position: 0.4999;   color: "#0164CC" }
             GradientStop { position: 0.5001;   color: "#653300" }
+            GradientStop { position: 0.6000;   color: "#3C1E00" }
         }
 
         transform: [

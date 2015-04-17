@@ -159,6 +159,16 @@ out_fail:
 
 static void PIOS_TIM_generic_irq_handler(TIM_TypeDef *timer)
 {
+    /* Check for an overflow event on this timer */
+    bool overflow_event     = 0;
+    uint16_t overflow_count = false;
+
+    if (TIM_GetITStatus(timer, TIM_IT_Update) == SET) {
+        TIM_ClearITPendingBit(timer, TIM_IT_Update);
+        overflow_count = timer->ARR;
+        overflow_event = true;
+    }
+
     /* Iterate over all registered clients of the TIM layer to find channels on this timer */
     for (uint8_t i = 0; i < pios_tim_num_devs; i++) {
         const struct pios_tim_dev *tim_dev = &pios_tim_devs[i];
@@ -166,18 +176,6 @@ static void PIOS_TIM_generic_irq_handler(TIM_TypeDef *timer)
         if (!tim_dev->channels || tim_dev->num_channels == 0) {
             /* No channels to process on this client */
             continue;
-        }
-
-        /* Check for an overflow event on this timer */
-        bool overflow_event;
-        uint16_t overflow_count;
-        if (TIM_GetITStatus(timer, TIM_IT_Update) == SET) {
-            TIM_ClearITPendingBit(timer, TIM_IT_Update);
-            overflow_count = timer->ARR;
-            overflow_event = true;
-        } else {
-            overflow_count = 0;
-            overflow_event = false;
         }
 
         for (uint8_t j = 0; j < tim_dev->num_channels; j++) {
@@ -251,11 +249,11 @@ static void PIOS_TIM_generic_irq_handler(TIM_TypeDef *timer)
                  * get the order wrong, our pulse width calculations could be off by up
                  * to ARR ticks.  That could be bad.
                  *
-                 * Heuristic: If the edge_count is < 16 ticks above zero then we assume the
+                 * Heuristic: If the edge_count is < 32 ticks above zero then we assume the
                  *            edge happened just after the overflow.
                  */
 
-                if (edge_count < 16) {
+                if (edge_count < 32) {
                     /* Call the overflow callback first */
                     if (tim_dev->callbacks->overflow) {
                         (*tim_dev->callbacks->overflow)((uint32_t)tim_dev,
@@ -300,67 +298,6 @@ static void PIOS_TIM_generic_irq_handler(TIM_TypeDef *timer)
         }
     }
 }
-#if 0
-uint16_t val = 0;
-for (uint8_t i = 0; i < pios_pwm_cfg.num_channels; i++) {
-    struct pios_pwm_channel channel = pios_pwm_cfg.channels[i];
-    if ((channel.timer == timer) && (TIM_GetITStatus(channel.timer, channel.ccr) == SET)) {
-        TIM_ClearITPendingBit(channel.timer, channel.ccr);
-
-        switch (channel.channel) {
-        case TIM_Channel_1:
-            val = TIM_GetCapture1(channel.timer);
-            break;
-        case TIM_Channel_2:
-            val = TIM_GetCapture2(channel.timer);
-            break;
-        case TIM_Channel_3:
-            val = TIM_GetCapture3(channel.timer);
-            break;
-        case TIM_Channel_4:
-            val = TIM_GetCapture4(channel.timer);
-            break;
-        }
-
-        if (CaptureState[i] == 0) {
-            RiseValue[i] = val;
-        } else {
-            FallValue[i] = val;
-        }
-
-        // flip state machine and capture value here
-        /* Simple rise or fall state machine */
-        TIM_ICInitTypeDef TIM_ICInitStructure = pios_pwm_cfg.tim_ic_init;
-        if (CaptureState[i] == 0) {
-            /* Switch states */
-            CaptureState[i] = 1;
-
-            /* Switch polarity of input capture */
-            TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
-            TIM_ICInitStructure.TIM_Channel    = channel.channel;
-            TIM_ICInit(channel.timer, &TIM_ICInitStructure);
-        } else {
-            /* Capture computation */
-            if (FallValue[i] > RiseValue[i]) {
-                CaptureValue[i] = (FallValue[i] - RiseValue[i]);
-            } else {
-                CaptureValue[i] = ((channel.timer->ARR - RiseValue[i]) + FallValue[i]);
-            }
-
-            /* Switch states */
-            CaptureState[i] = 0;
-
-            /* Increase supervisor counter */
-            CapCounter[i]++;
-
-            /* Switch polarity of input capture */
-            TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-            TIM_ICInitStructure.TIM_Channel    = channel.channel;
-            TIM_ICInit(channel.timer, &TIM_ICInitStructure);
-        }
-    }
-}
-#endif /* if 0 */
 
 /* Bind Interrupt Handlers
  *

@@ -260,7 +260,7 @@ static const struct pios_spi_cfg pios_spi_flash_accel_cfg_cc3d = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_13,
-            .GPIO_Speed = GPIO_Speed_10MHz,
+            .GPIO_Speed = GPIO_Speed_50MHz,
             .GPIO_Mode  = GPIO_Mode_AF_PP,
         },
     },
@@ -268,7 +268,7 @@ static const struct pios_spi_cfg pios_spi_flash_accel_cfg_cc3d = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_14,
-            .GPIO_Speed = GPIO_Speed_10MHz,
+            .GPIO_Speed = GPIO_Speed_50MHz,
             .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
         },
     },
@@ -276,7 +276,7 @@ static const struct pios_spi_cfg pios_spi_flash_accel_cfg_cc3d = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_15,
-            .GPIO_Speed = GPIO_Speed_10MHz,
+            .GPIO_Speed = GPIO_Speed_50MHz,
             .GPIO_Mode  = GPIO_Mode_AF_PP,
         },
     },
@@ -360,7 +360,7 @@ static const struct pios_spi_cfg pios_spi_flash_accel_cfg_cc = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_13,
-            .GPIO_Speed = GPIO_Speed_10MHz,
+            .GPIO_Speed = GPIO_Speed_50MHz,
             .GPIO_Mode  = GPIO_Mode_AF_PP,
         },
     },
@@ -368,7 +368,7 @@ static const struct pios_spi_cfg pios_spi_flash_accel_cfg_cc = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_14,
-            .GPIO_Speed = GPIO_Speed_10MHz,
+            .GPIO_Speed = GPIO_Speed_50MHz,
             .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
         },
     },
@@ -376,7 +376,7 @@ static const struct pios_spi_cfg pios_spi_flash_accel_cfg_cc = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_15,
-            .GPIO_Speed = GPIO_Speed_10MHz,
+            .GPIO_Speed = GPIO_Speed_50MHz,
             .GPIO_Mode  = GPIO_Mode_AF_PP,
         },
     },
@@ -1244,6 +1244,18 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
     },
     /* Use only the first channel for ppm */
     .channels     = &pios_tim_rcvrport_all_channels[0],
+    .num_channels = 1,
+};
+
+const struct pios_ppm_cfg pios_ppm_pin8_cfg = {
+    .tim_ic_init         = {
+        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
+        .TIM_ICSelection = TIM_ICSelection_DirectTI,
+        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
+        .TIM_ICFilter    = 0x0,
+    },
+    /* Use only the first channel for ppm */
+    .channels     = &pios_tim_rcvrport_all_channels[5],
     .num_channels = 1,
 };
 

@@ -29,7 +29,6 @@
  */
 
 #include "inc/manualcontrol.h"
-#include <pios_struct_helper.h>
 #include <sanitycheck.h>
 #include <manualcontrolcommand.h>
 #include <accessorydesired.h>
@@ -38,7 +37,8 @@
 #include <stabilizationdesired.h>
 
 // Private constants
-#define ARMED_THRESHOLD 0.50f
+#define ARMED_THRESHOLD     0.50f
+#define GROUND_LOW_THROTTLE 0.01f
 
 // Private types
 typedef enum {
@@ -63,7 +63,7 @@ static bool forcedDisArm(void);
  * @input: ManualControlCommand, AccessoryDesired
  * @output: FlightStatus.Arming
  */
-void armHandler(bool newinit)
+void armHandler(bool newinit, FrameType_t frameType)
 {
     static ArmState_t armState;
 
@@ -83,7 +83,12 @@ void armHandler(bool newinit)
 
     bool lowThrottle = cmd.Throttle < 0;
 
-    bool armSwitch   = false;
+    if (frameType == FRAME_TYPE_GROUND) {
+        // Deadbanding applied in receiver.c typically at 2% but we don't assume its enabled.
+        lowThrottle = fabsf(cmd.Throttle) < GROUND_LOW_THROTTLE;
+    }
+
+    bool armSwitch = false;
 
     switch (settings.Arming) {
     case FLIGHTMODESETTINGS_ARMING_ACCESSORY0:
@@ -215,6 +220,15 @@ void armHandler(bool newinit)
         break;
 
     case ARM_STATE_DISARMING_TIMEOUT:
+    {
+        // we should never reach the disarming timeout if the pathfollower is engaged - reset timeout
+        FlightStatusControlChainData cc;
+        FlightStatusControlChainGet(&cc);
+        if (cc.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            armedDisarmStart = sysTime;
+        }
+    }
+
         // We get here when armed while throttle low, even when the arming timeout is not enabled
         if ((settings.ArmedTimeout != 0) && (timeDifferenceMs(armedDisarmStart, sysTime) > settings.ArmedTimeout)) {
             armState = ARM_STATE_DISARMED;
@@ -259,7 +273,7 @@ static bool okToArm(void)
 
     // Check each alarm
     for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++) {
-        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
+        if (SystemAlarmsAlarmToArray(alarms.Alarm)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
             if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
             }
@@ -270,9 +284,9 @@ static bool okToArm(void)
 
     StabilizationDesiredStabilizationModeData stabDesired;
 
-    uint8_t flightMode;
-    FlightStatusFlightModeGet(&flightMode);
-    switch (flightMode) {
+    FlightStatusData flightStatus;
+    FlightStatusGet(&flightStatus);
+    switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
@@ -285,10 +299,19 @@ static bool okToArm(void)
         if (stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEHOLD ||
             stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO) {
             return false;
-        } else {
-            return true;
         }
+
+        // avoid assisted control with auto throttle.  As it sits waiting to launch,
+        // it will move to hold, and auto thrust will auto launch otherwise!
+        if (flightStatus.FlightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST) {
+            return false;
+        }
+
+        return true;
+
         break;
+    case FLIGHTSTATUS_FLIGHTMODE_LAND:
+        return false;
 
     default:
         return false;

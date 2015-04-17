@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configairframetwidget.h
+ * @file       configgroundvehiclewidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Airframe configuration panel
+ * @brief ground vehicle configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -50,13 +50,17 @@ public:
     ~ConfigGroundVehicleWidget();
 
     virtual void refreshWidgetsValues(QString frameType);
+    virtual void initMixerCurves(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
 protected:
     void enableControls(bool enable);
+    void resizeEvent(QResizeEvent *);
+    void showEvent(QShowEvent *);
 
 private:
     Ui_GroundConfigWidget *m_aircraft;
+    QGraphicsSvgItem *m_vehicleImg;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);

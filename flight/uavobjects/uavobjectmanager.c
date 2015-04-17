@@ -33,154 +33,23 @@
 
 #include "openpilot.h"
 #include "pios_struct_helper.h"
-
-extern uintptr_t pios_uavo_settings_fs_id;
-
-#if (defined(__MACH__) && defined(__APPLE__))
-#include <mach-o/getsect.h>
-#endif
-
-// Constants
-
-// Private types
-
-// Macros
-#define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
-
-// Mach-o: dummy segment to calculate ASLR offset in sim_osx
-#if (defined(__MACH__) && defined(__APPLE__))
-static long _aslr_offset __attribute__((section("__DATA,_aslr")));
-#endif
-
-/* Table of UAVO handles */
-#if (defined(__MACH__) && defined(__APPLE__))
-/* Mach-o format */
-static struct UAVOData * *__start__uavo_handles;
-static struct UAVOData * *__stop__uavo_handles;
-#else
-/* ELF format: automagically defined at compile time */
-extern struct UAVOData *__start__uavo_handles[] __attribute__((weak));
-extern struct UAVOData *__stop__uavo_handles[] __attribute__((weak));
-#endif
-
-#define UAVO_LIST_ITERATE(_item) \
-    for (struct UAVOData * *_uavo_slot = __start__uavo_handles; \
-         _uavo_slot && _uavo_slot < __stop__uavo_handles; \
-         _uavo_slot++) { \
-        struct UAVOData *_item = *_uavo_slot; \
-        if (_item == NULL) { continue; }
-
-/**
- * List of event queues and the eventmask associated with the queue.
- */
-
-/** opaque type for instances **/
-typedef void *InstanceHandle;
-
-struct ObjectEventEntry {
-    struct ObjectEventEntry *next;
-    xQueueHandle queue;
-    UAVObjEventCallback     cb;
-    uint8_t eventMask;
-};
-
-/*
-   MetaInstance   == [UAVOBase [UAVObjMetadata]]
-   SingleInstance == [UAVOBase [UAVOData [InstanceData]]]
-   MultiInstance  == [UAVOBase [UAVOData [NumInstances [InstanceData0 [next]]]]
-                                                  ____________________/
-   \-->[InstanceData1 [next]]
-                                                  _________...________/
-   \-->[InstanceDataN [next]]
- */
-
-/*
- * UAVO Base Type
- *   - All Types of UAVObjects are of this base type
- *   - The flags determine what type(s) this object
- */
-struct UAVOBase {
-    /* Let these objects be added to an event queue */
-    struct ObjectEventEntry *next_event;
-
-    /* Describe the type of object that follows this header */
-    struct UAVOInfo {
-        bool isMeta        : 1;
-        bool isSingle      : 1;
-        bool isSettings    : 1;
-        bool isPriority    : 1;
-    } flags;
-} __attribute__((packed));
-
-/* Augmented type for Meta UAVO */
-struct UAVOMeta {
-    struct UAVOBase base;
-    UAVObjMetadata  instance0;
-} __attribute__((packed));
-
-/* Shared data structure for all data-carrying UAVObjects (UAVOSingle and UAVOMulti) */
-struct UAVOData {
-    struct UAVOBase base;
-    uint32_t id;
-    /*
-     * Embed the Meta object as another complete UAVO
-     * inside the payload for this UAVO.
-     */
-    struct UAVOMeta metaObj;
-    uint16_t instance_size;
-} __attribute__((packed, aligned(4)));
-
-/* Augmented type for Single Instance Data UAVO */
-struct UAVOSingle {
-    struct UAVOData uavo;
-
-    uint8_t instance0[];
-    /*
-     * Additional space will be malloc'd here to hold the
-     * the data for this instance.
-     */
-} __attribute__((packed));
-
-/* Part of a linked list of instances chained off of a multi instance UAVO. */
-struct UAVOMultiInst {
-    struct UAVOMultiInst *next;
-    uint8_t instance[];
-    /*
-     * Additional space will be malloc'd here to hold the
-     * the data for this instance.
-     */
-} __attribute__((packed));
-
-/* Augmented type for Multi Instance Data UAVO */
-struct UAVOMulti {
-    struct UAVOData uavo;
-    uint16_t num_instances;
-    struct UAVOMultiInst instance0 __attribute__((aligned(4)));
-    /*
-     * Additional space will be malloc'd here to hold the
-     * the data for instance 0.
-     */
-} __attribute__((packed));
-
-/** all information about a metaobject are hardcoded constants **/
-#define MetaNumBytes sizeof(UAVObjMetadata)
-#define MetaBaseObjectPtr(obj)           ((struct UAVOData *)((obj) - offsetof(struct UAVOData, metaObj)))
-#define MetaObjectPtr(obj)               ((struct UAVODataMeta *)&((obj)->metaObj))
-#define MetaDataPtr(obj)                 ((UAVObjMetadata *)&((obj)->instance0))
-#define LinkedMetaDataPtr(obj)           ((UAVObjMetadata *)&((obj)->metaObj.instance0))
-
-/** all information about instances are dependant on object type **/
-#define ObjSingleInstanceDataOffset(obj) ((void *)(&(((struct UAVOSingle *)obj)->instance0)))
-#define InstanceDataOffset(inst)         ((void *)&(((struct UAVOMultiInst *)inst)->instance))
-#define InstanceData(instance)           ((void *)instance)
+#include "inc/uavobjectprivate.h"
 
 // Private functions
-static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType event);
 static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId);
-static InstanceHandle getInstance(struct UAVOData *obj, uint16_t instId);
 static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue, UAVObjEventCallback cb, uint8_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue, UAVObjEventCallback cb);
 static void instanceAutoUpdated(UAVObjHandle obj_handle, uint16_t instId);
+
+
+int32_t UAVObjPers_stub(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused))  uint16_t instId)
+{
+    return 0;
+}
+int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)  __attribute__((weak, alias("UAVObjPers_stub")));;
+int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId) __attribute__((weak, alias("UAVObjPers_stub")));
+int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId) __attribute__((weak, alias("UAVObjPers_stub")));
+
 
 // Private variables
 static xSemaphoreHandle mutex;
@@ -795,101 +664,6 @@ void UAVObjInstanceWriteToLog(UAVObjHandle obj_handle, uint16_t instId)
 
 unlock_exit:
     xSemaphoreGiveRecursive(mutex);
-}
-
-/**
- * Save the data of the specified object to the file system (SD card).
- * If the object contains multiple instances, all of them will be saved.
- * A new file with the name of the object will be created.
- * The object data can be restored using the UAVObjLoad function.
- * @param[in] obj The object handle.
- * @param[in] instId The instance ID
- * @return 0 if success or -1 if failure
- */
-int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
-{
-    PIOS_Assert(obj_handle);
-
-    if (UAVObjIsMetaobject(obj_handle)) {
-        if (instId != 0) {
-            return -1;
-        }
-
-        if (PIOS_FLASHFS_ObjSave(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, (uint8_t *)MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) != 0) {
-            return -1;
-        }
-    } else {
-        InstanceHandle instEntry = getInstance((struct UAVOData *)obj_handle, instId);
-
-        if (instEntry == NULL) {
-            return -1;
-        }
-
-        if (InstanceData(instEntry) == NULL) {
-            return -1;
-        }
-
-        if (PIOS_FLASHFS_ObjSave(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) != 0) {
-            return -1;
-        }
-    }
-    return 0;
-}
-
-
-/**
- * Load an object from the file system (SD card).
- * A file with the name of the object will be opened.
- * The object data can be saved using the UAVObjSave function.
- * @param[in] obj The object handle.
- * @param[in] instId The object instance
- * @return 0 if success or -1 if failure
- */
-int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
-{
-    PIOS_Assert(obj_handle);
-
-    if (UAVObjIsMetaobject(obj_handle)) {
-        if (instId != 0) {
-            return -1;
-        }
-
-        // Fire event on success
-        if (PIOS_FLASHFS_ObjLoad(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, (uint8_t *)MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) == 0) {
-            sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
-        } else {
-            return -1;
-        }
-    } else {
-        InstanceHandle instEntry = getInstance((struct UAVOData *)obj_handle, instId);
-
-        if (instEntry == NULL) {
-            return -1;
-        }
-
-        // Fire event on success
-        if (PIOS_FLASHFS_ObjLoad(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) == 0) {
-            sendEvent((struct UAVOBase *)obj_handle, instId, EV_UNPACKED);
-        } else {
-            return -1;
-        }
-    }
-
-
-    return 0;
-}
-
-/**
- * Delete an object from the file system (SD card).
- * @param[in] obj The object handle.
- * @param[in] instId The object instance
- * @return 0 if success or -1 if failure
- */
-int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
-{
-    PIOS_Assert(obj_handle);
-    PIOS_FLASHFS_ObjDelete(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId);
-    return 0;
 }
 
 /**
@@ -1732,7 +1506,7 @@ xSemaphoreGiveRecursive(mutex);
 /**
  * Send a triggered event to all event queues registered on the object.
  */
-static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType triggered_event)
+int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType triggered_event)
 {
     /* Set up the message that will be sent to all registered listeners */
     UAVObjEvent msg = {
@@ -1821,7 +1595,7 @@ static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId)
 /**
  * Get the instance information or NULL if the instance does not exist
  */
-static InstanceHandle getInstance(struct UAVOData *obj, uint16_t instId)
+InstanceHandle getInstance(struct UAVOData *obj, uint16_t instId)
 {
     if (UAVObjIsMetaobject(&obj->base)) {
         /* Metadata Instance */

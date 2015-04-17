@@ -246,7 +246,7 @@ void ScopeGadgetOptionsPage::on_cmbUAVObjects_currentIndexChanged(QString val)
     }
     QList<UAVObjectField *> fieldList = obj->getFields();
     foreach(UAVObjectField * field, fieldList) {
-        if (field->getType() == UAVObjectField::STRING || field->getType() == UAVObjectField::ENUM) {
+        if (field->getType() == UAVObjectField::STRING) {
             continue;
         }
 

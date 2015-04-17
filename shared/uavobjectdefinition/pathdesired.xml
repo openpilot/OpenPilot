@@ -3,16 +3,14 @@
         <description>The endpoint or path the craft is trying to achieve.  Can come from @ref ManualControl or @ref PathPlanner </description>
 
 	<field name="Start" units="m" type="float" elementnames="North,East,Down" default="0"/>
-        <field name="End" units="m" type="float" elementnames="North,East,Down" default="0"/>
+    	<field name="End" units="m" type="float" elementnames="North,East,Down" default="0"/>
 	<field name="StartingVelocity" units="m/s" type="float" elements="1" default="0"/>
 	<field name="EndingVelocity" units="m/s" type="float" elements="1" default="0"/>
 
-	<field name="Mode" units="" type="enum" elements="1" options="FlyEndpoint,FlyVector,FlyCircleRight,FlyCircleLeft,
-		DriveEndpoint,DriveVector,DriveCircleLeft,DriveCircleRight,
-		FixedAttitude,
-		SetAccessory,
-		Land,
-		DisarmAlarm" default="0"/>
+	<!-- ensure the following Mode options are exactly the same as in pathaction mode -->
+    	<field name="Mode" units="" type="enum" elements="1" options="GoToEndpoint,FollowVector,CircleRight,CircleLeft,
+            FixedAttitude,SetAccessory,DisarmAlarm,Land,Brake,Velocity" default="GoToEndpoint" />
+
 	<!-- Endpoint mode - move directly towards endpoint regardless of position -->
 	<!-- Straight Mode - move across linear path through Start towards the waypoint end, adjusting velocity - continue straight -->
 	<!-- Circle Mode - move a circular pattern around End with radius End-Start (straight line in the vertical)-->

@@ -27,6 +27,7 @@
 #include "configvehicletypewidget.h"
 #include "systemsettings.h"
 #include "actuatorsettings.h"
+#include "configgadgetfactory.h"
 
 #include "cfg_vehicletypes/configccpmwidget.h"
 #include "cfg_vehicletypes/configfixedwingwidget.h"
@@ -68,9 +69,12 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     QStringList channelDesc;
     switch (systemSettingsData.AirframeType) {
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        // fixed wing
         channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         break;
     case SystemSettings::AIRFRAMETYPE_HELICP:
@@ -89,6 +93,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     case SystemSettings::AIRFRAMETYPE_HEXAX:
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
     case SystemSettings::AIRFRAMETYPE_HEXA:
+    case SystemSettings::AIRFRAMETYPE_HEXAH:
         // multirotor
         channelDesc = ConfigMultiRotorWidget::getChannelDescriptions();
         break;
@@ -116,6 +121,13 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     if (!settings->useExpertMode()) {
         m_aircraft->saveAircraftToRAM->setVisible(false);
     }
+
+    ConfigGadgetFactory *configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
+    connect(m_aircraft->vehicleSetupWizardButton, SIGNAL(clicked()), configGadgetFactory, SIGNAL(onOpenVehicleConfigurationWizard()));
+
+    SystemSettings *syssettings = SystemSettings::GetInstance(getObjectManager());
+    Q_ASSERT(syssettings);
+    m_aircraft->nameEdit->setMaxLength(syssettings->VEHICLENAME_NUMELEM);
 
     addApplySaveButtons(m_aircraft->saveAircraftToRAM, m_aircraft->saveAircraftToSD);
 
@@ -154,6 +166,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     addWidget(m_aircraft->ffTestBox1);
     addWidget(m_aircraft->ffTestBox2);
     addWidget(m_aircraft->ffTestBox3);
+    addWidget(m_aircraft->nameEdit);
 
     disableMouseWheelEvents();
     updateEnableControls();
@@ -170,6 +183,7 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 void ConfigVehicleTypeWidget::switchAirframeType(int index)
 {
     m_aircraft->airframesWidget->setCurrentWidget(getVehicleConfigWidget(index));
+    m_aircraft->tabWidget->setTabEnabled(1, index != 1);
 }
 
 /**
@@ -177,9 +191,9 @@ void ConfigVehicleTypeWidget::switchAirframeType(int index)
    Note: The default behavior of ConfigTaskWidget is bypassed.
    Therefore no automatic synchronization of UAV Objects to UI is done.
  */
-void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
+void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *object)
 {
-    Q_UNUSED(o);
+    ConfigTaskWidget::refreshWidgetsValues(object);
 
     if (!allObjectsUpdated()) {
         return;
@@ -194,20 +208,46 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     UAVObjectField *field = system->getField(QString("AirframeType"));
     Q_ASSERT(field);
 
-    // At this stage, we will need to have some hardcoded settings in this code, this
-    // is not ideal, but there you go.
+    // At this stage, we will need to have some hardcoded settings in this code
     QString frameType = field->getValue().toString();
 
-    int category = frameCategory(frameType);
+    // Always update custom tab from others airframe settings : debug/learn hardcoded mixers
+    int category = frameCategory("Custom");
     m_aircraft->aircraftType->setCurrentIndex(category);
 
     VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
+
     if (vehicleConfig) {
-        vehicleConfig->refreshWidgetsValues(frameType);
+        vehicleConfig->refreshWidgetsValues("Custom");
     }
 
-    updateFeedForwardUI();
+    // Switch to Airframe currently used
+    category = frameCategory(frameType);
 
+    if (frameType != "Custom") {
+        m_aircraft->aircraftType->setCurrentIndex(category);
+
+        VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
+
+        if (vehicleConfig) {
+            vehicleConfig->refreshWidgetsValues(frameType);
+        }
+    }
+
+    field = system->getField(QString("VehicleName"));
+    Q_ASSERT(field);
+    QString name;
+    for (uint i = 0; i < field->getNumElements(); ++i) {
+        QChar chr = field->getValue(i).toChar();
+        if (chr != 0) {
+            name.append(chr);
+        } else {
+            break;
+        }
+    }
+    m_aircraft->nameEdit->setText(name);
+
+    updateFeedForwardUI();
     setDirty(dirty);
 }
 
@@ -252,13 +292,26 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     vconfig->setMixerValue(mixer, "DecelTime", m_aircraft->decelTime->value());
     vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
 
-    // TODO call refreshWidgetsValues() to reflect actual saved values ?
+    field = system->getField(QString("VehicleName"));
+    Q_ASSERT(field);
+    QString name = m_aircraft->nameEdit->text();
+    for (uint i = 0; i < field->getNumElements(); ++i) {
+        if (i < (uint)name.length()) {
+            field->setValue(name.at(i).toLatin1(), i);
+        } else {
+            field->setValue(0, i);
+        }
+    }
+
+    // call refreshWidgetsValues() to reflect actual saved values
+    refreshWidgetsValues();
+    ConfigTaskWidget::updateObjectsFromWidgets();
     updateFeedForwardUI();
 }
 
 int ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
+    if (frameType == "FixedWing" || frameType == "Aileron" || frameType == "FixedWingElevon"
         || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
         return ConfigVehicleTypeWidget::FIXED_WING;
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
@@ -275,7 +328,7 @@ int ConfigVehicleTypeWidget::frameCategory(QString frameType)
         return ConfigVehicleTypeWidget::HELICOPTER;
     } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
                || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
-               || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
+               || frameType == "GroundVehicleMotorcycle" || frameType == "Motorcycle") {
         return ConfigVehicleTypeWidget::GROUND;
     } else {
         return ConfigVehicleTypeWidget::CUSTOM;

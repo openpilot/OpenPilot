@@ -72,7 +72,6 @@ struct pios_dsm_state {
 struct pios_dsm_dev {
     enum pios_dsm_dev_magic   magic;
     const struct pios_dsm_cfg *cfg;
-    enum pios_dsm_proto proto;
     struct pios_dsm_state     state;
 };
 
@@ -133,8 +132,10 @@ static void PIOS_DSM_Bind(struct pios_dsm_dev *dsm_dev, uint8_t bind)
     /* RX line, set high */
     GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 
-    /* on CC works up to 140ms, guess bind window is around 20-140ms after power up */
-    PIOS_DELAY_WaitmS(60);
+    /* Wait until the bind window opens. */
+    while (PIOS_DELAY_GetuS() < DSM_BIND_MIN_DELAY_US) {
+        ;
+    }
 
     for (int i = 0; i < bind; i++) {
         /* RX line, drive low for 120us */
@@ -181,7 +182,9 @@ static void PIOS_DSM_ResetState(struct pios_dsm_dev *dsm_dev)
 static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
 {
     struct pios_dsm_state *state = &(dsm_dev->state);
-    uint8_t resolution;
+    /* Fix resolution for detection. */
+    static uint8_t resolution    = 11;
+    uint32_t channel_log = 0;
 
 #ifdef DSM_LOST_FRAME_COUNTER
     /* increment the lost frame counter */
@@ -189,38 +192,6 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
     state->frames_lost += (frames_lost - state->frames_lost_last);
     state->frames_lost_last = frames_lost;
 #endif
-
-    /* check the frame type assuming master satellite stream */
-    uint8_t type = state->received_data[1];
-    switch (type) {
-    case 0x01:
-    case 0x02:
-    case 0x12:
-        /* DSM2, DSMJ stream */
-        if (dsm_dev->proto == PIOS_DSM_PROTO_DSM2) {
-            /* DSM2/DSMJ resolution is known from the header */
-            resolution = (type & DSM_DSM2_RES_MASK) ? 11 : 10;
-        } else {
-            /* DSMX resolution should explicitly be selected */
-            goto stream_error;
-        }
-        break;
-    case 0xA2:
-    case 0xB2:
-        /* DSMX stream */
-        if (dsm_dev->proto == PIOS_DSM_PROTO_DSMX10BIT) {
-            resolution = 10;
-        } else if (dsm_dev->proto == PIOS_DSM_PROTO_DSMX11BIT) {
-            resolution = 11;
-        } else {
-            /* DSMX resolution should explicitly be selected */
-            goto stream_error;
-        }
-        break;
-    default:
-        /* unknown yet data stream */
-        goto stream_error;
-    }
 
     /* unroll channels */
     uint8_t *s    = &(state->received_data[2]);
@@ -244,7 +215,28 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
         /* extract and save the channel value */
         uint8_t channel_num = (word >> resolution) & 0x0f;
         if (channel_num < PIOS_DSM_NUM_INPUTS) {
+            if (channel_log & (1 << channel_num)) {
+                /* Found duplicate. This should happen when in 11 bit */
+                /* mode and the data is 10 bits */
+                if (resolution == 10) {
+                    return -1;
+                }
+                resolution = 10;
+                return PIOS_DSM_UnrollChannels(dsm_dev);
+            }
+
+            if ((channel_log & 0xFF) == 0x55) {
+                /* This pattern indicates 10 bit pattern */
+                if (resolution == 11) {
+                    return -1;
+                }
+                resolution = 11;
+                return PIOS_DSM_UnrollChannels(dsm_dev);
+            }
+
             state->channel_data[channel_num] = (word & mask);
+            /* keep track of this channel */
+            channel_log |= (1 << channel_num);
         }
     }
 
@@ -290,7 +282,6 @@ int32_t PIOS_DSM_Init(uint32_t *dsm_id,
                       const struct pios_dsm_cfg *cfg,
                       const struct pios_com_driver *driver,
                       uint32_t lower_id,
-                      enum pios_dsm_proto proto,
                       uint8_t bind)
 {
     PIOS_DEBUG_Assert(dsm_id);
@@ -305,8 +296,7 @@ int32_t PIOS_DSM_Init(uint32_t *dsm_id,
     }
 
     /* Bind the configuration to the device instance */
-    dsm_dev->cfg   = cfg;
-    dsm_dev->proto = proto;
+    dsm_dev->cfg = cfg;
 
     /* Bind the receiver if requested */
     if (bind) {

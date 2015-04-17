@@ -84,7 +84,7 @@
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_MPU6000_ACCEL
 /* #define PIOS_INCLUDE_HMC5843 */
-/* #define PIOS_INCLUDE_HMC5883 */
+/* #define PIOS_INCLUDE_HMC5X83 */
 /* #define PIOS_HMC5883_HAS_GPIOS */
 /* #define PIOS_INCLUDE_BMP085 */
 /* #define PIOS_INCLUDE_MS5611 */
@@ -92,13 +92,15 @@
 /* #define PIOS_INCLUDE_ETASV3 */
 /* #define PIOS_INCLUDE_HCSR04 */
 
+#define PIOS_SENSOR_RATE 500.0f
+
 /* PIOS receiver drivers */
 #define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_PPM
-#define PIOS_INCLUDE_PPM_FLEXI
+/* #define PIOS_INCLUDE_PPM_FLEXI */
 #define PIOS_INCLUDE_DSM
 #define PIOS_INCLUDE_SBUS
-#define PIOS_INCLUDE_GCSRCVR
+/* #define PIOS_INCLUDE_GCSRCVR */
 /* #define PIOS_INCLUDE_OPLINKRCVR */
 
 /* PIOS abstract receiver interface */
@@ -140,7 +142,7 @@
 /* #define PIOS_TELEM_PRIORITY_QUEUE */
 #define PIOS_INCLUDE_GPS
 #define PIOS_GPS_MINIMAL
-#define PIOS_INCLUDE_GPS_NMEA_PARSER
+/* #define PIOS_INCLUDE_GPS_NMEA_PARSER */
 #define PIOS_INCLUDE_GPS_UBX_PARSER
 /* #define PIOS_GPS_SETS_HOMELOCATION */
 
@@ -160,7 +162,7 @@
 
 /* Task stack sizes */
 #define PIOS_ACTUATOR_STACK_SIZE        820
-#define PIOS_MANUAL_STACK_SIZE          635
+#define PIOS_MANUAL_STACK_SIZE          735
 #define PIOS_RECEIVER_STACK_SIZE        620
 #define PIOS_STABILIZATION_STACK_SIZE   400
 

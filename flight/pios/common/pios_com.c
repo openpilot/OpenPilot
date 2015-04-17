@@ -167,10 +167,11 @@ out_fail:
     return -1;
 }
 
+#if defined(PIOS_INCLUDE_FREERTOS)
 static void PIOS_COM_UnblockRx(struct pios_com_dev *com_dev, bool *need_yield)
 {
-#if defined(PIOS_INCLUDE_FREERTOS)
     static signed portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
     xSemaphoreGiveFromISR(com_dev->rx_sem, &xHigherPriorityTaskWoken);
 
     if (xHigherPriorityTaskWoken != pdFALSE) {
@@ -178,15 +179,19 @@ static void PIOS_COM_UnblockRx(struct pios_com_dev *com_dev, bool *need_yield)
     } else {
         *need_yield = false;
     }
-#else
-    *need_yield = false;
-#endif
 }
+#else
+static void PIOS_COM_UnblockRx(__attribute__((unused)) struct pios_com_dev *com_dev, bool *need_yield)
+{
+    *need_yield = false;
+}
+#endif
 
+#if defined(PIOS_INCLUDE_FREERTOS)
 static void PIOS_COM_UnblockTx(struct pios_com_dev *com_dev, bool *need_yield)
 {
-#if defined(PIOS_INCLUDE_FREERTOS)
     static signed portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
     xSemaphoreGiveFromISR(com_dev->tx_sem, &xHigherPriorityTaskWoken);
 
     if (xHigherPriorityTaskWoken != pdFALSE) {
@@ -194,10 +199,14 @@ static void PIOS_COM_UnblockTx(struct pios_com_dev *com_dev, bool *need_yield)
     } else {
         *need_yield = false;
     }
-#else
-    *need_yield = false;
-#endif
 }
+#else
+static void PIOS_COM_UnblockTx(__attribute__((unused)) struct pios_com_dev *com_dev, bool *need_yield)
+{
+    *need_yield = false;
+}
+#endif
+
 
 static uint16_t PIOS_COM_RxInCallback(uint32_t context, uint8_t *buf, uint16_t buf_len, uint16_t *headroom, bool *need_yield)
 {
@@ -207,9 +216,12 @@ static uint16_t PIOS_COM_RxInCallback(uint32_t context, uint8_t *buf, uint16_t b
 
     PIOS_Assert(valid);
     PIOS_Assert(com_dev->has_rx);
-
-    uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->rx, buf, buf_len);
-
+    uint16_t bytes_into_fifo;
+    if (buf_len == 1) {
+        bytes_into_fifo = fifoBuf_putByte(&com_dev->rx, buf[0]);
+    } else {
+        bytes_into_fifo = fifoBuf_putData(&com_dev->rx, buf, buf_len);
+    }
     if (bytes_into_fifo > 0) {
         /* Data has been added to the buffer */
         PIOS_COM_UnblockRx(com_dev, need_yield);

@@ -47,12 +47,14 @@ public:
     explicit ConnectionDiagram(QWidget *parent, VehicleConfigurationSource *configSource);
     ~ConnectionDiagram();
 
+    void fitInView();
 private:
+    static const char *FILE_NAME;
+    static const int IMAGE_PADDING;
     Ui::ConnectionDiagram *ui;
     VehicleConfigurationSource *m_configSource;
 
     QSvgRenderer *m_renderer;
-    QGraphicsSvgItem *m_background;
     QGraphicsScene *m_scene;
 
     void setupGraphicsScene();

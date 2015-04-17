@@ -149,7 +149,7 @@ template<typename Scalar> void geometry(void)
   t1.setIdentity();
   t1.linear() = q1.toRotationMatrix();
 
-  v0 << 50, 2, 1;//= ei_random_matrix<Vector3>().cwiseProduct(Vector3(10,2,0.5));
+  v0 << 50, 2, 1; // = ei_random_matrix<Vector3>().cwiseProduct(Vector3(10,2,0.5));
   t0.scale(v0);
   t1.prescale(v0);
 

@@ -3,8 +3,8 @@
         <file>html/Actuator-Critical.html</file>
         <file>html/Receiver-Critical.html</file>
         <file>html/Receiver-Warning.html</file>
-        <file>html/CPU-Critical.html</file>
-        <file>html/CPU-Warning.html</file>
+        <file>html/CPUOverload-Critical.html</file>
+        <file>html/CPUOverload-Warning.html</file>
         <file>html/FlightTime-Error.html</file>
         <file>html/Battery-Warning.html</file>
         <file>html/BootFault-Critical.html</file>
@@ -20,19 +20,28 @@
         <file>html/GPS-Error.html</file>
         <file>html/GPS-Warning.html</file>
         <file>html/Guidance-Warning.html</file>
-        <file>html/Memory-Critical.html</file>
-        <file>html/Memory-Warning.html</file>
+        <file>html/OutOfMemory-Critical.html</file>
+        <file>html/OutOfMemory-Warning.html</file>
         <file>html/Sensors-Critical.html</file>
         <file>html/Stabilization-Warning.html</file>
-        <file>html/Stack-Critical.html</file>
+        <file>html/StackOverflow-Critical.html</file>
         <file>html/Telemetry-Error.html</file>
+        <file>html/SystemConfiguration-Critical.html</file>
+        <file>html/PathPlan-Warning.html</file>
+        <file>html/Magnetometer-Critical.html</file>
+        <file>html/Magnetometer-Warning.html</file>
+        <file>html/Stabilization-Critical.html</file>
+        <file>html/SystemConfiguration-UnsupportedConfig_OneShot.html</file>
+        <file>html/SystemConfiguration-FlightMode.html</file>
+        <file>html/SystemConfiguration-BadThrottleOrCollectiveInputRange.html</file>
+        <file>html/BootFault-RebootRequired.html</file>
     </qresource>
     <qresource prefix="/systemhealth" lang="fr">
         <file alias="html/Actuator-Critical.html">html/fr/Actuator-Critical.html</file>
         <file alias="html/Receiver-Critical.html">html/fr/Receiver-Critical.html</file>
         <file alias="html/Receiver-Warning.html">html/fr/Receiver-Warning.html</file>
-        <file alias="html/CPU-Critical.html">html/fr/CPU-Critical.html</file>
-        <file alias="html/CPU-Warning.html">html/fr/CPU-Warning.html</file>
+        <file alias="html/CPUOverload-Critical.html">html/fr/CPUOverload-Critical.html</file>
+        <file alias="html/CPUOverload-Warning.html">html/fr/CPUOverload-Critical.html</file>
         <file alias="html/FlightTime-Error.html">html/fr/FlightTime-Error.html</file>
         <file alias="html/Battery-Warning.html">html/fr/Battery-Warning.html</file>
         <file alias="html/BootFault-Critical.html">html/fr/BootFault-Critical.html</file>
@@ -48,12 +57,21 @@
         <file alias="html/GPS-Error.html">html/fr/GPS-Error.html</file>
         <file alias="html/GPS-Warning.html">html/fr/GPS-Warning.html</file>
         <file alias="html/Guidance-Warning.html">html/fr/Guidance-Warning.html</file>
-        <file alias="html/Memory-Critical.html">html/fr/Memory-Critical.html</file>
-        <file alias="html/Memory-Warning.html">html/fr/Memory-Warning.html</file>
+        <file alias="html/OutOfMemory-Critical.html">html/fr/OutOfMemory-Critical.html</file>
+        <file alias="html/OutOfMemory-Warning.html">html/fr/OutOfMemory-Warning.html</file>
         <file alias="html/Sensors-Critical.html">html/fr/Sensors-Critical.html</file>
         <file alias="html/Stabilization-Warning.html">html/fr/Stabilization-Warning.html</file>
-        <file alias="html/Stack-Critical.html">html/fr/Stack-Critical.html</file>
+        <file alias="html/StackOverflow-Critical.html">html/fr/StackOverflow-Critical.html</file>
         <file alias="html/Telemetry-Error.html">html/fr/Telemetry-Error.html</file>
+        <file alias="html/SystemConfiguration-Critical.html">html/fr/SystemConfiguration-Critical.html</file>
+        <file alias="html/PathPlan-Warning.html">html/fr/PathPlan-Warning.html</file>
+        <file alias="html/Magnetometer-Warning.html">html/fr/Magnetometer-Warning.html</file>
+        <file alias="html/Magnetometer-Critical.html">html/fr/Magnetometer-Critical.html</file>
+        <file alias="html/Stabilization-Critical.html">html/fr/Stabilization-Critical.html</file>
+        <file alias="html/SystemConfiguration-UnsupportedConfig_OneShot.html">html/fr/SystemConfiguration-UnsupportedConfig_OneShot.html</file>
+        <file alias="html/SystemConfiguration-FlightMode.html">html/fr/SystemConfiguration-FlightMode.html</file>
+        <file alias="html/SystemConfiguration-BadThrottleOrCollectiveInputRange.html">html/fr/SystemConfiguration-BadThrottleOrCollectiveInputRange.html</file>
+        <file alias="html/BootFault-RebootRequired.html">html/fr/BootFault-RebootRequired.html</file>
 </qresource>
 
 </RCC>

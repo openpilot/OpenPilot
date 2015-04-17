@@ -32,7 +32,7 @@ Source code repository:	http://git.openpilot.org/
 Crucible code reviews:	http://reviews.openpilot.org/cru
 Project build server:	http://bamboo.openpilot.org/
 Community blogs:	http://forums.openpilot.org/blogs/
-Software downloads:	http://wiki.openpilot.org/display/BUILDS/OpenPilot+Software+Downloads
+Software downloads:	http://wiki.openpilot.org/display/WIKI/OpenPilot+Downloads
 
 How to build from source?
 -------------------------

@@ -585,6 +585,9 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 
     /* Wait until all bytes have been transmitted/received */
     while (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel)) {
+#if defined(PIOS_INCLUDE_FREERTOS)
+        vTaskDelay(0);
+#endif
         ;
     }
 

@@ -40,6 +40,9 @@
        </color>
       </brush>
      </property>
+     <property name="renderHints">
+      <set>QPainter::HighQualityAntialiasing|QPainter::TextAntialiasing</set>
+     </property>
     </widget>
    </item>
    <item>

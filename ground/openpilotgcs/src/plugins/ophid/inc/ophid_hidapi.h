@@ -30,12 +30,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <QDebug>
 #include <QString>
 #include <QMutex>
-#if defined(Q_OS_LINUX)
-#include <usb.h>
-#endif
 #include "../hidapi/hidapi.h"
 #include "ophid_const.h"
 #include "ophid_global.h"

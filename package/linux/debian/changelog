@@ -1,0 +1,5 @@
+openpilot (<VERSION>) <DIST>; urgency=low
+
+  * Release from upstream Git repository
+
+ -- James Duley <james@openpilot.org>  <DATE>

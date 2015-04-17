@@ -62,10 +62,14 @@
 #include "manualcontrolcommand.h"
 #include "taskinfo.h"
 
+#include <pios_sensors.h>
+#include <pios_adxl345.h>
+#include <pios_mpu6000.h>
+
 #include "CoordinateConversions.h"
 #include <pios_notify.h>
-
-
+#include <mathmisc.h>
+#include <pios_constants.h>
 #include <pios_instrumentation_helper.h>
 
 PERF_DEFINE_COUNTER(counterUpd);
@@ -79,16 +83,25 @@ PERF_DEFINE_COUNTER(counterAtt);
 // - 0xA7710004 number of accel samples read for each loop (cc only).
 
 // Private constants
-#define STACK_SIZE_BYTES 540
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 3)
+#define STACK_SIZE_BYTES    540
+#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
 
-#define SENSOR_PERIOD    4
-#define UPDATE_RATE      25.0f
+// Attitude module loop interval (defined by sensor rate in pios_config.h)
+static const uint32_t sensor_period_ms = ((uint32_t)1000.0f / PIOS_SENSOR_RATE);
 
-#define UPDATE_EXPECTED  (1.0f / 500.0f)
-#define UPDATE_MIN       1.0e-6f
-#define UPDATE_MAX       1.0f
-#define UPDATE_ALPHA     1.0e-2f
+#define UPDATE_RATE         25.0f
+
+// Interval in number of sample to recalculate temp bias
+#define TEMP_CALIB_INTERVAL 30
+// LPF
+#define TEMP_DT             (1.0f / PIOS_SENSOR_RATE)
+#define TEMP_LPF_FC         5.0f
+static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC));
+
+#define UPDATE_EXPECTED     (1.0f / PIOS_SENSOR_RATE)
+#define UPDATE_MIN          1.0e-6f
+#define UPDATE_MAX          1.0f
+#define UPDATE_ALPHA        1.0e-2f
 
 // Private types
 
@@ -130,6 +143,10 @@ static bool apply_accel_temp = false;
 static AccelGyroSettingsgyro_temp_coeffData gyro_temp_coeff;;
 static AccelGyroSettingsaccel_temp_coeffData accel_temp_coeff;
 static AccelGyroSettingstemp_calibrated_extentData temp_calibrated_extent;
+static float temperature = NAN;
+static float accel_temp_bias[3] = { 0 };
+static float gyro_temp_bias[3] = { 0 };
+static uint8_t temp_calibration_count = 0;
 
 // Accel and Gyro scaling (this is the product of sensor scale and adjustement in AccelGyroSettings
 static AccelGyroSettingsgyro_scaleData gyro_scale;
@@ -142,15 +159,16 @@ static volatile int32_t trim_accels[3];
 static volatile int32_t trim_samples;
 int32_t const MAX_TRIM_FLIGHT_SAMPLES = 65535;
 
-#define GRAV                       9.81f
-#define STD_CC_ACCEL_SCALE         (GRAV * 0.004f)
+#define STD_CC_ACCEL_SCALE         (PIOS_CONST_MKS_GRAV_ACCEL_F * 0.004f)
 /* 0.004f is gravity / LSB */
 #define STD_CC_ANALOG_GYRO_NEUTRAL 1665
 #define STD_CC_ANALOG_GYRO_GAIN    0.42f
 
+static struct PIOS_SENSORS_3Axis_SensorsWithTemp *mpu6000_data = NULL;
+
 // Used to detect CC vs CC3D
 static const struct pios_board_info *bdinfo = &pios_board_info_blob;
-#define BOARDISCC3D                (bdinfo->board_rev == 0x02)
+#define BOARDISCC3D (bdinfo->board_rev == 0x02)
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -160,8 +178,9 @@ int32_t AttitudeStart(void)
     // Start main task
     xTaskCreate(AttitudeTask, "Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, taskHandle);
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
-
+#endif
     return 0;
 }
 
@@ -222,20 +241,23 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
 
     AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
-    // Set critical error and wait until the accel is producing data
-    while (PIOS_ADXL345_FifoElements() == 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
-        PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
-    }
-
     bool cc3d = BOARDISCC3D;
 
     if (cc3d) {
 #if defined(PIOS_INCLUDE_MPU6000)
-        gyro_test = PIOS_MPU6000_Test();
+
+        gyro_test    = PIOS_MPU6000_Driver.test(0);
+        mpu6000_data = pios_malloc(sizeof(PIOS_SENSORS_3Axis_SensorsWithTemp) + sizeof(Vector3i16) * 2);
 #endif
     } else {
 #if defined(PIOS_INCLUDE_ADXL345)
+        // Set critical error and wait until the accel is producing data
+        while (PIOS_ADXL345_FifoElements() == 0) {
+            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+#ifdef PIOS_INCLUDE_WDG
+            PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+#endif
+        }
         accel_test = PIOS_ADXL345_Test();
 #endif
 
@@ -257,7 +279,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
     settingsUpdatedCb(AttitudeSettingsHandle());
 
     PIOS_DELTATIME_Init(&dtconfig, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
-
+    portTickType lastSysTime = xTaskGetTickCount();
     // Main task loop
     while (1) {
         FlightStatusData flightStatus;
@@ -291,9 +313,9 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             }
             init = 1;
         }
-
+#ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
-
+#endif
         AccelStateData accelState;
         GyroStateData gyros;
         int32_t retval = 0;
@@ -317,6 +339,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             PERF_MEASURE_PERIOD(counterPeriod);
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
         }
+        vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_PERIOD_MS);
     }
 }
 
@@ -443,46 +466,84 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-static struct pios_mpu6000_data mpu6000_data;
 static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
-    float accels[3], gyros[3];
+    float accels[3] = { 0 };
+    float gyros[3]  = { 0 };
+    float temp = 0;
+    uint8_t count   = 0;
 
 #if defined(PIOS_INCLUDE_MPU6000)
 
-    xQueueHandle queue = PIOS_MPU6000_GetQueue();
+    xQueueHandle queue = PIOS_MPU6000_Driver.get_queue(0);
+    BaseType_t ret     = xQueueReceive(queue, (void *)mpu6000_data, sensor_period_ms);
+    while (ret == pdTRUE) {
+        gyros[0]  += mpu6000_data->sample[1].x;
+        gyros[1]  += mpu6000_data->sample[1].y;
+        gyros[2]  += mpu6000_data->sample[1].z;
 
-    if (xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD) == errQUEUE_EMPTY) {
+        accels[0] += mpu6000_data->sample[0].x;
+        accels[1] += mpu6000_data->sample[0].y;
+        accels[2] += mpu6000_data->sample[0].z;
+
+        temp += mpu6000_data->temperature;
+
+        count++;
+        // check if further samples are already in queue
+        ret = xQueueReceive(queue, (void *)mpu6000_data, 0);
+    }
+    PERF_TRACK_VALUE(counterAccelSamples, count);
+
+    if (!count) {
         return -1; // Error, no data
     }
     // Do not read raw sensor data in simulation mode
     if (GyroStateReadOnly() || AccelStateReadOnly()) {
         return 0;
     }
+    float invcount = 1.0f / count;
     PERF_TIMED_SECTION_START(counterUpd);
-    gyros[0]  = mpu6000_data.gyro_x * gyro_scale.X;
-    gyros[1]  = mpu6000_data.gyro_y * gyro_scale.Y;
-    gyros[2]  = mpu6000_data.gyro_z * gyro_scale.Z;
+    gyros[0]  *= gyro_scale.X * invcount;
+    gyros[1]  *= gyro_scale.Y * invcount;
+    gyros[2]  *= gyro_scale.Z * invcount;
 
-    accels[0] = mpu6000_data.accel_x * accel_scale.X;
-    accels[1] = mpu6000_data.accel_y * accel_scale.Y;
-    accels[2] = mpu6000_data.accel_z * accel_scale.Z;
+    accels[0] *= accel_scale.X * invcount;
+    accels[1] *= accel_scale.Y * invcount;
+    accels[2] *= accel_scale.Z * invcount;
+    temp *= invcount;
 
-    float ctemp = mpu6000_data.temperature > temp_calibrated_extent.max ? temp_calibrated_extent.max :
-                  (mpu6000_data.temperature < temp_calibrated_extent.min ? temp_calibrated_extent.min
-                   : mpu6000_data.temperature);
+    if (isnan(temperature)) {
+        temperature = temp;
+    }
+    temperature = temp_alpha * (temp - temperature) + temperature;
 
+    if ((apply_gyro_temp || apply_accel_temp) && !temp_calibration_count) {
+        temp_calibration_count = TEMP_CALIB_INTERVAL;
+        float ctemp = boundf(temperature, temp_calibrated_extent.max, temp_calibrated_extent.min);
+        if (apply_gyro_temp) {
+            gyro_temp_bias[0] = (gyro_temp_coeff.X + gyro_temp_coeff.X2 * ctemp) * ctemp;
+            gyro_temp_bias[1] = (gyro_temp_coeff.Y + gyro_temp_coeff.Y2 * ctemp) * ctemp;
+            gyro_temp_bias[2] = (gyro_temp_coeff.Z + gyro_temp_coeff.Z2 * ctemp) * ctemp;
+        }
+
+        if (apply_accel_temp) {
+            accel_temp_bias[0] = accel_temp_coeff.X * ctemp;
+            accel_temp_bias[1] = accel_temp_coeff.Y * ctemp;
+            accel_temp_bias[2] = accel_temp_coeff.Z * ctemp;
+        }
+    }
+    temp_calibration_count--;
 
     if (apply_gyro_temp) {
-        gyros[0] -= (gyro_temp_coeff.X + gyro_temp_coeff.X2 * ctemp) * ctemp;
-        gyros[1] -= (gyro_temp_coeff.Y + gyro_temp_coeff.Y2 * ctemp) * ctemp;
-        gyros[2] -= (gyro_temp_coeff.Z + gyro_temp_coeff.Z2 * ctemp) * ctemp;
+        gyros[0] -= gyro_temp_bias[0];
+        gyros[1] -= gyro_temp_bias[1];
+        gyros[2] -= gyro_temp_bias[2];
     }
 
     if (apply_accel_temp) {
-        accels[0] -= accel_temp_coeff.X * ctemp;
-        accels[1] -= accel_temp_coeff.Y * ctemp;
-        accels[2] -= accel_temp_coeff.Z * ctemp;
+        accels[0] -= accel_temp_bias[0];
+        accels[1] -= accel_temp_bias[1];
+        accels[2] -= accel_temp_bias[2];
     }
     // gyrosData->temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
     // accelsData->temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
@@ -567,24 +628,24 @@ __attribute__((optimize("O3"))) static void updateAttitude(AccelStateData *accel
     CrossProduct((const float *)accels_filtered, (const float *)grot_filtered, accel_err);
 
     // Account for accel magnitude
-    float accel_mag = sqrtf(accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2]);
-    if (accel_mag < 1.0e-3f) {
+    float inv_accel_mag = fast_invsqrtf(accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2]);
+    if (inv_accel_mag > 1e3f) {
         return;
     }
 
     // Account for filtered gravity vector magnitude
-    float grot_mag;
+    float inv_grot_mag;
 
     if (accel_filter_enabled) {
-        grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
+        inv_grot_mag = fast_invsqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
     } else {
-        grot_mag = 1.0f;
+        inv_grot_mag = 1.0f;
     }
 
-    if (grot_mag < 1.0e-3f) {
+    if (inv_grot_mag > 1e3f) {
         return;
     }
-    const float invMag = 1.0f / (accel_mag * grot_mag);
+    const float invMag = (inv_accel_mag * inv_grot_mag);
     accel_err[0] *= invMag;
     accel_err[1] *= invMag;
     accel_err[2] *= invMag;
@@ -625,21 +686,20 @@ __attribute__((optimize("O3"))) static void updateAttitude(AccelStateData *accel
     }
 
     // Renomalize
-    float qmag = sqrtf(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
+    float inv_qmag = fast_invsqrtf(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
 
     // If quaternion has become inappropriately short or is nan reinit.
     // THIS SHOULD NEVER ACTUALLY HAPPEN
-    if ((fabsf(qmag) < 1e-3f) || isnan(qmag)) {
+    if ((fabsf(inv_qmag) > 1e3f) || isnan(inv_qmag)) {
         q[0] = 1;
         q[1] = 0;
         q[2] = 0;
         q[3] = 0;
     } else {
-        const float invQmag = 1.0f / qmag;
-        q[0] = q[0] * invQmag;
-        q[1] = q[1] * invQmag;
-        q[2] = q[2] * invQmag;
-        q[3] = q[3] * invQmag;
+        q[0] = q[0] * inv_qmag;
+        q[1] = q[1] * inv_qmag;
+        q[2] = q[2] * inv_qmag;
+        q[3] = q[3] * inv_qmag;
     }
 
     AttitudeStateData attitudeState;
@@ -701,17 +761,19 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     temp_calibrated_extent.max = accelGyroSettings.temp_calibrated_extent.max;
 
     if (BOARDISCC3D) {
+        float scales[2];
+        PIOS_MPU6000_Driver.get_scale(scales, 2, 0);
         accel_bias.X  = accelGyroSettings.accel_bias.X;
         accel_bias.Y  = accelGyroSettings.accel_bias.Y;
         accel_bias.Z  = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale.X  = accelGyroSettings.gyro_scale.X * PIOS_MPU6000_GetScale();
-        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * PIOS_MPU6000_GetScale();
-        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * PIOS_MPU6000_GetScale();
+        gyro_scale.X  = accelGyroSettings.gyro_scale.X * scales[1];
+        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * scales[1];
+        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * scales[1];
 
-        accel_scale.X = accelGyroSettings.accel_scale.X * PIOS_MPU6000_GetAccelScale();
-        accel_scale.Y = accelGyroSettings.accel_scale.Y * PIOS_MPU6000_GetAccelScale();
-        accel_scale.Z = accelGyroSettings.accel_scale.Z * PIOS_MPU6000_GetAccelScale();
+        accel_scale.X = accelGyroSettings.accel_scale.X * scales[0];
+        accel_scale.Y = accelGyroSettings.accel_scale.Y * scales[0];
+        accel_scale.Z = accelGyroSettings.accel_scale.Z * scales[0];
     } else {
         // Original CC with analog gyros and ADXL accel
         accel_bias.X  = accelGyroSettings.accel_bias.X;
@@ -757,7 +819,7 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accelGyroSettings.accel_scale.X = trim_accels[0] / trim_samples;
         accelGyroSettings.accel_scale.Y = trim_accels[1] / trim_samples;
         // Z should average -grav
-        accelGyroSettings.accel_scale.Z = trim_accels[2] / trim_samples + GRAV;
+        accelGyroSettings.accel_scale.Z = trim_accels[2] / trim_samples + PIOS_CONST_MKS_GRAV_ACCEL_F;
         attitudeSettings.TrimFlight     = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
         AttitudeSettingsSet(&attitudeSettings);
     } else {

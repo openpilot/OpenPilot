@@ -28,6 +28,7 @@
 #define CONFIGINPUTWIDGET_H
 
 #include "ui_input.h"
+#include "ui_input_wizard.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -39,6 +40,8 @@
 #include <QRadioButton>
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "actuatorsettings.h"
+#include "mixersettings.h"
 #include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>
@@ -47,6 +50,7 @@
 #include "flightstatus.h"
 #include "accessorydesired.h"
 #include <QPointer>
+#include "systemsettings.h"
 
 class Ui_InputWidget;
 
@@ -59,20 +63,24 @@ public:
     enum txMode { mode1, mode2, mode3, mode4 };
     enum txMovements { moveLeftVerticalStick, moveRightVerticalStick, moveLeftHorizontalStick, moveRightHorizontalStick, moveAccess0, moveAccess1, moveAccess2, moveFlightMode, centerAll, moveAll, nothing };
     enum txMovementType { vertical, horizontal, jump, mix };
-    enum txType { acro, heli };
+    enum txType { acro, heli, ground };
     void startInputWizard()
     {
         goToWizard();
     }
     void enableControls(bool enable);
+    bool shouldObjectBeSaved(UAVObject *object);
 
 private:
+    bool throttleError;
     bool growing;
     bool reverse[ManualControlSettings::CHANNELNEUTRAL_NUMELEM];
     txMovements currentMovement;
     int movePos;
     void setTxMovement(txMovements movement);
     Ui_InputWidget *ui;
+    Ui_InputWizardWidget *wizardUi;
+
     wizardSteps wizardStep;
     QList<QPointer<QWidget> > extraWidgets;
     txMode transmitterMode;
@@ -81,6 +89,10 @@ private:
         bool operator ==(const channelsStruct & rhs) const
         {
             return (group == rhs.group) && (number == rhs.number);
+        }
+        bool operator !=(const channelsStruct & rhs)  const
+        {
+            return !operator==(rhs);
         }
         int group;
         int number;
@@ -92,29 +104,45 @@ private:
     QEventLoop *loop;
     bool skipflag;
 
+    // Variables to support delayed transitions when detecting input controls.
+    QTimer nextDelayedTimer;
+    int nextDelayedTick;
+    int nextDelayedLatestActivityTick;
+
     int currentChannelNum;
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
+    QList<int> groundChannelOrder;
 
+    UAVObject::Metadata manualControlMdata;
     ManualControlCommand *manualCommandObj;
     ManualControlCommand::DataFields manualCommandData;
+
     FlightStatus *flightStatusObj;
     FlightStatus::DataFields flightStatusData;
+
+    UAVObject::Metadata accessoryDesiredMdata0;
     AccessoryDesired *accessoryDesiredObj0;
     AccessoryDesired *accessoryDesiredObj1;
     AccessoryDesired *accessoryDesiredObj2;
-    AccessoryDesired::DataFields accessoryDesiredData0;
-    AccessoryDesired::DataFields accessoryDesiredData1;
-    AccessoryDesired::DataFields accessoryDesiredData2;
-    UAVObject::Metadata manualControlMdata;
+
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
+
+    ActuatorSettings *actuatorSettingsObj;
+    ActuatorSettings::DataFields actuatorSettingsData;
+    ActuatorSettings::DataFields previousActuatorSettingsData;
+
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
     FlightModeSettings::DataFields previousFlightModeSettingsData;
     ReceiverActivity *receiverActivityObj;
     ReceiverActivity::DataFields receiverActivityData;
+
+    SystemSettings *systemSettingsObj;
+    SystemSettings::DataFields systemSettingsData;
+    SystemSettings::DataFields previousSystemSettingsData;
 
     QSvgRenderer *m_renderer;
 
@@ -152,8 +180,17 @@ private:
     void wizardSetUpStep(enum wizardSteps);
     void wizardTearDownStep(enum wizardSteps);
 
+    void registerControlActivity();
+
+    void wzNextDelayedStart();
+    void wzNextDelayedCancel();
+
+    AccessoryDesired *getAccessoryDesiredInstance(int instance);
+    float getAccessoryDesiredValue(int instance);
+
 private slots:
     void wzNext();
+    void wzNextDelayed();
     void wzBack();
     void wzCancel();
     void goToWizard();
@@ -168,7 +205,12 @@ private slots:
     void updatePositionSlider();
     void invertControls();
     void simpleCalibration(bool state);
+    void adjustSpecialNeutrals();
+    void checkThrottleRange();
     void updateCalibration();
+    void resetChannelSettings();
+    void resetActuatorSettings();
+    void forceOneFlightMode();
 
 protected:
     void resizeEvent(QResizeEvent *event);

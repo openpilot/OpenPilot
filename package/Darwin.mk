@@ -6,10 +6,12 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-FW_DIR := $(PACKAGE_DIR)/firmware
-
 .PHONY: package
-package:
+package: openpilotgcs uavobjects_matlab | $(PACKAGE_DIR)
+ifneq ($(GCS_BUILD_CONF),release)
+	# We can only package release builds
+	$(error Packaging is currently supported for release builds only)
+endif
 	( \
 	  ROOT_DIR="$(ROOT_DIR)" \
 	  BUILD_DIR="$(BUILD_DIR)" \
@@ -17,6 +19,5 @@ package:
 	  PACKAGE_DIR="$(PACKAGE_DIR)" \
 	  PACKAGE_NAME="$(PACKAGE_NAME)" \
 	  PACKAGE_SEP="$(PACKAGE_SEP)" \
-	  FW_DIR="$(FW_DIR)" \
 	  "$(ROOT_DIR)/package/osx/package" \
 	)

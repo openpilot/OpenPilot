@@ -32,10 +32,16 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 #include <taskinfo.h>
+#include <sanitycheck.h>
+#include <actuatorsettings.h>
 
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <pios_instrumentation.h>
 #endif
+#if defined(PIOS_INCLUDE_ADXL345)
+#include <pios_adxl345.h>
+#endif
+
 /*
  * Pull in the board-specific static HW definitions.
  * Including .c files is a bit ugly but this allows all of
@@ -51,6 +57,9 @@
  * NOTE: No slot in this map for NONE.
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
+static SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook();
+static void ActuatorSettingsUpdatedCb(UAVObjEvent *ev);
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN     32
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN     12
@@ -119,18 +128,21 @@ static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
 static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
     .exti_cfg   = &pios_exti_mpu6000_cfg,
     .Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
-    // Clock at 8 khz, downsampled by 16 for 500 Hz
-    .Smpl_rate_div_no_dlp = 15,
-    // Clock at 1 khz, downsampled by 2 for 500 Hz
-    .Smpl_rate_div_dlp    = 1,
-    .interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
-    .interrupt_en  = PIOS_MPU6000_INTEN_DATA_RDY,
-    .User_ctl             = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
-    .Pwr_mgmt_clk  = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
-    .accel_range   = PIOS_MPU6000_ACCEL_8G,
-    .gyro_range    = PIOS_MPU6000_SCALE_2000_DEG,
+    // Clock at 8 khz, downsampled by 8 for 1000 Hz
+    .Smpl_rate_div_no_dlp = 7,
+    // Clock at 1 khz, downsampled by 1 for 1000 Hz
+    .Smpl_rate_div_dlp    = 0,
+    .interrupt_cfg  = PIOS_MPU6000_INT_CLR_ANYRD,
+    .interrupt_en   = PIOS_MPU6000_INTEN_DATA_RDY,
+    .User_ctl             = PIOS_MPU6000_USERCTL_DIS_I2C,
+    .Pwr_mgmt_clk   = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
+    .accel_range    = PIOS_MPU6000_ACCEL_8G,
+    .gyro_range     = PIOS_MPU6000_SCALE_2000_DEG,
     .filter               = PIOS_MPU6000_LOWPASS_256_HZ,
-    .orientation   = PIOS_MPU6000_TOP_180DEG
+    .orientation    = PIOS_MPU6000_TOP_180DEG,
+    .fast_prescaler = PIOS_SPI_PRESCALER_4,
+    .std_prescaler  = PIOS_SPI_PRESCALER_64,
+    .max_downsample = 2
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
@@ -229,8 +241,10 @@ void PIOS_Board_Init(void)
     HwSettingsInitialize();
 
 #ifndef ERASE_FLASH
+#ifdef PIOS_INCLUDE_WDG
     /* Initialize watchdog as early as possible to catch faults during init */
     PIOS_WDG_Init();
+#endif
 #endif
 
     /* Initialize the alarms library */
@@ -477,27 +491,9 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_GPS */
         break;
-    case HWSETTINGS_CC_MAINPORT_DSM2:
-    case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
-    case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
+    case HWSETTINGS_CC_MAINPORT_DSM:
 #if defined(PIOS_INCLUDE_DSM)
         {
-            enum pios_dsm_proto proto;
-            switch (hwsettings_cc_mainport) {
-            case HWSETTINGS_CC_MAINPORT_DSM2:
-                proto = PIOS_DSM_PROTO_DSM2;
-                break;
-            case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
-                proto = PIOS_DSM_PROTO_DSMX10BIT;
-                break;
-            case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
-                proto = PIOS_DSM_PROTO_DSMX11BIT;
-                break;
-            default:
-                PIOS_Assert(0);
-                break;
-            }
-
             uint32_t pios_usart_dsm_id;
             if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_main_cfg)) {
                 PIOS_Assert(0);
@@ -508,7 +504,7 @@ void PIOS_Board_Init(void)
                               &pios_dsm_main_cfg,
                               &pios_usart_com_driver,
                               pios_usart_dsm_id,
-                              proto, 0)) {
+                              0)) {
                 PIOS_Assert(0);
             }
 
@@ -651,27 +647,9 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PPM_FLEXI */
         break;
-    case HWSETTINGS_CC_FLEXIPORT_DSM2:
-    case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
-    case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
+    case HWSETTINGS_CC_FLEXIPORT_DSM:
 #if defined(PIOS_INCLUDE_DSM)
         {
-            enum pios_dsm_proto proto;
-            switch (hwsettings_cc_flexiport) {
-            case HWSETTINGS_CC_FLEXIPORT_DSM2:
-                proto = PIOS_DSM_PROTO_DSM2;
-                break;
-            case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
-                proto = PIOS_DSM_PROTO_DSMX10BIT;
-                break;
-            case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
-                proto = PIOS_DSM_PROTO_DSMX11BIT;
-                break;
-            default:
-                PIOS_Assert(0);
-                break;
-            }
-
             uint32_t pios_usart_dsm_id;
             if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_flexi_cfg)) {
                 PIOS_Assert(0);
@@ -682,7 +660,7 @@ void PIOS_Board_Init(void)
                               &pios_dsm_flexi_cfg,
                               &pios_usart_com_driver,
                               pios_usart_dsm_id,
-                              proto, hwsettings_DSMxBind)) {
+                              hwsettings_DSMxBind)) {
                 PIOS_Assert(0);
             }
 
@@ -745,8 +723,8 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_rcvrport;
     HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
 
-    switch (hwsettings_rcvrport) {
-    case HWSETTINGS_CC_RCVRPORT_DISABLED:
+    switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
 #if defined(PIOS_INCLUDE_HCSR04)
         {
             uint32_t pios_hcsr04_id;
@@ -754,7 +732,7 @@ void PIOS_Board_Init(void)
         }
 #endif
         break;
-    case HWSETTINGS_CC_RCVRPORT_PWM:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
 #if defined(PIOS_INCLUDE_PWM)
         {
             uint32_t pios_pwm_id;
@@ -768,12 +746,17 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PWM */
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPM:
-    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
 #if defined(PIOS_INCLUDE_PPM)
         {
             uint32_t pios_ppm_id;
-            PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+            if (hwsettings_rcvrport == HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT) {
+                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_pin8_cfg);
+            } else {
+                PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+            }
 
             uint32_t pios_ppm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
@@ -783,7 +766,7 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PPM */
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPMPWM:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
         /* This is a combination of PPM and PWM inputs */
 #if defined(PIOS_INCLUDE_PPM)
         {
@@ -810,6 +793,8 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PWM */
         break;
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
+        break;
     }
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
@@ -827,15 +812,16 @@ void PIOS_Board_Init(void)
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
-    switch (hwsettings_rcvrport) {
-    case HWSETTINGS_CC_RCVRPORT_DISABLED:
-    case HWSETTINGS_CC_RCVRPORT_PWM:
-    case HWSETTINGS_CC_RCVRPORT_PPM:
-    case HWSETTINGS_CC_RCVRPORT_PPMPWM:
+    switch ((HwSettingsCC_RcvrPortOptions)hwsettings_rcvrport) {
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
         PIOS_Servo_Init(&pios_servo_cfg);
         break;
-    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
-    case HWSETTINGS_CC_RCVRPORT_OUTPUTS:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
         PIOS_Servo_Init(&pios_servo_rcvr_cfg);
         break;
     }
@@ -864,7 +850,7 @@ void PIOS_Board_Init(void)
         }
         PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
         PIOS_MPU6000_CONFIG_Configure();
-        init_test = PIOS_MPU6000_Test();
+        init_test = !PIOS_MPU6000_Driver.test(0);
 #endif /* PIOS_INCLUDE_MPU6000 */
 
         break;
@@ -874,6 +860,59 @@ void PIOS_Board_Init(void)
 
     /* Make sure we have at least one telemetry link configured or else fail initialization */
     PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
+
+    // Attach the board config check hook
+    SANITYCHECK_AttachHook(&CopterControlConfigHook);
+    // trigger a config check if actuatorsettings are updated
+    ActuatorSettingsInitialize();
+    ActuatorSettingsConnectCallback(ActuatorSettingsUpdatedCb);
+}
+
+SystemAlarmsExtendedAlarmStatusOptions CopterControlConfigHook()
+{
+    // inhibit usage of oneshot for non supported RECEIVER port modes
+    uint8_t recmode;
+
+    HwSettingsCC_RcvrPortGet(&recmode);
+    uint8_t flexiMode;
+    uint8_t modes[ACTUATORSETTINGS_BANKMODE_NUMELEM];
+    ActuatorSettingsBankModeGet(modes);
+    HwSettingsCC_FlexiPortGet(&flexiMode);
+
+    switch ((HwSettingsCC_RcvrPortOptions)recmode) {
+    // Those modes allows oneshot usage
+    case HWSETTINGS_CC_RCVRPORT_DISABLEDONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_OUTPUTSONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT:
+        if ((recmode == HWSETTINGS_CC_RCVRPORT_PPM_PIN8ONESHOT ||
+             flexiMode == HWSETTINGS_CC_FLEXIPORT_PPM) &&
+            (modes[3] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
+             modes[3] == ACTUATORSETTINGS_BANKMODE_ONESHOT125)) {
+            return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;
+        } else {
+            return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
+        }
+
+    // inhibit oneshot for the following modes
+    case HWSETTINGS_CC_RCVRPORT_PPMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTSNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PPMPWMNOONESHOT:
+    case HWSETTINGS_CC_RCVRPORT_PWMNOONESHOT:
+        for (uint8_t i = 0; i < ACTUATORSETTINGS_BANKMODE_NUMELEM; i++) {
+            if (modes[i] == ACTUATORSETTINGS_BANKMODE_PWMSYNC ||
+                modes[i] == ACTUATORSETTINGS_BANKMODE_ONESHOT125) {
+                return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;;
+            }
+
+            return SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
+        }
+    }
+    return SYSTEMALARMS_EXTENDEDALARMSTATUS_UNSUPPORTEDCONFIG_ONESHOT;;
+}
+// trigger a configuration check if ActuatorSettings are changed.
+void ActuatorSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    configuration_check();
 }
 
 /**

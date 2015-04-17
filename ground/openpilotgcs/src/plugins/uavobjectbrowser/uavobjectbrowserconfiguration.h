@@ -34,19 +34,26 @@
 using namespace Core;
 
 class UAVObjectBrowserConfiguration : public IUAVGadgetConfiguration {
-    Q_OBJECT Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRecentlyUpdatedColor)
+    Q_OBJECT Q_PROPERTY(QColor m_unknownObjectColor READ unknownObjectColor WRITE setUnknownObjectColor)
+    Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRecentlyUpdatedColor)
     Q_PROPERTY(QColor m_manuallyChangedColor READ manuallyChangedColor WRITE setManuallyChangedColor)
     Q_PROPERTY(int m_recentlyUpdatedTimeout READ recentlyUpdatedTimeout WRITE setRecentlyUpdatedTimeout)
     Q_PROPERTY(bool m_onlyHilightChangedValues READ onlyHighlightChangedValues WRITE setOnlyHighlightChangedValues)
     Q_PROPERTY(bool m_useCategorizedView READ categorizedView WRITE setCategorizedView)
     Q_PROPERTY(bool m_useScientificView READ scientificView WRITE setScientificView)
+    Q_PROPERTY(bool m_showDescription READ showDescription WRITE setShowDescription)
     Q_PROPERTY(bool m_showMetaData READ showMetaData WRITE setShowMetaData)
+    Q_PROPERTY(QByteArray m_splitterState READ splitterState WRITE setSplitterState)
 public:
     explicit UAVObjectBrowserConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
     void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
 
+    QColor unknownObjectColor() const
+    {
+        return m_unknownObjectColor;
+    }
     QColor recentlyUpdatedColor() const
     {
         return m_recentlyUpdatedColor;
@@ -75,10 +82,23 @@ public:
     {
         return m_showMetaData;
     }
+    bool showDescription() const
+    {
+        return m_showDescription;
+    }
+
+    QByteArray splitterState() const
+    {
+        return m_splitterState;
+    }
 
 signals:
 
 public slots:
+    void setUnknownObjectColor(QColor color)
+    {
+        m_unknownObjectColor = color;
+    }
     void setRecentlyUpdatedColor(QColor color)
     {
         m_recentlyUpdatedColor = color;
@@ -107,8 +127,18 @@ public slots:
     {
         m_showMetaData = value;
     }
+    void setShowDescription(bool value)
+    {
+        m_showDescription = value;
+    }
+
+    void setSplitterState(QByteArray arg)
+    {
+        m_splitterState = arg;
+    }
 
 private:
+    QColor m_unknownObjectColor;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
     bool m_onlyHilightChangedValues;
@@ -116,6 +146,8 @@ private:
     bool m_useCategorizedView;
     bool m_useScientificView;
     bool m_showMetaData;
+    bool m_showDescription;
+    QByteArray m_splitterState;
 };
 
 #endif // UAVOBJECTBROWSERCONFIGURATION_H

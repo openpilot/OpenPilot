@@ -49,6 +49,7 @@ typedef enum {
 
 typedef struct {
     QString     name;
+    QString     description;
     QString     units;
     FieldType   type;
     int numElements;

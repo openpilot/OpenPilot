@@ -175,7 +175,8 @@ void VtolLandController::UpdateVelocityDesired()
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // Implement optional horizontal position hold.
-    if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
+    if ((((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) ||
+	(flightStatus->ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_TRUE) ) {
         // landing flight mode has stored original horizontal position in pathdesired
         PositionStateData positionState;
         PositionStateGet(&positionState);

@@ -192,6 +192,9 @@ void VtolLandController::UpdateVelocityDesired()
     // update pathstatus
     pathStatus->error     = 0.0f;
     pathStatus->fractional_progress  = 0.0f;
+    if (fsm->GetCurrentState() == PFFSM_STATE_DISARMED) {
+        pathStatus->fractional_progress = 1.0f;
+    }
     pathStatus->path_direction_north = velocityDesired.North;
     pathStatus->path_direction_east  = velocityDesired.East;
     pathStatus->path_direction_down  = velocityDesired.Down;

@@ -1,0 +1,93 @@
+/**
+ ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_SBus S.Bus Functions
+ * @brief PIOS interface to read and write from Futaba S.Bus port
+ * @{
+ *
+ * @file       pios_sbus_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @brief      Futaba S.Bus Private structures.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+#ifndef PIOS_SRXL_PRIV_H
+#define PIOS_SRXL_PRIV_H
+
+#include <pios.h>
+#include <pios_stm32.h>
+#include <pios_usart_priv.h>
+
+/*
+ * Multiplex SRXL serial port settings:
+ *  115200bps inverted serial stream, 8 bits, no parity, 1 stop bits
+ *  frame period is 14ms (FastResponse ON) or 21ms (FastResponse OFF)
+ *
+ * Frame structure:
+ *  1 byte  - 0xa0 (start of frame byte)
+ *  1 byte  - version
+ *      0xa1 (v1 12-channels)
+ *      0xa2 (v2 16-channels)
+ * 24/32 bytes - channel data (4 + 12 bit/channel, 12/16 channels, LSB first)
+ *      16 bits per channel. 4 first reserved/not used. 12 bits channel data in
+ *          4095 steps, 0x000(800µs) - 0x800(1500µs) - 0xfff(2200µs)
+ *  2 bytes checksum (calculated over all bytes including start and version)
+ *
+ * Checksum calculation:
+ * u16 CRC16(u16 crc, u8 value) {
+ *     u8 i;
+ *     crc = crc ^ (s16)value << 8;
+ *     for(i = 0; i < 8; i++) {
+ *         if(crc & 0x8000) {
+ *             crc = crc << 1 ^ 0x1021;
+ *         } else {
+ *             crc = crc << 1;
+ *         }
+ *     }
+ *     return crc;
+ * }
+ */
+
+#define SRXL_V1_FRAME_LENGTH          (2 + 24 + 2)
+#define SRXL_V2_FRAME_LENGTH          (2 + 32 + 2)
+#define SRXL_SOF_BYTE                 0xa0
+#define SRXL_V1_BYTE                  0xa1
+#define SRXL_V2_BYTE                  0xa2
+
+/*
+ * S.Bus protocol provides 16 proportional and 2 discrete channels.
+ * Do not change unless driver code is updated accordingly.
+ */
+#if (PIOS_SRXL_NUM_INPUTS != 16)
+#error "Multiplex SRXL protocol provides 16 proportional channels."
+#endif
+
+extern const struct pios_rcvr_driver pios_srxl_rcvr_driver;
+
+extern int32_t PIOS_SRXL_Init(uint32_t *srxl_id,
+                              const struct pios_com_driver *driver,
+                              uint32_t lower_id);
+
+#endif /* PIOS_SRXL_PRIV_H */
+
+/**
+ * @}
+ * @}
+ */

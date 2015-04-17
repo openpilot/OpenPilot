@@ -555,18 +555,10 @@ static uint8_t conditionDistanceToTarget()
  */
 static uint8_t conditionLegRemaining()
 {
-    PathDesiredData pathDesired;
-    PositionStateData positionState;
+    PathStatusData pathStatus;
+    PathStatusGet(&pathStatus);
 
-    PathDesiredGet(&pathDesired);
-    PositionStateGet(&positionState);
-
-    float cur[3] = { positionState.North, positionState.East, positionState.Down };
-    struct path_status progress;
-
-    path_progress(&pathDesired,
-                  cur, &progress, mode3D);
-    if (progress.fractional_progress >= 1.0f - pathAction.ConditionParameters[0]) {
+    if (pathStatus.fractional_progress >= (1.0f - pathAction.ConditionParameters[0])) {
         return true;
     }
     return false;

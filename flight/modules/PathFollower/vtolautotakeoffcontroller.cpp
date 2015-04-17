@@ -100,13 +100,27 @@ uint8_t VtolAutoTakeoffController::Mode(void)
 void VtolAutoTakeoffController::ObjectiveUpdated(void)
 {
     // Set the objective's target velocity
-    controlDown.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]);
-    controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH],
-                                     pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]);
-    controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
-    controlDown.UpdatePositionSetpoint(pathDesired->End.Down);
 
-    fsm->setControlState((StatusVtolAutoTakeoffControlStateOptions)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE]);
+    if (flightStatus->ControlChain.PathPlanner != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+        controlDown.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]);
+        controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH],
+                                         pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]);
+        controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
+        controlDown.UpdatePositionSetpoint(pathDesired->End.Down);
+        fsm->setControlState((StatusVtolAutoTakeoffControlStateOptions)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE]);
+    } else {
+        float velocity_down;
+        FlightModeSettingsAutoTakeOffVelocityGet(&velocity_down);
+        controlDown.UpdateVelocitySetpoint(-velocity_down);
+        controlNE.UpdateVelocitySetpoint(0.0f, 0.0f);
+        // pathplanner mode the waypoint provides the final destination including altitude. Takeoff would
+        // often be waypoint 0, in which case the starting location is the current location, and the end location
+        // is the waypoint location which really needs to be the same as the end in north and east. If it is not,
+        // it will fly to that location the during ascent.
+        controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
+        controlDown.UpdatePositionSetpoint(pathDesired->End.Down);
+        fsm->setControlState(STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE);
+    }
 }
 void VtolAutoTakeoffController::Deactivate(void)
 {
@@ -195,6 +209,8 @@ void VtolAutoTakeoffController::UpdateVelocityDesired()
     pathStatus->fractional_progress = 0.0f;
     if (fsm->PositionHoldState()) {
         pathStatus->fractional_progress = 1.0f;
+        // note if the takeoff waypoint and the launch position are significantly different
+        // the above check might need to expand to assessment of north and east.
     }
     pathStatus->path_direction_north = velocityDesired.North;
     pathStatus->path_direction_east  = velocityDesired.East;

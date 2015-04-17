@@ -191,7 +191,7 @@ void VtolLandController::UpdateVelocityDesired()
 
     // update pathstatus
     pathStatus->error     = 0.0f;
-    pathStatus->fractional_progress  = 0.0f;
+    pathStatus->fractional_progress = 0.0f;
     if (fsm->GetCurrentState() == PFFSM_STATE_DISARMED) {
         pathStatus->fractional_progress = 1.0f;
     }

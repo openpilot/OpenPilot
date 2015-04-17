@@ -59,14 +59,14 @@ ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
         ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2
         ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2/+md5
-        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x64-5.4.1.run
-        QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x64-5.4.1.run.md5
+        QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x64-5.4.1.run
+        QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x64-5.4.1.run.md5
         QT_SDK_ARCH := gcc_64
     else
         ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2
         ARM_SDK_MD5_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2/+md5
-        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x86-5.4.1.run
-        QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x86-5.4.1.run.md5
+        QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x86-5.4.1.run
+        QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x86-5.4.1.run.md5
         QT_SDK_ARCH := gcc
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
@@ -74,8 +74,8 @@ ifeq ($(UNAME), Linux)
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2/+md5
-    QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
-    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg.md5
+    QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
+    QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg.md5
     QT_SDK_ARCH := clang_64
     QT_SDK_MAINTENANCE_TOOL := /Volumes/qt-opensource-mac-x64-clang-5.4.1/qt-opensource-mac-x64-clang-5.4.1.app/Contents/MacOS/qt-opensource-mac-x64-clang-5.4.1
     QT_SDK_MOUNT_DIR := /Volumes/qt-opensource-mac-x64-clang-5.4.1
@@ -85,8 +85,8 @@ else ifeq ($(UNAME), Darwin)
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip/+md5
-    QT_SDK_URL     := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
-    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe.md5
+    QT_SDK_URL     := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
+    QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe.md5
     QT_SDK_ARCH    := mingw491_32
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     SDL_URL        := http://wiki.openpilot.org/download/attachments/18612236/SDL-devel-1.2.15-mingw32.tar.gz

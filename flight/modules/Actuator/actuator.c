@@ -336,8 +336,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         }
 
         float *status  = (float *)&mixerStatus; // access status objects as an array of floats
-        float maxMotor = -1.0f; // highest motor value
-        float minMotor = 1.0f; // lowest motor value
+        float maxMotor = 1.0f; // highest motor value
+        float minMotor = -1.0f; // lowest motor value
 
         for (int ct = 0; ct < MAX_MIX_ACTUATORS; ct++) {
             // During boot all camera actuators should be completely disabled (PWM pulse = 0).
@@ -620,35 +620,20 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor)
 {
     int16_t valueScaled;
-    int16_t maxMotorScaled;
-    int16_t minMotorScaled;
-    int16_t diff;
 
     // Scale
     if (value >= 0.0f) {
-        valueScaled    = (int16_t)(value * ((float)(max - neutral))) + neutral;
-        maxMotorScaled = (int16_t)(maxMotor * ((float)(max - neutral))) + neutral;
-        minMotorScaled = (int16_t)(minMotor * ((float)(max - neutral))) + neutral;
+        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor))) + neutral; 
     } else {
-        valueScaled    = (int16_t)(value * ((float)(neutral - min))) + neutral;
-        maxMotorScaled = (int16_t)(maxMotor * ((float)(neutral - min))) + neutral;
-        minMotorScaled = (int16_t)(minMotor * ((float)(neutral - min))) + neutral;
+		valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor))) + neutral; 
     }
 
     if (max > min) {
-        diff = max - maxMotorScaled; // difference between max allowed and actual max motor
-        if (diff < 0) { // if the difference is smaller than 0 we add it to the scaled value
-            valueScaled += diff; // it's possible in extreme cases that this value can go below min
-            if (valueScaled < min) {
-                valueScaled = min; // This prevents that
-            }
+        if (valueScaled > max) {
+            valueScaled = max;
         }
-        diff = min - minMotorScaled; // difference between min allowed and actual min motor
-        if (diff > 0) { // if the difference is larger than 0 we add it to the scaled value
-            valueScaled += diff;
-            if (valueScaled > max) { // it's possible in extreme cases that this value can go above max
-                valueScaled = max; // This prevents that
-            }
+        if (valueScaled < min) {
+            valueScaled = min;
         }
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?

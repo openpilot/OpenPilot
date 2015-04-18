@@ -623,9 +623,9 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
 
     // Scale
     if (value >= 0.0f) {
-        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor))) + neutral; 
+        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor)) + neutral;
     } else {
-		valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor))) + neutral; 
+        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor)) + neutral;
     }
 
     if (max > min) {

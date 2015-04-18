@@ -45,6 +45,7 @@
 #include "cameradesired.h"
 #include "manualcontrolcommand.h"
 #include "taskinfo.h"
+#include <sanitycheck.h>
 #undef PIOS_INCLUDE_INSTRUMENTATION
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <pios_instrumentation.h>
@@ -88,7 +89,7 @@ static volatile bool mixer_settings_updated;
 // Private functions
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor);
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed);
 static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const MixerSettingsData *mixerSettings);
 static float MixerCurve(const float throttle, const float *curve, uint8_t elements);
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData *actuatorSettings);
@@ -262,9 +263,11 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         // safety settings
         if (!armed) {
+            // this also happens in scaleMotors as a per axis check
             throttleDesired = 0;
         }
         if (throttleDesired <= 0.00f || !armed) {
+            // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
             if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
                 desired.Roll = 0;
@@ -298,6 +301,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         bool positiveThrottle = (throttleDesired > 0.00f);
         bool spinWhileArmed   = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
+        // curve 1 is the throttle curve applied to all motors.
         float curve1 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
 
         // The source for the secondary curve is selectable
@@ -335,9 +339,10 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             break;
         }
 
-        float *status  = (float *)&mixerStatus; // access status objects as an array of floats
-        float maxMotor = 1.0f; // highest motor value
-        float minMotor = -1.0f; // lowest motor value
+        float *status   = (float *)&mixerStatus; // access status objects as an array of floats
+        float maxMotor  = 1.0f; // highest motor value
+        float minMotor  = -1.0f; // lowest motor value
+        bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
 
         for (int ct = 0; ct < MAX_MIX_ACTUATORS; ct++) {
             // During boot all camera actuators should be completely disabled (PWM pulse = 0).
@@ -370,7 +375,11 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                 // If armed meant to keep spinning,
                 else if ((spinWhileArmed && !positiveThrottle) ||
                          (status[ct] < 0)) {
-                    status[ct] = 0;
+                    if (!multirotor) {
+                        status[ct] = 0;
+                        // allow throttle values lower than 0 if multirotor.
+                        // Values will be scaled to 0 if they need to be in the scaleMotor function
+                    }
                 }
             }
 
@@ -449,7 +458,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                                                     actuatorSettings.ChannelMin[i],
                                                     actuatorSettings.ChannelNeutral[i],
                                                     maxMotor,
-                                                    minMotor);
+                                                    minMotor,
+                                                    spinWhileArmed,
+                                                    armed);
                 } else { // else we scale the channel
                     command.Channel[i] = scaleChannel(status[i],
                                                       actuatorSettings.ChannelMax[i],
@@ -501,6 +512,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 float ProcessMixer(const int index, const float curve1, const float curve2,
                    const MixerSettingsData *mixerSettings, ActuatorDesiredData *desired, const float period)
 {
+    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
     static float lastFilteredResult[MAX_MIX_ACTUATORS];
     const Mixer_t *mixers = (Mixer_t *)&mixerSettings->Mixer1Type; // pointer to array of mixers in UAVObjects
     const Mixer_t *mixer  = &mixers[index];
@@ -513,8 +525,10 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 
     // note: no feedforward for reversable motors yet for safety reasons
     if (mixer->type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
-        if (result < 0.0f) { // idle throttle
-            result = 0.0f;
+        if (!multirotor) { // we allow negative throttle with a multirotor
+            if (result < 0.0f) { // zero throttle
+                result = 0.0f;
+            }
         }
 
         // feed forward
@@ -554,32 +568,64 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 
 
 /**
- * Interpolate a throttle curve. Throttle input should be in the range 0 to 1.
- * Output is in the range 0 to 1.
+ * Interpolate a throttle curve. Throttle input should be in the range 0 to 1 unless frame type is multirotor
+ * Output is in the range 0 to 1 unless frame type is multirotor
+ * idx1 is the first valid index of the curve we look at
+ * idx2 is the next highest element in the curve
  */
 static float MixerCurve(const float throttle, const float *curve, uint8_t elements)
 {
+    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
+    bool negativeThrottle = false;
+
+    // negative throttle will be a v-curve
+    // we only do this if multirotor
+    if (multirotor) {
+        if (throttle < 0) {
+            throttle *= -1.0f; // set throttle to a positive value
+            negativeThrottle = true; // calculate the throttle as a positive value then set it back to negative below.
+        }
+    }
+
     float scale = throttle * (float)(elements - 1);
     int idx1    = scale;
 
     scale -= (float)idx1; // remainder
-    if (curve[0] < -1) {
+    if (curve[0] < -1) { // why are we doing this?
         return throttle;
     }
-    if (idx1 < 0) {
+    if (idx1 < 0) { // this doesn't happen if frame is of type multirotor
         idx1  = 0; // clamp to lowest entry in table
         scale = 0;
     }
+
     int idx2 = idx1 + 1;
+
     if (idx2 >= elements) {
         idx2 = elements - 1; // clamp to highest entry in table
         if (idx1 >= elements) {
+            if (multirotor) {
+                // if multirotor frame we can return throttle values higher than 100%.
+                // Since the we don't have elements in the curve higher than 100% we return
+                // the last element multiplied by the throttle float
+                if (!negativeThrottle) {
+                    // we only do this is throttle is not negative. This limits negative throttle to -100%(Maybe this is too much allowance)
+                    if (throttle < 2.0f) { // this limits positive throttle to 200% of max value in table (Maybe this is too much allowance)
+                        return curve[idx2] * throttle;
+                    } else {
+                        return curve[idx2] * 2.0f; // return 200% of max value in table
+                    }
+                }
+            }
             idx1 = elements - 1;
         }
     }
-    return curve[idx1] * (1.0f - scale) + curve[idx2] * scale;
+    if (negativeThrottle) {
+        return (curve[idx1] * (1.0f - scale) + curve[idx2] * scale) * -1.0f;
+    } else {
+        return curve[idx1] * (1.0f - scale) + curve[idx2] * scale;
+    }
 }
-
 
 /**
  * Convert channel from -1/+1 to servo pulse duration in microseconds
@@ -617,15 +663,15 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 /**
  * Constrain motor values to keep any one motor value from going too far out of range of another motor
  */
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor)
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed)
 {
     int16_t valueScaled;
 
     // Scale
     if (value >= 0.0f) {
-        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor)) + neutral;
+        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor))) + neutral;
     } else {
-        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor)) + neutral;
+        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor))) + neutral;
     }
 
     if (max > min) {
@@ -643,6 +689,14 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
         if (valueScaled > min) {
             valueScaled = min;
         }
+    }
+
+    if (!armed) {
+        // if not armed return min
+        valueScaled = min;
+    } else if ((valueScaled <= neutral) && (spinWhileArmed) && (armed)) {
+        // if armed and throttle is less than neutral we return neutral
+        valueScaled = neutral;
     }
 
     return valueScaled;

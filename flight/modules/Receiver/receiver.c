@@ -37,7 +37,6 @@
 #include <manualcontrolsettings.h>
 #include <manualcontrolcommand.h>
 #include <receiveractivity.h>
-#include <receiverstatus.h>
 #include <flightstatus.h>
 #include <flighttelemetrystats.h>
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
@@ -144,7 +143,6 @@ int32_t ReceiverInitialize()
     AccessoryDesiredInitialize();
     ManualControlCommandInitialize();
     ReceiverActivityInitialize();
-    ReceiverStatusInitialize();
     ManualControlSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     StabilizationSettingsInitialize();
@@ -660,7 +658,7 @@ static bool updateRcvrStatus(
     /* Compare with previous sample */
     if (quality != fsm->quality) {
         fsm->quality     = quality;
-        ReceiverStatusQualitySet(&quality);
+        ManualControlCommandQualitySet(&quality);
         activity_updated = true;
     }
 

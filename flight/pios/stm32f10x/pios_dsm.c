@@ -34,6 +34,8 @@
 
 #include "pios_dsm_priv.h"
 
+// *** UNTESTED CODE ***
+#undef DSM_LINK_QUALITY
 
 /* Forward Declarations */
 static int32_t PIOS_DSM_Get(uint32_t rcvr_id, uint8_t channel);
@@ -189,6 +191,8 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
     /* increment the lost frame counter */
     uint8_t frames_lost  = state->received_data[0];
 
+    // *** UNTESTED CODE ***
+#ifdef DSM_LINK_QUALITY
     /* We only get a lost frame count when the next good frame comes in */
     /* Present quality as a weighted average of good frames */
     /* First consider the bad frames */
@@ -201,6 +205,7 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
                       100) / DSM_FL_WEIGHTED_AVE;
 
     state->frames_lost_last = frames_lost;
+#endif /* DSM_LINK_QUALITY */
 
     /* unroll channels */
     uint8_t *s    = &(state->received_data[2]);

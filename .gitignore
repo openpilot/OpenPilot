@@ -71,3 +71,4 @@ RemoteSystemsTempFiles
 *.rej
 *.orig
 *.diff~
+/fw_coptercontrol/

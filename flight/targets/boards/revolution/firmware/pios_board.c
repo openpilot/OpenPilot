@@ -674,6 +674,27 @@ void PIOS_Board_Init(void)
         }
 #endif
         break;
+    case HWSETTINGS_RM_MAINPORT_SRXL:
+#if defined(PIOS_INCLUDE_SRXL)
+        {
+            uint32_t pios_usart_srxl_id;
+            if (PIOS_USART_Init(&pios_usart_srxl_id, &pios_usart_srxl_main_cfg)) {
+                PIOS_Assert(0);
+            }
+
+            uint32_t pios_srxl_id;
+            if (PIOS_SRXL_Init(&pios_srxl_id, &pios_usart_com_driver, pios_usart_srxl_id)) {
+                PIOS_Assert(0);
+            }
+
+            uint32_t pios_srxl_rcvr_id;
+            if (PIOS_RCVR_Init(&pios_srxl_rcvr_id, &pios_srxl_rcvr_driver, pios_srxl_id)) {
+                PIOS_Assert(0);
+            }
+            pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SRXL] = pios_srxl_rcvr_id;
+        }
+#endif
+        break;
     case HWSETTINGS_RM_MAINPORT_DSM:
         // Force binding to zero on the main port
         hwsettings_DSMxBind = 0;
@@ -869,7 +890,6 @@ void PIOS_Board_Init(void)
         PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         break;
     }
-
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
     GCSReceiverInitialize();

@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SBus Futaba S.Bus receiver functions
+ * @addtogroup PIOS_SRXL Multiplex SRXL receiver functions
+ * @brief Code to read Multiplex SRXL receiver serial stream
  * @{
  *
- * @file       pios_sbus.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
- * @brief      Futaba S.Bus functions header.
+ * @file       pios_srxl.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      Code to read Multiplex SRXL receiver serial stream
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

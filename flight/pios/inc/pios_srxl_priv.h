@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SBus S.Bus Functions
- * @brief PIOS interface to read and write from Futaba S.Bus port
+ * @addtogroup PIOS_SRXL Multiplex SRXL receiver functions
+ * @brief Code to read Multiplex SRXL receiver serial stream
  * @{
  *
- * @file       pios_sbus_priv.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
- * @brief      Futaba S.Bus Private structures.
+ * @file       pios_srxl_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      Code to read Multiplex SRXL receiver serial stream
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -65,14 +65,18 @@
  * }
  */
 
-#define SRXL_V1_FRAME_LENGTH          (2 + 24 + 2)
-#define SRXL_V2_FRAME_LENGTH          (2 + 32 + 2)
-#define SRXL_SOF_BYTE                 0xa0
-#define SRXL_V1_BYTE                  0xa1
-#define SRXL_V2_BYTE                  0xa2
+#define SRXL_SOF_BYTE              0xa0
+#define SRXL_V1_BYTE               0xa1
+#define SRXL_V2_BYTE               0xa2
+
+#define SRXL_HEADER_LENGTH         2
+#define SRXL_CHECKSUM_LENGTH       2
+#define SRXL_V1_CHANNEL_DATA_BYTES (12 * 2)
+#define SRXL_V2_CHANNEL_DATA_BYTES (16 * 2)
+#define SRXL_FRAME_LENGTH          (SRXL_HEADER_LENGTH + SRXL_V2_CHANNEL_DATA_BYTES + SRXL_CHECKSUM_LENGTH)
 
 /*
- * S.Bus protocol provides 16 proportional and 2 discrete channels.
+ * Multiplex SRXL protocol provides 16 proportional channels.
  * Do not change unless driver code is updated accordingly.
  */
 #if (PIOS_SRXL_NUM_INPUTS != 16)

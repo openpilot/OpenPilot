@@ -188,11 +188,11 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
     static uint8_t resolution    = 11;
     uint32_t channel_log = 0;
 
+    // *** UNTESTED CODE ***
+#ifdef DSM_LINK_QUALITY
     /* increment the lost frame counter */
     uint8_t frames_lost  = state->received_data[0];
 
-    // *** UNTESTED CODE ***
-#ifdef DSM_LINK_QUALITY
     /* We only get a lost frame count when the next good frame comes in */
     /* Present quality as a weighted average of good frames */
     /* First consider the bad frames */

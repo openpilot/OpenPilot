@@ -34,6 +34,9 @@
 
 #include "pios_dsm_priv.h"
 
+// *** UNTESTED CODE ***
+#undef DSM_LINK_QUALITY
+
 #ifndef PIOS_INCLUDE_RTC
 #error PIOS_INCLUDE_RTC must be used to use DSM
 #endif
@@ -189,6 +192,8 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
     static uint8_t resolution    = 11;
     uint32_t channel_log = 0;
 
+    // *** UNTESTED CODE ***
+#ifdef DSM_LINK_QUALITY
     /* increment the lost frame counter */
     uint8_t frames_lost  = state->received_data[0];
 
@@ -204,6 +209,7 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
                       100) / DSM_FL_WEIGHTED_AVE;
 
     state->frames_lost_last = frames_lost;
+#endif /* DSM_LINK_QUALITY */
 
     /* unroll channels */
     uint8_t *s    = &(state->received_data[2]);

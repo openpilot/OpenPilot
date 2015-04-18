@@ -52,7 +52,7 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+62"/>
+        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+64"/>
         <source>General</source>
         <translation>Général</translation>
     </message>
@@ -68,7 +68,7 @@
         <translation>&lt;Langue Système&gt;</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+120"/>
         <source>Variables</source>
         <translation>Variables</translation>
     </message>
@@ -103,21 +103,34 @@
         <translation>Sélectionner automatiquement un périphérique USB OpenPilot :</translation>
     </message>
     <message>
-        <location/>
         <source>Use UDP Mirror</source>
         <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
-        <translation>Utiliser Miroir UDP</translation>
+        <translation type="vanished">Utiliser Miroir UDP</translation>
     </message>
     <message>
-        <location/>
         <source>Expert Mode</source>
         <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
-        <translation>Mode Expert</translation>
+        <translation type="vanished">Mode Expert</translation>
     </message>
     <message>
         <location/>
         <source>Language:</source>
         <translation>Langue :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Expert Mode:</source>
+        <translation>Mode Expert :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Contribute usage statistics:</source>
+        <translation type="unfinished">Contribuer aux statistiques d&apos;utilisation :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use UDP Mirror:</source>
+        <translation>Utiliser Miroir UDP :</translation>
     </message>
 </context>
 <context>
@@ -16173,7 +16186,7 @@ IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la cart
 <context>
     <name>ConfigCcpmWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget.cpp" line="+1081"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget.cpp" line="+1080"/>
         <source>&lt;h1&gt;Swashplate Leveling Routine&lt;/h1&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16318,6 +16331,39 @@ Il est suggéré que si cela est une première configuration de votre contrôleu
         <location line="+105"/>
         <source>Current Tuning</source>
         <translation>Réglages Actuels</translation>
+    </message>
+</context>
+<context>
+    <name>UsageTrackerPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/usagetracker/usagetrackerplugin.cpp" line="+80"/>
+        <source>Usage feedback</source>
+        <translation>Retour d&apos;utilisation</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Yes, count me in</source>
+        <translation>Oui, comptez sur moi</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No, I will not help</source>
+        <translation>Non, je ne souhaite pas aider</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Openpilot GCS has a function to collect limited anonymous information about the usage of the application itself and the OpenPilot hardware connected to it.&lt;p&gt;The intention is to not include anything that can be considered sensitive or a threat to the users integrity. The collected information will be sent using a secure protocol to an OpenPilot web service and stored in a database for later analysis and statistical purposes.&lt;br&gt;No information will be sold or given to any third party. The sole purpose is to collect statistics about the usage of our software and hardware to enable us to make things better for you.&lt;p&gt;The following things are collected:&lt;ul&gt;&lt;li&gt;Bootloader version&lt;/li&gt;&lt;li&gt;Firmware version, tag and git hash&lt;/li&gt;&lt;li&gt;OP Hardware type, revision and mcu serial number&lt;/li&gt;&lt;li&gt;Selected configuration parameters&lt;/li&gt;&lt;li&gt;GCS version&lt;/li&gt;&lt;li&gt;Operating system version and architecture&lt;/li&gt;&lt;li&gt;Current local time&lt;/li&gt;&lt;/ul&gt;The information is collected only at the time when a board is connecting to GCS.&lt;p&gt;It is possible to enable or disable this functionality in the general settings part of the options for the GCS application at any time.&lt;p&gt;We need your help, with your feedback we know where to improve things and what platforms are in use. This is a community project that depends on people being involved.&lt;br&gt;Thank You for helping us making things better and for supporting OpenPilot!</source>
+        <translation type="unfinished">Openpilot GCS possède une fonction qui permet de collecter les informations de manière anonyme sur l&apos;utilisation de l&apos;application en elle-même ainsi que le matériel OpenPilot connecté dessus.&lt;p&gt;Il n&apos;est pas question de collecter des informations sensibles ou pouvant représenter une menace pour l&apos;intégrité des utilisateurs. Les informations collectées seront envoyées vers un site web OpenPilot en utilisant un protocole sécurisé et stockées dans une base de données pour une analyse et des statistiques ultérieures.&lt;br&gt;Aucune information ne sera vendue ou donnée à une quelconque tierce partie. Le seul but est de collecter des informations à propos de l&apos;utilisation de notre logiciel / matériel pour nous permettre de l&apos;améliorer.&lt;p&gt;Les éléments suivants sont collectés :&lt;ul&gt;&lt;li&gt;Version bootloader&lt;/li&gt;&lt;li&gt;Version firmware, tag et git hash&lt;/li&gt;&lt;li&gt;Type de matériel OP, révision et numéro de série CPU&lt;/li&gt;&lt;li&gt;Paramètres de configuration sélectionnés&lt;/li&gt;&lt;li&gt;Version GCS&lt;/li&gt;&lt;li&gt;Système d&apos;exploitation et architecture&lt;/li&gt;&lt;li&gt;Fuseau horaire&lt;/li&gt;&lt;/ul&gt;Les informations sont collectées au moment de la connexion de la carte avec GCS.&lt;p&gt;Il est possible d&apos;activer ou de désactiver cette fonctionnalité à tout moment dans le menu Options &gt; Paramètres généraux de GCS.&lt;p&gt;Nous avons besoin de votre aide, avec votre participation nous connaîtrons où apporter des améliorations et quelle plateforme vous utilisez. C&apos;est un projet communautaire qui dépend de l&apos;implication des utilisateurs.&lt;br&gt;Merci de nous aider à rendre les choses meilleures et soutenir OpenPilot !</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>&amp;Don&apos;t show this message again.</source>
+        <translation>&amp;Ne pas afficher ce message à nouveau.</translation>
+    </message>
+    <message>
+        <location line="+148"/>
+        <source>Unknown</source>
+        <translation>Inconnu</translation>
     </message>
 </context>
 </TS>

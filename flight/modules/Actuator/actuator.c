@@ -573,7 +573,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  * idx1 is the first valid index of the curve we look at
  * idx2 is the next highest element in the curve
  */
-static float MixerCurve(const float throttle, const float *curve, uint8_t elements)
+static float MixerCurve( float throttle, const float *curve, uint8_t elements)
 {
     bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
     bool negativeThrottle = false;
@@ -581,7 +581,7 @@ static float MixerCurve(const float throttle, const float *curve, uint8_t elemen
     // negative throttle will be a v-curve
     // we only do this if multirotor
     if (multirotor) {
-        if (throttle < 0) {
+        if (throttle < 0.0f) {
             throttle *= -1.0f; // set throttle to a positive value
             negativeThrottle = true; // calculate the throttle as a positive value then set it back to negative below.
         }
@@ -669,9 +669,9 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
 
     // Scale
     if (value >= 0.0f) {
-        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor))) + neutral;
+        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor)) + neutral;
     } else {
-        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor))) + neutral;
+        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor)) + neutral;
     }
 
     if (max > min) {

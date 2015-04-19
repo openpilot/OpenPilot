@@ -254,7 +254,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     connect(m_aircraft->ccpmCollectivespinBox, SIGNAL(valueChanged(int)), this, SLOT(UpdateMixer()));
     connect(m_aircraft->ccpmType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateType()));
     connect(m_aircraft->ccpmSingleServo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateType()));
-    connect(m_aircraft->TabObject, SIGNAL(currentChanged(QWidget *)), this, SLOT(UpdateType()));
+    connect(m_aircraft->TabObject, SIGNAL(currentChanged(int)), this, SLOT(UpdateType()));
 
     connect(m_aircraft->SwashLvlStartButton, SIGNAL(clicked()), this, SLOT(SwashLvlStartButtonPressed()));
     connect(m_aircraft->SwashLvlNextButton, SIGNAL(clicked()), this, SLOT(SwashLvlNextButtonPressed()));
@@ -384,43 +384,15 @@ QString ConfigCcpmWidget::updateConfigObjectsFromWidgets()
 
 void ConfigCcpmWidget::UpdateType()
 {
-    int TypeInt, SingleServoIndex, NumServosDefined;
+    int SingleServoIndex, NumServosDefined;
     double AdjustmentAngle = 0;
 
     SetUIComponentVisibilities();
 
-    TypeInt  = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
     TypeText = m_aircraft->ccpmType->currentText();
     SingleServoIndex = m_aircraft->ccpmSingleServo->currentIndex();
 
-    // set visibility of user settings (When Custom)
-    m_aircraft->ccpmAdvancedSettingsTable->setEnabled(TypeInt == 0);
-
-    // Clear advanced settings table if not Custom selected (Keep previous settings)
-    if (TypeText.compare(QString::fromUtf8("Custom - Advanced Settings"), Qt::CaseInsensitive) != 0) {
-        m_aircraft->ccpmAdvancedSettingsTable->clearFocus();
-    }
-
-    m_aircraft->ccpmAngleW->setEnabled(TypeInt == 1);
-    m_aircraft->ccpmAngleX->setEnabled(TypeInt == 1);
-    m_aircraft->ccpmAngleY->setEnabled(TypeInt == 1);
-    m_aircraft->ccpmAngleZ->setEnabled(TypeInt == 1);
-    m_aircraft->ccpmCorrectionAngle->setEnabled(TypeInt != 0);
-
-    m_aircraft->ccpmServoWChannel->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmServoXChannel->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmServoYChannel->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmServoZChannel->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmSingleServo->setEnabled(TypeInt > 1);
-
-    m_aircraft->ccpmEngineChannel->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmTailChannel->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmCollectiveSlider->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmCollectivespinBox->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmRevoSlider->setEnabled(TypeInt > 0);
-    m_aircraft->ccpmREVOspinBox->setEnabled(TypeInt > 0);
-
-    AdjustmentAngle = SingleServoIndex * 90;
+    AdjustmentAngle  = SingleServoIndex * 90;
 
     m_aircraft->PitchCurve->setVisible(1);
 
@@ -671,7 +643,11 @@ void ConfigCcpmWidget::UpdateMixer()
     float ThisAngle[6];
     QString Channel;
 
-    if (throwConfigError(QString("HeliCP"))) {
+    int TypeInt = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
+
+    // Don't check config if Custom, exit if currently updatingToHardware
+    // Avoid updating custom table if saving data to board
+    if ((throwConfigError(TypeInt) && TypeInt != 0) || updatingToHardware) {
         return;
     }
     GUIConfigDataUnion config = getConfigData();
@@ -694,16 +670,18 @@ void ConfigCcpmWidget::UpdateMixer()
             ;
         }
     }
-    int TypeInt = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
-    if (TypeInt != 0) { // not advanced settings
-        // get the channel data from the ui
-        MixerChannelData[0] = m_aircraft->ccpmEngineChannel->currentIndex();
-        MixerChannelData[1] = m_aircraft->ccpmTailChannel->currentIndex();
-        MixerChannelData[2] = m_aircraft->ccpmServoWChannel->currentIndex();
-        MixerChannelData[3] = m_aircraft->ccpmServoXChannel->currentIndex();
-        MixerChannelData[4] = m_aircraft->ccpmServoYChannel->currentIndex();
-        MixerChannelData[5] = m_aircraft->ccpmServoZChannel->currentIndex();
 
+    // get the channel data from the ui
+    MixerChannelData[0] = m_aircraft->ccpmEngineChannel->currentIndex();
+    MixerChannelData[1] = m_aircraft->ccpmTailChannel->currentIndex();
+    MixerChannelData[2] = m_aircraft->ccpmServoWChannel->currentIndex();
+    MixerChannelData[3] = m_aircraft->ccpmServoXChannel->currentIndex();
+    MixerChannelData[4] = m_aircraft->ccpmServoYChannel->currentIndex();
+    MixerChannelData[5] = m_aircraft->ccpmServoZChannel->currentIndex();
+
+    QTableWidget *table = m_aircraft->ccpmAdvancedSettingsTable;
+
+    if (TypeInt != 0) { // not advanced settings
         // get the angle data from the ui
         ThisAngle[2]  = m_aircraft->ccpmAngleW->value();
         ThisAngle[3]  = m_aircraft->ccpmAngleX->value();
@@ -722,11 +700,9 @@ void ConfigCcpmWidget::UpdateMixer()
         ServosText[3]->setPlainText(QString("%1").arg(MixerChannelData[5]));
 
         // go through the user data and update the mixer matrix
-        QTableWidget *table = m_aircraft->ccpmAdvancedSettingsTable;
         for (int i = 0; i < 6; i++) {
-            if ((MixerChannelData[i] > 0) && ((ThisEnable[i]) || (i < 2))) {
+            if (((MixerChannelData[i] > 0) && ThisEnable[i]) || (i < 2)) {
                 table->item(i, 0)->setText(QString("%1").arg(MixerChannelData[i]));
-
                 // Generate the mixer vector
                 if (i == 0) { // main motor-engine
                     table->item(i, 1)->setText(QString("%1").arg(127)); // ThrottleCurve1
@@ -787,14 +763,34 @@ void ConfigCcpmWidget::UpdateMixer()
         }
     } else {
         // advanced settings
-        QTableWidget *table = m_aircraft->ccpmAdvancedSettingsTable;
+        UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+        Q_ASSERT(mixer);
 
+        // Populate custom mixer table from board values
         for (int i = 0; i < 6; i++) {
-            Channel = table->item(i, 0)->text();
-            if (Channel == "-") {
-                Channel = QString((int)ConfigCcpmWidget::CHANNEL_NUMELEM + 1);
+            if (MixerChannelData[i] > 0) {
+                // Channel number
+                table->item(i, 0)->setText(QString("%1").arg(MixerChannelData[i]));
+                // Throttle1
+                table->item(i, 1)->setText(QString("%1").arg(getMixerVectorValue(mixer, MixerChannelData[i] - 1,
+                                                                                 VehicleConfig::MIXERVECTOR_THROTTLECURVE1)));
+                // Throttle2
+                table->item(i, 2)->setText(QString("%1").arg(getMixerVectorValue(mixer, MixerChannelData[i] - 1,
+                                                                                 VehicleConfig::MIXERVECTOR_THROTTLECURVE2)));
+                // Roll
+                table->item(i, 3)->setText(QString("%1").arg(getMixerVectorValue(mixer, MixerChannelData[i] - 1,
+                                                                                 VehicleConfig::MIXERVECTOR_ROLL)));
+                // Pitch
+                table->item(i, 4)->setText(QString("%1").arg(getMixerVectorValue(mixer, MixerChannelData[i] - 1,
+                                                                                 VehicleConfig::MIXERVECTOR_PITCH)));
+                // Yaw
+                table->item(i, 5)->setText(QString("%1").arg(getMixerVectorValue(mixer, MixerChannelData[i] - 1,
+                                                                                 VehicleConfig::MIXERVECTOR_YAW)));
+            } else {
+                for (int j = 0; j < 6; j++) {
+                    table->item(i, j)->setText(QString("-"));
+                }
             }
-            MixerChannelData[i] = Channel.toInt();
         }
     }
 }
@@ -893,6 +889,31 @@ void ConfigCcpmWidget::SetUIComponentVisibilities()
     m_aircraft->SwashLvlStepList->item(1)->setBackground(Qt::transparent);
     m_aircraft->SwashLvlStepList->item(2)->setBackground(Qt::transparent);
     m_aircraft->SwashLvlStepList->item(3)->setBackground(Qt::transparent);
+
+    // Enable / disable by TypeInt : 0 is custom
+    int TypeInt = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
+
+    // set visibility of user settings (When Custom)
+    m_aircraft->ccpmAdvancedSettingsTable->setEnabled(TypeInt == 0);
+
+    m_aircraft->ccpmAngleW->setEnabled(TypeInt == 1);
+    m_aircraft->ccpmAngleX->setEnabled(TypeInt == 1);
+    m_aircraft->ccpmAngleY->setEnabled(TypeInt == 1);
+    m_aircraft->ccpmAngleZ->setEnabled(TypeInt == 1);
+    m_aircraft->ccpmCorrectionAngle->setEnabled(TypeInt != 0);
+
+    m_aircraft->ccpmServoWChannel->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmServoXChannel->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmServoYChannel->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmServoZChannel->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmSingleServo->setEnabled(TypeInt > 1);
+
+    m_aircraft->ccpmEngineChannel->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmTailChannel->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmCollectiveSlider->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmCollectivespinBox->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmRevoSlider->setEnabled(TypeInt > 0);
+    m_aircraft->ccpmREVOspinBox->setEnabled(TypeInt > 0);
 }
 
 /**
@@ -1560,51 +1581,50 @@ void ConfigCcpmWidget::SwashLvlSpinBoxChanged(int value)
 /**
    This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
-bool ConfigCcpmWidget::throwConfigError(QString airframeType)
+bool ConfigCcpmWidget::throwConfigError(int TypeInt)
 {
-    Q_UNUSED(airframeType);
-
+    // Display all without errors
     bool error = false;
+
+    m_aircraft->ccpmServoWLabel->setText(QTextEdit(m_aircraft->ccpmServoWLabel->text()).toPlainText());
+    m_aircraft->ccpmServoXLabel->setText(QTextEdit(m_aircraft->ccpmServoXLabel->text()).toPlainText());
+    m_aircraft->ccpmServoYLabel->setText(QTextEdit(m_aircraft->ccpmServoYLabel->text()).toPlainText());
+    m_aircraft->ccpmServoZLabel->setText(QTextEdit(m_aircraft->ccpmServoZLabel->text()).toPlainText());
+    m_aircraft->ccpmEngineLabel->setText(QTextEdit(m_aircraft->ccpmEngineLabel->text()).toPlainText());
+    m_aircraft->ccpmTailLabel->setText(QTextEdit(m_aircraft->ccpmTailLabel->text()).toPlainText());
+
+    // Custom no need check
+    if (TypeInt == 0) {
+        return error;
+    }
 
     if ((m_aircraft->ccpmServoWChannel->currentIndex() == 0) && (m_aircraft->ccpmServoWChannel->isVisible())) {
         m_aircraft->ccpmServoWLabel->setText("<font color=red>" + m_aircraft->ccpmServoWLabel->text() + "</font>");
         error = true;
-    } else {
-        m_aircraft->ccpmServoWLabel->setText(QTextEdit(m_aircraft->ccpmServoWLabel->text()).toPlainText());
     }
 
     if ((m_aircraft->ccpmServoXChannel->currentIndex() == 0) && (m_aircraft->ccpmServoXChannel->isVisible())) {
         m_aircraft->ccpmServoXLabel->setText("<font color=red>" + m_aircraft->ccpmServoXLabel->text() + "</font>");
         error = true;
-    } else {
-        m_aircraft->ccpmServoXLabel->setText(QTextEdit(m_aircraft->ccpmServoXLabel->text()).toPlainText());
     }
 
     if ((m_aircraft->ccpmServoYChannel->currentIndex() == 0) && (m_aircraft->ccpmServoYChannel->isVisible())) {
         m_aircraft->ccpmServoYLabel->setText("<font color=red>" + m_aircraft->ccpmServoYLabel->text() + "</font>");
         error = true;
-    } else {
-        m_aircraft->ccpmServoYLabel->setText(QTextEdit(m_aircraft->ccpmServoYLabel->text()).toPlainText());
     }
 
     if ((m_aircraft->ccpmServoZChannel->currentIndex() == 0) && (m_aircraft->ccpmServoZChannel->isVisible())) {
         m_aircraft->ccpmServoZLabel->setText("<font color=red>" + m_aircraft->ccpmServoZLabel->text() + "</font>");
         error = true;
-    } else {
-        m_aircraft->ccpmServoZLabel->setText(QTextEdit(m_aircraft->ccpmServoZLabel->text()).toPlainText());
     }
 
     if ((m_aircraft->ccpmEngineChannel->currentIndex() == 0) && (m_aircraft->ccpmEngineChannel->isEnabled())) {
         m_aircraft->ccpmEngineLabel->setText("<font color=red>" + m_aircraft->ccpmEngineLabel->text() + "</font>");
-    } else {
-        m_aircraft->ccpmEngineLabel->setText(QTextEdit(m_aircraft->ccpmEngineLabel->text()).toPlainText());
     }
 
     if ((m_aircraft->ccpmTailChannel->currentIndex() == 0) && (m_aircraft->ccpmTailChannel->isEnabled())) {
         m_aircraft->ccpmTailLabel->setText("<font color=red>" + m_aircraft->ccpmTailLabel->text() + "</font>");
         error = true;
-    } else {
-        m_aircraft->ccpmTailLabel->setText(QTextEdit(m_aircraft->ccpmTailLabel->text()).toPlainText());
     }
 
     return error;

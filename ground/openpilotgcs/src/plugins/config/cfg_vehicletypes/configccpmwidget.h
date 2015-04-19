@@ -112,7 +112,7 @@ private:
 
 private slots:
     virtual void setupUI(QString airframeType);
-    virtual bool throwConfigError(QString airframeType);
+    virtual bool throwConfigError(int TypeInt);
 
     void ccpmSwashplateUpdate();
     void ccpmSwashplateRedraw();

@@ -14,6 +14,7 @@ DEFINES += QTCREATOR_UTILS_LIB
 include(../../openpilotgcslibrary.pri)
 
 SOURCES += reloadpromptutils.cpp \
+    gcsdirs.cpp \
     settingsutils.cpp \
     filesearch.cpp \
     pathchooser.cpp \
@@ -70,6 +71,7 @@ win32 {
 else:SOURCES += consoleprocess_unix.cpp
 
 HEADERS += utils_global.h \
+    gcsdirs.h \
     reloadpromptutils.h \
     settingsutils.h \
     filesearch.h \

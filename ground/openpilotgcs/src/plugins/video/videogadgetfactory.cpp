@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -33,18 +33,16 @@
 #include <coreplugin/iuavgadget.h>
 
 VideoGadgetFactory::VideoGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("VideoGadget"), tr("Video"), parent)
-{
-}
+    IUAVGadgetFactory(QString("VideoGadget"), tr("Video"), parent)
+{}
 
 VideoGadgetFactory::~VideoGadgetFactory()
-{
-
-}
+{}
 
 Core::IUAVGadget *VideoGadgetFactory::createGadget(QWidget *parent)
 {
     VideoGadgetWidget *gadgetWidget = new VideoGadgetWidget(parent);
+
     return new VideoGadget(QString("VideoGadget"), gadgetWidget, parent);
 }
 

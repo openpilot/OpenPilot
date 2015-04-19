@@ -8,8 +8,8 @@ SUBDIRS = \
     aggregation \
     extensionsystem \
     glc_lib \
-    gstreamer \
     utils \
+    gstreamer \
     opmapcontrol \
     qwt \
     sdlgamepad

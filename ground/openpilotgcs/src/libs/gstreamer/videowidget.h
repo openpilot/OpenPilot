@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -28,37 +28,40 @@
 #ifndef VIDEOWIDGET_H_
 #define VIDEOWIDGET_H_
 
+#include "gst_global.h"
+#include "pipeline.h"
+#include "overlay.h"
+
 #include <QWidget>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QMouseEvent>
 
-#include "gst_global.h"
-#include "pipeline.h"
-#include "overlay.h"
-
 typedef struct _GstElement GstElement;
 
 class BusSyncHandler;
 
-class GST_LIB_EXPORT VideoWidget: public QWidget {
-Q_OBJECT
+class GST_LIB_EXPORT VideoWidget : public QWidget {
+    Q_OBJECT
 public:
     VideoWidget(QWidget *parent = 0);
     ~VideoWidget();
 public:
+    QString pipelineDesc();
     void setPipelineDesc(QString pipelineDesc);
     bool isPlaying();
+
+    static const char *name(Pipeline::State state);
+
 public slots:
     void start();
     void pause();
     void stop();
-//public slots:
-//	void onMessage(GstMessage *message);
-//signals:
-//	void message(QString msg);
+
 signals:
+    void message(QString);
     void stateChanged(Pipeline::State newState);
+
 protected:
     QString getStatus();
     QString getStatusMessage();
@@ -67,20 +70,23 @@ protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *);
     void mouseDoubleClickEvent(QMouseEvent *);
+
 private:
     void init();
     void dispose();
     void setOverlay(Overlay *);
+    void setOverlayed(bool);
+
     // QWidget overrides
     bool event(QEvent *);
-    QPaintEngine * paintEngine() const;
-private:
-    QString pipelineDesc;
+    QPaintEngine *paintEngine() const;
+
+    QString m_pipelineDesc;
     QString lastError;
     GstElement *pipeline;
     Overlay *overlay;
+    bool overlayed;
     BusSyncHandler *handler;
-    bool reset;
 };
 
 #endif /* VIDEOWIDGET_H_ */

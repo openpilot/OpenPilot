@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -29,10 +29,9 @@
 #include "videogadget.h"
 
 VideoGadget::VideoGadget(QString classId, VideoGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 VideoGadget::~VideoGadget()
 {
@@ -42,5 +41,6 @@ VideoGadget::~VideoGadget()
 void VideoGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
     VideoGadgetConfiguration *m = qobject_cast<VideoGadgetConfiguration *>(config);
+
     m_widget->setConfiguration(m);
 }

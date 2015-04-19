@@ -8,7 +8,6 @@
 #include "pipeline.h"
 
 #include <gst/gst.h>
-#include <gst/interfaces/xoverlay.h>
 
 Pipeline::Pipeline()
 {
@@ -17,6 +16,4 @@ Pipeline::Pipeline()
 }
 
 Pipeline::~Pipeline()
-{
-}
-
+{}

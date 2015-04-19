@@ -14,39 +14,41 @@
 #include "pipeline.h"
 #include "overlay.h"
 
-class PipelineEvent: public QEvent {
+class PipelineEvent : public QEvent {
 public:
     // event types
     static const QEvent::Type PrepareWindowId;
     static const QEvent::Type StateChange;
+    static const QEvent::Type Progress;
     static const QEvent::Type Qos;
     static const QEvent::Type Error;
+    static const QEvent::Type Warning;
+    static const QEvent::Type Info;
 
     PipelineEvent(QEvent::Type type, QString src) :
-            QEvent(type), src(src)
-    {
-    }
+        QEvent(type), src(src)
+    {}
     virtual ~PipelineEvent()
-    {
-    }
+    {}
 public:
     QString src;
 };
 
 const QEvent::Type PipelineEvent::PrepareWindowId = static_cast<QEvent::Type>(QEvent::registerEventType());
-const QEvent::Type PipelineEvent::StateChange = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::StateChange     = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Progress = static_cast<QEvent::Type>(QEvent::registerEventType());
 const QEvent::Type PipelineEvent::Qos = static_cast<QEvent::Type>(QEvent::registerEventType());
-const QEvent::Type PipelineEvent::Error = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Error    = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Warning  = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Info     = static_cast<QEvent::Type>(QEvent::registerEventType());
 
-class PrepareWindowIdEvent: public PipelineEvent {
+class PrepareWindowIdEvent : public PipelineEvent {
 public:
-    PrepareWindowIdEvent(QString src, Overlay * overlay) :
-            PipelineEvent(PrepareWindowId, src), overlay(overlay)
-    {
-    }
+    PrepareWindowIdEvent(QString src, Overlay *overlay) :
+        PipelineEvent(PrepareWindowId, src), overlay(overlay)
+    {}
     virtual ~PrepareWindowIdEvent()
-    {
-    }
+    {}
     Overlay *getOverlay()
     {
         return overlay;
@@ -56,21 +58,19 @@ public:
         return PrepareWindowId;
     }
 private:
-    Overlay * overlay;
+    Overlay *overlay;
 };
 
-class StateChangedEvent: public PipelineEvent {
+class StateChangedEvent : public PipelineEvent {
 public:
-//	enum State {
-//		VoidPending, Null, Ready, Paused, Playing
-//	};
+// enum State {
+// VoidPending, Null, Ready, Paused, Playing
+// };
     StateChangedEvent(QString src, Pipeline::State oldState, Pipeline::State newState, Pipeline::State pendingState) :
-            PipelineEvent(StateChange, src), oldState(oldState), newState(newState), pendingState(pendingState)
-    {
-    }
+        PipelineEvent(StateChange, src), oldState(oldState), newState(newState), pendingState(pendingState)
+    {}
     virtual ~StateChangedEvent()
-    {
-    }
+    {}
     static QEvent::Type type()
     {
         return StateChange;
@@ -91,6 +91,39 @@ private:
     Pipeline::State oldState;
     Pipeline::State newState;
     Pipeline::State pendingState;
+};
+
+class ProgressEvent : public PipelineEvent {
+public:
+    enum ProgressType {
+        Start, Continue, Complete, Cancelled, Error
+    };
+
+    ProgressEvent(QString src, ProgressType progressType, QString code, QString text) :
+        PipelineEvent(Progress, src), progressType(progressType), code(code), text(text)
+    {}
+    virtual ~ProgressEvent()
+    {}
+    static QEvent::Type type()
+    {
+        return Progress;
+    }
+    ProgressType getProgressType()
+    {
+        return progressType;
+    }
+    QString getCode()
+    {
+        return code;
+    }
+    QString getText()
+    {
+        return text;
+    }
+private:
+    ProgressType progressType;
+    QString code;
+    QString text;
 };
 
 class QosData {
@@ -122,7 +155,7 @@ public:
     // Units of the 'processed' and 'dropped' fields.
     // Video sinks and video filters will use GST_FORMAT_BUFFERS (frames).
     // Audio sinks and audio filters will likely use GST_FORMAT_DEFAULT (samples)
-    //GstFormat format;
+    // GstFormat format;
     // Total number of units correctly processed since the last state change to READY or a flushing operation.
     quint64 processed;
     // Total number of units dropped since the last state change to READY or a flushing operation.
@@ -130,28 +163,26 @@ public:
 
     QString timestamps()
     {
-        return QString("live: %0\nrunning time: %1\nstream time: %2\ntimestamp: %3\nduration: %4").arg(live).arg(
-                running_time).arg(stream_time).arg(timestamp).arg(duration);
+        return QString("live: %0; running time: %1; stream time: %2; timestamp: %3; duration: %4").arg(live).arg(
+            running_time).arg(stream_time).arg(timestamp).arg(duration);
     }
     QString values()
     {
-        return QString("jitter: %0\nproportion: %1\nquality: %2").arg(jitter).arg(proportion).arg(quality);
+        return QString("jitter: %0; proportion: %1; quality: %2;").arg(jitter).arg(proportion).arg(quality);
     }
     QString stats()
     {
-        return QString("format: %0\nprocessed: %1\ndropped: %2").arg("").arg(processed).arg(dropped);
+        return QString("format: %0; processed: %1; dropped: %2;").arg("").arg(processed).arg(dropped);
     }
 };
 
-class QosEvent: public PipelineEvent {
+class QosEvent : public PipelineEvent {
 public:
     QosEvent(QString src, QosData data) :
-            PipelineEvent(Qos, src), data(data)
-    {
-    }
+        PipelineEvent(Qos, src), data(data)
+    {}
     virtual ~QosEvent()
-    {
-    }
+    {}
     static QEvent::Type type()
     {
         return Qos;
@@ -164,19 +195,13 @@ private:
     QosData data;
 };
 
-class ErrorEvent: public PipelineEvent {
+class MessageEvent : public PipelineEvent {
 public:
-    ErrorEvent(QString src, QString message, QString debug) :
-            PipelineEvent(Error, src), message(message), debug(debug)
-    {
-    }
-    virtual ~ErrorEvent()
-    {
-    }
-    static QEvent::Type type()
-    {
-        return Error;
-    }
+    MessageEvent(QEvent::Type type, QString src, QString message, QString debug) :
+        PipelineEvent(type, src), message(message), debug(debug)
+    {}
+    virtual ~MessageEvent()
+    {}
     QString getMessage()
     {
         return message;
@@ -190,5 +215,43 @@ private:
     QString debug;
 };
 
-#endif /* PIPELINEEVENT_H_ */
+class ErrorEvent : public MessageEvent {
+public:
+    ErrorEvent(QString src, QString message, QString debug) :
+        MessageEvent(Error, src, message, debug)
+    {}
+    virtual ~ErrorEvent()
+    {}
+    static QEvent::Type type()
+    {
+        return Error;
+    }
+};
 
+class WarningEvent : public MessageEvent {
+public:
+    WarningEvent(QString src, QString message, QString debug) :
+        MessageEvent(Warning, src, message, debug)
+    {}
+    virtual ~WarningEvent()
+    {}
+    static QEvent::Type type()
+    {
+        return Warning;
+    }
+};
+
+class InfoEvent : public MessageEvent {
+public:
+    InfoEvent(QString src, QString message, QString debug) :
+        MessageEvent(Info, src, message, debug)
+    {}
+    virtual ~InfoEvent()
+    {}
+    static QEvent::Type type()
+    {
+        return Info;
+    }
+};
+
+#endif /* PIPELINEEVENT_H_ */

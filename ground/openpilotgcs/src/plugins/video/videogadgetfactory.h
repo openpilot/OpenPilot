@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -37,8 +37,8 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class VideoGadgetFactory: public IUAVGadgetFactory {
-Q_OBJECT
+class VideoGadgetFactory : public IUAVGadgetFactory {
+    Q_OBJECT
 public:
     VideoGadgetFactory(QObject *parent = 0);
     ~VideoGadgetFactory();

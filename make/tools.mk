@@ -96,7 +96,10 @@ else ifeq ($(UNAME), Windows)
     OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
-    GSTREAMER_URL  := http://wiki.openpilot.org/download/attachments/18612236/gstreamer-sdk-x86-2013.6.msi
+    GSTREAMER_URL         := http://gstreamer.freedesktop.org/data/pkg/windows/1.4.5/gstreamer-1.0-x86-1.4.5.msi
+    GSTREAMER_MD5_URL     := https://wiki.openpilot.org/download/attachments/5472258/gstreamer-1.0-x86-1.4.5.msi.md5
+    GSTREAMER_SDK_URL     := http://gstreamer.freedesktop.org/data/pkg/windows/1.4.5/gstreamer-1.0-devel-x86-1.4.5.msi
+    GSTREAMER_SDK_MD5_URL := https://wiki.openpilot.org/download/attachments/5472258/gstreamer-1.0-devel-x86-1.4.5.msi.md5
 endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
@@ -119,8 +122,7 @@ else ifeq ($(UNAME), Windows)
     SDL_DIR     := $(TOOLS_DIR)/SDL-1.2.15
     OPENSSL_DIR := $(TOOLS_DIR)/openssl-1.0.1e-win32
     MESAWIN_DIR := $(TOOLS_DIR)/mesawin
-    #GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk-x86-2013.6/0.10/x86
-	GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk/0.10/x86
+    GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer/1.0/x86
 endif
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
@@ -157,6 +159,7 @@ $(eval $(call GROUP_SDK_TEMPLATE,all_sdk,$(ALL_SDK_TARGETS)))
 # Used by other makefiles
 export MKDIR	:= mkdir
 export CP	:= cp
+export MV	:= mv
 export RM	:= rm
 export LN	:= ln
 export CAT	:= cat
@@ -278,7 +281,7 @@ endef
 ##############################
 
 define DOWNLOAD_TEMPLATE
-@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(2))
+	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(2))
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
 		$(CURL) $(CURL_OPTIONS) --silent -o "$(DL_DIR)/$(2).md5" "$(3)" && \
@@ -321,10 +324,6 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	)
 
 	$(6)
-
-#		$(if $(filter $(suffix $(4)), .msi),
-#		@$(ECHO) $(MSG_INSTALLING) $$(call toprel, $(2))
-#		$(V1) msiexec /passive INSTALLDIR=$(OPENPILOT_TOOLS_DIR) /i $$(call toprel, $(DL_DIR)/$(4))
 
 $(1)_clean:
 	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
@@ -780,7 +779,39 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,gstreamer,$(GSTREAMER_SDK_DIR),$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL))))
+.PHONY: $(addprefix gstreamer_, install clean distclean)
+
+define GSTREAMER_INSTALL_TEMPLATE
+
+gstreamer_install: gstreamer_clean | $(DL_DIR) $(TOOLS_DIR)
+# download and install gstreamer
+	$(call DOWNLOAD_TEMPLATE,$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL)),$(GSTREAMER_MD5_URL))
+	@$(ECHO) $(MSG_EXTRACTING) $(notdir $(GSTREAMER_URL)) to $(call toprel, $(GSTREAMER_SDK_DIR))
+	$(V1) msiexec /a $(subst /,\,$(DL_DIR)/$(notdir $(GSTREAMER_URL))) /qn TARGETDIR=$(subst /,\,$(OPENPILOT_TOOLS_DIR))
+# download and install gstreamer sdk
+	$(call DOWNLOAD_TEMPLATE,$(GSTREAMER_SDK_URL),$(notdir $(GSTREAMER_SDK_URL)),$(GSTREAMER_SDK_MD5_URL))
+	@$(ECHO) $(MSG_EXTRACTING) $(notdir $(GSTREAMER_SDK_URL)) to $(call toprel, $(GSTREAMER_SDK_DIR))
+	$(V1) msiexec /a $(subst /,\,$(DL_DIR)/$(notdir $(GSTREAMER_SDK_URL))) /qn TARGETDIR=$(subst /,\,$(OPENPILOT_TOOLS_DIR))
+# remove conflicting libstdc++-6.dll (has wrong exception handling model)
+	$(V1) $(MV) $(GSTREAMER_SDK_DIR)/bin/libstdc++-6.dll $(GSTREAMER_SDK_DIR)/bin/libstdc++-6.dll.bak
+	$(V1) $(MV) $(GSTREAMER_SDK_DIR)/lib/stdc++.lib $(GSTREAMER_SDK_DIR)/lib/stdc++.lib.bak
+	$(V1) $(MV) $(GSTREAMER_SDK_DIR)/lib/libstdc++.dll.a $(GSTREAMER_SDK_DIR)/lib/libstdc++.dll.a.bak
+	$(V1) $(MV) $(GSTREAMER_SDK_DIR)/lib/libstdc++.la $(GSTREAMER_SDK_DIR)/lib/libstdc++.la.bak
+# and remove plugins that use it
+	$(V1) $(MV) $(GSTREAMER_SDK_DIR)/lib/gstreamer-1.0/libgsttaglib.dll $(GSTREAMER_SDK_DIR)/lib/gstreamer-1.0/libgsttaglib.dll.bak
+
+endef
+
+$(eval $(GSTREAMER_INSTALL_TEMPLATE))
+
+gstreamer_clean:
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(GSTREAMER_SDK_DIR))
+	$(V1) [ ! -d "$(GSTREAMER_SDK_DIR)" ] || $(RM) -rf "$(GSTREAMER_SDK_DIR)"
+
+gstreamer_distclean:
+	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $(DL_DIR)/$(5))
+	$(V1) [ ! -f "$(DL_DIR)/$(5)" ]     || $(RM) "$(DL_DIR)/$(5)"
+	$(V1) [ ! -f "$(DL_DIR)/$(5).md5" ] || $(RM) "$(DL_DIR)/$(5).md5"
 
 endif
 
@@ -934,37 +965,6 @@ export GTEST_DIR
 gtest_version:
 	-$(V1) $(SED) -n "s/^PACKAGE_STRING='\(.*\)'/\1/p" < $(GTEST_DIR)/configure
 
-
-
-##############################
-#
-# gstreamer
-#
-##############################
-
-ifeq ($(UNAME), Windows)
-
-$(eval $(call TOOL_INSTALL_TEMPLATE,gstreamer,$(GSTREAMER_SDK_DIR),$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL))))
-
-else # Linux or Mac
-
-all_sdk_version: gstreamer_version
-
-endif
-
-ifeq ($(shell [ -d "$(GSTREAMER_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-	export GSTREAMER_SDK_DIR
-    export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-0.10
-    export PATH := $(GSTREAMER_SDK_DIR/bin):$(PATH)
-else
-    # not installed, hope it's in the path...
-    # $(info $(EMPTY) WARNING     $(call toprel, $(GSTREAMER_SDK_DIR)) not found (make gstreamer_install), using system PATH)
-    export GSTREAMER := gst-launch-0.10
-endif
-
-.PHONY: gstreamer_version
-gstreamer_version:
-	-$(V1) $(GSTREAMER) --version
 
 
 ##############################

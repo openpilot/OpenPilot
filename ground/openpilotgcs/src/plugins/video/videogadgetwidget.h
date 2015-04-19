@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -36,10 +36,10 @@
 #include <QtGui/QResizeEvent>
 #include <QtGui/QPaintEvent>
 
+class VideoWidget;
 class VideoGadgetConfiguration;
 
-class VideoGadgetWidget : public QFrame
-{
+class VideoGadgetWidget : public QFrame {
     Q_OBJECT
 
 public:
@@ -47,16 +47,20 @@ public:
     ~VideoGadgetWidget();
 
     void setConfiguration(VideoGadgetConfiguration *config);
-private:
-    Ui_Form *m_config;
-    VideoGadgetConfiguration *config;
+
 private slots:
-	void start();
-	void pause();
+    void start();
+    void pause();
     void stop();
     void onStateChanged(Pipeline::State newState);
+
 private:
+    Ui_Form *m_ui;
+    VideoGadgetConfiguration *config;
+
     void msg(const QString &str);
+
+    VideoWidget *videoWidget();
 };
 
 #endif /* VIDEOGADGETWIDGET_H_ */

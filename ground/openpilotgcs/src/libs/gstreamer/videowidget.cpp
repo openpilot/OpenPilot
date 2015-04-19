@@ -21,6 +21,9 @@
  */
 #include "videowidget.h"
 
+#include "overlay.h"
+#include "pipelineevent.h"
+
 #include <QtCore>
 #include <QPainter>
 #include <QDebug>
@@ -32,15 +35,11 @@
 #include <gst/gst.h>
 #include <gst/video/videooverlay.h>
 
-#include "overlay.h"
-#include "pipelineevent.h"
-
-class GstOverlayImpl: public Overlay {
+class GstOverlayImpl : public Overlay {
 public:
     GstOverlayImpl(GstVideoOverlay *gst_overlay) :
-            gst_overlay(gst_overlay)
-    {
-    }
+        gst_overlay(gst_overlay)
+    {}
     void expose()
     {
         if (gst_overlay) {
@@ -54,53 +53,50 @@ private:
 class BusSyncHandler {
 public:
     BusSyncHandler(QWidget *widget, WId wid) :
-            widget(widget), wId(wid)
-    {
-    }
+        widget(widget), wId(wid)
+    {}
     bool handleMessage(GstMessage *msg);
 private:
     QWidget *widget;
     WId wId;
-
 };
 
-static GstElement *createPipelineFromDesc(const char*, QString &lastError);
-//static GstElement *createTestPipeline();
+static GstElement *createPipelineFromDesc(const char *, QString &lastError);
+// static GstElement *createTestPipeline();
 
 static GstBusSyncReply gst_bus_sync_handler(GstBus *, GstMessage *, BusSyncHandler *);
 
 VideoWidget::VideoWidget(QWidget *parent) :
-        QWidget(parent), pipeline(NULL), overlay(NULL)
+    QWidget(parent), pipeline(NULL), overlay(NULL)
 {
-    qDebug() << QString("VideoWidget - creating (%0) - #%1").arg((long) QThread::currentThreadId()).arg("VideoWidget");
+    qDebug() << "VideoWidget::VideoWidget";
 
     // initialize gstreamer
     gst::init(NULL, NULL);
 
     // make the widget native so it gets its own native window id that we will pass to gstreamer
     setAttribute(Qt::WA_NativeWindow);
-    //setAttribute(Qt::WA_DontCreateNativeAncestors);
+    // setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     // set black background
     QPalette pal(palette());
     pal.setColor(backgroundRole(), Qt::black);
     setPalette(pal);
 
+    // calling winId() will realize the window if it is not yet realized
+    // so wee need to call winId() here and not later from a gstreamer thread...
     WId wid = winId();
-    qDebug() << QString("VideoWidget - video winId : %0").arg((gulong) wid);
+    qDebug() << QString("VideoWidget::VideoWidget - video winId : %0").arg((gulong)wid);
     handler = new BusSyncHandler(this, wid);
 
     // init widget state (see setOverlay() for more information)
-    //setOverlay(NULL);
+    // setOverlay(NULL);
     setAutoFillBackground(true);
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_PaintOnScreen, false);
 
     // init state
     lastError = "";
-    reset = false;
-
-    qDebug() << QString("VideoWidget - created video widget winId : %0").arg((gulong) wid);
 }
 
 VideoWidget::~VideoWidget()
@@ -114,101 +110,92 @@ VideoWidget::~VideoWidget()
 
 bool VideoWidget::isPlaying()
 {
-    return (pipeline && GST_STATE(pipeline) == GST_STATE_PLAYING);
+    return pipeline && GST_STATE(pipeline) == GST_STATE_PLAYING;
+}
+
+QString VideoWidget::pipelineDesc()
+{
+    return m_pipelineDesc;
 }
 
 void VideoWidget::setPipelineDesc(QString pipelineDesc)
 {
-    qDebug() << QString("VideoWidget - setting pipeline desc to : %0").arg(pipelineDesc);
-    this->pipelineDesc = pipelineDesc;
+    qDebug() << QString("VideoWidget::setPipelineDesc - %0").arg(pipelineDesc);
+    this->m_pipelineDesc = pipelineDesc;
 }
 
 void VideoWidget::start()
 {
-    qDebug() << QString("VideoWidget - starting pipeline : %0").arg(pipelineDesc);
+    qDebug() << QString("VideoWidget::start - %0").arg(m_pipelineDesc);
     init();
-    gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
-    repaint();
+    update();
+    if (pipeline) {
+        gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
+    }
 }
 
 void VideoWidget::pause()
 {
     init();
-    if (GST_STATE(pipeline) == GST_STATE_PAUSED) {
-        gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
-    } else if (GST_STATE(pipeline) == GST_STATE_PLAYING) {
-        gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PAUSED);
+    update();
+    if (pipeline) {
+        if (GST_STATE(pipeline) == GST_STATE_PAUSED) {
+            gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
+        } else if (GST_STATE(pipeline) == GST_STATE_PLAYING) {
+            gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PAUSED);
+        }
     }
-    repaint();
 }
 
 void VideoWidget::stop()
 {
-    //gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_NULL);
     dispose();
-    repaint();
+    update();
 }
 
 void VideoWidget::init()
 {
-    if (reset) {
-        qDebug() << QString("VideoWidget - reseting pipeline (%0)").arg((long) QThread::currentThreadId());
-        dispose();
-    }
-
     if (pipeline) {
         // if pipeline is already created, reset some state and return
-        qDebug() << QString("VideoWidget - reseting pipeline state (%0)").arg((long) QThread::currentThreadId());
+        qDebug() << QString("VideoWidget::init - reseting pipeline state : %0").arg(m_pipelineDesc);
         lastError = "";
-        reset = false;
         return;
     }
 
     // reset state
     lastError = "";
-    reset = false;
 
     // create pipeline
-    qDebug() << QString("VideoWidget - initializing pipeline (%0)").arg((long) QThread::currentThreadId());
-    pipeline = createPipelineFromDesc(pipelineDesc.toStdString().c_str(), lastError);
-    if (!pipeline) {
-        return;
-    }
-    //gst_pipeline_set_auto_flush_bus(GST_PIPELINE(pipeline), false);
+    qDebug() << QString("VideoWidget::init - initializing pipeline : %0").arg(m_pipelineDesc);
+    pipeline = createPipelineFromDesc(m_pipelineDesc.toStdString().c_str(), lastError);
+    if (pipeline) {
+        // gst_pipeline_set_auto_flush_bus(GST_PIPELINE(pipeline), false);
 
-    // register bus synchronous handler
-    GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
-    gst_bus_set_sync_handler(bus, (GstBusSyncHandler) gst_bus_sync_handler, handler, NULL);
-    gst_object_unref(bus);
+        // register bus synchronous handler
+        GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
+        gst_bus_set_sync_handler(bus, (GstBusSyncHandler)gst_bus_sync_handler, handler, NULL);
+        gst_object_unref(bus);
+    }
 }
 
 void VideoWidget::dispose()
 {
-    if (!pipeline) {
-        return;
+    qDebug() << QString("VideoWidget::dispose - %0").arg(m_pipelineDesc);
+
+    setOverlay(NULL);
+
+    if (pipeline) {
+        gst_pipeline_set_auto_flush_bus(GST_PIPELINE(pipeline), true);
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(pipeline);
+        pipeline = NULL;
     }
-    qDebug() << QString("VideoWidget - disposing pipeline (%0)").arg((long) QThread::currentThreadId());
-
-    //GstElement *element = GST_ELEMENT(pipeline);
-    //pipeline = NULL;
-    gst_pipeline_set_auto_flush_bus(GST_PIPELINE(pipeline), true);
-    gst_element_set_state(pipeline, GST_STATE_NULL);
-    gst_object_unref(pipeline);
-    pipeline = NULL;
-
-    setOverlay (NULL);
-
-    lastError = "";
-    reset = false;
-
     // TODO should be done async?
 }
 
 void VideoWidget::paintEvent(QPaintEvent *event)
 {
-    //	qDebug()
-    //			<< QString("paint : %0 - %1 - %2").arg("VideoWidget").arg((long) winId()).arg(
-    //					(long) QThread::currentThreadId());
+    // qDebug() << QString("VideoWidget::paintEvent - %0").arg((long)winId());
     if (overlay) {
         overlay->expose();
     } else {
@@ -219,26 +206,20 @@ void VideoWidget::paintEvent(QPaintEvent *event)
 
 void VideoWidget::paintStatus(QPaintEvent *event)
 {
-    //	qDebug()
-    //			<< QString("paint : %0 - %1 - %2").arg("VideoWidget").arg((long) winId()).arg(
-    //					(long) QThread::currentThreadId());
+    Q_UNUSED(event);
+
     QTextDocument doc;
     doc.setDefaultStyleSheet("* { color:red; }");
-//	QString html = "<p>A QTextDocument can be used to present formatted text "
-//			"in a nice way.</p>"
-//			"<p align=center><b><font size=+2>in</font></b>"
-//			"</p>"
-//			"<p>The text can be really long and contain many "
-//			"paragraphs. It is properly wrapped and such...</p>";
-    QString html = "<p align=center><b><font size=+2>" + getStatus() + "</font></b></p>"
-            "<p align=center>" + getStatusMessage() + "</p>";
+
+    QString html     = "<p align=center><b><font size=+2>" + getStatus() + "</font></b></p>"
+                       "<p align=center>" + getStatusMessage() + "</p>";
 
     QRect widgetRect = QWidget::rect();
-    int x = 0;
-    int w = widgetRect.width();
-    int hh = widgetRect.height() / 4;
-    int y = (widgetRect.height() - hh) / 2;
-    int h = widgetRect.height() - y;
+    int x      = 0;
+    int w      = widgetRect.width();
+    int hh     = widgetRect.height() / 4;
+    int y      = (widgetRect.height() - hh) / 2;
+    int h      = widgetRect.height() - y;
     QRect rect = QRect(x, y, w, h);
 
     doc.setHtml(html);
@@ -249,24 +230,24 @@ void VideoWidget::paintStatus(QPaintEvent *event)
     painter.translate(rect.topLeft());
     doc.drawContents(&painter, rect.translated(-rect.topLeft()));
     painter.restore();
-    //painter.drawRect(rect);
+    // painter.drawRect(rect);
 
-    //		QBrush brush( Qt::yellow );
-    //		painter.setBrush( brush );		// set the yellow brush
-    //		painter.setPen( Qt::NoPen );		// do not draw outline
-    //		painter.drawRect(0, 0, width(), height());	// draw filled rectangle
-    //painter.end();
+    // QBrush brush( Qt::yellow );
+    // painter.setBrush( brush );		// set the yellow brush
+    // painter.setPen( Qt::NoPen );		// do not draw outline
+    // painter.drawRect(0, 0, width(), height());	// draw filled rectangle
+    // painter.end();
 
-    //QFont font = QApplication::font();
-    //font.setPixelSize( rect.height() );
-    //painter.setFont( font );
+    // QFont font = QApplication::font();
+    // font.setPixelSize( rect.height() );
+    // painter.setFont( font );
 }
 
 QString VideoWidget::getStatus()
 {
     if (!lastError.isEmpty()) {
         return "*** ERROR ***";
-    } else if (!pipeline && pipelineDesc.isEmpty()) {
+    } else if (!pipeline && m_pipelineDesc.isEmpty()) {
         return "*** NO PIPELINE ***";
     }
     return "";
@@ -280,12 +261,13 @@ QString VideoWidget::getStatusMessage()
     return "";
 }
 
+void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+}
+
 void VideoWidget::resizeEvent(QResizeEvent *event)
 {
-    //QApplication::syncX();
-    //	qDebug()
-    //			<< QString("resize : %0 - %1 - %2").arg("VideoWidget").arg((long) winId()).arg(
-    //					(long) QThread::currentThreadId());
     if (overlay) {
         overlay->expose();
     } else {
@@ -293,14 +275,10 @@ void VideoWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
-void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event)
-{
-}
-
-QPaintEngine * VideoWidget::paintEngine() const
+QPaintEngine *VideoWidget::paintEngine() const
 {
     // bypass double buffering, see setOverlay() for explanation
-    return (overlay ? NULL : QWidget::paintEngine());
+    return overlay ? NULL : QWidget::paintEngine();
 }
 
 // TODO find a better way and move away from this file
@@ -309,75 +287,131 @@ static Pipeline::State cvt(GstState state)
     switch (state) {
     case GST_STATE_VOID_PENDING:
         return Pipeline::VoidPending;
+
     case GST_STATE_NULL:
         return Pipeline::Null;
+
     case GST_STATE_READY:
         return Pipeline::Ready;
+
     case GST_STATE_PAUSED:
         return Pipeline::Paused;
+
     case GST_STATE_PLAYING:
         return Pipeline::Playing;
     }
     return Pipeline::Null;
-    //return StateChangedEvent::State.values()[state];
+    // return StateChangedEvent::State.values()[state];
+}
+
+static ProgressEvent::ProgressType cvt(GstProgressType type)
+{
+    switch (type) {
+    case GST_PROGRESS_TYPE_START:
+        return ProgressEvent::Start;
+
+    case GST_PROGRESS_TYPE_CONTINUE:
+        return ProgressEvent::Continue;
+
+    case GST_PROGRESS_TYPE_COMPLETE:
+        return ProgressEvent::Complete;
+
+    case GST_PROGRESS_TYPE_CANCELED:
+        return ProgressEvent::Cancelled;
+
+    case GST_PROGRESS_TYPE_ERROR:
+        return ProgressEvent::Error;
+    }
+    return ProgressEvent::Error;
 }
 
 // TODO find a better way and move away from this file
-static const char * name(Pipeline::State state)
+const char *VideoWidget::name(Pipeline::State state)
 {
     switch (state) {
     case Pipeline::VoidPending:
         return "VoidPending";
+
     case Pipeline::Null:
         return "Null";
+
     case Pipeline::Ready:
         return "Ready";
+
     case Pipeline::Paused:
         return "Paused";
+
     case Pipeline::Playing:
         return "Playing";
     }
-    return "null";
+    return "<unknown>";
 }
 
 bool VideoWidget::event(QEvent *event)
 {
     if (event->type() == PipelineEvent::PrepareWindowId) {
         PrepareWindowIdEvent *pe = static_cast<PrepareWindowIdEvent *>(event);
-        qDebug() << QString("VideoWidget - got event (%0) : PrepareWindowId").arg((long) QThread::currentThreadId());
+
+        // we take ownership of the overlay object
         setOverlay(pe->getOverlay());
+
+        QString msg = QString("pipeline %0 prepare window id").arg(pe->src);
+        qDebug() << "VideoWidget::event -" << msg;
+        emit message(msg);
+
         return true;
     } else if (event->type() == PipelineEvent::StateChange) {
         StateChangedEvent *sce = static_cast<StateChangedEvent *>(event);
-        qDebug()
-                << QString("VideoWidget - pipeline %0 changed state from %1 to %2").arg(sce->src).arg(name(sce->getOldState())).arg(
-                        name(sce->getNewState()));
-        //StateChangedEvent::State oldState = cvt(old_state);
-        //Pipeline::State newState = cvt(new_state);
+
+        QString msg = QString("pipeline %0 changed state from %1 to %2")
+                      .arg(sce->src).arg(name(sce->getOldState())).arg(name(sce->getNewState()));
+        qDebug() << "VideoWidget::event -" << msg;
         emit stateChanged(sce->getNewState());
+        // emit message(msg);
+
+        return true;
+    } else if (event->type() == PipelineEvent::Progress) {
+        ProgressEvent *pe = static_cast<ProgressEvent *>(event);
+        QString msg = QString("element %0 sent progress event: %1 %2 (%3)").arg(pe->src).arg(pe->getProgressType()).arg(
+            pe->getCode()).arg(pe->getText());
+        qDebug() << "VideoWidget::event -" << msg;
+        emit message(msg);
         return true;
     } else if (event->type() == PipelineEvent::Qos) {
         QosEvent *qe = static_cast<QosEvent *>(event);
-        qDebug()
-                << QString("VideoWidget - element %0 sent qos event:\n%1\n%2\n%3").arg(qe->src).arg(qe->getData().timestamps()).arg(
-                        qe->getData().values()).arg(qe->getData().stats());
+        QString msg  = QString("element %0 sent qos event: %1 %2 %3").arg(qe->src).arg(qe->getData().timestamps()).arg(
+            qe->getData().values()).arg(qe->getData().stats());
+        qWarning() << "VideoWidget::event -" << msg;
+        emit message(msg);
         return true;
     } else if (event->type() == PipelineEvent::Error) {
         ErrorEvent *ee = static_cast<ErrorEvent *>(event);
-        qDebug()
-                << QString("VideoWidget - element %0 sent error event:\n%1\n%2").arg(ee->src).arg(ee->getMessage()).arg(
-                        ee->getDebug());
+        QString msg    = QString("element %0 sent error event: %1 (%2)").arg(ee->src).arg(ee->getMessage()).arg(
+            ee->getDebug());
+        qCritical() << "VideoWidget::event -" << msg;
+        emit message(msg);
         if (lastError.isEmpty()) {
             // remember first error only (usually the most useful)
             lastError = QString("Pipeline error: %0").arg(ee->getMessage());
-            // TODO stop pipeline...
-            // force reset on next start
-            reset = true;
-            // need to repaint to display error message
-            repaint();
+            // stop pipeline...
+            stop();
         } else {
-            // TODO record subsequent errors separatly
+            // TODO record subsequent errors separately
         }
+        return true;
+    } else if (event->type() == PipelineEvent::Warning) {
+        WarningEvent *we = static_cast<WarningEvent *>(event);
+        QString msg = QString("element %0 sent warning event: %1 (%2)").arg(we->src).arg(we->getMessage()).arg(
+            we->getDebug());
+        qWarning() << "VideoWidget::event -" << msg;
+        emit message(msg);
+        return true;
+    } else if (event->type() == PipelineEvent::Info) {
+        InfoEvent *ie = static_cast<InfoEvent *>(event);
+        QString msg   = QString("element %0 sent info event: %1 (%2)").arg(ie->src).arg(ie->getMessage()).arg(
+            ie->getDebug());
+        qDebug() << "VideoWidget::event -" << msg;
+        emit message(msg);
         return true;
     }
     return QWidget::event(event);
@@ -386,10 +420,11 @@ bool VideoWidget::event(QEvent *event)
 void VideoWidget::setOverlay(Overlay *overlay)
 {
     if (this->overlay != overlay) {
-        if (this->overlay) {
-            delete this->overlay;
-        }
+        Overlay *oldOverlay = this->overlay;
         this->overlay = overlay;
+        if (oldOverlay) {
+            delete oldOverlay;
+        }
     }
 
     bool hasOverlay = overlay ? true : false;
@@ -398,7 +433,7 @@ void VideoWidget::setOverlay(Overlay *overlay)
 
     // disable background painting to avoid flickering when resizing
     setAttribute(Qt::WA_OpaquePaintEvent, hasOverlay);
-    //setAttribute(Qt::WA_NoSystemBackground, hasOverlay); // not sure it is needed
+    // setAttribute(Qt::WA_NoSystemBackground, hasOverlay); // not sure it is needed
 
     // disable double buffering to avoid flickering when resizing
     // for this to work we also need to override paintEngine() and make it return NULL.
@@ -407,46 +442,49 @@ void VideoWidget::setOverlay(Overlay *overlay)
     setAttribute(Qt::WA_PaintOnScreen, hasOverlay);
 }
 
-//static GstElement * createTestPipeline() {
-//	GstElement *pipeline = gst_pipeline_new("pipeline");
-//	g_assert(pipeline);
+// static GstElement * createTestPipeline() {
+// GstElement *pipeline = gst_pipeline_new("pipeline");
+// g_assert(pipeline);
 //
-//	GstElement *src = gst_element_factory_make("videotestsrc", "src");
-//	g_assert(src);
+// GstElement *src = gst_element_factory_make("videotestsrc", "src");
+// g_assert(src);
 //
-//	GstElement *sink = gst_element_factory_make("directdrawsink", "sink");
-//	g_assert(sink);
+// GstElement *sink = gst_element_factory_make("directdrawsink", "sink");
+// g_assert(sink);
 //
-//	gst_bin_add_many(GST_BIN(pipeline), src, sink, NULL);
-//	gst_element_link_many(src, sink, NULL);
+// gst_bin_add_many(GST_BIN(pipeline), src, sink, NULL);
+// gst_element_link_many(src, sink, NULL);
 //
-//	return pipeline;
-//}
+// return pipeline;
+// }
 
 static GstElement *createPipelineFromDesc(const char *desc, QString &lastError)
 {
-    qDebug() << QString("VideoWidget - creating pipeline : %0").arg(desc);
+    qDebug() << QString("VideoWidget::createPipelineFromDesc - creating pipeline : %0").arg(desc);
     GError *error = NULL;
     GstElement *pipeline = gst_parse_launch_full(desc, NULL, GST_PARSE_FLAG_FATAL_ERRORS, &error);
     if (!pipeline) {
         if (error != NULL) {
             // no pipeline and error...
             // report error to user
-            qCritical() << QString("Failed to create pipeline: %0").arg(error->message);
-            lastError = QString("Failed to create pipeline: %0").arg(error->message);
-            g_error_free(error);
+            QString msg = QString("Failed to create pipeline: %0").arg(error->message);
+            qCritical() << "VideoWidget::createPipelineFromDesc -" << msg;
+            lastError = msg;
         } else {
             // no pipeline and no error...
             // report generic error
-            qCritical() << QString("Failed to create pipeline");
-            lastError = QString("Failed to create pipeline");
+            QString msg = QString("Failed to create pipeline (no error reported!)");
+            qCritical() << "VideoWidget::createPipelineFromDesc -" << msg;
+            lastError = msg;
         }
     } else if (error) {
         // pipeline and error...
         // report error to user?
         // warning?
-        qCritical() << QString("Failed to create pipeline: %0").arg(error->message);
-
+        QString msg = QString("Created pipeline with error: %0").arg(error->message);
+        qWarning() << "VideoWidget::createPipelineFromDesc -" << msg;
+    }
+    if (error) {
         g_error_free(error);
     }
     return pipeline;
@@ -459,32 +497,50 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
     switch (GST_MESSAGE_TYPE(message)) {
     case GST_MESSAGE_ELEMENT:
         if (gst_is_video_overlay_prepare_window_handle_message(message)) {
-            qDebug()
-                    << QString("VideoWidget - element %0 prepare window with window #%1").arg(GST_OBJECT_NAME(message->src)).arg(
-                            (gulong) wId);
+            qDebug() << QString("VideoWidget::handleMessage - element %0 prepare window with id #%1").arg(GST_OBJECT_NAME(message->src)).arg((gulong)wId);
             // prepare-xwindow-id must be handled synchronously in order to have gstreamer use our window
             GstVideoOverlay *gst_video_overlay = GST_VIDEO_OVERLAY(GST_MESSAGE_SRC(message));
-            gst_video_overlay_set_window_handle(gst_video_overlay, (gulong) wId);
+            gst_video_overlay_set_window_handle(gst_video_overlay, (gulong)wId);
             // and now post event asynchronously
             Overlay *overlay = new GstOverlayImpl(gst_video_overlay);
-            QString name = GST_OBJECT_NAME(message->src);
+            QString name(GST_OBJECT_NAME(message->src));
             QCoreApplication::postEvent(widget, new PrepareWindowIdEvent(name, overlay));
         }
         break;
-    case GST_MESSAGE_STATE_CHANGED: {
+    case GST_MESSAGE_STATE_CHANGED:
+    {
         if (GST_IS_PIPELINE(message->src)) {
             GstState old_state, new_state, pending_state;
             gst_message_parse_state_changed(message, &old_state, &new_state, &pending_state);
-            // qDebug() << QString("VideoWidget - element %0 changed state from %1 to %2").arg(GST_OBJECT_NAME(message->src)).arg(gst_element_state_get_name(old_state)).arg(gst_element_state_get_name(new_state));
-            QString name = GST_OBJECT_NAME(message->src);
-            Pipeline::State oldState = cvt(old_state);
-            Pipeline::State newState = cvt(new_state);
-            Pipeline::State pendingState = cvt(pending_state);
-            QCoreApplication::postEvent(widget, new StateChangedEvent(name, oldState, newState, pendingState));
+
+            QString name(GST_OBJECT_NAME(message->src));
+            QCoreApplication::postEvent(widget, new StateChangedEvent(name, cvt(old_state), cvt(new_state), cvt(pending_state)));
         }
         break;
     }
-    case GST_MESSAGE_QOS: {
+// GST_MESSAGE_LATENCY
+// GST_MESSAGE_BUFFERING
+// GST_MESSAGE_CLOCK_PROVIDE
+// GST_MESSAGE_CLOCK_LOST
+// GST_MESSAGE_NEW_CLOCK
+    case GST_MESSAGE_PROGRESS:
+    {
+        // if (GST_IS_PIPELINE(message->src)) {
+        GstProgressType type;
+        gchar *code;
+        gchar *text;
+        gst_message_parse_progress(message, &type, &code, &text);
+
+        QString name(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new ProgressEvent(name, cvt(type), QString(code), QString(text)));
+
+        g_free(code);
+        g_free(text);
+        // }
+        break;
+    }
+    case GST_MESSAGE_QOS:
+    {
         QosData data;
         gboolean live;
         gst_message_parse_qos(message, &live, &data.running_time, &data.stream_time, &data.timestamp, &data.duration);
@@ -493,20 +549,51 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         gst_message_parse_qos_values(message, &data.jitter, &proportion, &data.quality);
         data.proportion = proportion;
         gst_message_parse_qos_stats(message, NULL, &data.processed, &data.dropped);
-        QString name = GST_OBJECT_NAME(message->src);
+
+        QString name(GST_OBJECT_NAME(message->src));
         QCoreApplication::postEvent(widget, new QosEvent(name, data));
+
         break;
     }
     case GST_MESSAGE_EOS:
         /* end-of-stream */
         // g_main_loop_quit (loop);
         break;
-    case GST_MESSAGE_ERROR: {
+    case GST_MESSAGE_ERROR:
+    {
         GError *err;
         gchar *debug;
         gst_message_parse_error(message, &err, &debug);
-        QString name = GST_OBJECT_NAME(message->src);
+
+        QString name(GST_OBJECT_NAME(message->src));
         QCoreApplication::postEvent(widget, new ErrorEvent(name, QString(err->message), QString(debug)));
+
+        g_error_free(err);
+        g_free(debug);
+        break;
+    }
+    case GST_MESSAGE_WARNING:
+    {
+        GError *err;
+        gchar *debug;
+        gst_message_parse_warning(message, &err, &debug);
+
+        QString name(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new WarningEvent(name, QString(err->message), QString(debug)));
+
+        g_error_free(err);
+        g_free(debug);
+        break;
+    }
+    case GST_MESSAGE_INFO:
+    {
+        GError *err;
+        gchar *debug;
+        gst_message_parse_info(message, &err, &debug);
+
+        QString name(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new InfoEvent(name, QString(err->message), QString(debug)));
+
         g_error_free(err);
         g_free(debug);
         break;
@@ -519,11 +606,7 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
 
 static GstBusSyncReply gst_bus_sync_handler(GstBus *bus, GstMessage *message, BusSyncHandler *handler)
 {
-    qDebug()
-            << QString("VideoWidget - bus_sync_handler (%0) : %1 : %2 (%3)").arg((long) QThread::currentThreadId()).arg(
-                    GST_OBJECT_NAME(message->src)).arg(GST_MESSAGE_TYPE_NAME(message)).arg(
-                    message != NULL ? GST_OBJECT_NAME(message) : "null");
-
+    qDebug() << QString("VideoWidget::gst_bus_sync_handler (%0) : %1 : %2 (%3)").arg((long)QThread::currentThreadId()).arg(GST_OBJECT_NAME(message->src)).arg(GST_MESSAGE_TYPE_NAME(message)).arg(message != NULL ? GST_OBJECT_NAME(message) : "null");
     if (handler->handleMessage(message)) {
         gst_message_unref(message);
         return GST_BUS_DROP;

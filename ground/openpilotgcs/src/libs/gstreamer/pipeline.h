@@ -8,20 +8,17 @@
 #ifndef PIPELINE_H_
 #define PIPELINE_H_
 
-typedef struct _GstElement GstElement;
+#include "gst_global.h"
 
-//class BusSyncHandler;
+#include <QString>
 
-class Pipeline {
+class GST_LIB_EXPORT Pipeline {
 public:
     enum State {
         VoidPending, Null, Ready, Paused, Playing
     };
     Pipeline();
     virtual ~Pipeline();
-private:
-    //GstElement *pipeline;
-    //BusSyncHandler *handler;
 };
 
 #endif /* PIPELINE_H_ */

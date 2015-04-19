@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -42,8 +42,8 @@ class VideoGadgetWidget;
 
 using namespace Core;
 
-class VideoGadget: public Core::IUAVGadget {
-Q_OBJECT
+class VideoGadget : public Core::IUAVGadget {
+    Q_OBJECT
 public:
     VideoGadget(QString classId, VideoGadgetWidget *widget, QWidget *parent = 0);
     ~VideoGadget();

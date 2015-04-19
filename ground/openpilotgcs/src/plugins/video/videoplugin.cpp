@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@ VideoPlugin::~VideoPlugin()
     // Do nothing
 }
 
-bool VideoPlugin::initialize(const QStringList& args, QString *errMsg)
+bool VideoPlugin::initialize(const QStringList & args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);

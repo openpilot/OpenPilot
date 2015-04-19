@@ -2519,15 +2519,14 @@
           <autoStart>true</autoStart>
           <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>videotestsrc ! video/x-raw-yuv, width=640, height=480 ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineDesc>videotestsrc ! d3dvideosink</pipelineDesc>
           <pipelineInfo>Displays test video.
 
-Supported OS : Windows
 </pipelineInfo>
           <respectAspectRatio>false</respectAspectRatio>
         </data>
       </Default>
-      <Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29__PCT__20__PCT__232>
+      <EGO__PCT__20Liquid__PCT__20Camera>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -2536,14 +2535,12 @@ Supported OS : Windows
           <autoStart>false</autoStart>
           <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>dx9screencapsrc x=0 y=0 width=640 height=480  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
-          <pipelineInfo>Same as Screen capture (dx9, no mouse) constrained to a rectangular area.
-
-Supported OS : Windows</pipelineInfo>
+          <pipelineDesc>rtspsrc location=rtsp://192.168.42.1/AmbaStreamTest latency=30 ! decodebin ! timeoverlay ! d3dvideosink</pipelineDesc>
+          <pipelineInfo></pipelineInfo>
           <respectAspectRatio>false</respectAspectRatio>
         </data>
-      </Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29__PCT__20__PCT__232>
-      <Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29>
+      </EGO__PCT__20Liquid__PCT__20Camera>
+      <Loopback__PCT__20-__PCT__20Audio__PCT__20Video__PCT__20__PCT__2B__PCT__20Sound__PCT__20Scope>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -2552,16 +2549,69 @@ Supported OS : Windows</pipelineInfo>
           <autoStart>true</autoStart>
           <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>dx9screencapsrc  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
-          <pipelineInfo>Screen capture video with DX9.
-No sound. No mouse. Not saved to file.
-
-Supported OS : Windows
-</pipelineInfo>
-          <respectAspectRatio>false</respectAspectRatio>
+          <pipelineDesc>ksvideosrc ! queue ! mix.
+directsoundsrc ! tee name=split ! queue ! directsoundsink
+split. ! queue ! wavescope ! queue ! mix.
+videomixer name=mix ! queue ! timeoverlay ! d3dvideosink </pipelineDesc>
+          <pipelineInfo></pipelineInfo>
+          <respectAspectRatio>true</respectAspectRatio>
         </data>
-      </Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29>
-      <Screen__PCT__20capture__PCT__20__PCT__28gdi__PCT__2C__PCT__20with__PCT__20mouse__PCT__29>
+      </Loopback__PCT__20-__PCT__20Audio__PCT__20Video__PCT__20__PCT__2B__PCT__20Sound__PCT__20Scope>
+      <Loopback__PCT__20-__PCT__20Audio__PCT__20Video>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>ksvideosrc ! queue ! timeoverlay ! d3dvideosink
+directsoundsrc ! queue ! directsoundsink
+</pipelineDesc>
+          <pipelineInfo></pipelineInfo>
+          <respectAspectRatio>true</respectAspectRatio>
+        </data>
+      </Loopback__PCT__20-__PCT__20Audio__PCT__20Video>
+      <Loopback__PCT__20-__PCT__20Audio>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>directsoundsrc ! tee name=split ! queue ! directsoundsink
+split. ! queue ! wavescope ! d3dvideosink</pipelineDesc>
+          <pipelineInfo>Plays a DirectSound source and displays it in a scope.
+
+Available scopes :
+- spacescope: Stereo visualizer
+- spectrascope: Frequency spectrum scope
+- synaescope: Synaescope
+- wavescope: Waveform oscilloscope
+</pipelineInfo>
+          <respectAspectRatio>true</respectAspectRatio>
+        </data>
+      </Loopback__PCT__20-__PCT__20Audio>
+      <Loopback__PCT__20-__PCT__20Video>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>ksvideosrc ! video/x-raw, framerate=30/1 ! timeoverlay ! d3dvideosink</pipelineDesc>
+          <pipelineInfo>Plays an usb camera.
+
+Supported OS : Windows</pipelineInfo>
+          <respectAspectRatio>true</respectAspectRatio>
+        </data>
+      </Loopback__PCT__20-__PCT__20Video>
+      <Screen__PCT__20Capture__PCT__20-__PCT__20DX9__PCT__20no__PCT__20mouse__PCT__20__PCT__28640x480__PCT__29>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -2570,18 +2620,48 @@ Supported OS : Windows
           <autoStart>false</autoStart>
           <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>gdiscreencapsrc cursor=true x=0 y=0 width=100 height=100  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineDesc>dx9screencapsrc x=0 y=0 width=640 height=480 ! d3dvideosink</pipelineDesc>
+          <pipelineInfo>Same as Screen capture (dx9, no mouse) constrained to a rectangular area.
+</pipelineInfo>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Screen__PCT__20Capture__PCT__20-__PCT__20DX9__PCT__20no__PCT__20mouse__PCT__20__PCT__28640x480__PCT__29>
+      <Screen__PCT__20Capture__PCT__20-__PCT__20DX9__PCT__20no__PCT__20mouse>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>dx9screencapsrc  ! d3dvideosink</pipelineDesc>
+          <pipelineInfo>Screen capture video with DX9.
+
+</pipelineInfo>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Screen__PCT__20Capture__PCT__20-__PCT__20DX9__PCT__20no__PCT__20mouse>
+      <Screen__PCT__20Capture__PCT__20-__PCT__20GDI__PCT__20with__PCT__20mouse__PCT__20__PCT__28100x100__PCT__29>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>false</autoStart>
+          <displayControls>false</displayControls>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>gdiscreencapsrc cursor=true x=0 y=0 width=100 height=100 ! videoconvert ! d3dvideosink</pipelineDesc>
           <pipelineInfo>Screen capture video with GDI.
 Mouse is captured.
 No sound. Not saved.
 
 WARNING : not stable, will crash GCS after some time when running.
-
-Supported OS : Windows</pipelineInfo>
+</pipelineInfo>
           <respectAspectRatio>false</respectAspectRatio>
         </data>
-      </Screen__PCT__20capture__PCT__20__PCT__28gdi__PCT__2C__PCT__20with__PCT__20mouse__PCT__29>
-      <Webcam__PCT__20__PCT__28DirectShow__PCT__29>
+      </Screen__PCT__20Capture__PCT__20-__PCT__20GDI__PCT__20with__PCT__20mouse__PCT__20__PCT__28100x100__PCT__29>
+      <Test__PCT__20-__PCT__20Audio>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -2590,14 +2670,12 @@ Supported OS : Windows</pipelineInfo>
           <autoStart>true</autoStart>
           <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>dshowvideosrc ! ffmpegcolorspace ! directdrawsink</pipelineDesc>
-          <pipelineInfo>Plays an usb camera.
-
-Supported OS : Windows</pipelineInfo>
+          <pipelineDesc>audiotestsrc ! timeoverlay ! directsoundsink</pipelineDesc>
+          <pipelineInfo></pipelineInfo>
           <respectAspectRatio>true</respectAspectRatio>
         </data>
-      </Webcam__PCT__20__PCT__28DirectShow__PCT__29>
-      <Webcam>
+      </Test__PCT__20-__PCT__20Audio>
+      <Test__PCT__20-__PCT__20Video>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -2606,42 +2684,11 @@ Supported OS : Windows</pipelineInfo>
           <autoStart>true</autoStart>
           <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>ksvideosrc ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
-          <pipelineInfo>Plays an usb camera.
-
-Supported OS : Windows</pipelineInfo>
-          <respectAspectRatio>true</respectAspectRatio>
+          <pipelineDesc>videotestsrc ! d3dvideosink</pipelineDesc>
+          <pipelineInfo></pipelineInfo>
+          <respectAspectRatio>false</respectAspectRatio>
         </data>
-      </Webcam>
-      <PIP>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <autoStart>true</autoStart>
-          <displayVideo>true</displayVideo>
-          <pipelineDesc>desktop.
-    ! ffmpegcolorspace
-    ! video/x-raw-yuv,rate=10/1
-    ! ffmpegcolorspace
-    ! vmix.sink_0
-webcam.
-    ! ffmpegcolorspace
-    ! video/x-raw-yuv,width=640,height=480,rate=30/1
-    ! ffmpegcolorspace
-    ! vmix.sink_1
-vmix.
-    ! ffmpegcolorspace
-    ! dshowvideosink
-dx9screencapsrc name=desktop
-dshowvideosrc name=webcam
-videomixer name=vmix
-    sink_0::xpos=0 sink_0::ypos=0 sink_0::zorder=0
-    sink_1::xpos=640 sink_1::ypos=0 sink_1::zorder=1</pipelineDesc>
-          <respectAspectRatio>true</respectAspectRatio>
-        </data>
-      </PIP>
+      </Test__PCT__20-__PCT__20Video>
     </VideoGadget>
     <configInfo>
       <locked>false</locked>

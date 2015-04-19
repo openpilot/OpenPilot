@@ -7,7 +7,7 @@
  * @{
  * @addtogroup VideoGadgetPlugin Video Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,9 +32,9 @@
 
 class VideoGadgetFactory;
 
-class VideoPlugin: public ExtensionSystem::IPlugin {
+class VideoPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-                         Q_PLUGIN_METADATA(IID "OpenPilot.Video")
+                                            Q_PLUGIN_METADATA(IID "OpenPilot.Video")
 public:
 
     VideoPlugin();
@@ -46,7 +46,6 @@ public:
 
 private:
     VideoGadgetFactory *mf;
-
 };
 
 #endif /* VIDEOPLUGIN_H_ */

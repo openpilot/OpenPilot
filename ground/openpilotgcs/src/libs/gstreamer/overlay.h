@@ -11,11 +11,9 @@
 class Overlay {
 public:
     Overlay()
-    {
-    }
+    {}
     virtual ~Overlay()
-    {
-    }
+    {}
     virtual void expose() = 0;
 };
 

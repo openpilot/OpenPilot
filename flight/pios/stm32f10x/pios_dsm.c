@@ -35,7 +35,7 @@
 #include "pios_dsm_priv.h"
 
 // *** UNTESTED CODE ***
-#undef DSM_LINK_QUALITY
+#define DSM_LINK_QUALITY
 
 /* Forward Declarations */
 static int32_t PIOS_DSM_Get(uint32_t rcvr_id, uint8_t channel);

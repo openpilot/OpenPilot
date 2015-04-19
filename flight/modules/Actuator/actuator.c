@@ -98,6 +98,7 @@ static int mixer_settings_count = 2;
 // Private functions
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed);
 static void setFailsafe();
 static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements);
 static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements);

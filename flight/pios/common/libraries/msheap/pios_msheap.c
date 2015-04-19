@@ -74,15 +74,15 @@ heap_handle_t fast_heap;
 extern void vApplicationMallocFailedHook(void) __attribute__((weak));
 
 void *
-pios_general_malloc(size_t s, bool use_fast_heap)
+pios_general_malloc(void *ptr, size_t s, bool use_fast_heap)
 {
 	void *p;
 
 	vPortEnterCritical();
 	if(use_fast_heap){
-		p = msheap_alloc(&fast_heap, s);
+		p = msheap_alloc(&fast_heap, ptr, s);
 	} else {
-		p = msheap_alloc(&sram_heap, s);
+		p = msheap_alloc(&sram_heap, ptr, s);
 	}
 	vPortExitCritical();
 
@@ -95,13 +95,13 @@ pios_general_malloc(size_t s, bool use_fast_heap)
 void *
 pvPortMalloc(size_t s)
 {
-	return pios_general_malloc(s, true);
+	return pios_general_malloc(NULL, s, true);
 }
 
 void *
 pvPortMallocStack(size_t s)
 {
-	return pios_general_malloc(s, false);
+	return pios_general_malloc(NULL, s, false);
 }
 
 void
@@ -154,7 +154,7 @@ malloc(size_t size)
 		heap_init_done = 1;
 	}
 
-	return msheap_alloc(sram_heap, size);
+	return msheap_alloc(NULL, sram_heap, size);
 }
 
 void

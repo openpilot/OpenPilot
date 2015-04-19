@@ -252,3 +252,11 @@ plugin_flightlog.depends += plugin_uavobjects
 plugin_flightlog.depends += plugin_uavtalk
 SUBDIRS += plugin_flightlog
 
+# Usage Tracker plugin
+plugin_usagetracker.subdir = usagetracker
+plugin_usagetracker.depends = plugin_coreplugin
+plugin_usagetracker.depends += plugin_uavobjects
+plugin_usagetracker.depends += plugin_uavtalk
+plugin_setupwizard.depends += plugin_uavobjectutil
+SUBDIRS += plugin_usagetracker
+

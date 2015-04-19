@@ -556,6 +556,7 @@ static uint8_t conditionDistanceToTarget()
 static uint8_t conditionLegRemaining()
 {
     PathStatusData pathStatus;
+
     PathStatusGet(&pathStatus);
 
     if (pathStatus.fractional_progress >= (1.0f - pathAction.ConditionParameters[0])) {

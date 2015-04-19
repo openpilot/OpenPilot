@@ -364,6 +364,7 @@ void VtolAutoTakeoffFSM::setup_checkstate(void)
     // If pathplanner, we need additional checks
     // E.g. if inflight, this mode is just positon hol
     StabilizationDesiredData stabDesired;
+
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust > vtolPathFollowerSettings->ThrustLimits.Min) {
         setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);

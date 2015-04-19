@@ -176,7 +176,7 @@ void VtolLandController::UpdateVelocityDesired()
 
     // Implement optional horizontal position hold.
     if ((((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) ||
-	(flightStatus->ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_TRUE) ) {
+        (flightStatus->ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_TRUE)) {
         // landing flight mode has stored original horizontal position in pathdesired
         PositionStateData positionState;
         PositionStateGet(&positionState);
@@ -271,17 +271,5 @@ void VtolLandController::UpdateAutoPilot()
         fsm->Abort();
     }
 
-    if (fsm->GetCurrentState() == PFFSM_STATE_DISARMED) {
-        setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
-    }
-
     PathStatusSet(pathStatus);
-}
-
-void VtolLandController::setArmedIfChanged(uint8_t val)
-{
-    if (flightStatus->Armed != val) {
-        flightStatus->Armed = val;
-        FlightStatusSet(flightStatus);
-    }
 }

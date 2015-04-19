@@ -529,7 +529,7 @@ void VtolLandFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTim
         mLandData->fsmLandStatus.WtgForGroundEffect.BounceAccel = 0.0f;
     }
 
-    if (flBounce ) { // || flBounceAccel) { // accel trigger can occur due to vibration and is too sensitive
+    if (flBounce) { // || flBounceAccel) { // accel trigger can occur due to vibration and is too sensitive
         mLandData->observation2Count++;
         if (mLandData->observation2Count > BOUNCE_TRIGGER_COUNT) {
             setState(LAND_STATE_GROUNDEFFECT, (flBounce ? STATUSVTOLLAND_STATEEXITREASON_BOUNCEVELOCITY : STATUSVTOLLAND_STATEEXITREASON_BOUNCEACCEL));

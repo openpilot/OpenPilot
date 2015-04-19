@@ -2604,7 +2604,7 @@ Available scopes :
           <autoStart>true</autoStart>
           <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>ksvideosrc ! video/x-raw, framerate=30/1 ! timeoverlay ! d3dvideosink</pipelineDesc>
+          <pipelineDesc>ksvideosrc ! timeoverlay ! d3dvideosink</pipelineDesc>
           <pipelineInfo>Plays an usb camera.
 
 Supported OS : Windows</pipelineInfo>
@@ -2790,42 +2790,18 @@ WARNING : not stable, will crash GCS after some time when running.
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
-          <side0>
-            <classId>ScopeGadget</classId>
-            <gadget>
-              <activeConfiguration>Accel</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>ScopeGadget</classId>
-            <gadget>
-              <activeConfiguration>Raw GyroState</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-          <type>splitter</type>
+          <classId>VideoGadget</classId>
+          <gadget>
+            <activeConfiguration>Loopback - Video</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
         </side0>
         <side1>
-          <side0>
-            <classId>ScopeGadget</classId>
-            <gadget>
-              <activeConfiguration>Attitude</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>ScopeGadget</classId>
-            <gadget>
-              <activeConfiguration>Uptimes</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhAAAAAIAAAGE)</splitterSizes>
-          <type>splitter</type>
+          <classId>VideoGadget</classId>
+          <gadget>
+            <activeConfiguration>Loopback - Audio</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
         <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACjQAAAAIAAAKU)</splitterSizes>

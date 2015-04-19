@@ -355,7 +355,7 @@ bool VideoWidget::event(QEvent *event)
         // we take ownership of the overlay object
         setOverlay(pe->getOverlay());
 
-        QString msg = QString("pipeline %0 prepare window id").arg(pe->src);
+        QString msg = QString("element %0 prepare window id").arg(pe->src);
         qDebug() << "VideoWidget::event -" << msg;
         emit message(msg);
 
@@ -518,14 +518,8 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         }
         break;
     }
-// GST_MESSAGE_LATENCY
-// GST_MESSAGE_BUFFERING
-// GST_MESSAGE_CLOCK_PROVIDE
-// GST_MESSAGE_CLOCK_LOST
-// GST_MESSAGE_NEW_CLOCK
     case GST_MESSAGE_PROGRESS:
     {
-        // if (GST_IS_PIPELINE(message->src)) {
         GstProgressType type;
         gchar *code;
         gchar *text;
@@ -536,7 +530,7 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
 
         g_free(code);
         g_free(text);
-        // }
+
         break;
     }
     case GST_MESSAGE_QOS:

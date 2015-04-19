@@ -26,10 +26,13 @@
  */
 #ifndef PIOS_MEM_H
 #define PIOS_MEM_H
+#include <strings.h>
 
 void *pios_fastheapmalloc(size_t size);
 
 void *pios_malloc(size_t size);
+
+void *pios_realloc(void *ptr, size_t size);
 
 void pios_free(void *p);
 

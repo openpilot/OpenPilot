@@ -52,7 +52,10 @@ typedef struct {
     uint    VTOLMotorWNW : 4;
     uint    VTOLMotorNNW : 4; // 64 bits
     uint    TRIYaw : 4;
-    quint32 padding : 28; // 96 bits
+    uint    Accessory0 : 4;
+    uint    Accessory1 : 4;
+    uint    Accessory2 : 4;
+    quint32 padding : 16; // 96 bits
     quint32 padding1; // 128 bits
 } __attribute__((packed))  multiGUISettingsStruct;
 

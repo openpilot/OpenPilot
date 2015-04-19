@@ -43,13 +43,13 @@ static volatile uint16_t ServoPosition[PIOS_SERVO_NUM_TIMERS];
  */
 void PIOS_Servo_Init(void)
 {}
-
 /**
  * Set the servo update rate (Max 500Hz)
- * \param[in] onetofour Rate for outputs 1 to 4 (Hz)
- * \param[in] fivetoeight Rate for outputs 5 to 8 (Hz)
+ * \param[in] array of rates in Hz
+ * \param[in] array of timer clocks in Hz
+ * \param[in] maximum number of banks
  */
-void PIOS_Servo_SetHz(const uint16_t *banks, uint8_t num_banks)
+void PIOS_Servo_SetHz(const uint16_t *speeds, const uint32_t *clock, uint8_t banks)
 {}
 
 /**

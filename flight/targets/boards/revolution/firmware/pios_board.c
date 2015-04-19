@@ -206,7 +206,7 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
     .orientation    = PIOS_MPU6000_TOP_180DEG,
     .fast_prescaler = PIOS_SPI_PRESCALER_4,
     .std_prescaler  = PIOS_SPI_PRESCALER_64,
-    .max_downsample = 16,
+    .max_downsample = 20,
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
@@ -740,10 +740,7 @@ void PIOS_Board_Init(void)
                           tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
             PIOS_Assert(0);
         }
-        /* Set Telemetry to use OPLinkMini if no other telemetry is configured (USB always overrides anyway) */
-        if (!pios_com_telem_rf_id) {
-            pios_com_telem_rf_id = pios_com_rf_id;
-        }
+
         oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_ENABLED;
 
         // Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.
@@ -922,20 +919,23 @@ void PIOS_Board_Init(void)
     PIOS_ADC_Init(&pios_adc_cfg);
 #endif
 
+#if defined(PIOS_INCLUDE_MPU6000)
+    PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
+    PIOS_MPU6000_CONFIG_Configure();
+    PIOS_MPU6000_Register();
+#endif
+
 #if defined(PIOS_INCLUDE_HMC5X83)
     onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_pressure_adapter_id, 0);
+    PIOS_HMC5x83_Register(onboard_mag);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)
     PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_mag_pressure_adapter_id);
+    PIOS_MS5611_Register();
 #endif
 
-#if defined(PIOS_INCLUDE_MPU6000)
-    PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
-    PIOS_MPU6000_CONFIG_Configure();
-#endif
-
-#ifdef PIOS_INCLUDE_WS2811
+    #ifdef PIOS_INCLUDE_WS2811
 #include <pios_ws2811.h>
     HwSettingsWS2811LED_OutOptions ws2811_pin_settings;
     HwSettingsWS2811LED_OutGet(&ws2811_pin_settings);

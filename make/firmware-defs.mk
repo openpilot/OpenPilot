@@ -71,6 +71,9 @@ MSG_FLASH_IMG        = $(QUOTE) FLASH_IMG $(MSG_EXTRA) $(QUOTE)
 # to the top of the source tree.
 toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 
+# Function to replace special characters like is done for the symbols.
+replace_special_chars = $(subst +,_,$(subst ~,_,$(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1)))))))
+
 # Display compiler version information.
 .PHONY: gccversion
 gccversion:
@@ -100,9 +103,9 @@ gccversion:
 	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		--wildcard \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_start=_binary_start \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_end=_binary_end \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_size=_binary_size \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_start=_binary_start \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_end=_binary_end \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_size=_binary_size \
 		$< $@
 
 # Create extended listing file/disassambly from ELF output file.
@@ -133,7 +136,7 @@ endef
 define OPFW_TEMPLATE
 FORCE:
 
-$(1).firmware_info.c: $(1) $(ROOT_DIR)/flight/templates/firmware_info.c.template FORCE
+$(1).firmware_info.c: $(1) $(ROOT_DIR)/flight/templates/firmware_info.c.template $(ROOT_DIR)/shared/uavobjectdefinition
 	@$(ECHO) $(MSG_FWINFO) $$(call toprel, $$@)
 	$(V1) $(VERSION_INFO) \
 		--template=$(ROOT_DIR)/flight/templates/firmware_info.c.template \
@@ -168,14 +171,14 @@ endef
 define COMPILE_C_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@$(ECHO) $(MSG_COMPILING) $$(call toprel, $$<)
-	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C source files. ARM-only
 define COMPILE_C_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@$(ECHO) $(MSG_COMPILING_ARM) $$(call toprel, $$<)
-	$(V1) $(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C++ source files.
@@ -225,7 +228,7 @@ define LINK_TEMPLATE
 .PRECIOUS : $(2) $(3)
 $(1):  $(2) $(3)
 	@$(ECHO) $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
+	$(V1) $(CC) $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
 endef
 
 # Link: create ELF output file from object files.
@@ -233,10 +236,10 @@ endef
 #   $2 = list of object files that make up the elf file
 define LINK_CXX_TEMPLATE
 .SECONDARY : $(1)
-.PRECIOUS : $(2)
-$(1):  $(2)
+.PRECIOUS : $(2) $(3)
+$(1):  $(2) $(3)
 	@$(ECHO) $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CXX) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
+	$(V1) $(CXX) $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$(CXXFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb

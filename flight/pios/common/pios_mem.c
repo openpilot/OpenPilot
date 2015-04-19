@@ -29,17 +29,32 @@
 
 #ifdef PIOS_TARGET_PROVIDES_FAST_HEAP
 // relies on pios_general_malloc to perform the allocation (i.e. pios_msheap.c)
-extern void *pios_general_malloc(size_t size, bool fastheap);
+extern void *pios_general_malloc(void *ptr, size_t size, bool fastheap);
 
 void *pios_fastheapmalloc(size_t size)
 {
-    return pios_general_malloc(size, true);
+    return pios_general_malloc(NULL, size, true);
 }
 
 
 void *pios_malloc(size_t size)
 {
-    return pios_general_malloc(size, false);
+    return pios_general_malloc(NULL, size, false);
+}
+
+void *pios_realloc(__attribute__((unused)) void *ptr, __attribute__((unused)) size_t size)
+{
+#ifdef PIOS_INCLUDE_REALLOC
+    return pios_general_malloc(ptr, size, false);
+
+#else
+    // Not allowed to use realloc without the proper define PIOS_INCLUDE_REALLOC set
+    while (1) {
+        ;
+    }
+    return NULL;
+
+#endif
 }
 
 void pios_free(void *p)
@@ -47,7 +62,7 @@ void pios_free(void *p)
     vPortFree(p);
 }
 
-#else
+#else /* ifdef PIOS_TARGET_PROVIDES_FAST_HEAP */
 // demand to pvPortMalloc implementation
 void *pios_fastheapmalloc(size_t size)
 {
@@ -58,6 +73,21 @@ void *pios_fastheapmalloc(size_t size)
 void *pios_malloc(size_t size)
 {
     return pvPortMalloc(size);
+}
+
+void *pios_realloc(__attribute__((unused)) void *ptr, __attribute__((unused)) size_t size)
+{
+#ifdef PIOS_INCLUDE_REALLOC
+    return pvPortMalloc(size);
+
+#else
+    // Not allowed to use realloc without the proper define PIOS_INCLUDE_REALLOC set
+    while (1) {
+        ;
+    }
+    return NULL;
+
+#endif
 }
 
 void pios_free(void *p)

@@ -49,7 +49,7 @@ public:
 
     bool isFinished()
     {
-        return m_currentWizardIndex >= m_wizardIndexes.size() - 1;
+        return m_currentWizardIndex >= m_wizardIndexes.size();
     }
 
     void loadSVGFile(QString file);
@@ -70,18 +70,31 @@ private slots:
     void on_servoMinAngleSlider_valueChanged(int position);
     void on_servoMaxAngleSlider_valueChanged(int position);
     void on_reverseCheckbox_toggled(bool checked);
+    void on_calibrateAllMotors_toggled(bool checked);
 
 private:
+    enum ElementType { FULL, FRAME, MOTOR, SERVO };
+    static const int LOW_OUTPUT_RATE_MILLISECONDS      = 1000;
+    static const int NEUTRAL_OUTPUT_RATE_MILLISECONDS  = 1500;
+    static const int HIGH_OUTPUT_RATE_MILLISECONDS_PWM = 1900;
+    static const int HIGH_OUTPUT_RATE_MILLISECONDS_ONESHOT125 = 2000;
+
     void setupVehicle();
     void startWizard();
     void setupVehicleItems();
     void setupVehicleHighlightedPart();
+    void showElementMovement(bool isUp, qreal value);
     void setWizardPage();
     void enableButtons(bool enable);
     void enableServoSliders(bool enabled);
-    void onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider);
+    void onStartButtonToggle(QAbstractButton *button, QList<quint16> &channels,
+                             quint16 value, quint16 safeValue, QSlider *slider);
     bool checkAlarms();
     void debugLogChannelValues();
+
+    void getCurrentChannels(QList<quint16> &channels);
+    void enableAllMotorsCheckBox(bool enable);
+    int getHighOutputRate();
     quint16 getCurrentChannel();
 
     Ui::OutputCalibrationPage *ui;
@@ -92,7 +105,9 @@ private:
     qint16 m_currentWizardIndex;
 
     QList<QString> m_vehicleElementIds;
+    QList<ElementType> m_vehicleElementTypes;
     QList<QGraphicsSvgItem *> m_vehicleItems;
+    QList<QGraphicsSvgItem *> m_arrowsItems;
     QList<quint16> m_vehicleHighlightElementIndexes;
     QList<quint16> m_channelIndex;
     QList<quint16> m_wizardIndexes;
@@ -100,6 +115,7 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
+    void resetOutputCalibrationUtil();
 
     static const QString MULTI_SVG_FILE;
     static const QString FIXEDWING_SVG_FILE;

@@ -43,8 +43,11 @@
 #include "waypoint.h"
 #include "waypointactive.h"
 #include "flightmodesettings.h"
+#include <systemsettings.h>
 #include "paths.h"
 #include "plans.h"
+#include <sanitycheck.h>
+#include <vtolpathfollowersettings.h>
 
 // Private constants
 #define STACK_SIZE_BYTES            1024
@@ -73,6 +76,7 @@ static uint8_t conditionAboveSpeed();
 static uint8_t conditionPointingTowardsNext();
 static uint8_t conditionPythonScript();
 static uint8_t conditionImmediate();
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
 
 
 // Private variables
@@ -82,7 +86,10 @@ static WaypointActiveData waypointActive;
 static WaypointData waypoint;
 static PathActionData pathAction;
 static bool pathplanner_active = false;
+static FrameType_t frameType;
+static bool mode3D;
 
+extern FrameType_t GetCurrentFrameType();
 
 /**
  * Module initialization
@@ -95,6 +102,9 @@ int32_t PathPlannerStart()
     WaypointActiveConnectCallback(commandUpdated);
     PathActionConnectCallback(commandUpdated);
     PathStatusConnectCallback(statusUpdated);
+    SettingsUpdatedCb(NULL);
+    SystemSettingsConnectCallback(&SettingsUpdatedCb);
+    VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
 
     // Start main task callback
     PIOS_CALLBACKSCHEDULER_Dispatch(pathPlannerHandle);
@@ -124,6 +134,39 @@ int32_t PathPlannerInitialize()
 }
 
 MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
+
+
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    uint8_t TreatCustomCraftAs;
+
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
+
+    frameType = GetCurrentFrameType();
+
+    if (frameType == FRAME_TYPE_CUSTOM) {
+        switch (TreatCustomCraftAs) {
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
+            frameType = FRAME_TYPE_FIXED_WING;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
+            frameType = FRAME_TYPE_MULTIROTOR;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
+            frameType = FRAME_TYPE_GROUND;
+            break;
+        }
+    }
+
+    switch (frameType) {
+    case FRAME_TYPE_GROUND:
+        mode3D = false;
+        break;
+    default:
+        mode3D = true;
+    }
+}
+
 
 /**
  * Module task
@@ -160,22 +203,17 @@ static void pathPlannerTask()
 
     static uint8_t failsafeRTHset = 0;
     if (!validPathPlan) {
-        // At this point the craft is in PathPlanner mode, so pilot has no manual control capability.
-        // Failsafe: behave as if in return to base mode
-        // what to do in this case is debatable, it might be better to just
-        // make a forced disarming but rth has a higher chance of survival when
-        // in flight.
         pathplanner_active = false;
 
         if (!failsafeRTHset) {
             failsafeRTHset = 1;
-            // copy pasta: same calculation as in manualcontrol, set return to home coordinates
             plan_setup_positionHold();
         }
         AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_CRITICAL);
 
         return;
     }
+
     failsafeRTHset = 0;
     AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
 
@@ -525,7 +563,7 @@ static uint8_t conditionLegRemaining()
     struct path_status progress;
 
     path_progress(&pathDesired,
-                  cur, &progress);
+                  cur, &progress, mode3D);
     if (progress.fractional_progress >= 1.0f - pathAction.ConditionParameters[0]) {
         return true;
     }
@@ -549,7 +587,7 @@ static uint8_t conditionBelowError()
     struct path_status progress;
 
     path_progress(&pathDesired,
-                  cur, &progress);
+                  cur, &progress, mode3D);
     if (progress.error <= pathAction.ConditionParameters[0]) {
         return true;
     }

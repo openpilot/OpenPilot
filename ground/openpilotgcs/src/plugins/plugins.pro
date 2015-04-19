@@ -256,3 +256,11 @@ SUBDIRS += plugin_flightlog
 plugin_video.subdir = video
 plugin_video.depends = plugin_coreplugin
 SUBDIRS += plugin_video
+
+# Usage Tracker plugin
+plugin_usagetracker.subdir = usagetracker
+plugin_usagetracker.depends = plugin_coreplugin
+plugin_usagetracker.depends += plugin_uavobjects
+plugin_usagetracker.depends += plugin_uavtalk
+plugin_setupwizard.depends += plugin_uavobjectutil
+SUBDIRS += plugin_usagetracker

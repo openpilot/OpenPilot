@@ -146,7 +146,7 @@ RawHIDReadThread::~RawHIDReadThread()
     m_running = false;
     // wait for the thread to terminate
     if (wait(10000) == false) {
-        qDebug() << "Cannot terminate RawHIDReadThread";
+        qWarning() << "Cannot terminate RawHIDReadThread";
     }
 }
 
@@ -219,7 +219,7 @@ RawHIDWriteThread::~RawHIDWriteThread()
     m_running = false;
     // wait for the thread to terminate
     if (wait(10000) == false) {
-        qDebug() << "Cannot terminate RawHIDReadThread";
+        qWarning() << "Cannot terminate RawHIDReadThread";
     }
 }
 
@@ -264,9 +264,9 @@ void RawHIDWriteThread::run()
         } else if (ret < 0) { // < 0 => error
             // TODO! make proper error handling, this only quick hack for unplug freeze
             m_running = false;
-            qDebug() << "Error writing to device (" << ret << ")";
+            qCritical() << "Error writing to device (" << ret << ")";
         } else {
-            qDebug() << "No data written to device ??";
+            qCritical() << "No data written to device ??";
         }
     }
 }

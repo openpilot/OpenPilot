@@ -1,0 +1,30 @@
+<xml>
+    <object name="GroundPathFollowerSettings" singleinstance="true" settings="true" category="Control">
+        <description>Settings for the @ref GroundPathFollowerModule</description>
+
+        <!-- these coefficients control desired movement in airspace -->
+        <field name="HorizontalVelMax" units="m/s" type="float" elements="1" defaultvalue="2"/>
+                <!-- Maximum speed the autopilot will try to achieve, usually for long distances -->
+        <field name="HorizontalVelMin" units="m/s" type="float" elements="1" defaultvalue="0"/>
+                <!-- V_y, Minimum speed the autopilot will try to fly, for example when loitering -->
+        <field name="CourseFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
+        <field name="VelocityFeedForward" units="s" type="float" elements="1" defaultvalue="0.1"/>
+                <!-- how many seconds to plan the flight vector ahead when initiating necessary heading changes - increase for planes with sluggish response -->
+        
+	<field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.2"/>
+                <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
+        <!-- these coefficients control actual control outputs -->
+
+        <field name="SpeedPI" units="deg / (m/s)" type="float" elements="4" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.1, .1, 0.001, 0.8"/>
+                <!-- coefficients for desired pitch
+                     in relation to speed error IASerror -->
+        <field name="ThrustLimit" units="" type="float" elements="2" elementnames="Min,SlowForward, Max" defaultvalue="-0.3,0.15,0.3" />
+                <!-- minimum and maximum allowed thrust and setpoint for cruise speed -->
+        <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
+
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

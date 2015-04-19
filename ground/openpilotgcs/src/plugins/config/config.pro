@@ -109,6 +109,7 @@ FORMS += \
     cc_hw_settings.ui \
     stabilization.ui \
     input.ui \
+    input_wizard.ui \
     output.ui \
     ccattitude.ui \
     defaultattitude.ui \

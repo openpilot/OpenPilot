@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>776</width>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,7 +53,7 @@
    <item row="1" column="0">
     <widget class="QStackedWidget" name="calibrationStack">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="intro">
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -94,14 +94,59 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Cantarell'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br /&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br /&gt;&lt;br /&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br /&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="motorInfo">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="calibrateAllMotors">
+         <property name="text">
+          <string>Calibrate all motor outputs at the same time</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="motorPWMValue">
+         <property name="text">
+          <string>Output value: 1000µs</string>
          </property>
         </widget>
        </item>
@@ -183,6 +228,13 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="servoPWMValue">
+         <property name="text">
+          <string>Output value: 1000µs</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QWidget" name="widget" native="true">

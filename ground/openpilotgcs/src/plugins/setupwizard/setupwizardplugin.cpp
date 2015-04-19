@@ -58,8 +58,7 @@ bool SetupWizardPlugin::initialize(const QStringList & args, QString *errMsg)
                                             "SetupWizardPlugin.ShowSetupWizard",
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
-    cmd->setDefaultKeySequence(QKeySequence("Ctrl+V"));
-    cmd->action()->setText(tr("Vehicle Setup Wizard"));
+    cmd->action()->setText(tr("Vehicle Setup Wizard..."));
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(showSetupWizard()));
 
     Core::ModeManager::instance()->addAction(cmd, 1);
@@ -71,7 +70,7 @@ bool SetupWizardPlugin::initialize(const QStringList & args, QString *errMsg)
                              "SetupWizardPlugin.ExportJSon",
                              QList<int>() <<
                              Core::Constants::C_GLOBAL_ID);
-    cmd->action()->setText(tr("Export Wizard Vehicle Template"));
+    cmd->action()->setText(tr("Export/Import Vehicle Template..."));
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportSettings()));
 
     Core::ModeManager::instance()->addAction(cmd, 1);

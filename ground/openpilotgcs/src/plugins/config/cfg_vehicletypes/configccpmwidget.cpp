@@ -40,8 +40,6 @@
 
 #include <math.h>
 
-#define  Pi 3.14159265358979323846
-
 QStringList ConfigCcpmWidget::getChannelDescriptions()
 {
     // init a channel_numelem list of channel desc defaults
@@ -181,16 +179,19 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
         Servos[i]     = new QGraphicsSvgItem();
         Servos[i]->setSharedRenderer(renderer);
         Servos[i]->setElementId(ServoNames.at(i));
+        Servos[i]->setZValue(20);
         m_aircraft->SwashplateImage->scene()->addItem(Servos[i]);
 
         ServosText[i] = new QGraphicsTextItem();
         ServosText[i]->setDefaultTextColor(Qt::yellow);
         ServosText[i]->setPlainText(QString("-"));
         ServosText[i]->setFont(serifFont);
+        ServosText[i]->setZValue(31);
 
         ServosTextCircles[i] = new QGraphicsEllipseItem(1, 1, 30, 30);
         ServosTextCircles[i]->setBrush(brush);
         ServosTextCircles[i]->setPen(pen2);
+        ServosTextCircles[i]->setZValue(30);
         m_aircraft->SwashplateImage->scene()->addItem(ServosTextCircles[i]);
         m_aircraft->SwashplateImage->scene()->addItem(ServosText[i]);
 
@@ -257,6 +258,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
 
     connect(m_aircraft->SwashLvlStartButton, SIGNAL(clicked()), this, SLOT(SwashLvlStartButtonPressed()));
     connect(m_aircraft->SwashLvlNextButton, SIGNAL(clicked()), this, SLOT(SwashLvlNextButtonPressed()));
+    connect(m_aircraft->SwashLvlPrevButton, SIGNAL(clicked()), this, SLOT(SwashLvlPrevButtonPressed()));
     connect(m_aircraft->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_aircraft->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
@@ -391,9 +393,13 @@ void ConfigCcpmWidget::UpdateType()
     TypeText = m_aircraft->ccpmType->currentText();
     SingleServoIndex = m_aircraft->ccpmSingleServo->currentIndex();
 
-    // set visibility of user settings
+    // set visibility of user settings (When Custom)
     m_aircraft->ccpmAdvancedSettingsTable->setEnabled(TypeInt == 0);
-    m_aircraft->ccpmAdvancedSettingsTable->clearFocus();
+
+    // Clear advanced settings table if not Custom selected (Keep previous settings)
+    if (TypeText.compare(QString::fromUtf8("Custom - Advanced Settings"), Qt::CaseInsensitive) != 0) {
+        m_aircraft->ccpmAdvancedSettingsTable->clearFocus();
+    }
 
     m_aircraft->ccpmAngleW->setEnabled(TypeInt == 1);
     m_aircraft->ccpmAngleX->setEnabled(TypeInt == 1);
@@ -552,15 +558,19 @@ void ConfigCcpmWidget::ccpmSwashplateRedraw()
     QRect size;
     double scale, xscale, yscale;
 
+    size = m_aircraft->SwashplateImage->rect();
+    // If size = default, get size from other Img/tab
+    if (size.width() == 100) {
+        size = m_aircraft->SwashLvlSwashplateImage->rect();
+    }
 
-    size   = m_aircraft->SwashplateImage->rect();
     xscale = size.width();
     yscale = size.height();
     scale  = xscale;
     if (yscale < scale) {
         scale = yscale;
     }
-    scale /= 460.00;
+    scale /= 540.00;
     m_aircraft->SwashplateImage->resetTransform();
     m_aircraft->SwashplateImage->scale(scale, scale);
 
@@ -592,10 +602,10 @@ void ConfigCcpmWidget::ccpmSwashplateRedraw()
     used[1]    = ((m_aircraft->ccpmServoXChannel->currentIndex() > 0) && (m_aircraft->ccpmServoXChannel->isEnabled()));
     used[2]    = ((m_aircraft->ccpmServoYChannel->currentIndex() > 0) && (m_aircraft->ccpmServoYChannel->isEnabled()));
     used[3]    = ((m_aircraft->ccpmServoZChannel->currentIndex() > 0) && (m_aircraft->ccpmServoZChannel->isEnabled()));
-    angle[0]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleW->value()) * Pi / 180.00;
-    angle[1]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleX->value()) * Pi / 180.00;
-    angle[2]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleY->value()) * Pi / 180.00;
-    angle[3]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleZ->value()) * Pi / 180.00;
+    angle[0]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleW->value()) * M_PI / 180.00;
+    angle[1]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleX->value()) * M_PI / 180.00;
+    angle[2]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleY->value()) * M_PI / 180.00;
+    angle[3]   = (CorrectionAngle + 180 + m_aircraft->ccpmAngleZ->value()) * M_PI / 180.00;
 
 
     for (i = 0; i < CCPM_MAX_SWASH_SERVOS; i++) {
@@ -640,16 +650,16 @@ void ConfigCcpmWidget::ccpmSwashplateRedraw()
         ServoLines[i]->setVisible(defined[i] != 0);
     }
 
-    // m_aircraft->SwashplateImage->centerOn (CenterX, CenterY);
+    // m_aircraft->SwashplateImage->centerOn(CenterX, CenterY);
 
     // m_aircraft->SwashplateImage->fitInView(SwashplateImg, Qt::KeepAspectRatio);
 }
 
 void ConfigCcpmWidget::ccpmSwashplateUpdate()
 {
-    ccpmSwashplateRedraw();
-    SetUIComponentVisibilities();
     UpdateMixer();
+    SetUIComponentVisibilities();
+    ccpmSwashplateRedraw();
 }
 
 void ConfigCcpmWidget::UpdateMixer()
@@ -664,7 +674,6 @@ void ConfigCcpmWidget::UpdateMixer()
     if (throwConfigError(QString("HeliCP"))) {
         return;
     }
-
     GUIConfigDataUnion config = getConfigData();
 
     useCCPM   = !(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
@@ -685,8 +694,8 @@ void ConfigCcpmWidget::UpdateMixer()
             ;
         }
     }
-
-    if (config.heli.SwashplateType > 0) { // not advanced settings
+    int TypeInt = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
+    if (TypeInt != 0) { // not advanced settings
         // get the channel data from the ui
         MixerChannelData[0] = m_aircraft->ccpmEngineChannel->currentIndex();
         MixerChannelData[1] = m_aircraft->ccpmTailChannel->currentIndex();
@@ -762,11 +771,11 @@ void ConfigCcpmWidget::UpdateMixer()
                     table->item(i, 3)->setText(
                         QString("%1").arg(
                             (int)(127.0 * (RollConstant)
-                                  * sin((180 + config.heli.CorrectionAngle + ThisAngle[i]) * Pi / 180.00)))); // Roll
+                                  * sin((180 + config.heli.CorrectionAngle + ThisAngle[i]) * M_PI / 180.00)))); // Roll
                     table->item(i, 4)->setText(
                         QString("%1").arg(
                             (int)(127.0 * (PitchConstant)
-                                  * cos((config.heli.CorrectionAngle + ThisAngle[i]) * Pi / 180.00)))); // Pitch
+                                  * cos((config.heli.CorrectionAngle + ThisAngle[i]) * M_PI / 180.00)))); // Pitch
                     // Yaw
                     table->item(i, 5)->setText(QString("%1").arg(0));
                 }
@@ -779,10 +788,11 @@ void ConfigCcpmWidget::UpdateMixer()
     } else {
         // advanced settings
         QTableWidget *table = m_aircraft->ccpmAdvancedSettingsTable;
+
         for (int i = 0; i < 6; i++) {
             Channel = table->item(i, 0)->text();
             if (Channel == "-") {
-                Channel = QString("9");
+                Channel = QString((int)ConfigCcpmWidget::CHANNEL_NUMELEM + 1);
             }
             MixerChannelData[i] = Channel.toInt();
         }
@@ -874,6 +884,15 @@ void ConfigCcpmWidget::SetUIComponentVisibilities()
         m_aircraft->ccpmRollScalingBox->setVisible(!m_aircraft->ccpmLinkRoll->isChecked());
         m_aircraft->ccpmLinkRoll->setVisible(1);
     }
+    // clear status check boxes
+    m_aircraft->SwashLvlStepList->item(0)->setCheckState(Qt::Unchecked);
+    m_aircraft->SwashLvlStepList->item(1)->setCheckState(Qt::Unchecked);
+    m_aircraft->SwashLvlStepList->item(2)->setCheckState(Qt::Unchecked);
+    m_aircraft->SwashLvlStepList->item(3)->setCheckState(Qt::Unchecked);
+    m_aircraft->SwashLvlStepList->item(0)->setBackground(Qt::transparent);
+    m_aircraft->SwashLvlStepList->item(1)->setBackground(Qt::transparent);
+    m_aircraft->SwashLvlStepList->item(2)->setBackground(Qt::transparent);
+    m_aircraft->SwashLvlStepList->item(3)->setBackground(Qt::transparent);
 }
 
 /**
@@ -939,16 +958,20 @@ void ConfigCcpmWidget::setMixer()
     UpdateMixer();
 
     // Set up some helper pointers
-    qint8 *mixers[8] = { mixerSettingsData.Mixer1Vector,
-                         mixerSettingsData.Mixer2Vector,
-                         mixerSettingsData.Mixer3Vector,
-                         mixerSettingsData.Mixer4Vector,
-                         mixerSettingsData.Mixer5Vector,
-                         mixerSettingsData.Mixer6Vector,
-                         mixerSettingsData.Mixer7Vector,
-                         mixerSettingsData.Mixer8Vector };
+    qint8 *mixers[12] = { mixerSettingsData.Mixer1Vector,
+                          mixerSettingsData.Mixer2Vector,
+                          mixerSettingsData.Mixer3Vector,
+                          mixerSettingsData.Mixer4Vector,
+                          mixerSettingsData.Mixer5Vector,
+                          mixerSettingsData.Mixer6Vector,
+                          mixerSettingsData.Mixer7Vector,
+                          mixerSettingsData.Mixer8Vector,
+                          mixerSettingsData.Mixer9Vector,
+                          mixerSettingsData.Mixer10Vector,
+                          mixerSettingsData.Mixer11Vector,
+                          mixerSettingsData.Mixer12Vector };
 
-    quint8 *mixerTypes[8] = {
+    quint8 *mixerTypes[12] = {
         &mixerSettingsData.Mixer1Type,
         &mixerSettingsData.Mixer2Type,
         &mixerSettingsData.Mixer3Type,
@@ -956,17 +979,20 @@ void ConfigCcpmWidget::setMixer()
         &mixerSettingsData.Mixer5Type,
         &mixerSettingsData.Mixer6Type,
         &mixerSettingsData.Mixer7Type,
-        &mixerSettingsData.Mixer8Type
+        &mixerSettingsData.Mixer8Type,
+        &mixerSettingsData.Mixer9Type,
+        &mixerSettingsData.Mixer10Type,
+        &mixerSettingsData.Mixer11Type,
+        &mixerSettingsData.Mixer12Type
     };
 
     // reset all to Disabled
     for (i = 0; i < 8; i++) {
         *mixerTypes[i] = 0;
     }
-
     // go through the user data and update the mixer matrix
     for (i = 0; i < 6; i++) {
-        if (MixerChannelData[i] > 0) {
+        if ((MixerChannelData[i] > 0) && (MixerChannelData[i] < (int)ConfigCcpmWidget::CHANNEL_NUMELEM + 1)) {
             // Set the mixer type. If Coax, then first two are motors. Otherwise, only first is motor
             if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive) == 0) {
                 *(mixerTypes[MixerChannelData[i] - 1]) = i > 1 ?
@@ -977,7 +1003,6 @@ void ConfigCcpmWidget::setMixer()
                                                          MixerSettings::MIXER1TYPE_SERVO :
                                                          MixerSettings::MIXER1TYPE_MOTOR;
             }
-
             // Configure the vector
             for (j = 0; j < 5; j++) {
                 mixers[MixerChannelData[i] - 1][j] = m_aircraft->ccpmAdvancedSettingsTable->item(i, j + 1)->text().toInt();
@@ -1052,8 +1077,8 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
     QMessageBox msgBox;
     int i;
 
-    msgBox.setText("<h1>Swashplate Leveling Routine</h1>");
-    msgBox.setInformativeText("<b>You are about to start the Swashplate levelling routine.</b><p>This process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.<p>The final state of your system should match the current configuration in the GCS config gadget.<p>Please ensure all ccpm settings in the GCS are correct before continuing.<p>If this process is interrupted, then the state of your OP board may not match the GCS configuration.<p><i>After completing this process, please check all settings before attempting to fly.</i><p><font color=red><b>Please disconnect your motor to ensure it will not spin up.</b></font><p><hr><i>Do you wish to proceed?</i>");
+    msgBox.setText(tr("<h1>Swashplate Leveling Routine</h1>"));
+    msgBox.setInformativeText(tr("<b>You are about to start the Swashplate levelling routine.</b><p>This process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.<p>The final state of your system should match the current configuration in the GCS config gadget.</p><p>Please ensure all ccpm settings in the GCS are correct before continuing.</p><p>If this process is interrupted, then the state of your OP board may not match the GCS configuration.</p><p><i>After completing this process, please check all settings before attempting to fly.</i></p><p><font color=red><b>Please disconnect your motor to ensure it will not spin up.</b></font><p><hr><i>Do you wish to proceed?</i></p>"));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Information);
@@ -1075,6 +1100,7 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
 
         m_aircraft->SwashLvlStartButton->setEnabled(false);
         m_aircraft->SwashLvlNextButton->setEnabled(true);
+        m_aircraft->SwashLvlPrevButton->setEnabled(false);
         m_aircraft->SwashLvlCancelButton->setEnabled(true);
         m_aircraft->SwashLvlFinishButton->setEnabled(false);
         // clear status check boxes
@@ -1136,6 +1162,7 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
 
         m_aircraft->SwashLvlStartButton->setEnabled(true);
         m_aircraft->SwashLvlNextButton->setEnabled(false);
+        m_aircraft->SwashLvlPrevButton->setEnabled(false);
         m_aircraft->SwashLvlCancelButton->setEnabled(false);
         m_aircraft->SwashLvlFinishButton->setEnabled(false);
         break;
@@ -1145,15 +1172,24 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
     }
 }
 
+void ConfigCcpmWidget::SwashLvlPrevButtonPressed()
+{
+    SwashLvlState--;
+    SwashLvlPrevNextButtonPressed();
+}
+
 void ConfigCcpmWidget::SwashLvlNextButtonPressed()
 {
-    // ShowDisclaimer(2);
     SwashLvlState++;
-
+    SwashLvlPrevNextButtonPressed();
+}
+void ConfigCcpmWidget::SwashLvlPrevNextButtonPressed()
+{
     switch (SwashLvlState) {
     case 0:
         break;
     case 1: // Neutral levelling
+        m_aircraft->SwashLvlPrevButton->setEnabled(false);
         m_aircraft->SwashLvlStepList->setCurrentRow(0);
         // set spin boxes and swashplate servos to Neutral values
         setSwashplateLevel(50);
@@ -1170,9 +1206,10 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
         }
         // issue user instructions
         m_aircraft->SwashLvlStepInstruction->setHtml(
-            "<h2>Neutral levelling</h2><p>Using adjustment of:<ul><li>servo horns<li>link lengths and<li>Neutral timing spinboxes to the right</ul><br>ensure that the swashplate is in the center of desired travel range and is level.");
+            tr("<h2>Neutral levelling</h2><p>Using adjustment of:<ul><li>Servo horns,</li><li>Link lengths,</li><li>Neutral triming spinboxes to the right</li></ul><br>Ensure that the swashplate is in the center of desired travel range and is level."));
         break;
     case 2: // Max levelling
+        m_aircraft->SwashLvlPrevButton->setEnabled(true);
         // check Neutral status as complete
         m_aircraft->SwashLvlStepList->item(0)->setCheckState(Qt::Checked);
         m_aircraft->SwashLvlStepList->setCurrentRow(1);
@@ -1183,7 +1220,7 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
         m_aircraft->SwashLvlPositionSpinBox->setValue(100);
         // issue user instructions
         m_aircraft->SwashLvlStepInstruction->setText(
-            "<h2>Max levelling</h2><p>Using adjustment of:<ul><li>Max timing spinboxes to the right ONLY</ul><br>ensure that the swashplate is at the top of desired travel range and is level.");
+            tr("<h2>Max levelling</h2><p>Using adjustment of:<ul><li>Max triming spinboxes to the right ONLY</li></ul><br>Ensure that the swashplate is at the top of desired travel range and is level."));
         break;
     case 3: // Min levelling
         // check Max status as complete
@@ -1196,10 +1233,11 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
         m_aircraft->SwashLvlPositionSpinBox->setValue(0);
         // issue user instructions
         m_aircraft->SwashLvlStepInstruction->setText(
-            "<h2>Min levelling</h2><p>Using adjustment of:<ul><li>Min timing spinboxes to the right ONLY</ul><br>ensure that the swashplate is at the bottom of desired travel range and is level.");
+            tr("<h2>Min levelling</h2><p>Using adjustment of:<ul><li>Min triming spinboxes to the right ONLY</li></ul><br>Ensure that the swashplate is at the bottom of desired travel range and is level."));
         break;
     case 4: // levelling verification
         // check Min status as complete
+        m_aircraft->SwashLvlNextButton->setEnabled(true);
         m_aircraft->SwashLvlStepList->item(2)->setCheckState(Qt::Checked);
         m_aircraft->SwashLvlStepList->setCurrentRow(3);
         // enable position slider
@@ -1214,14 +1252,14 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
 
         // issue user instructions
         m_aircraft->SwashLvlStepInstruction->setText(
-            "<h2>levelling verification</h2><p>Adjust the slider to the right over it's full range and observe the swashplate motion. It should remain level over the entire range of travel.");
+            tr("<h2>Levelling verification</h2><p>Adjust the slider to the right over it's full range and observe the swashplate motion. It should remain level over the entire range of travel.</p>"));
         break;
     case 5: // levelling complete
         // check verify status as complete
         m_aircraft->SwashLvlStepList->item(3)->setCheckState(Qt::Checked);
         // issue user instructions
         m_aircraft->SwashLvlStepInstruction->setText(
-            "<h2>levelling complete</h2><p>Press the Finish button to save these settings to the SD card<p>Press the cancel button to return to the pre-levelling settings");
+            tr("<h2>Levelling complete</h2><p>Press the Finish button to save these settings to the SD card</p><p>Press the cancel button to return to the pre-levelling settings</p>"));
         // disable position slider
         m_aircraft->SwashLvlPositionSlider->setEnabled(false);
         m_aircraft->SwashLvlPositionSpinBox->setEnabled(false);
@@ -1233,6 +1271,7 @@ void ConfigCcpmWidget::SwashLvlNextButtonPressed()
 
         m_aircraft->SwashLvlStartButton->setEnabled(false);
         m_aircraft->SwashLvlNextButton->setEnabled(false);
+        m_aircraft->SwashLvlPrevButton->setEnabled(true);
         m_aircraft->SwashLvlCancelButton->setEnabled(true);
         m_aircraft->SwashLvlFinishButton->setEnabled(true);
 
@@ -1256,6 +1295,7 @@ void ConfigCcpmWidget::SwashLvlCancelButtonPressed()
 
     m_aircraft->SwashLvlStartButton->setEnabled(true);
     m_aircraft->SwashLvlNextButton->setEnabled(false);
+    m_aircraft->SwashLvlPrevButton->setEnabled(false);
     m_aircraft->SwashLvlCancelButton->setEnabled(false);
     m_aircraft->SwashLvlFinishButton->setEnabled(false);
 
@@ -1287,7 +1327,9 @@ void ConfigCcpmWidget::SwashLvlCancelButtonPressed()
     enableSwashplateLevellingControl(false);
 
     m_aircraft->SwashLvlStepInstruction->setText(
-        "<h2>Levelling Cancelled</h2><p>Previous settings have been restored.");
+        tr("<h2>Levelling Cancelled</h2><p>Previous settings have been restored."));
+
+    ccpmSwashplateUpdate();
 }
 
 
@@ -1299,6 +1341,7 @@ void ConfigCcpmWidget::SwashLvlFinishButtonPressed()
 
     m_aircraft->SwashLvlStartButton->setEnabled(true);
     m_aircraft->SwashLvlNextButton->setEnabled(false);
+    m_aircraft->SwashLvlPrevButton->setEnabled(false);
     m_aircraft->SwashLvlCancelButton->setEnabled(false);
     m_aircraft->SwashLvlFinishButton->setEnabled(false);
 
@@ -1327,23 +1370,25 @@ void ConfigCcpmWidget::SwashLvlFinishButtonPressed()
     enableSwashplateLevellingControl(false);
 
     m_aircraft->SwashLvlStepInstruction->setText(
-        "<h2>Levelling Completed</h2><p>New settings have been saved to the SD card");
+        tr("<h2>Levelling Completed</h2><p>New settings have been saved to the SD card"));
 
     ShowDisclaimer(0);
     // ShowDisclaimer(2);
+
+    ccpmSwashplateUpdate();
 }
 
 int ConfigCcpmWidget::ShowDisclaimer(int messageID)
 {
     QMessageBox msgBox;
 
-    msgBox.setText("<font color=red><h1>Warning!!!</h2></font>");
+    msgBox.setText(tr("<font color=red><h1>Warning!!!</h2></font>"));
     int ret;
     switch (messageID) {
     case 0:
         // Basic disclaimer
         msgBox.setInformativeText(
-            "<h2>This code has many configurations.</h2><p>Please double check all settings before attempting flight!");
+            tr("<h2>This code has many configurations.</h2><p>Please double check all settings before attempting flight!"));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Information);
@@ -1354,7 +1399,7 @@ int ConfigCcpmWidget::ShowDisclaimer(int messageID)
     case 1:
         // Not Tested disclaimer
         msgBox.setInformativeText(
-            "<h2>The CCPM mixer code needs more testing!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?");
+            tr("<h2>The CCPM mixer code needs more testing!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?"));
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
         msgBox.setIcon(QMessageBox::Warning);
@@ -1370,7 +1415,7 @@ int ConfigCcpmWidget::ShowDisclaimer(int messageID)
     case 2:
         // DO NOT use
         msgBox.setInformativeText(
-            "<h2>The CCPM swashplate levelling code is NOT complete!</h2><p><font color=red>DO NOT use it for flight!</font>");
+            tr("<h2>The CCPM swashplate levelling code is NOT complete!</h2><p><font color=red>DO NOT use it for flight!</font>"));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Critical);
@@ -1521,28 +1566,28 @@ bool ConfigCcpmWidget::throwConfigError(QString airframeType)
 
     bool error = false;
 
-    if ((m_aircraft->ccpmServoWChannel->currentIndex() == 0) && (m_aircraft->ccpmServoWChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoWChannel->currentIndex() == 0) && (m_aircraft->ccpmServoWChannel->isVisible())) {
         m_aircraft->ccpmServoWLabel->setText("<font color=red>" + m_aircraft->ccpmServoWLabel->text() + "</font>");
         error = true;
     } else {
         m_aircraft->ccpmServoWLabel->setText(QTextEdit(m_aircraft->ccpmServoWLabel->text()).toPlainText());
     }
 
-    if ((m_aircraft->ccpmServoXChannel->currentIndex() == 0) && (m_aircraft->ccpmServoXChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoXChannel->currentIndex() == 0) && (m_aircraft->ccpmServoXChannel->isVisible())) {
         m_aircraft->ccpmServoXLabel->setText("<font color=red>" + m_aircraft->ccpmServoXLabel->text() + "</font>");
         error = true;
     } else {
         m_aircraft->ccpmServoXLabel->setText(QTextEdit(m_aircraft->ccpmServoXLabel->text()).toPlainText());
     }
 
-    if ((m_aircraft->ccpmServoYChannel->currentIndex() == 0) && (m_aircraft->ccpmServoYChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoYChannel->currentIndex() == 0) && (m_aircraft->ccpmServoYChannel->isVisible())) {
         m_aircraft->ccpmServoYLabel->setText("<font color=red>" + m_aircraft->ccpmServoYLabel->text() + "</font>");
         error = true;
     } else {
         m_aircraft->ccpmServoYLabel->setText(QTextEdit(m_aircraft->ccpmServoYLabel->text()).toPlainText());
     }
 
-    if ((m_aircraft->ccpmServoZChannel->currentIndex() == 0) && (m_aircraft->ccpmServoZChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoZChannel->currentIndex() == 0) && (m_aircraft->ccpmServoZChannel->isVisible())) {
         m_aircraft->ccpmServoZLabel->setText("<font color=red>" + m_aircraft->ccpmServoZLabel->text() + "</font>");
         error = true;
     } else {

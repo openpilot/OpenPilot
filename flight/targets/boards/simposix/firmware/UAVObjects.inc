@@ -24,6 +24,9 @@
 # (all architectures)
 
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += statusgrounddrive
+UAVOBJSRCFILENAMES += pidstatus
+UAVOBJSRCFILENAMES += statusvtolland
 UAVOBJSRCFILENAMES += vtolselftuningstats
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
@@ -62,6 +65,7 @@ UAVOBJSRCFILENAMES += gpstime
 UAVOBJSRCFILENAMES += gpsvelocitysensor
 UAVOBJSRCFILENAMES += gpssettings
 UAVOBJSRCFILENAMES += vtolpathfollowersettings
+UAVOBJSRCFILENAMES += groundpathfollowersettings
 UAVOBJSRCFILENAMES += fixedwingpathfollowersettings
 UAVOBJSRCFILENAMES += fixedwingpathfollowerstatus
 UAVOBJSRCFILENAMES += homelocation

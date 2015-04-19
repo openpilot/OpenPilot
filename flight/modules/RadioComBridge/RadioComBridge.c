@@ -108,8 +108,8 @@ static void radioRxTask(void *parameters);
 static void PPMInputTask(void *parameters);
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
-static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
-static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
+static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t *rxbuffer, uint8_t count);
+static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t *rxbuffer, uint8_t count);
 static void objectPersistenceUpdatedCb(UAVObjEvent *objEv);
 static void registerObject(UAVObjHandle obj);
 
@@ -403,14 +403,12 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
         PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
 #endif
         if (PIOS_COM_RADIO) {
-            uint8_t serial_data[1];
+            uint8_t serial_data[16];
             uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
             if (bytes_to_process > 0) {
                 if (data->parseUAVTalk) {
                     // Pass the data through the UAVTalk parser.
-                    for (uint8_t i = 0; i < bytes_to_process; i++) {
-                        ProcessRadioStream(data->radioUAVTalkCon, data->telemUAVTalkCon, serial_data[i]);
-                    }
+                    ProcessRadioStream(data->radioUAVTalkCon, data->telemUAVTalkCon, serial_data, bytes_to_process);
                 } else if (PIOS_COM_TELEMETRY) {
                     // Send the data straight to the telemetry port.
                     // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
@@ -448,12 +446,10 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
         }
 #endif /* PIOS_INCLUDE_USB */
         if (inputPort) {
-            uint8_t serial_data[1];
+            uint8_t serial_data[16];
             uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
             if (bytes_to_process > 0) {
-                for (uint8_t i = 0; i < bytes_to_process; i++) {
-                    ProcessTelemetryStream(data->telemUAVTalkCon, data->radioUAVTalkCon, serial_data[i]);
-                }
+                ProcessTelemetryStream(data->telemUAVTalkCon, data->radioUAVTalkCon, serial_data, bytes_to_process);
             }
         } else {
             vTaskDelay(5);
@@ -597,42 +593,45 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
  * @param[in] outConnectionHandle  The UAVTalk connection handle on the radio port.
  * @param[in] rxbyte  The received byte.
  */
-static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte)
+static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t *rxbuffer, uint8_t length)
 {
-    // Keep reading until we receive a completed packet.
-    UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbyte);
+    uint8_t position = 0;
 
-    if (state == UAVTALK_STATE_COMPLETE) {
-        // We only want to unpack certain telemetry objects
-        uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
-        switch (objId) {
-        case OPLINKSTATUS_OBJID:
-        case OPLINKSETTINGS_OBJID:
-        case OPLINKRECEIVER_OBJID:
-        case MetaObjectId(OPLINKSTATUS_OBJID):
-        case MetaObjectId(OPLINKSETTINGS_OBJID):
-        case MetaObjectId(OPLINKRECEIVER_OBJID):
-            UAVTalkReceiveObject(inConnectionHandle);
-            break;
-        case OBJECTPERSISTENCE_OBJID:
-        case MetaObjectId(OBJECTPERSISTENCE_OBJID):
-            // receive object locally
-            // some objects will send back a response to telemetry
-            // FIXME:
-            // OPLM will ack or nack all objects requests and acked object sends
-            // Receiver will probably also ack / nack the same messages
-            // This has some consequences like :
-            // Second ack/nack will not match an open transaction or will apply to wrong transaction
-            // Question : how does GCS handle receiving the same object twice
-            // The OBJECTPERSISTENCE logic can be broken too if for example OPLM nacks and then REVO acks...
-            UAVTalkReceiveObject(inConnectionHandle);
-            // relay packet to remote modem
-            UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
-            break;
-        default:
-            // all other packets are relayed to the remote modem
-            UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
-            break;
+    // Keep reading until we receive a completed packet.
+    while (position < length) {
+        UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbuffer, length, &position);
+        if (state == UAVTALK_STATE_COMPLETE) {
+            // We only want to unpack certain telemetry objects
+            uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
+            switch (objId) {
+            case OPLINKSTATUS_OBJID:
+            case OPLINKSETTINGS_OBJID:
+            case OPLINKRECEIVER_OBJID:
+            case MetaObjectId(OPLINKSTATUS_OBJID):
+            case MetaObjectId(OPLINKSETTINGS_OBJID):
+            case MetaObjectId(OPLINKRECEIVER_OBJID):
+                UAVTalkReceiveObject(inConnectionHandle);
+                break;
+            case OBJECTPERSISTENCE_OBJID:
+            case MetaObjectId(OBJECTPERSISTENCE_OBJID):
+                // receive object locally
+                // some objects will send back a response to telemetry
+                // FIXME:
+                // OPLM will ack or nack all objects requests and acked object sends
+                // Receiver will probably also ack / nack the same messages
+                // This has some consequences like :
+                // Second ack/nack will not match an open transaction or will apply to wrong transaction
+                // Question : how does GCS handle receiving the same object twice
+                // The OBJECTPERSISTENCE logic can be broken too if for example OPLM nacks and then REVO acks...
+                UAVTalkReceiveObject(inConnectionHandle);
+                // relay packet to remote modem
+                UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
+                break;
+            default:
+                // all other packets are relayed to the remote modem
+                UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
+                break;
+            }
         }
     }
 }
@@ -642,39 +641,43 @@ static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalk
  *
  * @param[in] inConnectionHandle  The UAVTalk connection handle on the radio port.
  * @param[in] outConnectionHandle  The UAVTalk connection handle on the telemetry port.
- * @param[in] rxbyte  The received byte.
+ * @param[in] rxbuffer  The received buffer.
+ * @param[in] length  buffer length
  */
-static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte)
+static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t *rxbuffer, uint8_t length)
 {
-    // Keep reading until we receive a completed packet.
-    UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbyte);
+    uint8_t position = 0;
 
-    if (state == UAVTALK_STATE_COMPLETE) {
-        // We only want to unpack certain objects from the remote modem
-        // Similarly we only want to relay certain objects to the telemetry port
-        uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
-        switch (objId) {
-        case OPLINKSTATUS_OBJID:
-        case OPLINKSETTINGS_OBJID:
-        case MetaObjectId(OPLINKSTATUS_OBJID):
-        case MetaObjectId(OPLINKSETTINGS_OBJID):
-            // Ignore object...
-            // These objects are shadowed by the modem and are not transmitted to the telemetry port
-            // - OPLINKSTATUS_OBJID : ground station will receive the OPLM link status instead
-            // - OPLINKSETTINGS_OBJID : ground station will read and write the OPLM settings instead
-            break;
-        case OPLINKRECEIVER_OBJID:
-        case MetaObjectId(OPLINKRECEIVER_OBJID):
-            // Receive object locally
-            // These objects are received by the modem and are not transmitted to the telemetry port
-            // - OPLINKRECEIVER_OBJID : not sure why
-            // some objects will send back a response to the remote modem
-            UAVTalkReceiveObject(inConnectionHandle);
-            break;
-        default:
-            // all other packets are relayed to the telemetry port
-            UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
-            break;
+    // Keep reading until we receive a completed packet.
+    while (position < length) {
+        UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbuffer, length, &position);
+        if (state == UAVTALK_STATE_COMPLETE) {
+            // We only want to unpack certain objects from the remote modem
+            // Similarly we only want to relay certain objects to the telemetry port
+            uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
+            switch (objId) {
+            case OPLINKSTATUS_OBJID:
+            case OPLINKSETTINGS_OBJID:
+            case MetaObjectId(OPLINKSTATUS_OBJID):
+            case MetaObjectId(OPLINKSETTINGS_OBJID):
+                // Ignore object...
+                // These objects are shadowed by the modem and are not transmitted to the telemetry port
+                // - OPLINKSTATUS_OBJID : ground station will receive the OPLM link status instead
+                // - OPLINKSETTINGS_OBJID : ground station will read and write the OPLM settings instead
+                break;
+            case OPLINKRECEIVER_OBJID:
+            case MetaObjectId(OPLINKRECEIVER_OBJID):
+                // Receive object locally
+                // These objects are received by the modem and are not transmitted to the telemetry port
+                // - OPLINKRECEIVER_OBJID : not sure why
+                // some objects will send back a response to the remote modem
+                UAVTalkReceiveObject(inConnectionHandle);
+                break;
+            default:
+                // all other packets are relayed to the telemetry port
+                UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
+                break;
+            }
         }
     }
 }

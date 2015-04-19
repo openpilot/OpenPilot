@@ -29,6 +29,8 @@
 #include <string.h>
 #include <stm32f4xx.h>
 
+extern int __libc_init_array(void);
+
 /* prototype for main() that tells us not to worry about it possibly returning */
 extern int              main(void) __attribute__((noreturn));
 
@@ -90,6 +92,10 @@ void _main(void)
     /* fill most of the IRQ/bootstrap stack with a watermark pattern so we can measure how much is used */
     /* leave a little space at the top in case memset() isn't a leaf with no locals */
     memset(&irq_stack, 0xa5, sizeof(irq_stack) - 64);
+
+#ifdef PIOS_ENABLE_CXX
+    __libc_init_array();
+#endif
 
     /* call main */
     (void)main();

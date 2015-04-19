@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup AltitudeModule Altitude Module
- * @brief Communicate with BMP085 and update @ref AltitudeActual "AltitudeActual UAV Object"
+ * @addtogroup PathFollower CONTROL interface class
+ * @brief CONTROL interface class for pathfollower goal implementations
  * @{
  *
- * @file       altitude.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Altitude module, reads temperature and pressure from BMP085
+ * @file       pathfollowercontrol.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      Interface class for controllers
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,14 +28,23 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ALTITUDE_H
-#define ALTITUDE_H
+#ifndef PATHFOLLOWERCONTROL_H
+#define PATHFOLLOWERCONTROL_H
+class PathFollowerControl {
+public:
+    virtual void Activate(void)   = 0;
+    virtual void Deactivate(void) = 0;
+    virtual void SettingsUpdated(void)  = 0;
+    virtual void UpdateAutoPilot(void)  = 0;
+    virtual void ObjectiveUpdated(void) = 0;
+    virtual uint8_t Mode(void) = 0;
+    static int32_t Initialize(PathDesiredData *ptr_pathDesired,
+                              FlightStatusData *ptr_flightStatus,
+                              PathStatusData *ptr_pathStatus);
+protected:
+    static PathDesiredData *pathDesired;
+    static FlightStatusData *flightStatus;
+    static PathStatusData *pathStatus;
+};
 
-int32_t AltitudeInitialize();
-
-#endif // ALTITUDE_H
-
-/**
- * @}
- * @}
- */
+#endif // PATHFOLLOWERCONTROL_H

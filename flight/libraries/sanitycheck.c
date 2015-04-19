@@ -43,11 +43,20 @@
 #include <taskinfo.h>
 
 // a number of useful macros
-#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+#define ADDSEVERITY(check)                                  severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+#define ADDEXTENDEDALARMSTATUS(error_code, error_substatus) if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) { alarmstatus = (error_code); alarmsubstatus = (error_substatus); }
 
+// private types
+typedef struct SANITYCHECK_CustomHookInstance {
+    SANITYCHECK_CustomHook_function *hook;
+    struct SANITYCHECK_CustomHookInstance *next;
+    bool enabled;
+} SANITYCHECK_CustomHookInstance;
 
 // ! Check a stabilization mode switch position for safety
 static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol, bool gpsassisted);
+
+SANITYCHECK_CustomHookInstance *hooks = 0;
 
 /**
  * Run a preflight check over the hardware configuration
@@ -109,7 +118,7 @@ int32_t configuration_check()
             ADDSEVERITY(navCapableFusion);
         }
 
-        switch (modes[i]) {
+        switch ((FlightModeSettingsFlightModePositionOptions)modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
             ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!multirotor);
@@ -134,24 +143,18 @@ int32_t configuration_check()
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
-            // Revo supports PathPlanner and that must be OK or we are not sane
-            // PathPlan alarm is uninitialized if not running
-            // PathPlan alarm is warning or error if the flightplan is invalid
-            SystemAlarmsAlarmData alarms;
-            SystemAlarmsAlarmGet(&alarms);
-            ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
             ADDSEVERITY(!gps_assisted);
         }
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(navCapableFusion);
             break;
 
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_COURSELOCK:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_HOMELEASH:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ABSOLUTEPOSITION:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
@@ -167,6 +170,41 @@ int32_t configuration_check()
         if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) {
             alarmstatus    = SYSTEMALARMS_EXTENDEDALARMSTATUS_FLIGHTMODE;
             alarmsubstatus = i;
+        }
+    }
+
+
+    // Check throttle/collective channel range for valid configuration of input for critical control
+    SystemSettingsThrustControlOptions thrustType;
+    SystemSettingsThrustControlGet(&thrustType);
+    ManualControlSettingsChannelMinData channelMin;
+    ManualControlSettingsChannelMaxData channelMax;
+    ManualControlSettingsChannelMinGet(&channelMin);
+    ManualControlSettingsChannelMaxGet(&channelMax);
+    switch (thrustType) {
+    case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+        ADDSEVERITY(fabsf(channelMax.Throttle - channelMin.Throttle) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+        ADDSEVERITY(fabsf(channelMax.Collective - channelMin.Collective) > 300.0f);
+        ADDEXTENDEDALARMSTATUS(SYSTEMALARMS_EXTENDEDALARMSTATUS_BADTHROTTLEORCOLLECTIVEINPUTRANGE, 0);
+        break;
+    default:
+        break;
+    }
+
+    // query sanity check hooks
+    if (severity < SYSTEMALARMS_ALARM_CRITICAL) {
+        SANITYCHECK_CustomHookInstance *instance = NULL;
+        LL_FOREACH(hooks, instance) {
+            if (instance->enabled) {
+                alarmstatus = instance->hook();
+                if (alarmstatus != SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE) {
+                    severity = SYSTEMALARMS_ALARM_CRITICAL;
+                    break;
+                }
+            }
         }
     }
 
@@ -265,10 +303,22 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
         return false;
     }
 
+
+    // if cruise control, ensure rate or acro are not set
+    if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL) {
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_YAW; i++) {
+            if ((modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_RATE ||
+                 modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ACRO)) {
+                return false;
+            }
+        }
+    }
+
     // Warning: This assumes that certain conditions in the XML file are met.  That
     // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL has the same numeric value for each channel
     // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
     // (this is checked at compile time by static constraint manualcontrol.h)
+
 
     return true;
 }
@@ -281,7 +331,6 @@ FrameType_t GetCurrentFrameType()
     switch ((SystemSettingsAirframeTypeOptions)airframe_type) {
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADH:
     case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX:
@@ -313,4 +362,40 @@ FrameType_t GetCurrentFrameType()
     }
     // anyway it should not reach here
     return FRAME_TYPE_CUSTOM;
+}
+
+void SANITYCHECK_AttachHook(SANITYCHECK_CustomHook_function *hook)
+{
+    PIOS_Assert(hook);
+    SANITYCHECK_CustomHookInstance *instance = NULL;
+
+    // Check whether there is an existing instance and enable it
+    LL_FOREACH(hooks, instance) {
+        if (instance->hook == hook) {
+            instance->enabled = true;
+            return;
+        }
+    }
+
+    // No existing instance found, attach this new one
+    instance = (SANITYCHECK_CustomHookInstance *)pios_malloc(sizeof(SANITYCHECK_CustomHookInstance));
+    PIOS_Assert(instance);
+    instance->hook    = hook;
+    instance->next    = NULL;
+    instance->enabled = true;
+    LL_APPEND(hooks, instance);
+}
+
+void SANITYCHECK_DetachHook(SANITYCHECK_CustomHook_function *hook)
+{
+    if (!hooks) {
+        return;
+    }
+    SANITYCHECK_CustomHookInstance *instance = NULL;
+    LL_FOREACH(hooks, instance) {
+        if (instance->hook == hook) {
+            instance->enabled = false;
+            return;
+        }
+    }
 }

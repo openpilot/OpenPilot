@@ -3,8 +3,6 @@
 # kept in sync with make/tools.mk.
 PYTHON_DIR = qt-5.4.0/Tools/mingw491_32/opt/bin
 
-ROOT_DIR = $$GCS_SOURCE_TREE/../..
-
 # Search the python using environment override first
 OPENPILOT_TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
 !isEmpty(OPENPILOT_TOOLS_DIR):exists($$OPENPILOT_TOOLS_DIR/$$PYTHON_DIR/python*) {

@@ -57,7 +57,9 @@ void pathFollowerHandler(bool newinit)
 
     uint8_t flightMode;
     uint8_t assistedControlFlightMode;
+    uint8_t flightModeAssist;
     FlightStatusFlightModeGet(&flightMode);
+    FlightStatusFlightModeAssistGet(&flightModeAssist);
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if (newinit) {
@@ -67,8 +69,9 @@ void pathFollowerHandler(bool newinit)
             plan_setup_returnToBase();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE) {
-                // Just initiated braking after returning from stabi control
+            if ((flightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) &&
+                (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY)) {
+                // Switch from primary (just entered this PH flight mode) into brake
                 plan_setup_assistedcontrol(false);
             } else {
                 plan_setup_positionHold();
@@ -78,7 +81,11 @@ void pathFollowerHandler(bool newinit)
             plan_setup_CourseLock();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
-            plan_setup_PositionRoam();
+            if (flightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
+                plan_setup_PositionRoam();
+            } else {
+                plan_setup_VelocityRoam();
+            }
             break;
         case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
             plan_setup_HomeLeash();
@@ -88,7 +95,11 @@ void pathFollowerHandler(bool newinit)
             break;
 
         case FLIGHTSTATUS_FLIGHTMODE_LAND:
-            plan_setup_land();
+            if (flightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
+                plan_setup_land();
+            } else {
+                plan_setup_VelocityRoam();
+            }
             break;
         case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
             plan_setup_AutoCruise();
@@ -117,7 +128,11 @@ void pathFollowerHandler(bool newinit)
         plan_run_CourseLock();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
-        plan_run_PositionRoam();
+        if (flightModeAssist == FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
+            plan_run_PositionRoam();
+        } else {
+            plan_run_VelocityRoam();
+        }
         break;
     case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
         plan_run_HomeLeash();
@@ -126,7 +141,9 @@ void pathFollowerHandler(bool newinit)
         plan_run_AbsolutePosition();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
-        plan_run_land();
+        if (flightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
+            plan_run_VelocityRoam();
+        }
         break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         plan_run_AutoCruise();

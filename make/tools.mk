@@ -60,14 +60,14 @@ endif
 
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
-        ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2
-        ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2/+md5
+        ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2
+        ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2/+md5
         QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-linux-x64-5.4.0.run
         QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-linux-x64-5.4.0.run.md5
         QT_SDK_ARCH := gcc_64
     else
-        ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2
-        ARM_SDK_MD5_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2/+md5
+        ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2
+        ARM_SDK_MD5_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2/+md5
         QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-linux-x86-5.4.0.run
         QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-linux-x86-5.4.0.run.md5
         QT_SDK_ARCH := gcc
@@ -75,8 +75,8 @@ ifeq ($(UNAME), Linux)
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
-    ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2
-    ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2/+md5
+    ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2
+    ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2/+md5
     QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-mac-x64-clang-5.4.0.dmg
     QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-mac-x64-clang-5.4.0.dmg.md5
     QT_SDK_ARCH := clang_64
@@ -86,8 +86,8 @@ else ifeq ($(UNAME), Darwin)
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
-    ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip
-    ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip/+md5
+    ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip
+    ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip/+md5
     QT_SDK_URL     := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-windows-x86-mingw491_opengl-5.4.0.exe
     QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.4/5.4.0/qt-opensource-windows-x86-mingw491_opengl-5.4.0.exe.md5
     QT_SDK_ARCH    := mingw491_32
@@ -96,6 +96,7 @@ else ifeq ($(UNAME), Windows)
     OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
+    MESAWIN_URL    := http://wiki.openpilot.org/download/attachments/18612236/mesawin.tar.gz
     GSTREAMER_URL         := http://gstreamer.freedesktop.org/data/pkg/windows/1.4.5/gstreamer-1.0-x86-1.4.5.msi
     GSTREAMER_MD5_URL     := https://wiki.openpilot.org/download/attachments/5472258/gstreamer-1.0-x86-1.4.5.msi.md5
     GSTREAMER_SDK_URL     := http://gstreamer.freedesktop.org/data/pkg/windows/1.4.5/gstreamer-1.0-devel-x86-1.4.5.msi
@@ -842,8 +843,8 @@ ifeq ($(UNAME), Windows)
 $(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),,$(notdir $(OPENSSL_URL))))
 
 ifeq ($(shell [ -d "$(OPENSSL_DIR)" ] && $(ECHO) "exists"), exists)
-    export OPENSSL := "$(OPENSSL_DIR)/bin/openssl"    
-    export OPENSSL_DIR := "$(OPENSSL_DIR)"
+    export OPENSSL := $(OPENSSL_DIR)/bin/openssl
+    export OPENSSL_DIR
 else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(OPENSSL_DIR)) not found (make openssl_install), using system PATH)

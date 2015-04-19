@@ -91,7 +91,12 @@ void updateGpsSettings(UAVObjEvent *ev);
 #else
 #if defined(PIOS_GPS_MINIMAL)
         #define GPS_READ_BUFFER    32
-        #define STACK_SIZE_BYTES   500
+
+#ifdef PIOS_INCLUDE_GPS_NMEA_PARSER
+        #define STACK_SIZE_BYTES   580 // NMEA
+#else
+        #define STACK_SIZE_BYTES   440 // UBX
+#endif // PIOS_INCLUDE_GPS_NMEA_PARSER
 #else
         #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL
@@ -203,9 +208,11 @@ int32_t GPSInitialize(void)
         GPSSettingsInitialize();
         GPSSettingsDataProtocolGet(&gpsProtocol);
         switch (gpsProtocol) {
+#if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
         case GPSSETTINGS_DATAPROTOCOL_NMEA:
             gps_rx_buffer = pios_malloc(NMEA_MAX_PACKET_LENGTH);
             break;
+#endif
         case GPSSETTINGS_DATAPROTOCOL_UBX:
             gps_rx_buffer = pios_malloc(sizeof(struct UBXPacket));
             break;
@@ -268,6 +275,12 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             ubx_autoconfig_run(&buffer, &count, status != GPSPOSITIONSENSOR_STATUS_NOGPS);
             // Something to send?
             if (count) {
+                // clear ack/nak
+                ubxLastAck.clsID = 0x00;
+                ubxLastAck.msgID = 0x00;
+                ubxLastNak.clsID = 0x00;
+                ubxLastNak.msgID = 0x00;
+
                 PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
             }
         }
@@ -459,12 +472,12 @@ static void updateHwSettings()
     }
 }
 
-#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
 void AuxMagSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     load_mag_settings();
 }
-#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+
 void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
     uint8_t ubxAutoConfig;
@@ -472,6 +485,7 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
     uint8_t ubxSbasMode;
     ubx_autoconfig_settings_t newconfig;
     uint8_t ubxSbasSats;
+    uint8_t ubxGnssMode;
 
     GPSSettingsUbxRateGet(&newconfig.navRate);
 
@@ -534,10 +548,44 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_GAGAN ? UBX_SBAS_SATS_GAGAN :
                          ubxSbasSats == GPSSETTINGS_UBXSBASSATS_SDCM ? UBX_SBAS_SATS_SDCM : UBX_SBAS_SATS_AUTOSCAN;
 
+    GPSSettingsUbxGNSSModeGet(&ubxGnssMode);
+
+    switch (ubxGnssMode) {
+    case GPSSETTINGS_UBXGNSSMODE_GPSGLONASS:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GLONASS:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GPS:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GPSBEIDOU:
+        newconfig.enableGPS     = true;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = true;
+        break;
+    case GPSSETTINGS_UBXGNSSMODE_GLONASSBEIDOU:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = true;
+        newconfig.enableBeiDou  = true;
+        break;
+    default:
+        newconfig.enableGPS     = false;
+        newconfig.enableGLONASS = false;
+        newconfig.enableBeiDou  = false;
+        break;
+    }
+
     ubx_autoconfig_set(newconfig);
 }
 #endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
-#endif /* ifdef PIOS_INCLUDE_GPS_UBX_PARSER */
 /**
  * @}
  * @}

@@ -106,9 +106,6 @@ static struct rcvr_activity_fsm activity_fsm;
 static void resetRcvrActivity(struct rcvr_activity_fsm *fsm);
 static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm);
 static void resetRcvrStatus(struct rcvr_activity_fsm *fsm);
-static bool updateRcvrStatus(
-    struct rcvr_activity_fsm *fsm,
-    ManualControlSettingsChannelGroupsOptions group);
 
 #define assumptions \
     ( \
@@ -187,6 +184,8 @@ static void receiverTask(__attribute__((unused)) void *parameters)
     SystemSettingsThrustControlOptions thrustType;
 
     while (1) {
+        extern uint32_t pios_rcvr_group_map[];
+
         // Wait until next update
         vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
 #ifdef PIOS_INCLUDE_WDG
@@ -204,8 +203,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 lastActivityTime = lastSysTime;
             }
             /* Read signal quality from the group used for the throttle */
-            (void)updateRcvrStatus(&activity_fsm,
-                                   settings.ChannelGroups.Throttle);
+            cmd.Quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[settings.ChannelGroups.Throttle]);
         }
         if (timeDifferenceMs(lastActivityTime, lastSysTime) > 5000) {
             resetRcvrActivity(&activity_fsm);
@@ -231,8 +229,6 @@ static void receiverTask(__attribute__((unused)) void *parameters)
 
         // Read channel values in us
         for (uint8_t n = 0; n < MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM && n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n) {
-            extern uint32_t pios_rcvr_group_map[];
-
             if (ManualControlSettingsChannelGroupsToArray(settings.ChannelGroups)[n] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                 cmd.Channel[n] = PIOS_RCVR_INVALID;
             } else {
@@ -254,8 +250,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
         }
 
         /* Read signal quality from the group used for the throttle */
-        (void)updateRcvrStatus(&activity_fsm,
-                               settings.ChannelGroups.Throttle);
+        cmd.Quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[settings.ChannelGroups.Throttle]);
 
         // Check settings, if error raise alarm
         if (settings.ChannelGroups.Roll >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
@@ -644,26 +639,6 @@ group_completed:
     return activity_updated;
 }
 
-/* Read signal quality from the specified group */
-static bool updateRcvrStatus(
-    struct rcvr_activity_fsm *fsm,
-    ManualControlSettingsChannelGroupsOptions group)
-{
-    extern uint32_t pios_rcvr_group_map[];
-    bool activity_updated = false;
-    uint8_t quality;
-
-    quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[group]);
-
-    /* Compare with previous sample */
-    if (quality != fsm->quality) {
-        fsm->quality     = quality;
-        ManualControlCommandQualitySet(&quality);
-        activity_updated = true;
-    }
-
-    return activity_updated;
-}
 
 /**
  * Convert channel from servo pulse duration (microseconds) to scaled -1/+1 range.

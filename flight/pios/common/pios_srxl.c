@@ -184,56 +184,62 @@ static int32_t PIOS_SRXL_Get(uint32_t rcvr_id, uint8_t channel)
 
 /**
  * Compute channel_data[] from received_data[].
- * For efficiency it unrolls first 8 channels without loops and does the
- * same for other 8 channels. Also 2 discrete channels will be set.
+ * For efficiency it unrolls first 12 channels without loops and does the
+ * same for other 4 channels if SRXL v2 is used.
  */
 static void PIOS_SRXL_UnrollChannels(struct pios_srxl_state *state)
 {
     uint8_t *s  = state->received_data;
     uint16_t *d = state->channel_data;
 
-#define F(v, s) (((v) >> (s)) & 0x7ff)
+#define UNROLL(offset) (s[SRXL_HEADER_LENGTH + (2 * offset)] << 8 | s[SRXL_HEADER_LENGTH + (2 * offset) + 1]) << 4
 
-    /* unroll channels 1-8 */
-    *d++ = F(s[0] | s[1] << 8, 0);
-    *d++ = F(s[1] | s[2] << 8, 3);
-    *d++ = F(s[2] | s[3] << 8 | s[4] << 16, 6);
-    *d++ = F(s[4] | s[5] << 8, 1);
-    *d++ = F(s[5] | s[6] << 8, 4);
-    *d++ = F(s[6] | s[7] << 8 | s[8] << 16, 7);
-    *d++ = F(s[8] | s[9] << 8, 2);
-    *d++ = F(s[9] | s[10] << 8, 5);
+    /* unroll channels 1-12 */
+    *d++ = UNROLL(0);
+    *d++ = UNROLL(1);
+    *d++ = UNROLL(2);
+    *d++ = UNROLL(3);
+    *d++ = UNROLL(4);
+    *d++ = UNROLL(5);
+    *d++ = UNROLL(6);
+    *d++ = UNROLL(7);
+    *d++ = UNROLL(8);
+    *d++ = UNROLL(9);
+    *d++ = UNROLL(10);
+    *d++ = UNROLL(11);
 
-    /* unroll channels 9-16 */
-    *d++ = F(s[11] | s[12] << 8, 0);
-    *d++ = F(s[12] | s[13] << 8, 3);
-    *d++ = F(s[13] | s[14] << 8 | s[15] << 16, 6);
-    *d++ = F(s[15] | s[16] << 8, 1);
-    *d++ = F(s[16] | s[17] << 8, 4);
-    *d++ = F(s[17] | s[18] << 8 | s[19] << 16, 7);
-    *d++ = F(s[19] | s[20] << 8, 2);
-    *d++ = F(s[20] | s[21] << 8, 5);
-}
-
-static uint16_t PIOS_SRXL_Calculate_Checksum(uint16_t crc, uint8_t value)
-{
-    uint8_t i;
-
-    crc = crc ^ (int16_t)value << 8;
-    for (i = 0; i < 8; i++) {
-        if (crc & 0x8000) {
-            crc = crc << 1 ^ 0x1021;
-        } else {
-            crc = crc << 1;
-        }
+    /* if 16 channels, unroll them, otherwise clear */
+    if (state->channel_data_bytes == SRXL_V2_CHANNEL_DATA_BYTES) {
+        *d++ = UNROLL(12);
+        *d++ = UNROLL(13);
+        *d++ = UNROLL(14);
+        *d++ = UNROLL(15);
+    } else {
+		*d++ = PIOS_RCVR_TIMEOUT;
+		*d++ = PIOS_RCVR_TIMEOUT;
+		*d++ = PIOS_RCVR_TIMEOUT;
+		*d++ = PIOS_RCVR_TIMEOUT;
     }
-    return crc;
 }
 
 static bool PIOS_SRXL_Validate_Checksum(struct pios_srxl_state *state)
 {
-    // Todo: validate checksum
-    return state->frame_found;
+	// Check the CRC16 checksum. The provided checksum is immediately after the channel data.
+	// All data including start byte and version byte is included in crc calculation.
+    uint8_t i = 0;
+    uint16_t crc = 0;
+	for (i = 0; i < SRXL_HEADER_LENGTH + state->channel_data_bytes; i++) {
+		crc = crc ^ (int16_t)state->received_data[i] << 8;
+	    for (i = 0; i < 8; i++) {
+	        if (crc & 0x8000) {
+	            crc = crc << 1 ^ 0x1021;
+	        } else {
+	            crc = crc << 1;
+	        }
+	    }
+	}
+	uint16_t checksum = (((uint8_t)(state->received_data[i] >> 8) | state->received_data[i + 1]));
+    return crc == checksum;
 }
 
 /* Update decoder state processing input byte from the SRXL stream */
@@ -244,7 +250,7 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
         return;
     }
 
-    if (state->byte_count < SRXL_HEADER_LENGTH + state->channel_data_bytes + SRXL_CHECKSUM_LENGTH) {
+    if (state->byte_count < (SRXL_HEADER_LENGTH + state->channel_data_bytes + SRXL_CHECKSUM_LENGTH)) {
         if (state->byte_count == 0) {
             if (b != SRXL_SOF_BYTE) {
                 /* discard the whole frame if the 1st byte is not correct */

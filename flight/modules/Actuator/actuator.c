@@ -100,8 +100,8 @@ static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
 static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed);
 static void setFailsafe();
-static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements);
-static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements);
+static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements, bool multirotor);
+static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements, bool multirotor);
 static bool set_channel(uint8_t mixer_channel, uint16_t value);
 static void actuator_update_rate_if_changed(bool force_update);
 static void MixerSettingsUpdatedCb(UAVObjEvent *ev);
@@ -109,7 +109,7 @@ static void ActuatorSettingsUpdatedCb(UAVObjEvent *ev);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
 float ProcessMixer(const int index, const float curve1, const float curve2,
                    ActuatorDesiredData *desired,
-                   const float period);
+                   const float period, bool multirotor);
 
 // this structure is equivalent to the UAVObjects for one mixer.
 typedef struct {
@@ -267,13 +267,15 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
         bool activeThrottle   = (throttleDesired < -0.001f || throttleDesired > 0.001f); // for ground and reversible motors
         bool positiveThrottle = (throttleDesired > 0.00f);
+        bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
 
         // safety settings
         if (!armed) {
-            throttleDesired = 0;
+            throttleDesired = 0; // this also happens in scaleMotors as a per axis check
         }
 
         if ((frameType == FRAME_TYPE_GROUND && !activeThrottle) || (frameType != FRAME_TYPE_GROUND && throttleDesired <= 0.00f) || !armed) {
+            // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
             if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
                 desired.Roll = 0;
@@ -297,13 +299,13 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
-        float curve1 = 0.0f;
+        float curve1 = 0.0f; // curve 1 is the throttle curve applied to all motors.
         float curve2 = 0.0f;
 
         // Interpolate curve 1 from throttleDesired as input.
         // assume reversible motor/mixer initially. We can later reverse this. The difference is simply that -ve throttleDesired values
         // map differently
-        curve1 = MixerCurveFullRangeProportional(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
+        curve1 = MixerCurveFullRangeProportional(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM, multirotor);
 
         // The source for the secondary curve is selectable
         AccessoryDesiredData accessory;
@@ -311,25 +313,38 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         switch (curve2Source) {
         case MIXERSETTINGS_CURVE2SOURCE_THROTTLE:
             // assume reversible motor/mixer initially
-            curve2 = MixerCurveFullRangeProportional(throttleDesired, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            curve2 = MixerCurveFullRangeProportional(throttleDesired, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ROLL:
             // Throttle curve contribution the same for +ve vs -ve roll
-            curve2 = MixerCurveFullRangeAbsolute(desired.Roll, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            if (multirotor) {
+                curve2 = MixerCurveFullRangeProportional(desired.Roll, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
+            } else {
+                curve2 = MixerCurveFullRangeAbsolute(desired.Roll, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
+            }
             break;
         case MIXERSETTINGS_CURVE2SOURCE_PITCH:
             // Throttle curve contribution the same for +ve vs -ve pitch
-            curve2 = MixerCurveFullRangeAbsolute(desired.Pitch, mixerSettings.ThrottleCurve2,
-                                                 MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            if (multirotor) {
+                curve2 = MixerCurveFullRangeProportional(desired.Pitch, mixerSettings.ThrottleCurve2,
+                                                         MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
+            } else {
+                curve2 = MixerCurveFullRangeAbsolute(desired.Pitch, mixerSettings.ThrottleCurve2,
+                                                     MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
+            }
             break;
         case MIXERSETTINGS_CURVE2SOURCE_YAW:
             // Throttle curve contribution the same for +ve vs -ve yaw
-            curve2 = MixerCurveFullRangeAbsolute(desired.Yaw, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            if (multirotor) {
+                curve2 = MixerCurveFullRangeProportional(desired.Yaw, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
+            } else {
+                curve2 = MixerCurveFullRangeAbsolute(desired.Yaw, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
+            }
             break;
         case MIXERSETTINGS_CURVE2SOURCE_COLLECTIVE:
             // assume reversible motor/mixer initially
             curve2 = MixerCurveFullRangeProportional(collectiveDesired, mixerSettings.ThrottleCurve2,
-                                                     MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+                                                     MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1:
@@ -339,7 +354,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY5:
             if (AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0, &accessory) == 0) {
                 // Throttle curve contribution the same for +ve vs -ve accessory....maybe not want we want.
-                curve2 = MixerCurveFullRangeAbsolute(accessory.AccessoryVal, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+                curve2 = MixerCurveFullRangeAbsolute(accessory.AccessoryVal, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             } else {
                 curve2 = 0.0f;
             }
@@ -351,6 +366,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         float *status   = (float *)&mixerStatus; // access status objects as an array of floats
         Mixer_t *mixers = (Mixer_t *)&mixerSettings.Mixer1Type;
+        float maxMotor  = 1.0f; // highest motor value
+        float minMotor  = -1.0f; // lowest motor value
 
         for (int ct = 0; ct < MAX_MIX_ACTUATORS; ct++) {
             // During boot all camera actuators should be completely disabled (PWM pulse = 0).
@@ -376,7 +393,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                 if (nonreversible_curve2 < 0.0f) {
                     nonreversible_curve2 = 0.0f;
                 }
-                status[ct] = ProcessMixer(ct, nonreversible_curve1, nonreversible_curve2, &desired, dTSeconds);
+                status[ct] = ProcessMixer(ct, nonreversible_curve1, nonreversible_curve2, &desired, dTSeconds, multirotor);
                 // If not armed or motors aren't meant to spin all the time
                 if (!armed ||
                     (!spinWhileArmed && !positiveThrottle)) {
@@ -387,10 +404,14 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                 // If armed meant to keep spinning,
                 else if ((spinWhileArmed && !positiveThrottle) ||
                          (status[ct] < 0)) {
-                    status[ct] = 0;
+                    if (!multirotor) {
+                        status[ct] = 0;
+                        // allow throttle values lower than 0 if multirotor.
+                        // Values will be scaled to 0 if they need to be in the scaleMotor function
+                    }
                 }
             } else if (mixer_type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) {
-                status[ct] = ProcessMixer(ct, curve1, curve2, &desired, dTSeconds);
+                status[ct] = ProcessMixer(ct, curve1, curve2, &desired, dTSeconds, multirotor);
                 // Reversable Motors are like Motors but go to neutral instead of minimum
                 // If not armed or motor is inactive - no "spinwhilearmed" for this engine type
                 if (!armed || !activeThrottle) {
@@ -399,7 +420,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                     status[ct] = 0; // force neutral throttle
                 }
             } else if (mixer_type == MIXERSETTINGS_MIXER1TYPE_SERVO) {
-                status[ct] = ProcessMixer(ct, curve1, curve2, &desired, dTSeconds);
+                status[ct] = ProcessMixer(ct, curve1, curve2, &desired, dTSeconds, multirotor);
             } else {
                 status[ct] = -1;
 
@@ -445,16 +466,38 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                     }
                 }
             }
+
+            // If mixer type is motor we need to find which motor has the highest value and which motor has the lowest value.
+            // For use in function scaleMotor
+            if (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
+                if (maxMotor < status[ct]) {
+                    maxMotor = status[ct];
+                }
+                if (minMotor > status[ct]) {
+                    minMotor = status[ct];
+                }
+            }
         }
 
         // Set real actuator output values scaling them from mixers. All channels
         // will be set except explicitly disabled (which will have PWM pulse = 0).
         for (int i = 0; i < MAX_MIX_ACTUATORS; i++) {
             if (command.Channel[i]) {
-                command.Channel[i] = scaleChannel(status[i],
-                                                  actuatorSettings.ChannelMax[i],
-                                                  actuatorSettings.ChannelMin[i],
-                                                  actuatorSettings.ChannelNeutral[i]);
+                if (mixers[i].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) { // If mixer is for a motor we need to find the highest value of all motors
+                    command.Channel[i] = scaleMotor(status[i],
+                                                    actuatorSettings.ChannelMax[i],
+                                                    actuatorSettings.ChannelMin[i],
+                                                    actuatorSettings.ChannelNeutral[i],
+                                                    maxMotor,
+                                                    minMotor,
+                                                    spinWhileArmed,
+                                                    armed);
+                } else { // else we scale the channel
+                    command.Channel[i] = scaleChannel(status[i],
+                                                      actuatorSettings.ChannelMax[i],
+                                                      actuatorSettings.ChannelMin[i],
+                                                      actuatorSettings.ChannelNeutral[i]);
+                }
             }
         }
 
@@ -498,7 +541,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
  * Process mixing for one actuator
  */
 float ProcessMixer(const int index, const float curve1, const float curve2,
-                   ActuatorDesiredData *desired, const float period)
+                   ActuatorDesiredData *desired, const float period, bool multirotor)
 {
     static float lastFilteredResult[MAX_MIX_ACTUATORS];
     const Mixer_t *mixers = (Mixer_t *)&mixerSettings.Mixer1Type; // pointer to array of mixers in UAVObjects
@@ -512,8 +555,10 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 
     // note: no feedforward for reversable motors yet for safety reasons
     if (mixer->type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
-        if (result < 0.0f) { // idle throttle
-            result = 0.0f;
+        if (!multirotor) { // we allow negative throttle with a multirotor
+            if (result < 0.0f) { // zero throttle
+                result = 0.0f;
+            }
         }
 
         // feed forward
@@ -561,9 +606,9 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  * Input of 0  ->  lookup(0)
  * Input of 1  ->  lookup(1)
  */
-static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements)
+static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements, bool multirotor)
 {
-    float unsigned_value = MixerCurveFullRangeAbsolute(input, curve, elements);
+    float unsigned_value = MixerCurveFullRangeAbsolute(input, curve, elements, multirotor);
 
     if (input < 0.0f) {
         return -unsigned_value;
@@ -581,7 +626,7 @@ static float MixerCurveFullRangeProportional(const float input, const float *cur
  * Input of 0  -> lookup(0)
  * Input of 1  -> lookup(1)
  */
-static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements)
+static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements, bool multirotor)
 {
     float abs_input = fabsf(input);
     float scale     = abs_input * (float)(elements - 1);
@@ -595,6 +640,16 @@ static float MixerCurveFullRangeAbsolute(const float input, const float *curve, 
     if (idx2 >= elements) {
         idx2 = elements - 1; // clamp to highest entry in table
         if (idx1 >= elements) {
+            if (multirotor) {
+                // if multirotor frame we can return throttle values higher than 100%.
+                // Since the we don't have elements in the curve higher than 100% we return
+                // the last element multiplied by the throttle float
+                if (throttle < 2.0f) { // this limits positive throttle to 200% of max value in table (Maybe this is too much allowance)
+                    return curve[idx2] * input;
+                } else {
+                    return curve[idx2] * 2.0f; // return 200% of max value in table
+                }
+            }
             idx1 = elements - 1;
         }
     }
@@ -632,6 +687,48 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
         if (valueScaled > min) {
             valueScaled = min;
         }
+    }
+
+    return valueScaled;
+}
+
+/**
+ * Constrain motor values to keep any one motor value from going too far out of range of another motor
+ */
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed)
+{
+    int16_t valueScaled;
+
+    // Scale
+    if (value >= 0.0f) {
+        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor)) + neutral;
+    } else {
+        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor)) + neutral;
+    }
+
+    if (max > min) {
+        if (valueScaled > max) {
+            valueScaled = max;
+        }
+        if (valueScaled < min) {
+            valueScaled = min;
+        }
+    } else {
+        // not sure what to do about reversed polarity right now. Why would anyone do this?
+        if (valueScaled < max) {
+            valueScaled = max;
+        }
+        if (valueScaled > min) {
+            valueScaled = min;
+        }
+    }
+
+    if (!armed) {
+        // if not armed return min
+        valueScaled = min;
+    } else if ((valueScaled <= neutral) && (spinWhileArmed) && (armed)) {
+        // if armed and throttle is less than neutral we return neutral
+        valueScaled = neutral;
     }
 
     return valueScaled;

@@ -1,0 +1,9 @@
+<xml>
+	<object name= "FrSkyTelemetrySettings" singleinstance="true" settings= "true" category="Telemtry" >
+		<field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="300"/>
+		<access gcs="readwrite" flight="readwrite"/>
+		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="manual" period="0"/>
+	</object>
+</xml>

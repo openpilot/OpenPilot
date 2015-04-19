@@ -45,7 +45,7 @@
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <actuatordesired.h>
-#include <sanitycheck.h> // need to check frame type for clamping desired axis movements
+#include <sanitycheck.h>
 
 #include <stabilization.h>
 #include <virtualflybar.h>

@@ -148,6 +148,16 @@ void VtolAutoTakeoffFSM::Activate()
     mAutoTakeoffData->fsmAutoTakeoffStatus.ControlState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
     assessAltitude();
 
+    // Check if we are already flying.  This can happen in pathplanner mode
+    // going into a second loop of the waypoints.
+    StabilizationDesiredData stabDesired;
+    StabilizationDesiredGet(&stabDesired);
+    if (stabDesired.Thrust > vtolPathFollowerSettings->ThrustLimits.Min) {
+        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        return;
+    }
+
+    // initially inactive and wait for a change in controlstate.
     setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 }
 
@@ -323,7 +333,7 @@ void VtolAutoTakeoffFSM::setControlState(StatusVtolAutoTakeoffControlStateOption
         setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE:
-        setState(AUTOTAKEOFF_STATE_SLOWSTART, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(AUTOTAKEOFF_STATE_CHECKSTATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD:
         setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
@@ -351,12 +361,15 @@ void VtolAutoTakeoffFSM::setup_checkstate(void)
     // 2. Not in flight. This was checked in plans.c
     // 3. User has placed throttle position to more than 50% to allow autotakeoff
 
-    // If pathplanner, we may need additional checks???
-    // E.g. if inflight, this mode is just positon hold??
+    // If pathplanner, we need additional checks
+    // E.g. if inflight, this mode is just positon hol
+    StabilizationDesiredData stabDesired;
+    StabilizationDesiredGet(&stabDesired);
+    if (stabDesired.Thrust > vtolPathFollowerSettings->ThrustLimits.Min) {
+        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        return;
+    }
 
-    // Sanity check arm state and thrust state
-
-    // TODO Orientation checks
 
     // Start from a enforced thrust off condition
     mAutoTakeoffData->flConstrainThrust = false;

@@ -98,7 +98,7 @@ static int mixer_settings_count = 2;
 // Private functions
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed);
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed);
 static void setFailsafe();
 static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements, bool multirotor);
 static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements, bool multirotor);
@@ -490,7 +490,6 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                                                     actuatorSettings.ChannelNeutral[i],
                                                     maxMotor,
                                                     minMotor,
-                                                    spinWhileArmed,
                                                     armed);
                 } else { // else we scale the channel
                     command.Channel[i] = scaleChannel(status[i],
@@ -644,7 +643,7 @@ static float MixerCurveFullRangeAbsolute(const float input, const float *curve, 
                 // if multirotor frame we can return throttle values higher than 100%.
                 // Since the we don't have elements in the curve higher than 100% we return
                 // the last element multiplied by the throttle float
-                if (throttle < 2.0f) { // this limits positive throttle to 200% of max value in table (Maybe this is too much allowance)
+                if (input < 2.0f) { // this limits positive throttle to 200% of max value in table (Maybe this is too much allowance)
                     return curve[idx2] * input;
                 } else {
                     return curve[idx2] * 2.0f; // return 200% of max value in table
@@ -695,7 +694,7 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 /**
  * Constrain motor values to keep any one motor value from going too far out of range of another motor
  */
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed)
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed)
 {
     int16_t valueScaled;
 

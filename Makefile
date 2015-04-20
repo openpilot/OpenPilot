@@ -468,13 +468,13 @@ DIRS += $(OPENPILOTGCS_DIR)
 OPENPILOTGCS_MAKEFILE := $(OPENPILOTGCS_DIR)/Makefile
 
 .PHONY: openpilotgcs_qmake
-openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
+openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): uavobjects_gcs | $(OPENPILOTGCS_DIR)
 	$(V1) ( cd $(OPENPILOTGCS_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
 	)
 
 .PHONY: openpilotgcs
-openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
+openpilotgcs: $(OPENPILOTGCS_MAKEFILE)
 	$(V1) $(MAKE) -w -C $(OPENPILOTGCS_DIR)/$(MAKE_DIR);
 
 .PHONY: openpilotgcs_clean

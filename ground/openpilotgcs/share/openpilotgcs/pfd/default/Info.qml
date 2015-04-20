@@ -245,8 +245,7 @@ Item {
         visible: SystemAlarms.Alarm_PathPlan == 1
 
         Text {
-            text: ["FLY END POINT","FLY VECTOR","FLY CIRCLE RIGHT","FLY CIRCLE LEFT","DRIVE END POINT","DRIVE VECTOR","DRIVE CIRCLE LEFT",
-                   "DRIVE CIRCLE RIGHT","FIXED ATTITUDE","SET ACCESSORY","LAND","DISARM ALARM"][PathDesired.Mode]
+            text: ["GOTO ENDPOINT","FOLLOW VECTOR","CIRCLE RIGHT","CIRCLE LEFT","FIXED ATTITUDE","SET ACCESSORY","DISARM ALARM","LAND","BRAKE","VELOCITY","AUTO TAKEOFF"][PathDesired.Mode]
             anchors.centerIn: parent
             color: "cyan"
 

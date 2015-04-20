@@ -403,6 +403,8 @@ void updatePathDesired()
         /*pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
            pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
            pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
+        // note takeoff relies on the start being the current location as it merely ascends and using
+        // the start as assumption current NE location
         pathDesired.Start.North = positionState.North;
         pathDesired.Start.East  = positionState.East;
         pathDesired.Start.Down  = positionState.Down;
@@ -553,18 +555,11 @@ static uint8_t conditionDistanceToTarget()
  */
 static uint8_t conditionLegRemaining()
 {
-    PathDesiredData pathDesired;
-    PositionStateData positionState;
+    PathStatusData pathStatus;
 
-    PathDesiredGet(&pathDesired);
-    PositionStateGet(&positionState);
+    PathStatusGet(&pathStatus);
 
-    float cur[3] = { positionState.North, positionState.East, positionState.Down };
-    struct path_status progress;
-
-    path_progress(&pathDesired,
-                  cur, &progress, mode3D);
-    if (progress.fractional_progress >= 1.0f - pathAction.ConditionParameters[0]) {
+    if (pathStatus.fractional_progress >= (1.0f - pathAction.ConditionParameters[0])) {
         return true;
     }
     return false;

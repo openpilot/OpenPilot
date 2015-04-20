@@ -90,6 +90,7 @@ modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
     case MapDataDelegate::MODE_FOLLOWVECTOR:
     case MapDataDelegate::MODE_VELOCITY:
     case MapDataDelegate::MODE_LAND:
+    case MapDataDelegate::MODE_AUTOTAKEOFF:
     case MapDataDelegate::MODE_BRAKE:
         return OVERLAY_LINE;
 

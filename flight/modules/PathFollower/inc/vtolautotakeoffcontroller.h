@@ -28,24 +28,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef VTOLLANDCONTROLLER_H
-#define VTOLLANDCONTROLLER_H
+#ifndef VTOLAUTOTAKEOFFCONTROLLER_H
+#define VTOLAUTOTAKEOFFCONTROLLER_H
 #include "pathfollowercontrol.h"
 #include "pidcontroldown.h"
 #include "pidcontrolne.h"
 // forward decl
-class PathFollowerFSM;
-class VtolLandController : public PathFollowerControl {
+class VtolAutoTakeoffFSM;
+class VtolAutoTakeoffController : public PathFollowerControl {
 private:
-    static VtolLandController *p_inst;
-    VtolLandController();
+    static VtolAutoTakeoffController *p_inst;
+    VtolAutoTakeoffController();
 
 
 public:
-    static VtolLandController *instance()
+    static VtolAutoTakeoffController *instance()
     {
         if (!p_inst) {
-            p_inst = new VtolLandController();
+            p_inst = new VtolAutoTakeoffController();
         }
         return p_inst;
     }
@@ -64,12 +64,13 @@ public:
 private:
     void UpdateVelocityDesired(void);
     int8_t UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction);
+    void setArmedIfChanged(uint8_t val);
 
-    PathFollowerFSM *fsm;
+    VtolAutoTakeoffFSM *fsm;
     VtolPathFollowerSettingsData *vtolPathFollowerSettings;
     PIDControlDown controlDown;
     PIDControlNE controlNE;
     uint8_t mActive;
 };
 
-#endif // VTOLLANDCONTROLLER_H
+#endif // VTOLAUTOTAKEOFFCONTROLLER_H

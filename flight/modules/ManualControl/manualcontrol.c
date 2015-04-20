@@ -403,6 +403,7 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
         newFlightModeAssist = isAssistedFlightMode(position, newMode, &modeSettings);
         if (newFlightModeAssist) {
             // Set the default thrust state
@@ -527,6 +528,7 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
             break;
         case FLIGHTSTATUS_FLIGHTMODE_LAND:
+        case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
             break;
 

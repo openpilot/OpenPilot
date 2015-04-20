@@ -242,11 +242,11 @@ extern uint32_t pios_com_hkosd_id;
 // -------------------------
 #define PIOS_DMA_PIN_CONFIG                                                                         \
     {                                                                                                   \
-        { GPIOC, GPIO_Pin_0, ADC_Channel_10 },                                                        \
-        { GPIOC, GPIO_Pin_1, ADC_Channel_11 },                                                        \
-        { NULL, 0, ADC_Channel_Vrefint }, /* Voltage reference */         \
-        { NULL, 0, ADC_Channel_TempSensor }, /* Temperature sensor */        \
-        { GPIOC, GPIO_Pin_2, ADC_Channel_12 }  \
+        { GPIOC, GPIO_Pin_0, ADC_Channel_10, true },                                                        \
+        { GPIOC, GPIO_Pin_1, ADC_Channel_11, true },                                                        \
+        { NULL, 0, ADC_Channel_Vrefint, true }, /* Voltage reference */         \
+        { NULL, 0, ADC_Channel_TempSensor, true }, /* Temperature sensor */        \
+        { GPIOC, GPIO_Pin_2, ADC_Channel_12, true }  \
     }
 
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */

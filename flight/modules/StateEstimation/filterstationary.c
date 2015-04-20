@@ -65,7 +65,7 @@ static int32_t init(__attribute__((unused)) stateFilter *self)
     return 0;
 }
 
-static filterResult filter(__attribute__((unused)) stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
+    <width>1895</width>
     <height>694</height>
    </rect>
   </property>
@@ -141,7 +141,7 @@ QGroupBox::title {
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="0" column="4">
+         <item row="0" column="5">
           <widget class="QGroupBox" name="ccpmSwashImageBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -815,6 +815,138 @@ margin:1px;
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="ccpmTailThrottleScalingBox">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
+             </property>
+             <property name="title">
+              <string>Throttle</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <property name="leftMargin">
+               <number>3</number>
+              </property>
+              <property name="topMargin">
+               <number>10</number>
+              </property>
+              <property name="rightMargin">
+               <number>3</number>
+              </property>
+              <property name="bottomMargin">
+               <number>3</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_20">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>7</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Tail</string>
+                </property>
+                <property name="scaledContents">
+                 <bool>true</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_14">
+                <item>
+                 <widget class="QSlider" name="ccpmTailThrottleScale">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>100</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>5</number>
+                  </property>
+                  <property name="value">
+                   <number>50</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="ccpmTailThrottleScaleBox">
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QGroupBox" name="ccpmPitchScalingBox">
              <property name="enabled">
               <bool>true</bool>
@@ -1022,6 +1154,117 @@ margin:1px;
               </item>
               <item>
                <widget class="QSpinBox" name="ccpmRollScaleBox">
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="ccpmYawScalingBox">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
+             </property>
+             <property name="title">
+              <string>Yaw</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_14">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <property name="leftMargin">
+               <number>3</number>
+              </property>
+              <property name="topMargin">
+               <number>20</number>
+              </property>
+              <property name="rightMargin">
+               <number>3</number>
+              </property>
+              <property name="bottomMargin">
+               <number>3</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_15">
+                <item>
+                 <widget class="QSlider" name="ccpmYawScale">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>100</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>5</number>
+                  </property>
+                  <property name="value">
+                   <number>50</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="ccpmYawScaleBox">
                 <property name="maximum">
                  <number>100</number>
                 </property>
@@ -1835,7 +2078,7 @@ margin:1px;
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="SwashplateBox_4">
+            <widget class="QGroupBox" name="ccpmOptionsBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -3500,6 +3743,70 @@ margin:1px;</string>
     <hint type="destinationlabel">
      <x>351</x>
      <y>376</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmTailThrottleScaleBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmTailThrottleScale</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>598</x>
+     <y>659</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>598</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmTailThrottleScale</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmTailThrottleScaleBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>598</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>598</x>
+     <y>659</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmYawScale</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmYawScaleBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>832</x>
+     <y>380</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>832</x>
+     <y>659</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmYawScaleBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmYawScale</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>832</x>
+     <y>659</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>832</x>
+     <y>380</y>
     </hint>
    </hints>
   </connection>

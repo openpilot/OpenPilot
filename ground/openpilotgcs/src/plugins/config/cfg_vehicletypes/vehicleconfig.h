@@ -68,14 +68,16 @@ typedef struct {
     uint    ccpmLinkRollState : 1;
     uint    SliderValue0 : 7;
     uint    SliderValue1 : 7;
-    uint    SliderValue2 : 7; // 41 bits
+    uint    SliderValue2 : 7;
+    uint    SliderValue3 : 7;
+    uint    SliderValue4 : 7; // 48 bits
     uint    ServoIndexW : 4;
     uint    ServoIndexX : 4;
     uint    ServoIndexY : 4;
     uint    ServoIndexZ : 4; // 57 bits
     uint    Throttle : 4;
     uint    Tail : 4; // 65bits
-    quint32 padding : 30; // 96 bits
+    quint32 padding : 23; // 96 bits
     quint32 padding1; // 128 bits
 } __attribute__((packed))  heliGUISettingsStruct;
 

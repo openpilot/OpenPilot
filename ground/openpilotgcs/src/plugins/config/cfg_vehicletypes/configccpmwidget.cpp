@@ -225,11 +225,11 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     m_aircraft->ccpmServoZChannel->setCurrentIndex(0);
 
     QStringList Types;
-    Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º")
-          << QString::fromUtf8("CCPM 4 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 120º")
-          << QString::fromUtf8("CCPM 3 Servo 140º") << QString::fromUtf8("FP 2 Servo 90º")
-          << QString::fromUtf8("Coax 2 Servo 90º") << QString::fromUtf8("Custom - User Angles")
-          << QString::fromUtf8("Custom - Advanced Settings");
+    Types << QString::fromUtf8("CCPM 2 Servo 90º - 2 motors") << QString::fromUtf8("CCPM 2 Servo 90º")
+          << QString::fromUtf8("CCPM 3 Servo 90º") << QString::fromUtf8("CCPM 4 Servo 90º")
+          << QString::fromUtf8("CCPM 3 Servo 120º") << QString::fromUtf8("CCPM 3 Servo 140º")
+          << QString::fromUtf8("FP 2 Servo 90º") << QString::fromUtf8("Coax 2 Servo 90º")
+          << QString::fromUtf8("Custom - User Angles") << QString::fromUtf8("Custom - Advanced Settings");
     m_aircraft->ccpmType->addItems(Types);
     m_aircraft->ccpmType->setCurrentIndex(m_aircraft->ccpmType->count() - 1);
 
@@ -398,7 +398,19 @@ void ConfigCcpmWidget::UpdateType()
 
     NumServosDefined = 4;
     // set values for pre defined heli types
-    if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º"), Qt::CaseInsensitive) == 0) {
+    if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º - 2 motors"), Qt::CaseInsensitive) == 0) {
+        m_aircraft->ccpmAngleW->setValue(AdjustmentAngle + 0);
+        m_aircraft->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90, 360));
+        m_aircraft->ccpmAngleY->setValue(0);
+        m_aircraft->ccpmAngleZ->setValue(0);
+        m_aircraft->ccpmAngleY->setEnabled(0);
+        m_aircraft->ccpmAngleZ->setEnabled(0);
+        m_aircraft->ccpmServoYChannel->setCurrentIndex(0);
+        m_aircraft->ccpmServoZChannel->setCurrentIndex(0);
+        m_aircraft->ccpmServoYChannel->setEnabled(0);
+        m_aircraft->ccpmServoZChannel->setEnabled(0);
+        NumServosDefined = 2;
+    } else if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º"), Qt::CaseInsensitive) == 0) {
         m_aircraft->ccpmAngleW->setValue(AdjustmentAngle + 0);
         m_aircraft->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90, 360));
         m_aircraft->ccpmAngleY->setValue(0);
@@ -485,11 +497,14 @@ void ConfigCcpmWidget::UpdateType()
 
     // Set the text of the motor boxes
     if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive) == 0) {
-        m_aircraft->ccpmEngineLabel->setText("CW motor");
-        m_aircraft->ccpmTailLabel->setText("CCW motor");
+        m_aircraft->ccpmEngineLabel->setText(tr("CW motor"));
+        m_aircraft->ccpmTailLabel->setText(tr("CCW motor"));
+    } else if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º - 2 motors"), Qt::CaseInsensitive) == 0) {
+        m_aircraft->ccpmEngineLabel->setText(tr("Engine"));
+        m_aircraft->ccpmTailLabel->setText(tr("Tail motor"));
     } else {
-        m_aircraft->ccpmEngineLabel->setText("Engine");
-        m_aircraft->ccpmTailLabel->setText("Tail rotor");
+        m_aircraft->ccpmEngineLabel->setText(tr("Engine"));
+        m_aircraft->ccpmTailLabel->setText(tr("Tail rotor"));
     }
 
     // set the visibility of the swashplate servo selection boxes
@@ -725,6 +740,11 @@ void ConfigCcpmWidget::UpdateMixer()
                         table->item(i, 1)->setText(QString("%1").arg(127));
                         // Yaw
                         table->item(i, 5)->setText(QString("%1").arg(127));
+                    } else if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º - 2 motors"), Qt::CaseInsensitive) == 0) {
+                        // ThrottleCurve1
+                        table->item(i, 1)->setText(QString("%1").arg(63));
+                        // Yaw
+                        table->item(i, 5)->setText(QString("%1").arg(63));
                     } else {
                         // ThrottleCurve1
                         table->item(i, 1)->setText(QString("%1").arg(0));
@@ -1023,8 +1043,12 @@ void ConfigCcpmWidget::setMixer()
     // go through the user data and update the mixer matrix
     for (i = 0; i < 6; i++) {
         if ((MixerChannelData[i] > 0) && (MixerChannelData[i] < (int)ConfigCcpmWidget::CHANNEL_NUMELEM + 1)) {
-            // Set the mixer type. If Coax, then first two are motors. Otherwise, only first is motor
+            // Set the mixer type. If Coax or tail motor used, then first two are motors. Otherwise, only first is motor
             if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive) == 0) {
+                *(mixerTypes[MixerChannelData[i] - 1]) = i > 1 ?
+                                                         MixerSettings::MIXER1TYPE_SERVO :
+                                                         MixerSettings::MIXER1TYPE_MOTOR;
+            } else if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º - 2 motors"), Qt::CaseInsensitive) == 0) {
                 *(mixerTypes[MixerChannelData[i] - 1]) = i > 1 ?
                                                          MixerSettings::MIXER1TYPE_SERVO :
                                                          MixerSettings::MIXER1TYPE_MOTOR;

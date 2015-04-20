@@ -160,10 +160,10 @@ DIRS += $(UAVOBJGENERATOR_DIR)
 
 .PHONY: uavobjgenerator
 uavobjgenerator: | $(UAVOBJGENERATOR_DIR)
-	$(V1) ( cd $(UAVOBJGENERATOR_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="$(UAVOGEN_BUILD_CONF) $(UAVOGEN_SILENT)" && \
-	    $(MAKE) --no-print-directory -w ; \
-	)
+	$(V1) cd $(UAVOBJGENERATOR_DIR) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro \
+	    -spec $(QT_SPEC) -r CONFIG+=$(UAVOGEN_BUILD_CONF) CONFIG+=$(UAVOGEN_SILENT) && \
+	    $(MAKE) --no-print-directory -w
 
 UAVOBJ_TARGETS := gcs flight python matlab java wireshark
 
@@ -469,9 +469,9 @@ OPENPILOTGCS_MAKEFILE := $(OPENPILOTGCS_DIR)/Makefile
 
 .PHONY: openpilotgcs_qmake
 openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
-	$(V1) ( cd $(OPENPILOTGCS_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
-	)
+	$(V1) cd $(OPENPILOTGCS_DIR) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro \
+	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)
 
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
@@ -495,9 +495,9 @@ UPLOADER_MAKEFILE := $(UPLOADER_DIR)/Makefile
 
 .PHONY: uploader_qmake
 uploader_qmake $(UPLOADER_MAKEFILE): | $(UPLOADER_DIR)
-	$(V1) ( cd $(UPLOADER_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
-	) 
+	$(V1) cd $(UPLOADER_DIR) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro \
+	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)
 
 .PHONY: uploader
 uploader: $(UPLOADER_MAKEFILE)

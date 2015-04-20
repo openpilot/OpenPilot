@@ -140,7 +140,7 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
 
     // Reset ConsumedEnergy counter
     if (batterySettings.ResetConsumedEnergy) {
-        flightBatteryData.ConsumedEnergy = 0;
+        flightBatteryData.ConsumedEnergy    = 0;
         batterySettings.ResetConsumedEnergy = false;
         FlightBatterySettingsSet(&batterySettings);
     }

@@ -1,3 +1,17 @@
+--- RELEASE-15.02.01 ---
+This release fixes an in important bug that may prevent failsafe to work correctly using CC3D/CC with a PWM receiver.
+
+The full list of bugfixes in this release is accessible here:
+https://progress.openpilot.org/issues/?filter=12260
+
+
+Release Notes - OpenPilot - Version RELEASE-15.02.1
+
+** Bug
+    * [OP-1812] - CC3D : PWM: Does not go into failsafe when RX is pulled under 50% throttle
+
+
+
 --- RELEASE-15.02 --- Ragin' Cajun ---
 This release introduces major flight performance improvements, enhancements as well as bug fixes. Many enhancements have been made to reducing dead-time of the communication between the flight controller and ESCs. In our testing, we have found this to be not only the best flight performance so far in the OpenPilot project but the best flight performance of any project we have tested against. This is a recommended upgrade for everyone and the more skilled of a pilot you are, the more you will love this release.
 

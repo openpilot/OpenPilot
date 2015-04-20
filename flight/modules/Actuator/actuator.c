@@ -573,7 +573,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  * idx1 is the first valid index of the curve we look at
  * idx2 is the next highest element in the curve
  */
-static float MixerCurve( float throttle, const float *curve, uint8_t elements)
+static float MixerCurve(float throttle, const float *curve, uint8_t elements)
 {
     bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
     bool negativeThrottle = false;
@@ -676,25 +676,28 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
 
     if (max > min) {
         if (valueScaled > max) {
-            valueScaled = max;
+            valueScaled = max; // clamp to max value only after scaling is done.
         }
         if (valueScaled < min) {
-            valueScaled = min;
+            valueScaled = min; // clamp to min value only after scaling is done.
         }
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?
         if (valueScaled < max) {
-            valueScaled = max;
+            valueScaled = max; // clamp to max value only after scaling is done.
         }
         if (valueScaled > min) {
-            valueScaled = min;
+            valueScaled = min; // clamp to min value only after scaling is done.
         }
     }
 
     if (!armed) {
         // if not armed return min
         valueScaled = min;
-    } else if ((valueScaled <= neutral) && (spinWhileArmed) && (armed)) {
+    } else if ((valueScaled <= neutral) && (!spinWhileArmed)) {
+        // if armed and throttle is less than neutral we return min
+        valueScaled = min;
+    } else if ((valueScaled <= neutral) && (spinWhileArmed)) {
         // if armed and throttle is less than neutral we return neutral
         valueScaled = neutral;
     }

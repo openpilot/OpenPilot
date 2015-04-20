@@ -174,7 +174,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM) {
             enums.append(QString("\n// Enumeration options for field %1\n").arg(info->fields[n]->name));
-            enums.append("typedef enum {\n");
+            enums.append("typedef enum __attribute__ ((__packed__)) {\n");
             // Go through each option
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m) {

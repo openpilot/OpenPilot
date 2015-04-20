@@ -129,7 +129,8 @@ uint8_t PIOS_RCVR_GetQuality(uint32_t rcvr_id)
 
     if (!PIOS_RCVR_validate(rcvr_dev)) {
         /* Undefined RCVR port for this board (see pios_board.c) */
-        PIOS_Assert(0);
+        /* As no receiver is available assume min */
+        return 0;
     }
 
     if (!rcvr_dev->driver->get_quality) {

@@ -707,25 +707,28 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
 
     if (max > min) {
         if (valueScaled > max) {
-            valueScaled = max;
+            valueScaled = max; //clamp to max value only after scaling is done.
         }
         if (valueScaled < min) {
-            valueScaled = min;
+            valueScaled = min; //clamp to min value only after scaling is done.
         }
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?
         if (valueScaled < max) {
-            valueScaled = max;
+            valueScaled = max; //clamp to max value only after scaling is done.
         }
         if (valueScaled > min) {
-            valueScaled = min;
+            valueScaled = min; //clamp to min value only after scaling is done.
         }
     }
 
     if (!armed) {
         // if not armed return min
         valueScaled = min;
-    } else if ((valueScaled <= neutral) && (spinWhileArmed) && (armed)) {
+    } else if ((valueScaled <= neutral) && (!spinWhileArmed)) {
+        // if armed and throttle is less than neutral we return min
+        valueScaled = min;
+    } else if ((valueScaled <= neutral) && (spinWhileArmed)) {
         // if armed and throttle is less than neutral we return neutral
         valueScaled = neutral;
     }

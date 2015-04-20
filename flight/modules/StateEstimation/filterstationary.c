@@ -57,7 +57,7 @@ int32_t filterStationaryInitialize(stateFilter *handle)
     return STACK_REQUIRED;
 }
 
-static int32_t init(__attribute__((unused)) stateFilter *self)
+static int32_t init(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 

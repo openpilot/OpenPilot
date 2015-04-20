@@ -98,7 +98,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">#SwashplateBox,#SwashplateBox_2,#SwashplateBox_3,#SwashplateBox_4,#ccpmSwashImageBox,#SwashLvlInstructionsBox,#SwashLvlccpmSwashImageBox,#SwashLvlccpmSliderBox,#SwashLvlStatusBox,#ThrottleCurveBox,#PitchCurveBox{
+        <string notr="true">#SwashplateBox,#SwashplateBox_2,#SwashplateBox_3,#ccpmOptionsBox,#ccpmSwashImageBox,#SwashLvlInstructionsBox,#SwashLvlccpmSwashImageBox,#SwashLvlccpmSliderBox,#SwashLvlStatusBox,#ThrottleCurveBox,#PitchCurveBox{
 background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
 border: 1px outset #999;
 border-radius: 6;
@@ -141,7 +141,7 @@ QGroupBox::title {
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="0" column="5">
+         <item row="0" column="4">
           <widget class="QGroupBox" name="ccpmSwashImageBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">

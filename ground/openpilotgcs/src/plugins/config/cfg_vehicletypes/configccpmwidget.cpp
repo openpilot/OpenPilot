@@ -963,6 +963,14 @@ void ConfigCcpmWidget::setMixer()
 {
     int i, j;
 
+    int TypeInt = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
+
+    // Don't check config if Custom, exit if currently updatingToHardware
+    // Avoid mixer changes if something wrong in config
+    if ((throwConfigError(TypeInt) && TypeInt != 0) || updatingToHardware) {
+        return;
+    }
+
     if (SwashLvlConfigurationInProgress) {
         return;
     }
@@ -1007,10 +1015,11 @@ void ConfigCcpmWidget::setMixer()
         &mixerSettingsData.Mixer12Type
     };
 
-    // reset all to Disabled
-    for (i = 0; i < 8; i++) {
+    // reset all outputs to Disabled
+    for (i = 0; i < (int)ConfigCcpmWidget::CHANNEL_NUMELEM; i++) {
         *mixerTypes[i] = 0;
     }
+
     // go through the user data and update the mixer matrix
     for (i = 0; i < 6; i++) {
         if ((MixerChannelData[i] > 0) && (MixerChannelData[i] < (int)ConfigCcpmWidget::CHANNEL_NUMELEM + 1)) {
@@ -1583,49 +1592,42 @@ void ConfigCcpmWidget::SwashLvlSpinBoxChanged(int value)
  */
 bool ConfigCcpmWidget::throwConfigError(int TypeInt)
 {
-    // Display all without errors
     bool error = false;
-
-    m_aircraft->ccpmServoWLabel->setText(QTextEdit(m_aircraft->ccpmServoWLabel->text()).toPlainText());
-    m_aircraft->ccpmServoXLabel->setText(QTextEdit(m_aircraft->ccpmServoXLabel->text()).toPlainText());
-    m_aircraft->ccpmServoYLabel->setText(QTextEdit(m_aircraft->ccpmServoYLabel->text()).toPlainText());
-    m_aircraft->ccpmServoZLabel->setText(QTextEdit(m_aircraft->ccpmServoZLabel->text()).toPlainText());
-    m_aircraft->ccpmEngineLabel->setText(QTextEdit(m_aircraft->ccpmEngineLabel->text()).toPlainText());
-    m_aircraft->ccpmTailLabel->setText(QTextEdit(m_aircraft->ccpmTailLabel->text()).toPlainText());
 
     // Custom no need check
     if (TypeInt == 0) {
         return error;
     }
 
-    if ((m_aircraft->ccpmServoWChannel->currentIndex() == 0) && (m_aircraft->ccpmServoWChannel->isVisible())) {
-        m_aircraft->ccpmServoWLabel->setText("<font color=red>" + m_aircraft->ccpmServoWLabel->text() + "</font>");
-        error = true;
-    }
+    QList<QComboBox *> comboChannelsName;
+    comboChannelsName << m_aircraft->ccpmEngineChannel << m_aircraft->ccpmTailChannel << m_aircraft->ccpmServoWChannel
+                      << m_aircraft->ccpmServoXChannel << m_aircraft->ccpmServoYChannel << m_aircraft->ccpmServoZChannel;
+    QString channelNames = "";
 
-    if ((m_aircraft->ccpmServoXChannel->currentIndex() == 0) && (m_aircraft->ccpmServoXChannel->isVisible())) {
-        m_aircraft->ccpmServoXLabel->setText("<font color=red>" + m_aircraft->ccpmServoXLabel->text() + "</font>");
-        error = true;
+    for (int i = 0; i < 6; i++) {
+        QComboBox *combobox = comboChannelsName[i];
+        if (combobox && (combobox->isVisible())) {
+            if (combobox->currentText() == "None") {
+                int size = combobox->style()->pixelMetric(QStyle::PM_SmallIconSize);
+                QPixmap pixmap(size, size);
+                pixmap.fill(QColor("red"));
+                combobox->setItemData(0, pixmap, Qt::DecorationRole); // Set color palettes
+                error = true;
+            } else if (channelNames.contains(combobox->currentText(), Qt::CaseInsensitive)) {
+                int size = combobox->style()->pixelMetric(QStyle::PM_SmallIconSize);
+                QPixmap pixmap(size, size);
+                pixmap.fill(QColor("orange"));
+                combobox->setItemData(combobox->currentIndex(), pixmap, Qt::DecorationRole); // Set color palettes
+                combobox->setToolTip(tr("Channel already used"));
+                error = true;
+            } else {
+                for (int index = 0; index < (int)ConfigCcpmWidget::CHANNEL_NUMELEM; index++) {
+                    combobox->setItemData(index, 0, Qt::DecorationRole); // Reset all color palettes
+                    combobox->setToolTip("");
+                }
+            }
+            channelNames += (combobox->currentText() == "None") ? "" : combobox->currentText();
+        }
     }
-
-    if ((m_aircraft->ccpmServoYChannel->currentIndex() == 0) && (m_aircraft->ccpmServoYChannel->isVisible())) {
-        m_aircraft->ccpmServoYLabel->setText("<font color=red>" + m_aircraft->ccpmServoYLabel->text() + "</font>");
-        error = true;
-    }
-
-    if ((m_aircraft->ccpmServoZChannel->currentIndex() == 0) && (m_aircraft->ccpmServoZChannel->isVisible())) {
-        m_aircraft->ccpmServoZLabel->setText("<font color=red>" + m_aircraft->ccpmServoZLabel->text() + "</font>");
-        error = true;
-    }
-
-    if ((m_aircraft->ccpmEngineChannel->currentIndex() == 0) && (m_aircraft->ccpmEngineChannel->isEnabled())) {
-        m_aircraft->ccpmEngineLabel->setText("<font color=red>" + m_aircraft->ccpmEngineLabel->text() + "</font>");
-    }
-
-    if ((m_aircraft->ccpmTailChannel->currentIndex() == 0) && (m_aircraft->ccpmTailChannel->isEnabled())) {
-        m_aircraft->ccpmTailLabel->setText("<font color=red>" + m_aircraft->ccpmTailLabel->text() + "</font>");
-        error = true;
-    }
-
     return error;
 }

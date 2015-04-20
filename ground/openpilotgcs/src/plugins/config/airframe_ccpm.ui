@@ -1050,7 +1050,7 @@ margin:1px;
              </property>
              <property name="minimumSize">
               <size>
-               <width>200</width>
+               <width>220</width>
                <height>0</height>
               </size>
              </property>
@@ -1098,13 +1098,13 @@ margin:1px;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>85</width>
+                  <width>100</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>120</width>
                   <height>25</height>
                  </size>
                 </property>
@@ -1120,13 +1120,13 @@ margin:1px;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>85</width>
+                  <width>100</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>120</width>
                   <height>25</height>
                  </size>
                 </property>
@@ -1195,7 +1195,7 @@ margin:1px;
              </property>
              <property name="minimumSize">
               <size>
-               <width>200</width>
+               <width>220</width>
                <height>0</height>
               </size>
              </property>
@@ -1265,13 +1265,13 @@ margin:1px;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>85</width>
+                  <width>100</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>120</width>
                   <height>25</height>
                  </size>
                 </property>
@@ -1287,13 +1287,13 @@ margin:1px;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>85</width>
+                  <width>100</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>120</width>
                   <height>25</height>
                  </size>
                 </property>
@@ -1312,13 +1312,13 @@ margin:1px;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>85</width>
+                  <width>100</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>120</width>
                   <height>25</height>
                  </size>
                 </property>
@@ -1359,13 +1359,13 @@ margin:1px;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>85</width>
+                  <width>100</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>120</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -1426,13 +1426,13 @@ margin:1px;
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>85</width>
+                  <width>100</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>120</width>
                   <height>25</height>
                  </size>
                 </property>
@@ -1504,7 +1504,7 @@ margin:1px;
              </property>
              <property name="minimumSize">
               <size>
-               <width>200</width>
+               <width>220</width>
                <height>0</height>
               </size>
              </property>
@@ -1844,7 +1844,7 @@ margin:1px;
              </property>
              <property name="minimumSize">
               <size>
-               <width>200</width>
+               <width>220</width>
                <height>0</height>
               </size>
              </property>

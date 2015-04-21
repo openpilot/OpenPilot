@@ -122,6 +122,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gpssettings.c
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
+    SRC += $(OPUAVSYNTHDIR)/receiverstatus.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c

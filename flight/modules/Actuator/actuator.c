@@ -40,6 +40,7 @@
 #include "actuatordesired.h"
 #include "actuatorcommand.h"
 #include "flightstatus.h"
+#include <flightmodesettings.h>
 #include "mixersettings.h"
 #include "mixerstatus.h"
 #include "cameradesired.h"
@@ -98,7 +99,7 @@ static int mixer_settings_count = 2;
 // Private functions
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed);
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed, bool AlwaysStabilizeWhenArmed);
 static void setFailsafe();
 static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements, bool multirotor);
 static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements, bool multirotor);
@@ -200,6 +201,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     ActuatorCommandData command;
     ActuatorDesiredData desired;
     MixerStatusData mixerStatus;
+    FlightModeSettingsData settings;
     FlightStatusData flightStatus;
     float throttleDesired;
     float collectiveDesired;
@@ -246,6 +248,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         dTSeconds = dTMilliseconds * 0.001f;
 
         FlightStatusGet(&flightStatus);
+        FlightModeSettingsGet(&settings);
         ActuatorDesiredGet(&desired);
         ActuatorCommandGet(&command);
 
@@ -267,24 +270,31 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
         bool activeThrottle   = (throttleDesired < -0.001f || throttleDesired > 0.001f); // for ground and reversible motors
         bool positiveThrottle = (throttleDesired > 0.00f);
-        bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
+        bool multirotor  = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
+        bool alwaysArmed = settings.Arming == FLIGHTMODESETTINGS_ARMING_ALWAYSARMED;
+        bool AlwaysStabilizeWhenArmed = settings.AlwaysStabilizeWhenArmed == FLIGHTMODESETTINGS_ALWAYSSTABILIZEWHENARMED_TRUE;
 
+        if (alwaysArmed) {
+            AlwaysStabilizeWhenArmed = false; // Do not allow always stabilize when alwaysArmed is active. This is dangerous.
+        }
         // safety settings
         if (!armed) {
-            throttleDesired = 0; // this also happens in scaleMotors as a per axis check
+            throttleDesired = 0.00f; // this also happens in scaleMotors as a per axis check
         }
 
         if ((frameType == FRAME_TYPE_GROUND && !activeThrottle) || (frameType != FRAME_TYPE_GROUND && throttleDesired <= 0.00f) || !armed) {
             // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
-            if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Roll = 0;
-            }
-            if (actuatorSettings.LowThrottleZeroAxis.Pitch == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Pitch = 0;
-            }
-            if (actuatorSettings.LowThrottleZeroAxis.Yaw == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Yaw = 0;
+            if (multirotor && AlwaysStabilizeWhenArmed && armed) { // we don't do this if this is a multirotor AND AlwaysStabilizeWhenArmed is true and the model is armed
+                if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                    desired.Roll = 0.00f;
+                }
+                if (actuatorSettings.LowThrottleZeroAxis.Pitch == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                    desired.Pitch = 0.00f;
+                }
+                if (actuatorSettings.LowThrottleZeroAxis.Yaw == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                    desired.Yaw = 0.00f;
+                }
             }
         }
 
@@ -490,7 +500,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                                                     actuatorSettings.ChannelNeutral[i],
                                                     maxMotor,
                                                     minMotor,
-                                                    armed);
+                                                    armed,
+                                                    AlwaysStabilizeWhenArmed);
                 } else { // else we scale the channel
                     command.Channel[i] = scaleChannel(status[i],
                                                       actuatorSettings.ChannelMax[i],
@@ -694,9 +705,10 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 /**
  * Constrain motor values to keep any one motor value from going too far out of range of another motor
  */
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed)
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed, bool AlwaysStabilizeWhenArmed)
 {
     int16_t valueScaled;
+    bool spinMotor; // spin the motor at at least idle?
 
     // Scale
     if (value >= 0.0f) {
@@ -707,29 +719,39 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
 
     if (max > min) {
         if (valueScaled > max) {
-            valueScaled = max; //clamp to max value only after scaling is done.
+            valueScaled = max; // clamp to max value only after scaling is done.
         }
         if (valueScaled < min) {
-            valueScaled = min; //clamp to min value only after scaling is done.
+            valueScaled = min; // clamp to min value only after scaling is done.
         }
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?
         if (valueScaled < max) {
-            valueScaled = max; //clamp to max value only after scaling is done.
+            valueScaled = max; // clamp to max value only after scaling is done.
         }
         if (valueScaled > min) {
-            valueScaled = min; //clamp to min value only after scaling is done.
+            valueScaled = min; // clamp to min value only after scaling is done.
         }
     }
 
+    // I've added the bool AlwaysStabilizeWhenArmed to this function. Right now we command the motors at min or a range between neutral and max.
+    // NEVER should a motor be command at between min and neutral. I don't like the idea of stabilization ever commanding a motor to min since
+    // this could lead to motor stoppage in flight. For now, we will treat AlwaysStabilizeWhenArmed == true as always spin at idle unless throttle is 0;
+    // This prevents motors startup sync issues causing possible ESC failures.
+
+    if (AlwaysStabilizeWhenArmed || spinWhileArmed) {
+        spinMotor = true;
+    }
+
+    // safety checks
     if (!armed) {
-        // if not armed return min
+        // if not armed return min EVERYTIME!
         valueScaled = min;
-    } else if ((valueScaled <= neutral) && (!spinWhileArmed)) {
-        // if armed and throttle is less than neutral we return min
+    } else if ((valueScaled <= neutral) && (!spinMotor)) {
+        // if armed and throttle is less than or equal to neutral and we don't spin motors at idle we return min
         valueScaled = min;
-    } else if ((valueScaled <= neutral) && (spinWhileArmed)) {
-        // if armed and throttle is less than neutral we return neutral
+    } else if ((valueScaled <= neutral) && (spinMotor)) { // don't need a spinWhileArmed check here. Keeping it for readability
+        // if armed and throttle is less than or equal to neutral we return neutral when motors are supposed to spin at idle.
         valueScaled = neutral;
     }
 

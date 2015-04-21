@@ -264,19 +264,19 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         // safety settings
         if (!armed) {
             // this also happens in scaleMotors as a per axis check
-            throttleDesired = 0;
+            throttleDesired = 0.00f;
         }
         if (throttleDesired <= 0.00f || !armed) {
             // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
             if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Roll = 0;
+                desired.Roll = 0.00f;
             }
             if (actuatorSettings.LowThrottleZeroAxis.Pitch == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Pitch = 0;
+                desired.Pitch = 0.00f;
             }
             if (actuatorSettings.LowThrottleZeroAxis.Yaw == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Yaw = 0;
+                desired.Yaw = 0.00f;
             }
         }
 

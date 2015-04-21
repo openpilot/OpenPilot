@@ -30,7 +30,7 @@
 
 #include "pios.h"
 
-#ifdef PIOS_INCLUDE_SRXL
+//#ifdef PIOS_INCLUDE_SRXL
 
 #include "pios_srxl_priv.h"
 
@@ -55,18 +55,16 @@ enum pios_srxl_dev_magic {
 
 struct pios_srxl_state {
     uint16_t channel_data[PIOS_SRXL_NUM_INPUTS];
-    /* Data for all channels, frame length without header, version and checksum */
     uint8_t  received_data[SRXL_FRAME_LENGTH];
     uint8_t  receive_timer;
     uint8_t  failsafe_timer;
     uint8_t  frame_found;
     uint8_t  byte_count;
-    uint8_t  channel_data_bytes;
+    uint8_t  data_bytes;
 };
 
 struct pios_srxl_dev {
     enum pios_srxl_dev_magic   magic;
-    const struct pios_srxl_cfg *cfg;
     struct pios_srxl_state     state;
 };
 
@@ -123,7 +121,7 @@ static void PIOS_SRXL_ResetState(struct pios_srxl_state *state)
     state->receive_timer      = 0;
     state->failsafe_timer     = 0;
     state->frame_found        = 0;
-    state->channel_data_bytes = 0;
+    state->data_bytes         = 0;
     PIOS_SRXL_ResetChannels(state);
 }
 
@@ -192,28 +190,28 @@ static void PIOS_SRXL_UnrollChannels(struct pios_srxl_state *state)
     uint8_t *s  = state->received_data;
     uint16_t *d = state->channel_data;
 
-#define UNROLL(offset) (s[SRXL_HEADER_LENGTH + (2 * offset)] << 8 | s[SRXL_HEADER_LENGTH + (2 * offset) + 1]) << 4
+#define DECODE_CHANNEL(offset) (s[SRXL_HEADER_LENGTH + (2 * offset)] << 8 | s[SRXL_HEADER_LENGTH + (2 * offset) + 1]) << 4
 
     /* unroll channels 1-12 */
-    *d++ = UNROLL(0);
-    *d++ = UNROLL(1);
-    *d++ = UNROLL(2);
-    *d++ = UNROLL(3);
-    *d++ = UNROLL(4);
-    *d++ = UNROLL(5);
-    *d++ = UNROLL(6);
-    *d++ = UNROLL(7);
-    *d++ = UNROLL(8);
-    *d++ = UNROLL(9);
-    *d++ = UNROLL(10);
-    *d++ = UNROLL(11);
+    *d++ = DECODE_CHANNEL(0);
+    *d++ = DECODE_CHANNEL(1);
+    *d++ = DECODE_CHANNEL(2);
+    *d++ = DECODE_CHANNEL(3);
+    *d++ = DECODE_CHANNEL(4);
+    *d++ = DECODE_CHANNEL(5);
+    *d++ = DECODE_CHANNEL(6);
+    *d++ = DECODE_CHANNEL(7);
+    *d++ = DECODE_CHANNEL(8);
+    *d++ = DECODE_CHANNEL(9);
+    *d++ = DECODE_CHANNEL(10);
+    *d++ = DECODE_CHANNEL(11);
 
     /* if 16 channels, unroll them, otherwise clear */
-    if (state->channel_data_bytes == SRXL_V2_CHANNEL_DATA_BYTES) {
-        *d++ = UNROLL(12);
-        *d++ = UNROLL(13);
-        *d++ = UNROLL(14);
-        *d++ = UNROLL(15);
+    if (state->data_bytes == SRXL_V2_CHANNEL_DATA_BYTES) {
+        *d++ = DECODE_CHANNEL(12);
+        *d++ = DECODE_CHANNEL(13);
+        *d++ = DECODE_CHANNEL(14);
+        *d++ = DECODE_CHANNEL(15);
     } else {
 		*d++ = PIOS_RCVR_TIMEOUT;
 		*d++ = PIOS_RCVR_TIMEOUT;
@@ -228,7 +226,7 @@ static bool PIOS_SRXL_Validate_Checksum(struct pios_srxl_state *state)
 	// All data including start byte and version byte is included in crc calculation.
     uint8_t i = 0;
     uint16_t crc = 0;
-	for (i = 0; i < SRXL_HEADER_LENGTH + state->channel_data_bytes; i++) {
+	for (i = 0; i < SRXL_HEADER_LENGTH + state->data_bytes; i++) {
 		crc = crc ^ (int16_t)state->received_data[i] << 8;
 	    for (i = 0; i < 8; i++) {
 	        if (crc & 0x8000) {
@@ -238,7 +236,7 @@ static bool PIOS_SRXL_Validate_Checksum(struct pios_srxl_state *state)
 	        }
 	    }
 	}
-	uint16_t checksum = (((uint8_t)(state->received_data[i] >> 8) | state->received_data[i + 1]));
+	uint16_t checksum = (((uint8_t)(state->received_data[i] << 8) | state->received_data[i + 1]));
     return crc == checksum;
 }
 
@@ -250,24 +248,20 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
         return;
     }
 
-    if (state->byte_count < (SRXL_HEADER_LENGTH + state->channel_data_bytes + SRXL_CHECKSUM_LENGTH)) {
+    if (state->byte_count < (SRXL_HEADER_LENGTH + state->data_bytes + SRXL_CHECKSUM_LENGTH)) {
         if (state->byte_count == 0) {
-            if (b != SRXL_SOF_BYTE) {
+        	// Set up the length of the channel data according to version received
+            if (b == SRXL_V1_HEADER) {
+                state->data_bytes = SRXL_V1_CHANNEL_DATA_BYTES;
+            } else if (b == SRXL_V2_HEADER) {
+                state->data_bytes = SRXL_V2_CHANNEL_DATA_BYTES;
+            } else {
                 /* discard the whole frame if the 1st byte is not correct */
                 state->frame_found = 0;
                 return;
             }
-        } else if (state->byte_count == 1) {
-            if (b == SRXL_V1_BYTE) {
-                state->channel_data_bytes = SRXL_V1_CHANNEL_DATA_BYTES;
-            } else if (b == SRXL_V2_BYTE) {
-                state->channel_data_bytes = SRXL_V2_CHANNEL_DATA_BYTES;
-            } else {
-                /* discard the whole frame if the 2nd byte is an unknown version */
-                state->frame_found = 0;
-                return;
-            }
-        } /* store next byte */
+        }
+        /* store next byte */
         state->received_data[state->byte_count] = b;
         state->byte_count++;
     } else {
@@ -323,8 +317,8 @@ static uint16_t PIOS_SRXL_RxInCallback(uint32_t context,
  *
  * Multiplex SRXL frames come at 14ms (FastResponse ON) or 21ms (FastResponse OFF)
  * rate at 115200bps.
- * RTC timer is running at 625Hz (1.6ms). So with divider 3 it gives
- * 4.8ms pause between frames which is good for both SRXL frame rates.
+ * RTC timer is running at 625Hz (1.6ms). So with divider 4 it gives
+ * 6.4ms pause between frames which is good for both SRXL frame rates.
  *
  * Data receive function must clear the receive_timer to confirm new
  * data reception. If no new data received in 100ms, we must call the
@@ -340,12 +334,12 @@ static void PIOS_SRXL_Supervisor(uint32_t srxl_id)
 
     struct pios_srxl_state *state = &(srxl_dev->state);
 
-    /* waiting for new frame if no bytes were received in 4.8ms */
-    if (++state->receive_timer > 3) {
+    /* waiting for new frame if no bytes were received in 6.4ms */
+
+    if (++state->receive_timer > 4) {
         state->frame_found   = 1;
         state->byte_count    = 0;
         state->receive_timer = 0;
-        state->channel_data_bytes = 0;
     }
 
     /* activate failsafe if no frames have arrived in 102.4ms */
@@ -355,7 +349,7 @@ static void PIOS_SRXL_Supervisor(uint32_t srxl_id)
     }
 }
 
-#endif /* PIOS_INCLUDE_SRXL */
+//#endif /* PIOS_INCLUDE_SRXL */
 
 /**
  * @}

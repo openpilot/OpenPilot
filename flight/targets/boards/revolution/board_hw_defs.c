@@ -899,7 +899,6 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
     .gpio_clk_periph  = RCC_AHB1Periph_GPIOC,
 };
 
-#include <pios_srxl_priv.h>
 #if defined(PIOS_INCLUDE_SRXL)
 /*
  * SRXL USART
@@ -932,7 +931,7 @@ static const struct pios_usart_cfg pios_usart_srxl_main_cfg = {
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
-            .GPIO_PuPd  = GPIO_PuPd_UP
+            .GPIO_PuPd  = GPIO_PuPd_DOWN
         },
     },
     .tx                                        = {

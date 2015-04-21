@@ -45,7 +45,6 @@ extern "C" {
 #include <vtolselftuningstats.h>
 }
 
-#include "pathfollowerfsm.h"
 #include "pidcontroldown.h"
 
 #define NEUTRALTHRUST_PH_POSITIONAL_ERROR_LIMIT 0.5f
@@ -59,7 +58,7 @@ extern "C" {
 
 PIDControlDown::PIDControlDown()
     : deltaTime(0.0f), mVelocitySetpointTarget(0.0f), mVelocitySetpointCurrent(0.0f), mVelocityState(0.0f), mDownCommand(0.0f),
-    mFSM(NULL), mNeutral(0.5f), mVelocityMax(1.0f), mPositionSetpointTarget(0.0f), mPositionState(0.0f),
+    mCallback(NULL), mNeutral(0.5f), mVelocityMax(1.0f), mPositionSetpointTarget(0.0f), mPositionState(0.0f),
     mMinThrust(0.1f), mMaxThrust(0.6f), mActive(false)
 {
     Deactivate();
@@ -67,9 +66,9 @@ PIDControlDown::PIDControlDown()
 
 PIDControlDown::~PIDControlDown() {}
 
-void PIDControlDown::Initialize(PathFollowerFSM *fsm)
+void PIDControlDown::Initialize(PIDControlDownCallback *callback)
 {
-    mFSM = fsm;
+    mCallback = callback;
 }
 
 void PIDControlDown::SetThrustLimits(float min_thrust, float max_thrust)
@@ -80,7 +79,6 @@ void PIDControlDown::SetThrustLimits(float min_thrust, float max_thrust)
 
 void PIDControlDown::Deactivate()
 {
-    // pid_zero(&PID);
     mActive = false;
 }
 
@@ -333,9 +331,9 @@ void PIDControlDown::UpdateVelocityState(float pv)
 {
     mVelocityState = pv;
 
-    if (mFSM) {
+    if (mCallback) {
         // The FSM controls the actual descent velocity and introduces step changes as required
-        float velocitySetpointDesired = mFSM->BoundVelocityDown(mVelocitySetpointTarget);
+        float velocitySetpointDesired = mCallback->BoundVelocityDown(mVelocitySetpointTarget);
         // RateLimit(velocitySetpointDesired, mVelocitySetpointCurrent, 2.0f );
         mVelocitySetpointCurrent = velocitySetpointDesired;
     } else {
@@ -354,8 +352,8 @@ float PIDControlDown::GetDownCommand(void)
     float ulow  = mMinThrust;
     float uhigh = mMaxThrust;
 
-    if (mFSM) {
-        mFSM->BoundThrust(ulow, uhigh);
+    if (mCallback) {
+        mCallback->BoundThrust(ulow, uhigh);
     }
     float downCommand = pid2_apply(&PID, mVelocitySetpointCurrent, mVelocityState, ulow, uhigh);
     pidStatus.setpoint = mVelocitySetpointCurrent;

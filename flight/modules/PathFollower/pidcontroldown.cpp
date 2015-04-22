@@ -89,8 +89,7 @@ void PIDControlDown::Activate()
     float currentThrust;
 
     StabilizationDesiredThrustGet(&currentThrust);
-    float u0 = currentThrust - mNeutral;
-    pid2_transfer(&PID, u0);
+    pid2_transfer(&PID, currentThrust);
     mActive = true;
 }
 

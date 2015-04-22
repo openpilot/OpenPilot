@@ -194,12 +194,17 @@ msheap_init(heap_handle_t *heap, void *base, void *limit)
 }
 
 void *
-msheap_alloc(heap_handle_t *heap, uint32_t size)
+msheap_alloc(heap_handle_t *heap, void *ptr, uint32_t size)
 {
     marker_t    cursor;
     marker_t    best;
+    uint32_t    copy_data = 0;
+    uint16_t    old_size = 0;
 
     ASSERT(3, msheap_check(heap));
+
+    if (size == 0)
+        return 0;
 
     /* convert the passed-in size to the number of marker-size units we need to allocate */
     size += marker_size;
@@ -209,6 +214,39 @@ msheap_alloc(heap_handle_t *heap, uint32_t size)
     /* cannot possibly satisfy this allocation */
     if (size > heap->heap_free)
         return 0;
+
+    /* realloc */
+    if (ptr != 0) {
+
+        best = (marker_t)ptr - 1;
+        ASSERT(0, region_check(heap, best));
+        ASSERT(3, msheap_check(heap));
+
+#ifdef HEAP_REALLOC_FREE_UNUSED_AREA
+
+        if (best->next.size == size)
+            goto done;
+
+        if (best->next.size > size) {
+            /* this region is free, mark it accordingly */
+            best->next.free = 1;
+            (best + best->next.size)->prev.free = 1;
+
+            traceFREE( ptr, best->next.size );
+
+            /* account for space we are freeing */
+            heap->heap_free += best->next.size;
+
+            goto split;
+        }
+#else
+        if (best->next.size >= size)
+            goto done;
+#endif
+        old_size = best->next.size;
+        msheap_free(heap, ptr);
+        copy_data = 1;
+    }
 
     /* simple single-pass best-fit search */
 restart:
@@ -242,13 +280,28 @@ restart:
         /* no space */
         return 0;
     }
+#ifdef HEAP_REALLOC_FREE_UNUSED_AREA
+split:
+#endif
 
     /* split the free region to make space */
     split_region(heap, best, size);
 
     /* update free space counter */
     heap->heap_free -= size;
+
+done:
     traceMALLOC( (void *)(best + 1), size );
+
+    /* Copy data that might be reused */
+    if (copy_data && ptr) {
+        size = old_size;
+        size = size - 1;
+        size *= marker_size;
+        for(uint32_t i=0 ; i < size; i++)
+            ((uint8_t *)(best + 1))[i] = ((uint8_t *)ptr)[i];
+    }
+
     /* and return a pointer to the allocated region */
     return (void *)(best + 1);
 }

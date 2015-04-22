@@ -128,21 +128,25 @@ private:
 
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
-    ManualControlSettings::DataFields previousManualSettingsData;
 
     ActuatorSettings *actuatorSettingsObj;
     ActuatorSettings::DataFields actuatorSettingsData;
-    ActuatorSettings::DataFields previousActuatorSettingsData;
 
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
-    FlightModeSettings::DataFields previousFlightModeSettingsData;
     ReceiverActivity *receiverActivityObj;
     ReceiverActivity::DataFields receiverActivityData;
 
     SystemSettings *systemSettingsObj;
     SystemSettings::DataFields systemSettingsData;
-    SystemSettings::DataFields previousSystemSettingsData;
+
+    typedef struct {
+        ManualControlSettings::DataFields manualSettingsData;
+        ActuatorSettings::DataFields actuatorSettingsData;
+        FlightModeSettings::DataFields    flightModeSettingsData;
+        SystemSettings::DataFields systemSettingsData;
+    } Memento;
+    Memento memento;
 
     QSvgRenderer *m_renderer;
 

@@ -132,12 +132,13 @@ static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
 };
 
 static const struct pios_hmc5x83_cfg pios_hmc5x83_cfg = {
-    .exti_cfg  = &pios_exti_hmc5x83_cfg,
-    .M_ODR     = PIOS_HMC5x83_ODR_75,
-    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
-    .Gain      = PIOS_HMC5x83_GAIN_1_9,
-    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
-    .Driver    = &PIOS_HMC5x83_I2C_DRIVER,
+    .exti_cfg    = &pios_exti_hmc5x83_cfg,
+    .M_ODR       = PIOS_HMC5x83_ODR_75,
+    .Meas_Conf   = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain        = PIOS_HMC5x83_GAIN_1_9,
+    .Mode        = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver      = &PIOS_HMC5x83_I2C_DRIVER,
+    .Orientation = PIOS_HMC5X83_ORIENTATION_EAST_NORTH_UP,
 };
 #endif /* PIOS_INCLUDE_HMC5X83 */
 
@@ -761,10 +762,7 @@ void PIOS_Board_Init(void)
                           tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
             PIOS_Assert(0);
         }
-        /* Set Telemetry to use OPLinkMini if no other telemetry is configured (USB always overrides anyway) */
-        if (!pios_com_telem_rf_id) {
-            pios_com_telem_rf_id = pios_com_rf_id;
-        }
+
         oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_ENABLED;
 
         // Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.
@@ -966,8 +964,18 @@ void PIOS_Board_Init(void)
     if (ws2811_pin_settings != HWSETTINGS_WS2811LED_OUT_DISABLED && ws2811_pin_settings < NELEMENTS(pios_ws2811_pin_cfg)) {
         PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg[ws2811_pin_settings]);
     }
-
 #endif // PIOS_INCLUDE_WS2811
+#ifdef PIOS_INCLUDE_ADC
+    {
+        uint8_t adc_config[HWSETTINGS_ADCROUTING_NUMELEM];
+        HwSettingsADCRoutingArrayGet(adc_config);
+        for (uint32_t i = 0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {
+            if (adc_config[i] != HWSETTINGS_ADCROUTING_DISABLED) {
+                PIOS_ADC_PinSetup(i);
+            }
+        }
+    }
+#endif // PIOS_INCLUDE_ADC
 }
 
 /**

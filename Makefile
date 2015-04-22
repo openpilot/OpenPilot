@@ -468,7 +468,7 @@ DIRS += $(OPENPILOTGCS_DIR)
 OPENPILOTGCS_MAKEFILE := $(OPENPILOTGCS_DIR)/Makefile
 
 .PHONY: openpilotgcs_qmake
-openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): uavobjects_gcs | $(OPENPILOTGCS_DIR)
+openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
 	$(V1) cd $(OPENPILOTGCS_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro \
 	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)

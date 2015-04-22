@@ -41,11 +41,10 @@
  *  frame period is 14ms (FastResponse ON) or 21ms (FastResponse OFF)
  *
  * Frame structure:
- *  1 byte  - 0xa0 (start of frame byte)
- *  1 byte  - version
+ *  1 byte  - start and version
  *      0xa1 (v1 12-channels)
  *      0xa2 (v2 16-channels)
- * 24/32 bytes - channel data (4 + 12 bit/channel, 12/16 channels, LSB first)
+ * 24/32 bytes - channel data (4 + 12 bit/channel, 12/16 channels, MSB first)
  *      16 bits per channel. 4 first reserved/not used. 12 bits channel data in
  *          4095 steps, 0x000(800µs) - 0x800(1500µs) - 0xfff(2200µs)
  *  2 bytes checksum (calculated over all bytes including start and version)

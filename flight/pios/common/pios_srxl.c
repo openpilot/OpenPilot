@@ -30,7 +30,7 @@
 
 #include "pios.h"
 
-//#ifdef PIOS_INCLUDE_SRXL
+#ifdef PIOS_INCLUDE_SRXL
 
 #include "pios_srxl_priv.h"
 
@@ -349,7 +349,7 @@ static void PIOS_SRXL_Supervisor(uint32_t srxl_id)
     }
 }
 
-//#endif /* PIOS_INCLUDE_SRXL */
+#endif /* PIOS_INCLUDE_SRXL */
 
 /**
  * @}

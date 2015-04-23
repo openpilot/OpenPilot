@@ -8244,8 +8244,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>884</width>
-            <height>736</height>
+            <width>950</width>
+            <height>773</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -18236,8 +18236,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>839</width>
-            <height>670</height>
+            <width>950</width>
+            <height>773</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -25298,10 +25298,10 @@ border-radius: 5;</string>
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>1000</number>
+                    <number>10</number>
                    </property>
                    <property name="value">
-                    <number>50</number>
+                    <number>10</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -25351,10 +25351,10 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>1000</number>
+                    <number>10</number>
                    </property>
                    <property name="value">
-                    <number>51</number>
+                    <number>10</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -25458,10 +25458,10 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>1000</number>
+                    <number>1</number>
                    </property>
                    <property name="value">
-                    <number>51</number>
+                    <number>1</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -25512,10 +25512,10 @@ border-radius: 5;</string>
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>1000</number>
+                    <number>1</number>
                    </property>
                    <property name="value">
-                    <number>50</number>
+                    <number>1</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -25565,10 +25565,10 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>1000</number>
+                    <number>1</number>
                    </property>
                    <property name="value">
-                    <number>51</number>
+                    <number>1</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>

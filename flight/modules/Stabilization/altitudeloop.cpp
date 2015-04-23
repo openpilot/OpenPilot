@@ -64,8 +64,6 @@ static PIDControlDown controlDown;
 static AltitudeHoldSettingsData altitudeHoldSettings;
 static ThrustModeType thrustMode;
 static float thrustDemand = 0.0f;
-static float thrustRate;
-static uint8_t thrustExp;
 
 
 // Private functions
@@ -99,11 +97,11 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
     } else if (mode == ALTITUDEVARIO && setpoint > DEADBAND_HIGH) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
-        controlDown.UpdateVelocitySetpoint(-((thrustExp * powf((setpoint - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - thrustExp) * (setpoint - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * thrustRate));
+        controlDown.UpdateVelocitySetpoint(-((altitudeHoldSettings.ThrustExp * powf((setpoint - DEADBAND_HIGH) / (DEADBAND_LOW), 3.0f) + (255.0f - altitudeHoldSettings.ThrustExp) * (setpoint - DEADBAND_HIGH) / DEADBAND_LOW) / 255.0f * altitudeHoldSettings.ThrustRate));
         thrustMode  = ALTITUDEVARIO;
         newaltitude = true;
     } else if (mode == ALTITUDEVARIO && setpoint < DEADBAND_LOW) {
-        controlDown.UpdateVelocitySetpoint(-(-(thrustExp * powf((DEADBAND_LOW - (setpoint < 0 ? 0 : setpoint)) / DEADBAND_LOW, 3) + (255 - thrustExp) * (DEADBAND_LOW - setpoint) / DEADBAND_LOW) / 255 * thrustRate));
+        controlDown.UpdateVelocitySetpoint(-(-(altitudeHoldSettings.ThrustExp * powf((DEADBAND_LOW - (setpoint < 0 ? 0 : setpoint)) / DEADBAND_LOW, 3.0f) + (255.0f - altitudeHoldSettings.ThrustExp) * (DEADBAND_LOW - setpoint) / DEADBAND_LOW) / 255.0f * altitudeHoldSettings.ThrustRate));
         thrustMode  = ALTITUDEVARIO;
         newaltitude = true;
     } else if (newaltitude == true) {
@@ -131,6 +129,8 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
         controlDown.ControlPosition();
         altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
         thrustDemand = controlDown.GetDownCommand();
+
+        // if thrust demand is high and we are below altitude by 2m, back off pitch
     }
     break;
 
@@ -140,7 +140,7 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
         break;
 
     case DIRECT:
-        altitudeHoldStatus.VelocityDesired = 0;
+        altitudeHoldStatus.VelocityDesired = 0.0f;
         break;
     }
 
@@ -160,8 +160,8 @@ void stabilizationAltitudeloopInit()
     VelocityStateInitialize();
     VtolSelfTuningStatsInitialize();
 
-    // Create object queue
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
+    VtolSelfTuningStatsConnectCallback(&SettingsUpdatedCb);
     SettingsUpdatedCb(NULL);
 }
 
@@ -175,7 +175,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
                                  altitudeHoldSettings.VerticalVelPID.Kd,
                                  altitudeHoldSettings.VerticalVelPID.Beta,
                                  (float)(OUTERLOOP_SKIPCOUNT * UPDATE_EXPECTED),
-                                 altitudeHoldSettings.VerticalVelMax);
+                                 altitudeHoldSettings.ThrustRate);
 
     controlDown.UpdatePositionalParameters(altitudeHoldSettings.VerticalPosP);
 
@@ -186,8 +186,6 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     // initialise limits on thrust but note the FSM can override.
     controlDown.SetThrustLimits(altitudeHoldSettings.ThrustLimits.Min, altitudeHoldSettings.ThrustLimits.Max);
 
-    AltitudeHoldSettingsThrustExpGet(&thrustExp);
-    AltitudeHoldSettingsThrustRateGet(&thrustRate);
 }
 
 

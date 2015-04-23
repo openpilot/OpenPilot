@@ -5,7 +5,6 @@
     <field name="ThrustExp" units="" type="uint8" elements="1" defaultvalue="128" />
     <field name="ThrustRate" units="m/s" type="float" elements="1" defaultvalue="5" />
     <field name="ThrustLimits" units="" type="float" elementnames="Min,Neutral,Max" defaultvalue="0.2, 0.5, 0.9"/>
-    <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="4.0" description="maximum allowed climb/dive velocity"/>
     <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.4"/>
     <field name="VerticalVelPID" units="(m/s^2)/(m/s)" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.35, 3.0, 0.05, 0.9"/>
     <access gcs="readwrite" flight="readwrite"/>

@@ -168,7 +168,6 @@ macx {
         MESAWIN_DIR = $$(MESAWIN_DIR)
         isEmpty(MESAWIN_DIR):MESAWIN_DIR = $${TOOLS_DIR}/mesawin
 
-        contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
         GCS_APP_TARGET   = openpilotgcs
 
         GCS_QT_PLUGINS_PATH = $$GCS_APP_PATH

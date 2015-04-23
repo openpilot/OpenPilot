@@ -11,10 +11,10 @@ defineReplace(prependAll) {
     return($$result)
 }
 
-XMLPATTERNS = $$targetPath($$[QT_INSTALL_BINS]/xmlpatterns)
-LUPDATE = $$targetPath($$[QT_INSTALL_BINS]/lupdate) -locations relative -no-ui-lines -no-sort
-LRELEASE = $$targetPath($$[QT_INSTALL_BINS]/lrelease)
-LCONVERT = $$targetPath($$[QT_INSTALL_BINS]/lconvert)
+XMLPATTERNS = $$[QT_INSTALL_BINS]/xmlpatterns
+LUPDATE = $$[QT_INSTALL_BINS]/lupdate -locations relative -no-ui-lines -no-sort
+LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+LCONVERT = $$[QT_INSTALL_BINS]/lconvert
 
 TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/openpilotgcs_,.ts)
 
@@ -26,7 +26,7 @@ QMAKE_SUBSTITUTES += extract-mimetypes.xq.in
 ts.commands += \
     $$XMLPATTERNS -output $$MIME_TR_H $$PWD/extract-mimetypes.xq && \
     (cd $$GCS_SOURCE_TREE && $$LUPDATE src $$MIME_TR_H -ts $$TRANSLATIONS) && \
-    $$QMAKE_DEL_FILE $$targetPath($$MIME_TR_H)
+    $$QMAKE_DEL_FILE $$MIME_TR_H
 
 QMAKE_EXTRA_TARGETS += ts
 

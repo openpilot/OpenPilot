@@ -11,10 +11,6 @@ defineReplace(cleanPath) {
     return($$join(out, /, $$pfx))
 }
 
-defineReplace(targetPath) {
-    return($$replace(1, /, $$QMAKE_DIR_SEP))
-}
-
 defineReplace(addNewline) { 
     return($$escape_expand(\\n\\t))
 }
@@ -41,8 +37,8 @@ defineTest(addCopyFileTarget) {
     $${file}.depends   = $$src
 
     # create directory. Better would be an order only dependency
-    $${file}.commands  = -@$(MKDIR) \"$$targetPath($$dirname(dest))\" $$addNewline()
-    $${file}.commands += $(COPY_FILE) \"$$targetPath($$src)\" \"$$targetPath($$dest)\"
+    $${file}.commands  = -@$(MKDIR) \"$$dirname(dest)\" $$addNewline()
+    $${file}.commands += $(COPY_FILE) \"$$src\" \"$$dest\"
 
     QMAKE_EXTRA_TARGETS += $$file
     POST_TARGETDEPS += $$eval($${file}.target)
@@ -66,10 +62,10 @@ defineTest(addCopyDirTarget) {
     # Windows does not update directory timestamp if files are modified
     win32: $${dir}.depends += FORCE
 
-    $${dir}.commands  = @rm -rf \"$$targetPath($$dest)\" $$addNewline()
+    $${dir}.commands  = @rm -rf \"$$dest\" $$addNewline()
     # create directory. Better would be an order only dependency
-    $${dir}.commands += -@$(MKDIR) \"$$targetPath($$dirname(dest))\" $$addNewline()
-    $${dir}.commands += $(COPY_DIR) \"$$targetPath($$src)\" \"$$targetPath($$dest)\"
+    $${dir}.commands += -@$(MKDIR) \"$$dirname(dest)\" $$addNewline()
+    $${dir}.commands += $(COPY_DIR) \"$$src\" \"$$dest\"
 
     QMAKE_EXTRA_TARGETS += $$dir
     POST_TARGETDEPS += $$eval($${dir}.target)

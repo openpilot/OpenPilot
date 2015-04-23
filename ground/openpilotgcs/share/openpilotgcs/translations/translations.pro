@@ -40,27 +40,15 @@ LIBS =
 
 updateqm.input = TRANSLATIONS
 updateqm.output = $$GCS_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
-isEmpty(vcproj):updateqm.variable_out = PRE_TARGETDEPS
+updateqm.variable_out = PRE_TARGETDEPS
 updateqm.commands = $$LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
 updateqm.name = LRELEASE ${QMAKE_FILE_IN}
 updateqm.CONFIG += no_link
 QMAKE_EXTRA_COMPILERS += updateqm
 
-isEmpty(vcproj) {
-    QMAKE_LINK = @: IGNORE THIS LINE
-    OBJECTS_DIR =
-    win32:CONFIG -= embed_manifest_exe
-} else {
-    CONFIG += console
-    PHONY_DEPS = .
-    phony_src.input = PHONY_DEPS
-    phony_src.output = phony.c
-    phony_src.variable_out = GENERATED_SOURCES
-    phony_src.commands = echo int main() { return 0; } > phony.c
-    phony_src.name = CREATE phony.c
-    phony_src.CONFIG += combine
-    QMAKE_EXTRA_COMPILERS += phony_src
-}
+QMAKE_LINK = @: IGNORE THIS LINE
+OBJECTS_DIR =
+win32:CONFIG -= embed_manifest_exe
 
 qmfiles.files = $$prependAll(LANGUAGES, $$OUT_PWD/openpilotgcs_,.qm)
 qmfiles.path = /share/openpilotgcs/translations
@@ -79,7 +67,7 @@ QT_TRANSLATIONS = $$QtQmExists(LANGUAGES)
 
 copyQT_QMs.input = QT_TRANSLATIONS
 copyQT_QMs.output = $$GCS_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
-isEmpty(vcproj):copyQT_QMs.variable_out = PRE_TARGETDEPS
+copyQT_QMs.variable_out = PRE_TARGETDEPS
 copyQT_QMs.commands = $(COPY_FILE) ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
 copyQT_QMs.name = Copy ${QMAKE_FILE_IN}
 copyQT_QMs.CONFIG += no_link

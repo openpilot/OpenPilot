@@ -468,7 +468,7 @@ openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
 	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)
 
 .PHONY: openpilotgcs
-openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
+openpilotgcs: $(UAVOBJGENERATOR) $(OPENPILOTGCS_MAKEFILE)
 	$(V1) $(MAKE) -w -C $(OPENPILOTGCS_DIR)/$(MAKE_DIR);
 
 .PHONY: openpilotgcs_clean

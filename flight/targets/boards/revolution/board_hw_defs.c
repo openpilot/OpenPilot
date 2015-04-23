@@ -899,55 +899,6 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
     .gpio_clk_periph  = RCC_AHB1Periph_GPIOC,
 };
 
-#if defined(PIOS_INCLUDE_SRXL)
-/*
- * SRXL USART
- */
-#include <pios_srxl_priv.h>
-
-static const struct pios_usart_cfg pios_usart_srxl_main_cfg = {
-    .regs  = USART1,
-    .remap = GPIO_AF_USART1,
-    .init  = {
-        .USART_BaudRate   = 115200,
-        .USART_WordLength = USART_WordLength_8b,
-        .USART_Parity     = USART_Parity_No,
-        .USART_StopBits   = USART_StopBits_1,
-        .USART_HardwareFlowControl             = USART_HardwareFlowControl_None,
-        .USART_Mode                            = USART_Mode_Rx,
-    },
-    .irq                                       = {
-        .init                                  = {
-            .NVIC_IRQChannel    = USART1_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-            .NVIC_IRQChannelSubPriority        = 0,
-            .NVIC_IRQChannelCmd = ENABLE,
-        },
-    },
-    .rx                                        = {
-        .gpio = GPIOA,
-        .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
-            .GPIO_Speed = GPIO_Speed_2MHz,
-            .GPIO_Mode  = GPIO_Mode_AF,
-            .GPIO_OType = GPIO_OType_PP,
-            .GPIO_PuPd  = GPIO_PuPd_DOWN
-        },
-    },
-    .tx                                        = {
-        .gpio = GPIOA,
-        .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
-            .GPIO_Speed = GPIO_Speed_2MHz,
-            .GPIO_Mode  = GPIO_Mode_OUT,
-            .GPIO_OType = GPIO_OType_PP,
-            .GPIO_PuPd  = GPIO_PuPd_NOPULL
-        },
-    },
-};
-
-#endif /* PIOS_INCLUDE_SRXL */
-
 #ifdef PIOS_INCLUDE_COM_FLEXI
 /*
  * FLEXI PORT
@@ -1055,6 +1006,54 @@ static const struct pios_dsm_cfg pios_dsm_flexi_cfg = {
 
 #endif /* PIOS_INCLUDE_DSM */
 
+#if defined(PIOS_INCLUDE_SRXL)
+/*
+ * SRXL USART
+ */
+#include <pios_srxl_priv.h>
+
+static const struct pios_usart_cfg pios_usart_srxl_main_cfg = {
+    .regs  = USART3,
+    .remap = GPIO_AF_USART3,
+    .init  = {
+        .USART_BaudRate   = 115200,
+        .USART_WordLength = USART_WordLength_8b,
+        .USART_Parity     = USART_Parity_No,
+        .USART_StopBits   = USART_StopBits_1,
+        .USART_HardwareFlowControl             = USART_HardwareFlowControl_None,
+        .USART_Mode                            = USART_Mode_Rx,
+    },
+    .irq                                       = {
+        .init                                  = {
+            .NVIC_IRQChannel    = USART3_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+    .rx                                        = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_11,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_Mode  = GPIO_Mode_AF,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+    },
+    .tx                                        = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_PuPd  = GPIO_PuPd_UP
+        },
+    },
+};
+
+#endif /* PIOS_INCLUDE_SRXL */
 /*
  * HK OSD
  */

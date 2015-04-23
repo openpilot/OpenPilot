@@ -13,8 +13,8 @@
 		<field name="RV_GPSPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,ComAux,ComBridge" defaultvalue="GPS"/>
 
 		<field name="RM_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Telemetry,PPM+Outputs,Outputs,Telemetry" defaultvalue="PWM"/>
-		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,SRXL,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
-		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
+		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
+		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM,SRXL,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="TelemetrySpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
 		<field name="GPSSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200,230400" defaultvalue="57600"/>

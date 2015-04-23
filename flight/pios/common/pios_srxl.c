@@ -180,21 +180,16 @@ static int32_t PIOS_SRXL_Get(uint32_t rcvr_id, uint8_t channel)
     return srxl_dev->state.channel_data[channel];
 }
 
-
-static uint16_t PIOS_SRXL_DecodeChannelData(uint8_t channel, uint8_t *data) {
-    uint16_t channel_value = ((uint16_t)data[SRXL_HEADER_LENGTH + (channel * 2)]) << 8;
-    channel_value += ((uint16_t)data[SRXL_HEADER_LENGTH + (channel * 2) + 1]);
-    channel_value = (800 + ((channel_value * 1400) >> 12));
-    return channel_value;
-}
-
 static void PIOS_SRXL_UnrollChannels(struct pios_srxl_state *state)
 {
-    uint8_t *s  = state->received_data;
-    uint16_t *d = state->channel_data;
-    uint8_t i;
-    for (i = 0; i < (SRXL_V2_CHANNEL_DATA_BYTES / 2); i++) {
-        d[i] = PIOS_SRXL_DecodeChannelData(i, s);
+    uint8_t *received_data  = state->received_data;
+    uint16_t *channel_data = state->channel_data;
+    uint8_t channel;
+    uint16_t channel_value;
+    for (channel = 0; channel < (state->data_bytes / 2); channel++) {
+        channel_value = ((uint16_t)received_data[SRXL_HEADER_LENGTH + (channel * 2)]) << 8;
+        channel_value = channel_value + ((uint16_t)received_data[SRXL_HEADER_LENGTH + (channel * 2) + 1]);
+        d[channel] = (800 + ((channel_value * 1400) >> 12));
     }
 }
 
@@ -297,8 +292,8 @@ static uint16_t PIOS_SRXL_RxInCallback(uint32_t context,
  *
  * Multiplex SRXL frames come at 14ms (FastResponse ON) or 21ms (FastResponse OFF)
  * rate at 115200bps.
- * RTC timer is running at 625Hz (1.6ms). So with divider 4 it gives
- * 6.4ms pause between frames which is good for both SRXL frame rates.
+ * RTC timer is running at 625Hz (1.6ms). So with divider 2 it gives
+ * 3.2ms pause between frames which is good for both SRXL frame rates.
  *
  * Data receive function must clear the receive_timer to confirm new
  * data reception. If no new data received in 100ms, we must call the
@@ -316,7 +311,7 @@ static void PIOS_SRXL_Supervisor(uint32_t srxl_id)
 
     /* waiting for new frame if no bytes were received in 6.4ms */
 
-    if (++state->receive_timer > 4) {
+    if (++state->receive_timer > 2) {
         state->frame_found   = 1;
         state->byte_count    = 0;
         state->receive_timer = 0;

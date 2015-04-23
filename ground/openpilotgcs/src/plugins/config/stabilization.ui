@@ -25209,8 +25209,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:AltitudePI</string>
-                     <string>element:Kp</string>
+                     <string>fieldname:VerticalPosP</string>
                      <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
@@ -25294,7 +25293,7 @@ border-radius: 5;</string>
                   </widget>
                  </item>
                  <item row="3" column="1">
-                  <widget class="QSlider" name="AltKdSlider">
+                  <widget class="QSlider" name="VelKiSlider">
                    <property name="toolTip">
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
@@ -25313,7 +25312,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:VelocityPI</string>
+                     <string>fieldname:VerticalVelPID</string>
                      <string>element:Ki</string>
                      <string>scale:0.00001</string>
                      <string>haslimits:yes</string>
@@ -25323,7 +25322,7 @@ border-radius: 5;</string>
                   </widget>
                  </item>
                  <item row="2" column="2">
-                  <widget class="QSpinBox" name="AltKi">
+                  <widget class="QSpinBox" name="VelKp">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -25370,7 +25369,7 @@ border-radius: 5;</string>
                   </widget>
                  </item>
                  <item row="3" column="2">
-                  <widget class="QSpinBox" name="AltKd">
+                  <widget class="QSpinBox" name="VelKi">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -25434,10 +25433,9 @@ border-radius: 5;</string>
                     <enum>QSlider::TicksBelow</enum>
                    </property>
                    <property name="objrelation" stdset="0">
-                    <stringlist>
+                    <stringlist notr="true">
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:AltitudePI</string>
-                     <string>element:Kp</string>
+                     <string>fieldname:VerticalPosP</string>
                      <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
@@ -25446,7 +25444,7 @@ border-radius: 5;</string>
                   </widget>
                  </item>
                  <item row="2" column="1">
-                  <widget class="QSlider" name="AltKiSlider">
+                  <widget class="QSlider" name="VelKpSlider">
                    <property name="toolTip">
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How much the vehicle should throttle up or down to compensate or achieve a certain vertical speed. Higher values lead to more aggressive throttle changes and could lead to oscillations. This is the most likely candidate to change depending on the crafts engine thrust. Heavy craft with weak engines might require higher values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
@@ -25465,7 +25463,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:VelocityPI</string>
+                     <string>fieldname:VerticalVelPID</string>
                      <string>element:Kp</string>
                      <string>scale:0.01</string>
                      <string>haslimits:yes</string>
@@ -27173,10 +27171,10 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>pushButton_7</tabstop>
   <tabstop>AltKpSlider</tabstop>
   <tabstop>AltKp</tabstop>
-  <tabstop>AltKiSlider</tabstop>
-  <tabstop>AltKi</tabstop>
-  <tabstop>AltKdSlider</tabstop>
-  <tabstop>AltKd</tabstop>
+  <tabstop>VelKpSlider</tabstop>
+  <tabstop>VelKp</tabstop>
+  <tabstop>VelKiSlider</tabstop>
+  <tabstop>VelKi</tabstop>
   <tabstop>pushButton_8</tabstop>
   <tabstop>AltThrExpSlider_2</tabstop>
   <tabstop>AltThrExp_2</tabstop>

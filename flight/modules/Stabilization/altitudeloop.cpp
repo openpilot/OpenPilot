@@ -39,6 +39,7 @@ extern "C" {
 #include <velocitystate.h>
 #include <positionstate.h>
 #include <vtolselftuningstats.h>
+#include <stabilization.h>
 }
 
 #include <pidcontroldown.h>
@@ -56,27 +57,19 @@ extern "C" {
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_LOW
 #define CBTASK_PRIORITY   CALLBACK_TASK_FLIGHTCONTROL
 
-#define STACK_SIZE_BYTES  512
 // Private types
 
 // Private variables
 static PIDControlDown controlDown;
-static DelayedCallbackInfo *altitudeHoldCBInfo;
 static AltitudeHoldSettingsData altitudeHoldSettings;
-static struct pid pid0, pid1;
 static ThrustModeType thrustMode;
-static PiOSDeltatimeConfig timeval;
-static float thrustSetpoint = 0.0f;
-static float thrustDemand   = 0.0f;
-    // this is the max speed in m/s at the extents of thrust
-    static float thrustRate;
-    static uint8_t thrustExp;
+static float thrustDemand = 0.0f;
+static float thrustRate;
+static uint8_t thrustExp;
 
 
 // Private functions
-static void altitudeHoldTask(void);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
-static void VelocityStateUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Setup mode and setpoint
@@ -88,7 +81,7 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
     static bool newaltitude = true;
 
     if (reinit) {
-	controlDown.Activate();
+        controlDown.Activate();
         newaltitude = true;
     }
 
@@ -100,27 +93,58 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
     if (altitudeHoldSettings.CutThrustWhenZero && setpoint <= 0) {
         // Cut thrust if desired
         controlDown.UpdateVelocitySetpoint(0.0f);
-        thrustDemand   = 0.0f;
-        thrustMode     = DIRECT;
-        newaltitude    = true;
+        thrustDemand = 0.0f;
+        thrustMode   = DIRECT;
+        newaltitude  = true;
     } else if (mode == ALTITUDEVARIO && setpoint > DEADBAND_HIGH) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
-	controlDown.UpdateVelocitySetpoint(-((thrustExp * powf((setpoint - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - thrustExp) * (setpoint - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * thrustRate));
-        thrustMode     = ALTITUDEVARIO;
-        newaltitude    = true;
+        controlDown.UpdateVelocitySetpoint(-((thrustExp * powf((setpoint - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - thrustExp) * (setpoint - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * thrustRate));
+        thrustMode  = ALTITUDEVARIO;
+        newaltitude = true;
     } else if (mode == ALTITUDEVARIO && setpoint < DEADBAND_LOW) {
-	controlDown.UpdateVelocitySetpoint(-(-(thrustExp * powf((DEADBAND_LOW - (setpoint < 0 ? 0 : setpoint)) / DEADBAND_LOW, 3) + (255 - thrustExp) * (DEADBAND_LOW - setpoint) / DEADBAND_LOW) / 255 * thrustRate));
-        thrustMode     = ALTITUDEVARIO;
-        newaltitude    = true;
+        controlDown.UpdateVelocitySetpoint(-(-(thrustExp * powf((DEADBAND_LOW - (setpoint < 0 ? 0 : setpoint)) / DEADBAND_LOW, 3) + (255 - thrustExp) * (DEADBAND_LOW - setpoint) / DEADBAND_LOW) / 255 * thrustRate));
+        thrustMode  = ALTITUDEVARIO;
+        newaltitude = true;
     } else if (newaltitude == true) {
         controlDown.UpdateVelocitySetpoint(0.0f);
         PositionStateData posState;
         PositionStateGet(&posState);
         controlDown.UpdatePositionSetpoint(posState.Down);
-        thrustMode     = ALTITUDEHOLD;
-        newaltitude    = false;
+        thrustMode  = ALTITUDEHOLD;
+        newaltitude = false;
     }
+
+    AltitudeHoldStatusData altitudeHoldStatus;
+    AltitudeHoldStatusGet(&altitudeHoldStatus);
+
+    float velocityStateDown;
+    VelocityStateDownGet(&velocityStateDown);
+    controlDown.UpdateVelocityState(velocityStateDown);
+
+    switch (thrustMode) {
+    case ALTITUDEHOLD:
+    {
+        float positionStateDown;
+        PositionStateDownGet(&positionStateDown);
+        controlDown.UpdatePositionState(positionStateDown);
+        controlDown.ControlPosition();
+        altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
+        thrustDemand = controlDown.GetDownCommand();
+    }
+    break;
+
+    case ALTITUDEVARIO:
+        altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
+        thrustDemand = controlDown.GetDownCommand();
+        break;
+
+    case DIRECT:
+        altitudeHoldStatus.VelocityDesired = 0;
+        break;
+    }
+
+    AltitudeHoldStatusSet(&altitudeHoldStatus);
 
     return thrustDemand;
 }
@@ -134,98 +158,36 @@ void stabilizationAltitudeloopInit()
     AltitudeHoldStatusInitialize();
     PositionStateInitialize();
     VelocityStateInitialize();
+    VtolSelfTuningStatsInitialize();
 
-    PIOS_DELTATIME_Init(&timeval, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
     // Create object queue
-
-    altitudeHoldCBInfo = PIOS_CALLBACKSCHEDULER_Create(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_ALTITUDEHOLD, STACK_SIZE_BYTES);
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
-    VelocityStateConnectCallback(&VelocityStateUpdatedCb);
-
-    // Start main task
     SettingsUpdatedCb(NULL);
 }
 
 
-/**
- * Module thread, should not return.
- */
-static void altitudeHoldTask(void)
-{
-    AltitudeHoldStatusData altitudeHoldStatus;
-    AltitudeHoldStatusGet(&altitudeHoldStatus);
-
-    float velocityStateDown;
-    VelocityStateDownGet(&velocityStateDown);
-    controlDown.UpdateVelocityState(velocityStateDown);
-
-    float dT;
-    dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
-
-    switch (thrustMode) {
-    case ALTITUDEHOLD:
-    {
-        float positionStateDown;
-        PositionStateDownGet(&positionStateDown);
-        controlDown.UpdatePositionState(positionStateDown);
-        controlDown.ControlPosition();
-        altitudeHoldStatus.VelocityDesired  = controlDown.GetVelocityDesired();
-    }
-    break;
-    case ALTITUDEVARIO:
-        altitudeHoldStatus.VelocityDesired  = controlDown.GetVelocityDesired();
-        break;
-    default:
-        altitudeHoldStatus.VelocityDesired = 0;
-        break;
-    }
-
-    AltitudeHoldStatusSet(&altitudeHoldStatus);
-
-    switch (thrustMode) {
-    case DIRECT:
-        thrustDemand = thrustSetpoint;
-        break;
-    default:
-    {
-        thrustDemand = controlDown.GetDownCommand();
-    }
-    break;
-    }
-}
-
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     AltitudeHoldSettingsGet(&altitudeHoldSettings);
-    //pid_configure(&pid0, altitudeHoldSettings.AltitudePI.Kp, altitudeHoldSettings.AltitudePI.Ki, 0, altitudeHoldSettings.AltitudePI.Ilimit);
-    //pid_zero(&pid0);
-    //pid_configure(&pid1, altitudeHoldSettings.VelocityPI.Kp, altitudeHoldSettings.VelocityPI.Ki, 0, altitudeHoldSettings.VelocityPI.Ilimit);
-    //pid_zero(&pid1);
 
-    controlDown.UpdateParameters(vtolPathFollowerSettings->LandVerticalVelPID.Kp,
-                                    vtolPathFollowerSettings->LandVerticalVelPID.Ki,
-                                    vtolPathFollowerSettings->LandVerticalVelPID.Kd,
-                                    vtolPathFollowerSettings->LandVerticalVelPID.Beta,
-                                    UPDATE_EXPECTED,
-                                    vtolPathFollowerSettings->VerticalVelMax);
+    controlDown.UpdateParameters(altitudeHoldSettings.VerticalVelPID.Kp,
+                                 altitudeHoldSettings.VerticalVelPID.Ki,
+                                 altitudeHoldSettings.VerticalVelPID.Kd,
+                                 altitudeHoldSettings.VerticalVelPID.Beta,
+                                 (float)(OUTERLOOP_SKIPCOUNT * UPDATE_EXPECTED),
+                                 altitudeHoldSettings.VerticalVelMax);
 
-    // The following is not currently used in the landing control.
-    controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
+    controlDown.UpdatePositionalParameters(altitudeHoldSettings.VerticalPosP);
 
     VtolSelfTuningStatsData vtolSelfTuningStats;
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
-    controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
+    controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + altitudeHoldSettings.ThrustLimits.Neutral);
 
     // initialise limits on thrust but note the FSM can override.
-    controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
+    controlDown.SetThrustLimits(altitudeHoldSettings.ThrustLimits.Min, altitudeHoldSettings.ThrustLimits.Max);
 
     AltitudeHoldSettingsThrustExpGet(&thrustExp);
     AltitudeHoldSettingsThrustRateGet(&thrustRate);
-}
-
-static void VelocityStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
-{
-    PIOS_CALLBACKSCHEDULER_Dispatch(altitudeHoldCBInfo);
 }
 
 

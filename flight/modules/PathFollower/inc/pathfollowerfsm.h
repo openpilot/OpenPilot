@@ -43,7 +43,7 @@ typedef enum {
     PFFSM_STATE_ABORT // Abort on error
 } PathFollowerFSMState_T;
 
-class PathFollowerFSM: public PIDControlDownCallback {
+class PathFollowerFSM : public PIDControlDownCallback {
 public:
     // PathFollowerFSM() {};
     virtual void Inactive(void) {}

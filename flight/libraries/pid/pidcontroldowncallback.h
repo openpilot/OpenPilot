@@ -36,7 +36,7 @@ public:
     // PIDControlDownCalback() {};
     virtual void BoundThrust(__attribute__((unused)) float &ulow, __attribute__((unused)) float &uhigh) = 0;
     virtual float BoundVelocityDown(float velocity) = 0;
-    //virtual ~PIDControlDownCalback() = 0;
+    // virtual ~PIDControlDownCalback() = 0;
 };
 
 #endif // PIDCONTROLDOWNCALLBACK_H

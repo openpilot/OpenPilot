@@ -20,7 +20,7 @@ include(../../python.pri)
 
     # Create custom authors target which generates a real file
     authors.target   = $$AUTHORS_FILE
-    authors.commands = -$(MKDIR) $$targetPath($$AUTHORS_DIR) $$addNewline()
+    authors.commands = -$(MKDIR) $$AUTHORS_DIR $$addNewline()
     authors.commands += $$AUTHORS_COMMAND \
                             --infile=\"$$AUTHORS_SOURCE\" \
                             --template=\"$$AUTHORS_TEMPLATE\" \

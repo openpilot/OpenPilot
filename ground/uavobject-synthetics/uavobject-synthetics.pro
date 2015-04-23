@@ -5,11 +5,6 @@
 
 TEMPLATE = aux
 
-# Some handy defines
-defineReplace(targetPath) {
-   return($$replace(1, /, $$QMAKE_DIR_SEP))
-}
-
 defineReplace(addNewline) {
     return($$escape_expand(\\n\\t))
 }
@@ -38,17 +33,17 @@ win32 {
     # Windows sometimes remembers working directory changed from Makefile, sometimes not.
     # That's why pushd/popd is used here - to make sure that we know current directory.
 
-    uavobjects.commands += -$(MKDIR) $$targetPath(../uavobject-synthetics) $$addNewline()
-    uavobjects.commands += pushd $$targetPath(../uavobject-synthetics) &&
-    uavobjects.commands += $$targetPath(../uavobjgenerator/$${BUILD_CONFIG}/uavobjgenerator)
-    uavobjects.commands +=   $$targetPath(../../shared/uavobjectdefinition)
-    uavobjects.commands +=   $$targetPath(../..) &&
+    uavobjects.commands += -$(MKDIR) ../uavobject-synthetics $$addNewline()
+    uavobjects.commands += pushd ../uavobject-synthetics &&
+    uavobjects.commands += ../uavobjgenerator/$${BUILD_CONFIG}/uavobjgenerator
+    uavobjects.commands += ../../shared/uavobjectdefinition
+    uavobjects.commands += ../.. &&
     uavobjects.commands += popd $$addNewline()
 
-    uavobjects.commands += -$(MKDIR) $$targetPath(../openpilotgcs) $$addNewline()
-    uavobjects.commands += pushd $$targetPath(../openpilotgcs) &&
+    uavobjects.commands += -$(MKDIR) ../openpilotgcs $$addNewline()
+    uavobjects.commands += pushd ../openpilotgcs &&
     uavobjects.commands += $(QMAKE) -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r
-    uavobjects.commands +=   $$targetPath(../../ground/openpilotgcs/)openpilotgcs.pro &&
+    uavobjects.commands += ../../ground/openpilotgcs/openpilotgcs.pro &&
     uavobjects.commands += popd $$addNewline()
 }
 

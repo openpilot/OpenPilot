@@ -16,8 +16,6 @@ LUPDATE = $$targetPath($$[QT_INSTALL_BINS]/lupdate) -locations relative -no-ui-l
 LRELEASE = $$targetPath($$[QT_INSTALL_BINS]/lrelease)
 LCONVERT = $$targetPath($$[QT_INSTALL_BINS]/lconvert)
 
-wd = $$replace(GCS_SOURCE_TREE, /, $$QMAKE_DIR_SEP)
-
 TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/openpilotgcs_,.ts)
 
 MIME_TR_H = $$PWD/mime_tr.h

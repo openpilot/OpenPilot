@@ -34,6 +34,16 @@
 
 #include "pios_srxl_priv.h"
 
+#define PIOS_INSTRUMENT_MODULE
+#include <pios_instrumentation_helper.h>
+
+PERF_DEFINE_COUNTER(crcFailureCount);
+PERF_DEFINE_COUNTER(failsafeCount);
+PERF_DEFINE_COUNTER(successfulMessageCount);
+PERF_DEFINE_COUNTER(messageUnrollTimer);
+PERF_DEFINE_COUNTER(messageReceiveRate);
+PERF_DEFINE_COUNTER(receivedBytesCount);
+
 /* Forward Declarations */
 static int32_t PIOS_SRXL_Get(uint32_t rcvr_id, uint8_t channel);
 static uint16_t PIOS_SRXL_RxInCallback(uint32_t context,
@@ -151,6 +161,13 @@ int32_t PIOS_SRXL_Init(uint32_t *srxl_id,
         PIOS_DEBUG_Assert(0);
     }
 
+    PERF_INIT_COUNTER(crcFailureCount, 0x55500001);
+    PERF_INIT_COUNTER(failsafeCount, 0x55500002);
+    PERF_INIT_COUNTER(successfulMessageCount, 0x55500003);
+    PERF_INIT_COUNTER(messageUnrollTimer, 0x55500004);
+    PERF_INIT_COUNTER(messageReceiveRate, 0x55500005);
+    PERF_INIT_COUNTER(receivedBytesCount, 0x55500006);
+
     return 0;
 
 out_fail:
@@ -182,15 +199,16 @@ static int32_t PIOS_SRXL_Get(uint32_t rcvr_id, uint8_t channel)
 
 static void PIOS_SRXL_UnrollChannels(struct pios_srxl_state *state)
 {
+	PERF_TIMED_SECTION_START(messageUnrollTimer);
     uint8_t *received_data  = state->received_data;
-    uint16_t *channel_data = state->channel_data;
     uint8_t channel;
     uint16_t channel_value;
     for (channel = 0; channel < (state->data_bytes / 2); channel++) {
         channel_value = ((uint16_t)received_data[SRXL_HEADER_LENGTH + (channel * 2)]) << 8;
         channel_value = channel_value + ((uint16_t)received_data[SRXL_HEADER_LENGTH + (channel * 2) + 1]);
-        d[channel] = (800 + ((channel_value * 1400) >> 12));
+        state->channel_data[channel] = (800 + ((channel_value * 1400) >> 12));
     }
+	PERF_TIMED_SECTION_END(messageUnrollTimer);
 }
 
 static bool PIOS_SRXL_Validate_Checksum(struct pios_srxl_state *state)
@@ -245,11 +263,14 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
             /* data looking good */
             PIOS_SRXL_UnrollChannels(state);
             state->failsafe_timer = 0;
+        	PERF_INCREMENT_VALUE(successfulMessageCount);
         } else {
             /* discard whole frame */
+        	PERF_INCREMENT_VALUE(crcFailureCount);
         }
         /* prepare for the next frame */
         state->frame_found = 0;
+        PERF_MEASURE_PERIOD(messageReceiveRate);
     }
 }
 
@@ -272,6 +293,7 @@ static uint16_t PIOS_SRXL_RxInCallback(uint32_t context,
     for (uint8_t i = 0; i < buf_len; i++) {
         PIOS_SRXL_UpdateState(state, buf[i]);
         state->receive_timer = 0;
+        PERF_INCREMENT_VALUE(receivedBytesCount);
     }
 
     /* Always signal that we can accept another byte */
@@ -321,6 +343,7 @@ static void PIOS_SRXL_Supervisor(uint32_t srxl_id)
     if (++state->failsafe_timer > 64) {
         PIOS_SRXL_ResetChannels(state);
         state->failsafe_timer = 0;
+    	PERF_INCREMENT_VALUE(failsafeCount);
     }
 }
 

@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>936</width>
-            <height>768</height>
+            <width>950</width>
+            <height>775</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -8244,8 +8244,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>936</width>
-            <height>685</height>
+            <width>950</width>
+            <height>736</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -18236,8 +18236,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>952</width>
-            <height>669</height>
+            <width>950</width>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -24082,8 +24082,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>952</width>
-            <height>669</height>
+            <width>950</width>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -25408,7 +25408,7 @@ border-radius: 5;</string>
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Small abouts of Kd can reduce oscillations in the velocity controller.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>100</number>
+                    <number>300</number>
                    </property>
                    <property name="value">
                     <number>50</number>
@@ -25424,7 +25424,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Kd</string>
-                     <string>scale:100</string>
+                     <string>scale:0.000001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25461,7 +25461,7 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>100</number>
+                    <number>300</number>
                    </property>
                    <property name="value">
                     <number>51</number>
@@ -25471,7 +25471,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Kd</string>
-                     <string>scale:0.001</string>
+                     <string>scale:0.000001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>
@@ -25514,6 +25514,9 @@ border-radius: 5;</string>
                    <property name="toolTip">
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The beta value applies a setpoint weighting that reduces the sensitivity to quick changes in the desired velocity.  Transitions from altitude hold to descent/climb can be made smooth applying a Beta value of around 80 to 90%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
+                   <property name="minimum">
+                    <number>70</number>
+                   </property>
                    <property name="maximum">
                     <number>100</number>
                    </property>
@@ -25534,7 +25537,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Beta</string>
-                     <string>scale:0.001</string>
+                     <string>scale:1</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25570,6 +25573,9 @@ border-radius: 5;</string>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
+                   <property name="minimum">
+                    <number>70</number>
+                   </property>
                    <property name="maximum">
                     <number>100</number>
                    </property>
@@ -25581,7 +25587,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Beta</string>
-                     <string>scale:100</string>
+                     <string>scale:1</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>

@@ -25408,7 +25408,7 @@ border-radius: 5;</string>
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Small abouts of Kd can reduce oscillations in the velocity controller.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>300</number>
+                    <number>700</number>
                    </property>
                    <property name="value">
                     <number>50</number>
@@ -25424,7 +25424,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Kd</string>
-                     <string>scale:0.000001</string>
+                     <string>scale:0.0001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25461,7 +25461,7 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>300</number>
+                    <number>700</number>
                    </property>
                    <property name="value">
                     <number>51</number>
@@ -25471,7 +25471,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Kd</string>
-                     <string>scale:0.000001</string>
+                     <string>scale:0.0001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>
@@ -25537,7 +25537,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Beta</string>
-                     <string>scale:1</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25587,7 +25587,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Beta</string>
-                     <string>scale:1</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>

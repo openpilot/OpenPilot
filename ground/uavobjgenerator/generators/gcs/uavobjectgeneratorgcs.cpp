@@ -36,7 +36,7 @@ bool UAVObjectGeneratorGCS::generate(UAVObjectParser *parser, QString templatepa
                          << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";
 
     gcsCodePath        = QDir(templatepath + QString(GCS_CODE_DIR));
-    gcsOutputPath      = QDir(outputpath + QString("gcs"));
+    gcsOutputPath      = QDir(outputpath);
     gcsOutputPath.mkpath(gcsOutputPath.absolutePath());
 
     gcsCodeTemplate    = readFile(gcsCodePath.absoluteFilePath("uavobject.cpp.template"));

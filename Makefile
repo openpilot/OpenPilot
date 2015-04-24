@@ -173,15 +173,14 @@ uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
 UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
 
-DIRS += $(UAVOBJ_OUT_DIR)
-
-uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
+uavobjects_%: uavobjgenerator
+	@$(MKDIR) -p $(UAVOBJ_OUT_DIR)/$*
+	$(V1) ( cd $(UAVOBJ_OUT_DIR)/$* && \
 	    $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
-uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
+uavobjects_test: uavobjgenerator
+	$(V1) $(UAVOBJGENERATOR) -v $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(UAVOBJ_OUT_DIR))"

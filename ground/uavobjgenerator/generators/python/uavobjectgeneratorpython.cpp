@@ -31,7 +31,7 @@ bool UAVObjectGeneratorPython::generate(UAVObjectParser *parser, QString templat
 {
     // Load template and setup output directory
     pythonCodePath     = QDir(templatepath + QString("flight/modules/FlightPlan/lib"));
-    pythonOutputPath   = QDir(outputpath + QString("python"));
+    pythonOutputPath   = QDir(outputpath);
     pythonOutputPath.mkpath(pythonOutputPath.absolutePath());
     pythonCodeTemplate = readFile(pythonCodePath.absoluteFilePath("uavobject.pyt.template"));
     if (pythonCodeTemplate.isEmpty()) {

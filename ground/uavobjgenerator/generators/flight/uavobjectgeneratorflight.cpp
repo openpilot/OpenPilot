@@ -36,7 +36,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     QString flightObjInit, objInc, objFileNames, objNames;
     qint32 sizeCalc;
     flightCodePath            = QDir(templatepath + QString(FLIGHT_CODE_DIR));
-    flightOutputPath          = QDir(outputpath + QString("flight"));
+    flightOutputPath          = QDir(outputpath);
     flightOutputPath.mkpath(flightOutputPath.absolutePath());
 
     flightCodeTemplate        = readFile(flightCodePath.absoluteFilePath("uavobject.c.template"));

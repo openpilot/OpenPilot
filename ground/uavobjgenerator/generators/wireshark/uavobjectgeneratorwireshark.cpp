@@ -37,7 +37,7 @@ bool UAVObjectGeneratorWireshark::generate(UAVObjectParser *parser, QString temp
 
     wiresharkCodePath     = QDir(templatepath + QString("ground/openpilotgcs/src/plugins/uavobjects/wireshark"));
 
-    wiresharkOutputPath   = QDir(outputpath + QString("wireshark"));
+    wiresharkOutputPath   = QDir(outputpath);
     wiresharkOutputPath.mkpath(wiresharkOutputPath.absolutePath());
 
     wiresharkCodeTemplate = readFile(wiresharkCodePath.absoluteFilePath("op-uavobjects/packet-op-uavobjects.c.template"));

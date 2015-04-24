@@ -30,7 +30,7 @@
 
 #include "pios.h"
 
-#ifdef PIOS_INCLUDE_SRXL
+//#ifdef PIOS_INCLUDE_SRXL
 
 #include "pios_srxl_priv.h"
 
@@ -39,7 +39,7 @@
 
 PERF_DEFINE_COUNTER(crcFailureCount);
 PERF_DEFINE_COUNTER(failsafeCount);
-PERF_DEFINE_COUNTER(successfulMessageCount);
+PERF_DEFINE_COUNTER(successfulCount);
 PERF_DEFINE_COUNTER(messageUnrollTimer);
 PERF_DEFINE_COUNTER(messageReceiveRate);
 PERF_DEFINE_COUNTER(receivedBytesCount);
@@ -163,7 +163,7 @@ int32_t PIOS_SRXL_Init(uint32_t *srxl_id,
 
     PERF_INIT_COUNTER(crcFailureCount, 0x55500001);
     PERF_INIT_COUNTER(failsafeCount, 0x55500002);
-    PERF_INIT_COUNTER(successfulMessageCount, 0x55500003);
+    PERF_INIT_COUNTER(successfulCount, 0x55500003);
     PERF_INIT_COUNTER(messageUnrollTimer, 0x55500004);
     PERF_INIT_COUNTER(messageReceiveRate, 0x55500005);
     PERF_INIT_COUNTER(receivedBytesCount, 0x55500006);
@@ -263,7 +263,7 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
             /* data looking good */
             PIOS_SRXL_UnrollChannels(state);
             state->failsafe_timer = 0;
-        	PERF_INCREMENT_VALUE(successfulMessageCount);
+        	PERF_INCREMENT_VALUE(successfulCount);
         } else {
             /* discard whole frame */
         	PERF_INCREMENT_VALUE(crcFailureCount);

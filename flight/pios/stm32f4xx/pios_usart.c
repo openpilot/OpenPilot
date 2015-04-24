@@ -40,17 +40,21 @@
 
 /* Provide a COM driver */
 static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud);
+static void PIOS_USART_SetCtrlLine(uint32_t usart_id, uint32_t mask, uint32_t state);
 static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback tx_out_cb, uint32_t context);
+static void PIOS_USART_RegisterCtrlLineCallback(uint32_t usart_id, pios_com_callback_ctrl_line ctrl_line_cb, uint32_t context);
 static void PIOS_USART_TxStart(uint32_t usart_id, uint16_t tx_bytes_avail);
 static void PIOS_USART_RxStart(uint32_t usart_id, uint16_t rx_bytes_avail);
 
 const struct pios_com_driver pios_usart_com_driver = {
-    .set_baud   = PIOS_USART_ChangeBaud,
-    .tx_start   = PIOS_USART_TxStart,
-    .rx_start   = PIOS_USART_RxStart,
-    .bind_tx_cb = PIOS_USART_RegisterTxCallback,
-    .bind_rx_cb = PIOS_USART_RegisterRxCallback,
+    .set_baud          = PIOS_USART_ChangeBaud,
+    .set_ctrl_line     = PIOS_USART_SetCtrlLine,
+    .tx_start          = PIOS_USART_TxStart,
+    .rx_start          = PIOS_USART_RxStart,
+    .bind_tx_cb        = PIOS_USART_RegisterTxCallback,
+    .bind_rx_cb        = PIOS_USART_RegisterRxCallback,
+    .bind_ctrl_line_cb = PIOS_USART_RegisterCtrlLineCallback,
 };
 
 enum pios_usart_dev_magic {
@@ -65,6 +69,8 @@ struct pios_usart_dev {
     uint32_t rx_in_context;
     pios_com_callback tx_out_cb;
     uint32_t tx_out_context;
+    pios_com_callback_ctrl_line ctrl_line_cb;
+    uint32_t ctrl_line_context;
 };
 
 static bool PIOS_USART_validate(struct pios_usart_dev *usart_dev)
@@ -194,6 +200,11 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
 
     *usart_id = (uint32_t)usart_dev;
 
+    /* Set initial control line state */
+    PIOS_USART_SetCtrlLine((uint32_t)usart_dev,
+                           COM_CTRL_LINE_DTR_MASK | COM_CTRL_LINE_RTS_MASK,
+                           COM_CTRL_LINE_DTR_MASK | COM_CTRL_LINE_RTS_MASK);
+
     /* Configure USART Interrupts */
     switch ((uint32_t)usart_dev->cfg->regs) {
     case (uint32_t)USART1:
@@ -276,6 +287,19 @@ static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud)
     USART_Init(usart_dev->cfg->regs, &USART_InitStructure);
 }
 
+static void PIOS_USART_SetCtrlLine(uint32_t usart_id, uint32_t mask, uint32_t state)
+{
+    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
+
+    bool valid = PIOS_USART_validate(usart_dev);
+
+    PIOS_Assert(valid);
+
+    if (usart_dev->ctrl_line_cb) {
+        (usart_dev->ctrl_line_cb)(usart_dev->ctrl_line_context, mask, state);
+    }
+}
+
 static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context)
 {
     struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
@@ -306,6 +330,22 @@ static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback t
      */
     usart_dev->tx_out_context = context;
     usart_dev->tx_out_cb = tx_out_cb;
+}
+
+static void PIOS_USART_RegisterCtrlLineCallback(uint32_t usart_id, pios_com_callback_ctrl_line ctrl_line_cb, uint32_t context)
+{
+    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
+
+    bool valid = PIOS_USART_validate(usart_dev);
+
+    PIOS_Assert(valid);
+
+    /*
+     * Order is important in these assignments since ISR uses _cb
+     * field to determine if it's ok to dereference _cb and _context
+     */
+    usart_dev->ctrl_line_context = context;
+    usart_dev->ctrl_line_cb = ctrl_line_cb;
 }
 
 static void PIOS_USART_generic_irq_handler(uint32_t usart_id)

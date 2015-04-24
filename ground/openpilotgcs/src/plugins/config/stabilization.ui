@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>974</width>
-    <height>857</height>
+    <height>755</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -8245,7 +8245,7 @@ border-radius: 5;</string>
             <x>0</x>
             <y>0</y>
             <width>950</width>
-            <height>773</height>
+            <height>736</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -18237,7 +18237,7 @@ border-radius: 5;</string>
             <x>0</x>
             <y>0</y>
             <width>950</width>
-            <height>773</height>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -24083,7 +24083,7 @@ font:bold;</string>
             <x>0</x>
             <y>0</y>
             <width>950</width>
-            <height>773</height>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -25295,13 +25295,13 @@ border-radius: 5;</string>
                  <item row="3" column="1">
                   <widget class="QSlider" name="VelKiSlider">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should attain its target velocity.  For neutral throttle estimation,  the altitude module assumes that when engaged the throttle thrust limit neutral setting is in the range required to hover. If the throttle required is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot;. Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>10</number>
+                    <number>100</number>
                    </property>
                    <property name="value">
-                    <number>10</number>
+                    <number>50</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -25314,7 +25314,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Ki</string>
-                     <string>scale:0.00001</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25351,17 +25351,17 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>10</number>
+                    <number>100</number>
                    </property>
                    <property name="value">
-                    <number>10</number>
+                    <number>51</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Ki</string>
-                     <string>scale:0.00001</string>
+                     <string>scale:0.001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>
@@ -25402,10 +25402,10 @@ border-radius: 5;</string>
                  <item row="4" column="1">
                   <widget class="QSlider" name="VelKdSlider">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Small abouts of Kd can reduce oscillations in the velocity controller.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>1000</number>
+                    <number>100</number>
                    </property>
                    <property name="value">
                     <number>50</number>
@@ -25421,7 +25421,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Kd</string>
-                     <string>scale:0.00001</string>
+                     <string>scale:100</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25458,17 +25458,17 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>1</number>
+                    <number>100</number>
                    </property>
                    <property name="value">
-                    <number>1</number>
+                    <number>51</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Kd</string>
-                     <string>scale:0.00001</string>
+                     <string>scale:0.001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>
@@ -25509,13 +25509,16 @@ border-radius: 5;</string>
                  <item row="5" column="1">
                   <widget class="QSlider" name="VelBetaSlider">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The beta value applies a setpoint weighting that reduces the sensitivity to quick changes in the desired velocity.  Transitions from altitude hold to descent/climb can be made smooth applying a Beta value of around 80 to 90%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>1</number>
+                    <number>100</number>
                    </property>
                    <property name="value">
-                    <number>1</number>
+                    <number>90</number>
+                   </property>
+                   <property name="sliderPosition">
+                    <number>90</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -25528,7 +25531,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Beta</string>
-                     <string>scale:0.00001</string>
+                     <string>scale:0.001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25565,17 +25568,17 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>1</number>
+                    <number>100</number>
                    </property>
                    <property name="value">
-                    <number>1</number>
+                    <number>90</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Beta</string>
-                     <string>scale:0.00001</string>
+                     <string>scale:100</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>
@@ -25632,7 +25635,7 @@ border-radius: 5;</string>
                  <item row="1" column="1">
                   <widget class="QSlider" name="AltKpSlider">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. Higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference.  Higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
                     <number>100</number>

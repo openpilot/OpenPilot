@@ -94,6 +94,9 @@ else ifeq ($(UNAME), Windows)
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
     MESAWIN_URL    := http://wiki.openpilot.org/download/attachments/18612236/mesawin.tar.gz
+    CMAKE_URL      := http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip
+    CMAKE_MD5_URL  := http://wiki.openpilot.org/download/attachments/18612236/cmake-2.8.12.2-win32-x86.zip.md5
+    MSYS_URL       := https://wiki.openpilot.org/download/attachments/5472258/MSYS-1.0.11.zip
 endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
@@ -115,6 +118,8 @@ else ifeq ($(UNAME), Windows)
     SDL_DIR      := $(TOOLS_DIR)/SDL-1.2.15
     OPENSSL_DIR  := $(TOOLS_DIR)/openssl-1.0.1e-win32
     MESAWIN_DIR  := $(TOOLS_DIR)/mesawin
+    CMAKE_DIR    := $(TOOLS_DIR)/cmake-2.8.12.2-win32-x86
+    MSYS_DIR     := $(TOOLS_DIR)/msys
 endif
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
@@ -162,6 +167,7 @@ GIT			:= git
 CURL		:= curl
 TAR			:= tar
 UNZIP		:= unzip
+ZIP			:= gzip
 OPENSSL		:= openssl
 ANT			:= ant
 JAVAC		:= javac
@@ -261,6 +267,27 @@ endif
 define MD5_CHECK_TEMPLATE
 "`test -f \"$(1)\" && $(OPENSSL) dgst -md5 \"$(1)\" | $(CUT) -f2 -d' '`" $(2) "`$(CUT) -f1 -d' ' < \"$(1).md5\"`"
 endef
+
+##############################
+#
+# Cross-platform MD5 generation template
+#  $(1) = file name without quotes
+#
+##############################
+
+ifeq ($(UNAME), Darwin)
+
+define MD5_GEN_TEMPLATE
+md5 -r $(1) > $(1).md5
+endef
+
+else
+
+define MD5_GEN_TEMPLATE
+$(OPENSSL) dgst -r -md5 $(1) > $(1).md5
+endef
+
+endif
 
 ##############################
 #
@@ -896,6 +923,49 @@ export GTEST_DIR
 .PHONY: gtest_version
 gtest_version:
 	-$(V1) $(SED) -n "s/^PACKAGE_STRING='\(.*\)'/\1/p" < $(GTEST_DIR)/configure
+
+##############################
+#
+# CMake
+#
+##############################
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,cmake,$(CMAKE_DIR),$(CMAKE_URL),$(CMAKE_MD5_URL),$(notdir $(CMAKE_URL))))
+
+ifeq ($(shell [ -d "$(CMAKE_DIR)" ] && $(ECHO) "exists"), exists)
+    export CMAKE := $(CMAKE_DIR)/bin/cmake
+    export PATH := $(CMAKE_DIR)/bin:$(PATH)
+else
+    # not installed, hope it's in the path...
+    #$(info $(EMPTY) WARNING     $(call toprel, $(CMAKE_DIR)) not found (make cmake_install), using system PATH)
+    export CMAKE := cmake
+endif
+
+.PHONY: cmake_version
+cmake_version:
+	-$(V1) $(CMAKE) --version
+
+##############################
+#
+# MSYS
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,msys,$(MSYS_DIR),$(MSYS_URL),,$(notdir $(MSYS_URL))))
+
+ifeq ($(shell [ -d "$(MSYS_DIR)" ] && $(ECHO) "exists"), exists)
+    export MSYS_DIR
+else
+    # not installed, hope it's in the path...
+    #$(info $(EMPTY) WARNING     $(call toprel, $(MSYS_DIR)) not found (make msys_install), using system PATH)
+endif
+
+.PHONY: msys_version
+msys_version:
+
+endif
 
 
 

@@ -30,11 +30,11 @@
 
 #include "pios.h"
 
-//#ifdef PIOS_INCLUDE_SRXL
+#ifdef PIOS_INCLUDE_SRXL
 
 #include "pios_srxl_priv.h"
 
-#define PIOS_INSTRUMENT_MODULE
+//#define PIOS_INSTRUMENT_MODULE
 #include <pios_instrumentation_helper.h>
 
 PERF_DEFINE_COUNTER(crcFailureCount);
@@ -43,6 +43,9 @@ PERF_DEFINE_COUNTER(successfulCount);
 PERF_DEFINE_COUNTER(messageUnrollTimer);
 PERF_DEFINE_COUNTER(messageReceiveRate);
 PERF_DEFINE_COUNTER(receivedBytesCount);
+PERF_DEFINE_COUNTER(frameStartCount);
+PERF_DEFINE_COUNTER(frameAbortCount);
+PERF_DEFINE_COUNTER(completeMessageCount);
 
 /* Forward Declarations */
 static int32_t PIOS_SRXL_Get(uint32_t rcvr_id, uint8_t channel);
@@ -127,11 +130,10 @@ static void PIOS_SRXL_ResetChannels(struct pios_srxl_state *state)
 /* Reset SRXL receiver state */
 static void PIOS_SRXL_ResetState(struct pios_srxl_state *state)
 {
-    state->byte_count         = 0;
     state->receive_timer      = 0;
     state->failsafe_timer     = 0;
     state->frame_found        = 0;
-    state->data_bytes         = 0;
+    state->data_bytes		  = 0;
     PIOS_SRXL_ResetChannels(state);
 }
 
@@ -161,12 +163,15 @@ int32_t PIOS_SRXL_Init(uint32_t *srxl_id,
         PIOS_DEBUG_Assert(0);
     }
 
-    PERF_INIT_COUNTER(crcFailureCount, 0x55500001);
-    PERF_INIT_COUNTER(failsafeCount, 0x55500002);
-    PERF_INIT_COUNTER(successfulCount, 0x55500003);
-    PERF_INIT_COUNTER(messageUnrollTimer, 0x55500004);
-    PERF_INIT_COUNTER(messageReceiveRate, 0x55500005);
-    PERF_INIT_COUNTER(receivedBytesCount, 0x55500006);
+    PERF_INIT_COUNTER(crcFailureCount, 0x5551);
+    PERF_INIT_COUNTER(failsafeCount, 0x5552);
+    PERF_INIT_COUNTER(successfulCount, 0x5553);
+    PERF_INIT_COUNTER(messageUnrollTimer, 0x5554);
+    PERF_INIT_COUNTER(messageReceiveRate, 0x5555);
+    PERF_INIT_COUNTER(receivedBytesCount, 0x5556);
+    PERF_INIT_COUNTER(frameStartCount, 0x5557);
+    PERF_INIT_COUNTER(frameAbortCount, 0x5558);
+    PERF_INIT_COUNTER(completeMessageCount, 0x5559);
 
     return 0;
 
@@ -244,6 +249,7 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
     if (state->byte_count < (SRXL_HEADER_LENGTH + state->data_bytes + SRXL_CHECKSUM_LENGTH)) {
         if (state->byte_count == 0) {
         	// Set up the length of the channel data according to version received
+        	PERF_INCREMENT_VALUE(frameStartCount);
             if (b == SRXL_V1_HEADER) {
                 state->data_bytes = SRXL_V1_CHANNEL_DATA_BYTES;
             } else if (b == SRXL_V2_HEADER) {
@@ -251,26 +257,30 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
             } else {
                 /* discard the whole frame if the 1st byte is not correct */
                 state->frame_found = 0;
+            	PERF_INCREMENT_VALUE(frameAbortCount);
                 return;
             }
         }
         /* store next byte */
         state->received_data[state->byte_count] = b;
         state->byte_count++;
-    } else {
-        // We have a complete message, lets decode it
-        if (PIOS_SRXL_Validate_Checksum(state)) {
-            /* data looking good */
-            PIOS_SRXL_UnrollChannels(state);
-            state->failsafe_timer = 0;
-        	PERF_INCREMENT_VALUE(successfulCount);
-        } else {
-            /* discard whole frame */
-        	PERF_INCREMENT_VALUE(crcFailureCount);
-        }
-        /* prepare for the next frame */
-        state->frame_found = 0;
-        PERF_MEASURE_PERIOD(messageReceiveRate);
+        if (state->byte_count == (SRXL_HEADER_LENGTH + state->data_bytes + SRXL_CHECKSUM_LENGTH))
+        {
+			PERF_INCREMENT_VALUE(completeMessageCount);
+			// We have a complete message, lets decode it
+			if (PIOS_SRXL_Validate_Checksum(state)) {
+				/* data looking good */
+				PIOS_SRXL_UnrollChannels(state);
+				state->failsafe_timer = 0;
+				PERF_INCREMENT_VALUE(successfulCount);
+			} else {
+				/* discard whole frame */
+				PERF_INCREMENT_VALUE(crcFailureCount);
+			}
+			/* prepare for the next frame */
+			state->frame_found = 0;
+			PERF_MEASURE_PERIOD(messageReceiveRate);
+		}
     }
 }
 
@@ -333,7 +343,7 @@ static void PIOS_SRXL_Supervisor(uint32_t srxl_id)
 
     /* waiting for new frame if no bytes were received in 6.4ms */
 
-    if (++state->receive_timer > 2) {
+    if (++state->receive_timer > 4) {
         state->frame_found   = 1;
         state->byte_count    = 0;
         state->receive_timer = 0;

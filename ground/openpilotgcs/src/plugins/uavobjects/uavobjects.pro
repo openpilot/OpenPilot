@@ -28,6 +28,7 @@ OTHER_FILES += UAVObjects.pluginspec
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
     $$UAVOBJECT_SYNTHETICS/statusgrounddrive.h \
+    $$UAVOBJECT_SYNTHETICS/statusvtolautotakeoff.h \
     $$UAVOBJECT_SYNTHETICS/pidstatus.h \
     $$UAVOBJECT_SYNTHETICS/statusvtolland.h \
     $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.h \
@@ -138,6 +139,7 @@ HEADERS += \
 
 SOURCES += \
     $$UAVOBJECT_SYNTHETICS/statusgrounddrive.cpp \
+    $$UAVOBJECT_SYNTHETICS/statusvtolautotakeoff.cpp \
     $$UAVOBJECT_SYNTHETICS/pidstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/statusvtolland.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.cpp \

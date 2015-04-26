@@ -78,31 +78,31 @@
                units=""
                type="enum"
                elements="6"
-               options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,PositionHold,CourseLock,PositionRoam,HomeLeash,AbsolutePosition,ReturnToBase,Land,PathPlanner,POI,AutoCruise"
+               options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,PositionHold,CourseLock,PositionRoam,HomeLeash,AbsolutePosition,ReturnToBase,Land,PathPlanner,POI,AutoCruise,AutoTakeoff"
                defaultvalue="Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6"
                limits="\
-                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
+                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
                        %0903NE:POI:PathPlanner:AutoCruise;\
                        \
-                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
+                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
                        %0903NE:POI:PathPlanner:AutoCruise;\
                        \
-                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
+                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
                        %0903NE:POI:PathPlanner:AutoCruise;\
                        \
-                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
+                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
                        %0903NE:POI:PathPlanner:AutoCruise;\
                        \
-                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
+                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
                        %0903NE:POI:PathPlanner:AutoCruise;\
                        \
-                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
+                       %0402NE:PositionHold:CourseLock:PositionRoam:HomeLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,AutoTakeoff\
                        %0903NE:POI:PathPlanner:AutoCruise;"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
@@ -112,6 +112,8 @@
         <field name="ReturnToBaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="10"/>
         <field name="ReturnToBaseNextCommand" units="" type="enum" elements="1" options="Hold,Land" defaultvalue="Hold"/>
         <field name="LandingVelocity" units="m" type="float" elements="1" defaultvalue="0.6"/>
+        <field name="AutoTakeOffVelocity" units="m" type="float" elements="1" defaultvalue="0.6"/>
+        <field name="AutoTakeOffHeight" units="m" type="float" elements="1" defaultvalue="2.5" description="height in meters above arming altitude to climb to during autotakeoff"/>
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="30,15" description="stick sensitivity for position roam modes"/>
 	<field name="VarioControlLowPassAlpha" units="" type="float" elements="1" defaultvalue="0.98" description="stick low pass filter for position roam modes"/>
         <access gcs="readwrite" flight="readwrite"/>

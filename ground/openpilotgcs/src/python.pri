@@ -1,7 +1,7 @@
 # We use python to extract git version info and generate some other files,
 # but it may be installed locally. The expected python version should be
 # kept in sync with make/tools.mk.
-PYTHON_DIR = qt-5.4.0/Tools/mingw491_32/opt/bin
+PYTHON_DIR = qt-5.4.1/Tools/mingw491_32/opt/bin
 
 # Search the python using environment override first
 OPENPILOT_TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)

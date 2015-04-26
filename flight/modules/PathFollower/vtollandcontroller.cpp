@@ -175,7 +175,8 @@ void VtolLandController::UpdateVelocityDesired()
     controlNE.UpdateVelocityState(velocityState.North, velocityState.East);
 
     // Implement optional horizontal position hold.
-    if (((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) {
+    if ((((uint8_t)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS]) == PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH) ||
+        (flightStatus->ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_TRUE)) {
         // landing flight mode has stored original horizontal position in pathdesired
         PositionStateData positionState;
         PositionStateGet(&positionState);
@@ -191,7 +192,10 @@ void VtolLandController::UpdateVelocityDesired()
 
     // update pathstatus
     pathStatus->error     = 0.0f;
-    pathStatus->fractional_progress  = 0.0f;
+    pathStatus->fractional_progress = 0.0f;
+    if (fsm->GetCurrentState() == PFFSM_STATE_DISARMED) {
+        pathStatus->fractional_progress = 1.0f;
+    }
     pathStatus->path_direction_north = velocityDesired.North;
     pathStatus->path_direction_east  = velocityDesired.East;
     pathStatus->path_direction_down  = velocityDesired.Down;
@@ -267,17 +271,5 @@ void VtolLandController::UpdateAutoPilot()
         fsm->Abort();
     }
 
-    if (fsm->GetCurrentState() == PFFSM_STATE_DISARMED) {
-        setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
-    }
-
     PathStatusSet(pathStatus);
-}
-
-void VtolLandController::setArmedIfChanged(FlightStatusArmedOptions val)
-{
-    if (flightStatus->Armed != val) {
-        flightStatus->Armed = val;
-        FlightStatusSet(flightStatus);
-    }
 }

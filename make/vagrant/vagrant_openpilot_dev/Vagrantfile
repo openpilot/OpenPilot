@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+  #config.vm.box = "jhartman/xubuntu14.04.1"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = true
+    vb.customize ["modifyvm", :id, "--memory", "4096"]
+  end
+
+  #config.vm.synced_folder "../../projects", "/home/vagrant/projects"
+
+  config.vm.provision :shell, :path => "bootstrap.sh"
+
+  config.ssh.forward_x11=true
+
+  # update definitions
+  config.vm.provision "shell", inline: "apt-get update"	
+
+  # just the basic desktop environment. if you want the addons, you can install them later
+  config.vm.provision "shell", inline: "apt-get install xubuntu-desktop --no-install-recommends --assume-yes"
+
+  # otherwise icons don't get loaded
+  config.vm.provision "shell", inline: "apt-get install xubuntu-icon-theme --assume-yes"
+  
+  #activate logon with gui and reboot
+  config.vm.provision "shell", inline: "dpkg-reconfigure lightdm"
+  config.vm.provision "shell", inline: "reboot"
+
+end

@@ -40,8 +40,6 @@ extern "C" {
 
 #include <homelocation.h>
 #include <accelstate.h>
-#include <fixedwingpathfollowersettings.h>
-#include <fixedwingpathfollowerstatus.h>
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
@@ -84,7 +82,7 @@ extern "C" {
 #define LANDING_PID_SCALAR_I              10.0f
 #define LANDING_SLOWDOWN_HEIGHT           -5.0f
 #define BOUNCE_VELOCITY_TRIGGER_LIMIT     -0.3f
-#define BOUNCE_ACCELERATION_TRIGGER_LIMIT -6.0f
+#define BOUNCE_ACCELERATION_TRIGGER_LIMIT -9.0f // -6.0 found to be too sensitive
 #define BOUNCE_TRIGGER_COUNT              4
 #define GROUNDEFFECT_SLOWDOWN_FACTOR      0.3f
 #define GROUNDEFFECT_SLOWDOWN_COUNT       4
@@ -531,7 +529,7 @@ void VtolLandFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTim
         mLandData->fsmLandStatus.WtgForGroundEffect.BounceAccel = 0.0f;
     }
 
-    if (flBounce || flBounceAccel) {
+    if (flBounce) { // || flBounceAccel) { // accel trigger can occur due to vibration and is too sensitive
         mLandData->observation2Count++;
         if (mLandData->observation2Count > BOUNCE_TRIGGER_COUNT) {
             setState(STATUSVTOLLAND_STATE_GROUNDEFFECT, (flBounce ? STATUSVTOLLAND_STATEEXITREASON_BOUNCEVELOCITY : STATUSVTOLLAND_STATEEXITREASON_BOUNCEACCEL));
@@ -563,7 +561,7 @@ void VtolLandFSM::run_wtg_for_groundeffect(__attribute__((unused)) uint8_t flTim
 void VtolLandFSM::setup_groundeffect(void)
 {
     setStateTimeout(TIMEOUT_GROUNDEFFECT);
-    mLandData->flZeroStabiHorizontal     = true;
+    mLandData->flZeroStabiHorizontal     = false;
     PositionStateData positionState;
     PositionStateGet(&positionState);
     mLandData->expectedLandPositionNorth = positionState.North;
@@ -596,7 +594,7 @@ void VtolLandFSM::run_groundeffect(__attribute__((unused)) uint8_t flTimeout)
     float north_error   = mLandData->expectedLandPositionNorth - positionState.North;
     float east_error    = mLandData->expectedLandPositionEast - positionState.East;
     float positionError = sqrtf(north_error * north_error + east_error * east_error);
-    if (positionError > 0.3f) {
+    if (positionError > 1.5f) {
         setState(STATUSVTOLLAND_STATE_THRUSTDOWN, STATUSVTOLLAND_STATEEXITREASON_POSITIONERROR);
         return;
     }

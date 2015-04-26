@@ -47,7 +47,7 @@ typedef struct {
 /////////////////////////////////////////////////////////////////////////////
 
 
-inline int32_t STOPWATCH_Init(uint32_t resolution, stopwatch_t *stopwatch)
+static inline int32_t STOPWATCH_Init(uint32_t resolution, stopwatch_t *stopwatch)
 {
     stopwatch->raw = PIOS_DELAY_GetRaw();
     stopwatch->resolution = resolution;
@@ -58,7 +58,7 @@ inline int32_t STOPWATCH_Init(uint32_t resolution, stopwatch_t *stopwatch)
 // ! Resets the stopwatch
 // ! \return < 0 on errors
 /////////////////////////////////////////////////////////////////////////////
-inline int32_t STOPWATCH_Reset(stopwatch_t *stopwatch)
+static inline int32_t STOPWATCH_Reset(stopwatch_t *stopwatch)
 {
     stopwatch->raw = PIOS_DELAY_GetRaw();
     return 0; // no error
@@ -68,7 +68,7 @@ inline int32_t STOPWATCH_Reset(stopwatch_t *stopwatch)
 // ! Returns current value of stopwatch
 // ! \return stopwatch value
 /////////////////////////////////////////////////////////////////////////////
-inline uint32_t STOPWATCH_ValueGet(stopwatch_t *stopwatch)
+static inline uint32_t STOPWATCH_ValueGet(stopwatch_t *stopwatch)
 {
     uint32_t value = PIOS_DELAY_GetuSSince(stopwatch->raw);
 

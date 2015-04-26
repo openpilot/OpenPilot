@@ -35,6 +35,9 @@
 #include <flightstatus.h>
 #include <flightmodesettings.h>
 #include <stabilizationdesired.h>
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+#include <statusvtolland.h>
+#endif
 
 // Private constants
 #define ARMED_THRESHOLD     0.50f
@@ -315,6 +318,9 @@ static bool okToArm(void)
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
         return false;
 
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
+        return true;
+
     default:
         return false;
 
@@ -338,6 +344,19 @@ static bool forcedDisArm(void)
     if (alarms.Receiver == SYSTEMALARMS_ALARM_CRITICAL) {
         return true;
     }
+
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    // check landing state if active
+    FlightStatusData flightStatus;
+    FlightStatusGet(&flightStatus);
+    if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
+        StatusVtolLandData statusland;
+        StatusVtolLandGet(&statusland);
+        if (statusland.State == STATUSVTOLLAND_STATE_DISARMED) {
+            return true;
+        }
+    }
+#endif
     return false;
 }
 

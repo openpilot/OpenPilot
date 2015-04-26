@@ -52,7 +52,7 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+62"/>
+        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+64"/>
         <source>General</source>
         <translation>Général</translation>
     </message>
@@ -68,7 +68,7 @@
         <translation>&lt;Langue Système&gt;</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+120"/>
         <source>Variables</source>
         <translation>Variables</translation>
     </message>
@@ -103,21 +103,34 @@
         <translation>Sélectionner automatiquement un périphérique USB OpenPilot :</translation>
     </message>
     <message>
-        <location/>
         <source>Use UDP Mirror</source>
         <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
-        <translation>Utiliser Miroir UDP</translation>
+        <translation type="vanished">Utiliser Miroir UDP</translation>
     </message>
     <message>
-        <location/>
         <source>Expert Mode</source>
         <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
-        <translation>Mode Expert</translation>
+        <translation type="vanished">Mode Expert</translation>
     </message>
     <message>
         <location/>
         <source>Language:</source>
         <translation>Langue :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Expert Mode:</source>
+        <translation>Mode Expert :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Contribute usage statistics:</source>
+        <translation>Contribuer aux statistiques d&apos;utilisation :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use UDP Mirror:</source>
+        <translation>Utiliser Miroir UDP :</translation>
     </message>
 </context>
 <context>
@@ -10699,7 +10712,7 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+393"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+396"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
         <translation></translation>
     </message>
@@ -10825,6 +10838,31 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
         <translation>Pour un Quadricoptère : Profondeur correspond à la Rotation Avant, Ailerons à Roulis et Dérive correspond à Lacet.</translation>
     </message>
     <message>
+        <location line="+209"/>
+        <source>&lt;p&gt;Please enable throttle hold mode.&lt;/p&gt;&lt;p&gt;Move the Collective Pitch stick.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Veuillez activer les gaz en position maintenue.&lt;/p&gt;&lt;p&gt;Bougez le manche du Collectif de tangage.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&lt;p&gt;Please toggle the Flight Mode switch.&lt;/p&gt;&lt;p&gt;For switches you may have to repeat this rapidly.&lt;/p&gt;&lt;p&gt;Alternatively, you can click Next to skip this channel, but you will get only &lt;b&gt;ONE&lt;/b&gt; Flight Mode.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Veuillez activer l&apos;interrupteur de Mode de Vol.&lt;/p&gt;&lt;p&gt;Pour les interrupteurs vous pourriez avoir à répéter l&apos;opération rapidement.&lt;/p&gt;&lt;p&gt;Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal mais vous aurez seulement &lt;b&gt;UN&lt;/b&gt; Mode de Vol.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&lt;p&gt;Please disable throttle hold mode.&lt;/p&gt;&lt;p&gt;Move the Throttle stick.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Veuillez désactiver les gaz en position maintenue.&lt;/p&gt;&lt;p&gt;Bougez le manche des Gaz.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&lt;p&gt;Please move each control one at a time according to the instructions and picture below.&lt;/p&gt;&lt;p&gt;Move the %1 stick.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.&lt;/p&gt;&lt;p&gt;Bougez le manche %1.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&lt;p&gt;Alternatively, click Next to skip this channel.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.&lt;/p&gt;</translation>
+    </message>
+    <message>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
@@ -10854,7 +10892,7 @@ IMPORTANT: These new settings have not been saved to the board yet. After pressi
 IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la carte. Après avoir appuyé sur Suivant vous serez dirigé vers l&apos;onglet Paramètres d&apos;Armement où vous pourrez choisir votre séquence d&apos;armement et enregistrer la configuration.</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="-202"/>
         <source>Please center all controls and trims and press Next when ready.
 
 For a ground vehicle, this center position will be used as neutral value of each channel.</source>
@@ -10863,52 +10901,47 @@ For a ground vehicle, this center position will be used as neutral value of each
 Pour un véhicule terrestre, ces positions centrales seront utilisées comme neutre de chaque canal.</translation>
     </message>
     <message>
-        <location line="+178"/>
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
         <translatorcomment>hélico ? à traduire [Platypus] Ca convient ? [soh] A confirmer par un héliqueux.</translatorcomment>
-        <translation type="unfinished">Veuillez activer les gaz en position maintenue.
+        <translation type="obsolete">Veuillez activer les gaz en position maintenue.
 
 Bougez le manche du Collectif de tangage.</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Please toggle the Flight Mode switch.
 
 For switches you may have to repeat this rapidly.</source>
-        <translation>Veuillez activer l&apos;interrupteur de Mode de Vol.
+        <translation type="vanished">Veuillez activer l&apos;interrupteur de Mode de Vol.
 
 Pour les interrupteurs vous pourriez avoir à répéter l&apos;opération rapidement.</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Please disable throttle hold mode.
 
 Move the Throttle stick.</source>
         <translatorcomment>hélico ? à traduire</translatorcomment>
-        <translation type="unfinished">Veuillez désactiver les gaz en position maintenue.
+        <translation type="obsolete">Veuillez désactiver les gaz en position maintenue.
 
 Bougez le manche des Gaz.</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Please move each control one at a time according to the instructions and picture below.
 
 Move the %1 stick.</source>
-        <translation>Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.
+        <translation type="vanished">Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.
 
 Bougez le manche %1.</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+208"/>
         <source>Next / Skip</source>
         <translation>Suivant / Sauter</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source> Alternatively, click Next to skip this channel.</source>
-        <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
+        <translation type="vanished"> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
         <location line="+748"/>
@@ -16173,69 +16206,87 @@ IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la cart
 <context>
     <name>ConfigCcpmWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget.cpp" line="+1081"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget.cpp" line="+1080"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+1110"/>
         <source>&lt;h1&gt;Swashplate Leveling Routine&lt;/h1&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+1"/>
         <source>&lt;b&gt;You are about to start the Swashplate levelling routine.&lt;/b&gt;&lt;p&gt;This process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.&lt;p&gt;The final state of your system should match the current configuration in the GCS config gadget.&lt;/p&gt;&lt;p&gt;Please ensure all ccpm settings in the GCS are correct before continuing.&lt;/p&gt;&lt;p&gt;If this process is interrupted, then the state of your OP board may not match the GCS configuration.&lt;/p&gt;&lt;p&gt;&lt;i&gt;After completing this process, please check all settings before attempting to fly.&lt;/i&gt;&lt;/p&gt;&lt;p&gt;&lt;font color=red&gt;&lt;b&gt;Please disconnect your motor to ensure it will not spin up.&lt;/b&gt;&lt;/font&gt;&lt;p&gt;&lt;hr&gt;&lt;i&gt;Do you wish to proceed?&lt;/i&gt;&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+128"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+128"/>
         <source>&lt;h2&gt;Neutral levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Servo horns,&lt;/li&gt;&lt;li&gt;Link lengths,&lt;/li&gt;&lt;li&gt;Neutral triming spinboxes to the right&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is in the center of desired travel range and is level.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+14"/>
         <source>&lt;h2&gt;Max levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Max triming spinboxes to the right ONLY&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is at the top of desired travel range and is level.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+13"/>
         <source>&lt;h2&gt;Min levelling&lt;/h2&gt;&lt;p&gt;Using adjustment of:&lt;ul&gt;&lt;li&gt;Min triming spinboxes to the right ONLY&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Ensure that the swashplate is at the bottom of desired travel range and is level.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+19"/>
         <source>&lt;h2&gt;Levelling verification&lt;/h2&gt;&lt;p&gt;Adjust the slider to the right over it&apos;s full range and observe the swashplate motion. It should remain level over the entire range of travel.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+7"/>
         <source>&lt;h2&gt;Levelling complete&lt;/h2&gt;&lt;p&gt;Press the Finish button to save these settings to the SD card&lt;/p&gt;&lt;p&gt;Press the cancel button to return to the pre-levelling settings&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+68"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+68"/>
         <source>&lt;h2&gt;Levelling Cancelled&lt;/h2&gt;&lt;p&gt;Previous settings have been restored.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+43"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+43"/>
         <source>&lt;h2&gt;Levelling Completed&lt;/h2&gt;&lt;p&gt;New settings have been saved to the SD card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+12"/>
         <source>&lt;font color=red&gt;&lt;h1&gt;Warning!!!&lt;/h2&gt;&lt;/font&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+6"/>
         <source>&lt;h2&gt;This code has many configurations.&lt;/h2&gt;&lt;p&gt;Please double check all settings before attempting flight!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+11"/>
         <source>&lt;h2&gt;The CCPM mixer code needs more testing!&lt;/h2&gt;&lt;p&gt;&lt;font color=red&gt;Use it at your own risk!&lt;/font&gt;&lt;p&gt;Do you wish to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+16"/>
         <source>&lt;h2&gt;The CCPM swashplate levelling code is NOT complete!&lt;/h2&gt;&lt;p&gt;&lt;font color=red&gt;DO NOT use it for flight!&lt;/font&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configccpmwidget_dev.cpp" line="+174"/>
+        <source>Channel already used</source>
+        <translation type="unfinished">Canal déjà utilisé</translation>
     </message>
 </context>
 <context>
@@ -16318,6 +16369,39 @@ Il est suggéré que si cela est une première configuration de votre contrôleu
         <location line="+105"/>
         <source>Current Tuning</source>
         <translation>Réglages Actuels</translation>
+    </message>
+</context>
+<context>
+    <name>UsageTrackerPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/usagetracker/usagetrackerplugin.cpp" line="+80"/>
+        <source>Usage feedback</source>
+        <translation>Retour d&apos;utilisation</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Yes, count me in</source>
+        <translation>Oui, comptez sur moi</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No, I will not help</source>
+        <translation>Non, je ne souhaite pas aider</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Openpilot GCS has a function to collect limited anonymous information about the usage of the application itself and the OpenPilot hardware connected to it.&lt;p&gt;The intention is to not include anything that can be considered sensitive or a threat to the users integrity. The collected information will be sent using a secure protocol to an OpenPilot web service and stored in a database for later analysis and statistical purposes.&lt;br&gt;No information will be sold or given to any third party. The sole purpose is to collect statistics about the usage of our software and hardware to enable us to make things better for you.&lt;p&gt;The following things are collected:&lt;ul&gt;&lt;li&gt;Bootloader version&lt;/li&gt;&lt;li&gt;Firmware version, tag and git hash&lt;/li&gt;&lt;li&gt;OP Hardware type, revision and mcu serial number&lt;/li&gt;&lt;li&gt;Selected configuration parameters&lt;/li&gt;&lt;li&gt;GCS version&lt;/li&gt;&lt;li&gt;Operating system version and architecture&lt;/li&gt;&lt;li&gt;Current local time&lt;/li&gt;&lt;/ul&gt;The information is collected only at the time when a board is connecting to GCS.&lt;p&gt;It is possible to enable or disable this functionality in the general settings part of the options for the GCS application at any time.&lt;p&gt;We need your help, with your feedback we know where to improve things and what platforms are in use. This is a community project that depends on people being involved.&lt;br&gt;Thank You for helping us making things better and for supporting OpenPilot!</source>
+        <translation type="unfinished">Openpilot GCS possède une fonction qui permet de collecter les informations de manière anonyme sur l&apos;utilisation de l&apos;application en elle-même ainsi que le matériel OpenPilot connecté dessus.&lt;p&gt;Il n&apos;est pas question de collecter des informations sensibles ou pouvant représenter une menace pour l&apos;intégrité des utilisateurs. Les informations collectées seront envoyées vers un site web OpenPilot en utilisant un protocole sécurisé et stockées dans une base de données pour une analyse et des statistiques ultérieures.&lt;br&gt;Aucune information ne sera vendue ou donnée à une quelconque tierce partie. Le seul but est de collecter des informations à propos de l&apos;utilisation de notre logiciel / matériel pour nous permettre de l&apos;améliorer.&lt;p&gt;Les éléments suivants sont collectés :&lt;ul&gt;&lt;li&gt;Version bootloader&lt;/li&gt;&lt;li&gt;Version firmware, tag et git hash&lt;/li&gt;&lt;li&gt;Type de matériel OP, révision et numéro de série CPU&lt;/li&gt;&lt;li&gt;Paramètres de configuration sélectionnés&lt;/li&gt;&lt;li&gt;Version GCS&lt;/li&gt;&lt;li&gt;Système d&apos;exploitation et architecture&lt;/li&gt;&lt;li&gt;Fuseau horaire&lt;/li&gt;&lt;/ul&gt;Les informations sont collectées au moment de la connexion de la carte avec GCS.&lt;p&gt;Il est possible d&apos;activer ou de désactiver cette fonctionnalité à tout moment dans le menu Options &gt; Paramètres généraux de GCS.&lt;p&gt;Nous avons besoin de votre aide, avec votre participation nous connaîtrons où apporter des améliorations et quelle plateforme vous utilisez. C&apos;est un projet communautaire qui dépend de l&apos;implication des utilisateurs.&lt;br&gt;Merci de nous aider à rendre les choses meilleures et soutenir OpenPilot !</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>&amp;Don&apos;t show this message again.</source>
+        <translation>&amp;Ne pas afficher ce message à nouveau.</translation>
+    </message>
+    <message>
+        <location line="+148"/>
+        <source>Unknown</source>
+        <translation>Inconnu</translation>
     </message>
 </context>
 </TS>

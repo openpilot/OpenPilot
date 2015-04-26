@@ -1012,7 +1012,7 @@ static const struct pios_dsm_cfg pios_dsm_flexi_cfg = {
  */
 #include <pios_srxl_priv.h>
 
-static const struct pios_usart_cfg pios_usart_srxl_main_cfg = {
+static const struct pios_usart_cfg pios_usart_srxl_flexi_cfg = {
     .regs  = USART3,
     .remap = GPIO_AF_USART3,
     .init  = {

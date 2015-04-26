@@ -503,7 +503,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_SRXL)
         {
             uint32_t pios_usart_srxl_id;
-            if (PIOS_USART_Init(&pios_usart_srxl_id, &pios_usart_srxl_main_cfg)) {
+            if (PIOS_USART_Init(&pios_usart_srxl_id, &pios_usart_srxl_flexi_cfg)) {
                 PIOS_Assert(0);
             }
 

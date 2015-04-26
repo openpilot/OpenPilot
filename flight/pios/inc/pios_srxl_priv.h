@@ -64,8 +64,8 @@
  * }
  */
 
-#define SRXL_V1_HEADER			   0xa1
-#define SRXL_V2_HEADER			   0xa2
+#define SRXL_V1_HEADER             0xa1
+#define SRXL_V2_HEADER             0xa2
 
 #define SRXL_HEADER_LENGTH         1
 #define SRXL_CHECKSUM_LENGTH       2

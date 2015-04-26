@@ -34,7 +34,7 @@
 
 #include "pios_srxl_priv.h"
 
-//#define PIOS_INSTRUMENT_MODULE
+// #define PIOS_INSTRUMENT_MODULE
 #include <pios_instrumentation_helper.h>
 
 PERF_DEFINE_COUNTER(crcFailureCount);
@@ -77,8 +77,8 @@ struct pios_srxl_state {
 };
 
 struct pios_srxl_dev {
-    enum pios_srxl_dev_magic   magic;
-    struct pios_srxl_state     state;
+    enum pios_srxl_dev_magic magic;
+    struct pios_srxl_state   state;
 };
 
 /* Allocate S.Bus device descriptor */
@@ -130,10 +130,10 @@ static void PIOS_SRXL_ResetChannels(struct pios_srxl_state *state)
 /* Reset SRXL receiver state */
 static void PIOS_SRXL_ResetState(struct pios_srxl_state *state)
 {
-    state->receive_timer      = 0;
-    state->failsafe_timer     = 0;
-    state->frame_found        = 0;
-    state->data_bytes		  = 0;
+    state->receive_timer  = 0;
+    state->failsafe_timer = 0;
+    state->frame_found    = 0;
+    state->data_bytes     = 0;
     PIOS_SRXL_ResetChannels(state);
 }
 
@@ -204,8 +204,8 @@ static int32_t PIOS_SRXL_Get(uint32_t rcvr_id, uint8_t channel)
 
 static void PIOS_SRXL_UnrollChannels(struct pios_srxl_state *state)
 {
-	PERF_TIMED_SECTION_START(messageUnrollTimer);
-    uint8_t *received_data  = state->received_data;
+    PERF_TIMED_SECTION_START(messageUnrollTimer);
+    uint8_t *received_data = state->received_data;
     uint8_t channel;
     uint16_t channel_value;
     for (channel = 0; channel < (state->data_bytes / 2); channel++) {
@@ -213,28 +213,29 @@ static void PIOS_SRXL_UnrollChannels(struct pios_srxl_state *state)
         channel_value = channel_value + ((uint16_t)received_data[SRXL_HEADER_LENGTH + (channel * 2) + 1]);
         state->channel_data[channel] = (800 + ((channel_value * 1400) >> 12));
     }
-	PERF_TIMED_SECTION_END(messageUnrollTimer);
+    PERF_TIMED_SECTION_END(messageUnrollTimer);
 }
 
 static bool PIOS_SRXL_Validate_Checksum(struct pios_srxl_state *state)
 {
-	// Check the CRC16 checksum. The provided checksum is immediately after the channel data.
-	// All data including start byte and version byte is included in crc calculation.
-    uint8_t i = 0;
+    // Check the CRC16 checksum. The provided checksum is immediately after the channel data.
+    // All data including start byte and version byte is included in crc calculation.
+    uint8_t i    = 0;
     uint16_t crc = 0;
-	for (i = 0; i < SRXL_HEADER_LENGTH + state->data_bytes; i++) {
-		crc = crc ^ (int16_t)state->received_data[i] << 8;
-		uint8_t j = 0;
-	    for (j = 0; j < 8; j++) {
-	        if (crc & 0x8000) {
-	            crc = crc << 1 ^ 0x1021;
-	        } else {
-	            crc = crc << 1;
-	        }
-	    }
-	}
-	uint16_t checksum = (((uint16_t)(state->received_data[i] << 8) |
-			(uint16_t)state->received_data[i + 1]));
+
+    for (i = 0; i < SRXL_HEADER_LENGTH + state->data_bytes; i++) {
+        crc = crc ^ (int16_t)state->received_data[i] << 8;
+        uint8_t j = 0;
+        for (j = 0; j < 8; j++) {
+            if (crc & 0x8000) {
+                crc = crc << 1 ^ 0x1021;
+            } else {
+                crc = crc << 1;
+            }
+        }
+    }
+    uint16_t checksum = (((uint16_t)(state->received_data[i] << 8) |
+                          (uint16_t)state->received_data[i + 1]));
     return crc == checksum;
 }
 
@@ -248,8 +249,8 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
 
     if (state->byte_count < (SRXL_HEADER_LENGTH + state->data_bytes + SRXL_CHECKSUM_LENGTH)) {
         if (state->byte_count == 0) {
-        	// Set up the length of the channel data according to version received
-        	PERF_INCREMENT_VALUE(frameStartCount);
+            // Set up the length of the channel data according to version received
+            PERF_INCREMENT_VALUE(frameStartCount);
             if (b == SRXL_V1_HEADER) {
                 state->data_bytes = SRXL_V1_CHANNEL_DATA_BYTES;
             } else if (b == SRXL_V2_HEADER) {
@@ -257,30 +258,29 @@ static void PIOS_SRXL_UpdateState(struct pios_srxl_state *state, uint8_t b)
             } else {
                 /* discard the whole frame if the 1st byte is not correct */
                 state->frame_found = 0;
-            	PERF_INCREMENT_VALUE(frameAbortCount);
+                PERF_INCREMENT_VALUE(frameAbortCount);
                 return;
             }
         }
         /* store next byte */
         state->received_data[state->byte_count] = b;
         state->byte_count++;
-        if (state->byte_count == (SRXL_HEADER_LENGTH + state->data_bytes + SRXL_CHECKSUM_LENGTH))
-        {
-			PERF_INCREMENT_VALUE(completeMessageCount);
-			// We have a complete message, lets decode it
-			if (PIOS_SRXL_Validate_Checksum(state)) {
-				/* data looking good */
-				PIOS_SRXL_UnrollChannels(state);
-				state->failsafe_timer = 0;
-				PERF_INCREMENT_VALUE(successfulCount);
-			} else {
-				/* discard whole frame */
-				PERF_INCREMENT_VALUE(crcFailureCount);
-			}
-			/* prepare for the next frame */
-			state->frame_found = 0;
-			PERF_MEASURE_PERIOD(messageReceiveRate);
-		}
+        if (state->byte_count == (SRXL_HEADER_LENGTH + state->data_bytes + SRXL_CHECKSUM_LENGTH)) {
+            PERF_INCREMENT_VALUE(completeMessageCount);
+            // We have a complete message, lets decode it
+            if (PIOS_SRXL_Validate_Checksum(state)) {
+                /* data looking good */
+                PIOS_SRXL_UnrollChannels(state);
+                state->failsafe_timer = 0;
+                PERF_INCREMENT_VALUE(successfulCount);
+            } else {
+                /* discard whole frame */
+                PERF_INCREMENT_VALUE(crcFailureCount);
+            }
+            /* prepare for the next frame */
+            state->frame_found = 0;
+            PERF_MEASURE_PERIOD(messageReceiveRate);
+        }
     }
 }
 
@@ -353,7 +353,7 @@ static void PIOS_SRXL_Supervisor(uint32_t srxl_id)
     if (++state->failsafe_timer > 64) {
         PIOS_SRXL_ResetChannels(state);
         state->failsafe_timer = 0;
-    	PERF_INCREMENT_VALUE(failsafeCount);
+        PERF_INCREMENT_VALUE(failsafeCount);
     }
 }
 

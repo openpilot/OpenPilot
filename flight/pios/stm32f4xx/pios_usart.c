@@ -194,6 +194,7 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
     /* If a DTR line is specified, initialize it */
     if (usart_dev->cfg->dtr.gpio) {
         GPIO_Init(usart_dev->cfg->dtr.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->dtr.init);
+        PIOS_USART_SetCtrlLine((uint32_t)usart_dev, COM_CTRL_LINE_DTR_MASK, 0);
     }
 
     /* Configure the USART */
@@ -295,7 +296,7 @@ static void PIOS_USART_SetCtrlLine(uint32_t usart_id, uint32_t mask, uint32_t st
     if (usart_dev->cfg->dtr.gpio && (mask & COM_CTRL_LINE_DTR_MASK)) {
         GPIO_WriteBit(usart_dev->cfg->dtr.gpio,
                       usart_dev->cfg->dtr.init.GPIO_Pin,
-                      state & COM_CTRL_LINE_DTR_MASK ? Bit_SET : Bit_RESET);
+                      state & COM_CTRL_LINE_DTR_MASK ? Bit_RESET : Bit_SET);
     }
 }
 

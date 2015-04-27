@@ -48,6 +48,8 @@
 #include "plans.h"
 #include <sanitycheck.h>
 #include <vtolpathfollowersettings.h>
+#include <statusvtolautotakeoff.h>
+#include <manualcontrolcommand.h>
 
 // Private constants
 #define STACK_SIZE_BYTES            1024
@@ -77,6 +79,8 @@ static uint8_t conditionPointingTowardsNext();
 static uint8_t conditionPythonScript();
 static uint8_t conditionImmediate();
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
+static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired);
+static void planner_setup_pathdesired(PathDesiredData *pathDesired);
 
 
 // Private variables
@@ -167,6 +171,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     }
 }
 
+#define AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START 0.3f
 
 /**
  * Module task
@@ -219,6 +224,17 @@ static void pathPlannerTask()
 
     WaypointActiveGet(&waypointActive);
 
+    // with the introduction of takeoff, we allow for arming
+    // whilst in pathplanner mode.  Previously it was just an assumption that
+    // a user never armed in pathplanner mode.  This check allows a user to select
+    // pathplanner, to upload waypoints, and then arm in pathplanner.
+    if (!flightStatus.Armed) {
+        return;
+    }
+
+
+    // the transition from pathplanner to another flightmode back to pathplanner
+    // triggers a reset back to 0 index in the waypoint list
     if (pathplanner_active == false) {
         pathplanner_active   = true;
 
@@ -244,6 +260,22 @@ static void pathPlannerTask()
         setWaypoint(pathAction.ErrorDestination);
         return;
     }
+
+    // check start conditions
+    // autotakeoff requires midpoint thrust uf we are in a pending takeoff situation
+    if (pathAction.Command == PATHACTION_MODE_AUTOTAKEOFF) {
+        pathAction.EndCondition = PATHACTION_ENDCONDITION_LEGREMAINING;
+        if ((uint8_t)pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] == STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE) {
+            ManualControlCommandData cmd;
+            ManualControlCommandGet(&cmd);
+            if (cmd.Throttle > AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START) {
+                pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] = (float)STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE;
+                PathDesiredSet(&pathDesired);
+            }
+            return;
+        }
+    }
+
 
     // check if condition has been met
     endCondition = pathConditionCheck();
@@ -282,6 +314,35 @@ static void pathPlannerTask()
         break;
     }
 }
+
+// callback function when waypoints changed in any way, update pathDesired
+void updatePathDesired()
+{
+    // only ever touch pathDesired if pathplanner is enabled
+    if (!pathplanner_active) {
+        return;
+    }
+
+    PathDesiredData pathDesired;
+
+    // find out current waypoint
+    WaypointActiveGet(&waypointActive);
+
+    WaypointInstGet(waypointActive.Index, &waypoint);
+    PathActionInstGet(waypoint.Action, &pathAction);
+
+    switch (pathAction.Command) {
+    case PATHACTION_MODE_AUTOTAKEOFF:
+        planner_setup_pathdesired_takeoff(&pathDesired);
+        break;
+    default:
+        planner_setup_pathdesired(&pathDesired);
+        break;
+    }
+
+    PathDesiredSet(&pathDesired);
+}
+
 
 // safety checks for path plan integrity
 static uint8_t checkPathPlan()
@@ -367,33 +428,20 @@ void statusUpdated(__attribute__((unused)) UAVObjEvent *ev)
     PIOS_CALLBACKSCHEDULER_Dispatch(pathPlannerHandle);
 }
 
-
-// callback function when waypoints changed in any way, update pathDesired
-void updatePathDesired()
+// Standard setup of a pathDesired command from the waypoint path plan
+static void planner_setup_pathdesired(PathDesiredData *pathDesired)
 {
-    // only ever touch pathDesired if pathplanner is enabled
-    if (!pathplanner_active) {
-        return;
-    }
+    pathDesired->End.North = waypoint.Position.North;
+    pathDesired->End.East  = waypoint.Position.East;
+    pathDesired->End.Down  = waypoint.Position.Down;
+    pathDesired->EndingVelocity    = waypoint.Velocity;
+    pathDesired->Mode = pathAction.Mode;
+    pathDesired->ModeParameters[0] = pathAction.ModeParameters[0];
+    pathDesired->ModeParameters[1] = pathAction.ModeParameters[1];
+    pathDesired->ModeParameters[2] = pathAction.ModeParameters[2];
+    pathDesired->ModeParameters[3] = pathAction.ModeParameters[3];
+    pathDesired->UID = waypointActive.Index;
 
-    PathDesiredData pathDesired;
-
-    // find out current waypoint
-    WaypointActiveGet(&waypointActive);
-
-    WaypointInstGet(waypointActive.Index, &waypoint);
-    PathActionInstGet(waypoint.Action, &pathAction);
-
-    pathDesired.End.North = waypoint.Position.North;
-    pathDesired.End.East  = waypoint.Position.East;
-    pathDesired.End.Down  = waypoint.Position.Down;
-    pathDesired.EndingVelocity    = waypoint.Velocity;
-    pathDesired.Mode = pathAction.Mode;
-    pathDesired.ModeParameters[0] = pathAction.ModeParameters[0];
-    pathDesired.ModeParameters[1] = pathAction.ModeParameters[1];
-    pathDesired.ModeParameters[2] = pathAction.ModeParameters[2];
-    pathDesired.ModeParameters[3] = pathAction.ModeParameters[3];
-    pathDesired.UID = waypointActive.Index;
 
     if (waypointActive.Index == 0) {
         PositionStateData positionState;
@@ -405,22 +453,61 @@ void updatePathDesired()
            pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
         // note takeoff relies on the start being the current location as it merely ascends and using
         // the start as assumption current NE location
-        pathDesired.Start.North = positionState.North;
-        pathDesired.Start.East  = positionState.East;
-        pathDesired.Start.Down  = positionState.Down;
-        pathDesired.StartingVelocity = pathDesired.EndingVelocity;
+        pathDesired->Start.North = positionState.North;
+        pathDesired->Start.East  = positionState.East;
+        pathDesired->Start.Down  = positionState.Down;
+        pathDesired->StartingVelocity = pathDesired->EndingVelocity;
     } else {
         // Get previous waypoint as start point
         WaypointData waypointPrev;
         WaypointInstGet(waypointActive.Index - 1, &waypointPrev);
 
-        pathDesired.Start.North = waypointPrev.Position.North;
-        pathDesired.Start.East  = waypointPrev.Position.East;
-        pathDesired.Start.Down  = waypointPrev.Position.Down;
-        pathDesired.StartingVelocity = waypointPrev.Velocity;
+        pathDesired->Start.North = waypointPrev.Position.North;
+        pathDesired->Start.East  = waypointPrev.Position.East;
+        pathDesired->Start.Down  = waypointPrev.Position.Down;
+        pathDesired->StartingVelocity = waypointPrev.Velocity;
     }
-    PathDesiredSet(&pathDesired);
 }
+
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN 2.0f
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX 50.0f
+static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired)
+{
+    PositionStateData positionState;
+
+    PositionStateGet(&positionState);
+    float velocity_down;
+    float autotakeoff_height;
+    FlightModeSettingsAutoTakeOffVelocityGet(&velocity_down);
+    FlightModeSettingsAutoTakeOffHeightGet(&autotakeoff_height);
+    autotakeoff_height = fabsf(autotakeoff_height);
+    if (autotakeoff_height < AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN) {
+        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN;
+    } else if (autotakeoff_height > AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX) {
+        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX;
+    }
+
+
+    pathDesired->Start.North = positionState.North;
+    pathDesired->Start.East  = positionState.East;
+    pathDesired->Start.Down  = positionState.Down;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH] = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]  = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]  = -velocity_down;
+    // initially halt takeoff.
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] = (float)STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE;
+
+    pathDesired->End.North = positionState.North;
+    pathDesired->End.East  = positionState.East;
+    pathDesired->End.Down  = positionState.Down - autotakeoff_height;
+
+    pathDesired->StartingVelocity = 0.0f;
+    pathDesired->EndingVelocity   = 0.0f;
+    pathDesired->Mode = PATHDESIRED_MODE_AUTOTAKEOFF;
+
+    pathDesired->UID  = waypointActive.Index;
+}
+
 
 // helper function to go to a specific waypoint
 static void setWaypoint(uint16_t num)

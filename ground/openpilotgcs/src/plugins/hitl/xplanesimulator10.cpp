@@ -62,7 +62,7 @@
 #include <coreplugin/threadmanager.h>
 #include <math.h>
 
-void TraceBuf(const char *buf, int len);
+void TraceBuf10(const char *buf, int len);
 
 XplaneSimulator10::XplaneSimulator10(const SimulatorSettings & params) :
     Simulator(params)
@@ -142,7 +142,7 @@ void XplaneSimulator10::transmitUpdate()
         buf.append(reinterpret_cast<const char *>(&none), sizeof(none));
         buf.append(reinterpret_cast<const char *>(&none), sizeof(none));
         buf.append(reinterpret_cast<const char *>(&none), sizeof(none));
-// TraceBuf(buf.data(),41);
+// TraceBuf10(buf.data(),41);
 
         if (outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1) {
             emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
@@ -226,7 +226,7 @@ void XplaneSimulator10::processUpdate(const QByteArray & dataBuf)
         int channelCounter = dataBuf.size() / 36;
         do {
             switch (buf[0]) { // switch by id
-            case XplaneSimulator10::LatitudeLongitudeAltitude:
+            case XplaneSimulator10::LatitudeLongitude:
                 latitude     = *((float *)(buf.data() + 4 * 1));
                 longitude    = *((float *)(buf.data() + 4 * 2));
                 altitude_msl = *((float *)(buf.data() + 4 * 3)) * FT2M;
@@ -337,7 +337,7 @@ void XplaneSimulator10::processUpdate(const QByteArray & dataBuf)
 }
 
 
-void TraceBuf(const char *buf, int len)
+void TraceBuf10(const char *buf, int len)
 {
     QString str;
     bool reminder = true;

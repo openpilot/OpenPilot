@@ -73,9 +73,9 @@ private:
     void processUpdate(const QByteArray & data);
 };
 
-class XplaneSimulatorCreator : public SimulatorCreator {
+class XplaneSimulatorCreator9 : public SimulatorCreator {
 public:
-    XplaneSimulatorCreator(const QString & classId, const QString & description)
+    XplaneSimulatorCreator9(const QString & classId, const QString & description)
         :  SimulatorCreator(classId, description)
     {}
 

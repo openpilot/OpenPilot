@@ -209,9 +209,7 @@ static void PIOS_PWM_tim_overflow_cb(__attribute__((unused)) uint32_t tim_id, ui
         /* Channel out of range */
         return;
     }
-    if (!pwm_dev->CaptureState[channel]) {
-        return;
-    }
+
     pwm_dev->us_since_update[channel] += count;
     if (pwm_dev->us_since_update[channel] >= PWM_SUPERVISOR_TIMEOUT) {
         pwm_dev->CaptureState[channel]    = 0;

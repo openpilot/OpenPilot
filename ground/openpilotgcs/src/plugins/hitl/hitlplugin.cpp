@@ -32,7 +32,8 @@
 #include "aerosimrcsimulator.h"
 #include "fgsimulator.h"
 #include "il2simulator.h"
-#include "xplanesimulator.h"
+#include "xplanesimulator9.h"
+#include "xplanesimulator10.h"
 
 QList<SimulatorCreator * > HITLPlugin::typeSimulators;
 

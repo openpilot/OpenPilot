@@ -909,6 +909,17 @@ void PIOS_Board_Init(void)
 #include <pios_ws2811.h>
     PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg);
 #endif // PIOS_INCLUDE_WS2811
+#ifdef PIOS_INCLUDE_ADC
+    {
+        uint8_t adc_config[HWSETTINGS_ADCROUTING_NUMELEM];
+        HwSettingsADCRoutingArrayGet(adc_config);
+        for (uint32_t i = 0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {
+            if (adc_config[i] != HWSETTINGS_ADCROUTING_DISABLED) {
+                PIOS_ADC_PinSetup(i);
+            }
+        }
+    }
+#endif // PIOS_INCLUDE_ADC
 }
 
 /**

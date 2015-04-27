@@ -118,7 +118,7 @@ int32_t configuration_check()
             ADDSEVERITY(navCapableFusion);
         }
 
-        switch (modes[i]) {
+        switch ((FlightModeSettingsFlightModePositionOptions)modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
             ADDSEVERITY(!gps_assisted);
             ADDSEVERITY(!multirotor);
@@ -143,24 +143,19 @@ int32_t configuration_check()
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {
-            // Revo supports PathPlanner and that must be OK or we are not sane
-            // PathPlan alarm is uninitialized if not running
-            // PathPlan alarm is warning or error if the flightplan is invalid
-            SystemAlarmsAlarmData alarms;
-            SystemAlarmsAlarmGet(&alarms);
-            ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
             ADDSEVERITY(!gps_assisted);
         }
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTAKEOFF:
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(navCapableFusion);
             break;
 
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_COURSELOCK:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONROAM:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_HOMELEASH:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ABSOLUTEPOSITION:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:

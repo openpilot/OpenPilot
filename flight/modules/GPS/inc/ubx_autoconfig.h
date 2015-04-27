@@ -88,6 +88,10 @@ typedef struct {
 
     int8_t  navRate;
     ubx_config_dynamicmodel_t dynamicModel;
+
+    bool    enableGPS;
+    bool    enableGLONASS;
+    bool    enableBeiDou;
 } ubx_autoconfig_settings_t;
 
 // Mask for "all supported devices": battery backed RAM, Flash, EEPROM, SPI Flash
@@ -164,6 +168,44 @@ typedef struct {
     uint32_t scanmode1;
 } __attribute__((packed)) ubx_cfg_sbas_t;
 
+typedef enum {
+    UBX_GNSS_ID_GPS     = 0,
+    UBX_GNSS_ID_SBAS    = 1,
+    UBX_GNSS_ID_GALILEO = 2,
+    UBX_GNSS_ID_BEIDOU  = 3,
+    UBX_GNSS_ID_IMES    = 4,
+    UBX_GNSS_ID_QZSS    = 5,
+    UBX_GNSS_ID_GLONASS = 6,
+    UBX_GNSS_ID_MAX
+} ubx_config_gnss_id_t;
+
+#define UBX_CFG_GNSS_FLAGS_ENABLED      0x01
+#define UBX_CFG_GNSS_FLAGS_GPS_L1CA     0x010000
+#define UBX_CFG_GNSS_FLAGS_SBAS_L1CA    0x010000
+#define UBX_CFG_GNSS_FLAGS_BEIDOU_B1I   0x010000
+#define UBX_CFG_GNSS_FLAGS_QZSS_L1CA    0x010000
+#define UBX_CFG_GNSS_FLAGS_QZSS_L1SAIF  0x040000
+#define UBX_CFG_GNSS_FLAGS_GLONASS_L1OF 0x010000
+
+#define UBX_CFG_GNSS_NUMCH_VER7         22
+#define UBX_CFG_GNSS_NUMCH_VER8         32
+
+typedef struct {
+    uint8_t  gnssId;
+    uint8_t  resTrkCh;
+    uint8_t  maxTrkCh;
+    uint8_t  resvd;
+    uint32_t flags;
+} __attribute__((packed)) ubx_cfg_gnss_cfgblock_t;
+
+typedef struct {
+    uint8_t msgVer;
+    uint8_t numTrkChHw;
+    uint8_t numTrkChUse;
+    uint8_t numConfigBlocks;
+    ubx_cfg_gnss_cfgblock_t cfgBlocks[UBX_GNSS_ID_MAX];
+} __attribute__((packed)) ubx_cfg_gnss_t;
+
 typedef struct {
     uint8_t  prolog[2];
     uint8_t  class;
@@ -181,6 +223,7 @@ typedef union {
             ubx_cfg_nav5_t cfg_nav5;
             ubx_cfg_rate_t cfg_rate;
             ubx_cfg_sbas_t cfg_sbas;
+            ubx_cfg_gnss_t cfg_gnss;
         } payload;
         uint8_t resvd[2]; // added space for checksum bytes
     } message;

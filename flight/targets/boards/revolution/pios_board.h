@@ -281,23 +281,27 @@ extern uint32_t pios_packet_handler;
 // PIOS_ADC_PinGet(4) = VREF
 // PIOS_ADC_PinGet(5) = Temperature sensor
 // -------------------------
-#define PIOS_DMA_PIN_CONFIG                                                                 \
-    {                                                                                           \
-        { GPIOC, GPIO_Pin_1, ADC_Channel_11 },                                                \
-        { GPIOC, GPIO_Pin_2, ADC_Channel_12 },                                                \
-        { NULL, 0, ADC_Channel_Vrefint }, /* Voltage reference */         \
-        { NULL, 0, ADC_Channel_TempSensor }, /* Temperature sensor */        \
+#define PIOS_DMA_PIN_CONFIG                            \
+    {                                                  \
+        { GPIOC, GPIO_Pin_1, ADC_Channel_11, false }, /* batt/sonar pin 3   */  \
+        { GPIOC, GPIO_Pin_2, ADC_Channel_12, false }, /* batt/sonar pin 4   */  \
+        { GPIOA, GPIO_Pin_3, ADC_Channel_3, false }, /* Servo pin 3        */  \
+        { GPIOA, GPIO_Pin_2, ADC_Channel_2, false }, /* Servo pin 4        */  \
+        { GPIOA, GPIO_Pin_1, ADC_Channel_1, false }, /* Servo pin 5        */  \
+        { GPIOA, GPIO_Pin_0, ADC_Channel_9, false }, /* Servo pin 6        */  \
+        { NULL, 0, ADC_Channel_Vrefint, false }, /* Voltage reference  */  \
+        { NULL, 0, ADC_Channel_TempSensor, false }, /* Temperature sensor */  \
     }
 
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */
 /* which is annoying because this then determines the rate at which we generate buffer turnover events */
 /* the objective here is to get enough buffer space to support 100Hz averaging rate */
-#define PIOS_ADC_NUM_CHANNELS     4
+#define PIOS_ADC_NUM_CHANNELS     8
 #define PIOS_ADC_MAX_OVERSAMPLING 2
 #define PIOS_ADC_USE_ADC2         0
 
 #define PIOS_ADC_USE_TEMP_SENSOR
-#define PIOS_ADC_TEMPERATURE_PIN  3
+#define PIOS_ADC_TEMPERATURE_PIN  7
 
 // -------------------------
 // USB

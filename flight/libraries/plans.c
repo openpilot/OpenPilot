@@ -40,12 +40,40 @@
 #include <manualcontrolcommand.h>
 #include <attitudestate.h>
 #include <vtolpathfollowersettings.h>
+#include <stabilizationbank.h>
+#include <stabilizationdesired.h>
 #include <sin_lookup.h>
+#include <statusvtolautotakeoff.h>
 
 #define UPDATE_EXPECTED 0.02f
 #define UPDATE_MIN      1.0e-6f
 #define UPDATE_MAX      1.0f
 #define UPDATE_ALPHA    1.0e-2f
+
+
+static float applyExpo(float value, float expo);
+
+
+static float applyExpo(float value, float expo)
+{
+    // note: fastPow makes a small error, therefore result needs to be bound
+    float exp = boundf(fastPow(1.00695f, expo), 0.5f, 2.0f);
+
+    // magic number scales expo
+    // so that
+    // expo=100 yields value**10
+    // expo=0 yields value**1
+    // expo=-100 yields value**(1/10)
+    // (pow(2.0,1/100)~=1.00695)
+    if (value > 0.0f) {
+        return boundf(fastPow(value, exp), 0.0f, 1.0f);
+    } else if (value < -0.0f) {
+        return boundf(-fastPow(-value, exp), -1.0f, 0.0f);
+    } else {
+        return 0.0f;
+    }
+}
+
 
 /**
  * @brief initialize UAVOs and structs used by this library
@@ -61,6 +89,8 @@ void plan_initialize()
     ManualControlCommandInitialize();
     VelocityStateInitialize();
     VtolPathFollowerSettingsInitialize();
+    StabilizationBankInitialize();
+    StabilizationDesiredInitialize();
 }
 
 /**
@@ -85,7 +115,7 @@ void plan_setup_positionHold()
     pathDesired.Start.Down       = positionState.Down;
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
-    pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+    pathDesired.Mode = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(&pathDesired);
 }
@@ -126,48 +156,201 @@ void plan_setup_returnToBase()
 
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
-    pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+
+    uint8_t ReturnToBaseNextCommand;
+    FlightModeSettingsReturnToBaseNextCommandGet(&ReturnToBaseNextCommand);
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND] = (float)ReturnToBaseNextCommand;
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED1]     = 0.0f;
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED2]     = 0.0f;
+    pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED3]     = 0.0f;
+    pathDesired.Mode = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(&pathDesired);
 }
 
-static PiOSDeltatimeConfig landdT;
-void plan_setup_land()
+
+// Vtol AutoTakeoff invocation from flight mode requires the following sequence:
+// 1. Arming must be done whilst in the AutoTakeOff flight mode
+// 2. If the AutoTakeoff flight mode is selected and already armed, requires disarming first
+// 3. Wait for armed state
+// 4. Once the user increases the throttle position to above 50%, then and only then initiate auto-takeoff.
+// 5. Whilst the throttle is < 50% before takeoff, all stick inputs are being ignored.
+// 6. If during the autotakeoff sequence, at any stage, if the throttle stick position reduces to less than 10%, landing is initiated.
+
+static StatusVtolAutoTakeoffControlStateOptions autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
+
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN 2.0f
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX 50.0f
+static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
 {
-    float descendspeed;
+    PositionStateData positionState;
 
-    plan_setup_positionHold();
+    PositionStateGet(&positionState);
+    float velocity_down;
+    float autotakeoff_height;
 
-    FlightModeSettingsLandingVelocityGet(&descendspeed);
-    PathDesiredData pathDesired;
-    PathDesiredGet(&pathDesired);
-    pathDesired.StartingVelocity = descendspeed;
-    pathDesired.EndingVelocity   = descendspeed;
-    PathDesiredSet(&pathDesired);
-    PIOS_DELTATIME_Init(&landdT, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
-}
-
-/**
- * @brief execute land
- */
-void plan_run_land()
-{
-    float downPos, descendspeed;
-    PathDesiredEndData pathDesiredEnd;
-
-    PositionStateDownGet(&downPos); // current down position
-    PathDesiredEndGet(&pathDesiredEnd); // desired position
-    PathDesiredEndingVelocityGet(&descendspeed);
-
-    // desired position is updated to match the desired descend speed but don't run ahead
-    // too far if the current position can't keep up. This normaly means we have landed.
-    if (pathDesiredEnd.Down - downPos < 10) {
-        pathDesiredEnd.Down += descendspeed * PIOS_DELTATIME_GetAverageSeconds(&landdT);
+    FlightModeSettingsAutoTakeOffVelocityGet(&velocity_down);
+    FlightModeSettingsAutoTakeOffHeightGet(&autotakeoff_height);
+    autotakeoff_height = fabsf(autotakeoff_height);
+    if (autotakeoff_height < AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN) {
+        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN;
+    } else if (autotakeoff_height > AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX) {
+        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX;
     }
 
-    PathDesiredEndSet(&pathDesiredEnd);
+
+    pathDesired->Start.North = positionState.North;
+    pathDesired->Start.East  = positionState.East;
+    pathDesired->Start.Down  = positionState.Down;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH] = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]  = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]  = -velocity_down;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] = (float)autotakeoffState;
+
+    pathDesired->End.North = positionState.North;
+    pathDesired->End.East  = positionState.East;
+    pathDesired->End.Down  = positionState.Down - autotakeoff_height;
+
+    pathDesired->StartingVelocity = 0.0f;
+    pathDesired->EndingVelocity   = 0.0f;
+    pathDesired->Mode = PATHDESIRED_MODE_AUTOTAKEOFF;
 }
 
+#define AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT 0.2f
+void plan_setup_AutoTakeoff()
+{
+    autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
+    // We only allow takeoff if the state transition of disarmed to armed occurs
+    // whilst in the autotake flight mode
+    FlightStatusData flightStatus;
+    FlightStatusGet(&flightStatus);
+    StabilizationDesiredData stabiDesired;
+    StabilizationDesiredGet(&stabiDesired);
+
+    // Are we inflight?
+    if (flightStatus.Armed && stabiDesired.Thrust > AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT) {
+        // ok assume already in flight and just enter position hold
+        // if we are not actually inflight this will just be a violent autotakeoff
+        autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD;
+        plan_setup_positionHold();
+    } else {
+        if (flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST;
+            // Note that if this mode was invoked unintentionally whilst in flight, effectively
+            // all inputs get ignored and the vtol continues to fly to its previous
+            // stabi command.
+        }
+        PathDesiredData pathDesired;
+        plan_setup_AutoTakeoff_helper(&pathDesired);
+        PathDesiredSet(&pathDesired);
+    }
+}
+
+#define AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START 0.3f
+#define AUTOTAKEOFF_THROTTLE_ABORT_LIMIT                  0.1f
+void plan_run_AutoTakeoff()
+{
+    StatusVtolAutoTakeoffControlStateOptions priorState = autotakeoffState;
+
+    switch (autotakeoffState) {
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST:
+    {
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        if (!flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE;
+        }
+    }
+    break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED:
+    {
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        if (flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE;
+        }
+    }
+    break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE:
+    {
+        ManualControlCommandData cmd;
+        ManualControlCommandGet(&cmd);
+
+        if (cmd.Throttle > AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE;
+        }
+    }
+    break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE:
+    {
+        ManualControlCommandData cmd;
+        ManualControlCommandGet(&cmd);
+
+        if (cmd.Throttle < AUTOTAKEOFF_THROTTLE_ABORT_LIMIT) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT;
+            plan_setup_land();
+        }
+    }
+    break;
+
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT:
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD:
+    // nothing to do. land has been requested. stay here for forever until mode change.
+    default:
+        break;
+    }
+
+    if (autotakeoffState != STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT &&
+        autotakeoffState != STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD) {
+        if (priorState != autotakeoffState) {
+            PathDesiredData pathDesired;
+            plan_setup_AutoTakeoff_helper(&pathDesired);
+            PathDesiredSet(&pathDesired);
+        }
+    }
+}
+
+static void plan_setup_land_helper(PathDesiredData *pathDesired)
+{
+    PositionStateData positionState;
+
+    PositionStateGet(&positionState);
+    float velocity_down;
+
+    FlightModeSettingsLandingVelocityGet(&velocity_down);
+
+    pathDesired->Start.North = positionState.North;
+    pathDesired->Start.East  = positionState.East;
+    pathDesired->Start.Down  = positionState.Down;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_NORTH] = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_EAST]  = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_DOWN]  = velocity_down;
+
+    pathDesired->End.North = positionState.North;
+    pathDesired->End.East  = positionState.East;
+    pathDesired->End.Down  = positionState.Down;
+
+    pathDesired->StartingVelocity = 0.0f;
+    pathDesired->EndingVelocity   = 0.0f;
+    pathDesired->Mode = PATHDESIRED_MODE_LAND;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH;
+}
+
+void plan_setup_land()
+{
+    PathDesiredData pathDesired;
+
+    plan_setup_land_helper(&pathDesired);
+    PathDesiredSet(&pathDesired);
+}
+
+static void plan_setup_land_from_velocityroam()
+{
+    plan_setup_land();
+    FlightStatusAssistedControlStateOptions assistedControlFlightMode;
+    assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
+    FlightStatusAssistedControlStateSet(&assistedControlFlightMode);
+}
 
 /**
  * @brief positionvario functionality
@@ -195,6 +378,14 @@ void plan_setup_CourseLock()
 void plan_setup_PositionRoam()
 {
     plan_setup_PositionVario();
+}
+
+void plan_setup_VelocityRoam()
+{
+    vario_control_lowpass[0] = 0.0f;
+    vario_control_lowpass[1] = 0.0f;
+    vario_control_lowpass[2] = 0.0f;
+    AttitudeStateYawGet(&vario_course);
 }
 
 void plan_setup_HomeLeash()
@@ -340,6 +531,9 @@ static void plan_run_PositionVario(vario_type type)
             pathDesired.Start.North = pathDesired.End.North + offset.Horizontal; // in FlyEndPoint the direction of this vector does not matter
             pathDesired.Start.East  = pathDesired.End.East;
             pathDesired.Start.Down  = pathDesired.End.Down;
+
+            // set mode explicitly
+
             PathDesiredSet(&pathDesired);
         }
     } else {
@@ -378,6 +572,106 @@ static void plan_run_PositionVario(vario_type type)
         pathDesired.Start.East  = pathDesired.End.East;
         pathDesired.Start.Down  = pathDesired.End.Down;
         PathDesiredSet(&pathDesired);
+    }
+}
+
+void plan_run_VelocityRoam()
+{
+    // float alpha;
+    PathDesiredData pathDesired;
+    FlightStatusAssistedControlStateOptions assistedControlFlightMode;
+    FlightStatusFlightModeOptions flightMode;
+
+    PathDesiredGet(&pathDesired);
+    FlightModeSettingsPositionHoldOffsetData offset;
+    FlightModeSettingsPositionHoldOffsetGet(&offset);
+    FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
+    FlightStatusFlightModeGet(&flightMode);
+    StabilizationBankData stabSettings;
+    StabilizationBankGet(&stabSettings);
+
+    ManualControlCommandData cmd;
+    ManualControlCommandGet(&cmd);
+
+    cmd.Roll  = applyExpo(cmd.Roll, stabSettings.StickExpo.Roll);
+    cmd.Pitch = applyExpo(cmd.Pitch, stabSettings.StickExpo.Pitch);
+    cmd.Yaw   = applyExpo(cmd.Yaw, stabSettings.StickExpo.Yaw);
+
+    bool flagRollPitchHasInput = (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f);
+
+    if (!flagRollPitchHasInput) {
+        // no movement desired, re-enter positionHold at current start-position
+        if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY) {
+            // initiate braking and change assisted control flight mode to braking
+            if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
+                // avoid brake then hold sequence to continue descent.
+                plan_setup_land_from_velocityroam();
+            } else {
+                plan_setup_assistedcontrol(false);
+            }
+        }
+        // otherwise nothing to do in braking/hold modes
+    } else {
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
+
+        // Revert assist control state to primary, which in this case implies
+        // we are in roaming state (a GPS vector assisted velocity roam)
+        assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+
+        // Calculate desired velocity in each direction
+        float angle;
+        AttitudeStateYawGet(&angle);
+        angle = DEG2RAD(angle);
+        float cos_angle  = cosf(angle);
+        float sine_angle = sinf(angle);
+        float rotated[2] = {
+            -cmd.Pitch * cos_angle - cmd.Roll * sine_angle,
+            -cmd.Pitch * sine_angle + cmd.Roll * cos_angle
+        };
+        // flip pitch to have pitch down (away) point north
+        float horizontalVelMax;
+        float verticalVelMax;
+        VtolPathFollowerSettingsHorizontalVelMaxGet(&horizontalVelMax);
+        VtolPathFollowerSettingsVerticalVelMaxGet(&verticalVelMax);
+        float velocity_north = rotated[0] * horizontalVelMax;
+        float velocity_east  = rotated[1] * horizontalVelMax;
+        float velocity_down  = 0.0f;
+
+        if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
+            FlightModeSettingsLandingVelocityGet(&velocity_down);
+        }
+
+        float velocity = velocity_north * velocity_north + velocity_east * velocity_east;
+        velocity = sqrtf(velocity);
+
+        // if one stick input (pitch or roll) should we use fly by vector? set arbitrary distance of say 20m after which we
+        // expect new stick input
+        // if two stick input pilot is fighting wind manually and we use fly by velocity
+        // in reality setting velocity desired to zero will fight wind anyway.
+
+        pathDesired.Start.North = positionState.North;
+        pathDesired.Start.East  = positionState.East;
+        pathDesired.Start.Down  = positionState.Down;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_NORTH] = velocity_north;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_EAST]  = velocity_east;
+        pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_VELOCITYVECTOR_DOWN]  = velocity_down;
+
+        pathDesired.End.North = positionState.North;
+        pathDesired.End.East  = positionState.East;
+        pathDesired.End.Down  = positionState.Down;
+
+        pathDesired.StartingVelocity = velocity;
+        pathDesired.EndingVelocity   = velocity;
+        pathDesired.Mode = PATHDESIRED_MODE_VELOCITY;
+        if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
+            pathDesired.Mode = PATHDESIRED_MODE_LAND;
+            pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_LAND_OPTION_NONE;
+        } else {
+            pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_VELOCITY_UNUSED] = 0.0f;
+        }
+        PathDesiredSet(&pathDesired);
+        FlightStatusAssistedControlStateSet(&assistedControlFlightMode);
     }
 }
 
@@ -437,7 +731,7 @@ void plan_setup_AutoCruise()
     pathDesired.Start.Down       = pathDesired.End.Down;
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
-    pathDesired.Mode             = PATHDESIRED_MODE_FLYENDPOINT;
+    pathDesired.Mode             = PATHDESIRED_MODE_GOTOENDPOINT;
 
     PathDesiredSet(&pathDesired);
 
@@ -528,22 +822,27 @@ void plan_setup_assistedcontrol(uint8_t timeout_occurred)
 
     PositionStateGet(&positionState);
     PathDesiredData pathDesired;
-    PathDesiredGet(&pathDesired);
 
     FlightStatusAssistedControlStateOptions assistedControlFlightMode;
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
 
     if (timeout_occurred) {
-        pathDesired.End.North        = positionState.North;
-        pathDesired.End.East         = positionState.East;
-        pathDesired.End.Down         = positionState.Down;
-        pathDesired.Start.North      = positionState.North;
-        pathDesired.Start.East       = positionState.East;
-        pathDesired.Start.Down       = positionState.Down;
-        pathDesired.StartingVelocity = 0.0f;
-        pathDesired.EndingVelocity   = 0.0f;
-        pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-        assistedControlFlightMode    = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
+        FlightStatusFlightModeOptions flightMode;
+        FlightStatusFlightModeGet(&flightMode);
+        if (flightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
+            plan_setup_land_helper(&pathDesired);
+        } else {
+            pathDesired.End.North        = positionState.North;
+            pathDesired.End.East         = positionState.East;
+            pathDesired.End.Down         = positionState.Down;
+            pathDesired.Start.North      = positionState.North;
+            pathDesired.Start.East       = positionState.East;
+            pathDesired.Start.Down       = positionState.Down;
+            pathDesired.StartingVelocity = 0.0f;
+            pathDesired.EndingVelocity   = 0.0f;
+            pathDesired.Mode = PATHDESIRED_MODE_GOTOENDPOINT;
+        }
+        assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
     } else {
         VelocityStateData velocityState;
         VelocityStateGet(&velocityState);

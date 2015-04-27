@@ -107,7 +107,7 @@ struct UBX_ACK_NAK ubxLastNak;
 #define UBX_PVT_TIMEOUT (1000)
 // parse incoming character stream for messages in UBX binary format
 
-int parse_ubx_stream(uint8_t *rx, uint8_t len, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
+int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
 {
     int ret = PARSER_INCOMPLETE; // message not (yet) complete
     enum proto_states {
@@ -124,8 +124,8 @@ int parse_ubx_stream(uint8_t *rx, uint8_t len, char *gps_rx_buffer, GPSPositionS
     };
     uint8_t c;
     static enum proto_states proto_state = START;
-    static uint8_t rx_count = 0;
-    struct UBXPacket *ubx   = (struct UBXPacket *)gps_rx_buffer;
+    static uint16_t rx_count = 0;
+    struct UBXPacket *ubx    = (struct UBXPacket *)gps_rx_buffer;
 
     for (int i = 0; i < len; i++) {
         c = rx[i];
@@ -413,8 +413,10 @@ static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) 
     struct UBX_NAV_SVINFO *svinfo = &ubx->payload.nav_svinfo;
 
     svdata.SatsInView = 0;
+
+    // First, use slots for SVs actually being received
     for (chan = 0; chan < svinfo->numCh; chan++) {
-        if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM) {
+        if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM && svinfo->sv[chan].cno > 0) {
             svdata.Azimuth[svdata.SatsInView]   = svinfo->sv[chan].azim;
             svdata.Elevation[svdata.SatsInView] = svinfo->sv[chan].elev;
             svdata.PRN[svdata.SatsInView] = svinfo->sv[chan].svid;
@@ -422,6 +424,18 @@ static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) 
             svdata.SatsInView++;
         }
     }
+
+    // Now try to add the rest
+    for (chan = 0; chan < svinfo->numCh; chan++) {
+        if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM && 0 == svinfo->sv[chan].cno) {
+            svdata.Azimuth[svdata.SatsInView]   = svinfo->sv[chan].azim;
+            svdata.Elevation[svdata.SatsInView] = svinfo->sv[chan].elev;
+            svdata.PRN[svdata.SatsInView] = svinfo->sv[chan].svid;
+            svdata.SNR[svdata.SatsInView] = svinfo->sv[chan].cno;
+            svdata.SatsInView++;
+        }
+    }
+
     // fill remaining slots (if any)
     for (chan = svdata.SatsInView; chan < GPSSATELLITES_PRN_NUMELEM; chan++) {
         svdata.Azimuth[chan]   = 0;

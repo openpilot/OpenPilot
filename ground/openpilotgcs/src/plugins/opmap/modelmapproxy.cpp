@@ -86,18 +86,18 @@ void modelMapProxy::selectedWPChanged(QList<WayPointItem *> list)
 modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
 {
     switch (type) {
-    case MapDataDelegate::MODE_FLYENDPOINT:
-    case MapDataDelegate::MODE_FLYVECTOR:
-    case MapDataDelegate::MODE_DRIVEENDPOINT:
-    case MapDataDelegate::MODE_DRIVEVECTOR:
+    case MapDataDelegate::MODE_GOTOENDPOINT:
+    case MapDataDelegate::MODE_FOLLOWVECTOR:
+    case MapDataDelegate::MODE_VELOCITY:
+    case MapDataDelegate::MODE_LAND:
+    case MapDataDelegate::MODE_AUTOTAKEOFF:
+    case MapDataDelegate::MODE_BRAKE:
         return OVERLAY_LINE;
 
-    case MapDataDelegate::MODE_FLYCIRCLERIGHT:
-    case MapDataDelegate::MODE_DRIVECIRCLERIGHT:
+    case MapDataDelegate::MODE_CIRCLERIGHT:
         return OVERLAY_CIRCLE_RIGHT;
 
-    case MapDataDelegate::MODE_FLYCIRCLELEFT:
-    case MapDataDelegate::MODE_DRIVECIRCLELEFT:
+    case MapDataDelegate::MODE_CIRCLELEFT:
     default:
         return OVERLAY_CIRCLE_LEFT;
     }

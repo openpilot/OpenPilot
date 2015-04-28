@@ -376,8 +376,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         float *status   = (float *)&mixerStatus; // access status objects as an array of floats
         Mixer_t *mixers = (Mixer_t *)&mixerSettings.Mixer1Type;
-        float maxMotor  = 1.0f; // highest motor value
-        float minMotor  = -1.0f; // lowest motor value
+        float maxMotor  = -1.0f; // highest motor value. Addition method needs this to be -1.0f, division method needs this to be 1.0f
+        float minMotor  = 1.0f; // lowest motor value Addition method needs this to be 1.0f, division method needs this to be -1.0f
 
         for (int ct = 0; ct < MAX_MIX_ACTUATORS; ct++) {
             // During boot all camera actuators should be completely disabled (PWM pulse = 0).
@@ -709,7 +709,6 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed, bool AlwaysStabilizeWhenArmed, float throttleDesired)
 {
     int16_t valueScaled;
-    bool spinMotor; // spin the motor at at least idle?
     int16_t maxMotorScaled;
     int16_t minMotorScaled;
     int16_t diff;

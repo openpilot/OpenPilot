@@ -588,7 +588,6 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  */
 static float MixerCurve(float throttle, const float *curve, uint8_t elements, bool multirotor)
 {
-    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
     bool negativeThrottle = false;
 
     // negative throttle will be a v-curve

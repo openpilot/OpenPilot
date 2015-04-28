@@ -120,6 +120,7 @@ static void stabilizationOuterloopTask()
             case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
                 rpy_desired[t] = stabilizationDesiredAxis[t];
                 break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
             case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
             default:
                 rpy_desired[t] = ((float *)&attitudeState.Roll)[t];
@@ -148,6 +149,8 @@ static void stabilizationOuterloopTask()
         }
 #endif /* if defined(PIOS_QUATERNION_STABILIZATION) */
     }
+
+
     for (t = 0; t < AXES; t++) {
         bool reinit = (StabilizationStatusOuterLoopToArray(enabled)[t] != previous_mode[t]);
         previous_mode[t] = StabilizationStatusOuterLoopToArray(enabled)[t];
@@ -239,6 +242,40 @@ static void stabilizationOuterloopTask()
                 rateDesiredAxis[t] = rate_input + weak_leveling;
             }
             break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
+                rateDesiredAxis[t] = stabilizationDesiredAxis[t]; // default for all axes
+                // now test limits for pitch and/or roll
+                if (t == 1) { // pitch
+                    if (attitudeState.Pitch < -stabSettings.stabBank.PitchMax) {
+                        // attitude exceeds pitch max.
+                        // zero rate desired if also -ve
+                        if (rateDesiredAxis[t] < 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    } else if (attitudeState.Pitch > stabSettings.stabBank.PitchMax) {
+                        // attitude exceeds pitch max
+                        // zero rate desired if also +ve
+                        if (rateDesiredAxis[t] > 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    }
+                } else if (t == 0) { // roll
+                    if (attitudeState.Roll < -stabSettings.stabBank.RollMax) {
+                        // attitude exceeds roll max.
+                        // zero rate desired if also -ve
+                        if (rateDesiredAxis[t] < 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    } else if (attitudeState.Roll > stabSettings.stabBank.RollMax) {
+                        // attitude exceeds roll max
+                        // zero rate desired if also +ve
+                        if (rateDesiredAxis[t] > 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    }
+                }
+                break;
+
             case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
             default:
                 rateDesiredAxis[t] = stabilizationDesiredAxis[t];

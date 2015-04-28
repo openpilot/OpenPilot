@@ -40,6 +40,7 @@
 #include "actuatordesired.h"
 #include "actuatorcommand.h"
 #include "flightstatus.h"
+#include <flightmodesettings.h>
 #include "mixersettings.h"
 #include "mixerstatus.h"
 #include "cameradesired.h"
@@ -89,16 +90,17 @@ static volatile bool mixer_settings_updated;
 // Private functions
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed);
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed, bool AlwaysStabilizeWhenArmed, float throttleDesired);
+
 static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const MixerSettingsData *mixerSettings);
-static float MixerCurve(const float throttle, const float *curve, uint8_t elements);
+static float MixerCurve(const float throttle, const float *curve, uint8_t elements, bool multirotor);
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData *actuatorSettings);
 static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuatorSettings, bool force_update);
 static void MixerSettingsUpdatedCb(UAVObjEvent *ev);
 static void ActuatorSettingsUpdatedCb(UAVObjEvent *ev);
 float ProcessMixer(const int index, const float curve1, const float curve2,
                    const MixerSettingsData *mixerSettings, ActuatorDesiredData *desired,
-                   const float period);
+                   const float period, bool multirotor);
 
 // this structure is equivalent to the UAVObjects for one mixer.
 typedef struct {
@@ -179,6 +181,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     ActuatorCommandData command;
     ActuatorDesiredData desired;
     MixerStatusData mixerStatus;
+    FlightModeSettingsData settings;
     FlightStatusData flightStatus;
     SystemSettingsThrustControlOptions thrustType;
     float throttleDesired;
@@ -240,6 +243,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         dTSeconds = dTMilliseconds * 0.001f;
 
         FlightStatusGet(&flightStatus);
+        FlightModeSettingsGet(&settings);
         ActuatorDesiredGet(&desired);
         ActuatorCommandGet(&command);
         SystemSettingsThrustControlGet(&thrustType);
@@ -260,7 +264,13 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         }
 
         bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
+        bool multirotor  = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
+        bool alwaysArmed = settings.Arming == FLIGHTMODESETTINGS_ARMING_ALWAYSARMED;
+        bool AlwaysStabilizeWhenArmed = settings.AlwaysStabilizeWhenArmed == FLIGHTMODESETTINGS_ALWAYSSTABILIZEWHENARMED_TRUE;
 
+        if (alwaysArmed) {
+            AlwaysStabilizeWhenArmed = false; // Do not allow always stabilize when alwaysArmed is active. This is dangerous.
+        }
         // safety settings
         if (!armed) {
             // this also happens in scaleMotors as a per axis check
@@ -269,14 +279,17 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         if (throttleDesired <= 0.00f || !armed) {
             // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
-            if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Roll = 0.00f;
-            }
-            if (actuatorSettings.LowThrottleZeroAxis.Pitch == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Pitch = 0.00f;
-            }
-            if (actuatorSettings.LowThrottleZeroAxis.Yaw == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
-                desired.Yaw = 0.00f;
+            if (multirotor && AlwaysStabilizeWhenArmed && armed) { // we don't do this if this is a multirotor AND AlwaysStabilizeWhenArmed is true and the model is armed
+            } else {
+            	if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+					desired.Roll = 0.00f;
+				}
+				if (actuatorSettings.LowThrottleZeroAxis.Pitch == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+					desired.Pitch = 0.00f;
+				}
+				if (actuatorSettings.LowThrottleZeroAxis.Yaw == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+					desired.Yaw = 0.00f;
+				}
             }
         }
 
@@ -302,28 +315,28 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         bool spinWhileArmed   = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
         // curve 1 is the throttle curve applied to all motors.
-        float curve1 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
+        float curve1 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM, multirotor);
 
         // The source for the secondary curve is selectable
         float curve2 = 0;
         AccessoryDesiredData accessory;
         switch (mixerSettings.Curve2Source) {
         case MIXERSETTINGS_CURVE2SOURCE_THROTTLE:
-            curve2 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            curve2 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ROLL:
-            curve2 = MixerCurve(desired.Roll, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            curve2 = MixerCurve(desired.Roll, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_PITCH:
             curve2 = MixerCurve(desired.Pitch, mixerSettings.ThrottleCurve2,
-                                MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+                                MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_YAW:
-            curve2 = MixerCurve(desired.Yaw, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            curve2 = MixerCurve(desired.Yaw, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_COLLECTIVE:
             curve2 = MixerCurve(collectiveDesired, mixerSettings.ThrottleCurve2,
-                                MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+                                MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1:
@@ -332,7 +345,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY4:
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY5:
             if (AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0, &accessory) == 0) {
-                curve2 = MixerCurve(accessory.AccessoryVal, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+                curve2 = MixerCurve(accessory.AccessoryVal, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM, multirotor);
             } else {
                 curve2 = 0;
             }
@@ -340,9 +353,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         }
 
         float *status   = (float *)&mixerStatus; // access status objects as an array of floats
-        float maxMotor  = 1.0f; // highest motor value
-        float minMotor  = -1.0f; // lowest motor value
-        bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
+        float maxMotor  = -1.0f; // highest motor value. Addition method needs this to be -1.0f, division method needs this to be 1.0f
+        float minMotor  = 1.0f; // lowest motor value Addition method needs this to be 1.0f, division method needs this to be -1.0f
 
         for (int ct = 0; ct < MAX_MIX_ACTUATORS; ct++) {
             // During boot all camera actuators should be completely disabled (PWM pulse = 0).
@@ -358,7 +370,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             }
 
             if ((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_SERVO)) {
-                status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dTSeconds);
+                status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dTSeconds, multirotor);
             } else {
                 status[ct] = -1;
             }
@@ -460,7 +472,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                                                     maxMotor,
                                                     minMotor,
                                                     spinWhileArmed,
-                                                    armed);
+                                                    armed,
+													AlwaysStabilizeWhenArmed,
+													throttleDesired);
                 } else { // else we scale the channel
                     command.Channel[i] = scaleChannel(status[i],
                                                       actuatorSettings.ChannelMax[i],
@@ -510,9 +524,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
  * Process mixing for one actuator
  */
 float ProcessMixer(const int index, const float curve1, const float curve2,
-                   const MixerSettingsData *mixerSettings, ActuatorDesiredData *desired, const float period)
+                   const MixerSettingsData *mixerSettings, ActuatorDesiredData *desired, const float period, bool multirotor)
 {
-    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
     static float lastFilteredResult[MAX_MIX_ACTUATORS];
     const Mixer_t *mixers = (Mixer_t *)&mixerSettings->Mixer1Type; // pointer to array of mixers in UAVObjects
     const Mixer_t *mixer  = &mixers[index];
@@ -573,7 +586,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  * idx1 is the first valid index of the curve we look at
  * idx2 is the next highest element in the curve
  */
-static float MixerCurve(float throttle, const float *curve, uint8_t elements)
+static float MixerCurve(float throttle, const float *curve, uint8_t elements, bool multirotor)
 {
     bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor.
     bool negativeThrottle = false;
@@ -663,23 +676,38 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 /**
  * Constrain motor values to keep any one motor value from going too far out of range of another motor
  */
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed)
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed, bool AlwaysStabilizeWhenArmed, float throttleDesired)
 {
     int16_t valueScaled;
+    int16_t maxMotorScaled;
+    int16_t minMotorScaled;
+    int16_t diff;
 
     // Scale
     if (value >= 0.0f) {
-        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor)) + neutral;
+        valueScaled    = (int16_t)(value * ((float)(max - neutral))) + neutral;
+        maxMotorScaled = (int16_t)(maxMotor * ((float)(max - neutral))) + neutral;
+        minMotorScaled = (int16_t)(minMotor * ((float)(max - neutral))) + neutral;
     } else {
-        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor)) + neutral;
+        valueScaled    = (int16_t)(value * ((float)(neutral - min))) + neutral;
+        maxMotorScaled = (int16_t)(maxMotor * ((float)(neutral - min))) + neutral;
+        minMotorScaled = (int16_t)(minMotor * ((float)(neutral - min))) + neutral;
     }
 
     if (max > min) {
-        if (valueScaled > max) {
-            valueScaled = max; // clamp to max value only after scaling is done.
+        diff = max - maxMotorScaled; // difference between max allowed and actual max motor
+        if (diff < 0) { // if the difference is smaller than 0 we add it to the scaled value
+            valueScaled += diff;
+            if (valueScaled > max) {
+                valueScaled = max; // clamp to max value only after scaling is done.
+            }
         }
-        if (valueScaled < min) {
-            valueScaled = min; // clamp to min value only after scaling is done.
+        diff = min - minMotorScaled; // difference between min allowed and actual min motor
+        if (diff > 0) { // if the difference is larger than 0 we add it to the scaled value
+            valueScaled += diff;
+            if (valueScaled < min) {
+                valueScaled = min; // clamp to min value only after scaling is done.
+            }
         }
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?
@@ -691,15 +719,20 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
         }
     }
 
+    // I've added the bool AlwaysStabilizeWhenArmed to this function. Right now we command the motors at min or a range between neutral and max.
+    // NEVER should a motor be command at between min and neutral. I don't like the idea of stabilization ever commanding a motor to min, but we give people the option
+    // This prevents motors startup sync issues causing possible ESC failures.
+
+    // safety checks
     if (!armed) {
-        // if not armed return min
+        // if not armed return min EVERYTIME!
         valueScaled = min;
-    } else if ((valueScaled <= neutral) && (!spinWhileArmed)) {
-        // if armed and throttle is less than neutral we return min
-        valueScaled = min;
-    } else if ((valueScaled <= neutral) && (spinWhileArmed)) {
-        // if armed and throttle is less than neutral we return neutral
+    } else if (!AlwaysStabilizeWhenArmed && (throttleDesired <= 0.0f) && spinWhileArmed) {
+        // stabilize when armed?
         valueScaled = neutral;
+    } else if (!spinWhileArmed && (throttleDesired <= 0.0f)) {
+        // soft disarm
+        valueScaled = min;
     }
 
     return valueScaled;

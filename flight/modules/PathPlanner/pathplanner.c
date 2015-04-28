@@ -262,7 +262,7 @@ static void pathPlannerTask()
     }
 
     // check start conditions
-    // autotakeoff requires midpoint thrust uf we are in a pending takeoff situation
+    // autotakeoff requires midpoint thrust if we are in a pending takeoff situation
     if (pathAction.Command == PATHACTION_MODE_AUTOTAKEOFF) {
         pathAction.EndCondition = PATHACTION_ENDCONDITION_LEGREMAINING;
         if ((uint8_t)pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] == STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE) {

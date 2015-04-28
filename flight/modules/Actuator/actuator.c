@@ -709,20 +709,35 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
 {
     int16_t valueScaled;
     bool spinMotor; // spin the motor at at least idle?
+    int16_t maxMotorScaled;
+    int16_t minMotorScaled;
+    int16_t diff;
 
     // Scale
     if (value >= 0.0f) {
-        valueScaled = (int16_t)(value * ((float)(max - neutral) / maxMotor)) + neutral;
+        valueScaled    = (int16_t)(value * ((float)(max - neutral))) + neutral;
+        maxMotorScaled = (int16_t)(maxMotor * ((float)(max - neutral))) + neutral;
+        minMotorScaled = (int16_t)(minMotor * ((float)(max - neutral))) + neutral;
     } else {
-        valueScaled = (int16_t)(value * ((float)(neutral - min) / minMotor)) + neutral;
+        valueScaled    = (int16_t)(value * ((float)(neutral - min))) + neutral;
+        maxMotorScaled = (int16_t)(maxMotor * ((float)(neutral - min))) + neutral;
+        minMotorScaled = (int16_t)(minMotor * ((float)(neutral - min))) + neutral;
     }
 
     if (max > min) {
-        if (valueScaled > max) {
-            valueScaled = max; // clamp to max value only after scaling is done.
+        diff = max - maxMotorScaled; // difference between max allowed and actual max motor
+        if (diff < 0) { // if the difference is smaller than 0 we add it to the scaled value
+            valueScaled += diff;
+            if (valueScaled > max) {
+                valueScaled = max; // clamp to max value only after scaling is done.
+            }
         }
-        if (valueScaled < min) {
-            valueScaled = min; // clamp to min value only after scaling is done.
+        diff = min - minMotorScaled; // difference between min allowed and actual min motor
+        if (diff > 0) { // if the difference is larger than 0 we add it to the scaled value
+            valueScaled += diff;
+            if (valueScaled < min) {
+                valueScaled = min; // clamp to min value only after scaling is done.
+            }
         }
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?

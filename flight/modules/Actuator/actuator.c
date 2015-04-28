@@ -99,7 +99,7 @@ static int mixer_settings_count = 2;
 // Private functions
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed, bool AlwaysStabilizeWhenArmed);
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed, bool AlwaysStabilizeWhenArmed, float throttleDesired);
 static void setFailsafe();
 static float MixerCurveFullRangeProportional(const float input, const float *curve, uint8_t elements, bool multirotor);
 static float MixerCurveFullRangeAbsolute(const float input, const float *curve, uint8_t elements, bool multirotor);
@@ -501,7 +501,8 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                                                     maxMotor,
                                                     minMotor,
                                                     armed,
-                                                    AlwaysStabilizeWhenArmed);
+                                                    AlwaysStabilizeWhenArmed,
+                                                    throttleDesired);
                 } else { // else we scale the channel
                     command.Channel[i] = scaleChannel(status[i],
                                                       actuatorSettings.ChannelMax[i],
@@ -705,7 +706,7 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 /**
  * Constrain motor values to keep any one motor value from going too far out of range of another motor
  */
-static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed, bool AlwaysStabilizeWhenArmed)
+static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool armed, bool AlwaysStabilizeWhenArmed, float throttleDesired)
 {
     int16_t valueScaled;
     bool spinMotor; // spin the motor at at least idle?
@@ -750,24 +751,19 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
     }
 
     // I've added the bool AlwaysStabilizeWhenArmed to this function. Right now we command the motors at min or a range between neutral and max.
-    // NEVER should a motor be command at between min and neutral. I don't like the idea of stabilization ever commanding a motor to min since
-    // this could lead to motor stoppage in flight. For now, we will treat AlwaysStabilizeWhenArmed == true as always spin at idle unless throttle is 0;
+    // NEVER should a motor be command at between min and neutral. I don't like the idea of stabilization ever commanding a motor to min, but we give people the option
     // This prevents motors startup sync issues causing possible ESC failures.
-
-    if (AlwaysStabilizeWhenArmed || spinWhileArmed) {
-        spinMotor = true;
-    }
 
     // safety checks
     if (!armed) {
         // if not armed return min EVERYTIME!
         valueScaled = min;
-    } else if ((valueScaled <= neutral) && (!spinMotor)) {
-        // if armed and throttle is less than or equal to neutral and we don't spin motors at idle we return min
-        valueScaled = min;
-    } else if ((valueScaled <= neutral) && (spinMotor)) { // don't need a spinWhileArmed check here. Keeping it for readability
-        // if armed and throttle is less than or equal to neutral we return neutral when motors are supposed to spin at idle.
+    } else if (!AlwaysStabilizeWhenArmed && (throttleDesired <= 0.0f) && spinWhileArmed) {
+        // stabilize when armed?
         valueScaled = neutral;
+    } else if (!spinWhileArmed && (throttleDesired <= 0.0f)) {
+        // soft disarm
+        valueScaled = min;
     }
 
     return valueScaled;

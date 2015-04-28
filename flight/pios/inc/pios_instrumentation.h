@@ -47,7 +47,7 @@ extern int8_t pios_instrumentation_last_used_counter;
  * @param counter_handle handle of the counter to update @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  * @param newValue the updated value.
  */
-inline void PIOS_Instrumentation_updateCounter(pios_counter_t counter_handle, int32_t newValue)
+static inline void PIOS_Instrumentation_updateCounter(pios_counter_t counter_handle, int32_t newValue)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
@@ -69,7 +69,7 @@ inline void PIOS_Instrumentation_updateCounter(pios_counter_t counter_handle, in
  * Used to determine the time duration of a code block, mark the begin of the block. @see PIOS_Instrumentation_TimeEnd
  * @param counter_handle handle of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
-inline void PIOS_Instrumentation_TimeStart(pios_counter_t counter_handle)
+static inline void PIOS_Instrumentation_TimeStart(pios_counter_t counter_handle)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
@@ -83,7 +83,7 @@ inline void PIOS_Instrumentation_TimeStart(pios_counter_t counter_handle)
  * Used to determine the time duration of a code block, mark the end of the block. @see PIOS_Instrumentation_TimeStart
  * @param counter_handle handle of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
-inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
+static inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
@@ -106,7 +106,7 @@ inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
  * Used to determine the mean period between each call to the function
  * @param counter_handle handle of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
-inline void PIOS_Instrumentation_TrackPeriod(pios_counter_t counter_handle)
+static inline void PIOS_Instrumentation_TrackPeriod(pios_counter_t counter_handle)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     pios_perf_counter_t *counter = (pios_perf_counter_t *)counter_handle;

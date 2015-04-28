@@ -20,6 +20,7 @@
 # (all architectures)
 UAVOBJSRCFILENAMES =
 UAVOBJSRCFILENAMES += statusgrounddrive
+UAVOBJSRCFILENAMES += statusvtolautotakeoff
 UAVOBJSRCFILENAMES += pidstatus
 UAVOBJSRCFILENAMES += statusvtolland
 UAVOBJSRCFILENAMES += vtolselftuningstats

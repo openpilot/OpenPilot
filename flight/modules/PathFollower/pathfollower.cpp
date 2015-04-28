@@ -81,12 +81,14 @@ extern "C" {
 #include <pidstatus.h>
 #include <homelocation.h>
 #include <accelstate.h>
+#include <statusvtolautotakeoff.h>
 #include <statusvtolland.h>
 #include <statusgrounddrive.h>
 }
 
 #include "pathfollowercontrol.h"
 #include "vtollandcontroller.h"
+#include "vtolautotakeoffcontroller.h"
 #include "vtolvelocitycontroller.h"
 #include "vtolbrakecontroller.h"
 #include "vtolflycontroller.h"
@@ -172,6 +174,7 @@ extern "C" int32_t PathFollowerInitialize()
     PIDStatusInitialize();
     StatusVtolLandInitialize();
     StatusGroundDriveInitialize();
+    StatusVtolAutoTakeoffInitialize();
 
     // VtolLandFSM additional objects
     HomeLocationInitialize();
@@ -206,6 +209,7 @@ void pathFollowerInitializeControllersForFrameType()
     case FRAME_TYPE_HELI:
         if (!multirotor_initialised) {
             VtolLandController::instance()->Initialize(&vtolPathFollowerSettings);
+            VtolAutoTakeoffController::instance()->Initialize(&vtolPathFollowerSettings);
             VtolVelocityController::instance()->Initialize(&vtolPathFollowerSettings);
             VtolFlyController::instance()->Initialize(&vtolPathFollowerSettings);
             VtolBrakeController::instance()->Initialize(&vtolPathFollowerSettings);
@@ -261,6 +265,10 @@ static void pathFollowerSetActiveController(void)
                 break;
             case PATHDESIRED_MODE_LAND: // land with optional velocity roam option
                 activeController = VtolLandController::instance();
+                activeController->Activate();
+                break;
+            case PATHDESIRED_MODE_AUTOTAKEOFF:
+                activeController = VtolAutoTakeoffController::instance();
                 activeController->Activate();
                 break;
             default:

@@ -696,21 +696,21 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
         diff = max - maxMotorScaled; // difference between max allowed and actual max motor
         if (diff < 0) { // if the difference is smaller than 0 we add it to the scaled value
             valueScaled += diff;
-            if (valueScaled > max) {
-                valueScaled = max; // clamp to max value only after scaling is done.
-            }
         }
-        diff = min - minMotorScaled; // difference between min allowed and actual min motor
+        diff = neutral - minMotorScaled; // difference between min allowed and actual min motor
         if (diff > 0) { // if the difference is larger than 0 we add it to the scaled value
             valueScaled += diff;
-            //todo: make this flow easier to understand
-            if ( (valueScaled < neutral) && (spinWhileArmed) ) {
-            	valueScaled = neutral; // clamp to neutral value only after scaling is done.
-            } else if ( (valueScaled < neutral) && (!spinWhileArmed) ) {
-            	valueScaled = neutral; // clamp to neutral value only after scaling is done. //throttle goes to min is throttledesired is equal to or less than 0 below
-            } else if (valueScaled < neutral) {
-            	valueScaled = min; // clamp to min value only after scaling is done.
-            }
+        }
+        //todo: make this flow easier to understand
+        if ( (valueScaled < neutral) && (spinWhileArmed) ) {
+        	valueScaled = neutral; // clamp to neutral value only after scaling is done.
+        } else if ( (valueScaled < neutral) && (!spinWhileArmed) ) {
+        	valueScaled = neutral; // clamp to neutral value only after scaling is done. //throttle goes to min is throttledesired is equal to or less than 0 below
+        } else if (valueScaled < neutral) {
+        	valueScaled = min; // clamp to min value only after scaling is done.
+        }
+        if (valueScaled > max) {
+            valueScaled = max; // clamp to max value only after scaling is done.
         }
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?

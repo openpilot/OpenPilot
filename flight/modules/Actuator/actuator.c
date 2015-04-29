@@ -280,7 +280,6 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
             if (multirotor && AlwaysStabilizeWhenArmed && armed) { // we don't do this if this is a multirotor AND AlwaysStabilizeWhenArmed is true and the model is armed
-            } else {
             	if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
 					desired.Roll = 0.00f;
 				}
@@ -704,8 +703,13 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
         diff = min - minMotorScaled; // difference between min allowed and actual min motor
         if (diff > 0) { // if the difference is larger than 0 we add it to the scaled value
             valueScaled += diff;
-            if (valueScaled < min) {
-                valueScaled = min; // clamp to min value only after scaling is done.
+            //todo: make this flow easier to understand
+            if ( (valueScaled < neutral) && (spinWhileArmed) ) {
+            	valueScaled = neutral; // clamp to neutral value only after scaling is done.
+            } else if ( (valueScaled < neutral) && (!spinWhileArmed) ) {
+            	valueScaled = neutral; // clamp to neutral value only after scaling is done. //throttle goes to min is throttledesired is equal to or less than 0 below
+            } else if (valueScaled < neutral) {
+            	valueScaled = min; // clamp to min value only after scaling is done.
             }
         }
     } else {
@@ -732,6 +736,9 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
     } else if (!spinWhileArmed && (throttleDesired <= 0.0f)) {
         // soft disarm
         valueScaled = min;
+    } else if (spinWhileArmed && (valueScaled <= neutral)) {
+        // don't stop motors in flight to stabilize AlwaysStabilizeWhenArmed and
+        valueScaled = neutral;
     }
 
     return valueScaled;

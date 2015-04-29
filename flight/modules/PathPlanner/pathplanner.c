@@ -263,7 +263,7 @@ static void pathPlannerTask()
 
     // check start conditions
     // autotakeoff requires midpoint thrust if we are in a pending takeoff situation
-    if (pathAction.Command == PATHACTION_MODE_AUTOTAKEOFF) {
+    if (pathAction.Mode == PATHACTION_MODE_AUTOTAKEOFF) {
         pathAction.EndCondition = PATHACTION_ENDCONDITION_LEGREMAINING;
         if ((uint8_t)pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] == STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE) {
             ManualControlCommandData cmd;
@@ -331,7 +331,7 @@ void updatePathDesired()
     WaypointInstGet(waypointActive.Index, &waypoint);
     PathActionInstGet(waypoint.Action, &pathAction);
 
-    switch (pathAction.Command) {
+    switch (pathAction.Mode) {
     case PATHACTION_MODE_AUTOTAKEOFF:
         planner_setup_pathdesired_takeoff(&pathDesired);
         break;

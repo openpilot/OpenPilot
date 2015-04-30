@@ -317,6 +317,7 @@ static bool okToArm(void)
         return false;
 
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
+    case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
         return true;
 
     default:

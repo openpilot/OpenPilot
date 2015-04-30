@@ -5,5 +5,5 @@ setup(name='OpenPilot UavTalk',
       version='1.0',
       description='OpenPilot UavTalk',
       url='http://www.openpilot.org',
-      packages=['openpilot', 'openpilot.uavtalk'],
+      packages=['openpilot', 'openpilot.uavtalk', 'openpilot.uavobjects'],
      )

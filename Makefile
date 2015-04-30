@@ -189,6 +189,10 @@ uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	    $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
+uavobjects_python_install: 
+	$(V1) ( cp $(UAVOBJ_OUT_DIR)/python/* $(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/ )
+	$(V1) ( cd $(ROOT_DIR)/ground/pyuavtalk/ && python setup.py build && python setup.py install)
+
 uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
@@ -1027,6 +1031,8 @@ help:
 	@$(ECHO) "     uavobjects_test      - Parse xml-files - check for valid, duplicate ObjId's, ..."
 	@$(ECHO) "     uavobjects_<group>   - Generate source files from a subset of the UAVObject definition XML files"
 	@$(ECHO) "                            Supported groups are ($(UAVOBJ_TARGETS))"
+	@$(ECHO) "     uavobjects_python_install"
+	@$(ECHO) "     			    - Install generated python files as eggs for use with example Python scripts"
 	@$(ECHO)
 	@$(ECHO) "   [Packaging]"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"

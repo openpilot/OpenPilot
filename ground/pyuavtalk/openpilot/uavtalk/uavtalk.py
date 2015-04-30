@@ -87,7 +87,11 @@ class Crc(object):
         return self.crc
     
     def add(self, value):
-        self.crc = Crc.crcTable[self.crc ^ (value & 0xff)]
+        try:
+                self.crc = Crc.crcTable[self.crc ^ (value & 0xff)]
+        except TypeError:
+                print "Likely End Of File"
+                raise SystemExit
         
     def addList(self, values):
         for v in values:

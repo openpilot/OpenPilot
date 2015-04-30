@@ -244,27 +244,6 @@ MODULE_INITCALL(GPSInitialize, GPSStart);
 /**
  * Main gps task. It does not return.
  */
-enum pios_com_dev_magic {
-    PIOS_COM_DEV_MAGIC = 0xaa55aa55,
-};
-
-struct pios_com_dev {
-    enum pios_com_dev_magic magic;
-    uint32_t lower_id;
-    const struct pios_com_driver *driver;
-
-#if defined(PIOS_INCLUDE_FREERTOS)
-    xSemaphoreHandle tx_sem;
-    xSemaphoreHandle rx_sem;
-    xSemaphoreHandle sendbuffer_sem;
-#endif
-
-    bool has_rx;
-    bool has_tx;
-
-    t_fifo_buffer rx;
-    t_fifo_buffer tx;
-};
 
 static void gpsTask(__attribute__((unused)) void *parameters)
 {
@@ -472,11 +451,13 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
     // no booting of Revo should be required during any setup or testing, just Send the settings you want to play with
     // with autoconfig enabled, just change the baud rate in HwSettings and it will change the GPS internal baud and then the Revo port
     // with autoconfig disabled, it will only change the Revo port, so you can try to find the current GPS baud rate if you don't know it
+    // GPSPositionSensor.SensorType and .UbxAutoConfigStatus now give correct values at all times, so use .SensorType to prove it is
+    // connected, even to an incorrectly configured (e.g. factory default) GPS
 
     // Use cases:
     // - the user can plug in a default GPS, use autoconfig-store once and then always use autoconfig-disabled
     // - the user can plug in a default GPS that can't store settings (defaults to 9600 baud) and always use autoconfig-nostore
-    // - - this is my main reason for coding this: cheap eBay GPS's that loose their settings sometimes
+    // - - this is one reason for coding this: cheap eBay GPS's that loose their settings sometimes
     // - the user can plug in a default GPS that _can_ store settings and always use autoconfig-nostore with that too
     // - - if settings change in newer releases of OP, this will make sure to use the correct settings with whatever code you are running
     // - the user can plug in a correctly configured GPS and use autoconfig-disabled
@@ -496,45 +477,39 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
     // - - just plug the default (9600 baud) GPS in to an unpowered Revo, power the Revo/GPS through the servo connector, wait some time, unplug
     // - - or with this code, OP could and even should just ship GPS's with default settings
 
-    // if we add an "initial baud rate" instead of assuming 9600 for autoconfig-nostore/store
+    // if we add an "initial baud rate" instead of assuming 9600 at boot up for autoconfig-nostore/store
     // - the user can use the same GPS with both an older release of OP (e.g. GPS settings at 38400) and the current release (autoconfig-nostore)
-    // - should the 57600 be fixed as part of autoconfig-store/nostore and the HwSettings.GPSSpeed be the initial baud rate?
+    // - the 57600 could be fixed instead of the 9600 as part of autoconfig-store/nostore and the HwSettings.GPSSpeed be the initial baud rate?
 
     // About using UBlox GPS's with default settings (9600 baud and NEMA data):
     // - the default uBlox settings (different than OP settings) are NEMA and 9600 baud
     // - - and that is OK and you use autoconfig-nostore
     // - - I personally feel that this is the best way to set it up because if OP dev changes GPS settings,
     // - - you get them automatically changed to match whatever version of OP code you are running
-    // - - but 9600 is only OK for startup and only if you NEVER enable and store (even once) OP messages (a lot more data) at 9600
-    // - - using autoconfig-store just one time at 9600 will pretty much force you to use 57600
+    // - - but 9600 is only OK for this autoconfig startup
     // - by my testing, the 9600 initial to 57600 final baud startup takes:
-    // - - 1:13 if the GPS has been configured to send OP data at 9600
-    // - - 0:12 if the GPS has default data settings (NEMA)
-    // - - reminder that even 1:13 isn't that bad.  You need to wait for the GPS to acquire satellites,
-    // - - and it does that the whole time it is being configured
+    // - - 0:10 if the GPS has been configured to send OP data at 9600
+    // - - 0:06 if the GPS has default data settings (NEMA) at 9600
+    // - - reminder that even 0:10 isn't that bad.  You need to wait for the GPS to acquire satellites,
 
-    // Some things you want to know if you want to play around with this:
-    // - 57600 baud is what you want stored inside the GPS settings if you autoconfig-store it even once at any baud rate
-    // - - then use autoconfig-disabled once the GPS settings are stored in the GPS
-    // - don't play with low baud rates, with OP data settings (lots of data) at best it takes a long time to auto-configure
-    // - - at 19200 or lower it will fail to autoconfig and set the status to 'ERROR'
-    // - - at 19200 or lower the autoconfig is skipped and only the baud rate is changed
-    // - if you autoconfigure-store an OP configuration at 19200 baud or lower
-    // - - it will actually store a factory default configuration at that baud rate
-    // - - you will probably have to use u-center to fix it
-    // - - default settings (NEMA) at 9600 are OK because there is not nearly as much data as the OP config uses,
+    // Some things you want to think about if you want to play around with this:
+    // - don't play with low baud rates, with OP data settings (lots of data) it can take a long time to auto-configure
+    // - - at 2400 it could take a long time to autoconfig or error out
+    // - - at 9600 or lower the autoconfig is skipped and only the baud rate is changed
+    // - if you autoconfigure an OP configuration at 9600 baud or lower
+    // - - it will actually make a factory default configuration (not an OP configuration) at that baud rate
     // - remember that there are two baud rates (inside the GPS and the Revo port) and you can get them out of sync
     // - - rebooting the Revo from the Ground Control Station (without powering the GPS down too)
-    // - - can leave the baud rates out of sync if you are using autoconfig-nostore
+    // - - can leave the baud rates out of sync if you are using autoconfig
     // - - just power off and on both the Revo and the GPS
+    // - my OP GPS #2 will NOT save 115200 baud or higher, but it will use all bauds, even 230400
+    // - - so you could use autoconfig.nostore with this high baud rate, but not autoconfig.store (once) followed by autoconfig.disabled
+    // - - I haven't tested other GPS's in regard to this
 
-    // my OP GPS #2 will NOT save 115200 baud or higher, but it will use all bauds, even 230400
-
-    // since 9600 baud and lower are not usable, and are best left at NEMA, I could / should / will code it to do a factory reset
-    // - if set to 9600 baud (or lower???)
+    // since 9600 baud and lower are not usable, and are best left at NEMA, I could have coded it to do a factory reset
+    // - if set to 9600 baud (or lower)
 
     if (gpsPort) {
-        // static uint8_t old_speed = HWSETTINGS_GPSSPEED_230400+1;
         uint8_t speed;
 
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
@@ -587,9 +562,11 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
                 PIOS_COM_ChangeBaud(gpsPort, 230400);
                 break;
             }
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
             // even changing the baud rate will make it re-verify the sensor type
             // that way the user can just try some baud rates and it when the sensor type is valid, the baud rate is correct
             ubx_reset_sensor_type();
+#endif
         }
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
         else {

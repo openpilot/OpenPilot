@@ -156,29 +156,25 @@ def printUsage():
     appName = os.path.basename(sys.argv[0])
     print
     print "usage:"
-    print "  %s port o|w|g|s" % appName
-    print "  o: Show Attitude using an \"observer\""
-    print "  w: Show Attitude waiting for updates from flight"
-    print "  g: Show Attitude performing get operations"
-    print "  s: Drive Servo"
+    print "  %s filename " % appName
     print
-    print "  for example: %s COM30 o" % appName
+    print "  for example: %s /tmp/OP-2015-04-28_23-16-33.opl" % appName
     print 
     
 if __name__ == '__main__':
     
-    # if len(sys.argv) != 3:
-    #     print "ERROR: Incorrect number of arguments"
-    #     printUsage()
-    #     sys.exit(2)
+    if len(sys.argv) !=2:
+         print "ERROR: Incorrect number of arguments"
+	 print len(sys.argv)
+         printUsage()
+         sys.exit(2)
 
-    # filename, option = sys.argv[1:]
+    script, filename = sys.argv
+    if not os.path.exists(sys.argv[1]):
+    	sys.exit('ERROR: Database %s was not found!' % sys.argv[1])
 
     # Log everything, and send it to stderr.
     logging.basicConfig(level=logging.INFO)
-
-    filename = "/Users/kfinisterre/Desktop/OP-2015-04-28_23-16-33.opl"
-#    filename = "/Users/kfinisterre/Downloads/logs_20140903_100339.opl"
 
     try:
         demo = UavtalkDemo()

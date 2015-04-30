@@ -280,6 +280,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
             if (multirotor && AlwaysStabilizeWhenArmed && armed) { // we don't do this if this is a multirotor AND AlwaysStabilizeWhenArmed is true and the model is armed
+            } else {
             	if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
 					desired.Roll = 0.00f;
 				}
@@ -672,7 +673,7 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 }
 
 /**
- * Constrain motor values to keep any one motor value from going too far out of range of another motor
+ * Constrain motor values to keep any one motor value from going too far out of range of another motor. Only for multirotor.
  */
 static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral, float maxMotor, float minMotor, bool spinWhileArmed, bool armed, bool AlwaysStabilizeWhenArmed, float throttleDesired)
 {
@@ -682,15 +683,10 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
     int16_t diff;
 
     // Scale
-    if (value >= 0.0f) {
-        valueScaled    = (int16_t)(value * ((float)(max - neutral))) + neutral;
-        maxMotorScaled = (int16_t)(maxMotor * ((float)(max - neutral))) + neutral;
-        minMotorScaled = (int16_t)(minMotor * ((float)(max - neutral))) + neutral;
-    } else {
-        valueScaled    = (int16_t)(value * ((float)(neutral - min))) + neutral;
-        maxMotorScaled = (int16_t)(maxMotor * ((float)(neutral - min))) + neutral;
-        minMotorScaled = (int16_t)(minMotor * ((float)(neutral - min))) + neutral;
-    }
+	valueScaled    = (int16_t)(value * ((float)(max - neutral))) + neutral;
+	maxMotorScaled = (int16_t)(maxMotor * ((float)(max - neutral))) + neutral;
+	minMotorScaled = (int16_t)(minMotor * ((float)(max - neutral))) + neutral;
+
 
     if (max > min) {
         diff = max - maxMotorScaled; // difference between max allowed and actual max motor
@@ -702,16 +698,18 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
             valueScaled += diff;
         }
         //todo: make this flow easier to understand
-        if ( (valueScaled < neutral) && (spinWhileArmed) ) {
-        	valueScaled = neutral; // clamp to neutral value only after scaling is done.
-        } else if ( (valueScaled < neutral) && (!spinWhileArmed) ) {
-        	valueScaled = neutral; // clamp to neutral value only after scaling is done. //throttle goes to min is throttledesired is equal to or less than 0 below
-        } else if (valueScaled < neutral) {
-        	valueScaled = min; // clamp to min value only after scaling is done.
-        }
         if (valueScaled > max) {
             valueScaled = max; // clamp to max value only after scaling is done.
         }
+
+        if ( (valueScaled < neutral) && (spinWhileArmed) && AlwaysStabilizeWhenArmed) {
+        	valueScaled = neutral; // clamp to neutral value only after scaling is done.
+        } else if ( (valueScaled < neutral) && (!spinWhileArmed) && AlwaysStabilizeWhenArmed ) {
+        	valueScaled = neutral; // clamp to neutral value only after scaling is done. //throttle goes to min if throttledesired is equal to or less than 0 below
+        } else if (valueScaled < neutral) {
+        	valueScaled = min; // clamp to min value only after scaling is done.
+        }
+
     } else {
         // not sure what to do about reversed polarity right now. Why would anyone do this?
         if (valueScaled < max) {
@@ -731,14 +729,12 @@ static int16_t scaleMotor(float value, int16_t max, int16_t min, int16_t neutral
         // if not armed return min EVERYTIME!
         valueScaled = min;
     } else if (!AlwaysStabilizeWhenArmed && (throttleDesired <= 0.0f) && spinWhileArmed) {
+    	//all motors idle is AlwaysStabilizeWhenArmed is false, throttle is less than or equal to neutral and spin while armed
         // stabilize when armed?
         valueScaled = neutral;
     } else if (!spinWhileArmed && (throttleDesired <= 0.0f)) {
         // soft disarm
         valueScaled = min;
-    } else if (spinWhileArmed && (valueScaled <= neutral)) {
-        // don't stop motors in flight to stabilize AlwaysStabilizeWhenArmed and
-        valueScaled = neutral;
     }
 
     return valueScaled;

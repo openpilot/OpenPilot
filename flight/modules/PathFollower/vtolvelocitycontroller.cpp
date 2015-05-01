@@ -154,7 +154,19 @@ void VtolVelocityController::UpdateVelocityDesired()
     VelocityDesiredSet(&velocityDesired);
 }
 
-int8_t VtolVelocityController::UpdateStabilizationDesired(__attribute__((unused)) bool yaw_attitude, __attribute__((unused)) float yaw_direction)
+/**
+ * Compute bearing of current movement direction
+ */
+float VtolVelocityController::updateCourseBearing()
+{
+    VelocityStateData v;
+
+    VelocityStateGet(&v);
+    // atan2f always returns in between + and - 180 degrees
+    return RAD2DEG(atan2f(v.East, v.North));
+}
+
+int8_t VtolVelocityController::UpdateStabilizationDesired(bool yaw_attitude, float yaw_direction)
 {
     uint8_t result = 1;
     StabilizationDesiredData stabDesired;
@@ -182,7 +194,11 @@ int8_t VtolVelocityController::UpdateStabilizationDesired(__attribute__((unused)
     ManualControlCommandGet(&manualControl);
 
     stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
-    stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
+    if (yaw_attitude) {
+        stabDesired.Yaw = yaw_direction;
+    } else {
+        stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
+    }
 
     // default thrust mode to altvario
     stabDesired.StabilizationMode.Thrust = STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO;
@@ -199,7 +215,20 @@ void VtolVelocityController::UpdateAutoPilot()
     bool yaw_attitude = false;
     float yaw = 0.0f;
 
-    int8_t result     = UpdateStabilizationDesired(yaw_attitude, yaw);
+    switch (vtolPathFollowerSettings->YawControl) {
+    case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
+        yaw_attitude = false;
+        break;
+    case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
+	yaw_attitude = true;
+        yaw = updateCourseBearing();
+        break;
+    default:
+      yaw_attitude = false;
+      break;
+    }
+
+    int8_t result = UpdateStabilizationDesired(yaw_attitude, yaw);
 
     if (!result) {
         fallback_to_hold();

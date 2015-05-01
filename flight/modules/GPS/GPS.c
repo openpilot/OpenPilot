@@ -535,7 +535,7 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
         if (ev == NULL || gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED || gpsSettings.DataProtocol != GPSSETTINGS_DATAPROTOCOL_UBX)
 #endif
         {
-            // Set Revo / Nano port speed
+            // Set Revo port speed
             switch (speed) {
             case HWSETTINGS_GPSSPEED_2400:
                 PIOS_COM_ChangeBaud(gpsPort, 2400);

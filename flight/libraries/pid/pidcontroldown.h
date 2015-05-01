@@ -34,13 +34,13 @@ extern "C" {
 #include <pid.h>
 #include <stabilizationdesired.h>
 }
-#include "pathfollowerfsm.h"
+#include "pidcontroldowncallback.h"
 
 class PIDControlDown {
 public:
     PIDControlDown();
     ~PIDControlDown();
-    void Initialize(PathFollowerFSM *fsm);
+    void Initialize(PIDControlDownCallback *callback);
     void SetThrustLimits(float min_thrust, float max_thrust);
     void Deactivate();
     void Activate();
@@ -69,7 +69,7 @@ private:
     float mVelocitySetpointCurrent;
     float mVelocityState;
     float mDownCommand;
-    PathFollowerFSM *mFSM;
+    PIDControlDownCallback *mCallback;
     float mNeutral;
     float mVelocityMax;
     struct pid PIDpos;

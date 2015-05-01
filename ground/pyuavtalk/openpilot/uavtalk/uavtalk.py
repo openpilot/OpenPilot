@@ -37,6 +37,7 @@ TYPE_OBJ = 0x00
 TYPE_OBJ_REQ = 0x01
 TYPE_OBJ_ACK = 0x02
 TYPE_ACK = 0x03
+TYPE_NACK = 0x04
 
 MIN_HEADER_LENGTH = 10  # sync(1), type (1), size(2), object ID(4)
 MAX_HEADER_LENGTH = 10 # sync(1), type (1), size(2), object ID (4), instance ID(2 not used in single objects)
@@ -170,34 +171,53 @@ class UavTalkRecThread(threading.Thread):
                 else:
                     self.rxCount = 0
                     self.rxObjId = 0
-                    self.rxState += 1
+                    self.rxState = UavTalkRecThread.STATE_OBJID
                     
         elif self.rxState == UavTalkRecThread.STATE_OBJID:
             self.rxObjId >>= 8
             self.rxObjId |= (rx<<24)
             self.rxCount += 1
-            
-            if self.rxCount == 4:    
-                # Received complete ObjID
-                self.obj = self.uavTalk.objMan.getObj(self.rxObjId)
-                if self.obj != None:
-                    self.rxDataSize = self.obj.getSerialisedSize()
-                    
-                    if MIN_HEADER_LENGTH + self.obj.getSerialisedSize() != self.rxSize:
-                        logging.error("packet Size MISMATCH")
-                        self.rxState = UavTalkRecThread.STATE_SYNC
-                    else:
-                        print "Object: %s" % self.obj
-                        self.rxCount = 0
-                        self.rxData = []
-                        if (self.rxDataSize > 0):
-                            self.rxState = UavTalkRecThread.STATE_DATA
-                        else:
-                            self.rxState = UavTalkRecThread.STATE_DATA+1
+
+            if self.rxCount < 4:
+                return
+
+            self.rxCount = 0
+            self.rxInstId = 0
+            self.rxState += 1
+
+        elif self.rxState == UavTalkRecThread.STATE_INSTID:
+            self.rxCount += 1
+
+            if self.rxCount < 2:
+                return
+
+            self.rxCount = 0
+
+            # Received complete ObjID
+            self.obj = self.uavTalk.objMan.getObj(self.rxObjId)
+            if self.obj != None:
+                self.rxDataSize = self.obj.getSerialisedSize()
+
+                if MIN_HEADER_LENGTH + self.obj.getSerialisedSize() != self.rxSize:
+                    logging.error("packet Size MISMATCH")
+                    self.rxState = UavTalkRecThread.STATE_SYNC
                 else:
-                    logging.warning("Rec UNKNOWN Obj %x", self.rxObjId)
-                    self.rxState = self.STATE_SYNC
-                
+                    print "Object: %s" % self.obj
+                    self.rxCount = 0
+                    self.rxData = []
+
+                    if self.rxType == TYPE_OBJ_REQ | self.rxType == TYPE_ACK | self.rxType == TYPE_NACK:
+                        self.rxDataSize = 0
+
+                    if self.rxDataSize > 0:
+                        self.rxState = UavTalkRecThread.STATE_DATA
+                    else:
+                        self.rxState = UavTalkRecThread.STATE_DATA+1
+            else:
+                logging.warning("Rec UNKNOWN Obj %x", self.rxObjId)
+                self.rxState = self.STATE_SYNC
+
+
         elif self.rxState == UavTalkRecThread.STATE_DATA:
             self.rxData.append(rx)
             self.rxCount += 1

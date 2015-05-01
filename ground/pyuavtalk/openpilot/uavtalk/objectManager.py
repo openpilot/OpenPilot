@@ -34,8 +34,7 @@ import inspect
 from openpilot.uavtalk.uavobject import *
 
 
-
-class TimeoutException(Exception): 
+class TimeoutException(Exception):
     pass 
 
 class ObjManager(object):

@@ -37,7 +37,7 @@ $(DATAFIELDS)
 # Object $(NAME) definition
 class $(NAME)(UAVObject):
     # Object constants
-    OBJID = $(UOBJID)
+    OBJID = $(OBJIDHEX)
 
     # Constructor
     def __init__(self):

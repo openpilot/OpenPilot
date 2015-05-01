@@ -298,22 +298,6 @@ static void stabilizationOuterloopTask()
                 rateDesiredAxis[t] = stabilizationDesiredAxis[t];
                 break;
             }
-        } else {
-            switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
-#ifdef REVOLUTION
-            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
-                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEHOLD, reinit);
-                break;
-            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO:
-                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEVARIO, reinit);
-                break;
-#endif /* REVOLUTION */
-            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
-            default:
-                rateDesiredAxis[t] = stabilizationDesiredAxis[t];
-                break;
-            }
-        }
     }
 
     RateDesiredSet(&rateDesired);

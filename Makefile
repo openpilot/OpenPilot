@@ -185,11 +185,13 @@ $(UAVOBJ_OUT_DIR):
 	$(V1) $(MKDIR) -p $@
 
 uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
+	$(V1) mkdir -p $(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/ 
 	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
 	    $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
 uavobjects_python_install: 
+	$(V1) if [ -d "$(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/" ]; then echo "UAVObjects already exist"; else make uavobjects_python; fi
 	$(V1) ( cp $(UAVOBJ_OUT_DIR)/python/* $(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/ )
 	$(V1) ( cd $(ROOT_DIR)/ground/pyuavtalk/ && python setup.py build && python setup.py install)
 

@@ -39,12 +39,11 @@ TYPE_OBJ_ACK = 0x02
 TYPE_ACK = 0x03
 TYPE_NACK = 0x04
 
-MIN_HEADER_LENGTH = 10  # sync(1), type (1), size(2), object ID(4)
-MAX_HEADER_LENGTH = 10 # sync(1), type (1), size(2), object ID (4), instance ID(2 not used in single objects)
+HEADER_LENGTH = 10 # sync(1), type (1), size(2), object ID (4), instance ID(2 )
 
 MAX_PAYLOAD_LENGTH = 255
 CHECKSUM_LENGTH = 1
-MAX_PACKET_LENGTH = (MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH)
+MAX_PACKET_LENGTH = (HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH)
     
 
         
@@ -115,7 +114,7 @@ class UavTalkRecThread(threading.Thread):
         self.rxCrc = Crc()
         self.stop = False
         
-    def run(self):
+    def run(self):Fi
         #self.uavTalk.serial.open()
         self.stop = False
 
@@ -165,7 +164,7 @@ class UavTalkRecThread(threading.Thread):
             
             if self.rxCount == 2:    
                 # Received complete packet size, check for valid packet size
-                if (self.rxSize < MIN_HEADER_LENGTH) or (self.rxSize > MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH):
+                if (self.rxSize < HEADER_LENGTH) or (self.rxSize > HEADER_LENGTH + MAX_PAYLOAD_LENGTH):
                     logging.error("INVALID Packet Size")
                     self.rxState = UavTalkRecThread.STATE_SYNC
                 else:
@@ -195,10 +194,10 @@ class UavTalkRecThread(threading.Thread):
 
             # Received complete ObjID
             self.obj = self.uavTalk.objMan.getObj(self.rxObjId)
-            if self.obj != None:
+            if self.obj is not None:
                 self.rxDataSize = self.obj.getSerialisedSize()
 
-                if MIN_HEADER_LENGTH + self.obj.getSerialisedSize() != self.rxSize:
+                if HEADER_LENGTH + self.obj.getSerialisedSize() != self.rxSize:
                     logging.error("packet Size MISMATCH")
                     self.rxState = UavTalkRecThread.STATE_SYNC
                 else:
@@ -288,8 +287,8 @@ class UavTalk(object):
         
         header = [SYNC, type | VERSION, 0, 0, 0, 0, 0, 0]
         
-        length = MIN_HEADER_LENGTH 
-        if data != None: 
+        length = HEADER_LENGTH
+        if data is not None:
             length += len(data)
         header[2] = length & 0xFF
         header[3] = (length >>8) & 0xFF
@@ -301,7 +300,7 @@ class UavTalk(object):
         crc.addList(header)
         self.serial.write("".join(map(chr,header)))
         
-        if data != None:
+        if data is not None:
             crc.addList(data)
             self.serial.write("".join(map(chr,data)))
         

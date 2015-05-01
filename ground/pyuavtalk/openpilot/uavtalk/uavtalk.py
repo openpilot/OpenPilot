@@ -114,7 +114,7 @@ class UavTalkRecThread(threading.Thread):
         self.rxCrc = Crc()
         self.stop = False
         
-    def run(self):Fi
+    def run(self):
         #self.uavTalk.serial.open()
         self.stop = False
 

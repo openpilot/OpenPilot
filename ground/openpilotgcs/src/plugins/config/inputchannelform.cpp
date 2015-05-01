@@ -158,6 +158,9 @@ void InputChannelForm::groupUpdated()
     case ManualControlSettings::CHANNELGROUPS_SBUS:
         count = 18;
         break;
+    case ManualControlSettings::CHANNELGROUPS_SRXL:
+        count = 16;
+        break;
     case ManualControlSettings::CHANNELGROUPS_GCS:
         count = GCSReceiver::CHANNEL_NUMELEM;
         break;

@@ -279,8 +279,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         if (throttleDesired <= 0.00f || !armed) {
             // throttleDesired should never be 0 or go below 0.
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
-            if (multirotor && AlwaysStabilizeWhenArmed && armed) { // we don't do this if this is a multirotor AND AlwaysStabilizeWhenArmed is true and the model is armed
-            } else {
+            if (!(multirotor && AlwaysStabilizeWhenArmed && armed)) { // we don't do this if this is a multirotor AND AlwaysStabilizeWhenArmed is true and the model is armed
             	if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
 					desired.Roll = 0.00f;
 				}

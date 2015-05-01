@@ -258,6 +258,12 @@ extern uint32_t pios_packet_handler;
 #define PIOS_SBUS_NUM_INPUTS         (16 + 2)
 
 // -------------------------
+// Receiver Multiplex SRXL input
+// -------------------------
+#define PIOS_SRXL_MAX_DEVS           1
+#define PIOS_SRXL_NUM_INPUTS         16
+
+// -------------------------
 // Receiver DSM input
 // -------------------------
 #define PIOS_DSM_MAX_DEVS            2

@@ -193,6 +193,12 @@ uavobjects_python_install:
 	$(V1) ( cp $(UAVOBJ_OUT_DIR)/python/* $(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/ )
 	$(V1) ( cd $(ROOT_DIR)/ground/pyuavtalk/ && python setup.py build && python setup.py install)
 
+uavobjects_python_clean: 
+	@$(ECHO) " CLEAN      $(call toprel, $(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/)"
+	$(V1) [ ! -d "$(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/" ] || $(RM) -r "$(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/"
+	@$(ECHO) " CLEAN      $(call toprel, $(UAVOBJ_OUT_DIR)/python/)"
+	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)/python/" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)/python/"
+
 uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
@@ -1033,6 +1039,8 @@ help:
 	@$(ECHO) "                            Supported groups are ($(UAVOBJ_TARGETS))"
 	@$(ECHO) "     uavobjects_python_install"
 	@$(ECHO) "     			    - Install generated python files as eggs for use with example Python scripts"
+	@$(ECHO) "     uavobjects_python_clean"
+	@$(ECHO) "     			    - Remove generated python UAVOs from build directory & pyuavtalk folder"
 	@$(ECHO)
 	@$(ECHO) "   [Packaging]"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package (no clean)"

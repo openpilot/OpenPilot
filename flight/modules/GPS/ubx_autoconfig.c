@@ -489,7 +489,7 @@ static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
 
 // There are two baud rates of interest
 //   The baud rate the GPS is talking at
-//   The baud rate Revo or CC/3D is talking at
+//   The baud rate Revo is talking at
 //   These two must match for the GPS to work
 //   You only have direct control of the Revo baud rate
 //   The two baud rates must be the same for the Revo to send a command to the GPS
@@ -547,7 +547,7 @@ static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
 //   Real time progress of the GPS detection process
 //     Data Objects -> GPSPositionSensor -> AutoConfigStatus (DISABLED, RUNNING, DONE, ERROR)
 
-// Syncing the baud rates means that the GPS's internal baud rate setting is the same as the Revo (or CC/3D) port setting
+// Syncing the baud rates means that the GPS's internal baud rate setting is the same as the Revo port setting
 //   This is necessary for the GPS to work with Revo
 // To sync to and find out an unknown GPS baud rate (or sync to and use a known GPS baud rate)
 //   Temporarily change the AutoConfig mode to Disabled

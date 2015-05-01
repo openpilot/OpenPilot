@@ -50,7 +50,7 @@
 #include "UBX.h"
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
 #include "inc/ubx_autoconfig.h"
-#include "../../libraries/inc/fifo_buffer.h"
+//#include "../../libraries/inc/fifo_buffer.h"
 #endif
 
 #include <pios_instrumentation_helper.h>
@@ -535,7 +535,7 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
         if (ev == NULL || gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED || gpsSettings.DataProtocol != GPSSETTINGS_DATAPROTOCOL_UBX)
 #endif
         {
-            // Set Revo port speed
+            // Set Revo / Nano port speed
             switch (speed) {
             case HWSETTINGS_GPSSPEED_2400:
                 PIOS_COM_ChangeBaud(gpsPort, 2400);

@@ -138,6 +138,7 @@ static void stabilizationOuterloopTask()
             case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
                 rpy_desired[t] = stabilizationDesiredAxis[t];
                 break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
             case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
             default:
                 rpy_desired[t] = ((float *)&attitudeState.Roll)[t];
@@ -239,29 +240,79 @@ static void stabilizationOuterloopTask()
         }
         break;
         case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
-            // FIXME: local_error[] is rate - attitude for Weak Leveling
-            // The only ramifications are:
-            // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS
-            // Changing Rate mode max rate currently requires a change to Kp
-            // That would be changed to Attitude mode max angle affecting Kp
-            // Also does not take dT into account
-        {
-            float stickinput[3];
-            stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
-            stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
-            stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
-            float rate_input    = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
-            float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
-            weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
+                // FIXME: local_error[] is rate - attitude for Weak Leveling
+                // The only ramifications are:
+                // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS
+                // Changing Rate mode max rate currently requires a change to Kp
+                // That would be changed to Attitude mode max angle affecting Kp
+                // Also does not take dT into account
+            {
+                float stickinput[3];
+                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
+                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
+                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
+                float rate_input    = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
+                float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
+                weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
 
             // Compute desired rate as input biased towards leveling
             rateDesiredAxis[t] = rate_input + weak_leveling;
         }
-        break;
-        case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
-        default:
-            rateDesiredAxis[t] = stabilizationDesiredAxis[t];
             break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
+                rateDesiredAxis[t] = stabilizationDesiredAxis[t]; // default for all axes
+                // now test limits for pitch and/or roll
+                if (t == 1) { // pitch
+                    if (attitudeState.Pitch < -stabSettings.stabBank.PitchMax) {
+                        // attitude exceeds pitch max.
+                        // zero rate desired if also -ve
+                        if (rateDesiredAxis[t] < 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    } else if (attitudeState.Pitch > stabSettings.stabBank.PitchMax) {
+                        // attitude exceeds pitch max
+                        // zero rate desired if also +ve
+                        if (rateDesiredAxis[t] > 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    }
+                } else if (t == 0) { // roll
+                    if (attitudeState.Roll < -stabSettings.stabBank.RollMax) {
+                        // attitude exceeds roll max.
+                        // zero rate desired if also -ve
+                        if (rateDesiredAxis[t] < 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    } else if (attitudeState.Roll > stabSettings.stabBank.RollMax) {
+                        // attitude exceeds roll max
+                        // zero rate desired if also +ve
+                        if (rateDesiredAxis[t] > 0.0f) {
+                            rateDesiredAxis[t] = 0.0f;
+                        }
+                    }
+                }
+                break;
+
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+            default:
+                rateDesiredAxis[t] = stabilizationDesiredAxis[t];
+                break;
+            }
+        } else {
+            switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
+#ifdef REVOLUTION
+            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
+                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEHOLD, reinit);
+                break;
+            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO:
+                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEVARIO, reinit);
+                break;
+#endif /* REVOLUTION */
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+            default:
+                rateDesiredAxis[t] = stabilizationDesiredAxis[t];
+                break;
+            }
         }
     }
 

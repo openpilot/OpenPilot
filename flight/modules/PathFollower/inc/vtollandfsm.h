@@ -82,7 +82,7 @@ protected:
     // FSM instance data type
     typedef struct {
         StatusVtolLandData  fsmLandStatus;
-        PathFollowerFSM_LandState_T currentState;
+        StatusVtolLandStateOptions currentState;
         TakeOffLocationData takeOffLocation;
         uint32_t stateRunCount;
         uint32_t stateTimeoutCount;
@@ -133,7 +133,7 @@ protected:
     void setup_abort(void);
     void run_abort(uint8_t);
     void initFSM(void);
-    void setState(PathFollowerFSM_LandState_T newState, StatusVtolLandStateExitReasonOptions reason);
+    void setState(StatusVtolLandStateOptions newState, StatusVtolLandStateExitReasonOptions reason);
     int32_t runState();
     int32_t runAlways();
     void updateVtolLandFSMStatus();

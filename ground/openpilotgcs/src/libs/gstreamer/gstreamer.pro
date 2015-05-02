@@ -38,7 +38,7 @@ LIBS += -L$(GSTREAMER_SDK_DIR)/lib
 LIBS += -lgobject-2.0 -lglib-2.0 -lgstreamer-1.0 -lgstvideo-1.0
 
 win32 {
-    include(gst-plugins-bad/gst-plugins-bad.pro)
+    #include(gst-plugins-bad/gst-plugins-bad.pro)
 }
 
 include(copydata.pro)

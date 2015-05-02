@@ -30,10 +30,10 @@ static bool initialized = false;
 // static int print_element_info(GstElementFactory *factory, gboolean print_names);
 
 // GST_PLUGIN_STATIC_DECLARE(winks);
-static gboolean plugin_init(GstPlugin *plugin)
-{
-    return gst_element_register(plugin, "ksvideosrc", GST_RANK_NONE, GST_TYPE_KS_VIDEO_SRC);
-}
+//static gboolean plugin_init(GstPlugin *plugin)
+//{
+//    return gst_element_register(plugin, "ksvideosrc", GST_RANK_NONE, GST_TYPE_KS_VIDEO_SRC);
+//}
 
 // see http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/gst-running.html
 void gst::init(int *argc, char * *argv[])
@@ -52,9 +52,9 @@ void gst::init(int *argc, char * *argv[])
     gst_init(argc, argv);
 
     qDebug() << "gstreamer - registering plugins";
-    gst_plugin_register_static(GST_VERSION_MAJOR, GST_VERSION_MINOR, "winks",
-                               "Windows kernel streaming plugin", plugin_init, "1.4.0", "LGPL",
-                               "gst-plugins-bad", "GStreamer", "http://gstreamer.net/");
+//    gst_plugin_register_static(GST_VERSION_MAJOR, GST_VERSION_MINOR, "winks",
+//                               "Windows kernel streaming plugin", plugin_init, "1.4.0", "LGPL",
+//                               "gst-plugins-bad", "GStreamer", "http://gstreamer.net/");
 
     // gst_ks_video_src_get_type();
     // GST_PLUGIN_STATIC_REGISTER(winks);

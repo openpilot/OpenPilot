@@ -433,7 +433,6 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
                 m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
                 data.BankUpdateFreq[1] = servoFrequence;
-                data.BankMode[1] = bankMode;
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 data.BankUpdateFreq[1] = escFrequence;
                 data.BankMode[1] = bankMode;

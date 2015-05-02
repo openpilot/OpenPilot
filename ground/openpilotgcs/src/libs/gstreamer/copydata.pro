@@ -50,6 +50,10 @@ equals(copydata, 1) {
             libbz2.dll \
             libgcc_s_sjlj-1.dll
 
+        DLLS += \
+            libgstbadbase-1.0-0.dll \
+            libgstbadvideo-1.0-0.dll
+
         for(dll, DLLS) {
             addCopyFileTarget($${dll},$$(GSTREAMER_SDK_DIR)/bin,$${GCS_APP_PATH})
         }
@@ -63,6 +67,7 @@ equals(copydata, 1) {
             libgstcoreelements.dll \
             libgstdeinterlace.dll \
             libgstrawparse.dll \
+            libgstimagefreeze.dll \
             libgstvideomixer.dll \
             libgstvideoparsersbad.dll \
             libgstvideorate.dll \
@@ -72,7 +77,7 @@ equals(copydata, 1) {
             libgstpango.dll \
             libgstdebugutilsbad.dll \
             libgstd3dvideosink.dll \
-            #libgstwinks.dll \
+            libgstwinks.dll \
             libgstwinscreencap.dll \
             libgstaudiotestsrc.dll \
             libgstaudiovisualizers.dll \
@@ -84,6 +89,9 @@ equals(copydata, 1) {
             libgstrtpmanager.dll \
             libgstrtp.dll \
             libgstlibav.dll
+
+        DLLS += \
+            libgstcompositor.dll
 
         for(dll, DLLS) {
             addCopyFileTarget($${dll},$$(GSTREAMER_SDK_DIR)/lib/gstreamer-1.0,$${GCS_LIBRARY_PATH}/gstreamer-1.0)

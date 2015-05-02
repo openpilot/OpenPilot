@@ -137,6 +137,7 @@ void VideoWidget::start()
 
 void VideoWidget::pause()
 {
+    qDebug() << QString("VideoWidget::pause - %0").arg(m_pipelineDesc);
     init();
     update();
     if (pipeline) {
@@ -150,6 +151,7 @@ void VideoWidget::pause()
 
 void VideoWidget::stop()
 {
+    qDebug() << QString("VideoWidget::stop - %0").arg(m_pipelineDesc);
     dispose();
     update();
 }
@@ -510,22 +512,6 @@ void VideoWidget::setOverlay(Overlay *overlay)
     // drawback is that this widget won't participate in composition...
     setAttribute(Qt::WA_PaintOnScreen, hasOverlay);
 }
-
-// static GstElement * createTestPipeline() {
-// GstElement *pipeline = gst_pipeline_new("pipeline");
-// g_assert(pipeline);
-//
-// GstElement *src = gst_element_factory_make("videotestsrc", "src");
-// g_assert(src);
-//
-// GstElement *sink = gst_element_factory_make("directdrawsink", "sink");
-// g_assert(sink);
-//
-// gst_bin_add_many(GST_BIN(pipeline), src, sink, NULL);
-// gst_element_link_many(src, sink, NULL);
-//
-// return pipeline;
-// }
 
 static GstElement *createPipelineFromDesc(const char *desc, QString &lastError)
 {

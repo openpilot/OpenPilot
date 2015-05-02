@@ -170,7 +170,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
                 }
                 break;
             default:
-            	break;
+                break;
             }
         }
         switch (airspeedSettings.AirspeedSensorType) {

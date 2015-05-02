@@ -69,7 +69,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     flightInitTemplate.replace(QString("$(OBJINC)"), objInc);
     flightInitTemplate.replace(QString("$(OBJINIT)"), flightObjInit);
     bool res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/uavobjectsinit.c",
-                                   flightInitTemplate);
+                                    flightInitTemplate);
     if (!res) {
         cout << "Error: Could not write flight object init file" << endl;
         return false;
@@ -78,7 +78,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     // Write the flight object initialization header
     flightInitIncludeTemplate.replace(QString("$(SIZECALCULATION)"), QString().setNum(sizeCalc));
     res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/uavobjectsinit.h",
-                              flightInitIncludeTemplate);
+                               flightInitIncludeTemplate);
     if (!res) {
         cout << "Error: Could not write flight object init header file" << endl;
         return false;
@@ -88,7 +88,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     flightMakeTemplate.replace(QString("$(UAVOBJFILENAMES)"), objFileNames);
     flightMakeTemplate.replace(QString("$(UAVOBJNAMES)"), objNames);
     res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/Makefile.inc",
-                              flightMakeTemplate);
+                               flightMakeTemplate);
     if (!res) {
         cout << "Error: Could not write flight Makefile" << endl;
         return false;
@@ -119,14 +119,10 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     // that StringList here for use below.
     //
     QStringList typeList;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        if (info->fields[n]->type == FIELDTYPE_ENUM)
-        {
+    for (int n = 0; n < info->fields.length(); ++n) {
+        if (info->fields[n]->type == FIELDTYPE_ENUM) {
             typeList << QString("%1%2Options").arg(info->name).arg(info->fields[n]->name);
-        }
-        else
-        {
+        } else {
             typeList << fieldTypeStrC[info->fields[n]->type];
         }
     }
@@ -276,7 +272,6 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
         {
             // For non-array fields
             if (info->fields[n]->numElements == 1) {
-
                 /* Set */
                 setgetfields.append(QString("void %2%3Set(%1 *New%3)\n")
                                     .arg(typeList[n])

@@ -237,22 +237,22 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     // Get the different axis modes for this switch position
     switch (index) {
     case 1:
-        FlightModeSettingsStabilization1SettingsArrayGet((FlightModeSettingsStabilization1SettingsOptions*) modes);
+        FlightModeSettingsStabilization1SettingsArrayGet((FlightModeSettingsStabilization1SettingsOptions *)modes);
         break;
     case 2:
-        FlightModeSettingsStabilization2SettingsArrayGet((FlightModeSettingsStabilization2SettingsOptions*) modes);
+        FlightModeSettingsStabilization2SettingsArrayGet((FlightModeSettingsStabilization2SettingsOptions *)modes);
         break;
     case 3:
-        FlightModeSettingsStabilization3SettingsArrayGet((FlightModeSettingsStabilization3SettingsOptions*) modes);
+        FlightModeSettingsStabilization3SettingsArrayGet((FlightModeSettingsStabilization3SettingsOptions *)modes);
         break;
     case 4:
-        FlightModeSettingsStabilization4SettingsArrayGet((FlightModeSettingsStabilization4SettingsOptions*) modes);
+        FlightModeSettingsStabilization4SettingsArrayGet((FlightModeSettingsStabilization4SettingsOptions *)modes);
         break;
     case 5:
-        FlightModeSettingsStabilization5SettingsArrayGet((FlightModeSettingsStabilization5SettingsOptions*) modes);
+        FlightModeSettingsStabilization5SettingsArrayGet((FlightModeSettingsStabilization5SettingsOptions *)modes);
         break;
     case 6:
-        FlightModeSettingsStabilization6SettingsArrayGet((FlightModeSettingsStabilization6SettingsOptions*) modes);
+        FlightModeSettingsStabilization6SettingsArrayGet((FlightModeSettingsStabilization6SettingsOptions *)modes);
         break;
     default:
         return false;

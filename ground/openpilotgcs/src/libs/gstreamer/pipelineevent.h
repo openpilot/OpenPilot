@@ -19,6 +19,10 @@ public:
     // event types
     static const QEvent::Type PrepareWindowId;
     static const QEvent::Type StateChange;
+    static const QEvent::Type StreamStatus;
+    static const QEvent::Type NewClock;
+    static const QEvent::Type ClockProvide;
+    static const QEvent::Type ClockLost;
     static const QEvent::Type Progress;
     static const QEvent::Type Qos;
     static const QEvent::Type Error;
@@ -36,18 +40,20 @@ public:
 
 const QEvent::Type PipelineEvent::PrepareWindowId = static_cast<QEvent::Type>(QEvent::registerEventType());
 const QEvent::Type PipelineEvent::StateChange     = static_cast<QEvent::Type>(QEvent::registerEventType());
-const QEvent::Type PipelineEvent::Progress = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::StreamStatus    = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::NewClock = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::ClockProvide    = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::ClockLost = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Progress  = static_cast<QEvent::Type>(QEvent::registerEventType());
 const QEvent::Type PipelineEvent::Qos = static_cast<QEvent::Type>(QEvent::registerEventType());
-const QEvent::Type PipelineEvent::Error    = static_cast<QEvent::Type>(QEvent::registerEventType());
-const QEvent::Type PipelineEvent::Warning  = static_cast<QEvent::Type>(QEvent::registerEventType());
-const QEvent::Type PipelineEvent::Info     = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Error     = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Warning   = static_cast<QEvent::Type>(QEvent::registerEventType());
+const QEvent::Type PipelineEvent::Info = static_cast<QEvent::Type>(QEvent::registerEventType());
 
 class PrepareWindowIdEvent : public PipelineEvent {
 public:
     PrepareWindowIdEvent(QString src, Overlay *overlay) :
         PipelineEvent(PrepareWindowId, src), overlay(overlay)
-    {}
-    virtual ~PrepareWindowIdEvent()
     {}
     Overlay *getOverlay()
     {
@@ -63,13 +69,8 @@ private:
 
 class StateChangedEvent : public PipelineEvent {
 public:
-// enum State {
-// VoidPending, Null, Ready, Paused, Playing
-// };
     StateChangedEvent(QString src, Pipeline::State oldState, Pipeline::State newState, Pipeline::State pendingState) :
         PipelineEvent(StateChange, src), oldState(oldState), newState(newState), pendingState(pendingState)
-    {}
-    virtual ~StateChangedEvent()
     {}
     static QEvent::Type type()
     {
@@ -87,10 +88,137 @@ public:
     {
         return pendingState;
     }
+    static const char *stateName(Pipeline::State state)
+    {
+        switch (state) {
+        case Pipeline::VoidPending:
+            return "VoidPending";
+
+        case Pipeline::Null:
+            return "Null";
+
+        case Pipeline::Ready:
+            return "Ready";
+
+        case Pipeline::Paused:
+            return "Paused";
+
+        case Pipeline::Playing:
+            return "Playing";
+        }
+        return "<unknown>";
+    }
 private:
     Pipeline::State oldState;
     Pipeline::State newState;
     Pipeline::State pendingState;
+};
+
+class StreamStatusEvent : public PipelineEvent {
+public:
+    enum StreamStatusType {
+        Create, Enter, Leave, Destroy, Start, Pause, Stop, Null
+    };
+    StreamStatusEvent(QString src, StreamStatusType status, QString owner) :
+        PipelineEvent(StreamStatus, src), status(status), owner(owner)
+    {}
+    static QEvent::Type type()
+    {
+        return StreamStatus;
+    }
+    StreamStatusType getStatus()
+    {
+        return status;
+    }
+    const char *getStatusName()
+    {
+        return statusName(status);
+    }
+    static const char *statusName(StreamStatusType status)
+    {
+        switch (status) {
+        case StreamStatusEvent::Create:
+            return "Create";
+
+        case StreamStatusEvent::Enter:
+            return "Enter";
+
+        case StreamStatusEvent::Leave:
+            return "Leave";
+
+        case StreamStatusEvent::Destroy:
+            return "Destroy";
+
+        case StreamStatusEvent::Start:
+            return "Start";
+
+        case StreamStatusEvent::Pause:
+            return "Pause";
+
+        case StreamStatusEvent::Stop:
+            return "Stop";
+
+        case StreamStatusEvent::Null:
+            return "Null";
+        }
+        return "<unknown>";
+    }
+    QString getOwner()
+    {
+        return owner;
+    }
+private:
+    StreamStatusType status;
+    QString owner;
+};
+
+class ClockEvent : public PipelineEvent {
+public:
+    ClockEvent(QEvent::Type type, QString src, QString name) : PipelineEvent(type, src), name(name)
+    {}
+    QString getName()
+    {
+        return name;
+    }
+private:
+    QString name;
+};
+
+class NewClockEvent : public ClockEvent {
+public:
+    NewClockEvent(QString src, QString name) : ClockEvent(NewClock, src, name)
+    {}
+    static QEvent::Type type()
+    {
+        return NewClock;
+    }
+};
+
+class ClockProvideEvent : public ClockEvent {
+public:
+    ClockProvideEvent(QString src, QString name, bool ready) : ClockEvent(ClockProvide, src, name), ready(ready)
+    {}
+    static QEvent::Type type()
+    {
+        return ClockProvide;
+    }
+    bool isReady()
+    {
+        return ready;
+    }
+private:
+    bool ready;
+};
+
+
+class ClockLostEvent : public ClockEvent {
+public:
+    ClockLostEvent(QString src, QString name) : ClockEvent(ClockLost, src, name)
+    {}
+    static QEvent::Type type()
+    {
+        return ClockLost;
+    }
 };
 
 class ProgressEvent : public PipelineEvent {
@@ -101,8 +229,6 @@ public:
 
     ProgressEvent(QString src, ProgressType progressType, QString code, QString text) :
         PipelineEvent(Progress, src), progressType(progressType), code(code), text(text)
-    {}
-    virtual ~ProgressEvent()
     {}
     static QEvent::Type type()
     {
@@ -178,10 +304,7 @@ public:
 
 class QosEvent : public PipelineEvent {
 public:
-    QosEvent(QString src, QosData data) :
-        PipelineEvent(Qos, src), data(data)
-    {}
-    virtual ~QosEvent()
+    QosEvent(QString src, QosData data) : PipelineEvent(Qos, src), data(data)
     {}
     static QEvent::Type type()
     {
@@ -200,8 +323,6 @@ public:
     MessageEvent(QEvent::Type type, QString src, QString message, QString debug) :
         PipelineEvent(type, src), message(message), debug(debug)
     {}
-    virtual ~MessageEvent()
-    {}
     QString getMessage()
     {
         return message;
@@ -217,10 +338,7 @@ private:
 
 class ErrorEvent : public MessageEvent {
 public:
-    ErrorEvent(QString src, QString message, QString debug) :
-        MessageEvent(Error, src, message, debug)
-    {}
-    virtual ~ErrorEvent()
+    ErrorEvent(QString src, QString message, QString debug) : MessageEvent(Error, src, message, debug)
     {}
     static QEvent::Type type()
     {
@@ -230,10 +348,7 @@ public:
 
 class WarningEvent : public MessageEvent {
 public:
-    WarningEvent(QString src, QString message, QString debug) :
-        MessageEvent(Warning, src, message, debug)
-    {}
-    virtual ~WarningEvent()
+    WarningEvent(QString src, QString message, QString debug) : MessageEvent(Warning, src, message, debug)
     {}
     static QEvent::Type type()
     {
@@ -243,10 +358,7 @@ public:
 
 class InfoEvent : public MessageEvent {
 public:
-    InfoEvent(QString src, QString message, QString debug) :
-        MessageEvent(Info, src, message, debug)
-    {}
-    virtual ~InfoEvent()
+    InfoEvent(QString src, QString message, QString debug) : MessageEvent(Info, src, message, debug)
     {}
     static QEvent::Type type()
     {

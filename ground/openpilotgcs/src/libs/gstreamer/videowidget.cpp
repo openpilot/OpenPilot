@@ -301,29 +301,8 @@ static Pipeline::State cvt(GstState state)
         return Pipeline::Playing;
     }
     return Pipeline::Null;
-    // return StateChangedEvent::State.values()[state];
 }
 
-static ProgressEvent::ProgressType cvt(GstProgressType type)
-{
-    switch (type) {
-    case GST_PROGRESS_TYPE_START:
-        return ProgressEvent::Start;
-
-    case GST_PROGRESS_TYPE_CONTINUE:
-        return ProgressEvent::Continue;
-
-    case GST_PROGRESS_TYPE_COMPLETE:
-        return ProgressEvent::Complete;
-
-    case GST_PROGRESS_TYPE_CANCELED:
-        return ProgressEvent::Cancelled;
-
-    case GST_PROGRESS_TYPE_ERROR:
-        return ProgressEvent::Error;
-    }
-    return ProgressEvent::Error;
-}
 
 // TODO find a better way and move away from this file
 const char *VideoWidget::name(Pipeline::State state)
@@ -347,8 +326,57 @@ const char *VideoWidget::name(Pipeline::State state)
     return "<unknown>";
 }
 
+static StreamStatusEvent::StreamStatusType cvt(GstStreamStatusType type)
+{
+    switch (type) {
+    case GST_STREAM_STATUS_TYPE_CREATE:
+        return StreamStatusEvent::Create;
+
+    case GST_STREAM_STATUS_TYPE_ENTER:
+        return StreamStatusEvent::Enter;
+
+    case GST_STREAM_STATUS_TYPE_LEAVE:
+        return StreamStatusEvent::Leave;
+
+    case GST_STREAM_STATUS_TYPE_DESTROY:
+        return StreamStatusEvent::Destroy;
+
+    case GST_STREAM_STATUS_TYPE_START:
+        return StreamStatusEvent::Start;
+
+    case GST_STREAM_STATUS_TYPE_PAUSE:
+        return StreamStatusEvent::Pause;
+
+    case GST_STREAM_STATUS_TYPE_STOP:
+        return StreamStatusEvent::Stop;
+    }
+    return StreamStatusEvent::Null;
+}
+
+static ProgressEvent::ProgressType cvt(GstProgressType type)
+{
+    switch (type) {
+    case GST_PROGRESS_TYPE_START:
+        return ProgressEvent::Start;
+
+    case GST_PROGRESS_TYPE_CONTINUE:
+        return ProgressEvent::Continue;
+
+    case GST_PROGRESS_TYPE_COMPLETE:
+        return ProgressEvent::Complete;
+
+    case GST_PROGRESS_TYPE_CANCELED:
+        return ProgressEvent::Cancelled;
+
+    case GST_PROGRESS_TYPE_ERROR:
+        return ProgressEvent::Error;
+    }
+    return ProgressEvent::Error;
+}
+
 bool VideoWidget::event(QEvent *event)
 {
+    // qDebug().noquote() << QString("VideoWidget::event (%0) : %1").arg((long) QThread::currentThreadId()).arg(event->type());
     if (event->type() == PipelineEvent::PrepareWindowId) {
         PrepareWindowIdEvent *pe = static_cast<PrepareWindowIdEvent *>(event);
 
@@ -363,10 +391,50 @@ bool VideoWidget::event(QEvent *event)
     } else if (event->type() == PipelineEvent::StateChange) {
         StateChangedEvent *sce = static_cast<StateChangedEvent *>(event);
 
-        QString msg = QString("pipeline %0 changed state from %1 to %2")
+        QString msg = QString("%0 changed state from %1 to %2")
                       .arg(sce->src).arg(name(sce->getOldState())).arg(name(sce->getNewState()));
         qDebug() << "VideoWidget::event -" << msg;
         emit stateChanged(sce->getNewState());
+        // emit message(msg);
+
+        return true;
+    } else if (event->type() == PipelineEvent::StreamStatus) {
+        StreamStatusEvent *sse = static_cast<StreamStatusEvent *>(event);
+
+        QString msg = QString("%0 stream status %1 %2").arg(sse->src).arg(sse->getStatusName()).arg(sse->getOwner());
+        qDebug() << "VideoWidget::event -" << msg;
+        // emit message(msg);
+
+        return true;
+    } else if (event->type() == PipelineEvent::NewClock) {
+        NewClockEvent *nce = static_cast<NewClockEvent *>(event);
+
+        QString msg = QString("%0 has new clock %1").arg(nce->src).arg(nce->getName());
+        qDebug() << "VideoWidget::event -" << msg;
+        // emit message(msg);
+
+        return true;
+    } else if (event->type() == PipelineEvent::ClockProvide) {
+        ClockProvideEvent *cpe = static_cast<ClockProvideEvent *>(event);
+
+        QString msg = QString("%0 clock provide %1 ready=%2").arg(cpe->src).arg(cpe->getName()).arg(cpe->isReady());
+        qDebug() << "VideoWidget::event -" << msg;
+        // emit message(msg);
+
+        return true;
+    } else if (event->type() == PipelineEvent::ClockLost) {
+        ClockLostEvent *cle = static_cast<ClockLostEvent *>(event);
+
+        QString msg = QString("%0 lost clock %1").arg(cle->src).arg(cle->getName());
+        qDebug() << "VideoWidget::event -" << msg;
+        // emit message(msg);
+
+        return true;
+    } else if (event->type() == PipelineEvent::NewClock) {
+        NewClockEvent *nce = static_cast<NewClockEvent *>(event);
+
+        QString msg = QString("%0 changed has new clock %1").arg(nce->src).arg(nce->getName());
+        qDebug() << "VideoWidget::event -" << msg;
         // emit message(msg);
 
         return true;
@@ -381,8 +449,8 @@ bool VideoWidget::event(QEvent *event)
         QosEvent *qe = static_cast<QosEvent *>(event);
         QString msg  = QString("element %0 sent qos event: %1 %2 %3").arg(qe->src).arg(qe->getData().timestamps()).arg(
             qe->getData().values()).arg(qe->getData().stats());
-        qWarning() << "VideoWidget::event -" << msg;
-        emit message(msg);
+        // qWarning() << "VideoWidget::event -" << msg;
+        // emit message(msg);
         return true;
     } else if (event->type() == PipelineEvent::Error) {
         ErrorEvent *ee = static_cast<ErrorEvent *>(event);
@@ -503,8 +571,8 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
             gst_video_overlay_set_window_handle(gst_video_overlay, (gulong)wId);
             // and now post event asynchronously
             Overlay *overlay = new GstOverlayImpl(gst_video_overlay);
-            QString name(GST_OBJECT_NAME(message->src));
-            QCoreApplication::postEvent(widget, new PrepareWindowIdEvent(name, overlay));
+            QString src(GST_OBJECT_NAME(message->src));
+            QCoreApplication::postEvent(widget, new PrepareWindowIdEvent(src, overlay));
         }
         break;
     case GST_MESSAGE_STATE_CHANGED:
@@ -513,8 +581,59 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
             GstState old_state, new_state, pending_state;
             gst_message_parse_state_changed(message, &old_state, &new_state, &pending_state);
 
-            QString name(GST_OBJECT_NAME(message->src));
-            QCoreApplication::postEvent(widget, new StateChangedEvent(name, cvt(old_state), cvt(new_state), cvt(pending_state)));
+            QString src(GST_OBJECT_NAME(message->src));
+            QCoreApplication::postEvent(widget, new StateChangedEvent(src, cvt(old_state), cvt(new_state), cvt(pending_state)));
+        }
+        break;
+    }
+    case GST_MESSAGE_STREAM_STATUS:
+    {
+        GstStreamStatusType type;
+        GstElement *owner;
+        gst_message_parse_stream_status(message, &type, &owner);
+
+        QString src(GST_OBJECT_NAME(message->src));
+        QString name(GST_OBJECT_NAME(owner));
+        QCoreApplication::postEvent(widget, new StreamStatusEvent(src, cvt(type), name));
+        break;
+    }
+    case GST_MESSAGE_NEW_CLOCK:
+    {
+        if (GST_IS_PIPELINE(message->src)) {
+            GstClock *clock;
+
+            gst_message_parse_new_clock(message, &clock);
+
+            QString src(GST_OBJECT_NAME(message->src));
+            QString name(GST_OBJECT_NAME(clock));
+            QCoreApplication::postEvent(widget, new NewClockEvent(src, name));
+        }
+        break;
+    }
+    case GST_MESSAGE_CLOCK_PROVIDE:
+    {
+        if (GST_IS_PIPELINE(message->src)) {
+            GstClock *clock;
+            gboolean ready;
+
+            gst_message_parse_clock_provide(message, &clock, &ready);
+
+            QString src(GST_OBJECT_NAME(message->src));
+            QString name(GST_OBJECT_NAME(clock));
+            QCoreApplication::postEvent(widget, new ClockProvideEvent(src, name, ready));
+        }
+        break;
+    }
+    case GST_MESSAGE_CLOCK_LOST:
+    {
+        if (GST_IS_PIPELINE(message->src)) {
+            GstClock *clock;
+
+            gst_message_parse_clock_lost(message, &clock);
+
+            QString src(GST_OBJECT_NAME(message->src));
+            QString name(GST_OBJECT_NAME(clock));
+            QCoreApplication::postEvent(widget, new ClockLostEvent(src, name));
         }
         break;
     }
@@ -525,8 +644,8 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         gchar *text;
         gst_message_parse_progress(message, &type, &code, &text);
 
-        QString name(GST_OBJECT_NAME(message->src));
-        QCoreApplication::postEvent(widget, new ProgressEvent(name, cvt(type), QString(code), QString(text)));
+        QString src(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new ProgressEvent(src, cvt(type), QString(code), QString(text)));
 
         g_free(code);
         g_free(text);
@@ -539,13 +658,15 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         gboolean live;
         gst_message_parse_qos(message, &live, &data.running_time, &data.stream_time, &data.timestamp, &data.duration);
         data.live = (live == TRUE) ? true : false;
+
         gdouble proportion;
         gst_message_parse_qos_values(message, &data.jitter, &proportion, &data.quality);
         data.proportion = proportion;
+
         gst_message_parse_qos_stats(message, NULL, &data.processed, &data.dropped);
 
-        QString name(GST_OBJECT_NAME(message->src));
-        QCoreApplication::postEvent(widget, new QosEvent(name, data));
+        QString src(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new QosEvent(src, data));
 
         break;
     }
@@ -559,8 +680,8 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         gchar *debug;
         gst_message_parse_error(message, &err, &debug);
 
-        QString name(GST_OBJECT_NAME(message->src));
-        QCoreApplication::postEvent(widget, new ErrorEvent(name, QString(err->message), QString(debug)));
+        QString src(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new ErrorEvent(src, QString(err->message), QString(debug)));
 
         g_error_free(err);
         g_free(debug);
@@ -572,8 +693,8 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         gchar *debug;
         gst_message_parse_warning(message, &err, &debug);
 
-        QString name(GST_OBJECT_NAME(message->src));
-        QCoreApplication::postEvent(widget, new WarningEvent(name, QString(err->message), QString(debug)));
+        QString src(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new WarningEvent(src, QString(err->message), QString(debug)));
 
         g_error_free(err);
         g_free(debug);
@@ -585,8 +706,8 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
         gchar *debug;
         gst_message_parse_info(message, &err, &debug);
 
-        QString name(GST_OBJECT_NAME(message->src));
-        QCoreApplication::postEvent(widget, new InfoEvent(name, QString(err->message), QString(debug)));
+        QString src(GST_OBJECT_NAME(message->src));
+        QCoreApplication::postEvent(widget, new InfoEvent(src, QString(err->message), QString(debug)));
 
         g_error_free(err);
         g_free(debug);
@@ -595,12 +716,15 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
     default:
         break;
     }
-    return true;
+    return false;
 }
 
 static GstBusSyncReply gst_bus_sync_handler(GstBus *bus, GstMessage *message, BusSyncHandler *handler)
 {
-    qDebug() << QString("VideoWidget::gst_bus_sync_handler (%0) : %1 : %2 (%3)").arg((long)QThread::currentThreadId()).arg(GST_OBJECT_NAME(message->src)).arg(GST_MESSAGE_TYPE_NAME(message)).arg(message != NULL ? GST_OBJECT_NAME(message) : "null");
+    qDebug().noquote() << QString("VideoWidget::gst_bus_sync_handler (%0) : %1 : %2")
+        .arg((long)QThread::currentThreadId())
+        .arg(GST_MESSAGE_SRC_NAME(message))
+        .arg(GST_MESSAGE_TYPE_NAME(message));
     if (handler->handleMessage(message)) {
         gst_message_unref(message);
         return GST_BUS_DROP;

@@ -402,7 +402,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                     nonreversible_curve1 = 0.0f;
                 }
                 if (nonreversible_curve2 < 0.0f) {
-                    nonreversible_curve2 = 0.0f;
+                	if (!multirotor) { //allow negative throttle if multirotor. function scaleMotors handles the sanity checks.
+                		nonreversible_curve2 = 0.0f;
+                	}
                 }
                 status[ct] = ProcessMixer(ct, nonreversible_curve1, nonreversible_curve2, &desired, dTSeconds, multirotor);
                 // If not armed or motors aren't meant to spin all the time

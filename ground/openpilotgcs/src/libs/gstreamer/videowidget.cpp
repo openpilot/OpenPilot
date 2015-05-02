@@ -121,6 +121,7 @@ QString VideoWidget::pipelineDesc()
 void VideoWidget::setPipelineDesc(QString pipelineDesc)
 {
     qDebug() << QString("VideoWidget::setPipelineDesc - %0").arg(pipelineDesc);
+    stop();
     this->m_pipelineDesc = pipelineDesc;
 }
 

@@ -185,7 +185,6 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // initialise limits on thrust but note the FSM can override.
     controlDown.SetThrustLimits(altitudeHoldSettings.ThrustLimits.Min, altitudeHoldSettings.ThrustLimits.Max);
-
 }
 
 

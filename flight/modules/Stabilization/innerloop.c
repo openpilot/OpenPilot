@@ -49,7 +49,7 @@
 #include <stabilization.h>
 #include <virtualflybar.h>
 #include <cruisecontrol.h>
-
+#include <sanitycheck.h>
 // Private constants
 
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_CRITICAL
@@ -239,6 +239,7 @@ static void stabilizationInnerloopTask()
     float *actuatorDesiredAxis = &actuator.Roll;
     int t;
     float dT;
+    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor
     dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
 
     for (t = 0; t < AXES; t++) {
@@ -308,7 +309,12 @@ static void stabilizationInnerloopTask()
             }
         }
 
-        actuatorDesiredAxis[t] = boundf(actuatorDesiredAxis[t], -1.0f, 1.0f);
+        if (!multirotor) {
+            // we only need to clamp the desired axis to a sane range if the frame is not a multirotor type
+            // we don't want to do any clamping until after the motors are calculated and scaled.
+            // need to figure out what to do with a tricopter tail servo.
+            actuatorDesiredAxis[t] = boundf(actuatorDesiredAxis[t], -1.0f, 1.0f);
+        }
     }
 
     actuator.UpdateTime = dT * 1000;

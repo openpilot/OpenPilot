@@ -62,7 +62,7 @@ bool UAVObjectGeneratorGCS::generate(UAVObjectParser *parser, QString templatepa
     // Write the gcs object inialization files
     gcsInitTemplate.replace(QString("$(OBJINC)"), objInc);
     gcsInitTemplate.replace(QString("$(OBJINIT)"), gcsObjInit);
-    bool res = writeFileIfDiffrent(gcsOutputPath.absolutePath() + "/uavobjectsinit.cpp", gcsInitTemplate);
+    bool res = writeFileIfDifferent(gcsOutputPath.absolutePath() + "/uavobjectsinit.cpp", gcsInitTemplate);
     if (!res) {
         cout << "Error: Could not write output files" << endl;
         return false;
@@ -371,12 +371,12 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo *info)
     outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Write the GCS code
-    bool res = writeFileIfDiffrent(gcsOutputPath.absolutePath() + "/" + info->namelc + ".cpp", outCode);
+    bool res = writeFileIfDifferent(gcsOutputPath.absolutePath() + "/" + info->namelc + ".cpp", outCode);
     if (!res) {
         cout << "Error: Could not write gcs output files" << endl;
         return false;
     }
-    res = writeFileIfDiffrent(gcsOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude);
+    res = writeFileIfDifferent(gcsOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude);
     if (!res) {
         cout << "Error: Could not write gcs output files" << endl;
         return false;

@@ -710,7 +710,7 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
     }
 
     // Default maxThrottle and minThrottle
-    float maxThrottle = 0.9;
+    float maxThrottle = 1;
     float minThrottle = 0;
 
 
@@ -1010,7 +1010,7 @@ void VehicleConfigurationHelper::resetVehicleConfig()
         Q_ASSERT(field);
         // Set default curve at 90% max for Multirotors
         for (quint32 i = 0; i < field->getNumElements(); i++) {
-            field->setValue(i * (0.9f / (field->getNumElements() - 1)), i);
+            field->setValue(i * (1.0f / (field->getNumElements() - 1)), i);
         }
     }
 

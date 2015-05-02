@@ -51,8 +51,7 @@ equals(copydata, 1) {
             libgcc_s_sjlj-1.dll
 
         for(dll, DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/bin/$$dll\") \
-                $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+            addCopyFileTarget($${dll},$$(GSTREAMER_SDK_DIR)/bin,$${GCS_APP_PATH})
         }
 
         # copy plugin DLLs
@@ -86,17 +85,10 @@ equals(copydata, 1) {
             libgstrtp.dll \
             libgstlibav.dll
 
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_LIBRARY_PATH/gstreamer-1.0/$$dll\") $$addNewline()
         for(dll, DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/lib/gstreamer-1.0/$$dll\") \
-                $$targetPath(\"$$GCS_LIBRARY_PATH/gstreamer-1.0/$$dll\") $$addNewline()
+            addCopyFileTarget($${dll},$$(GSTREAMER_SDK_DIR)/lib/gstreamer-1.0,$${GCS_LIBRARY_PATH}/gstreamer-1.0)
         }
 
     }
 
-    # add make target
-    POST_TARGETDEPS += copydata
-
-    data_copy.target = copydata
-    QMAKE_EXTRA_TARGETS += data_copy
 }

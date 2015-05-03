@@ -702,12 +702,11 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_rv_auxsbusport;
     HwSettingsRV_AuxSBusPortGet(&hwsettings_rv_auxsbusport);
     bool non_inverted = FALSE;
-
     switch (hwsettings_rv_auxsbusport) {
     case HWSETTINGS_RV_AUXSBUSPORT_DISABLED:
         break;
     case HWSETTINGS_RV_AUXSBUSPORT_SBUSNONSTANDARDNONINVERTED:
-        bool non_inverted = TRUE;
+        non_inverted = TRUE;
     case HWSETTINGS_RV_AUXSBUSPORT_SBUS:
 #ifdef PIOS_INCLUDE_SBUS
         {

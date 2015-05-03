@@ -646,7 +646,6 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_mainport;
     HwSettingsRM_MainPortGet(&hwsettings_mainport);
     bool non_inverted = FALSE;
-
     switch (hwsettings_mainport) {
     case HWSETTINGS_RM_MAINPORT_DISABLED:
         break;
@@ -657,7 +656,7 @@ void PIOS_Board_Init(void)
         PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_GPS_RX_BUF_LEN, PIOS_COM_GPS_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_gps_id);
         break;
     case HWSETTINGS_RM_MAINPORT_SBUSNONSTANDARDNONINVERTED:
-        bool non_inverted = TRUE;
+        non_inverted = TRUE;
     case HWSETTINGS_RM_MAINPORT_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
         {

@@ -429,7 +429,6 @@ void PIOS_Board_Init(void)
     uint8_t hwsettings_cc_mainport;
     HwSettingsCC_MainPortGet(&hwsettings_cc_mainport);
     bool non_inverted = FALSE;
-
     switch (hwsettings_cc_mainport) {
     case HWSETTINGS_CC_MAINPORT_DISABLED:
         break;
@@ -454,7 +453,7 @@ void PIOS_Board_Init(void)
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
         break;
     case HWSETTINGS_CC_MAINPORT_SBUSNONSTANDARDNONINVERTED:
-        bool non_inverted = TRUE;
+        non_inverted = TRUE;
     case HWSETTINGS_CC_MAINPORT_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
         {

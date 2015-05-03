@@ -148,6 +148,9 @@ int32_t PIOS_SBus_Init(uint32_t *sbus_id,
     *sbus_id = (uint32_t)sbus_dev;
 
     /* Enable inverter clock and enable the inverter */
+// (*cfg->gpio_clk_func)(cfg->gpio_clk_periph, ENABLE);
+// GPIO_Init(cfg->inv.gpio, &cfg->inv.init);
+// GPIO_WriteBit(cfg->inv.gpio, cfg->inv.init.GPIO_Pin, cfg->gpio_inv_enable);
 
     /* Set comm driver callback */
     (driver->bind_rx_cb)(lower_id, PIOS_SBus_RxInCallback, *sbus_id);

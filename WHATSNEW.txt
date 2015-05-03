@@ -1,4 +1,4 @@
---- RELEASE-15.02.02-RC1 ---
+--- RELEASE-15.02.02-RC2 ---
 This release fixes a bug that prevents revo onboard mag to work correctly.
 
 Release Notes - OpenPilot - Version RELEASE-15.02.02
@@ -10,6 +10,11 @@ https://progress.openpilot.org/issues/?filter=12262
     * [OP-1820] - fix onboard mag orientation
     * [OP-1821] - Tricopter tail servo wrong speed on wizard
     * [OP-1827] - Version ID wrong in Windows uninstaller
+    * [OP-1872] - Vehicle Wiz Tricopter tail servo settings don't save
+
+** Improvement
+    * [OP-1835] - Add motor constraints in place of overhead throttle buffer for enhanced stability and power. Add swash constraints for helis.
+
 
 ** Task
     * [OP-1831] - due to oneshot higher pid values ki now shows "red" warning in stabilization page 

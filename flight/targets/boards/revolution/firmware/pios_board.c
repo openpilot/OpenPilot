@@ -654,6 +654,7 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_MAINPORT_GPS:
         PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_GPS_RX_BUF_LEN, PIOS_COM_GPS_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_gps_id);
         break;
+    case HWSETTINGS_RM_MAINPORT_SBUS_NON_INVERTED:
     case HWSETTINGS_RM_MAINPORT_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
         {

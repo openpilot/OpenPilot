@@ -2,18 +2,18 @@
 	<object name="HwSettings" singleinstance="true" settings="true" category="System">
 		<description>Selection of optional hardware configurations.</description>
 		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled+OneShot,PWM+NoOneShot,PPM+NoOneShot,PPM+PWM+NoOneShot,PPM+Outputs+NoOneShot,PPM_PIN8+OneShot, Outputs+OneShot" defaultvalue="PWM+NoOneShot"/>
-		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Telemetry"/>
+		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,S.Bus Non Inverted,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Telemetry"/>
 		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,PPM,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="RV_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
 		<field name="RV_AuxPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,DSM,ComAux,ComBridge,OsdHk" defaultvalue="Disabled"/>
-		<field name="RV_AuxSBusPort" units="function" type="enum" elements="1" options="Disabled,S.Bus,DSM,ComAux,ComBridge,OsdHk" defaultvalue="Disabled"/>
+		<field name="RV_AuxSBusPort" units="function" type="enum" elements="1" options="Disabled,S.Bus,S.Bus Non Inverted,DSM,ComAux,ComBridge,OsdHk" defaultvalue="Disabled"/>
 		<field name="RV_FlexiPort" units="function" type="enum" elements="1" options="Disabled,I2C,DSM,ComAux,ComBridge" defaultvalue="Disabled"/>
 		<field name="RV_TelemetryPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,ComAux,ComBridge" defaultvalue="Telemetry"/>
 		<field name="RV_GPSPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,ComAux,ComBridge" defaultvalue="GPS"/>
 
 		<field name="RM_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Telemetry,PPM+Outputs,Outputs,Telemetry" defaultvalue="PWM"/>
-		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
+		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,S.Bus Non Inverted,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="TelemetrySpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>

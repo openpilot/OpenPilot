@@ -705,6 +705,7 @@ void PIOS_Board_Init(void)
     switch (hwsettings_rv_auxsbusport) {
     case HWSETTINGS_RV_AUXSBUSPORT_DISABLED:
         break;
+    case HWSETTINGS_RV_AUXSBUSPORT_SBUS_NON_INVERTED:
     case HWSETTINGS_RV_AUXSBUSPORT_SBUS:
 #ifdef PIOS_INCLUDE_SBUS
         {

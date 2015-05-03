@@ -452,6 +452,7 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
         break;
+    case HWSETTINGS_CC_MAINPORT_SBUS_NON_INVERTED:
     case HWSETTINGS_CC_MAINPORT_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
         {

@@ -127,7 +127,8 @@ static void PIOS_SBus_ResetState(struct pios_sbus_state *state)
 int32_t PIOS_SBus_Init(uint32_t *sbus_id,
                        const struct pios_sbus_cfg *cfg,
                        const struct pios_com_driver *driver,
-                       uint32_t lower_id)
+                       uint32_t lower_id,
+                       bool non_inverted)
 {
     PIOS_DEBUG_Assert(sbus_id);
     PIOS_DEBUG_Assert(cfg);
@@ -150,7 +151,11 @@ int32_t PIOS_SBus_Init(uint32_t *sbus_id,
     /* Enable inverter clock and enable the inverter */
     (*cfg->gpio_clk_func)(cfg->gpio_clk_periph, ENABLE);
     GPIO_Init(cfg->inv.gpio, &cfg->inv.init);
-    GPIO_WriteBit(cfg->inv.gpio, cfg->inv.init.GPIO_Pin, cfg->gpio_inv_enable);
+    if (non_inverted) {
+        GPIO_WriteBit(cfg->inv.gpio, cfg->inv.init.GPIO_Pin, cfg->gpio_inv_disable); // look for non inverted sbus signal
+    } else {
+        GPIO_WriteBit(cfg->inv.gpio, cfg->inv.init.GPIO_Pin, cfg->gpio_inv_enable); // look for inverted sbus signal
+    }
 
     /* Set comm driver callback */
     (driver->bind_rx_cb)(lower_id, PIOS_SBus_RxInCallback, *sbus_id);

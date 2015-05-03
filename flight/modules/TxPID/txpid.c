@@ -55,7 +55,9 @@
 #include "accessorydesired.h"
 #include "manualcontrolcommand.h"
 #include "stabilizationsettings.h"
+#ifdef REVOLUTION
 #include "altitudeholdsettings.h"
+#endif
 #include "stabilizationbank.h"
 #include "stabilizationsettingsbank1.h"
 #include "stabilizationsettingsbank2.h"
@@ -96,7 +98,9 @@ int32_t TxPIDInitialize(void)
     bool txPIDEnabled;
     HwSettingsOptionalModulesData optionalModules;
 
+#ifdef REVOLUTION
     AltitudeHoldSettingsInitialize();
+#endif
 
     HwSettingsInitialize();
     HwSettingsOptionalModulesGet(&optionalModules);
@@ -191,13 +195,17 @@ static void updatePIDs(UAVObjEvent *ev)
     }
     StabilizationSettingsData stab;
     StabilizationSettingsGet(&stab);
+#ifdef REVOLUTION
     AltitudeHoldSettingsData altitude;
     AltitudeHoldSettingsGet(&altitude);
+#endif
     AccessoryDesiredData accessory;
 
     uint8_t needsUpdateBank     = 0;
     uint8_t needsUpdateStab     = 0;
+#ifdef REVOLUTION
     uint8_t needsUpdateAltitude = 0;
+#endif
 
     // Loop through every enabled instance
     for (uint8_t i = 0; i < TXPIDSETTINGS_PIDS_NUMELEM; i++) {
@@ -357,6 +365,7 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_ACROPLUSFACTOR:
                 needsUpdateBank     |= update(&bank.AcroInsanityFactor, value);
                 break;
+#ifdef REVOLUTION
             case TXPIDSETTINGS_PIDS_ALTITUDEPOSKP:
                 needsUpdateAltitude |= update(&altitude.VerticalPosP, value);
                 break;
@@ -372,6 +381,7 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_ALTITUDEVELOCITYBETA:
                 needsUpdateAltitude |= update(&altitude.VerticalVelPID.Beta, value);
                 break;
+#endif
             default:
                 PIOS_Assert(0);
             }
@@ -380,9 +390,11 @@ static void updatePIDs(UAVObjEvent *ev)
     if (needsUpdateStab) {
         StabilizationSettingsSet(&stab);
     }
+#ifdef REVOLUTION
     if (needsUpdateAltitude) {
         AltitudeHoldSettingsSet(&altitude);
     }
+#endif
     if (needsUpdateBank) {
         switch (inst.BankNumber) {
         case 0:

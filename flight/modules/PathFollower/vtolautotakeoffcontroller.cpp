@@ -278,7 +278,7 @@ void VtolAutoTakeoffController::UpdateAutoPilot()
     PathStatusSet(pathStatus);
 }
 
-void VtolAutoTakeoffController::setArmedIfChanged(uint8_t val)
+void VtolAutoTakeoffController::setArmedIfChanged(FlightStatusArmedOptions val)
 {
     if (flightStatus->Armed != val) {
         flightStatus->Armed = val;

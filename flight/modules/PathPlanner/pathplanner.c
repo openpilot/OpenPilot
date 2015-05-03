@@ -146,7 +146,7 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsOptions TreatCustomCraftAs;
 
     VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 

@@ -53,7 +53,6 @@ DIRS = $(DL_DIR) $(TOOLS_DIR) $(BUILD_DIR) $(PACKAGE_DIR) $(DIST_DIR)
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
-UAVOGEN_BUILD_CONF	:= release
 GOOGLE_API_VERSION	:= 14
 
 # Clean out undesirable variables from the environment and command-line
@@ -124,7 +123,7 @@ else ifeq ($(UNAME), Darwin)
     UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 else ifeq ($(UNAME), Windows)
     QT_SPEC = win32-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
+    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/$(GCS_BUILD_CONF)/uavobjgenerator.exe"
 endif
 
 ##############################
@@ -151,12 +150,6 @@ clean: all_clean
 #
 ##############################
 
-ifeq ($(V), 1)
-    UAVOGEN_SILENT :=
-else
-    UAVOGEN_SILENT := silent
-endif
-
 UAVOBJGENERATOR_DIR = $(BUILD_DIR)/uavobjgenerator
 DIRS += $(UAVOBJGENERATOR_DIR)
 
@@ -164,7 +157,7 @@ DIRS += $(UAVOBJGENERATOR_DIR)
 uavobjgenerator: | $(UAVOBJGENERATOR_DIR)
 	$(V1) cd $(UAVOBJGENERATOR_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro \
-	    -spec $(QT_SPEC) -r CONFIG+=$(UAVOGEN_BUILD_CONF) CONFIG+=$(UAVOGEN_SILENT) && \
+	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) && \
 	    $(MAKE) --no-print-directory -w
 
 UAVOBJ_TARGETS := gcs flight python matlab java wireshark

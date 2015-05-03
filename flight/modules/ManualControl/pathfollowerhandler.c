@@ -55,9 +55,9 @@ void pathFollowerHandler(bool newinit)
         plan_initialize();
     }
 
-    uint8_t flightMode;
-    uint8_t assistedControlFlightMode;
-    uint8_t flightModeAssist;
+    FlightStatusFlightModeOptions flightMode;
+    FlightStatusAssistedControlStateOptions assistedControlFlightMode;
+    FlightStatusFlightModeAssistOptions flightModeAssist;
     FlightStatusFlightModeGet(&flightMode);
     FlightStatusFlightModeAssistGet(&flightModeAssist);
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);

@@ -350,7 +350,7 @@ static void stabilizationInnerloopTask()
     }
 
     {
-        uint8_t armed;
+        FlightStatusArmedOptions armed;
         FlightStatusArmedGet(&armed);
         float throttleDesired;
         ManualControlCommandThrottleGet(&throttleDesired);

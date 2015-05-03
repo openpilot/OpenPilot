@@ -128,23 +128,23 @@ void VtolAutoTakeoffFSM::Inactive(void)
 void VtolAutoTakeoffFSM::initFSM(void)
 {
     if (vtolPathFollowerSettings != 0) {
-        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
     } else {
-        mAutoTakeoffData->currentState = AUTOTAKEOFF_STATE_INACTIVE;
+        mAutoTakeoffData->currentState = STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE;
     }
 }
 
 void VtolAutoTakeoffFSM::Activate()
 {
     memset(mAutoTakeoffData, 0, sizeof(VtolAutoTakeoffFSMData_T));
-    mAutoTakeoffData->currentState   = AUTOTAKEOFF_STATE_INACTIVE;
+    mAutoTakeoffData->currentState   = STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE;
     mAutoTakeoffData->flLowAltitude  = true;
     mAutoTakeoffData->flAltitudeHold = false;
     mAutoTakeoffData->boundThrustMin = 0.0f;
     mAutoTakeoffData->boundThrustMax = 0.0f;
     mAutoTakeoffData->flZeroStabiHorizontal = true; // turn off positional controllers
     TakeOffLocationGet(&(mAutoTakeoffData->takeOffLocation));
-    mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeAtState[AUTOTAKEOFF_STATE_INACTIVE] = 0.0f;
+    mAutoTakeoffData->fsmAutoTakeoffStatus.AltitudeAtState[STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE] = 0.0f;
     mAutoTakeoffData->fsmAutoTakeoffStatus.ControlState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
     assessAltitude();
 
@@ -153,31 +153,31 @@ void VtolAutoTakeoffFSM::Activate()
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust > vtolPathFollowerSettings->ThrustLimits.Min) {
-        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         return;
     }
 
     // initially inactive and wait for a change in controlstate.
-    setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+    setState(STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 }
 
 void VtolAutoTakeoffFSM::Abort(void)
 {
-    setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+    setState(STATUSVTOLAUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 }
 
 PathFollowerFSMState_T VtolAutoTakeoffFSM::GetCurrentState(void)
 {
     switch (mAutoTakeoffData->currentState) {
-    case AUTOTAKEOFF_STATE_INACTIVE:
+    case STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE:
         return PFFSM_STATE_INACTIVE;
 
         break;
-    case AUTOTAKEOFF_STATE_ABORT:
+    case STATUSVTOLAUTOTAKEOFF_STATE_ABORT:
         return PFFSM_STATE_ABORT;
 
         break;
-    case AUTOTAKEOFF_STATE_DISARMED:
+    case STATUSVTOLAUTOTAKEOFF_STATE_DISARMED:
         return PFFSM_STATE_DISARMED;
 
         break;
@@ -248,7 +248,7 @@ void VtolAutoTakeoffFSM::ConstrainStabiDesired(StabilizationDesiredData *stabDes
 // Set the new state and perform setup for subsequent state run calls
 // This is called by state run functions on event detection that drive
 // state transitions.
-void VtolAutoTakeoffFSM::setState(PathFollowerFSM_AutoTakeoffState_T newState, StatusVtolAutoTakeoffStateExitReasonOptions reason)
+void VtolAutoTakeoffFSM::setState(StatusVtolAutoTakeoffStateOptions newState, StatusVtolAutoTakeoffStateExitReasonOptions reason)
 {
     mAutoTakeoffData->fsmAutoTakeoffStatus.StateExitReason[mAutoTakeoffData->currentState] = reason;
 
@@ -257,7 +257,7 @@ void VtolAutoTakeoffFSM::setState(PathFollowerFSM_AutoTakeoffState_T newState, S
     }
     mAutoTakeoffData->currentState = newState;
 
-    if (newState != AUTOTAKEOFF_STATE_INACTIVE) {
+    if (newState != STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE) {
         PositionStateData positionState;
         PositionStateGet(&positionState);
         float takeOffDown = 0.0f;
@@ -324,22 +324,22 @@ void VtolAutoTakeoffFSM::setControlState(StatusVtolAutoTakeoffControlStateOption
 
     switch (controlState) {
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED:
-        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE:
-        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST:
-        setState(AUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_INACTIVE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE:
-        setState(AUTOTAKEOFF_STATE_CHECKSTATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_CHECKSTATE, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD:
-        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT:
-        setState(AUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_ABORT, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         break;
     }
 }
@@ -367,7 +367,7 @@ void VtolAutoTakeoffFSM::setup_checkstate(void)
 
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust > vtolPathFollowerSettings->ThrustLimits.Min) {
-        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
         return;
     }
 
@@ -377,7 +377,7 @@ void VtolAutoTakeoffFSM::setup_checkstate(void)
     mAutoTakeoffData->boundThrustMin    = -0.1f;
     mAutoTakeoffData->boundThrustMax    = 0.0f;
 
-    setState(AUTOTAKEOFF_STATE_SLOWSTART, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
+    setState(STATUSVTOLAUTOTAKEOFF_STATE_SLOWSTART, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
 }
 
 // STATE: SLOWSTART spools up motors to vtol min over 2 seconds for effect.
@@ -415,7 +415,7 @@ void VtolAutoTakeoffFSM::run_slowstart(__attribute__((unused)) uint8_t flTimeout
     }
 
     if (flTimeout) {
-        setState(AUTOTAKEOFF_STATE_THRUSTUP, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_THRUSTUP, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
 
@@ -442,7 +442,7 @@ void VtolAutoTakeoffFSM::run_thrustup(__attribute__((unused)) uint8_t flTimeout)
     }
 
     if (flTimeout) {
-        setState(AUTOTAKEOFF_STATE_TAKEOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_TAKEOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
 
@@ -458,7 +458,7 @@ void VtolAutoTakeoffFSM::run_takeoff(__attribute__((unused)) uint8_t flTimeout)
 
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust < 0.0f) {
-        setState(AUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ZEROTHRUST);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ZEROTHRUST);
         return;
     }
 
@@ -470,11 +470,11 @@ void VtolAutoTakeoffFSM::run_takeoff(__attribute__((unused)) uint8_t flTimeout)
     float down_error    = pathDesired->End.Down - positionState.Down;
     float positionError = sqrtf(north_error * north_error + east_error * east_error);
     if (positionError > 3.0f) {
-        setState(AUTOTAKEOFF_STATE_THRUSTDOWN, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_POSITIONERROR);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_THRUSTDOWN, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_POSITIONERROR);
         return;
     }
     if (fabsf(down_error) < 0.5f) {
-        setState(AUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ARRIVEDATALT);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_HOLD, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ARRIVEDATALT);
         return;
     }
 }
@@ -515,11 +515,11 @@ void VtolAutoTakeoffFSM::run_thrustdown(__attribute__((unused)) uint8_t flTimeou
     StabilizationDesiredData stabDesired;
     StabilizationDesiredGet(&stabDesired);
     if (stabDesired.Thrust < 0.0f || mAutoTakeoffData->thrustLimit < 0.0f) {
-        setState(AUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ZEROTHRUST);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_ZEROTHRUST);
     }
 
     if (flTimeout) {
-        setState(AUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
+        setState(STATUSVTOLAUTOTAKEOFF_STATE_THRUSTOFF, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_TIMEOUT);
     }
 }
 
@@ -534,7 +534,7 @@ void VtolAutoTakeoffFSM::setup_thrustoff(void)
 
 void VtolAutoTakeoffFSM::run_thrustoff(__attribute__((unused)) uint8_t flTimeout)
 {
-    setState(AUTOTAKEOFF_STATE_DISARMED, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
+    setState(STATUSVTOLAUTOTAKEOFF_STATE_DISARMED, STATUSVTOLAUTOTAKEOFF_STATEEXITREASON_NONE);
 }
 
 // STATE: DISARMED

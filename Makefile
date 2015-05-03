@@ -54,7 +54,6 @@ DIRS = $(DL_DIR) $(TOOLS_DIR) $(BUILD_DIR) $(PACKAGE_DIR) $(DIST_DIR)
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
 UAVOGEN_BUILD_CONF	:= release
-ANDROIDGCS_BUILD_CONF	:= debug
 GOOGLE_API_VERSION	:= 14
 
 # Clean out undesirable variables from the environment and command-line

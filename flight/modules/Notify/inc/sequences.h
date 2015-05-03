@@ -52,7 +52,8 @@ typedef enum {
     NOTIFY_SEQUENCE_ALM_CONFIG = 17,
     NOTIFY_SEQUENCE_ALM_RECEIVER      = 18,
     NOTIFY_SEQUENCE_DISARMED = 19,
-    NOTIFY_SEQUENCE_NULL     = 255, // skips any signalling for this condition
+    NOTIFY_SEQUENCE_ALM_ATTITUDE      = 20,
+    NOTIFY_SEQUENCE_NULL = 255, // skips any signalling for this condition
 } NotifySequences;
 
 // This structure determine sequences attached to an alarm
@@ -60,6 +61,7 @@ typedef struct {
     uint32_t timeBetweenNotifications; // time in milliseconds to wait between each notification iteration
     uint8_t  alarmIndex; // Index of the alarm, use one of the SYSTEMALARMS_ALARM_XXXXX defines
     uint8_t  warnNotification; // index of the sequence to be used when alarm is in warning status(pick one from NotifySequences enum)
+    uint8_t  criticalNotification; // index of the sequence to be used when alarm is in critical status(pick one from NotifySequences enum)
     uint8_t  errorNotification; // index of the sequence to be used when alarm is in error status(pick one from NotifySequences enum)
 } AlarmDefinition_t;
 
@@ -156,6 +158,10 @@ const LedSequence_t notifications[] = {
                                                    { .time_off = 50,  .time_on    = 50, .color = COLOR_ORANGE, .repeats = 9, },
                                                    { .time_off = 500, .time_on    = 50, .color = COLOR_ORANGE, .repeats = 1, },
                                                      }, },
+    [NOTIFY_SEQUENCE_ALM_ATTITUDE] =               { .repeats  = 10, .steps     = {
+                                                   { .time_off = 0, .time_on    = 50, .color = COLOR_RED,  .repeats = 1, },
+                                                   { .time_off = 0, .time_on    = 50, .color = COLOR_BLUE, .repeats = 1, },
+                                                     }, },
 };
 
 // List of background sequences attached to each flight mode
@@ -185,31 +191,43 @@ const AlarmDefinition_t alarmsMap[] = {
         .timeBetweenNotifications = 10000,
         .alarmIndex = SYSTEMALARMS_ALARM_GPS,
         .warnNotification = NOTIFY_SEQUENCE_ALM_WARN_GPS,
+        .criticalNotification     = NOTIFY_SEQUENCE_ALM_ERROR_GPS,
         .errorNotification = NOTIFY_SEQUENCE_ALM_ERROR_GPS,
     },
     {
-        .timeBetweenNotifications = 15000,
+        .timeBetweenNotifications = 5000,
         .alarmIndex = SYSTEMALARMS_ALARM_MAGNETOMETER,
         .warnNotification = NOTIFY_SEQUENCE_NULL,
+        .criticalNotification     = NOTIFY_SEQUENCE_ALM_MAG,
         .errorNotification = NOTIFY_SEQUENCE_ALM_MAG,
     },
     {
         .timeBetweenNotifications = 15000,
         .alarmIndex = SYSTEMALARMS_ALARM_BATTERY,
         .warnNotification = NOTIFY_SEQUENCE_ALM_WARN_BATTERY,
+        .criticalNotification     = NOTIFY_SEQUENCE_ALM_ERROR_BATTERY,
         .errorNotification = NOTIFY_SEQUENCE_ALM_ERROR_BATTERY,
     },
     {
         .timeBetweenNotifications = 5000,
         .alarmIndex = SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION,
         .warnNotification = NOTIFY_SEQUENCE_NULL,
+        .criticalNotification     = NOTIFY_SEQUENCE_ALM_CONFIG,
         .errorNotification = NOTIFY_SEQUENCE_ALM_CONFIG,
     },
     {
-        .timeBetweenNotifications = 5000,
+        .timeBetweenNotifications = 2000,
         .alarmIndex = SYSTEMALARMS_ALARM_RECEIVER,
         .warnNotification = NOTIFY_SEQUENCE_ALM_RECEIVER,
+        .criticalNotification     = NOTIFY_SEQUENCE_ALM_RECEIVER,
         .errorNotification = NOTIFY_SEQUENCE_ALM_RECEIVER,
+    },
+    {
+        .timeBetweenNotifications = 1000,
+        .alarmIndex = SYSTEMALARMS_ALARM_ATTITUDE,
+        .warnNotification = NOTIFY_SEQUENCE_ALM_ATTITUDE,
+        .criticalNotification     = NOTIFY_SEQUENCE_NULL,
+        .errorNotification = NOTIFY_SEQUENCE_ALM_ATTITUDE,
     },
 };
 

@@ -267,7 +267,7 @@ static void stabilizationOuterloopTask()
 
     RateDesiredSet(&rateDesired);
     {
-        uint8_t armed;
+        FlightStatusArmedOptions armed;
         FlightStatusArmedGet(&armed);
         float throttleDesired;
         ManualControlCommandThrottleGet(&throttleDesired);

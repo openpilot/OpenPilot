@@ -49,6 +49,7 @@
 #include <sanitycheck.h>
 #include <vtolpathfollowersettings.h>
 #include <statusvtolautotakeoff.h>
+#include <statusvtolland.h>
 #include <manualcontrolcommand.h>
 
 // Private constants
@@ -79,6 +80,7 @@ static uint8_t conditionPointingTowardsNext();
 static uint8_t conditionPythonScript();
 static uint8_t conditionImmediate();
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
+static void planner_setup_pathdesired_land(PathDesiredData *pathDesired);
 static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired);
 static void planner_setup_pathdesired(PathDesiredData *pathDesired, uint8_t);
 
@@ -130,6 +132,8 @@ int32_t PathPlannerInitialize()
     VelocityStateInitialize();
     WaypointInitialize();
     WaypointActiveInitialize();
+    StatusVtolAutoTakeoffInitialize();
+    StatusVtolLandInitialize();
 
     pathPlannerHandle = PIOS_CALLBACKSCHEDULER_Create(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER0, STACK_SIZE_BYTES);
     pathDesiredUpdaterHandle = PIOS_CALLBACKSCHEDULER_Create(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER1, STACK_SIZE_BYTES);
@@ -142,7 +146,7 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsOptions TreatCustomCraftAs;
 
     VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
@@ -337,6 +341,9 @@ void updatePathDesired()
     case PATHACTION_MODE_AUTOTAKEOFF:
         planner_setup_pathdesired_takeoff(&pathDesired);
         break;
+    case PATHACTION_MODE_LAND:
+        planner_setup_pathdesired_land(&pathDesired);
+        break;
     default:
         planner_setup_pathdesired(&pathDesired, autotakeoff);
         break;
@@ -508,6 +515,32 @@ static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired)
     pathDesired->Mode = PATHDESIRED_MODE_AUTOTAKEOFF;
 
     pathDesired->UID  = waypointActive.Index;
+}
+
+static void planner_setup_pathdesired_land(PathDesiredData *pathDesired)
+{
+    PositionStateData positionState;
+
+    PositionStateGet(&positionState);
+    float velocity_down;
+
+    FlightModeSettingsLandingVelocityGet(&velocity_down);
+
+    pathDesired->Start.North = positionState.North;
+    pathDesired->Start.East  = positionState.East;
+    pathDesired->Start.Down  = positionState.Down;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_NORTH] = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_EAST]  = 0.0f;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_DOWN]  = velocity_down;
+
+    pathDesired->End.North = positionState.North;
+    pathDesired->End.East  = positionState.East;
+    pathDesired->End.Down  = positionState.Down;
+
+    pathDesired->StartingVelocity = 0.0f;
+    pathDesired->EndingVelocity   = 0.0f;
+    pathDesired->Mode = PATHDESIRED_MODE_LAND;
+    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH;
 }
 
 

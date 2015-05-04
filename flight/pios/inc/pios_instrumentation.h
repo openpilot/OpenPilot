@@ -128,6 +128,29 @@ static inline void PIOS_Instrumentation_TrackPeriod(pios_counter_t counter_handl
 }
 
 /**
+ * Increment a counter with a value
+ * @param counter_handle handle of the counter to update @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
+ * @param increment the value to increment counter with.
+ */
+static inline void PIOS_Instrumentation_incrementCounter(pios_counter_t counter_handle, int32_t increment)
+{
+    PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
+    vPortEnterCritical();
+    pios_perf_counter_t *counter = (pios_perf_counter_t *)counter_handle;
+    counter->value += increment;
+    counter->max--;
+    if (counter->value > counter->max) {
+        counter->max = counter->value;
+    }
+    counter->min++;
+    if (counter->value < counter->min) {
+        counter->min = counter->value;
+    }
+    counter->lastUpdateTS = PIOS_DELAY_GetRaw();
+    vPortExitCritical();
+}
+
+/**
  * Initialize the Instrumentation infrastructure
  * @param maxCounters maximum number of allowed counters
  */

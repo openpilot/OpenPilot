@@ -1,10 +1,14 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SRXL Multiplex SRXL receiver functions
+ * @brief Code to read Multiplex SRXL receiver serial stream
+ * @{
  *
- * @file       generator_io.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      I/O Code for the generator
- *
+ * @file       pios_srxl.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      Code to read Multiplex SRXL receiver serial stream
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,19 +28,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_SRXL_H
+#define PIOS_SRXL_H
 
-#ifndef GENERATORIO
-#define GENERATORIO
+/* Global Types */
 
-#include <QString>
-#include <QFile>
-#include <QTextStream>
-#include <QDir>
-#include <iostream>
+/* Public Functions */
 
-QString readFile(QString name);
-QString readFile(QString name);
-bool writeFile(QString name, QString & str);
-bool writeFileIfDifferent(QString name, QString & str);
+#endif /* PIOS_SRXL_H */
 
-#endif
+/**
+ * @}
+ * @}
+ */

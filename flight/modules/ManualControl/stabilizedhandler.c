@@ -123,7 +123,7 @@ void stabilizedHandler(bool newinit)
     stabilization.Roll =
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL) ? cmd.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd.Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS) ? cmd.Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATETRAINER) ? cmd.Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd.Roll * stabSettings.RollMax :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd.Roll * stabSettings.RollMax :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd.Roll * stabSettings.ManualRate.Roll :
@@ -135,7 +135,7 @@ void stabilizedHandler(bool newinit)
     stabilization.Pitch =
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL) ? cmd.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATETRAINER) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd.Pitch * stabSettings.PitchMax :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd.Pitch * stabSettings.PitchMax :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
@@ -157,7 +157,7 @@ void stabilizedHandler(bool newinit)
         stabilization.Yaw =
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL) ? cmd.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
-            (stab_settings[2] == STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATETRAINER) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd.Yaw * stabSettings.YawMax :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd.Yaw * stabSettings.YawMax :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd.Yaw * stabSettings.ManualRate.Yaw :

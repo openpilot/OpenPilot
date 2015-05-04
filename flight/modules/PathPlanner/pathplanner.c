@@ -82,7 +82,7 @@ static uint8_t conditionImmediate();
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
 static void planner_setup_pathdesired_land(PathDesiredData *pathDesired);
 static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired);
-static void planner_setup_pathdesired(PathDesiredData *pathDesired);
+static void planner_setup_pathdesired(PathDesiredData *pathDesired, uint8_t);
 
 
 // Private variables
@@ -327,14 +327,16 @@ void updatePathDesired()
         return;
     }
 
-    PathDesiredData pathDesired;
-
     // find out current waypoint
     WaypointActiveGet(&waypointActive);
-
     WaypointInstGet(waypointActive.Index, &waypoint);
+
+    // Capture if current mode is takeoff
+    uint8_t autotakeoff = (pathAction.Mode == PATHACTION_MODE_AUTOTAKEOFF);
+
     PathActionInstGet(waypoint.Action, &pathAction);
 
+    PathDesiredData pathDesired;
     switch (pathAction.Mode) {
     case PATHACTION_MODE_AUTOTAKEOFF:
         planner_setup_pathdesired_takeoff(&pathDesired);
@@ -343,7 +345,7 @@ void updatePathDesired()
         planner_setup_pathdesired_land(&pathDesired);
         break;
     default:
-        planner_setup_pathdesired(&pathDesired);
+        planner_setup_pathdesired(&pathDesired, autotakeoff);
         break;
     }
 
@@ -436,7 +438,7 @@ void statusUpdated(__attribute__((unused)) UAVObjEvent *ev)
 }
 
 // Standard setup of a pathDesired command from the waypoint path plan
-static void planner_setup_pathdesired(PathDesiredData *pathDesired)
+static void planner_setup_pathdesired(PathDesiredData *pathDesired, uint8_t overwrite_start_position)
 {
     pathDesired->End.North = waypoint.Position.North;
     pathDesired->End.East  = waypoint.Position.East;
@@ -450,7 +452,7 @@ static void planner_setup_pathdesired(PathDesiredData *pathDesired)
     pathDesired->UID = waypointActive.Index;
 
 
-    if (waypointActive.Index == 0) {
+    if (waypointActive.Index == 0 || overwrite_start_position) {
         PositionStateData positionState;
         PositionStateGet(&positionState);
         // First waypoint has itself as start point (used to be home position but that proved dangerous when looping)

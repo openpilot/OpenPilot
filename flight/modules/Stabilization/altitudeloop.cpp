@@ -191,7 +191,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
                                  altitudeHoldSettings.VerticalVelPID.Ki,
                                  altitudeHoldSettings.VerticalVelPID.Kd,
                                  altitudeHoldSettings.VerticalVelPID.Beta,
-                                 (float)(OUTERLOOP_SKIPCOUNT * UPDATE_EXPECTED),
+                                 (float)(UPDATE_EXPECTED),
                                  altitudeHoldSettings.ThrustRate);
 
     controlDown.UpdatePositionalParameters(altitudeHoldSettings.VerticalPosP);

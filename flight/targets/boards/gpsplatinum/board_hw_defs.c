@@ -246,14 +246,15 @@ static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
 
 static const struct pios_hmc5x83_cfg pios_mag_cfg = {
 #ifdef PIOS_HMC5X83_HAS_GPIOS
-    .exti_cfg  = &pios_exti_mag_cfg,
+    .exti_cfg    = &pios_exti_mag_cfg,
 #endif
-    .M_ODR     = PIOS_HMC5x83_ODR_30,
-    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .M_ODR       = PIOS_HMC5x83_ODR_30,
+    .Meas_Conf   = PIOS_HMC5x83_MEASCONF_NORMAL,
     .Gain             = PIOS_HMC5x83_GAIN_1_3,
     .Mode             = PIOS_HMC5x83_MODE_CONTINUOUS,
-    .Driver    = &PIOS_HMC5x83_SPI_DRIVER,
+    .Driver      = &PIOS_HMC5x83_SPI_DRIVER,
     .TempCompensation = true,
+    .Orientation = PIOS_HMC5X83_ORIENTATION_WEST_NORTH_DOWN,
 };
 #endif /* PIOS_INCLUDE_HMC5883 */
 

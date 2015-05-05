@@ -25,6 +25,8 @@
  */
 
 #include "uavobjectparser.h"
+#include <QDomDocument>
+#include <QDomElement>
 #include <QDebug>
 /**
  * Constructor
@@ -209,9 +211,6 @@ QString UAVObjectParser::parseXML(QString & xml, QString & filename)
             // Get next element
             childNode = childNode.nextSibling();
         }
-
-        // Sort all fields according to size
-        qStableSort(info->fields.begin(), info->fields.end(), fieldTypeLessThan);
 
         // Sort all fields according to size
         qStableSort(info->fields.begin(), info->fields.end(), fieldTypeLessThan);

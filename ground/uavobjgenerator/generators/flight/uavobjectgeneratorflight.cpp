@@ -68,8 +68,8 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     // Write the flight object inialization files
     flightInitTemplate.replace(QString("$(OBJINC)"), objInc);
     flightInitTemplate.replace(QString("$(OBJINIT)"), flightObjInit);
-    bool res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/uavobjectsinit.c",
-                                   flightInitTemplate);
+    bool res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/uavobjectsinit.c",
+                                    flightInitTemplate);
     if (!res) {
         cout << "Error: Could not write flight object init file" << endl;
         return false;
@@ -77,8 +77,8 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
 
     // Write the flight object initialization header
     flightInitIncludeTemplate.replace(QString("$(SIZECALCULATION)"), QString().setNum(sizeCalc));
-    res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/uavobjectsinit.h",
-                              flightInitIncludeTemplate);
+    res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/uavobjectsinit.h",
+                               flightInitIncludeTemplate);
     if (!res) {
         cout << "Error: Could not write flight object init header file" << endl;
         return false;
@@ -87,8 +87,8 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser *parser, QString templat
     // Write the flight object Makefile
     flightMakeTemplate.replace(QString("$(UAVOBJFILENAMES)"), objFileNames);
     flightMakeTemplate.replace(QString("$(UAVOBJNAMES)"), objNames);
-    res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/Makefile.inc",
-                              flightMakeTemplate);
+    res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/Makefile.inc",
+                               flightMakeTemplate);
     if (!res) {
         cout << "Error: Could not write flight Makefile" << endl;
         return false;
@@ -115,13 +115,25 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     replaceCommonTags(outInclude, info);
     replaceCommonTags(outCode, info);
 
+    // Use the appropriate typedef for enums where we find them. Set up
+    // that StringList here for use below.
+    //
+    QStringList typeList;
+    for (int n = 0; n < info->fields.length(); ++n) {
+        if (info->fields[n]->type == FIELDTYPE_ENUM) {
+            typeList << QString("%1%2Options").arg(info->name).arg(info->fields[n]->name);
+        } else {
+            typeList << fieldTypeStrC[info->fields[n]->type];
+        }
+    }
+
     // Replace the $(DATAFIELDS) tag
     QString type;
     QString fields;
     QString dataStructures;
     for (int n = 0; n < info->fields.length(); ++n) {
         // Determine type
-        type = fieldTypeStrC[info->fields[n]->type];
+        type = typeList[n];
         // Append field
         // Check if it a named set and creates structures accordingly
         if (info->fields[n]->numElements > 1) {
@@ -158,7 +170,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM) {
             enums.append(QString("\n// Enumeration options for field %1\n").arg(info->fields[n]->name));
-            enums.append("typedef enum {\n");
+            enums.append("typedef enum __attribute__ ((__packed__)) {\n");
             // Go through each option
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m) {
@@ -262,26 +274,26 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
             if (info->fields[n]->numElements == 1) {
                 /* Set */
                 setgetfields.append(QString("void %2%3Set(%1 *New%3)\n")
-                                    .arg(fieldTypeStrC[info->fields[n]->type])
+                                    .arg(typeList[n])
                                     .arg(info->name)
                                     .arg(info->fields[n]->name));
                 setgetfields.append(QString("{\n"));
                 setgetfields.append(QString("    UAVObjSetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), sizeof(%3));\n")
                                     .arg(info->name)
                                     .arg(info->fields[n]->name)
-                                    .arg(fieldTypeStrC[info->fields[n]->type]));
+                                    .arg(typeList[n]));
                 setgetfields.append(QString("}\n"));
 
                 /* GET */
                 setgetfields.append(QString("void %2%3Get(%1 *New%3)\n")
-                                    .arg(fieldTypeStrC[info->fields[n]->type])
+                                    .arg(typeList[n])
                                     .arg(info->name)
                                     .arg(info->fields[n]->name));
                 setgetfields.append(QString("{\n"));
                 setgetfields.append(QString("    UAVObjGetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), sizeof(%3));\n")
                                     .arg(info->name)
                                     .arg(info->fields[n]->name)
-                                    .arg(fieldTypeStrC[info->fields[n]->type]));
+                                    .arg(typeList[n]));
                 setgetfields.append(QString("}\n"));
             } else {
                 // When no struct accessor is available for a field array accessor is the default.
@@ -300,7 +312,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                                         .arg(info->name)
                                         .arg(info->fields[n]->name)
                                         .arg(info->fields[n]->numElements)
-                                        .arg(fieldTypeStrC[info->fields[n]->type]));
+                                        .arg(typeList[n]));
                     setgetfields.append(QString("}\n"));
 
                     /* GET */
@@ -313,7 +325,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                                         .arg(info->name)
                                         .arg(info->fields[n]->name)
                                         .arg(info->fields[n]->numElements)
-                                        .arg(fieldTypeStrC[info->fields[n]->type]));
+                                        .arg(typeList[n]));
                     setgetfields.append(QString("}\n"));
 
                     // Append array suffix to array accessors
@@ -323,7 +335,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                 // array based field accessor
                 /* SET */
                 setgetfields.append(QString("void %2%3%4Set( %1 *New%3 )\n")
-                                    .arg(fieldTypeStrC[info->fields[n]->type])
+                                    .arg(typeList[n])
                                     .arg(info->name)
                                     .arg(info->fields[n]->name)
                                     .arg(suffix));
@@ -332,12 +344,12 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                                     .arg(info->name)
                                     .arg(info->fields[n]->name)
                                     .arg(info->fields[n]->numElements)
-                                    .arg(fieldTypeStrC[info->fields[n]->type]));
+                                    .arg(typeList[n]));
                 setgetfields.append(QString("}\n"));
 
                 /* GET */
                 setgetfields.append(QString("void %2%3%4Get( %1 *New%3 )\n")
-                                    .arg(fieldTypeStrC[info->fields[n]->type])
+                                    .arg(typeList[n])
                                     .arg(info->name)
                                     .arg(info->fields[n]->name)
                                     .arg(suffix));
@@ -346,7 +358,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                                     .arg(info->name)
                                     .arg(info->fields[n]->name)
                                     .arg(info->fields[n]->numElements)
-                                    .arg(fieldTypeStrC[info->fields[n]->type]));
+                                    .arg(typeList[n]));
                 setgetfields.append(QString("}\n"));
             }
         }
@@ -378,14 +390,14 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
             }
             /* SET */
             setgetfieldsextern.append(QString("extern void %2%3%4Set(%1 *New%3);\n")
-                                      .arg(fieldTypeStrC[info->fields[n]->type])
+                                      .arg(typeList[n])
                                       .arg(info->name)
                                       .arg(info->fields[n]->name)
                                       .arg(suffix));
 
             /* GET */
             setgetfieldsextern.append(QString("extern void %2%3%4Get(%1 *New%3);\n")
-                                      .arg(fieldTypeStrC[info->fields[n]->type])
+                                      .arg(typeList[n])
                                       .arg(info->name)
                                       .arg(info->fields[n]->name)
                                       .arg(suffix));
@@ -394,13 +406,13 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     outInclude.replace(QString("$(SETGETFIELDSEXTERN)"), setgetfieldsextern);
 
     // Write the flight code
-    bool res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/" + info->namelc + ".c", outCode);
+    bool res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/" + info->namelc + ".c", outCode);
     if (!res) {
         cout << "Error: Could not write flight code files" << endl;
         return false;
     }
 
-    res = writeFileIfDiffrent(flightOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude);
+    res = writeFileIfDifferent(flightOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude);
     if (!res) {
         cout << "Error: Could not write flight include files" << endl;
         return false;

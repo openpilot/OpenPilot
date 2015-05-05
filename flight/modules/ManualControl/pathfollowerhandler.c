@@ -55,9 +55,9 @@ void pathFollowerHandler(bool newinit)
         plan_initialize();
     }
 
-    uint8_t flightMode;
-    uint8_t assistedControlFlightMode;
-    uint8_t flightModeAssist;
+    FlightStatusFlightModeOptions flightMode;
+    FlightStatusAssistedControlStateOptions assistedControlFlightMode;
+    FlightStatusFlightModeAssistOptions flightModeAssist;
     FlightStatusFlightModeGet(&flightMode);
     FlightStatusFlightModeAssistGet(&flightModeAssist);
     FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
@@ -100,6 +100,9 @@ void pathFollowerHandler(bool newinit)
             } else {
                 plan_setup_VelocityRoam();
             }
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
+            plan_setup_AutoTakeoff();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
             plan_setup_AutoCruise();
@@ -144,6 +147,9 @@ void pathFollowerHandler(bool newinit)
         if (flightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
             plan_run_VelocityRoam();
         }
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
+        plan_run_AutoTakeoff();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         plan_run_AutoCruise();

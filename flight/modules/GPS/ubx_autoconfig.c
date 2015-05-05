@@ -693,7 +693,7 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
         HwSettingsGPSSpeedGet(&hwsettings_baud);
 #if !defined(ALWAYS_RESET)
         // ALWAYS_RESET is undefined because it causes stored settings to change even with autoconfig.nostore
-        //   but with it off, some settings may be enabled that should really be disabled (but aren't) after autoconfig.nostore 
+        //   but with it off, some settings may be enabled that should really be disabled (but aren't) after autoconfig.nostore
         // if user requests a low baud rate then we just reset and leave it set to NEMA
         //   because low baud and high OP data rate doesn't play nice
         // if user requests that settings be saved, we will reset here too

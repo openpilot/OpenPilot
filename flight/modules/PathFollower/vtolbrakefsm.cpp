@@ -101,7 +101,7 @@ int32_t VtolBrakeFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollo
         mBrakeData = (VtolBrakeFSMData_T *)pios_malloc(sizeof(VtolBrakeFSMData_T));
         PIOS_Assert(mBrakeData);
     }
-    memset(mBrakeData, sizeof(VtolBrakeFSMData_T), 0);
+    memset(mBrakeData, 0, sizeof(VtolBrakeFSMData_T));
     vtolPathFollowerSettings = ptr_vtolPathFollowerSettings;
     pathDesired  = ptr_pathDesired;
     flightStatus = ptr_flightStatus;
@@ -113,7 +113,7 @@ int32_t VtolBrakeFSM::Initialize(VtolPathFollowerSettingsData *ptr_vtolPathFollo
 
 void VtolBrakeFSM::Inactive(void)
 {
-    memset(mBrakeData, sizeof(VtolBrakeFSMData_T), 0);
+    memset(mBrakeData, 0, sizeof(VtolBrakeFSMData_T));
     initFSM();
 }
 
@@ -125,7 +125,7 @@ void VtolBrakeFSM::initFSM(void)
 
 void VtolBrakeFSM::Activate()
 {
-    memset(mBrakeData, sizeof(VtolBrakeFSMData_T), 0);
+    memset(mBrakeData, 0, sizeof(VtolBrakeFSMData_T));
     mBrakeData->currentState = BRAKE_STATE_INACTIVE;
     setState(BRAKE_STATE_BRAKE, FSMBRAKESTATUS_STATEEXITREASON_NONE);
 }

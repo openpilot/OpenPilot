@@ -61,11 +61,6 @@ void PIDControlNE::Deactivate()
 
 void PIDControlNE::Activate()
 {
-    // Do we need to initialise any loops for smooth transition
-    // float currentNE;
-    // StabilizationDesiredNEGet(&currentNE);
-    // float u0 = currentNE - mNeutral;
-    // pid2_transfer(&PID, u0);
     mActive = true;
 }
 

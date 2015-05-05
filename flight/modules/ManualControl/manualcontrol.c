@@ -182,7 +182,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     frameType = GetCurrentFrameType();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsOptions TreatCustomCraftAs;
     VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
 
 
@@ -403,6 +403,7 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
         newFlightModeAssist = isAssistedFlightMode(position, newMode, &modeSettings);
         if (newFlightModeAssist) {
             // Set the default thrust state
@@ -485,7 +486,7 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
 {
     uint8_t flightModeAssistOption = STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE;
     uint8_t isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
-    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
+    StabilizationSettingsFlightModeAssistMapOptions FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
 
     StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
     if (position < STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM) {
@@ -527,6 +528,7 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
             break;
         case FLIGHTSTATUS_FLIGHTMODE_LAND:
+        case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
             break;
 

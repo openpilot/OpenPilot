@@ -220,12 +220,12 @@ void VtolVelocityController::UpdateAutoPilot()
         yaw_attitude = false;
         break;
     case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
-	yaw_attitude = true;
+        yaw_attitude = true;
         yaw = updateCourseBearing();
         break;
     default:
-      yaw_attitude = false;
-      break;
+        yaw_attitude = false;
+        break;
     }
 
     int8_t result = UpdateStabilizationDesired(yaw_attitude, yaw);

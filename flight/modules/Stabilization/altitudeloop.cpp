@@ -60,6 +60,7 @@ extern "C" {
 // Private types
 
 // Private variables
+static DelayedCallbackInfo *altitudeHoldCBInfo;
 static PIDControlDown controlDown;
 static AltitudeHoldSettingsData altitudeHoldSettings;
 static ThrustModeType thrustMode;
@@ -68,6 +69,8 @@ static float thrustDemand = 0.0f;
 
 // Private functions
 static void SettingsUpdatedCb(UAVObjEvent *ev);
+static void altitudeHoldTask(void);
+static void VelocityStateUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Setup mode and setpoint
@@ -113,7 +116,17 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
         newaltitude = false;
     }
 
+    return thrustDemand;
+}
+
+
+/**
+ * Module thread, should not return.
+ */
+static void altitudeHoldTask(void)
+{
     AltitudeHoldStatusData altitudeHoldStatus;
+
     AltitudeHoldStatusGet(&altitudeHoldStatus);
 
     float velocityStateDown;
@@ -129,8 +142,6 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
         controlDown.ControlPosition();
         altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
         thrustDemand = controlDown.GetDownCommand();
-
-        // if thrust demand is high and we are below altitude by 2m, back off pitch
     }
     break;
 
@@ -145,8 +156,11 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
     }
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
+}
 
-    return thrustDemand;
+static void VelocityStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    PIOS_CALLBACKSCHEDULER_Dispatch(altitudeHoldCBInfo);
 }
 
 /**
@@ -163,6 +177,9 @@ void stabilizationAltitudeloopInit()
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
     VtolSelfTuningStatsConnectCallback(&SettingsUpdatedCb);
     SettingsUpdatedCb(NULL);
+
+    altitudeHoldCBInfo = PIOS_CALLBACKSCHEDULER_Create(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_ALTITUDEHOLD, STACK_SIZE_BYTES);
+    VelocityStateConnectCallback(&VelocityStateUpdatedCb);
 }
 
 

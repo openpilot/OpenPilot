@@ -193,7 +193,7 @@ uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
 uavobjects_python_install: 
 	$(V1) if [ -d "$(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/" ]; then echo "UAVObjects already exist"; else make uavobjects_python; fi
 	$(V1) ( cp $(UAVOBJ_OUT_DIR)/python/* $(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/ )
-	$(V1) ( cd $(ROOT_DIR)/ground/pyuavtalk/ && python setup.py build && python setup.py install)
+	$(V1) ( cd $(ROOT_DIR)/ground/pyuavtalk/ && sudo python setup.py build && sudo python setup.py install)
 
 uavobjects_python_clean: 
 	@$(ECHO) " CLEAN      $(call toprel, $(ROOT_DIR)/ground/pyuavtalk/openpilot/uavobjects/)"

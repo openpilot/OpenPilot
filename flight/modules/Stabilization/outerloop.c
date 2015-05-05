@@ -300,26 +300,25 @@ static void stabilizationOuterloopTask()
             break;
         }
     }
-}
 
-RateDesiredSet(&rateDesired);
-{
-    FlightStatusArmedOptions armed;
-    FlightStatusArmedGet(&armed);
-    float throttleDesired;
-    ManualControlCommandThrottleGet(&throttleDesired);
-    if (armed != FLIGHTSTATUS_ARMED_ARMED ||
-        ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0)) {
-        // Force all axes to reinitialize when engaged
-        for (t = 0; t < AXES; t++) {
-            previous_mode[t] = 255;
+    RateDesiredSet(&rateDesired);
+    {
+        FlightStatusArmedOptions armed;
+        FlightStatusArmedGet(&armed);
+        float throttleDesired;
+        ManualControlCommandThrottleGet(&throttleDesired);
+        if (armed != FLIGHTSTATUS_ARMED_ARMED ||
+            ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0)) {
+            // Force all axes to reinitialize when engaged
+            for (t = 0; t < AXES; t++) {
+                previous_mode[t] = 255;
+            }
         }
     }
-}
 
 // update cruisecontrol based on attitude
-cruisecontrol_compute_factor(&attitudeState, rateDesired.Thrust);
-stabSettings.monitor.rateupdates = 0;
+    cruisecontrol_compute_factor(&attitudeState, rateDesired.Thrust);
+    stabSettings.monitor.rateupdates = 0;
 }
 
 

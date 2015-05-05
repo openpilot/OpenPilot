@@ -230,140 +230,140 @@ static void updatePIDs(UAVObjEvent *ev)
 
             switch (TxPIDSettingsPIDsToArray(inst.PIDs)[i]) {
             case TXPIDSETTINGS_PIDS_ROLLRATEKP:
-                needsUpdateBank     |= update(&bank.RollRatePID.Kp, value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEKI:
-                needsUpdateBank     |= update(&bank.RollRatePID.Ki, value);
+                needsUpdateBank |= update(&bank.RollRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEKD:
-                needsUpdateBank     |= update(&bank.RollRatePID.Kd, value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEILIMIT:
-                needsUpdateBank     |= update(&bank.RollRatePID.ILimit, value);
+                needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATERESP:
-                needsUpdateBank     |= update(&bank.ManualRate.Roll, value);
+                needsUpdateBank |= update(&bank.ManualRate.Roll, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
-                needsUpdateBank     |= update(&bank.RollPI.Kp, value);
+                needsUpdateBank |= update(&bank.RollPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKI:
-                needsUpdateBank     |= update(&bank.RollPI.Ki, value);
+                needsUpdateBank |= update(&bank.RollPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEILIMIT:
-                needsUpdateBank     |= update(&bank.RollPI.ILimit, value);
+                needsUpdateBank |= update(&bank.RollPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDERESP:
-                needsUpdateBank     |= updateUint8(&bank.RollMax, value);
+                needsUpdateBank |= updateUint8(&bank.RollMax, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKP:
-                needsUpdateBank     |= update(&bank.PitchRatePID.Kp, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKI:
-                needsUpdateBank     |= update(&bank.PitchRatePID.Ki, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKD:
-                needsUpdateBank     |= update(&bank.PitchRatePID.Kd, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEILIMIT:
-                needsUpdateBank     |= update(&bank.PitchRatePID.ILimit, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATERESP:
-                needsUpdateBank     |= update(&bank.ManualRate.Pitch, value);
+                needsUpdateBank |= update(&bank.ManualRate.Pitch, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
-                needsUpdateBank     |= update(&bank.PitchPI.Kp, value);
+                needsUpdateBank |= update(&bank.PitchPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKI:
-                needsUpdateBank     |= update(&bank.PitchPI.Ki, value);
+                needsUpdateBank |= update(&bank.PitchPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEILIMIT:
-                needsUpdateBank     |= update(&bank.PitchPI.ILimit, value);
+                needsUpdateBank |= update(&bank.PitchPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDERESP:
-                needsUpdateBank     |= updateUint8(&bank.PitchMax, value);
+                needsUpdateBank |= updateUint8(&bank.PitchMax, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKP:
-                needsUpdateBank     |= update(&bank.RollRatePID.Kp, value);
-                needsUpdateBank     |= update(&bank.PitchRatePID.Kp, value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kp, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKI:
-                needsUpdateBank     |= update(&bank.RollRatePID.Ki, value);
-                needsUpdateBank     |= update(&bank.PitchRatePID.Ki, value);
+                needsUpdateBank |= update(&bank.RollRatePID.Ki, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKD:
-                needsUpdateBank     |= update(&bank.RollRatePID.Kd, value);
-                needsUpdateBank     |= update(&bank.PitchRatePID.Kd, value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kd, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEILIMIT:
-                needsUpdateBank     |= update(&bank.RollRatePID.ILimit, value);
-                needsUpdateBank     |= update(&bank.PitchRatePID.ILimit, value);
+                needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATERESP:
-                needsUpdateBank     |= update(&bank.ManualRate.Roll, value);
-                needsUpdateBank     |= update(&bank.ManualRate.Pitch, value);
+                needsUpdateBank |= update(&bank.ManualRate.Roll, value);
+                needsUpdateBank |= update(&bank.ManualRate.Pitch, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
-                needsUpdateBank     |= update(&bank.RollPI.Kp, value);
-                needsUpdateBank     |= update(&bank.PitchPI.Kp, value);
+                needsUpdateBank |= update(&bank.RollPI.Kp, value);
+                needsUpdateBank |= update(&bank.PitchPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKI:
-                needsUpdateBank     |= update(&bank.RollPI.Ki, value);
-                needsUpdateBank     |= update(&bank.PitchPI.Ki, value);
+                needsUpdateBank |= update(&bank.RollPI.Ki, value);
+                needsUpdateBank |= update(&bank.PitchPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEILIMIT:
-                needsUpdateBank     |= update(&bank.RollPI.ILimit, value);
-                needsUpdateBank     |= update(&bank.PitchPI.ILimit, value);
+                needsUpdateBank |= update(&bank.RollPI.ILimit, value);
+                needsUpdateBank |= update(&bank.PitchPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDERESP:
-                needsUpdateBank     |= updateUint8(&bank.RollMax, value);
-                needsUpdateBank     |= updateUint8(&bank.PitchMax, value);
+                needsUpdateBank |= updateUint8(&bank.RollMax, value);
+                needsUpdateBank |= updateUint8(&bank.PitchMax, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKP:
-                needsUpdateBank     |= update(&bank.YawRatePID.Kp, value);
+                needsUpdateBank |= update(&bank.YawRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKI:
-                needsUpdateBank     |= update(&bank.YawRatePID.Ki, value);
+                needsUpdateBank |= update(&bank.YawRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKD:
-                needsUpdateBank     |= update(&bank.YawRatePID.Kd, value);
+                needsUpdateBank |= update(&bank.YawRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEILIMIT:
-                needsUpdateBank     |= update(&bank.YawRatePID.ILimit, value);
+                needsUpdateBank |= update(&bank.YawRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATERESP:
-                needsUpdateBank     |= update(&bank.ManualRate.Yaw, value);
+                needsUpdateBank |= update(&bank.ManualRate.Yaw, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
-                needsUpdateBank     |= update(&bank.YawPI.Kp, value);
+                needsUpdateBank |= update(&bank.YawPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKI:
-                needsUpdateBank     |= update(&bank.YawPI.Ki, value);
+                needsUpdateBank |= update(&bank.YawPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEILIMIT:
-                needsUpdateBank     |= update(&bank.YawPI.ILimit, value);
+                needsUpdateBank |= update(&bank.YawPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDERESP:
-                needsUpdateBank     |= updateUint8(&bank.YawMax, value);
+                needsUpdateBank |= updateUint8(&bank.YawMax, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLEXPO:
-                needsUpdateBank     |= updateInt8(&bank.StickExpo.Roll, value);
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Roll, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHEXPO:
-                needsUpdateBank     |= updateInt8(&bank.StickExpo.Pitch, value);
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Pitch, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHEXPO:
-                needsUpdateBank     |= updateInt8(&bank.StickExpo.Roll, value);
-                needsUpdateBank     |= updateInt8(&bank.StickExpo.Pitch, value);
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Roll, value);
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Pitch, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWEXPO:
-                needsUpdateBank     |= updateInt8(&bank.StickExpo.Yaw, value);
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Yaw, value);
                 break;
             case TXPIDSETTINGS_PIDS_GYROTAU:
-                needsUpdateStab     |= update(&stab.GyroTau, value);
+                needsUpdateStab |= update(&stab.GyroTau, value);
                 break;
             case TXPIDSETTINGS_PIDS_ACROPLUSFACTOR:
-                needsUpdateBank     |= update(&bank.AcroInsanityFactor, value);
+                needsUpdateBank |= update(&bank.AcroInsanityFactor, value);
                 break;
 #ifdef REVOLUTION
             case TXPIDSETTINGS_PIDS_ALTITUDEPOSKP:

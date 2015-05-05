@@ -117,6 +117,7 @@ static void stabilizationOuterloopTask()
         break;
 #endif /* REVOLUTION */
     case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+    case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
     default:
         rateDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST] = stabilizationDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST];
         break;
@@ -259,10 +260,6 @@ static void stabilizationOuterloopTask()
             rateDesiredAxis[t] = rate_input + weak_leveling;
         }
         break;
-        case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
-        default:
-            rateDesiredAxis[t] = stabilizationDesiredAxis[t];
-            break;
         case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
             rateDesiredAxis[t] = stabilizationDesiredAxis[t]; // default for all axes
             // now test limits for pitch and/or roll
@@ -297,21 +294,6 @@ static void stabilizationOuterloopTask()
             }
             break;
 
-        case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
-        default:
-            rateDesiredAxis[t] = stabilizationDesiredAxis[t];
-            break;
-        }
-    } else {
-        switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
-#ifdef REVOLUTION
-        case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
-            rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEHOLD, reinit);
-            break;
-        case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO:
-            rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEVARIO, reinit);
-            break;
-#endif /* REVOLUTION */
         case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
         default:
             rateDesiredAxis[t] = stabilizationDesiredAxis[t];

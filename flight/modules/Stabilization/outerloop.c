@@ -138,6 +138,7 @@ static void stabilizationOuterloopTask()
             case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
                 rpy_desired[t] = stabilizationDesiredAxis[t];
                 break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
             case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
             default:
                 rpy_desired[t] = ((float *)&attitudeState.Roll)[t];
@@ -262,27 +263,81 @@ static void stabilizationOuterloopTask()
         default:
             rateDesiredAxis[t] = stabilizationDesiredAxis[t];
             break;
-        }
-    }
-
-    RateDesiredSet(&rateDesired);
-    {
-        FlightStatusArmedOptions armed;
-        FlightStatusArmedGet(&armed);
-        float throttleDesired;
-        ManualControlCommandThrottleGet(&throttleDesired);
-        if (armed != FLIGHTSTATUS_ARMED_ARMED ||
-            ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0)) {
-            // Force all axes to reinitialize when engaged
-            for (t = 0; t < AXES; t++) {
-                previous_mode[t] = 255;
+        case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
+            rateDesiredAxis[t] = stabilizationDesiredAxis[t]; // default for all axes
+            // now test limits for pitch and/or roll
+            if (t == 1) { // pitch
+                if (attitudeState.Pitch < -stabSettings.stabBank.PitchMax) {
+                    // attitude exceeds pitch max.
+                    // zero rate desired if also -ve
+                    if (rateDesiredAxis[t] < 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
+                    }
+                } else if (attitudeState.Pitch > stabSettings.stabBank.PitchMax) {
+                    // attitude exceeds pitch max
+                    // zero rate desired if also +ve
+                    if (rateDesiredAxis[t] > 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
+                    }
+                }
+            } else if (t == 0) { // roll
+                if (attitudeState.Roll < -stabSettings.stabBank.RollMax) {
+                    // attitude exceeds roll max.
+                    // zero rate desired if also -ve
+                    if (rateDesiredAxis[t] < 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
+                    }
+                } else if (attitudeState.Roll > stabSettings.stabBank.RollMax) {
+                    // attitude exceeds roll max
+                    // zero rate desired if also +ve
+                    if (rateDesiredAxis[t] > 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
+                    }
+                }
             }
+            break;
+
+        case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+        default:
+            rateDesiredAxis[t] = stabilizationDesiredAxis[t];
+            break;
+        }
+    } else {
+        switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
+#ifdef REVOLUTION
+        case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
+            rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEHOLD, reinit);
+            break;
+        case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO:
+            rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEVARIO, reinit);
+            break;
+#endif /* REVOLUTION */
+        case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+        default:
+            rateDesiredAxis[t] = stabilizationDesiredAxis[t];
+            break;
         }
     }
+}
 
-    // update cruisecontrol based on attitude
-    cruisecontrol_compute_factor(&attitudeState, rateDesired.Thrust);
-    stabSettings.monitor.rateupdates = 0;
+RateDesiredSet(&rateDesired);
+{
+    FlightStatusArmedOptions armed;
+    FlightStatusArmedGet(&armed);
+    float throttleDesired;
+    ManualControlCommandThrottleGet(&throttleDesired);
+    if (armed != FLIGHTSTATUS_ARMED_ARMED ||
+        ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0)) {
+        // Force all axes to reinitialize when engaged
+        for (t = 0; t < AXES; t++) {
+            previous_mode[t] = 255;
+        }
+    }
+}
+
+// update cruisecontrol based on attitude
+cruisecontrol_compute_factor(&attitudeState, rateDesired.Thrust);
+stabSettings.monitor.rateupdates = 0;
 }
 
 

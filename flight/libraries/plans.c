@@ -294,6 +294,14 @@ void plan_run_AutoTakeoff()
     break;
 
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT:
+    {
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        if (!flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
+        }
+    }
+    break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD:
     // nothing to do. land has been requested. stay here for forever until mode change.
     default:

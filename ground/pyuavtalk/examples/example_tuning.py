@@ -61,7 +61,7 @@ if __name__ == '__main__':
             _port = port
             
         serPort = serial.Serial(_port, 57600, timeout=.5)
-        uavTalk = UavTalk(serPort)
+        uavTalk = UavTalk(serPort, None)
         objMan = ObjManager(uavTalk)
         objMan.importDefinitions()
         uavTalk.start()

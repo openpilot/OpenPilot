@@ -60,7 +60,7 @@ class UavtalkDemo():
             raise IOError("Failed to open serial port")
         
         print "Creating UavTalk"
-        self.uavTalk = UavTalk(serPort)
+        self.uavTalk = UavTalk(serPort, None)
         
         print "Starting ObjectManager"
         self.objMan = ObjManager(self.uavTalk)

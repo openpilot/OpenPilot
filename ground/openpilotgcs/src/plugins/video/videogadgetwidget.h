@@ -52,7 +52,7 @@ private slots:
     void start();
     void pause();
     void stop();
-    void onStateChanged(Pipeline::State newState);
+    void onStateChanged(Pipeline::State oldState, Pipeline::State newState, Pipeline::State pendingState);
 
 private:
     Ui_Form *m_ui;

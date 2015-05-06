@@ -397,7 +397,7 @@ bool VideoWidget::event(QEvent *event)
         QString msg = QString("%0 changed state from %1 to %2")
                       .arg(sce->src).arg(name(sce->getOldState())).arg(name(sce->getNewState()));
         qDebug() << "VideoWidget::event -" << msg;
-        emit stateChanged(sce->getNewState());
+        emit stateChanged(sce->getOldState(), sce->getNewState(), sce->getPendingState());
         // emit message(msg);
 
         return true;

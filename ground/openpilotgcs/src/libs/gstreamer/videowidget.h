@@ -60,7 +60,7 @@ public slots:
 
 signals:
     void message(QString);
-    void stateChanged(Pipeline::State newState);
+    void stateChanged(Pipeline::State oldState, Pipeline::State newState, Pipeline::State pendingState);
 
 protected:
     QString getStatus();

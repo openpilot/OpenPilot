@@ -50,7 +50,7 @@ VideoGadgetWidget::VideoGadgetWidget(QWidget *parent) :
     connect(m_ui->pauseButton, &QPushButton::clicked, this, &VideoGadgetWidget::pause);
     connect(m_ui->stopButton, &QPushButton::clicked, this, &VideoGadgetWidget::stop);
 
-    onStateChanged(Pipeline::Null);
+    onStateChanged(Pipeline::Null, Pipeline::Null, Pipeline::Null);
 }
 
 VideoGadgetWidget::~VideoGadgetWidget()
@@ -79,54 +79,57 @@ void VideoGadgetWidget::setConfiguration(VideoGadgetConfiguration *config)
 void VideoGadgetWidget::start()
 {
     msg(QString("starting..."));
-    // m_ui->startButton->setEnabled(false);
+    m_ui->startButton->setEnabled(false);
     videoWidget()->start();
 }
 
 void VideoGadgetWidget::pause()
 {
     msg(QString("pausing..."));
-    // m_ui->pauseButton->setEnabled(false);
+    m_ui->pauseButton->setEnabled(false);
     videoWidget()->pause();
 }
 
 void VideoGadgetWidget::stop()
 {
     msg(QString("stopping..."));
-    // m_ui->stopButton->setEnabled(false);
     videoWidget()->stop();
 }
 
-void VideoGadgetWidget::onStateChanged(Pipeline::State newState)
+void VideoGadgetWidget::onStateChanged(Pipeline::State oldState, Pipeline::State newState, Pipeline::State pendingState)
 {
     msg(QString("state changed: ") + VideoWidget::name(newState));
     switch (newState) {
     case Pipeline::Ready:
         m_ui->pauseButton->setVisible(false);
-        m_ui->pauseButton->setEnabled(false);
-        m_ui->startButton->setVisible(true);
+
         m_ui->startButton->setEnabled(true);
+        m_ui->startButton->setVisible(true);
+
         m_ui->stopButton->setEnabled(false);
         break;
     case Pipeline::Paused:
         m_ui->pauseButton->setVisible(false);
-        m_ui->pauseButton->setEnabled(false);
+
+        m_ui->startButton->setEnabled(pendingState != Pipeline::Playing);
         m_ui->startButton->setVisible(true);
-        m_ui->startButton->setEnabled(true);
+
         m_ui->stopButton->setEnabled(true);
         break;
     case Pipeline::Playing:
         m_ui->startButton->setVisible(false);
-        m_ui->startButton->setEnabled(false);
-        m_ui->pauseButton->setVisible(true);
+
         m_ui->pauseButton->setEnabled(true);
+        m_ui->pauseButton->setVisible(true);
+
         m_ui->stopButton->setEnabled(true);
         break;
     default:
         m_ui->pauseButton->setVisible(false);
-        m_ui->pauseButton->setEnabled(false);
-        m_ui->startButton->setVisible(true);
+
         m_ui->startButton->setEnabled(true);
+        m_ui->startButton->setVisible(true);
+
         m_ui->stopButton->setEnabled(false);
         break;
     }

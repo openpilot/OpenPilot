@@ -69,13 +69,17 @@ if __name__ == '__main__':
         import objectpersistence
 
         print "Getting Current Settings:"        
-        while True:
+	for _ in range(2): # Try only twice to get the settings
             try:
-                time.sleep(.5)
-                objMan.StabilizationSettings.getUpdate()
-                break
+                time.sleep(10)
+                objMan.StabilizationSettingsBank1.getUpdate()
             except TimeoutException:
                 print "Timeout"
+		pass
+            except KeyboardInterrupt:
+		os._exit(1)
+	    else:
+		raise
 
         while True:
             while True:        
@@ -84,13 +88,13 @@ if __name__ == '__main__':
                 print "q. Quit"
                 print "s. Save settings"
                 print
-                print "1. Tune  Roll  Rate      %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettings.RollRatePI.value)
-                print "2. Tune  Pitch Rate      %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettings.PitchRatePI.value)
-                print "3. Tune  Yaw   Rate      %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettings.YawRatePI.value)
+                print "1. Tune  Roll  Rate      %2.4f %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettingsBank1.RollRatePID.value)
+                print "2. Tune  Pitch Rate      %2.4f %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettingsBank1.PitchRatePID.value)
+                print "3. Tune  Yaw   Rate      %2.4f %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettingsBank1.YawRatePID.value)
                 print
-                print "4. Tune  Roll  Attitude  %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettings.RollPI.value)
-                print "5. Tune  Pitch Attitude  %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettings.PitchPI.value)
-                print "6. Tune  Yaw   Attitude  %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettings.YawPI.value)
+                print "4. Tune  Roll  Attitude  %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettingsBank1.RollPI.value)
+                print "5. Tune  Pitch Attitude  %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettingsBank1.PitchPI.value)
+                print "6. Tune  Yaw   Attitude  %2.4f %2.4f %2.4f" % tuple(objMan.StabilizationSettingsBank1.YawPI.value)
                 print
                 sel = raw_input()
                 if len(sel) != 1:
@@ -101,8 +105,8 @@ if __name__ == '__main__':
                     print "Saving ",
                     objMan.ObjectPersistence.Operation.value = objectpersistence.OperationField.SAVE
                     objMan.ObjectPersistence.Selection.value = objectpersistence.SelectionField.SINGLEOBJECT
-                    objMan.ObjectPersistence.ObjectID.value = objMan.StabilizationSettings.objId
-                    objMan.ObjectPersistence.InstanceID.value = objMan.StabilizationSettings.instId
+                    objMan.ObjectPersistence.ObjectID.value = objMan.StabilizationSettingsBank1.objId
+                    objMan.ObjectPersistence.InstanceID.value = objMan.StabilizationSettingsBank1.instId
                     objMan.ObjectPersistence.updated()
                     for i in range(10):
                         print ".",
@@ -112,24 +116,24 @@ if __name__ == '__main__':
                             break
                     print        
                 elif sel == "1":
-                    PI = objMan.StabilizationSettings.RollRatePI.value
+                    PI = objMan.StabilizationSettingsBank1.RollRatePID.value
                     break
                 elif sel == "2":
-                    PI = objMan.StabilizationSettings.PitchRatePI.value
+                    PI = objMan.StabilizationSettingsBank1.PitchRatePI.value
                     break
                 elif sel == "3":
-                    PI = objMan.StabilizationSettings.YawRatePI.value
+                    PI = objMan.StabilizationSettingsBank1.YawRatePI.value
                     break
                 elif sel == "4":
-                    PI = objMan.StabilizationSettings.RollPI.value
+                    PI = objMan.StabilizationSettingsBank1.RollPI.value
                     break
                 elif sel == "5":
-                    PI = objMan.StabilizationSettings.PitchPI.value
+                    PI = objMan.StabilizationSettingsBank1.PitchPI.value
                     break
                 elif sel == "6":
-                    PI = objMan.StabilizationSettings.YawPI.value
+                    PI = objMan.StabilizationSettingsBank1.YawPI.value
                     break
-            
+
             while True:        
                 print
                 print 
@@ -178,19 +182,14 @@ if __name__ == '__main__':
                     txControl = objMan.ManualControlCommand.Accessory1.value
                     value = tuneFrom + ((txControl+1)/2)*(tuneTo-tuneFrom)
                     PI[PIIndex] = value
-                    objMan.StabilizationSettings.updated()
+                    objMan.StabilizationSettingsBank1.updated()
                     
                     print "\r%-1.2f => %2.4f" % (txControl, value),
                     time.sleep(.1)
                     
                 except TimeoutException:
                     print "Timeout \a"
-                except KeyboardInterrupt:
-                    break
-            
             print
-            
-    
     except Exception,e:
         print
         print "An error occured: ", e
@@ -202,7 +201,4 @@ if __name__ == '__main__':
         uavTalk.stop()
     except Exception:
         pass
-    
-    raw_input("Press ENTER, the application will close")
-
 

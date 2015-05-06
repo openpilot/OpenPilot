@@ -65,20 +65,6 @@ class UavtalkDemo():
         print "Starting UavTalk"
         self.uavTalk.start()
         
-        #print "Starting ConnectionManager"
-        # self.connMan = ConnectionManager(self.uavTalk, self.objMan)
-        
-        # print "Connecting...",
-        # self.connMan.connect()
-        # print "Connected"
-        #
-        # print "Getting all Data"
-        # self.objMan.requestAllObjUpdate()
-        #
-        # print "SN:",
-        # sn = self.objMan.FirmwareIAPObj.CPUSerial.value
-        # print "".join(map(_hex02, sn))
-        
     def stop(self):
         if self.uavTalk:
             print "Stopping UavTalk"
@@ -192,11 +178,5 @@ if __name__ == '__main__':
     
     print
     
-    # try:
-    #     demo.stop()
-    # except Exception:
-    #     pass
-    #
-    #raw_input("Press ENTER, the application will close")
 
 

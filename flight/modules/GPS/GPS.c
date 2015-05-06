@@ -157,10 +157,6 @@ int32_t GPSStart(void)
 int32_t GPSInitialize(void)
 {
     gpsPort = PIOS_COM_GPS;
-<<<<<<< HEAD
-=======
-    GPSSettingsDataProtocolOptions gpsProtocol;
->>>>>>> next
 
     HwSettingsInitialize();
 #ifdef MODULE_GPS_BUILTIN

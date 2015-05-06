@@ -100,15 +100,7 @@ bool VehicleConfigurationHelper::setupHardwareSettings(bool save)
 
 bool VehicleConfigurationHelper::isApplicable(UAVObject *dataObj)
 {
-    switch (m_configSource->getControllerType()) {
-    case VehicleConfigurationSource::CONTROLLER_CC:
-    case VehicleConfigurationSource::CONTROLLER_CC3D:
-        if (dataObj->getName() == "EKFConfiguration") {
-            return false;
-        }
-    default:
-        return true;
-    }
+    return true;
 }
 
 void VehicleConfigurationHelper::addModifiedObject(UAVDataObject *object, QString description)
@@ -136,41 +128,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
     data.OptionalModules[HwSettings::OPTIONALMODULES_AIRSPEED] = 0;
 
     switch (m_configSource->getControllerType()) {
-    case VehicleConfigurationSource::CONTROLLER_CC:
-    case VehicleConfigurationSource::CONTROLLER_CC3D:
-        // Reset all ports
-        data.CC_RcvrPort  = HwSettings::CC_RCVRPORT_DISABLEDONESHOT;
-
-        // Default mainport to be active telemetry link
-        data.CC_MainPort  = HwSettings::CC_MAINPORT_TELEMETRY;
-
-        data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DISABLED;
-        switch (m_configSource->getInputType()) {
-        case VehicleConfigurationSource::INPUT_PWM:
-            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PWMNOONESHOT;
-            break;
-        case VehicleConfigurationSource::INPUT_PPM:
-            if (m_configSource->getEscType() == VehicleConfigurationSource::ESC_ONESHOT ||
-                m_configSource->getEscType() == VehicleConfigurationSource::ESC_SYNCHED) {
-                data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM_PIN8ONESHOT;
-            } else {
-                data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPMNOONESHOT;
-            }
-            break;
-        case VehicleConfigurationSource::INPUT_SBUS:
-            // We have to set teletry on flexport since s.bus needs the mainport.
-            data.CC_MainPort  = HwSettings::CC_MAINPORT_SBUS;
-            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_TELEMETRY;
-            break;
-        case VehicleConfigurationSource::INPUT_DSM:
-            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSM;
-            break;
-        default:
-            break;
-        }
-        break;
     case VehicleConfigurationSource::CONTROLLER_REVO:
-    case VehicleConfigurationSource::CONTROLLER_NANO:
     case VehicleConfigurationSource::CONTROLLER_DISCOVERYF4:
         // Reset all ports to their defaults
         data.RM_RcvrPort  = HwSettings::RM_RCVRPORT_DISABLED;
@@ -430,20 +388,11 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             // Servo always on channel 4
             data.BankUpdateFreq[0] = escFrequence;
             data.BankMode[0] = bankMode;
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
-                m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
-                data.BankUpdateFreq[1] = servoFrequence;
-            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 data.BankUpdateFreq[1] = escFrequence;
                 data.BankMode[1] = bankMode;
                 data.BankUpdateFreq[2] = servoFrequence;
-            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                data.BankUpdateFreq[1] = escFrequence;
-                data.BankMode[1] = bankMode;
-                data.BankUpdateFreq[2] = escFrequence;
-                data.BankMode[2] = bankMode;
-                data.BankUpdateFreq[3] = servoFrequence;
-            }
+            } 
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
@@ -502,11 +451,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
                 if (i == 1) {
                     data.BankUpdateFreq[i] = escFrequence;
                 }
-            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                if (i == 2) {
-                    data.BankUpdateFreq[i] = escFrequence;
-                }
-            }
+            } 
         }
 
         actSettings->setData(data);
@@ -539,11 +484,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
                 if (i == 1) {
                     data.BankUpdateFreq[i] = escFrequence;
                 }
-            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                if (i == 2) {
-                    data.BankUpdateFreq[i] = escFrequence;
-                }
-            }
+            } 
         }
 
         actSettings->setData(data);
@@ -624,21 +565,7 @@ void VehicleConfigurationHelper::applySensorBiasConfiguration()
         accelGyroSettings->setData(accelGyroSettingsData);
         addModifiedObject(accelGyroSettings, tr("Writing gyro and accelerometer bias settings"));
 
-        switch (m_configSource->getControllerType()) {
-        case VehicleConfigurationSource::CONTROLLER_CC:
-        case VehicleConfigurationSource::CONTROLLER_CC3D:
-        {
-            AttitudeSettings *copterControlCalibration = AttitudeSettings::GetInstance(m_uavoManager);
-            Q_ASSERT(copterControlCalibration);
-            AttitudeSettings::DataFields data = copterControlCalibration->getData();
-
-            data.AccelTau = DEFAULT_ENABLED_ACCEL_TAU;
-            data.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
-
-            copterControlCalibration->setData(data);
-            addModifiedObject(copterControlCalibration, tr("Writing board settings"));
-            break;
-        }
+        switch (m_configSource->getControllerType()) {        
         case VehicleConfigurationSource::CONTROLLER_REVO:
         {
             RevoCalibration *revolutionCalibration = RevoCalibration::GetInstance(m_uavoManager);

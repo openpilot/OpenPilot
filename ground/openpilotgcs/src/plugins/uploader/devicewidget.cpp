@@ -86,22 +86,10 @@ void DeviceWidget::populate()
     myDevice->lblHWRev->setText(tr("HW Revision: ") + QString::number(id & 0x00FF, 16));
 
     switch (id) {
-    case 0x0101:
-    case 0x0201:
-        devicePic.load("");
-        break;
     case 0x0301:
         devicePic.load(":/uploader/images/gcs-board-oplink.png");
         break;
-    case 0x0401:
-        devicePic.load(":/uploader/images/gcs-board-cc.png");
-        break;
-    case 0x0402:
-        devicePic.load(":/uploader/images/gcs-board-cc3d.png");
-        break;
     case 0x0903:
-        devicePic.load(":/uploader/images/gcs-board-revo.png");
-        break;
     case 0x0904:
         devicePic.load(":/uploader/images/gcs-board-revo.png");
         break;
@@ -361,8 +349,7 @@ void DeviceWidget::uploadFirmware()
         // - Check whether board type matches firmware:
         int board = m_dfu->devices[deviceID].ID;
         int firmwareBoard = ((desc.at(12) & 0xff) << 8) + (desc.at(13) & 0xff);
-        if ((board == 0x401 && firmwareBoard == 0x402) ||
-            (board == 0x901 && firmwareBoard == 0x902) || // L3GD20 revo supports Revolution firmware
+        if ((board == 0x901 && firmwareBoard == 0x902) || // L3GD20 revo supports Revolution firmware
             (board == 0x902 && firmwareBoard == 0x903)) { // RevoMini1 supporetd by RevoMini2 firmware
             // These firmwares are designed to be backwards compatible
         } else if (firmwareBoard != board) {

@@ -752,13 +752,6 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     case 0x301:
         filename = "fw_oplinkmini";
         break;
-    case 0x401:
-    case 0x402:
-        filename = "fw_coptercontrol";
-        break;
-    case 0x501:
-        filename = "fw_osd";
-        break;
     case 0x902:
         filename = "fw_revoproto";
         break;
@@ -814,7 +807,6 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     commonSystemBoot(false, erase);
 
     // Wait for board to connect to GCS again after boot and erase
-    // For older board like CC3D this can take some time
     // Theres a special case with OPLink
     if (!telemetryManager->isConnected() && !m_oplinkwatchdog.isConnected()) {
         progressUpdate(erase ? BOOTING_AND_ERASING : BOOTING, QVariant());

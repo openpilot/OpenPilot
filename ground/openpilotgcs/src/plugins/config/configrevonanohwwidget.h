@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configtelemetrytwidget.h
+ * @file       configrevohwwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Telemetry configuration panel
+ * @brief Revolution hardware configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,33 +24,41 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGCCHWWIDGET_H
-#define CONFIGCCHWWIDGET_H
+#ifndef CONFIGREVONANOHWWIDGET_H
+#define CONFIGREVONANOHWWIDGET_H
 
-#include "ui_cc_hw_settings.h"
+#include "ui_configrevonanohwwidget.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include <QWidget>
 #include <QList>
-#include "smartsavebutton.h"
 
-class ConfigCCHWWidget : public ConfigTaskWidget {
+
+class ConfigRevoNanoHWWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
-    ConfigCCHWWidget(QWidget *parent = 0);
-    ~ConfigCCHWWidget();
-private slots:
-    void openHelp();
-    void refreshValues();
-    void widgetsContentsChanged();
-    void enableSaveButtons(bool enable);
+    ConfigRevoNanoHWWidget(QWidget *parent = 0);
+    ~ConfigRevoNanoHWWidget();
 
 private:
-    Ui_CC_HW_Widget *m_telemetry;
-    QSvgRenderer *m_renderer;
+    bool m_refreshing;
+    Ui_RevoNanoHWWidget *m_ui;
+    void setupCustomCombos();
+
+protected slots:
+    void refreshWidgetsValues(UAVObject *obj = NULL);
+    void updateObjectsFromWidgets();
+
+private slots:
+    void usbVCPPortChanged(int index);
+    void usbHIDPortChanged(int index);
+    void flexiPortChanged(int index);
+    void mainPortChanged(int index);
+    void rcvrPortChanged(int index);
+    void openHelp();
 };
 
-#endif // CONFIGCCHWWIDGET_H
+#endif // CONFIGREVONANOHWWIDGET_H

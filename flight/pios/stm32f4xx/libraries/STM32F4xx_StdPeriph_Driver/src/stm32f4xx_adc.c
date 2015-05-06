@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f4xx_adc.c
   * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    11-January-2013
+  * @version V1.4.0
+  * @date    04-August-2014
   * @brief   This file provides firmware functions to manage the following 
   *          functionalities of the Analog to Digital Convertor (ADC) peripheral:
   *           + Initialization and Configuration (in addition to ADC multi mode 
@@ -85,7 +85,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2013 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
   *
   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
   * You may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *
-  ******************************************************************************  
+  ******************************************************************************
   */ 
 
 /* Includes ------------------------------------------------------------------*/
@@ -604,6 +604,10 @@ void ADC_TempSensorVrefintCmd(FunctionalState NewState)
 
 /**
   * @brief  Enables or disables the VBAT (Voltage Battery) channel.
+  * 
+  * @note   the Battery voltage measured is equal to VBAT/2 on STM32F40xx and 
+  *         STM32F41xx devices and equal to VBAT/4 on STM32F42xx and STM32F43xx devices 
+  *              
   * @param  NewState: new state of the VBAT channel.
   *          This parameter can be: ENABLE or DISABLE.
   * @retval None
@@ -849,7 +853,7 @@ FlagStatus ADC_GetSoftwareStartConvStatus(ADC_TypeDef* ADCx)
   assert_param(IS_ADC_ALL_PERIPH(ADCx));
   
   /* Check the status of SWSTART bit */
-  if ((ADCx->CR2 & ADC_CR2_JSWSTART) != (uint32_t)RESET)
+  if ((ADCx->CR2 & ADC_CR2_SWSTART) != (uint32_t)RESET)
   {
     /* SWSTART bit is set */
     bitstatus = SET;

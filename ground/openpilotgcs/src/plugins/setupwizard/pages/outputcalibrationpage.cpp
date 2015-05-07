@@ -690,6 +690,8 @@ void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 void OutputCalibrationPage::on_servoButton_toggled(bool checked)
 {
     ui->servoButton->setText(checked ? tr("Stop") : tr("Start"));
+    // Now we set servos, motors are done (Tricopter fix)
+    ui->calibrateAllMotors->setChecked(false);
 
     QList<quint16> currentChannels;
     getCurrentChannels(currentChannels);

@@ -132,7 +132,9 @@ class UavtalkDemo():
         print " %s Rate: %02.1f Hz  " % (dot, self.updateRate),
             
         roll = self.objMan.AttitudeState.Roll.value
-        print "Roll: %-4d " % roll,
+        print "RPY: %f %f %f " % (self.objMan.AttitudeState.Roll.value,self.objMan.AttitudeState.Pitch.value,self.objMan.AttitudeState.Yaw.value)+" \r",
+	return
+        print "Roll: %f " % roll,
         i = roll/90
         if i<-1: i=-1
         if i>1: i= 1

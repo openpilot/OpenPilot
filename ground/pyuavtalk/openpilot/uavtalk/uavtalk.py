@@ -201,7 +201,7 @@ class UavTalkRecThread(threading.Thread):
                     logging.error("packet Size MISMATCH")
                     self.rxState = UavTalkRecThread.STATE_SYNC
                 else:
-                    print "Object: %s" % self.obj
+#                    print "Object: %s" % self.obj
                     self.rxCount = 0
                     self.rxData = []
 

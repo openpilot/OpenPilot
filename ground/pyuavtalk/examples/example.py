@@ -215,7 +215,4 @@ if __name__ == '__main__':
         demo.stop()
     except Exception:
         pass
-    
-    raw_input("Press ENTER, the application will close")
-
 

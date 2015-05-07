@@ -130,9 +130,12 @@ class ObjManager(object):
                 #print "GetMeta %s" % obj
                 try:
                     logging.debug("Getting %s" % obj)
+                    print("Getting %s" % obj)
                     self.waitObjUpdate(obj, request=True, timeout=.1)
                     logging.debug("  Getting %s" % obj.metadata)
+                    print("  Getting %s" % obj.metadata)
                     self.waitObjUpdate(obj.metadata, request=True, timeout=.1)
+                    print("  Done Getting %s" % obj.metadata)
                 except TimeoutException:
                     logging.debug("  TIMEOUT")
                     pass

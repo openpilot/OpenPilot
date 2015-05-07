@@ -69,12 +69,12 @@ class UavtalkDemo():
         print "Starting UavTalk"
         self.uavTalk.start()
         
-        print "Starting ConnectionManager"
-        self.connMan = ConnectionManager(self.uavTalk, self.objMan)
+        #print "Starting ConnectionManager"
+        #self.connMan = ConnectionManager(self.uavTalk, self.objMan)
         
-        print "Connecting...",
-        self.connMan.connect()
-        print "Connected"
+        #print "Connecting...",
+        #self.connMan.connect()
+        #print "Connected"
         
         print "Getting all Data"
         self.objMan.requestAllObjUpdate()
@@ -89,31 +89,31 @@ class UavtalkDemo():
             self.uavTalk.stop()
         
     def showAttitudeViaObserver(self):
-        print "Request fast periodic updates for AttitudeActual"
-        self.objMan.AttitudeActual.metadata.telemetryUpdateMode.value = UAVMetaDataObject.UpdateMode.PERIODIC
-        self.objMan.AttitudeActual.metadata.telemetryUpdatePeriod.value = 50
-        self.objMan.AttitudeActual.metadata.updated()
+        print "Request fast periodic updates for AttitudeState"
+        self.objMan.AttitudeState.metadata.telemetryUpdateMode.value = UAVMetaDataObject.UpdateMode.PERIODIC
+        self.objMan.AttitudeState.metadata.telemetryUpdatePeriod.value = 50
+        self.objMan.AttitudeState.metadata.updated()
         
-        print "Install Observer for AttitudeActual updates\n"
-        self.objMan.regObjectObserver(self.objMan.AttitudeActual, self, "_onAttitudeUpdate")
+        print "Install Observer for AttitudeState updates\n"
+        self.objMan.regObjectObserver(self.objMan.AttitudeState, self, "_onAttitudeUpdate")
         # Spin until we get interrupted
         while True:
             time.sleep(1)
         
     def showAttitudeViaWait(self):
-        print "Request fast periodic updates for AttitudeActual"
-        self.objMan.AttitudeActual.metadata.telemetryUpdateMode.value = UAVMetaDataObject.UpdateMode.PERIODIC
-        self.objMan.AttitudeActual.metadata.telemetryUpdatePeriod.value = 50
-        self.objMan.AttitudeActual.metadata.updated()
+        print "Request fast periodic updates for AttitudeState"
+        self.objMan.AttitudeState.metadata.telemetryUpdateMode.value = UAVMetaDataObject.UpdateMode.PERIODIC
+        self.objMan.AttitudeState.metadata.telemetryUpdatePeriod.value = 50
+        self.objMan.AttitudeState.metadata.updated()
         
         while True:
-            self.objMan.AttitudeActual.waitUpdate()
-            self._onAttitudeUpdate(self.objMan.AttitudeActual)
+            self.objMan.AttitudeState.waitUpdate()
+            self._onAttitudeUpdate(self.objMan.AttitudeState)
                     
     def showAttitudeViaGet(self):
         while True:
-            self.objMan.AttitudeActual.getUpdate()
-            self._onAttitudeUpdate(self.objMan.AttitudeActual)
+            self.objMan.AttitudeState.getUpdate()
+            self._onAttitudeUpdate(self.objMan.AttitudeState)
         
     def _onAttitudeUpdate(self, args):
         self.nbUpdates += 1
@@ -131,7 +131,7 @@ class UavtalkDemo():
         
         print " %s Rate: %02.1f Hz  " % (dot, self.updateRate),
             
-        roll = self.objMan.AttitudeActual.Roll.value
+        roll = self.objMan.AttitudeState.Roll.value
         print "Roll: %-4d " % roll,
         i = roll/90
         if i<-1: i=-1

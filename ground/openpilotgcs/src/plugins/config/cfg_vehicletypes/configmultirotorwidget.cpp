@@ -420,7 +420,7 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         m_aircraft->multiThrottleCurve->initCurve(&curveValues);
     } else {
         // no, init a straight curve
-        m_aircraft->multiThrottleCurve->initLinearCurve(curveValues.count(), 0.9);
+        m_aircraft->multiThrottleCurve->initLinearCurve(curveValues.count(), 1.0);
     }
 
     GUIConfigDataUnion config    = getConfigData();

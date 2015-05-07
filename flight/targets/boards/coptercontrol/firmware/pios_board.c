@@ -428,7 +428,7 @@ void PIOS_Board_Init(void)
     HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
     uint8_t hwsettings_cc_mainport;
     HwSettingsCC_MainPortGet(&hwsettings_cc_mainport);
-
+    bool non_inverted = FALSE;
     switch (hwsettings_cc_mainport) {
     case HWSETTINGS_CC_MAINPORT_DISABLED:
         break;
@@ -452,6 +452,8 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
         break;
+    case HWSETTINGS_CC_MAINPORT_SBUSNONSTANDARD:
+        non_inverted = TRUE;
     case HWSETTINGS_CC_MAINPORT_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
         {
@@ -461,7 +463,7 @@ void PIOS_Board_Init(void)
             }
 
             uint32_t pios_sbus_id;
-            if (PIOS_SBus_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
+            if (PIOS_SBus_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id, non_inverted)) {
                 PIOS_Assert(0);
             }
 

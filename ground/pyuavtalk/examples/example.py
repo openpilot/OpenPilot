@@ -76,12 +76,12 @@ class UavtalkDemo():
         #self.connMan.connect()
         #print "Connected"
         
-        print "Getting all Data"
-        self.objMan.requestAllObjUpdate()
+        #print "Getting all Data"
+        #self.objMan.requestAllObjUpdate()
         
-        print "SN:",
-        sn = self.objMan.FirmwareIAPObj.CPUSerial.value
-        print "".join(map(_hex02, sn))
+        #print "SN:",
+        #sn = self.objMan.FirmwareIAPObj.CPUSerial.value
+        #print "".join(map(_hex02, sn))
         
     def stop(self):
         if self.uavTalk:

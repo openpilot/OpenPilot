@@ -701,12 +701,12 @@ void PIOS_Board_Init(void)
       // TODO: ensure that the serial invertion pin is setted correctly
     uint8_t hwsettings_rv_auxsbusport;
     HwSettingsRV_AuxSBusPortGet(&hwsettings_rv_auxsbusport);
-    bool non_inverted = FALSE;
+    bool non_inverted = false;
     switch (hwsettings_rv_auxsbusport) {
     case HWSETTINGS_RV_AUXSBUSPORT_DISABLED:
         break;
     case HWSETTINGS_RV_AUXSBUSPORT_SBUSNONSTANDARDNONINVERTED:
-        non_inverted = TRUE;
+        non_inverted = true;
     case HWSETTINGS_RV_AUXSBUSPORT_SBUS:
 #ifdef PIOS_INCLUDE_SBUS
         {

@@ -82,7 +82,7 @@ static uint8_t conditionImmediate();
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
 static void planner_setup_pathdesired_land(PathDesiredData *pathDesired);
 static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired);
-static void planner_setup_pathdesired(PathDesiredData *pathDesired, uint8_t);
+static void planner_setup_pathdesired(PathDesiredData *pathDesired, bool overwrite_start_position);
 
 
 // Private variables
@@ -332,7 +332,7 @@ void updatePathDesired()
     WaypointInstGet(waypointActive.Index, &waypoint);
 
     // Capture if current mode is takeoff
-    uint8_t autotakeoff = (pathAction.Mode == PATHACTION_MODE_AUTOTAKEOFF);
+    bool autotakeoff = (pathAction.Mode == PATHACTION_MODE_AUTOTAKEOFF);
 
     PathActionInstGet(waypoint.Action, &pathAction);
 
@@ -438,7 +438,7 @@ void statusUpdated(__attribute__((unused)) UAVObjEvent *ev)
 }
 
 // Standard setup of a pathDesired command from the waypoint path plan
-static void planner_setup_pathdesired(PathDesiredData *pathDesired, uint8_t overwrite_start_position)
+static void planner_setup_pathdesired(PathDesiredData *pathDesired, bool overwrite_start_position)
 {
     pathDesired->End.North = waypoint.Position.North;
     pathDesired->End.East  = waypoint.Position.East;

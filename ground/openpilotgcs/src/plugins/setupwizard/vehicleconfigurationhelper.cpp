@@ -129,6 +129,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
 
     switch (m_configSource->getControllerType()) {
     case VehicleConfigurationSource::CONTROLLER_REVO:
+    case VehicleConfigurationSource::CONTROLLER_NANO:
     case VehicleConfigurationSource::CONTROLLER_DISCOVERYF4:
         // Reset all ports to their defaults
         data.RM_RcvrPort  = HwSettings::RM_RCVRPORT_DISABLED;

@@ -35,7 +35,7 @@
 #include "pios_dsm_priv.h"
 
 // *** UNTESTED CODE ***
-#define DSM_LINK_QUALITY
+#undef DSM_LINK_QUALITY
 
 #ifndef PIOS_INCLUDE_RTC
 #error PIOS_INCLUDE_RTC must be used to use DSM

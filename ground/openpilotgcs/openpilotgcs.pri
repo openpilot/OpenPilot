@@ -138,7 +138,6 @@ macx {
     GCS_LIBRARY_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Plugins
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH
     GCS_QT_QML_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Imports
-    GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_BASENAME = Resources
     GCS_DOC_PATH     = $$GCS_DATA_PATH/doc
@@ -147,7 +146,6 @@ macx {
 } else {
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
-    GCS_LIBEXEC_PATH = $$GCS_APP_PATH # FIXME
     GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
     GCS_DATA_BASENAME = share/openpilotgcs
     GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc

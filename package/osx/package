@@ -4,7 +4,7 @@
 : ${ROOT_DIR?} ${BUILD_DIR?} ${PACKAGE_LBL?} ${PACKAGE_DIR?} ${PACKAGE_NAME?} ${PACKAGE_SEP?}
 
 # more variables
-APP_PATH="${BUILD_DIR}/openpilotgcs_release/bin/openpilotgcs.app"
+APP_PATH="${BUILD_DIR}/openpilotgcs_release/openpilotgcs.app"
 TEMP_FILE="${PACKAGE_DIR}/OpenPilot-temp.dmg"
 OUT_FILE="${PACKAGE_DIR}/../${PACKAGE_NAME}${PACKAGE_SEP}${PACKAGE_LBL}${PACKAGE_SEP}osx.dmg"
 VOL_NAME="OpenPilot"

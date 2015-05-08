@@ -4,7 +4,6 @@ QT += core gui network widgets
 
 TEMPLATE = app
 TARGET = udp_test
-DESTDIR = $$GCS_APP_PATH
 
 HEADERS += \
     udptestwidget.h

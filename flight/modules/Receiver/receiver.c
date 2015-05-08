@@ -713,14 +713,19 @@ static bool updateRcvrStatus(
 {
     extern uint32_t pios_rcvr_group_map[];
     bool activity_updated = false;
-    uint8_t quality;
+    int8_t quality;
 
     quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[group]);
+
+    /* If no driver is detected or any other error then return */
+    if (quality < 0) {
+        return activity_updated;
+    }
 
     /* Compare with previous sample */
     if (quality != fsm->quality) {
         fsm->quality     = quality;
-        ReceiverStatusQualitySet(&quality);
+        ReceiverStatusQualitySet(&fsm->quality);
         activity_updated = true;
     }
 

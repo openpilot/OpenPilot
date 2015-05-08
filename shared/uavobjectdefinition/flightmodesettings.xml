@@ -23,7 +23,7 @@
 		limits="%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
+			%NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
 			%0401NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario;"
 			/>
@@ -34,7 +34,7 @@
 		limits="%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
+			%NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
 			%0401NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario;"
 			/>
@@ -45,7 +45,7 @@
 		limits="%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
+			%NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
 			%0401NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario;"
 			/>
@@ -56,7 +56,7 @@
 		limits="%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
+			%NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
 			%0401NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario;"
 			/>
@@ -67,7 +67,7 @@
 		limits="%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
+			%NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude,\
 			%0401NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:RateTrainer:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:AltitudeHold:AltitudeVario;"
 			/>

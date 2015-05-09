@@ -96,7 +96,8 @@ extern const struct pios_rcvr_driver pios_sbus_rcvr_driver;
 extern int32_t PIOS_SBus_Init(uint32_t *sbus_id,
                               const struct pios_sbus_cfg *cfg,
                               const struct pios_com_driver *driver,
-                              uint32_t lower_id);
+                              uint32_t lower_id,
+                              bool non_inverted);
 
 #endif /* PIOS_SBUS_PRIV_H */
 

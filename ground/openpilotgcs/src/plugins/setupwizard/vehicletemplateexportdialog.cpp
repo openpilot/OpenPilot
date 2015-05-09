@@ -48,7 +48,6 @@
 #include <uavtalk/telemetrymanager.h>
 #include <utils/pathutils.h>
 
-const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
 const char *VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
 const char *VehicleTemplateExportDialog::EXPORT_MULTI_NAME     = "multirotor";
 const char *VehicleTemplateExportDialog::EXPORT_HELI_NAME      = "helicopter";

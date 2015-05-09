@@ -306,25 +306,12 @@ void logInit(QString fileName)
 inline QStringList getPluginPaths()
 {
     QStringList rc;
-    // Figure out root:  Up one from 'bin'
-    QDir rootDir = QApplication::applicationDirPath();
 
-    rootDir.cdUp();
-    const QString rootDirPath = rootDir.canonicalPath();
-    // 1) "plugins" (Win/Linux)
-    QString pluginPath = rootDirPath;
+    QString pluginPath = QApplication::applicationDirPath();
     pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String(GCS_LIBRARY_BASENAME);
-    pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String("openpilotgcs");
-    pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String("plugins");
+    pluginPath += QLatin1String(PLUGIN_REL_PATH);
     rc.push_back(pluginPath);
-    // 2) "PlugIns" (OS X)
-    pluginPath  = rootDirPath;
-    pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String("Plugins");
-    rc.push_back(pluginPath);
+
     return rc;
 }
 

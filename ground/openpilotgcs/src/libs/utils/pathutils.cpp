@@ -42,15 +42,9 @@ PathUtils::PathUtils()
  */
 QString PathUtils::GetDataPath()
 {
-    // This routine works with "/" as the standard:
-    // Figure out root:  Up one from 'bin'
-    QDir rootDir = QApplication::applicationDirPath();
-
-    rootDir.cdUp();
-    const QString rootDirPath = rootDir.canonicalPath();
-    QString dataPath = rootDirPath;
+    QString dataPath = QApplication::applicationDirPath();
     dataPath += QLatin1Char('/');
-    dataPath += QLatin1String(GCS_DATA_BASENAME);
+    dataPath += QLatin1String(DATA_REL_PATH);
     dataPath += QLatin1Char('/');
     return dataPath;
 }

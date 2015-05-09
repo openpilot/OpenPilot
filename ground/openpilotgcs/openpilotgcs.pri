@@ -140,9 +140,9 @@ macx {
 } else {
     GCS_PATH         = $$GCS_BUILD_TREE
     GCS_APP_PATH     = $$GCS_PATH/bin
-    GCS_LIBRARY_PATH = $$GCS_PATH/lib/openpilotgcs
+    GCS_LIBRARY_PATH = $$GCS_PATH/lib/$$GCS_APP_TARGET
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
-    GCS_DATA_PATH    = $$GCS_PATH/share/openpilotgcs
+    GCS_DATA_PATH    = $$GCS_PATH/share/$$GCS_APP_TARGET
     GCS_DOC_PATH     = $$GCS_PATH/share/doc
 
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1

@@ -141,17 +141,20 @@ static void altitudeHoldTask(void)
         controlDown.UpdatePositionState(positionStateDown);
         controlDown.ControlPosition();
         altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
+        altitudeHoldStatus.State = ALTITUDEHOLDSTATUS_STATE_ALTITUDEHOLD;
         thrustDemand = controlDown.GetDownCommand();
     }
     break;
 
     case ALTITUDEVARIO:
         altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
+        altitudeHoldStatus.State = ALTITUDEHOLDSTATUS_STATE_ALTITUDEVARIO;
         thrustDemand = controlDown.GetDownCommand();
         break;
 
     case DIRECT:
         altitudeHoldStatus.VelocityDesired = 0.0f;
+        altitudeHoldStatus.State = ALTITUDEHOLDSTATUS_STATE_DIRECT;
         break;
     }
 
@@ -202,6 +205,9 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // initialise limits on thrust but note the FSM can override.
     controlDown.SetThrustLimits(altitudeHoldSettings.ThrustLimits.Min, altitudeHoldSettings.ThrustLimits.Max);
+
+    // disable neutral thrust calcs which should only be done in a hold mode.
+    controlDown.DisableNeutralThrustCalc();
 }
 
 

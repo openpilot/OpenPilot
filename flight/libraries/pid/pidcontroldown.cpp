@@ -59,7 +59,7 @@ extern "C" {
 PIDControlDown::PIDControlDown()
     : deltaTime(0.0f), mVelocitySetpointTarget(0.0f), mVelocitySetpointCurrent(0.0f), mVelocityState(0.0f), mDownCommand(0.0f),
     mCallback(NULL), mNeutral(0.5f), mVelocityMax(1.0f), mPositionSetpointTarget(0.0f), mPositionState(0.0f),
-    mMinThrust(0.1f), mMaxThrust(0.6f), mActive(false)
+    mMinThrust(0.1f), mMaxThrust(0.6f), mActive(false), mAllowNeutralThrustCalc(true)
 {
     Deactivate();
 }

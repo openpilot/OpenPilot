@@ -145,6 +145,9 @@ void VtolFlyController::SettingsUpdated(void)
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
     controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
+
+    // disable neutral thrust calcs which should only be done in a hold mode.
+    controlDown.DisableNeutralThrustCalc();
 }
 
 /**

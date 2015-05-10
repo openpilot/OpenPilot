@@ -58,6 +58,14 @@ public:
     void ControlPositionWithPath(struct path_status *progress);
     void UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
     void UpdateVelocityStateWithBrake(float pvDown, float path_time, float brakeRate);
+    void DisableNeutralThrustCalc()
+    {
+        mAllowNeutralThrustCalc = false;
+    }
+    void EnableNeutralThrustCalc()
+    {
+        mAllowNeutralThrustCalc = true;
+    }
 
 private:
     void setup_neutralThrustCalc();
@@ -77,7 +85,6 @@ private:
     float mPositionState;
     float mMinThrust;
     float mMaxThrust;
-    uint8_t mActive;
 
     struct NeutralThrustEstimation {
         uint32_t count;
@@ -90,6 +97,8 @@ private:
         bool     have_correction;
     };
     struct NeutralThrustEstimation neutralThrustEst;
+    bool mActive;
+    bool mAllowNeutralThrustCalc;
 };
 
 #endif // PIDCONTROLDOWN_H

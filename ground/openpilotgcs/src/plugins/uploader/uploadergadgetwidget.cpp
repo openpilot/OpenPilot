@@ -752,6 +752,9 @@ bool UploaderGadgetWidget::autoUpdate(bool erase)
     case 0x301:
         filename = "fw_oplinkmini";
         break;
+    case 0x501:
+        filename = "fw_osd";
+        break;
     case 0x902:
         filename = "fw_revoproto";
         break;

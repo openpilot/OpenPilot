@@ -11,13 +11,11 @@ CatalogFile.NTamd64 = OpenPilot-CDC_amd64.cat
 %ProviderName% = DeviceList, NTx86, NTamd64
 
 [DeviceList.NTx86]
-%CopterControl% = DriverInstall,USB\VID_20A0&PID_415b&MI_00
 %Revolution% = DriverInstall,USB\VID_20A0&PID_415e&MI_00
 %OPLinkMini% = DriverInstall,USB\VID_20A0&PID_415c&MI_00
 %OPLink1W% = DriverInstall,USB\VID_20A0&PID_4195&MI_00
 
 [DeviceList.NTamd64]
-%CopterControl% = DriverInstall,USB\VID_20A0&PID_415b&MI_00
 %Revolution% = DriverInstall,USB\VID_20A0&PID_415e&MI_00
 %OPLinkMini% = DriverInstall,USB\VID_20A0&PID_415c&MI_00
 %OPLink1W% = DriverInstall,USB\VID_20A0&PID_4195&MI_00
@@ -37,7 +35,6 @@ HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 
 [Strings]
 ProviderName = "OpenPilot"
-CopterControl = "CopterControl Virtual COM Port"
 Revolution = "Revolution Virtual COM Port"
 OPLinkMini = "OPLinkMini Virtual COM Port"
 OPLink1W = "OPLink1W Virtual COM Port"

@@ -377,7 +377,7 @@ void Core::OnMapClose()
 
     CancelAsyncTasks();
 }
-GeoCoderStatusCode::Types Core::SetCurrentPositionByKeywords(QString const & keys)
+QString Core::SetCurrentPositionByKeywords(QString const & keys)
 {
     QString status = "ZERO_RESULTS";
     PointLatLng pos = OPMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
@@ -389,8 +389,7 @@ GeoCoderStatusCode::Types Core::SetCurrentPositionByKeywords(QString const & key
     {
 	qDebug() << "Status is not OK: " << status; 
     }
-    //return status;
-    return GeoCoderStatusCode::G_GEO_SUCCESS;
+    return status;
 }
 RectLatLng Core::CurrentViewArea()
 {

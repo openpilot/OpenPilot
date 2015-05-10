@@ -579,12 +579,11 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
             return internals::PointLatLng(0, 0);
         }
         {
+            geo = reply->readAll();
 #ifdef DEBUG_URLFACTORY
             qDebug() << "GetLatLngFromGeocoderUrl:Reply ok";
-#endif // DEBUG_URLFACTORY
-            geo = reply->readAll();
-
 	    qDebug() << geo; // This is the response from the geocode request (no longer in CSV)
+#endif // DEBUG_URLFACTORY
 
 	    // This is SOOOO horribly hackish, code duplication needs to go. Needed a quick fix. 
 	    QXmlStreamReader reader(geo);

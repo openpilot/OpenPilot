@@ -114,13 +114,13 @@ include $(ROOT_DIR)/make/tools.mk
 # We almost need to consider autoconf/automake instead of this
 ifeq ($(UNAME), Linux)
     QT_SPEC = linux-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/uavobjgenerator
 else ifeq ($(UNAME), Darwin)
     QT_SPEC = macx-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/uavobjgenerator
 else ifeq ($(UNAME), Windows)
     QT_SPEC = win32-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/$(GCS_BUILD_CONF)/uavobjgenerator.exe"
+    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/$(GCS_BUILD_CONF)/uavobjgenerator.exe
 endif
 
 ##############################

@@ -154,10 +154,10 @@ UAVOBJGENERATOR_DIR = $(BUILD_DIR)/uavobjgenerator
 DIRS += $(UAVOBJGENERATOR_DIR)
 
 .PHONY: uavobjgenerator
-uavobjgenerator: | $(UAVOBJGENERATOR_DIR)
+uavobjgenerator $(UAVOBJGENERATOR): | $(UAVOBJGENERATOR_DIR)
 	$(V1) cd $(UAVOBJGENERATOR_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro \
-	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) && \
+	    ( [ -f Makefile ] || $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro \
+	    -spec $(QT_SPEC) CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) ) && \
 	    $(MAKE) --no-print-directory -w
 
 UAVOBJ_TARGETS := gcs flight python matlab java wireshark
@@ -168,13 +168,13 @@ uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
 UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
 
-uavobjects_%: uavobjgenerator
+uavobjects_%:  $(UAVOBJGENERATOR)
 	@$(MKDIR) -p $(UAVOBJ_OUT_DIR)/$*
 	$(V1) ( cd $(UAVOBJ_OUT_DIR)/$* && \
 	    $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
-uavobjects_test: uavobjgenerator
+uavobjects_test:  $(UAVOBJGENERATOR)
 	$(V1) $(UAVOBJGENERATOR) -v $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:

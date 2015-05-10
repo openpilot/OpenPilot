@@ -21,8 +21,6 @@ HEADERS += \
     configinputwidget.h \
     configoutputwidget.h \
     configvehicletypewidget.h \
-    config_cc_hw_widget.h \
-    configccattitudewidget.h \
     configstabilizationwidget.h \
     assertions.h \
     defaultattitudewidget.h \
@@ -68,8 +66,6 @@ SOURCES += \
     configinputwidget.cpp \
     configoutputwidget.cpp \
     configvehicletypewidget.cpp \
-    config_cc_hw_widget.cpp \
-    configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
@@ -106,12 +102,10 @@ FORMS += \
     airframe_ground.ui \
     airframe_multirotor.ui \
     airframe_custom.ui \
-    cc_hw_settings.ui \
     stabilization.ui \
     input.ui \
     input_wizard.ui \
     output.ui \
-    ccattitude.ui \
     defaultattitude.ui \
     defaulthwsettings.ui \
     inputchannelform.ui \
@@ -121,6 +115,6 @@ FORMS += \
     txpid.ui \
     mixercurve.ui \
     configrevohwwidget.ui \
-    oplink.ui
+    oplink.ui 
 
 RESOURCES += configgadget.qrc

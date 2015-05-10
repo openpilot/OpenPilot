@@ -26,7 +26,8 @@
  */
 #include "urlfactory.h"
 #include <QRegExp>
-
+#include <QDomDocument>
+#include <QtXml>
 
 namespace core {
 const double UrlFactory::EarthRadiusKm = 6378.137; // WGS-84
@@ -97,6 +98,12 @@ void UrlFactory::TryCorrectGoogleVersions()
     if (CorrectGoogleVersions && !IsCorrectGoogleVersions()) {
         QNetworkReply *reply;
         QNetworkRequest qheader;
+	// This SSL Hack is half assed... technically bad *security* joojoo.
+	// Required due to a QT5 bug on linux and Mac
+	// 
+	QSslConfiguration conf = qheader.sslConfiguration();
+	conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+	qheader.setSslConfiguration(conf);
         QNetworkAccessManager network;
         QEventLoop q;
         QTimer tT;
@@ -109,7 +116,10 @@ void UrlFactory::TryCorrectGoogleVersions()
         qDebug() << "Correct GoogleVersion";
 #endif // DEBUG_URLFACTORY
        // setIsCorrectGoogleVersions(true);
-        QString url = "https://maps.google.com/maps?output=classic";
+        // QString url = "https://www.google.com/maps/@0,-0,7z?dg=dbrw&newdg=1";
+	// We need to switch to the Above url... the /lochp method will be depreciated soon
+	// https://productforums.google.com/forum/#!category-topic/maps/navigation/k6EFrp7J7Jk
+        QString url = "https://www.google.com/lochp";
 
         qheader.setUrl(QUrl(url));
         qheader.setRawHeader("User-Agent", UserAgent);
@@ -126,7 +136,12 @@ void UrlFactory::TryCorrectGoogleVersions()
 #endif // DEBUG_URLFACTORY
             return;
         }
+
         QString html = QString(reply->readAll());
+#ifdef DEBUG_URLFACTORY
+	qDebug() << html;
+#endif // DEBUG_URLFACTORY
+
         QRegExp reg("\"*https://mts0.google.com/vt/lyrs=m@(\\d*)", Qt::CaseInsensitive);
         if (reg.indexIn(html) != -1) {
             QStringList gc = reg.capturedTexts();
@@ -148,6 +163,7 @@ void UrlFactory::TryCorrectGoogleVersions()
             qDebug() << "TryCorrectGoogleVersions, VersionGoogleLabels: " << VersionGoogleLabels;
 #endif // DEBUG_URLFACTORY
         }
+
         reg = QRegExp("\"*https://khms0.google.com/kh/v=(\\d*)", Qt::CaseInsensitive);
         if (reg.indexIn(html) != -1) {
             QStringList gc = reg.capturedTexts();
@@ -157,6 +173,7 @@ void UrlFactory::TryCorrectGoogleVersions()
 
             qDebug() << "TryCorrectGoogleVersions, VersionGoogleSatellite: " << VersionGoogleSatellite;
         }
+
         reg = QRegExp("\"*https://mts0.google.com/vt/lyrs=t@(\\d*),r@(\\d*)", Qt::CaseInsensitive);
         if (reg.indexIn(html) != -1) {
             QStringList gc = reg.capturedTexts();
@@ -492,23 +509,29 @@ void UrlFactory::GetSecGoogleWords(const Point &pos, QString &sec1, QString &sec
 QString UrlFactory::MakeGeocoderUrl(QString keywords)
 {
     QString key = keywords.replace(' ', '+');
-
-    return QString("http://maps.google.com/maps/geo?q=%1&output=csv&key=%2").arg(key).arg(GoogleMapsAPIKey);
+    // CSV output has been depreciated. API key is no longer needed. 
+    return QString("https://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address=%1").arg(key);
 }
 QString UrlFactory::MakeReverseGeocoderUrl(internals::PointLatLng &pt, const QString &language)
 {
-    return QString("http://maps.google.com/maps/geo?hl=%1&ll=%2,%3&output=csv&key=%4").arg(language).arg(QString::number(pt.Lat())).arg(QString::number(pt.Lng())).arg(GoogleMapsAPIKey);
+    // CSV output has been depreciated. API key is no longer needed. 
+    return QString("https://maps.googleapis.com/maps/api/geocode/xml?latlng=%1,%2").arg(QString::number(pt.Lat())).arg(QString::number(pt.Lng()));
 }
-internals::PointLatLng UrlFactory::GetLatLngFromGeodecoder(const QString &keywords, GeoCoderStatusCode::Types &status)
+internals::PointLatLng UrlFactory::GetLatLngFromGeodecoder(const QString &keywords, QString &status)
 {
     return GetLatLngFromGeocoderUrl(MakeGeocoderUrl(keywords), UseGeocoderCache, status);
 }
-internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, GeoCoderStatusCode::Types &status)
+
+QString latxml;
+QString lonxml;
+//QString status;
+
+internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, QString &status)
 {
 #ifdef DEBUG_URLFACTORY
     qDebug() << "Entered GetLatLngFromGeocoderUrl:";
 #endif // DEBUG_URLFACTORY
-    status = GeoCoderStatusCode::Unknow;
+    status = "ZERO_RESULTS";
     internals::PointLatLng ret(0, 0);
     QString urlEnd = url.mid(url.indexOf("geo?q=") + 6);
     urlEnd.replace(QRegExp(
@@ -529,6 +552,10 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
 #endif // DEBUG_URLFACTORY
         QNetworkReply *reply;
         QNetworkRequest qheader;
+        // Lame hack *SSL security == none, bypass QT bug
+        QSslConfiguration conf = qheader.sslConfiguration();
+        conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+        qheader.setSslConfiguration(conf);
         QNetworkAccessManager network;
         network.setProxy(Proxy);
         qheader.setUrl(QUrl(url));
@@ -557,6 +584,82 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
 #endif // DEBUG_URLFACTORY
             geo = reply->readAll();
 
+	    qDebug() << geo; // This is the response from the geocode request (no longer in CSV)
+
+	    // This is SOOOO horribly hackish, code duplication needs to go. Needed a quick fix. 
+	    QXmlStreamReader reader(geo);
+	    while(!reader.atEnd())
+	    {  
+  		reader.readNext();
+
+  		if(reader.isStartElement())
+  		{
+    		    if(reader.name() == "lat")
+    		    {		
+      			reader.readNext();
+      			if(reader.atEnd()) 
+				break;
+
+      			if(reader.isCharacters())
+      			{
+        		    QString text = reader.text().toString();
+			    qDebug() << text;
+			    latxml = text;
+			    break;
+      			}
+    		    }
+  	        }
+
+	     }
+
+	    while(!reader.atEnd())
+	    {  
+  		reader.readNext();
+
+  		if(reader.isStartElement())
+  		{
+    		    if(reader.name() == "lng")
+    		    {		
+      			reader.readNext();
+      			if(reader.atEnd()) 
+				break;
+
+      			if(reader.isCharacters())
+      			{
+        		    QString text = reader.text().toString();
+			    qDebug() << text;
+			    lonxml = text;
+			    break;
+      			}
+    		    }
+  	        }
+
+	     }
+
+	    QXmlStreamReader reader2(geo);
+	    while(!reader2.atEnd())
+	    {  
+  		reader2.readNext();
+
+  		if(reader2.isStartElement())
+  		{
+    		    if(reader2.name() == "status")
+    		    {		
+      			reader2.readNext();
+      			if(reader2.atEnd()) 
+				break;
+
+      			if(reader2.isCharacters())
+      			{
+        		    QString text = reader2.text().toString();
+			    qDebug() << text;
+			    status = text;
+			    break;
+      			}
+    		    }
+  	        }
+
+	     }
 
             // cache geocoding
             if (useCache && geo.startsWith("200")) {
@@ -567,23 +670,36 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
     }
 
 
-    // parse values
-    // true : 200,4,56.1451640,22.0681787
-    // false: 602,0,0,0
     {
-        QStringList values = geo.split(',');
-        if (values.count() == 4) {
-            status = (GeoCoderStatusCode::Types)QString(values[0]).toInt();
-            if (status == GeoCoderStatusCode::G_GEO_SUCCESS) {
-                double lat = QString(values[2]).toDouble();
-                double lng = QString(values[3]).toDouble();
+            if (status == "OK") {
+                double lat = QString(latxml).toDouble();
+                double lng = QString(lonxml).toDouble();
 
                 ret = internals::PointLatLng(lat, lng);
 #ifdef DEBUG_URLFACTORY
+                qDebug() << "Status is: " << status;
                 qDebug() << "Lat=" << lat << " Lng=" << lng;
 #endif // DEBUG_URLFACTORY
             }
-        }
+	    else if (status == "ZERO_RESULTS") {
+		qDebug() << "No results";
+	    }
+	    else if (status == "OVER_QUERY_LIMIT") {
+		qDebug() << "You are over quota on queries";
+	    }
+	    else if (status == "REQUEST_DENIED") {
+		qDebug() << "Request was denied";
+	    }
+	    else if (status == "INVALID_REQUEST") {
+		qDebug() << "Invalid request, missing address, lat long or location";
+	    }
+	    else if (status == "UNKNOWN_ERROR") {
+		qDebug() << "Some sort of server error.";
+	    }
+	    else
+	    {
+	        qDebug() << "UrlFactory loop error";
+	    }
     }
     return ret;
 }

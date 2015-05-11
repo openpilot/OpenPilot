@@ -335,21 +335,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         return QString("https://%1%2.gmaptiles.co.kr/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
-    case MapType::YahooMap:
-    {
-        return QString("http://maps%1.yimg.com/hx/tl?v=%2&.intl=%3&x=%4&y=%5&z=%6&r=1").arg(((GetServerNum(pos, 2)) + 1)).arg(VersionYahooMap).arg(language).arg(pos.X()).arg((((1 << zoom) >> 1) - 1 - pos.Y())).arg((zoom + 1));
-    }
-
-    case MapType::YahooSatellite:
-    {
-        return QString("http://maps%1.yimg.com/ae/ximg?v=%2&t=a&s=256&.intl=%3&x=%4&y=%5&z=%6&r=1").arg("3").arg(VersionYahooSatellite).arg(language).arg(pos.X()).arg(((1 << zoom) >> 1) - 1 - pos.Y()).arg(zoom + 1);
-    }
-    break;
-    case MapType::YahooLabels:
-    {
-        return QString("http://maps%1.yimg.com/hx/tl?v=%2&t=h&.intl=%3&x=%4&y=%5&z=%6&r=1").arg("1").arg(VersionYahooLabels).arg(language).arg(pos.X()).arg(((1 << zoom) >> 1) - 1 - pos.Y()).arg(zoom + 1);
-    }
-    break;
+    // *.yimg.com has been depreciated. "Here" is what Yahoo uses now. https://developer.here.com/rest-apis/documentation/enterprise-map-tile/topics/request-constructing.html
     case MapType::OpenStreetMap:
     {
         char letter = "abc"[GetServerNum(pos, 3)];
@@ -483,11 +469,19 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
 
     case MapType::YandexMapRu:
     {
+        /*  
+	    Used "oldmaps" to determine map types - https://old.maps.yandex.ru/?ll=-83.110960%2C40.091250&spn=7.745361%2C6.015476&z=7&l=map
+	    map: 'https:\/\/vec0%d.maps.yandex.net\/tiles?l=map&%c&%l',
+            sat: 'https:\/\/sat0%d.maps.yandex.net\/tiles?l=sat&%c&%l',
+            skl: 'https:\/\/vec0%d.maps.yandex.net\/tiles?l=skl&%c&%l',
+									*/
+
         QString server = "vec";
+        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.net/tiles?l=map&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
 
-        // http://vec01.maps.yandex.ru/tiles?l=map&v=2.10.2&x=1494&y=650&z=11
-
-        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.ru/tiles?l=map&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
+// Satllite maps are poor quality, but available. 
+//        QString server = "sat";
+//        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.net/tiles?l=sat&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
     }
     break;
     default:

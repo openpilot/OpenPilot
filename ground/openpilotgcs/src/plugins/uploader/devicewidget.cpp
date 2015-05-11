@@ -78,6 +78,11 @@ void DeviceWidget::populate()
 {
     int id = m_dfu->devices[deviceID].ID;
 
+    // Exclude CC/CC3D
+    if ((id == 0x0401) || (id == 0x0402)) {
+        return;
+    }
+
     myDevice->lbldevID->setText(tr("Device ID: ") + QString::number(id, 16));
     // DeviceID tells us what sort of HW we have detected:
     // display a nice icon:

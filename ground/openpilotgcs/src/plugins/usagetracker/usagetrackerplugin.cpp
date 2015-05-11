@@ -178,18 +178,11 @@ void UsageTrackerPlugin::collectUsageParameters(QMap<QString, QString> &paramete
         parameters["conf_receiver"] = getUAVFieldValue(objManager, "ManualControlSettings", "ChannelGroups", 0);
         parameters["conf_vehicle"]  = getUAVFieldValue(objManager, "SystemSettings", "AirframeType");
 
-        if ((boardModel & 0xff00) == 0x0400) {
-            // CopterControl family
-            parameters["conf_rport"] = getUAVFieldValue(objManager, "HwSettings", "CC_RcvrPort");
-            parameters["conf_mport"] = getUAVFieldValue(objManager, "HwSettings", "CC_MainPort");
-            parameters["conf_fport"] = getUAVFieldValue(objManager, "HwSettings", "CC_FlexiPort");
-        } else if ((boardModel & 0xff00) == 0x0900) {
-            // Revolution family
-            parameters["conf_rport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_RcvrPort");
-            parameters["conf_mport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_MainPort");
-            parameters["conf_fport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_FlexiPort");
-            parameters["conf_fusion"] = getUAVFieldValue(objManager, "RevoSettings", "FusionAlgorithm");
-        }
+        // Revolution family
+        parameters["conf_rport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_RcvrPort");
+        parameters["conf_mport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_MainPort");
+        parameters["conf_fport"]  = getUAVFieldValue(objManager, "HwSettings", "RM_FlexiPort");
+        parameters["conf_fusion"] = getUAVFieldValue(objManager, "RevoSettings", "FusionAlgorithm");
 
         parameters["conf_uport"]    = getUAVFieldValue(objManager, "HwSettings", "USB_HIDPort");
         parameters["conf_vport"]    = getUAVFieldValue(objManager, "HwSettings", "USB_VCPPort");

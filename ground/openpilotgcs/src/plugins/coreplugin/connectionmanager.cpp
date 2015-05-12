@@ -445,17 +445,9 @@ void ConnectionManager::devChanged(IConnection *connection)
     updateConnectionDropdown();
 
     if (ccFound && ccWarningClosed) {
-        ccWarningClosed     = false;
-        ccWarningMessageBox = new QMessageBox();
-        ccWarningMessageBox->setWindowTitle(tr("CopterControl Not Supported"));
-        ccWarningMessageBox->setIcon(QMessageBox::Information);
-        ccWarningMessageBox->setStandardButtons(QMessageBox::Ok);
-        ccWarningMessageBox->setText(tr("This version of OpenPilot GCS does not support CC and CC3D boards.\n\nPlease use OpenPilot GCS version 15.02.xx instead"));
-
-        ccWarningMessageBox->show();
-    }
-    if (!ccFound && !ccWarningClosed) {
-        ccWarningMessageBox->close();
+        ccWarningClosed = false;
+        QMessageBox::information(this, tr("CopterControl Not Supported"),
+                                 tr("This version of OpenPilot GCS does not support CC and CC3D boards.\n\nPlease use OpenPilot GCS version 15.02.xx instead"));
         ccWarningClosed = true;
     }
 

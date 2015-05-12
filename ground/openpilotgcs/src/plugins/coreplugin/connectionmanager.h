@@ -152,7 +152,6 @@ private:
     bool polling;
     bool ccFound;
     bool ccWarningClosed;
-    QMessageBox *ccWarningMessageBox;
     Internal::MainWindow *m_mainWindow;
     QList <IConnection *> connectionBackup;
     QTimer *reconnect;

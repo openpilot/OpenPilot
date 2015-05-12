@@ -8244,7 +8244,7 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>884</width>
+            <width>950</width>
             <height>736</height>
            </rect>
           </property>
@@ -18236,8 +18236,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>839</width>
-            <height>670</height>
+            <width>950</width>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -25298,7 +25298,7 @@ border-radius: 5;</string>
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should attain its target velocity.  For neutral throttle estimation,  the altitude module assumes that when engaged the throttle thrust limit neutral setting is in the range required to hover. If the throttle required is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot;. Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>50</number>
+                    <number>100</number>
                    </property>
                    <property name="singleStep">
                     <number>1</number>
@@ -25354,7 +25354,7 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>50</number>
+                    <number>100</number>
                    </property>
                    <property name="value">
                     <number>25</number>
@@ -25408,7 +25408,7 @@ border-radius: 5;</string>
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Small abouts of Kd can reduce oscillations in the velocity controller.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
-                    <number>700</number>
+                    <number>300</number>
                    </property>
                    <property name="value">
                     <number>50</number>
@@ -25461,7 +25461,7 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>700</number>
+                    <number>300</number>
                    </property>
                    <property name="value">
                     <number>51</number>
@@ -25627,7 +25627,7 @@ border-radius: 5;</string>
                     <number>100</number>
                    </property>
                    <property name="value">
-                    <number>51</number>
+                    <number>50</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>

@@ -225,7 +225,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString sec2    = ""; // after &zoom=...
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
-
+        qDebug() << QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabels).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
         return QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabels).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
@@ -276,6 +276,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         TryCorrectGoogleVersions();
         // http://mt0.google.cn/vt/v=w2t.110&hl=zh-CN&gl=cn&x=12&y=6&z=4&s=Ga
 
+        qDebug() << QString("http://%1%2.google.cn/%3/imgtp=png32&lyrs=%4&hl=%5&gl=cn&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsChina).arg("zh-CN").arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
         return QString("http://%1%2.google.cn/%3/imgtp=png32&lyrs=%4&hl=%5&gl=cn&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsChina).arg("zh-CN").arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
@@ -342,16 +343,19 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         return QString("http://%1.tile.openstreetmap.org/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
     }
     break;
+    // Need to update tile format to fit http://wiki.openstreetmap.org/wiki/Tile_servers
     case MapType::OpenStreetOsm:
     {
         char letter = "abc"[GetServerNum(pos, 3)];
-        return QString("http://%1.tah.openstreetmap.org/Tiles/tile/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
+        qDebug() << QString("http://%1.tile.openstreetmap.org/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
+        return QString("http://%1.tile.openstreetmap.org/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
     }
     break;
     case MapType::OpenStreetMapSurfer:
     {
         // http://tiles1.mapsurfer.net/tms_r.ashx?x=37378&y=20826&z=16
 
+        qDebug() << QString("http://tiles1.mapsurfer.net/tms_r.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
         return QString("http://tiles1.mapsurfer.net/tms_r.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
     }
     break;
@@ -359,6 +363,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
     {
         // http://tiles2.mapsurfer.net/tms_t.ashx?x=9346&y=5209&z=14
 
+        qDebug() << QString("http://tiles2.mapsurfer.net/tms_t.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
         return QString("http://tiles2.mapsurfer.net/tms_t.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
     }
     break;
@@ -398,7 +403,8 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
     {
         // http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_ShadedRelief_World_2D/MapServer/tile/1/0/1.jpg
 
-        return QString("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_ShadedRelief_World_2D/MapServer/tile/%1/%2/%3").arg(zoom).arg(pos.Y()).arg(pos.X());
+        qDebug() << QString("http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/%1/%2/%3").arg(zoom).arg(pos.Y()).arg(pos.X());
+        return QString("http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/%1/%2/%3").arg(zoom).arg(pos.Y()).arg(pos.X());
     }
     break;
     case MapType::ArcGIS_Terrain:
@@ -417,6 +423,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         // return string.Format("http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto/MapServer/tile/{0}/{1}/{2}", zoom, pos.Y(), pos.X());
         // http://dc1.maps.lt/cache/mapslt_ortofoto_512/map/_alllayers/L03/R0000001d/C0000002a.jpg
         // TODO verificar
+        qDebug() << QString("http://dc1.maps.lt/cache/mapslt_ortofoto/map/_alllayers/L%1/R%2/C%3.jpg").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
         return QString("http://dc1.maps.lt/cache/mapslt_ortofoto/map/_alllayers/L%1/R%2/C%3.jpg").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
     }
     break;
@@ -429,6 +436,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         // http://dc1.maps.lt/cache/mapslt_512/map/_alllayers/L03/R0000001b/C00000029.png
         // TODO verificar
         // http://dc1.maps.lt/cache/mapslt/map/_alllayers/L02/R0000001c/C00000029.png
+        qDebug() << QString("http://dc1.maps.lt/cache/mapslt/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
         return QString("http://dc1.maps.lt/cache/mapslt/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
     }
     break;
@@ -438,6 +446,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         // return string.Format("http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto_overlay/MapServer/tile/{0}/{1}/{2}", zoom, pos.Y(), pos.X());
         // http://dc1.maps.lt/cache/mapslt_ortofoto_overlay_512/map/_alllayers/L03/R0000001d/C00000029.png
         // TODO verificar
+        qDebug() << QString("http://dc1.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
         return QString("http://dc1.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
     }
     break;
@@ -458,12 +467,15 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString y = QString("%1").arg(QString::number(pos.Y()), 9, (QChar)'0');
         y.insert(3, "/").insert(7, "/");
         // "http://map03.pergo.com.tr/tile/2/000/000/003/000/000/002.png"
+	// This has changed map03 does not exist. (neither does map3) Servers have changed to map1 and map2? 
         return QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4)).arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
     }
     break;
     case MapType::SigPacSpainMap:
     {
-        return QString("http://sigpac.mapa.es/kmlserver/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+	// http://sigpac.magrama.es/fega/h5visor/ is new server location 
+        qDebug() << QString("http://sigpac.mapa.es/kmlserver/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+        return QString("http://sigpac.magrama.es/SDG/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
     }
     break;
 

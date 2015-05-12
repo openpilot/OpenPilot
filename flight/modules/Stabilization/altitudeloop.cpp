@@ -81,7 +81,7 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
 {
     static bool newaltitude = true;
 
-    if (reinit) {
+    if (reinit || !controlDown.IsActive()) {
         controlDown.Activate();
         newaltitude = true;
     }
@@ -97,6 +97,7 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
         thrustDemand = 0.0f;
         thrustMode   = DIRECT;
         newaltitude  = true;
+        return thrustDemand;
     } else if (mode == ALTITUDEVARIO && setpoint > DEADBAND_HIGH) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
@@ -116,7 +117,17 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
         newaltitude = false;
     }
 
+    thrustDemand = boundf(thrustDemand, altitudeHoldSettings.ThrustLimits.Min, altitudeHoldSettings.ThrustLimits.Max);
+
     return thrustDemand;
+}
+
+/**
+ * Disable the alt hold task loop velocity controller to save cpu cycles
+ */
+void stabilizationDisableAltitudeHold(void)
+{
+    controlDown.Deactivate();
 }
 
 
@@ -125,13 +136,18 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
  */
 static void altitudeHoldTask(void)
 {
-    AltitudeHoldStatusData altitudeHoldStatus;
+    if (!controlDown.IsActive()) {
+        return;
+    }
 
+    AltitudeHoldStatusData altitudeHoldStatus;
     AltitudeHoldStatusGet(&altitudeHoldStatus);
 
     float velocityStateDown;
     VelocityStateDownGet(&velocityStateDown);
     controlDown.UpdateVelocityState(velocityStateDown);
+
+    float local_thrustDemand = 0.0f;
 
     switch (thrustMode) {
     case ALTITUDEHOLD:
@@ -142,14 +158,14 @@ static void altitudeHoldTask(void)
         controlDown.ControlPosition();
         altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
         altitudeHoldStatus.State = ALTITUDEHOLDSTATUS_STATE_ALTITUDEHOLD;
-        thrustDemand = controlDown.GetDownCommand();
+        local_thrustDemand = controlDown.GetDownCommand();
     }
     break;
 
     case ALTITUDEVARIO:
         altitudeHoldStatus.VelocityDesired = controlDown.GetVelocityDesired();
         altitudeHoldStatus.State = ALTITUDEHOLDSTATUS_STATE_ALTITUDEVARIO;
-        thrustDemand = controlDown.GetDownCommand();
+        local_thrustDemand = controlDown.GetDownCommand();
         break;
 
     case DIRECT:
@@ -159,6 +175,7 @@ static void altitudeHoldTask(void)
     }
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
+    thrustDemand = local_thrustDemand;
 }
 
 static void VelocityStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

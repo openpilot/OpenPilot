@@ -107,6 +107,11 @@ static void stabilizationOuterloopTask()
 
     bool reinit = (StabilizationStatusOuterLoopToArray(enabled)[STABILIZATIONSTATUS_OUTERLOOP_THRUST] != previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST]);
     previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST] = StabilizationStatusOuterLoopToArray(enabled)[STABILIZATIONSTATUS_OUTERLOOP_THRUST];
+    if (reinit && (previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST] == STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE ||
+                   previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST] == STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO)) {
+        // disable the altvario velocity control loop
+        stabilizationDisableAltitudeHold();
+    }
     switch (StabilizationStatusOuterLoopToArray(enabled)[STABILIZATIONSTATUS_OUTERLOOP_THRUST]) {
 #ifdef REVOLUTION
     case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:

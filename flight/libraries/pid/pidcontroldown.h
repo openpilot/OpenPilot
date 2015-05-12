@@ -44,6 +44,10 @@ public:
     void SetThrustLimits(float min_thrust, float max_thrust);
     void Deactivate();
     void Activate();
+    bool IsActive()
+    {
+        return mActive;
+    }
     void UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax);
     void UpdateNeutralThrust(float neutral);
     void UpdateVelocitySetpoint(float setpoint);

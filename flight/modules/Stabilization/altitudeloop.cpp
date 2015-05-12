@@ -84,6 +84,8 @@ float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit
     if (reinit || !controlDown.IsActive()) {
         controlDown.Activate();
         newaltitude = true;
+        // calculate a thrustDemand on reinit only
+        altitudeHoldTask();
     }
 
     const float DEADBAND      = 0.20f;

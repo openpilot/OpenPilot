@@ -25317,7 +25317,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Ki</string>
-                     <string>scale:0.1</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -25364,7 +25364,7 @@ border-radius: 5;</string>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:VerticalVelPID</string>
                      <string>element:Ki</string>
-                     <string>scale:0.1</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98,10</string>
                     </stringlist>

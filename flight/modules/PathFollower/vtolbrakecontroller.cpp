@@ -132,7 +132,7 @@ void VtolBrakeController::SettingsUpdated(void)
     controlNE.UpdateParameters(vtolPathFollowerSettings->BrakeHorizontalVelPID.Kp,
                                vtolPathFollowerSettings->BrakeHorizontalVelPID.Ki,
                                vtolPathFollowerSettings->BrakeHorizontalVelPID.Kd,
-                               vtolPathFollowerSettings->BrakeHorizontalVelPID.ILimit,
+                               vtolPathFollowerSettings->BrakeHorizontalVelPID.Beta,
                                dT,
                                10.0f * vtolPathFollowerSettings->HorizontalVelMax); // avoid constraining initial fast entry into brake
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
@@ -312,8 +312,10 @@ int8_t VtolBrakeController::UpdateStabilizationDesired(void)
             // and a better throttle management to the standard Position Hold.
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
             break;
+        default:
+            break;
         }
-        stabDesired.StabilizationMode.Thrust = thrustMode;
+        stabDesired.StabilizationMode.Thrust = (StabilizationDesiredStabilizationModeOptions)thrustMode;
     }
 
     // set the thrust value

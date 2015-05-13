@@ -5621,13 +5621,16 @@ Beware of not locking yourself out!</source>
         <source>If enabled, a fast recalibration of gyro zero point will be done
 whenever the frame is armed. Do not move the airframe while
 arming it in that case!</source>
-        <translation>每次解锁航模时，控制器以解锁时摆放状态做一次快速水平校准。
-打开此项设置后，请务必保证每次解锁时候航模静止放置！</translation>
+        <translation>每次解锁航模时，为陀螺仪传感器零点位置做一次快速调整。
+打开此项设置后，请务必保证每次解锁时候航模静止放置！
+陀螺仪传感器的作用是测量旋转量，不是用来确保飞行器维持
+对地水平的。加速度传感器Z轴读取到的重力加速度才是用来维持
+水平飞行稳定的参考值！</translation>
     </message>
     <message>
         <location/>
         <source>Zero gyros while arming aircraft</source>
-        <translation>每次解锁时，重置陀螺仪读取数值</translation>
+        <translation>除非你对自己智商足够自信，且透彻明白陀螺仪传感器和加速度传感器的作用和区别，否则请勿自作聪明取消此项设置</translation>
     </message>
     <message>
         <location/>
@@ -9244,38 +9247,48 @@ Please select the type of multirotor you want to create a configuration for belo
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+435"/>
-        <location line="+104"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+561"/>
+        <location line="+131"/>
         <source>Start</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-198"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-268"/>
         <location line="+8"/>
-        <location line="+178"/>
-        <location line="+25"/>
+        <location line="+243"/>
+        <location line="+38"/>
         <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs</source>
         <translation>输出值：&lt;b&gt;%1&lt;/b&gt;µs</translation>
     </message>
     <message>
-        <location line="-206"/>
+        <location line="-284"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To find &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;the neutral rate for this reversable motor&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, press the Start button below and slide the slider to the right or left until you find the value where the motor doesn&apos;t start. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+89"/>
-        <location line="+104"/>
+        <location line="+132"/>
+        <location line="+131"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location line="-43"/>
+        <location line="-59"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
         <translation>输出模块出错。
 
 请确认设备上固件版本是否正确，然后重新启动设置向导。如果问题继续存在，请到openpilot.org官网论坛寻求进一步技术支持。</translation>
+    </message>
+    <message>
+        <location line="+132"/>
+        <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs (Min)</source>
+        <translation>输出值：&lt;b&gt;%1&lt;/b&gt;µs (最小)</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Output value : &lt;b&gt;%1&lt;/b&gt; µs (Max)</source>
+        <translation>输出值：&lt;b&gt;%1&lt;/b&gt;µs (最大)</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
@@ -9369,6 +9382,11 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Output value: 1000µs</source>
         <translation>输出值：1000µs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibrate all motor outputs at the same time</source>
+        <translation type="unfinished">一次性给所有电机设置相同怠速点</translation>
     </message>
 </context>
 <context>
@@ -10268,7 +10286,7 @@ Do you still want to proceed?</source>
         <translation>在设置向导结束以后会停留在“解锁设置”选项页，请务必修改遥控器解锁方式。</translation>
     </message>
     <message>
-        <location line="+210"/>
+        <location line="+212"/>
         <source>Next</source>
         <translation>下一步</translation>
     </message>
@@ -10349,6 +10367,16 @@ You can press &apos;back&apos; at any time to return to the previous screen or p
         <translation>对于多旋翼飞行器，升降舵（ELEV）控制俯仰，副翼（AILE）控制横滚，方向舵（RUDD）控制方向。</translation>
     </message>
     <message>
+        <location line="+1016"/>
+        <source>Warning</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>&lt;p&gt;There is something wrong with Throttle range. Please redo calibration and move &lt;b&gt;ALL sticks&lt;/b&gt;, Throttle stick included.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;油门行程识别出错。请重新拨动&lt;b&gt;所有操纵杆&lt;/b&gt;再次进行校准，切记不要忽略油门摇杆。&lt;/p&gt;</translation>
+    </message>
+    <message>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
@@ -10377,7 +10405,7 @@ IMPORTANT: These new settings have not been saved to the board yet. After pressi
 注意：遥控器校准结果尚未保存，请点击“下一步”进入“解锁设置”页，将解锁动作设置好以后，再点击”保存“按钮将所有遥控器输入设置信息保存。</translation>
     </message>
     <message>
-        <location line="+191"/>
+        <location line="-825"/>
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
@@ -10419,7 +10447,7 @@ Move the %1 stick.</source>
         <translation>结束手动校准</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>&lt;p&gt;Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.&lt;/p&gt;&lt;p&gt;Be sure your receiver is powered with an external source and Transmitter is on.&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;&lt;b&gt;Stop Manual Calibration&lt;/b&gt; when done&lt;/p&gt;</source>
         <translation>&lt;p&gt;安全起见，在后续操作开始之前，强制遥控器进入永久锁定状态。&lt;/p&gt;&lt;p&gt;请确认遥控器发射机和接收器已经打开。&lt;/p&gt;&lt;p align=&apos;center&apos;&gt;完成手动校准后，请点击&lt;b&gt;结束手动校准&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
@@ -10429,12 +10457,12 @@ Move the %1 stick.</source>
         <translation>手动校准结束后，请打开“解锁设置”选项页设置飞行器解锁动作。</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+51"/>
         <source>Start Manual Calibration</source>
         <translation>开始手动校准</translation>
     </message>
     <message>
-        <location line="-764"/>
+        <location line="-783"/>
         <source> Alternatively, click Next to skip this channel.</source>
         <translation>你也可以点击“下一步/跳过”忽略该项。</translation>
     </message>
@@ -10762,14 +10790,14 @@ Move the %1 stick.</source>
         <location line="+24"/>
         <location line="+6"/>
         <location line="+19"/>
-        <location line="+16"/>
+        <location line="+19"/>
         <location line="+16"/>
         <location line="+38"/>
         <source>Unknown</source>
         <translation>未知设备</translation>
     </message>
     <message>
-        <location line="-182"/>
+        <location line="-185"/>
         <source>Vehicle type: </source>
         <translation>航模类型： </translation>
     </message>
@@ -10927,6 +10955,11 @@ Move the %1 stick.</source>
     </message>
     <message>
         <location line="+9"/>
+        <source>Synched ESC</source>
+        <translation>Synched电调</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Oneshot ESC</source>
         <translation>Oneshot电调</translation>
     </message>
@@ -11040,7 +11073,7 @@ Move the %1 stick.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+199"/>
+        <location line="+196"/>
         <location line="+32"/>
         <location line="+37"/>
         <source>Writing actuator settings</source>
@@ -11073,7 +11106,7 @@ Move the %1 stick.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+146"/>
+        <location line="+144"/>
         <source>Writing mixer settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13400,7 +13433,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+49"/>
-        <location line="+49"/>
+        <location line="+58"/>
         <location line="+42"/>
         <location line="+7"/>
         <location line="+9"/>
@@ -14305,7 +14338,7 @@ Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse clic
         <location line="+3"/>
         <location line="+261"/>
         <source>%1 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-201"/>
@@ -14329,8 +14362,12 @@ Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse clic
     </message>
     <message>
         <location line="+32"/>
+        <source>OneShot and PWMSync output only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN8+OneShot&apos; &lt;b&gt;&lt;font color=&apos;%1&apos;&gt;Bank %2&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>
+        <translation>要打开OneShot以及PWMSync输出，请确保遥控接收器端口设置为“+OneShot”&lt;br&gt;当接收器端口设置为“PPM_PIN8+OneShot”时，&lt;b&gt;&lt;font color=&apos;#C3A8FF&apos;&gt;输出集%2&lt;/font&gt;&lt;/b&gt;必须设置为PWM</translation>
+    </message>
+    <message>
         <source>OneShot only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN8+OneShot&apos; &lt;b&gt;&lt;font color=&apos;%1&apos;&gt;Bank %2&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>
-        <translation>遥控接收器端口设置为“+OneShot”后才能&lt;br&gt;正常工作。假设设置为“PPM_PIN6+OneShot”，则&lt;b&gt;&lt;font color=&apos;%1&apos;&gt;输出集%2&lt;/font&gt;&lt;/b&gt;必须设置为PWM</translation>
+        <translation type="vanished">遥控接收器端口设置为“+OneShot”后才能&lt;br&gt;正常工作。假设设置为“PPM_PIN6+OneShot”，则&lt;b&gt;&lt;font color=&apos;%1&apos;&gt;输出集%2&lt;/font&gt;&lt;/b&gt;必须设置为PWM</translation>
     </message>
     <message>
         <source>OneShot only works with Receiver Port settings marked with &apos;+OneShot&apos;&lt;br&gt;When using Receiver Port setting &apos;PPM_PIN6+OneShot&apos; &lt;b&gt;&lt;font color=&apos;#C3A8FF&apos;&gt;Bank 4 (output 6,9-10)&lt;/font&gt;&lt;/b&gt; must be set to PWM</source>

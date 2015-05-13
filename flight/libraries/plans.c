@@ -157,7 +157,7 @@ void plan_setup_returnToBase()
     pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
 
-    uint8_t ReturnToBaseNextCommand;
+    FlightModeSettingsReturnToBaseNextCommandOptions ReturnToBaseNextCommand;
     FlightModeSettingsReturnToBaseNextCommandGet(&ReturnToBaseNextCommand);
     pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_NEXTCOMMAND] = (float)ReturnToBaseNextCommand;
     pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_GOTOENDPOINT_UNUSED1]     = 0.0f;
@@ -294,6 +294,14 @@ void plan_run_AutoTakeoff()
     break;
 
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT:
+    {
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        if (!flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
+        }
+    }
+    break;
     case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD:
     // nothing to do. land has been requested. stay here for forever until mode change.
     default:

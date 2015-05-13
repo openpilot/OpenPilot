@@ -43,7 +43,7 @@
 
 static bool useMag = false;
 #endif
-static GPSPositionSensorSensorTypeOptions sensorType = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
+GPSPositionSensorSensorTypeOptions sensorType = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
 
 static bool usePvt = false;
 static uint32_t lastPvtTime = 0;
@@ -466,9 +466,11 @@ static void parse_ubx_mon_ver(struct UBXPacket *ubx, __attribute__((unused)) GPS
     struct UBX_MON_VER *mon_ver = &ubx->payload.mon_ver;
 
     ubxHwVersion = atoi(mon_ver->hwVersion);
-
     sensorType   = (ubxHwVersion >= 80000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX8 :
                    ((ubxHwVersion >= 70000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
+    // send sensor type right now because on UBX NEMA we don't get a full set of messages
+    // and we want to be able to see sensor type even on UBX NEMA GPS's
+    GPSPositionSensorSensorTypeSet((uint8_t *)&sensorType);
 }
 
 static void parse_ubx_op_sys(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)

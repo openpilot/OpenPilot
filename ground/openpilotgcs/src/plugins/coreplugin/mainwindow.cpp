@@ -65,6 +65,7 @@
 #include <utils/pathchooser.h>
 #include <utils/stylehelper.h>
 #include <utils/xmlconfig.h>
+#include "version_info/version_info.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QFileInfo>
@@ -133,7 +134,7 @@ MainWindow::MainWindow() :
 #endif
     m_toggleFullScreenAction(0)
 {
-    setWindowTitle(tr("OpenPilot GCS"));
+    setWindowTitle(tr("OpenPilot GCS ") + VersionInfo::label());
 #ifndef Q_WS_MAC
     qApp->setWindowIcon(QIcon(":/core/images/openpilot_logo_128.png"));
 #endif

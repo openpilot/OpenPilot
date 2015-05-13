@@ -113,6 +113,9 @@ endif
 # Include tools installers
 include $(ROOT_DIR)/make/tools.mk
 
+# Include third party builders if available
+-include $(ROOT_DIR)/make/3rdparty/3rdparty.mk
+
 # We almost need to consider autoconf/automake instead of this
 ifeq ($(UNAME), Linux)
     QT_SPEC = linux-g++
@@ -206,10 +209,9 @@ export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 DIRS += $(OPGCSSYNTHDIR)
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare gpsplatinum
+ALL_BOARDS    := oplinkmini revolution osd revoproto simposix discoveryf4bare gpsplatinum
 
 # Short names of each board (used to display board name in parallel builds)
-coptercontrol_short    := 'cc  '
 oplinkmini_short       := 'oplm'
 revolution_short       := 'revo'
 osd_short              := 'osd '
@@ -481,6 +483,8 @@ openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
 openpilotgcs_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(OPENPILOTGCS_DIR))"
 	$(V1) [ ! -d "$(OPENPILOTGCS_DIR)" ] || $(RM) -r "$(OPENPILOTGCS_DIR)"
+
+
 
 ################################
 #

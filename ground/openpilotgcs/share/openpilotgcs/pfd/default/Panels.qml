@@ -38,6 +38,7 @@ Item {
     function hide_display_rcinput(){
         show_panels = true;
         display_oplm = false
+        display_bat = false
         rc_input_bg.z = 10
         battery_bg.z = -1
         oplm_bg.z = -1
@@ -47,6 +48,7 @@ Item {
     function hide_display_battery(){
         show_panels = true;
         display_oplm = false
+        display_bat = true
         rc_input_bg.z = 10
         battery_bg.z = 20
         oplm_bg.z = -1
@@ -56,6 +58,7 @@ Item {
     function hide_display_oplink(){
         show_panels = true;
         display_oplm = true
+        display_bat = false
         rc_input_bg.z = 10
         battery_bg.z = 20
         oplm_bg.z = 30
@@ -65,6 +68,7 @@ Item {
     function hide_display_system(){
         show_panels = true;
         display_oplm = false
+        display_bat = false
         rc_input_bg.z = 10
         battery_bg.z = 20
         oplm_bg.z = 30
@@ -526,7 +530,8 @@ Item {
             MouseArea { 
                id: reset_panel_consumed_energy_mouseArea; 
                anchors.fill: parent;
-               cursorShape: Qt.PointingHandCursor; 
+               cursorShape: Qt.PointingHandCursor;
+               visible: display_bat == true ? 1 : 0
                onClicked: qmlWidget.resetConsumedEnergy();
             }
 
@@ -579,6 +584,7 @@ Item {
             MouseArea { 
                id: reset_panel_consumed_energy_mouseArea2; 
                anchors.fill: parent;
+               visible: display_bat == true ? 1 : 0
                cursorShape: Qt.PointingHandCursor; 
                onClicked: qmlWidget.resetConsumedEnergy();
             }

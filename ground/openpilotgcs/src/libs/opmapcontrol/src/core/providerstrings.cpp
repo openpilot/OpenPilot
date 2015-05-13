@@ -28,7 +28,8 @@
 
 
 namespace core {
-const QString ProviderStrings::levelsForSigPacSpainMap[] = { "0",         "1",         "2",         "3",       "4",
+const QString ProviderStrings::levelsForSigPacSpainMap[] = { 
+//"0",         "1",         "2",         "3",       "4",
                                                              "MTNSIGPAC",
                                                              "MTN2000",   "MTN2000",   "MTN2000",   "MTN2000", "MTN2000",
                                                              "MTN200",    "MTN200",    "MTN200",

@@ -290,7 +290,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         TryCorrectGoogleVersions();
         // http://mt0.google.cn/vt/v=w2p.110&hl=zh-CN&gl=cn&x=12&y=6&z=4&s=Ga
 
-        return QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&gl=cn&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleTerrainChina).arg("zh-CN").arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("http://%1%2.google.cn/%3/lyrs=%4&hl=%5&gl=cn&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleTerrainChina).arg("zh-CN").arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     case MapType::GoogleMapKorea:
@@ -304,10 +304,8 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         // https://mts0.google.com/vt/lyrs=m@224000000&hl=ko&gl=KR&src=app&x=107&y=50&z=7&s=Gal
         // https://mts0.google.com/mt/v=kr1.11&hl=ko&x=109&y=49&z=7&s=
 
-        qDebug() << QString("https://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleMapKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
-
-        QString ret = QString("https://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleMapKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
-        return ret;
+        qDebug() << QString("https://%1%2.google.com/%3/v=%4&hl=ko&gl=KR&x=%5%6&y=%7&z=%8&s=%9").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleMapKorea).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("https://%1%2.google.com/%3/v=%4&hl=ko&gl=KR&x=%5%6&y=%7&z=%8&s=%9").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleMapKorea).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     case MapType::GoogleSatelliteKorea:
@@ -327,15 +325,14 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
     case MapType::GoogleLabelsKorea:
     {
         QString server  = "mts";
-        QString request = "mt";
+        QString request = "vt";
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
-        // https://mts1.google.co.kr/mt/v=kr1t.11&hl=lt&x=109&y=50&z=7&s=G
 
-        qDebug() << QString("https://%1%2.google.co.kr/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
-        return QString("https://%1%2.google.co.kr/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        qDebug() << QString("https://%1%2.google.com/%3/v=%4&hl=ko&gl=KR&x=%5%6&y=%7&z=%8&s=%9").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("https://%1%2.google.com/%3/v=%4&hl=ko&gl=KR&x=%5%6&y=%7&z=%8&s=%9").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     // *.yimg.com has been depreciated. "Here" is what Yahoo uses now. https://developer.here.com/rest-apis/documentation/enterprise-map-tile/topics/request-constructing.html
@@ -477,8 +474,8 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
     case MapType::SigPacSpainMap:
     {
 	// http://sigpac.magrama.es/fega/h5visor/ is new server location 
-        qDebug() << QString("http://sigpac.magrama.es/SDG/raster/MTN2000@3785/%2.%3.%4.img").arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
-        return QString("http://sigpac.magrama.es/SDG/raster/MTN2000@3785/%2.%3.%4.img").arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+        qDebug() << QString("http://sigpac.magrama.es/SDG/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+        return QString("http://sigpac.magrama.es/SDG/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
     }
     break;
 
@@ -523,6 +520,7 @@ QString UrlFactory::MakeGeocoderUrl(QString keywords)
 }
 QString UrlFactory::MakeReverseGeocoderUrl(internals::PointLatLng &pt, const QString &language)
 {
+    qDebug() << "Language: " << language;
     // CSV output has been depreciated. API key is no longer needed. 
     return QString("https://maps.googleapis.com/maps/api/geocode/xml?latlng=%1,%2").arg(QString::number(pt.Lat())).arg(QString::number(pt.Lng()));
 }

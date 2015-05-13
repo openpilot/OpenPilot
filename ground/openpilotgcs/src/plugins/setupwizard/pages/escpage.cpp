@@ -73,29 +73,5 @@ void EscPage::initializePage()
 
 bool EscPage::isSynchOrOneShotAvailable()
 {
-    bool available = true;
-
-    switch (getWizard()->getControllerType()) {
-    case SetupWizard::CONTROLLER_CC:
-    case SetupWizard::CONTROLLER_CC3D:
-        switch (getWizard()->getVehicleType()) {
-        case SetupWizard::VEHICLE_MULTI:
-            switch (getWizard()->getVehicleSubType()) {
-            case SetupWizard::MULTI_ROTOR_TRI_Y:
-            case SetupWizard::MULTI_ROTOR_QUAD_X:
-            case SetupWizard::MULTI_ROTOR_QUAD_H:
-            case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
-                available = getWizard()->getInputType() != SetupWizard::INPUT_PWM;
-                break;
-            default:
-                available = false;
-                break;
-            }
-            break;
-        default: break;
-        }
-        break;
-    default: break;
-    }
-    return available;
+    return true;
 }

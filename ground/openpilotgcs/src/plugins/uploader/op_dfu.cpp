@@ -1074,7 +1074,6 @@ int DFUObject::receiveData(void *data, int size)
 #define BOARD_ID_MB   1
 #define BOARD_ID_INS  2
 #define BOARD_ID_PIP  3
-#define BOARD_ID_CC   4
 #define BOARD_ID_REVO 9
 
 /**
@@ -1097,9 +1096,6 @@ OP_DFU::eBoardType DFUObject::GetBoardType(int boardNum)
         break;
     case BOARD_ID_PIP: // PIP RF Modem
         brdType = eBoardPip;
-        break;
-    case BOARD_ID_CC: // CopterControl family
-        brdType = eBoardCC;
         break;
     case BOARD_ID_REVO: // Revo board
         brdType = eBoardRevo;

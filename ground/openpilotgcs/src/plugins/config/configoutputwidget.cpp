@@ -354,11 +354,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     if (utilMngr) {
         int board = utilMngr->getBoardModel();
         // Setup labels and combos for banks according to board type
-        if ((board & 0xff00) == 0x0400) {
-            // Coptercontrol family of boards 4 timer banks
-            bankLabels << "1 (1-3)" << "2 (4)" << "3 (5,7-8)" << "4 (6,9-10)";
-            channelBanks << 1 << 1 << 1 << 2 << 3 << 4 << 3 << 3 << 4 << 4;
-        } else if ((board & 0xff00) == 0x0900) {
+        if ((board & 0xff00) == 0x0900) {
             // Revolution family of boards 6 timer banks
             bankLabels << "1 (1-2)" << "2 (3)" << "3 (4)" << "4 (5-6)" << "5 (7-8)" << "6 (9-10)";
             channelBanks << 1 << 1 << 2 << 3 << 4 << 4 << 5 << 5 << 6 << 6;

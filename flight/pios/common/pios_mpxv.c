@@ -69,7 +69,7 @@ uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc, uint16_t measurement)
 float PIOS_MPXV_CalcAirspeed(PIOS_MPXV_descriptor *desc, uint16_t measurement)
 {
     // Calculate dynamic pressure, as per docs - Apply scale factor (voltage divider)
-    float Qc = 3.3f / 4096.0f * (float)((measurement - desc->zeroPoint) * desc->Scale);
+    float Qc = 3.3f / 4096.0f * (float)((measurement - desc->zeroPoint) * desc->scale);
 
     // Saturate Qc on the lower bound, in order to make sure we don't have negative airspeeds. No need
     // to saturate on the upper bound, we'll handle that later with calibratedAirspeed.

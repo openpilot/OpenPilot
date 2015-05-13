@@ -104,7 +104,7 @@ void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsDa
         }
     }
     sensor.zeroPoint = airspeedSettings->ZeroPoint;
-    sensor.Scale     = airspeedSettings->Scale;
+    sensor.scale     = airspeedSettings->Scale;
 
     // Filter CAS : airspeedSettings->SamplePeriod value is 0 - 255 range
     float alpha = 1 - (airspeedSettings->SamplePeriod / ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS); // Low pass filter.

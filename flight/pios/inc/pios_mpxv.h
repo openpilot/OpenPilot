@@ -38,7 +38,7 @@ typedef struct {
     uint16_t calibrationCount;
     uint32_t calibrationSum;
     uint16_t zeroPoint;
-    float    Scale;
+    float    scale;
     float    maxSpeed;
 } PIOS_MPXV_descriptor;
 

@@ -320,6 +320,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         TryCorrectGoogleVersions();
         // http://khm1.google.co.kr/kh/v=54&x=109&y=49&z=7&s=
 
+        qDebug() << QString("https://%1%2.google.co.kr/%3/v=%4&x=%5%6&y=%7&z=%8&s=%9").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleSatelliteKorea).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
         return QString("https://%1%2.google.co.kr/%3/v=%4&x=%5%6&y=%7&z=%8&s=%9").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleSatelliteKorea).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
@@ -331,9 +332,10 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString sec2    = ""; // after &zoom=...
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
-        // https://mts1.gmaptiles.co.kr/mt/v=kr1t.11&hl=lt&x=109&y=50&z=7&s=G
+        // https://mts1.google.co.kr/mt/v=kr1t.11&hl=lt&x=109&y=50&z=7&s=G
 
-        return QString("https://%1%2.gmaptiles.co.kr/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        qDebug() << QString("https://%1%2.google.co.kr/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("https://%1%2.google.co.kr/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     // *.yimg.com has been depreciated. "Here" is what Yahoo uses now. https://developer.here.com/rest-apis/documentation/enterprise-map-tile/topics/request-constructing.html
@@ -468,14 +470,15 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         y.insert(3, "/").insert(7, "/");
         // "http://map03.pergo.com.tr/tile/2/000/000/003/000/000/002.png"
 	// This has changed map03 does not exist. (neither does map3) Servers have changed to map1 and map2? 
+        qDebug() << QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4)).arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
         return QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4)).arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
     }
     break;
     case MapType::SigPacSpainMap:
     {
 	// http://sigpac.magrama.es/fega/h5visor/ is new server location 
-        qDebug() << QString("http://sigpac.mapa.es/kmlserver/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
-        return QString("http://sigpac.magrama.es/SDG/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+        qDebug() << QString("http://sigpac.magrama.es/SDG/raster/MTN2000@3785/%2.%3.%4.img").arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+        return QString("http://sigpac.magrama.es/SDG/raster/MTN2000@3785/%2.%3.%4.img").arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
     }
     break;
 

@@ -100,15 +100,9 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             }
         }
         if (accessmode != AccessMode::CacheOnly) {
-            QEventLoop q;
             QNetworkReply *reply;
             QNetworkRequest qheader;
             QNetworkAccessManager network;
-            QTimer tT;
-            tT.setSingleShot(true);
-            connect(&network, SIGNAL(finished(QNetworkReply *)),
-                    &q, SLOT(quit()));
-            connect(&tT, SIGNAL(timeout()), &q, SLOT(quit()));
             network.setProxy(Proxy);
 #ifdef DEBUG_GMAPS
             qDebug() << "Try Tile from the Internet";
@@ -142,6 +136,14 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             case MapType::GoogleHybridChina:
             {
                 qheader.setRawHeader("Referrer", "http://ditu.google.cn/");
+            }
+            break;
+
+            case MapType::GoogleMapKorea:
+            case MapType::GoogleSatelliteKorea:
+            case MapType::GoogleLabelsKorea:
+            {
+                qheader.setRawHeader("Referrer", "http://maps.google.co.kr/");
             }
             break;
 
@@ -184,26 +186,28 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             default:
                 break;
             }
+	    qDebug() << "Timeout is " << Timeout;
             reply = network.get(qheader);
-            tT.start(Timeout);
-            q.exec();
+	    qDebug() << "reply " << reply;
 
-            if (!tT.isActive()) {
-                errorvars.lock();
-                ++diag.timeouts;
-                errorvars.unlock();
-                return ret;
-            }
-            tT.stop();
-            if ((reply->error() != QNetworkReply::NoError)) {
-                errorvars.lock();
-                ++diag.networkerrors;
-                errorvars.unlock();
-                reply->deleteLater();
-                return ret;
-            }
+	    QTime time;
+	    while ((!(reply->isFinished()) || (time.elapsed() > (6 * Timeout)))) {
+		QCoreApplication::processEvents(QEventLoop::AllEvents);
+	    }
+
+	    qDebug() << "Finished?" << reply->error() << " abort?" << (time.elapsed() > Timeout * 6);
+
+	    if ((reply->error() != QNetworkReply::NoError) | (time.elapsed() > Timeout * 6)) {
+		return ret;
+	    }
+	    else
+	    {
+		qDebug() << "QNetworkReply Errors!";
+	    }
             ret = reply->readAll();
+	    qDebug() << "ret " << ret;
             reply->deleteLater(); // TODO can't this be global??
+
             if (ret.isEmpty()) {
 #ifdef DEBUG_GMAPS
                 qDebug() << "Invalid Tile";

@@ -135,9 +135,9 @@ public:
     };
 
     enum USBConstants {
-        idVendor_OpenPilot      = 0x20a0,
-        idProduct_OpenPilot     = 0x415a,
-        idProduct_OPLinkMini    = 0x415c
+        idVendor_OpenPilot   = 0x20a0,
+        idProduct_OpenPilot  = 0x415a,
+        idProduct_OPLinkMini = 0x415c
     };
 
     static USBMonitor *instance();

@@ -163,6 +163,7 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 void ConfigGadgetWidget::onAutopilotDisconnect()
 {
     QWidget *qwd = new DefaultAttitudeWidget(this);
+
     stackWidget->replaceTab(ConfigGadgetWidget::sensors, qwd);
 
     qwd = new DefaultHwSettingsWidget(this);

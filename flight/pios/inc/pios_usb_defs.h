@@ -363,9 +363,9 @@ enum usb_product_ids {
 enum usb_op_board_ids {
     USB_OP_BOARD_ID_OPENPILOT_MAIN = 1,
     /* Board ID 2 may be unused or AHRS */
-    USB_OP_BOARD_ID_OPLINK = 3,
+    USB_OP_BOARD_ID_OPLINK     = 3,
     /* USB_OP_BOARD_ID_COPTERCONTROL  = 4, */
-    USB_OP_BOARD_ID_REVOLUTION     = 5,
+    USB_OP_BOARD_ID_REVOLUTION = 5,
     USB_OP_BOARD_ID_OSD = 6,
 } __attribute__((packed));
 

@@ -580,7 +580,7 @@ void VehicleConfigurationHelper::applySensorBiasConfiguration()
         accelGyroSettings->setData(accelGyroSettingsData);
         addModifiedObject(accelGyroSettings, tr("Writing gyro and accelerometer bias settings"));
 
-        switch (m_configSource->getControllerType()) {        
+        switch (m_configSource->getControllerType()) {
         case VehicleConfigurationSource::CONTROLLER_REVO:
         {
             RevoCalibration *revolutionCalibration = RevoCalibration::GetInstance(m_uavoManager);

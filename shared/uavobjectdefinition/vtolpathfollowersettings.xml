@@ -7,8 +7,8 @@
         <field name="CourseFeedForward" units="s" type="float" elements="1" defaultvalue="1.0"/>
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.25"/>
         <field name="VerticalPosP" units="" type="float" elements="1" defaultvalue="0.4"/>
-        <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="8.0, 0.5, 0.0, 15"/>
-        <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.3, 0.3, 0.0, 1.0"/>
+        <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="8.0, 0.5, 0.0, 0.95"/>
+        <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.3, 0.3, 0.0, 0.95"/>
         <field name="ThrustLimits" units="" type="float" elementnames="Min,Neutral,Max" defaultvalue="0.2, 0.5, 0.9"/>
         <field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="2"/>
         <field name="ThrustControl" units="" type="enum" elements="1" options="manual,auto" defaultvalue="manual"/>
@@ -21,10 +21,10 @@
         <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="50"/>
         <field name="BrakeRate" units="m/s2" type="float" elements="1" defaultvalue="2.5"/>
         <field name="BrakeMaxPitch" units="deg" type="float" elements="1" defaultvalue="25"/>
-        <field name="BrakeHorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="12.0, 0.0, 0.03, 15"/>
+        <field name="BrakeHorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="12.0, 0.0, 0.03, 0.95"/>
         <field name="BrakeVelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="0"/>
-        <field name="LandVerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.35, 3.0, 0.05, 0.9"/>
-        <field name="AutoTakeoffVerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.35, 3.0, 0.05, 0.9"/>
+        <field name="LandVerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.42, 3.0, 0.02, 0.95"/>
+        <field name="AutoTakeoffVerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.42, 3.0, 0.02, 0.95"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

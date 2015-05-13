@@ -107,7 +107,7 @@ void VtolVelocityController::SettingsUpdated(void)
     controlNE.UpdateParameters(vtolPathFollowerSettings->HorizontalVelPID.Kp,
                                vtolPathFollowerSettings->HorizontalVelPID.Ki,
                                vtolPathFollowerSettings->HorizontalVelPID.Kd,
-                               vtolPathFollowerSettings->HorizontalVelPID.ILimit,
+                               vtolPathFollowerSettings->HorizontalVelPID.Beta,
                                dT,
                                vtolPathFollowerSettings->HorizontalVelMax);
 
@@ -181,7 +181,7 @@ int8_t VtolVelocityController::UpdateStabilizationDesired(__attribute__((unused)
     ManualControlCommandData manualControl;
     ManualControlCommandGet(&manualControl);
 
-    stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+    stabDesired.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
     stabDesired.Yaw = stabSettings.MaximumRate.Yaw * manualControl.Yaw;
 
     // default thrust mode to altvario

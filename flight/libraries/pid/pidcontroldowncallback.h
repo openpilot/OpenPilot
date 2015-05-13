@@ -2,14 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup StabilizationModule Stabilization Module
- * @brief altitudeloop mode
- * @note This file implements the logic for a altitudeloop
+ * @addtogroup PID Library
+ * @brief Thrust control callback pure virtual
  * @{
  *
- * @file       altitudeloop.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      Attitude stabilization module.
+ * @file       pidcontroldowncallback.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
+ * @brief      Interface class for PathFollower FSMs
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -29,14 +28,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef PIDCONTROLDOWNCALLBACK_H
+#define PIDCONTROLDOWNCALLBACK_H
 
-#ifndef ALTITUDELOOP_H
-#define ALTITUDELOOP_H
+class PIDControlDownCallback {
+public:
+    // PIDControlDownCalback() {};
+    virtual void BoundThrust(__attribute__((unused)) float &ulow, __attribute__((unused)) float &uhigh) = 0;
+    virtual float BoundVelocityDown(float velocity) = 0;
+    // virtual ~PIDControlDownCalback() = 0;
+};
 
-typedef enum { ALTITUDEHOLD = 0, ALTITUDEVARIO = 1, DIRECT = 2 } ThrustModeType;
-
-void stabilizationAltitudeloopInit();
-float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit);
-void stabilizationDisableAltitudeHold(void);
-
-#endif /* ALTITUDELOOP_H */
+#endif // PIDCONTROLDOWNCALLBACK_H

@@ -33,9 +33,9 @@
 
 // defines
 // TODO: NEO8 max rate is for Rom version, flash is limited to 10Hz, need to handle that.
-#define UBX_MAX_RATE_VER8       18
-#define UBX_MAX_RATE_VER7       10
-#define UBX_MAX_RATE            5
+#define UBX_MAX_RATE_VER8 18
+#define UBX_MAX_RATE_VER7 10
+#define UBX_MAX_RATE      5
 
 // reset to factory (and 9600 baud), and baud changes are not acked
 // it could be 31 (full PIOS buffer) + 60 (gnss) + overhead bytes at 240 bytes per second
@@ -50,28 +50,30 @@
 // rather than have long timeouts, we will let timeouts * retries handle that if it happens
 
 // timeout for ack reception
-#define UBX_REPLY_TIMEOUT                (500 * 1000)
+#define UBX_REPLY_TIMEOUT             (500 * 1000)
 // timeout for a settings save, in case it has to erase flash
-#define UBX_REPLY_TO_SAVE_TIMEOUT       (3000 * 1000)
+#define UBX_REPLY_TO_SAVE_TIMEOUT     (3000 * 1000)
 // max retries in case of timeout
-#define UBX_MAX_RETRIES                     5
+#define UBX_MAX_RETRIES               5
 // pause between each verifiably correct configuration step
-#define UBX_VERIFIED_STEP_WAIT_TIME       (50 * 1000)
+#define UBX_VERIFIED_STEP_WAIT_TIME   (50 * 1000)
 // pause between each unverifiably correct configuration step
-#define UBX_UNVERIFIED_STEP_WAIT_TIME    (500 * 1000)
+#define UBX_UNVERIFIED_STEP_WAIT_TIME (500 * 1000)
 
-#define UBX_CFG_CFG_OP_STORE_SETTINGS   (UBX_CFG_CFG_SETTINGS_IOPORT   | \
-                                         UBX_CFG_CFG_SETTINGS_MSGCONF  | \
-                                         UBX_CFG_CFG_SETTINGS_NAVCONF)
+#define UBX_CFG_CFG_OP_STORE_SETTINGS \
+    (UBX_CFG_CFG_SETTINGS_IOPORT | \
+     UBX_CFG_CFG_SETTINGS_MSGCONF | \
+     UBX_CFG_CFG_SETTINGS_NAVCONF)
 #define UBX_CFG_CFG_OP_CLEAR_SETTINGS ((~UBX_CFG_CFG_OP_STORE_SETTINGS) & UBX_CFG_CFG_SETTINGS_ALL)
 // don't clear rinv as that is just text as configured by the owner
-#define UBX_CFG_CFG_OP_RESET_SETTINGS   (UBX_CFG_CFG_SETTINGS_IOPORT   | \
-                                         UBX_CFG_CFG_SETTINGS_MSGCONF  | \
-                                         UBX_CFG_CFG_SETTINGS_INFMSG   | \
-                                         UBX_CFG_CFG_SETTINGS_NAVCONF  | \
-                                         UBX_CFG_CFG_SETTINGS_TPCONF   | \
-                                         UBX_CFG_CFG_SETTINGS_SFDRCONF | \
-                                         UBX_CFG_CFG_SETTINGS_ANTCONF)
+#define UBX_CFG_CFG_OP_RESET_SETTINGS \
+    (UBX_CFG_CFG_SETTINGS_IOPORT | \
+     UBX_CFG_CFG_SETTINGS_MSGCONF | \
+     UBX_CFG_CFG_SETTINGS_INFMSG | \
+     UBX_CFG_CFG_SETTINGS_NAVCONF | \
+     UBX_CFG_CFG_SETTINGS_TPCONF | \
+     UBX_CFG_CFG_SETTINGS_SFDRCONF | \
+     UBX_CFG_CFG_SETTINGS_ANTCONF)
 
 // types
 typedef enum {

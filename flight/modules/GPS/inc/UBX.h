@@ -366,36 +366,36 @@ struct UBX_ACK_NAK {
 // 0008  00 00 D0 08 00 00 80 25
 // 0010  00 00 07 00 03 00 00 00
 // 0018  00 00-A2 B5
-#define UBX_CFG_PRT_PORTID_DDC   0
-#define UBX_CFG_PRT_PORTID_UART1 1
-#define UBX_CFG_PRT_PORTID_UART2 2
-#define UBX_CFG_PRT_PORTID_USB   3
-#define UBX_CFG_PRT_PORTID_SPI   4
-#define UBX_CFG_PRT_MODE_DATABITS5     0x00
-#define UBX_CFG_PRT_MODE_DATABITS6     0x40
-#define UBX_CFG_PRT_MODE_DATABITS7     0x80
-#define UBX_CFG_PRT_MODE_DATABITS8     0xC0
-#define UBX_CFG_PRT_MODE_EVENPARITY   0x000
-#define UBX_CFG_PRT_MODE_ODDPARITY    0x200
-#define UBX_CFG_PRT_MODE_NOPARITY     0x800
+#define UBX_CFG_PRT_PORTID_DDC       0
+#define UBX_CFG_PRT_PORTID_UART1     1
+#define UBX_CFG_PRT_PORTID_UART2     2
+#define UBX_CFG_PRT_PORTID_USB       3
+#define UBX_CFG_PRT_PORTID_SPI       4
+#define UBX_CFG_PRT_MODE_DATABITS5   0x00
+#define UBX_CFG_PRT_MODE_DATABITS6   0x40
+#define UBX_CFG_PRT_MODE_DATABITS7   0x80
+#define UBX_CFG_PRT_MODE_DATABITS8   0xC0
+#define UBX_CFG_PRT_MODE_EVENPARITY  0x000
+#define UBX_CFG_PRT_MODE_ODDPARITY   0x200
+#define UBX_CFG_PRT_MODE_NOPARITY    0x800
 #define UBX_CFG_PRT_MODE_STOPBITS1_0 0x0000
 #define UBX_CFG_PRT_MODE_STOPBITS1_5 0x1000
 #define UBX_CFG_PRT_MODE_STOPBITS2_0 0x2000
 #define UBX_CFG_PRT_MODE_STOPBITS0_5 0x3000
-#define UBX_CFG_PRT_MODE_RESERVED      0x10
+#define UBX_CFG_PRT_MODE_RESERVED    0x10
 
-#define UBX_CFG_PRT_MODE_DEFAULT (UBX_CFG_PRT_MODE_DATABITS8 | UBX_CFG_PRT_MODE_NOPARITY | UBX_CFG_PRT_MODE_STOPBITS1_0 | UBX_CFG_PRT_MODE_RESERVED)
+#define UBX_CFG_PRT_MODE_DEFAULT     (UBX_CFG_PRT_MODE_DATABITS8 | UBX_CFG_PRT_MODE_NOPARITY | UBX_CFG_PRT_MODE_STOPBITS1_0 | UBX_CFG_PRT_MODE_RESERVED)
 
 struct UBX_CFG_PRT {
     uint8_t  portID;       // 1 or 2 for UART ports
     uint8_t  res0;         // reserved
-    uint16_t res1;         // reserved
-    uint32_t mode;         // bit masks for databits, stopbits, parity, and non-zero reserved
-    uint32_t baudRate;     // bits per second, 9600 means 9600
-    uint16_t inProtoMask;  // bit 0 on = UBX, bit 1 on = NEMA
+    uint16_t res1; // reserved
+    uint32_t mode; // bit masks for databits, stopbits, parity, and non-zero reserved
+    uint32_t baudRate; // bits per second, 9600 means 9600
+    uint16_t inProtoMask; // bit 0 on = UBX, bit 1 on = NEMA
     uint16_t outProtoMask; // bit 0 on = UBX, bit 1 on = NEMA
-    uint16_t flags;        // reserved
-    uint16_t pad;          // reserved
+    uint16_t flags; // reserved
+    uint16_t pad; // reserved
 } __attribute__((packed));
 
 struct UBX_CFG_MSG {
@@ -411,11 +411,11 @@ struct UBX_CFG_RATE {
 } __attribute__((packed));
 
 // Mask for "all supported devices": battery backed RAM, Flash, EEPROM, SPI Flash
-#define UBX_CFG_CFG_DEVICE_BBR      0x01
-#define UBX_CFG_CFG_DEVICE_FLASH    0x02
-#define UBX_CFG_CFG_DEVICE_EEPROM   0x04
-#define UBX_CFG_CFG_DEVICE_SPIFLASH 0x10
-#define UBX_CFG_CFG_DEVICE_ALL (UBX_CFG_CFG_DEVICE_BBR | UBX_CFG_CFG_DEVICE_FLASH | UBX_CFG_CFG_DEVICE_EEPROM | UBX_CFG_CFG_DEVICE_SPIFLASH)
+#define UBX_CFG_CFG_DEVICE_BBR        0x01
+#define UBX_CFG_CFG_DEVICE_FLASH      0x02
+#define UBX_CFG_CFG_DEVICE_EEPROM     0x04
+#define UBX_CFG_CFG_DEVICE_SPIFLASH   0x10
+#define UBX_CFG_CFG_DEVICE_ALL        (UBX_CFG_CFG_DEVICE_BBR | UBX_CFG_CFG_DEVICE_FLASH | UBX_CFG_CFG_DEVICE_EEPROM | UBX_CFG_CFG_DEVICE_SPIFLASH)
 #define UBX_CFG_CFG_SETTINGS_NONE     0x000
 #define UBX_CFG_CFG_SETTINGS_IOPORT   0x001
 #define UBX_CFG_CFG_SETTINGS_MSGCONF  0x002
@@ -426,14 +426,15 @@ struct UBX_CFG_RATE {
 #define UBX_CFG_CFG_SETTINGS_RINVCONF 0x200
 #define UBX_CFG_CFG_SETTINGS_ANTCONF  0x400
 
-#define UBX_CFG_CFG_SETTINGS_ALL        (UBX_CFG_CFG_SETTINGS_IOPORT   | \
-                                         UBX_CFG_CFG_SETTINGS_MSGCONF  | \
-                                         UBX_CFG_CFG_SETTINGS_INFMSG   | \
-                                         UBX_CFG_CFG_SETTINGS_NAVCONF  | \
-                                         UBX_CFG_CFG_SETTINGS_TPCONF   | \
-                                         UBX_CFG_CFG_SETTINGS_SFDRCONF | \
-                                         UBX_CFG_CFG_SETTINGS_RINVCONF | \
-                                         UBX_CFG_CFG_SETTINGS_ANTCONF)
+#define UBX_CFG_CFG_SETTINGS_ALL \
+    (UBX_CFG_CFG_SETTINGS_IOPORT | \
+     UBX_CFG_CFG_SETTINGS_MSGCONF | \
+     UBX_CFG_CFG_SETTINGS_INFMSG | \
+     UBX_CFG_CFG_SETTINGS_NAVCONF | \
+     UBX_CFG_CFG_SETTINGS_TPCONF | \
+     UBX_CFG_CFG_SETTINGS_SFDRCONF | \
+     UBX_CFG_CFG_SETTINGS_RINVCONF | \
+     UBX_CFG_CFG_SETTINGS_ANTCONF)
 
 // Sent messages for configuration support
 struct UBX_CFG_CFG {

@@ -6,7 +6,7 @@ Item {
 
     property real est_flight_time: Math.round(FlightBatteryState.EstimatedFlightTime)
     property real est_time_h: (est_flight_time > 0 ? Math.floor(est_flight_time / 3600) : 0 )
-    property real est_time_m: (est_flight_time > 0 ? Math.floor((est_flight_time - est_time_h*3600)/60) : 0) 
+    property real est_time_m: (est_flight_time > 0 ? Math.floor((est_flight_time - est_time_h*3600)/60) : 0)
     property real est_time_s: (est_flight_time > 0 ? Math.floor(est_flight_time - est_time_h*3600 - est_time_m*60) : 0)
 
     function formatTime(time) {
@@ -23,25 +23,30 @@ Item {
     //
 
     property bool show_panels: false
-    property bool hide_display_rc: false
-    property bool hide_display_bat: false
-    property bool hide_display_oplm: false
+    property bool display_rc: false
+    property bool display_bat: false
+    property bool display_oplm: false
+    property bool display_sys: false
 
     function close_panels(){
         if (show_panels == true)
             show_panels = false;
+        else
+            show_panels = true;
     }
 
     function hide_display_rcinput(){
         show_panels = true;
+        display_oplm = false
         rc_input_bg.z = 10
         battery_bg.z = -1
         oplm_bg.z = -1
-        system_bg.z = -1         
+        system_bg.z = -1
     }
 
     function hide_display_battery(){
         show_panels = true;
+        display_oplm = false
         rc_input_bg.z = 10
         battery_bg.z = 20
         oplm_bg.z = -1
@@ -50,6 +55,7 @@ Item {
 
     function hide_display_oplink(){
         show_panels = true;
+        display_oplm = true
         rc_input_bg.z = 10
         battery_bg.z = 20
         oplm_bg.z = 30
@@ -58,13 +64,14 @@ Item {
 
     function hide_display_system(){
         show_panels = true;
+        display_oplm = false
         rc_input_bg.z = 10
         battery_bg.z = 20
         oplm_bg.z = 30
         system_bg.z = 40
     }
 
-                             // Uninitialised, Ok,   Warning, Critical, Error                      
+    // Uninitialised, Ok, Warning, Critical, Error
     property variant batColors : ["#2c2929", "green", "orange", "red", "red"]
 
     property real smeter_angle
@@ -86,16 +93,16 @@ Item {
 
     // Hack : check if telemetry is active. Works with real link and log replay
 
-    function telemetry_check(){
+    function telemetry_check() {
        telemetry_sum = OPLinkStatus.RXRate + OPLinkStatus.RXRate
-       
-       if (telemetry_sum != telemetry_sum_old || OPLinkStatus.LinkState == 4){
+
+       if (telemetry_sum != telemetry_sum_old || OPLinkStatus.LinkState == 4) {
            telemetry_link = 1
        } else {
            telemetry_link = 0
        }
        telemetry_sum_old = telemetry_sum
-    } 
+    }
 
     Timer {
          id: telemetry_activity
@@ -163,11 +170,22 @@ Item {
      }
 
     // End Functions
-    // 
+    //
     // Start Drawing
 
     //
-    // Close panel
+    // Animation properties
+    //
+
+    property double offset_value: close_bg.width * 0.85
+
+    property int anim_type: Easing.InOutExpo //Easing.InOutSine Easing.InOutElastic
+    property real anim_amplitude: 1.2
+    property real anim_period: 2
+    property int duration_value: 1600
+
+    //
+    // Close - Open panel
     //
 
     SvgElementImage {
@@ -176,18 +194,42 @@ Item {
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        states: State  {
+
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: close_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (close_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: close_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
+
+        transitions: Transition {
+        SequentialAnimation {
               id: close_anim
-              PropertyAnimation  { property: "x"; duration: 800 }
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
               }
-        } 
+        }
+    }
+
+    SvgElementImage {
+        id: panel_open_icon
+        elementName: "panel-open-icon"
+        sceneSize: panels.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: close_bg.z+1        
+        opacity: show_panels == true ? 0 : 1
+
+        states: State {
+             name: "fading"
+             when: show_panels == true
+             PropertyChanges { target: panel_open_icon; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
+             PropertyChanges { target: panel_open_icon; opacity: 0; }
+        }
+
+        transitions: Transition {
+        SequentialAnimation {
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+              PropertyAnimation { property: "opacity"; duration: 500; }
+              }
+        }
     }
 
     SvgElementImage {
@@ -195,25 +237,26 @@ Item {
         elementName: "close-panel-mousearea"
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: close_bg.z+100 
 
-        MouseArea { 
-             id: hidedisp_close; 
-             anchors.fill: parent; 
-             cursorShape: show_panels == true ? Qt.WhatsThisCursor : Qt.ArrowCursor  
+        MouseArea {
+             id: hidedisp_close;
+             anchors.fill: parent;
+             cursorShape: Qt.PointingHandCursor 
              onClicked: close_panels()
         }
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: close_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (close_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: close_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     //
@@ -227,18 +270,18 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 10
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: rc_input_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: rc_input_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              id: rc_input_anim
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                id: rc_input_anim
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     SvgElementImage {
@@ -248,17 +291,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: rc_input_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: rc_input_labels; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: rc_input_labels; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
+
+        transitions: Transition {
+        SequentialAnimation {
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
               }
-        } 
+        }
     }
 
     SvgElementImage {
@@ -268,24 +311,24 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: rc_input_bg.z+1
 
-        MouseArea { 
-             id: hidedisp_rcinput; 
-             anchors.fill: parent; 
-             cursorShape: hide_display_bat == false && hide_display_oplm == false ? Qt.WhatsThisCursor : Qt.ArrowCursor  
-             onClicked: hide_display_bat == false && hide_display_oplm == false ? hide_display_rcinput() : 0
+        MouseArea {
+             id: hidedisp_rcinput;
+             anchors.fill: parent;
+             cursorShape: Qt.PointingHandCursor
+             onClicked: hide_display_rcinput()
         }
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: rc_input_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: rc_input_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
+
+        transitions: Transition {
+        SequentialAnimation {
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
               }
-        } 
+        }
     }
 
     SvgElementImage {
@@ -293,7 +336,7 @@ Item {
         elementName: "rc-throttle"
         sceneSize: panels.sceneSize
         z: rc_input_bg.z+2
-        
+
         width: scaledBounds.width * sceneItem.width
         height: (scaledBounds.height * sceneItem.height) * (ManualControlCommand.Throttle)
 
@@ -301,18 +344,18 @@ Item {
         y: (scaledBounds.y * sceneItem.height) - rc_throttle.height + (scaledBounds.height * sceneItem.height)
 
         smooth: true
-        
-        states: State  {
+
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: rc_throttle; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: rc_throttle; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
+
+        transitions: Transition {
+        SequentialAnimation {
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
               }
-        } 
+        }
     }
 
     SvgElementImage {
@@ -320,7 +363,7 @@ Item {
         elementName: "rc-stick"
         sceneSize: panels.sceneSize
         z: rc_input_bg.z+3
-        
+
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
 
@@ -328,7 +371,7 @@ Item {
         y: (scaledBounds.y * sceneItem.height) + (ManualControlCommand.Pitch * rc_stick.width * 2.5)
 
         smooth: true
-        
+
         //rotate it around his center
         transform: Rotation {
             angle: ManualControlCommand.Yaw * 90
@@ -336,17 +379,17 @@ Item {
             origin.x : rc_stick.width / 2
         }
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
+
+        transitions: Transition {
+        SequentialAnimation {
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
               }
-        } 
+        }
     }
 
     //
@@ -360,17 +403,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 20
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: battery_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: battery_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
+
+        transitions: Transition {
+        SequentialAnimation {
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
               }
-        } 
+        }
     }
 
     SvgElementPositionItem {
@@ -378,22 +421,22 @@ Item {
         sceneSize: panels.sceneSize
         elementName: "battery-volt-text"
         z: battery_bg.z+1
-        
+
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: scaledBounds.y * sceneItem.height
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: battery_volt; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: battery_volt; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Rectangle {
             anchors.fill: parent
@@ -424,17 +467,17 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: scaledBounds.y * sceneItem.height
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: battery_amp; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: battery_amp; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Rectangle {
             anchors.fill: parent
@@ -465,17 +508,17 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: scaledBounds.y * sceneItem.height
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: battery_milliamp; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: battery_milliamp; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Rectangle {
             anchors.fill: parent
@@ -517,17 +560,17 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: scaledBounds.y * sceneItem.height
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: battery_estimated_flight_time; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: battery_estimated_flight_time; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Rectangle {
             anchors.fill: parent
@@ -567,17 +610,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: battery_bg.z+5
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: battery_labels; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: battery_labels; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     SvgElementImage {
@@ -587,24 +630,24 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: battery_bg.z+6
 
-        MouseArea { 
-             id: hidedisp_battery; 
-             anchors.fill: parent; 
-             cursorShape: Qt.WhatsThisCursor
+        MouseArea {
+             id: hidedisp_battery;
+             anchors.fill: parent;
+             cursorShape: Qt.PointingHandCursor
              onClicked: hide_display_battery()
         }
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: battery_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: battery_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     //
@@ -618,17 +661,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 30
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: oplm_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: oplm_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
+
+        transitions: Transition {
+        SequentialAnimation {
+              PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
               }
-        } 
+        }
     }
 
     SvgElementImage {
@@ -638,17 +681,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: oplm_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: smeter_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: smeter_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     SvgElementImage {
@@ -658,17 +701,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: oplm_bg.z+2
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: smeter_scale; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: smeter_scale; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     SvgElementImage {
@@ -678,41 +721,44 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: oplm_bg.z+3
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: smeter_needle; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: smeter_needle; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
         }
 
         transform: Rotation {
             angle: smeter_angle.toFixed(1)
-             origin.y : smeter_needle.height 
-        } 
+            origin.y : smeter_needle.height
+        }
     }
 
     SvgElementImage {
         id: smeter_mask
         elementName: "smeter-mask"
         sceneSize: panels.sceneSize
-        y: Math.floor(scaledBounds.y * sceneItem.height)
+        //y: Math.floor(scaledBounds.y * sceneItem.height)
+        width: smeter_scale.width * 1.09
+        //anchors.horizontalCenter: smeter_scale
+
         z: oplm_bg.z+4
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: smeter_mask; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: smeter_mask; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
         }
     }
 
@@ -721,18 +767,20 @@ Item {
         elementName: "oplm-button-bg"
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
+        width: smeter_mask.width
+
         z: oplm_bg.z+5
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: oplm_button_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: oplm_button_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
         }
     }
 
@@ -746,7 +794,7 @@ Item {
             property variant button_color: "button"+index+"_color"
 
             id: idButton_oplm
-            
+
             elementName: "oplm-button-" + index
             sceneSize: panels.sceneSize
 
@@ -759,23 +807,24 @@ Item {
                 opacity: smeter_filter == index ? 0.5 : 0
             }
 
-            MouseArea { 
-                 id: idButton_oplm_mousearea; 
-                 anchors.fill: parent; 
-                 cursorShape: Qt.PointingHandCursor
+            MouseArea {
+                 id: idButton_oplm_mousearea;
+                 anchors.fill: parent;
+                 visible: display_oplm == true ? 1 : 0
+                 cursorShape: display_oplm == true ? Qt.PointingHandCursor  : Qt.ArrowCursor
                  onClicked: select_oplm(index)
             }
 
-            states: State  {
+            states: State {
                  name: "fading"
-                 when: show_panels !== true
-                 PropertyChanges  { target: idButton_oplm; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+                 when: show_panels == true
+                 PropertyChanges { target: idButton_oplm; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
             }
- 
-            transitions: Transition  {
-            SequentialAnimation  {
-                 PropertyAnimation  { property: "x"; duration: 800 }
-                 }
+
+            transitions: Transition {
+                SequentialAnimation {
+                    PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+                }
             }
         }
     }
@@ -786,17 +835,18 @@ Item {
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: oplm_bg.z+6
-        states: State  {
+
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: oplm_id_label; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: oplm_id_label; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     SvgElementPositionItem {
@@ -809,17 +859,17 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: scaledBounds.y * sceneItem.height
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: oplm_id_text; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: oplm_id_text; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Text {
              text: oplm_pair_id > 0 ? oplm_pair_id.toString(16) : "--  --  --  --"
@@ -841,24 +891,24 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: oplm_bg.z
 
-        MouseArea { 
-             id: hidedisp_oplm; 
-             anchors.fill: parent; 
-             cursorShape: Qt.WhatsThisCursor
+        MouseArea {
+             id: hidedisp_oplm;
+             anchors.fill: parent;
+             cursorShape: Qt.PointingHandCursor
              onClicked: hide_display_oplink()
         }
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: oplm_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: oplm_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     //
@@ -872,18 +922,18 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 40
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              id: system_anim
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                id: system_anim
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 
     SvgElementPositionItem {
@@ -893,21 +943,21 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_frametype; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_frametype; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
         }
 
         Text {
              text: ["FixedWing", "FixedWingElevon", "FixedWingVtail", "VTOL", "HeliCP", "QuadX", "QuadP",
-                    "Hexa+", "Octo+", "Custom", "HexaX", "HexaH", "OctoV", "OctoCoaxP", "OctoCoaxX", "OctoX", "HexaCoax",
+                    "QuadH", "Hexa+", "Octo+", "Custom", "HexaX", "HexaH", "OctoV", "OctoCoaxP", "OctoCoaxX", "OctoX", "HexaCoax",
                     "Tricopter", "GroundVehicleCar", "GroundVehicleDiff", "GroundVehicleMoto"][SystemSettings.AirframeType]
              anchors.right: parent.right
              color: "white"
@@ -916,7 +966,7 @@ Item {
                  pixelSize: Math.floor(parent.height * 1.4)
                  weight: Font.DemiBold
              }
-        } 
+        }
     }
 
     SvgElementPositionItem {
@@ -926,17 +976,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_cpuloadtemp; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_cpuloadtemp; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Text {
              // Coptercontrol detect with mem free : Only display Cpu load, no temperature available.
@@ -949,7 +999,7 @@ Item {
                  pixelSize: Math.floor(parent.height * 1.4)
                  weight: Font.DemiBold
              }
-        } 
+        }
     }
 
     SvgElementPositionItem {
@@ -959,17 +1009,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_memfree; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_memfree; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Text {
              text: SystemStats.HeapRemaining > 1024 ? memory_free.toFixed(2) +"Kb" : memory_free +"bytes"
@@ -980,7 +1030,7 @@ Item {
                  pixelSize: Math.floor(parent.height * 1.4)
                  weight: Font.DemiBold
              }
-        } 
+        }
     }
 
     SvgElementPositionItem {
@@ -990,17 +1040,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_fusion_algo; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_fusion_algo; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Text {
              text: ["None", "Basic (No Nav)", "CompMag", "Comp+Mag+GPS", "EKFIndoor", "GPS Nav (INS13)"][RevoSettings.FusionAlgorithm]
@@ -1011,7 +1061,7 @@ Item {
                  pixelSize: Math.floor(parent.height * 1.35)
                  weight: Font.DemiBold
              }
-        } 
+        }
     }
 
     SvgElementPositionItem {
@@ -1021,17 +1071,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_mag_used; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_mag_used; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Text {
              text: ["Invalid", "OnBoard", "External"][MagState.Source]
@@ -1042,7 +1092,7 @@ Item {
                  pixelSize: Math.floor(parent.height * 1.4)
                  weight: Font.DemiBold
              }
-        } 
+        }
     }
 
     SvgElementPositionItem {
@@ -1052,17 +1102,17 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_gpstype; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_gpstype; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
 
         Text {
              text: ["Unknown", "NMEA", "UBX", "UBX7", "UBX8"][GPSPositionSensor.SensorType]
@@ -1073,7 +1123,7 @@ Item {
                  pixelSize: Math.floor(parent.height * 1.4)
                  weight: Font.DemiBold
              }
-        } 
+        }
     }
 
     SvgElementImage {
@@ -1083,23 +1133,23 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
 
-        MouseArea { 
-             id: hidedisp_system; 
-             anchors.fill: parent; 
-             cursorShape: Qt.WhatsThisCursor 
+        MouseArea {
+             id: hidedisp_system;
+             anchors.fill: parent;
+             cursorShape: Qt.PointingHandCursor
              onClicked: hide_display_system()
         }
 
-        states: State  {
+        states: State {
              name: "fading"
-             when: show_panels !== true
-             PropertyChanges  { target: system_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: show_panels == true
+             PropertyChanges { target: system_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
     }
 }

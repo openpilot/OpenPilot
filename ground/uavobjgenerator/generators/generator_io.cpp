@@ -75,7 +75,7 @@ bool writeFile(QString name, QString & str)
 /**
  * Write contents of string to file if the content changes
  */
-bool writeFileIfDiffrent(QString name, QString & str)
+bool writeFileIfDifferent(QString name, QString & str)
 {
     if (str == readFile(name, false)) {
         return true;

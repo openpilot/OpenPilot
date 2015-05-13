@@ -134,7 +134,7 @@ static void ControlUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         }
         DebugLogEntrySet(entry);
     } else if (control.Operation == DEBUGLOGCONTROL_OPERATION_FORMATFLASH) {
-        uint8_t armed;
+        FlightStatusArmedOptions armed;
         FlightStatusArmedGet(&armed);
         if (armed == FLIGHTSTATUS_ARMED_DISARMED) {
             PIOS_DEBUGLOG_Format();

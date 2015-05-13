@@ -30,8 +30,6 @@
 #include <QString>
 #include <QStringList>
 #include <QList>
-#include <QDomDocument>
-#include <QDomElement>
 #include <QDomNode>
 #include <QByteArray>
 

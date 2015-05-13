@@ -606,14 +606,12 @@ static void telemetryRxTask(void *parameters)
 
         if (inputPort) {
             // Block until data are available
-            uint8_t serial_data[1];
+            uint8_t serial_data[16];
             uint16_t bytes_to_process;
 
             bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
-                for (uint8_t i = 0; i < bytes_to_process; i++) {
-                    UAVTalkProcessInputStream(channel->uavTalkCon, serial_data[i]);
-                }
+                UAVTalkProcessInputStream(channel->uavTalkCon, serial_data, bytes_to_process);
             }
         } else {
             vTaskDelay(5);
@@ -890,7 +888,7 @@ static void updateSettings(channelContext *channel)
 
     if (port) {
         // Retrieve settings
-        uint8_t speed;
+        HwSettingsTelemetrySpeedOptions speed;
         HwSettingsTelemetrySpeedGet(&speed);
 
         // Set port speed

@@ -116,7 +116,7 @@ extern void msheap_init(heap_handle_t *heap, void *base, void *limit);
  *
  * @param   size        The number of bytes required (more may be allocated).
  */
-extern void *msheap_alloc(heap_handle_t *heap, uint32_t size);
+extern void *msheap_alloc(heap_handle_t *heap, void *ptr, uint32_t size);
 
 /**
  * Free memory back to the heap.

@@ -38,3 +38,5 @@ HEADERS += opmaps.h \
     kibertilecache.h \
     debugheader.h \
     diagnostics.h
+
+QT += xml

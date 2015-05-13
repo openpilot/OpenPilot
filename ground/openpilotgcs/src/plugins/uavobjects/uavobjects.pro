@@ -27,6 +27,10 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/statusgrounddrive.h \
+    $$UAVOBJECT_SYNTHETICS/statusvtolautotakeoff.h \
+    $$UAVOBJECT_SYNTHETICS/pidstatus.h \
+    $$UAVOBJECT_SYNTHETICS/statusvtolland.h \
     $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.h \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
@@ -96,6 +100,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.h \
+    $$UAVOBJECT_SYNTHETICS/groundpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/ratedesired.h \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.h \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
@@ -134,6 +139,10 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/statusgrounddrive.cpp \
+    $$UAVOBJECT_SYNTHETICS/statusvtolautotakeoff.cpp \
+    $$UAVOBJECT_SYNTHETICS/pidstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/statusvtolland.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolselftuningstats.cpp \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
@@ -203,6 +212,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/groundpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/ratedesired.cpp \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.cpp \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \

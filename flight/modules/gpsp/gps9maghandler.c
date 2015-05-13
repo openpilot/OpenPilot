@@ -49,9 +49,8 @@ void handleMag()
 
     if (PIOS_HMC5x83_ReadMag(onboard_mag, mag) == 0) {
         MagUbxPkt magPkt;
-        // swap axis so that if side with connector is aligned to revo side with connectors, mags data are aligned
-        magPkt.fragments.data.X = -mag[1];
-        magPkt.fragments.data.Y = mag[0];
+        magPkt.fragments.data.X = mag[0];
+        magPkt.fragments.data.Y = mag[1];
         magPkt.fragments.data.Z = mag[2];
         magPkt.fragments.data.status = 1;
         ubx_buildPacket(&magPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_MAG, sizeof(MagData));

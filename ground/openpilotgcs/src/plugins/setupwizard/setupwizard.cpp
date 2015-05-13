@@ -95,8 +95,6 @@ int SetupWizard::nextId() const
     case PAGE_CONTROLLER:
     {
         switch (getControllerType()) {
-        case CONTROLLER_CC:
-        case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
         case CONTROLLER_NANO:
         case CONTROLLER_DISCOVERYF4:
@@ -204,8 +202,6 @@ int SetupWizard::nextId() const
     case PAGE_SUMMARY:
     {
         switch (getControllerType()) {
-        case CONTROLLER_CC:
-        case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
         case CONTROLLER_NANO:
         case CONTROLLER_DISCOVERYF4:
@@ -237,12 +233,6 @@ QString SetupWizard::getSummaryText()
 
     summary.append("<b>").append(tr("Controller type: ")).append("</b>");
     switch (getControllerType()) {
-    case CONTROLLER_CC:
-        summary.append(tr("OpenPilot CopterControl"));
-        break;
-    case CONTROLLER_CC3D:
-        summary.append(tr("OpenPilot CopterControl 3D"));
-        break;
     case CONTROLLER_REVO:
         summary.append(tr("OpenPilot Revolution"));
         break;
@@ -492,6 +482,9 @@ void SetupWizard::customBackClicked()
         static_cast<OutputCalibrationPage *>(currentPage())->customBackClicked();
     } else {
         back();
+        if (currentId() == PAGE_OUTPUT_CALIBRATION) {
+            static_cast<OutputCalibrationPage *>(currentPage())->customBackClicked();
+        }
     }
 }
 

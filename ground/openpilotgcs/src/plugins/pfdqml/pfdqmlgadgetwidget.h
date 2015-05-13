@@ -18,6 +18,7 @@
 #define PFDQMLGADGETWIDGET_H_
 
 #include "pfdqmlgadgetconfiguration.h"
+#include "uavobjectmanager.h"
 #include <QQuickView>
 
 class PfdQmlGadgetWidget : public QQuickView {
@@ -84,6 +85,8 @@ public:
         return m_altitude;
     }
 
+    Q_INVOKABLE void resetConsumedEnergy();
+
 public slots:
     void setEarthFile(QString arg);
     void setTerrainEnabled(bool arg);
@@ -119,6 +122,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 private:
+    UAVObjectManager *m_uavoManager;
     QString m_qmlFileName;
     QString m_earthFile;
     bool m_openGLEnabled;

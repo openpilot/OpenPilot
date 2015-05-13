@@ -2320,16 +2320,38 @@ void OPMapGadgetWidget::on_tbFind_clicked()
 {
     QPalette pal = m_widget->leFind->palette();
 
-    int result   = m_map->SetCurrentPositionByKeywords(m_widget->leFind->text());
+    QString status   = m_map->SetCurrentPositionByKeywords(m_widget->leFind->text());
 
-    if (result == core::GeoCoderStatusCode::G_GEO_SUCCESS) {
+    if (status == "OK") {
         pal.setColor(m_widget->leFind->backgroundRole(), Qt::green);
         m_widget->leFind->setPalette(pal);
         m_map->SetZoom(12);
-    } else {
+    } else if (status == "ZERO_RESULTS") {
         pal.setColor(m_widget->leFind->backgroundRole(), Qt::red);
         m_widget->leFind->setPalette(pal);
+        qDebug() << "No results";
+    } else if (status == "OVER_QUERY_LIMIT") {
+        pal.setColor(m_widget->leFind->backgroundRole(), Qt::yellow);
+        m_widget->leFind->setPalette(pal);
+        qDebug() << "You are over quota on queries";
+    } else if (status == "REQUEST_DENIED") {
+        pal.setColor(m_widget->leFind->backgroundRole(), Qt::darkRed);
+        m_widget->leFind->setPalette(pal);
+        qDebug() << "Request was denied";
+    } else if (status == "INVALID_REQUEST") {
+        pal.setColor(m_widget->leFind->backgroundRole(), Qt::darkYellow);
+        m_widget->leFind->setPalette(pal);
+        qDebug() << "Invalid request, missing address, lat long or location";
+    } else if (status == "UNKNOWN_ERROR") {
+        pal.setColor(m_widget->leFind->backgroundRole(), Qt::darkYellow);
+        m_widget->leFind->setPalette(pal);
+        qDebug() << "Some sort of server error.";
+    } else {
+        pal.setColor(m_widget->leFind->backgroundRole(), Qt::gray);
+        m_widget->leFind->setPalette(pal);
+        qDebug() << "Some sort of code error!";
     }
+
 }
 
 void OPMapGadgetWidget::onHomeDoubleClick(HomeItem *)

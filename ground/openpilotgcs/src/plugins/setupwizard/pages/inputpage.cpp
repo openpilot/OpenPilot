@@ -72,27 +72,6 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
     HwSettings *hwSettings = HwSettings::GetInstance(uavoManager);
     HwSettings::DataFields data = hwSettings->getData();
     switch (getWizard()->getControllerType()) {
-    case SetupWizard::CONTROLLER_CC:
-    case SetupWizard::CONTROLLER_CC3D:
-    {
-        switch (selectedType) {
-        case VehicleConfigurationSource::INPUT_PWM:
-            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PWMNOONESHOT;
-
-        case VehicleConfigurationSource::INPUT_PPM:
-            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PPMNOONESHOT;
-
-        case VehicleConfigurationSource::INPUT_SBUS:
-            return data.CC_MainPort != HwSettings::CC_MAINPORT_SBUS;
-
-        case VehicleConfigurationSource::INPUT_DSM:
-            // TODO: Handle all of the DSM types ?? Which is most common?
-            return data.CC_MainPort != HwSettings::CC_MAINPORT_DSM;
-
-        default: return true;
-        }
-        break;
-    }
     case SetupWizard::CONTROLLER_REVO:
     case SetupWizard::CONTROLLER_DISCOVERYF4:
     {

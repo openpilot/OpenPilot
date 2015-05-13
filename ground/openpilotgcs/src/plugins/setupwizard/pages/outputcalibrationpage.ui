@@ -53,7 +53,7 @@
    <item row="1" column="0">
     <widget class="QStackedWidget" name="calibrationStack">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="intro">
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -122,6 +122,26 @@ p, li { white-space: pre-wrap; }
           <bool>true</bool>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="calibrateAllMotors">
+         <property name="text">
+          <string>Calibrate all motor outputs at the same time</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <widget class="QLabel" name="motorPWMValue">

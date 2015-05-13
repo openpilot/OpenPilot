@@ -100,7 +100,7 @@ void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValu
     startChannelOutput(channels, safeValue);
 }
 
-void OutputCalibrationUtil::startChannelOutput(QList<quint16> channels, quint16 safeValue)
+void OutputCalibrationUtil::startChannelOutput(QList<quint16> &channels, quint16 safeValue)
 {
     if (c_prepared) {
         m_outputChannels = channels;

@@ -20,6 +20,9 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #####
 
+# REVO C++ support 
+USE_CXX = YES
+
 override ARM_SDK_PREFIX :=
 override THUMB :=
 
@@ -83,10 +86,11 @@ endif
 
 ## MODULES
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+CPPSRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.cpp}}
 SRC += ${OUTDIR}/InitMods.c
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
-SRC += $(OPSYSTEM)/simposix.c
+CPPSRC += $(OPSYSTEM)/simposix.cpp
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
@@ -123,6 +127,7 @@ SRC += $(PIOSCORECOMMON)/pios_mem.c
 
 ## PIOS Hardware
 include $(PIOS)/posix/library.mk
+
 
 include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)
@@ -315,7 +320,7 @@ endif
 
 
 # Link: create ELF output file from object files.
-$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
+$(eval $(call LINK_CXX_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
 
 # Assemble: create object files from assembler source files.
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
@@ -330,7 +335,7 @@ $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
 
 # Compile: create object files from C++ source files.
-$(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
+$(foreach src, $(CPPSRC), $(eval $(call COMPILE_CXX_TEMPLATE, $(src))))
 
 # Compile: create object files from C++ source files. ARM-only
 $(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src))))

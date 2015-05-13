@@ -164,7 +164,6 @@ ifeq ($(USE_CXX), YES)
     CPPFLAGS += -DPIOS_ENABLE_CXX
 endif
 
-
 # Compiler flags to generate dependency files
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
 

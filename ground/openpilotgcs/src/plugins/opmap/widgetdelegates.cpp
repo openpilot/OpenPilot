@@ -106,19 +106,18 @@ void MapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDa
 {
     switch (type) {
     case flightDataModel::MODE:
-        combo->addItem("Fly Direct", MODE_FLYENDPOINT);
-        combo->addItem("Fly Vector", MODE_FLYVECTOR);
-        combo->addItem("Fly Circle Right", MODE_FLYCIRCLERIGHT);
-        combo->addItem("Fly Circle Left", MODE_FLYCIRCLELEFT);
-
-        combo->addItem("Drive Direct", MODE_DRIVEENDPOINT);
-        combo->addItem("Drive Vector", MODE_DRIVEVECTOR);
-        combo->addItem("Drive Circle Right", MODE_DRIVECIRCLELEFT);
-        combo->addItem("Drive Circle Left", MODE_DRIVECIRCLERIGHT);
-
+        combo->addItem("Goto Endpoint", MODE_GOTOENDPOINT);
+        combo->addItem("Follow Vector", MODE_FOLLOWVECTOR);
+        combo->addItem("Circle Right", MODE_CIRCLERIGHT);
+        combo->addItem("Circle Left", MODE_CIRCLELEFT);
         combo->addItem("Fixed Attitude", MODE_FIXEDATTITUDE);
         combo->addItem("Set Accessory", MODE_SETACCESSORY);
         combo->addItem("Disarm Alarm", MODE_DISARMALARM);
+        combo->addItem("Land", MODE_LAND);
+        combo->addItem("AutoTakeoff", MODE_AUTOTAKEOFF);
+        combo->addItem("Brake", MODE_BRAKE);
+        combo->addItem("Velocity", MODE_VELOCITY);
+
         break;
     case flightDataModel::CONDITION:
         combo->addItem("None", ENDCONDITION_NONE);

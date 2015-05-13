@@ -33,6 +33,10 @@ FLIGHTLIBINC	= $(FLIGHTLIB)/inc
 OPUAVOBJINC	= $(OPUAVOBJ)/inc
 OPUAVTALKINC	= $(OPUAVTALK)/inc
 
+## PID 
+PIDLIB		=$(FLIGHTLIB)/pid
+PIDLIBINC	=$(FLIGHTLIB)/pid
+
 ## Math
 MATHLIB		= $(FLIGHTLIB)/math
 MATHLIBINC	= $(FLIGHTLIB)/math
@@ -80,6 +84,7 @@ SRC += $(PIOSCOMMON)/pios_rfm22b.c
 SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
+SRC += $(PIOSCOMMON)/pios_srxl.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_sensors.c
 
@@ -87,7 +92,10 @@ SRC += $(PIOSCOMMON)/pios_sensors.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
+
+## PID library functions
 SRC += $(MATHLIB)/pid.c
+CPPSRC += $(PIDLIB)/pidcontroldown.cpp
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
@@ -166,6 +174,7 @@ EXTRAINCDIRS += $(FLIGHTLIBINC)
 EXTRAINCDIRS += $(PIOSCOMMON)
 EXTRAINCDIRS += $(OPSYSTEMINC)
 EXTRAINCDIRS += $(MATHLIBINC)
+EXTRAINCDIRS += $(PIDLIBINC)
 EXTRAINCDIRS += $(OPUAVOBJINC)
 EXTRAINCDIRS += $(OPUAVTALKINC)
 EXTRAINCDIRS += $(OPUAVSYNTHDIR)

@@ -138,6 +138,13 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
     const float dT = SAMPLE_PERIOD_MS / 1000.0f;
     float energyRemaining;
 
+    // Reset ConsumedEnergy counter
+    if (batterySettings.ResetConsumedEnergy) {
+        flightBatteryData.ConsumedEnergy    = 0;
+        batterySettings.ResetConsumedEnergy = false;
+        FlightBatterySettingsSet(&batterySettings);
+    }
+
     // calculate the battery parameters
     if (voltageADCPin >= 0) {
         flightBatteryData.Voltage = (PIOS_ADC_PinGetVolt(voltageADCPin) - batterySettings.SensorCalibrations.VoltageZero) * batterySettings.SensorCalibrations.VoltageFactor; // in Volts

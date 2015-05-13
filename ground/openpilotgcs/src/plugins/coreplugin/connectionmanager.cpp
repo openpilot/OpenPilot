@@ -89,6 +89,8 @@ void ConnectionManager::init()
     // new connection object from plugins
     QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(objectAdded(QObject *)), this, SLOT(objectAdded(QObject *)));
     QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(aboutToRemoveObject(QObject *)), this, SLOT(aboutToRemoveObject(QObject *)));
+
+    ccWarningClosed = true;
 }
 
 
@@ -435,15 +437,22 @@ void ConnectionManager::devChanged(IConnection *connection)
     }
     // clear device list combobox
     m_availableDevList->clear();
+    ccFound = false;
 
     // remove registered devices of this IConnection from the list
     updateConnectionList(connection);
 
     updateConnectionDropdown();
 
+    if (ccFound && ccWarningClosed) {
+        ccWarningClosed = false;
+        QMessageBox::information(this, tr("CopterControl Not Supported"),
+                                 tr("This version of OpenPilot GCS does not support CC and CC3D boards.\n\nPlease use OpenPilot GCS version 15.02.xx instead"));
+        ccWarningClosed = true;
+    }
+
     qDebug() << "# devices " << m_devList.count();
     emit availableDevicesChanged(m_devList);
-
 
     // disable connection button if the liNameif (m_availableDevList->count() > 0)
     if (m_availableDevList->count() > 0) {
@@ -457,17 +466,21 @@ void ConnectionManager::updateConnectionDropdown()
 {
     // add all the list again to the combobox
     foreach(DevListItem d, m_devList) {
-        m_availableDevList->addItem(d.getConName());
-        m_availableDevList->setItemData(m_availableDevList->count() - 1, d.getConName(), Qt::ToolTipRole);
-        if (!m_ioDev && d.getConName().startsWith("USB")) {
-            if (m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect()) {
-                m_availableDevList->setCurrentIndex(m_availableDevList->count() - 1);
+        if (!d.getConName().contains("CopterControl")) {
+            m_availableDevList->addItem(d.getConName());
+            m_availableDevList->setItemData(m_availableDevList->count() - 1, d.getConName(), Qt::ToolTipRole);
+            if (!m_ioDev && d.getConName().startsWith("USB")) {
+                if (m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect()) {
+                    m_availableDevList->setCurrentIndex(m_availableDevList->count() - 1);
+                }
+                if (m_mainWindow->generalSettings()->autoConnect() && polling) {
+                    qDebug() << "Automatically opening device";
+                    connectDevice(d);
+                    qDebug() << "ConnectionManager::updateConnectionDropdown autoconnected USB device";
+                }
             }
-            if (m_mainWindow->generalSettings()->autoConnect() && polling) {
-                qDebug() << "Automatically opening device";
-                connectDevice(d);
-                qDebug() << "ConnectionManager::updateConnectionDropdown autoconnected USB device";
-            }
+        } else {
+            ccFound = true;
         }
     }
     if (m_ioDev) {

@@ -108,7 +108,7 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QString name, QIcon icon, int pr
             this, SLOT(modeChanged(Core::IMode *)));
 
     // other setup
-    m_splitterOrView = new SplitterOrView(this, 0);
+    m_splitterOrView = new SplitterOrView(this);
 
     // SplitterOrView with 0 as gadget calls our setCurrentGadget, which relies on currentSplitterOrView(),
     // which needs our m_splitterorView to be set, which isn't set yet at that time.
@@ -209,10 +209,10 @@ void UAVGadgetManager::emptyView(Core::Internal::UAVGadgetView *view)
     }
 
     IUAVGadget *uavGadget = view->gadget();
-// emit uavGadgetAboutToClose(uavGadget);
+    // emit uavGadgetAboutToClose(uavGadget);
     removeGadget(uavGadget);
     view->removeGadget();
-// emit uavGadgetsClosed(uavGadgets);
+    // emit uavGadgetsClosed(uavGadgets);
 }
 
 
@@ -221,27 +221,22 @@ void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
     if (!view) {
         return;
     }
-    SplitterOrView *splitterOrView = m_splitterOrView->findView(view);
-    Q_ASSERT(splitterOrView);
-    Q_ASSERT(splitterOrView->view() == view);
-    if (splitterOrView == m_splitterOrView) {
-        return;
-    }
 
     IUAVGadget *gadget = view->gadget();
-    emptyView(view);
+
+    // find SplitterOrView splitter that contains the view to delete
+    SplitterOrView *splitter = m_splitterOrView->findSplitter(gadget);
+    if (!splitter) {
+        return;
+    }
+    Q_ASSERT(splitter->isSplitter() == true);
+
+    splitter->unsplit(gadget);
+
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     im->removeGadget(gadget);
 
-    SplitterOrView *splitter     = m_splitterOrView->findSplitter(splitterOrView);
-    Q_ASSERT(splitterOrView->hasGadget() == false);
-    Q_ASSERT(splitter->isSplitter() == true);
-    splitterOrView->hide();
-    delete splitterOrView;
-
-    splitter->unsplit();
-
-    SplitterOrView *newCurrent = splitter->findFirstView();
+    SplitterOrView *newCurrent   = splitter->findFirstView();
     Q_ASSERT(newCurrent);
     if (newCurrent) {
         setCurrentGadget(newCurrent->gadget());
@@ -254,8 +249,7 @@ void UAVGadgetManager::addGadgetToContext(IUAVGadget *gadget)
         return;
     }
     m_core->addContextObject(gadget);
-
-// emit uavGadgetOpened(uavGadget);
+    // emit uavGadgetOpened(uavGadget);
 }
 
 void UAVGadgetManager::removeGadget(IUAVGadget *gadget)

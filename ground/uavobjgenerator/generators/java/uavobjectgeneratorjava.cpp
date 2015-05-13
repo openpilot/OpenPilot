@@ -62,7 +62,7 @@ bool UAVObjectGeneratorJava::generate(UAVObjectParser *parser, QString templatep
     // Write the gcs object inialization files
     javaInitTemplate.replace(QString("$(OBJINC)"), objInc);
     javaInitTemplate.replace(QString("$(OBJINIT)"), javaObjInit);
-    bool res = writeFileIfDiffrent(javaOutputPath.absolutePath() + "/UAVObjectsInitialize.java", javaInitTemplate);
+    bool res = writeFileIfDifferent(javaOutputPath.absolutePath() + "/UAVObjectsInitialize.java", javaInitTemplate);
     if (!res) {
         cout << "Error: Could not write output files" << endl;
         return false;
@@ -238,7 +238,7 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo *info)
     outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Write the java code
-    bool res = writeFileIfDiffrent(javaOutputPath.absolutePath() + "/" + info->name + ".java", outCode);
+    bool res = writeFileIfDifferent(javaOutputPath.absolutePath() + "/" + info->name + ".java", outCode);
     if (!res) {
         cout << "Error: Could not write gcs output files" << endl;
         return false;

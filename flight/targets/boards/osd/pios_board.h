@@ -208,13 +208,13 @@ extern uint32_t pios_com_telem_usb_id;
 
 #define PIOS_DMA_PIN_CONFIG \
     { \
-        { GPIOC, GPIO_Pin_0, ADC_Channel_10 }, \
-        { GPIOC, GPIO_Pin_1, ADC_Channel_11 }, \
-        { GPIOC, GPIO_Pin_2, ADC_Channel_12 }, \
-        { NULL, 0, ADC_Channel_TempSensor }, /* Temperature sensor */ \
-        { GPIOC, GPIO_Pin_3, ADC_Channel_13 }, \
-        { GPIOA, GPIO_Pin_7, ADC_Channel_7 }, \
-        { NULL, 0, ADC_Channel_Vrefint } /* Voltage reference */ \
+        { GPIOC, GPIO_Pin_0, ADC_Channel_10, true }, \
+        { GPIOC, GPIO_Pin_1, ADC_Channel_11, true }, \
+        { GPIOC, GPIO_Pin_2, ADC_Channel_12, true }, \
+        { NULL, 0, ADC_Channel_TempSensor, true }, /* Temperature sensor */ \
+        { GPIOC, GPIO_Pin_3, ADC_Channel_13, true }, \
+        { GPIOA, GPIO_Pin_7, ADC_Channel_7, true }, \
+        { NULL, 0, ADC_Channel_Vrefint, true } /* Voltage reference */ \
     }
 
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */

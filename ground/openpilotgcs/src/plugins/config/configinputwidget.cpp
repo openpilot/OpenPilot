@@ -42,10 +42,13 @@
 #include <utils/stylehelper.h>
 #include <QMessageBox>
 
-#define ACCESS_MIN_MOVE -3
-#define ACCESS_MAX_MOVE 3
-#define STICK_MIN_MOVE  -8
-#define STICK_MAX_MOVE  8
+#define ACCESS_MIN_MOVE            -3
+#define ACCESS_MAX_MOVE            3
+#define STICK_MIN_MOVE             -8
+#define STICK_MAX_MOVE             8
+
+#define CHANNEL_NUMBER_NONE        0
+#define DEFAULT_FLIGHT_MODE_NUMBER 3
 
 ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
@@ -72,6 +75,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     accessoryDesiredObj1  = AccessoryDesired::GetInstance(getObjectManager(), 1);
     accessoryDesiredObj2  = AccessoryDesired::GetInstance(getObjectManager(), 2);
     actuatorSettingsObj   = ActuatorSettings::GetInstance(getObjectManager());
+    systemSettingsObj     = SystemSettings::GetInstance(getObjectManager());
 
     // Only instance 0 is present if the board is not connected.
     // The other instances are populated lazily.
@@ -349,6 +353,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         ManualControlSettings::CHANNELGROUPS_ACCESSORY1 <<
         ManualControlSettings::CHANNELGROUPS_ACCESSORY2;
 
+    groundChannelOrder << ManualControlSettings::CHANNELGROUPS_THROTTLE <<
+        ManualControlSettings::CHANNELGROUPS_YAW <<
+        ManualControlSettings::CHANNELGROUPS_ACCESSORY0;
+
     updateEnableControls();
 }
 
@@ -411,14 +419,18 @@ void ConfigInputWidget::goToWizard()
     // chooses a different TX type (which could otherwise result in
     // unexpected TX channels being enabled)
     manualSettingsData             = manualSettingsObj->getData();
-    previousManualSettingsData     = manualSettingsData;
+    memento.manualSettingsData     = manualSettingsData;
     flightModeSettingsData         = flightModeSettingsObj->getData();
-    previousFlightModeSettingsData = flightModeSettingsData;
+    memento.flightModeSettingsData = flightModeSettingsData;
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
     // Stash actuatorSettings
     actuatorSettingsData           = actuatorSettingsObj->getData();
-    previousActuatorSettingsData   = actuatorSettingsData;
+    memento.actuatorSettingsData   = actuatorSettingsData;
+
+    // Stash systemSettings
+    systemSettingsData             = systemSettingsObj->getData();
+    memento.systemSettingsData     = systemSettingsData;
 
     // Now reset channel and actuator settings (disable outputs)
     resetChannelSettings();
@@ -460,9 +472,10 @@ void ConfigInputWidget::wzCancel()
     ui->stackedWidget->setCurrentIndex(0);
 
     // Load settings back from beginning of wizard
-    manualSettingsObj->setData(previousManualSettingsData);
-    flightModeSettingsObj->setData(previousFlightModeSettingsData);
-    actuatorSettingsObj->setData(previousActuatorSettingsData);
+    manualSettingsObj->setData(memento.manualSettingsData);
+    flightModeSettingsObj->setData(memento.flightModeSettingsData);
+    actuatorSettingsObj->setData(memento.actuatorSettingsData);
+    systemSettingsObj->setData(memento.systemSettingsData);
 }
 
 void ConfigInputWidget::registerControlActivity()
@@ -545,12 +558,17 @@ void ConfigInputWidget::wzNext()
         restoreMdata();
 
         // Load actuator settings back from beginning of wizard
-        actuatorSettingsObj->setData(previousActuatorSettingsData);
+        actuatorSettingsObj->setData(memento.actuatorSettingsData);
 
         // Force flight mode neutral to middle and Throttle neutral at 4%
         adjustSpecialNeutrals();
         throttleError = false;
         checkThrottleRange();
+
+        // Force flight mode number to be 1 if 2 CH ground vehicle was selected
+        if (transmitterType == ground) {
+            forceOneFlightMode();
+        }
 
         manualSettingsObj->setData(manualSettingsData);
         // move to Arming Settings tab
@@ -629,6 +647,8 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         wizardUi->wzBack->setEnabled(true);
         if (transmitterType == heli) {
             wizardUi->typeHeli->setChecked(true);
+        } else if (transmitterType == ground) {
+            wizardUi->typeGround->setChecked(true);
         } else {
             wizardUi->typeAcro->setChecked(true);
         }
@@ -687,6 +707,10 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
     case wizardIdentifyCenter:
         setTxMovement(centerAll);
         wizardUi->pagesStack->setCurrentWidget(wizardUi->identifyCenterPage);
+        if (transmitterType == ground) {
+            wizardUi->identifyCenterInstructions->setText(QString(tr("Please center all controls and trims and press Next when ready.\n\n"
+                                                                     "For a ground vehicle, this center position will be used as neutral value of each channel.")));
+        }
         break;
     case wizardIdentifyLimits:
     {
@@ -752,6 +776,12 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
     case wizardChooseType:
         if (wizardUi->typeAcro->isChecked()) {
             transmitterType = acro;
+        } else if (wizardUi->typeGround->isChecked()) {
+            transmitterType    = ground;
+            /* Make sure to tell controller, this is really a ground vehicle. */
+            systemSettingsData = systemSettingsObj->getData();
+            systemSettingsData.AirframeType = SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR;
+            systemSettingsObj->setData(systemSettingsData);
         } else {
             transmitterType = heli;
         }
@@ -775,6 +805,12 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(identifyControls()));
         wizardUi->wzNext->setEnabled(true);
         setTxMovement(nothing);
+        /* If flight mode stick isn't identified, force flight mode number to be 1 */
+        manualSettingsData = manualSettingsObj->getData();
+        if (manualSettingsData.ChannelGroups[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] ==
+            ManualControlSettings::CHANNELGROUPS_NONE) {
+            forceOneFlightMode();
+        }
         break;
     case wizardIdentifyCenter:
         manualCommandData  = manualCommandObj->getData();
@@ -855,21 +891,32 @@ void ConfigInputWidget::restoreMdata()
  */
 void ConfigInputWidget::setChannel(int newChan)
 {
+    bool canBeSkipped = false;
+
     if (newChan == ManualControlSettings::CHANNELGROUPS_COLLECTIVE) {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please enable throttle hold mode.\n\nMove the Collective Pitch stick.")));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please enable throttle hold mode.</p>"
+                                                                "<p>Move the Collective Pitch stick.</p>")));
     } else if (newChan == ManualControlSettings::CHANNELGROUPS_FLIGHTMODE) {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please toggle the Flight Mode switch.\n\nFor switches you may have to repeat this rapidly.")));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please toggle the Flight Mode switch.</p>"
+                                                                "<p>For switches you may have to repeat this rapidly.</p>"
+                                                                "<p>Alternatively, you can click Next to skip this channel, but you will get only <b>ONE</b> Flight Mode.</p>")));
+        canBeSkipped = true;
     } else if ((transmitterType == heli) && (newChan == ManualControlSettings::CHANNELGROUPS_THROTTLE)) {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please disable throttle hold mode.\n\nMove the Throttle stick.")));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please disable throttle hold mode.</p>"
+                                                                "<p>Move the Throttle stick.</p>")));
     } else {
-        wizardUi->identifyStickInstructions->setText(QString(tr("Please move each control one at a time according to the instructions and picture below.\n\n"
-                                                                "Move the %1 stick.")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
+        wizardUi->identifyStickInstructions->setText(QString(tr("<p>Please move each control one at a time according to the instructions and picture below.</p>"
+                                                                "<p>Move the %1 stick.</p>")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
     }
 
     if (manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory")) {
+        wizardUi->identifyStickInstructions->setText(wizardUi->identifyStickInstructions->text() + tr("<p>Alternatively, click Next to skip this channel.</p>"));
+        canBeSkipped = true;
+    }
+
+    if (canBeSkipped) {
         wizardUi->wzNext->setEnabled(true);
         wizardUi->wzNext->setText(tr("Next / Skip"));
-        wizardUi->identifyStickInstructions->setText(wizardUi->identifyStickInstructions->text() + tr(" Alternatively, click Next to skip this channel."));
     } else {
         wizardUi->wzNext->setEnabled(false);
     }
@@ -885,7 +932,18 @@ void ConfigInputWidget::setChannel(int newChan)
  */
 void ConfigInputWidget::nextChannel()
 {
-    QList <int> order = (transmitterType == heli) ? heliChannelOrder : acroChannelOrder;
+    QList <int> order;
+    switch (transmitterType) {
+    case heli:
+        order = heliChannelOrder;
+        break;
+    case ground:
+        order = groundChannelOrder;
+        break;
+    default:
+        order = acroChannelOrder;
+        break;
+    }
 
     if (currentChannelNum == -1) {
         setChannel(order[0]);
@@ -906,7 +964,18 @@ void ConfigInputWidget::nextChannel()
  */
 void ConfigInputWidget::prevChannel()
 {
-    QList <int> order = transmitterType == heli ? heliChannelOrder : acroChannelOrder;
+    QList <int> order;
+    switch (transmitterType) {
+    case heli:
+        order = heliChannelOrder;
+        break;
+    case ground:
+        order = groundChannelOrder;
+        break;
+    default:
+        order = acroChannelOrder;
+        break;
+    }
 
     // No previous from unset channel or next state
     if (currentChannelNum == -1) {
@@ -1014,6 +1083,7 @@ void ConfigInputWidget::identifyLimits()
     }
     manualSettingsObj->setData(manualSettingsData);
 }
+
 void ConfigInputWidget::setMoveFromCommand(int command)
 {
     // ManualControlSettings::ChannelNumberElem:
@@ -1624,7 +1694,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         // Stash actuatorSettings
         actuatorSettingsData = actuatorSettingsObj->getData();
-        previousActuatorSettingsData = actuatorSettingsData;
+        memento.actuatorSettingsData = actuatorSettingsData;
 
         // Disable all actuators
         resetActuatorSettings();
@@ -1634,7 +1704,30 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         manualCommandData  = manualCommandObj->getData();
         manualSettingsData = manualSettingsObj->getData();
 
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Ground vehicle"),
+                                      tr("<p>Are you configuring a transmitter for your <b>ground vehicle</b> with reversible motor<br>"
+                                         "controlled by throttle stick?</p>"
+                                         "<p>If so, please make sure you've centered throttle control and press <b>Yes</b> button. Otherwise, press No.</p>"
+                                         "<p>Attention, if you press <b>Yes</b>, then the <b>Flight Mode Count</b> will be set to 1.</p>"),
+                                      QMessageBox::Yes | QMessageBox::No);
+
+        if (reply == QMessageBox::Yes) {
+            transmitterType = ground;
+            manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
+                manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
+            /* Make sure to tell controller, this is really a ground vehicle. */
+            systemSettingsData = systemSettingsObj->getData();
+            systemSettingsData.AirframeType = SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR;
+            systemSettingsObj->setData(systemSettingsData);
+        }
+
         restoreMdataSingle(manualCommandObj, &manualControlMdata);
+
+        // Force flight mode number to be 1 if 2 channel ground vehicle was confirmed
+        if (transmitterType == ground) {
+            forceOneFlightMode();
+        }
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             if ((i == ManualControlSettings::CHANNELNUMBER_FLIGHTMODE) || (i == ManualControlSettings::CHANNELNUMBER_THROTTLE)) {
@@ -1647,7 +1740,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         manualSettingsObj->setData(manualSettingsData);
 
         // Load actuator settings back from beginning of manual calibration
-        actuatorSettingsObj->setData(previousActuatorSettingsData);
+        actuatorSettingsObj->setData(memento.actuatorSettingsData);
 
         ui->configurationWizard->setEnabled(true);
         ui->saveRCInputToRAM->setEnabled(true);
@@ -1666,6 +1759,12 @@ void ConfigInputWidget::adjustSpecialNeutrals()
     manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE] =
         (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE] +
          manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE]) / 2;
+
+    // A ground vehicle has a reversible motor, the center position of throttle is the neutral setting.
+    // So do not have to set a special neutral value for it.
+    if (transmitterType == ground) {
+        return;
+    }
 
     // Force throttle to be near min, add 4% from total range to avoid arming issues
     manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
@@ -1699,9 +1798,10 @@ void ConfigInputWidget::resetChannelSettings()
 {
     manualSettingsData = manualSettingsObj->getData();
     // Clear all channel data : Channel Type (PPM,PWM..) and Number
-    for (unsigned int channel = 0; channel < 9; channel++) {
+    for (unsigned int channel = 0; channel < ManualControlSettings::CHANNELNUMBER_NUMELEM; channel++) {
         manualSettingsData.ChannelGroups[channel] = ManualControlSettings::CHANNELGROUPS_NONE;
-        manualSettingsData.ChannelNumber[channel] = 0;
+        manualSettingsData.ChannelNumber[channel] = CHANNEL_NUMBER_NONE;
+        manualSettingsData.FlightModeNumber = DEFAULT_FLIGHT_MODE_NUMBER;
         manualSettingsObj->setData(manualSettingsData);
     }
 }
@@ -1736,4 +1836,11 @@ void ConfigInputWidget::resetActuatorSettings()
         }
         actuatorSettingsObj->setData(actuatorSettingsData);
     }
+}
+
+void ConfigInputWidget::forceOneFlightMode()
+{
+    manualSettingsData = manualSettingsObj->getData();
+    manualSettingsData.FlightModeNumber = 1;
+    manualSettingsObj->setData(manualSettingsData);
 }

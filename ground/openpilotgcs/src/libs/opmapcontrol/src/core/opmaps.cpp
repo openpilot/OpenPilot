@@ -103,6 +103,12 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             QNetworkReply *reply;
             QNetworkRequest qheader;
             QNetworkAccessManager network;
+            // This SSL Hack is half assed... technically bad *security* joojoo.
+            // Required due to a QT5 bug on linux and Mac
+            //
+            QSslConfiguration conf = qheader.sslConfiguration();
+            conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+            qheader.setSslConfiguration(conf);
             network.setProxy(Proxy);
 #ifdef DEBUG_GMAPS
             qDebug() << "Try Tile from the Internet";
@@ -196,8 +202,10 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
 	    }
 
 	    qDebug() << "Finished?" << reply->error() << " abort?" << (time.elapsed() > Timeout * 6);
+	    // If you are seeing Error 6 here you are dealing with a QT SSL Bug!!! 
 
 	    if ((reply->error() != QNetworkReply::NoError) | (time.elapsed() > Timeout * 6)) {
+		qDebug() << "reply error: " << reply->error();
 		return ret;
 	    }
 	    else

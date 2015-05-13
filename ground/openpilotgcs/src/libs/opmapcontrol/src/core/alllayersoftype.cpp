@@ -55,6 +55,13 @@ QVector<MapType::Types> AllLayersOfType::GetAllLayersOfType(const MapType::Types
         }
         break;
 
+        case MapType::OpenStreetMapSurferTerrain:
+        {
+            types.append(MapType::OpenStreetMapSurfer);
+            types.append(MapType::OpenStreetMapSurferTerrain);
+        }
+        break;
+
         case MapType::ArcGIS_MapsLT_Map_Hybrid:
         {
             types.append(MapType::ArcGIS_MapsLT_OrtoFoto);

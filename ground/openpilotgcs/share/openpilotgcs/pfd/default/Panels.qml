@@ -536,7 +536,8 @@ Item {
             anchors.fill: parent
 
             TooltipArea {
-                  text: "Reset consumed energy"
+               text: "Reset consumed energy"
+               visible: display_bat == true ? 1 : 0
             }
 
             MouseArea { 
@@ -594,7 +595,8 @@ Item {
             //color: panels.batColors[SystemAlarms.Alarm_Battery]
 
             TooltipArea {
-                  text: "Reset consumed energy"
+               text: "Reset consumed energy"
+               visible: display_bat == true ? 1 : 0
             }
 
             MouseArea { 

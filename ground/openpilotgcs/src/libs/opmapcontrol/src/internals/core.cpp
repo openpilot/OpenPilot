@@ -295,7 +295,7 @@ void Core::SetMapType(const MapType::Types &value)
         {
             if (Projection()->Type() != "PlateCarreeProjectionPergo") {
                 SetProjection(new PlateCarreeProjectionPergo());
-                maxzoom = 17;
+                maxzoom = 18;
             }
         }
         break;

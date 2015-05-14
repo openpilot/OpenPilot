@@ -73,6 +73,8 @@ QString UrlFactory::TileXYToQuadKey(const int &tileX, const int &tileY, const in
 }
 int UrlFactory::GetServerNum(const Point &pos, const int &max) const
 {
+    qDebug() << QString("%1").arg(pos.X());
+    qDebug() << QString("%1").arg(pos.Y());
     return (pos.X() + 2 * pos.Y()) % max;
 }
 void UrlFactory::setIsCorrectGoogleVersions(bool value)
@@ -475,9 +477,11 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString y = QString("%1").arg(QString::number(pos.Y()), 9, (QChar)'0');
         y.insert(3, "/").insert(7, "/");
         // "http://map03.pergo.com.tr/tile/2/000/000/003/000/000/002.png"
-	// This has changed map03 does not exist. (neither does map3) Servers have changed to map1 and map2? 
-        qDebug() << QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4)).arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
-        return QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4)).arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
+	// This has changed map03 does not exist. (neither does map3) Servers have changed to map1 and map2 or maps? 
+
+        qDebug() << QString("http://maps.pergo.com.tr/tile/%1/%2/%3.png").arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
+        return QString("http://maps.pergo.com.tr/tile/%1/%2/%3.png").arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
+
     }
     break;
     case MapType::SigPacSpainMap:

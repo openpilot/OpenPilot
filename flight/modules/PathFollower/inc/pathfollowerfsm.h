@@ -34,6 +34,7 @@
 extern "C" {
 #include <stabilizationdesired.h>
 }
+#include <pidcontroldowncallback.h>
 
 typedef enum {
     PFFSM_STATE_INACTIVE = 0, // Inactive state is the initialised state on startup
@@ -42,7 +43,7 @@ typedef enum {
     PFFSM_STATE_ABORT // Abort on error
 } PathFollowerFSMState_T;
 
-class PathFollowerFSM {
+class PathFollowerFSM : public PIDControlDownCallback {
 public:
     // PathFollowerFSM() {};
     virtual void Inactive(void) {}

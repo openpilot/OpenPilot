@@ -470,7 +470,7 @@ static void parse_ubx_mon_ver(struct UBXPacket *ubx, __attribute__((unused)) GPS
                    ((ubxHwVersion >= 70000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
     // send sensor type right now because on UBX NEMA we don't get a full set of messages
     // and we want to be able to see sensor type even on UBX NEMA GPS's
-    GPSPositionSensorSensorTypeSet((uint8_t *) &sensorType);
+    GPSPositionSensorSensorTypeSet((uint8_t *)&sensorType);
 }
 
 static void parse_ubx_op_sys(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)

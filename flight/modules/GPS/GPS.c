@@ -50,7 +50,7 @@
 #include "UBX.h"
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
 #include "inc/ubx_autoconfig.h"
-//#include "../../libraries/inc/fifo_buffer.h"
+// #include "../../libraries/inc/fifo_buffer.h"
 #endif
 
 #include <pios_instrumentation_helper.h>
@@ -196,7 +196,7 @@ int32_t GPSInitialize(void)
     GPSSettingsGet(&gpsSettings);
     // must updateHwSettings() before updateGpsSettings() so baud rate is set before GPS serial code starts running
     updateHwSettings(0);
-#else
+#else /* if defined(REVOLUTION) */
     if (gpsPort && gpsEnabled) {
         GPSPositionSensorInitialize();
         GPSVelocitySensorInitialize();
@@ -294,9 +294,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
         // need to do this whether there is received data or not, or the status (e.g. gcs) is not always correct
         int32_t ac_status = ubx_autoconfig_get_status();
         static uint8_t lastStatus = GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED
-                                  + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING
-                                  + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE
-                                  + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR;
+                                    + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING
+                                    + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE
+                                    + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR;
         gpspositionsensor.AutoConfigStatus =
             ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
             ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
@@ -306,7 +306,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             GPSPositionSensorAutoConfigStatusSet(&gpspositionsensor.AutoConfigStatus);
             lastStatus = gpspositionsensor.AutoConfigStatus;
         }
-#endif
+#endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
 
         // This blocks the task until there is something on the buffer (or 100ms? passes)
         uint16_t cnt;
@@ -509,72 +509,71 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
     // since 9600 baud and lower are not usable, and are best left at NEMA, I could have coded it to do a factory reset
     // - if set to 9600 baud (or lower)
 
-   if (gpsPort) {
+    if (gpsPort) {
         HwSettingsGPSSpeedOptions speed;
- 
+
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
-       // use 9600 baud during startup if autoconfig is enabled
-       // that is the flag that the code should assumes a factory default baud rate
-       if (ev == NULL && gpsSettings.UbxAutoConfig != GPSSETTINGS_UBXAUTOCONFIG_DISABLED) {
-           speed = HWSETTINGS_GPSSPEED_9600;
-       }
-       else
+        // use 9600 baud during startup if autoconfig is enabled
+        // that is the flag that the code should assumes a factory default baud rate
+        if (ev == NULL && gpsSettings.UbxAutoConfig != GPSSETTINGS_UBXAUTOCONFIG_DISABLED) {
+            speed = HWSETTINGS_GPSSPEED_9600;
+        } else
 #endif
-       {
-           // Retrieve settings
-           HwSettingsGPSSpeedGet(&speed);
-       }
- 
-       // must always set the baud here, even if it looks like it is the same
-       // e.g. startup sets 9600 here, ubx_autoconfig sets 57600 there, then the user selects a change back to 9600 here
- 
-       // on    startup (ev == NULL) we must set the Revo port baud rate
-       // after startup (ev != NULL) we must set the Revo port baud rate only if autoconfig is disabled
-       // always we must set the Revo port baud rate if not using UBX
+        {
+            // Retrieve settings
+            HwSettingsGPSSpeedGet(&speed);
+        }
+
+        // must always set the baud here, even if it looks like it is the same
+        // e.g. startup sets 9600 here, ubx_autoconfig sets 57600 there, then the user selects a change back to 9600 here
+
+        // on    startup (ev == NULL) we must set the Revo port baud rate
+        // after startup (ev != NULL) we must set the Revo port baud rate only if autoconfig is disabled
+        // always we must set the Revo port baud rate if not using UBX
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
-       if (ev == NULL || gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED || gpsSettings.DataProtocol != GPSSETTINGS_DATAPROTOCOL_UBX)
+        if (ev == NULL || gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED || gpsSettings.DataProtocol != GPSSETTINGS_DATAPROTOCOL_UBX)
 #endif
-       {
-           // Set Revo port speed
-           switch (speed) {
-           case HWSETTINGS_GPSSPEED_2400:
-               PIOS_COM_ChangeBaud(gpsPort, 2400);
-               break;
-           case HWSETTINGS_GPSSPEED_4800:
-               PIOS_COM_ChangeBaud(gpsPort, 4800);
-               break;
-           case HWSETTINGS_GPSSPEED_9600:
-               PIOS_COM_ChangeBaud(gpsPort, 9600);
-               break;
-           case HWSETTINGS_GPSSPEED_19200:
-               PIOS_COM_ChangeBaud(gpsPort, 19200);
-               break;
-           case HWSETTINGS_GPSSPEED_38400:
-               PIOS_COM_ChangeBaud(gpsPort, 38400);
-               break;
-           case HWSETTINGS_GPSSPEED_57600:
-               PIOS_COM_ChangeBaud(gpsPort, 57600);
-               break;
-           case HWSETTINGS_GPSSPEED_115200:
-               PIOS_COM_ChangeBaud(gpsPort, 115200);
-               break;
-           case HWSETTINGS_GPSSPEED_230400:
-               PIOS_COM_ChangeBaud(gpsPort, 230400);
-               break;
-           }
+        {
+            // Set Revo port speed
+            switch (speed) {
+            case HWSETTINGS_GPSSPEED_2400:
+                PIOS_COM_ChangeBaud(gpsPort, 2400);
+                break;
+            case HWSETTINGS_GPSSPEED_4800:
+                PIOS_COM_ChangeBaud(gpsPort, 4800);
+                break;
+            case HWSETTINGS_GPSSPEED_9600:
+                PIOS_COM_ChangeBaud(gpsPort, 9600);
+                break;
+            case HWSETTINGS_GPSSPEED_19200:
+                PIOS_COM_ChangeBaud(gpsPort, 19200);
+                break;
+            case HWSETTINGS_GPSSPEED_38400:
+                PIOS_COM_ChangeBaud(gpsPort, 38400);
+                break;
+            case HWSETTINGS_GPSSPEED_57600:
+                PIOS_COM_ChangeBaud(gpsPort, 57600);
+                break;
+            case HWSETTINGS_GPSSPEED_115200:
+                PIOS_COM_ChangeBaud(gpsPort, 115200);
+                break;
+            case HWSETTINGS_GPSSPEED_230400:
+                PIOS_COM_ChangeBaud(gpsPort, 230400);
+                break;
+            }
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
-           // even changing the baud rate will make it re-verify the sensor type
-           // that way the user can just try some baud rates and it when the sensor type is valid, the baud rate is correct
-           ubx_reset_sensor_type();
+            // even changing the baud rate will make it re-verify the sensor type
+            // that way the user can just try some baud rates and it when the sensor type is valid, the baud rate is correct
+            ubx_reset_sensor_type();
 #endif
-       }
+        }
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
-       else {
-           // it will never do this during startup because ev == NULL
-           ubx_autoconfig_set(NULL);
-       }
+        else {
+            // it will never do this during startup because ev == NULL
+            ubx_autoconfig_set(NULL);
+        }
 #endif
-   }
+    }
 }
 
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)

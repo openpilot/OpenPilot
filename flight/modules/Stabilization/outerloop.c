@@ -103,7 +103,33 @@ static void stabilizationOuterloopTask()
     float *stabilizationDesiredAxis = &stabilizationDesired.Roll;
     float *rateDesiredAxis = &rateDesired.Roll;
     int t;
-    float dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
+    float dT    = PIOS_DELTATIME_GetAverageSeconds(&timeval);
+
+    bool reinit = (StabilizationStatusOuterLoopToArray(enabled)[STABILIZATIONSTATUS_OUTERLOOP_THRUST] != previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST]);
+    previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST] = StabilizationStatusOuterLoopToArray(enabled)[STABILIZATIONSTATUS_OUTERLOOP_THRUST];
+#ifdef REVOLUTION
+    if (reinit && (previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST] == STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE ||
+                   previous_mode[STABILIZATIONSTATUS_OUTERLOOP_THRUST] == STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO)) {
+        // disable the altvario velocity control loop
+        stabilizationDisableAltitudeHold();
+    }
+#endif /* REVOLUTION */
+    switch (StabilizationStatusOuterLoopToArray(enabled)[STABILIZATIONSTATUS_OUTERLOOP_THRUST]) {
+#ifdef REVOLUTION
+    case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
+        rateDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST] = stabilizationAltitudeHold(stabilizationDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST], ALTITUDEHOLD, reinit);
+        break;
+    case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO:
+        rateDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST] = stabilizationAltitudeHold(stabilizationDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST], ALTITUDEVARIO, reinit);
+        break;
+#endif /* REVOLUTION */
+    case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+    case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
+    default:
+        rateDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST] = stabilizationDesiredAxis[STABILIZATIONSTATUS_OUTERLOOP_THRUST];
+        break;
+    }
+
 
     float local_error[3];
     {
@@ -151,151 +177,134 @@ static void stabilizationOuterloopTask()
     }
 
 
-    for (t = 0; t < AXES; t++) {
-        bool reinit = (StabilizationStatusOuterLoopToArray(enabled)[t] != previous_mode[t]);
+    for (t = STABILIZATIONSTATUS_OUTERLOOP_ROLL; t < STABILIZATIONSTATUS_OUTERLOOP_THRUST; t++) {
+        reinit = (StabilizationStatusOuterLoopToArray(enabled)[t] != previous_mode[t]);
         previous_mode[t] = StabilizationStatusOuterLoopToArray(enabled)[t];
 
-        if (t < STABILIZATIONSTATUS_OUTERLOOP_THRUST) {
-            if (reinit) {
-                stabSettings.outerPids[t].iAccumulator = 0;
-            }
-            switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
-            case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
-                rateDesiredAxis[t] = pid_apply(&stabSettings.outerPids[t], local_error[t], dT);
-                break;
-            case STABILIZATIONSTATUS_OUTERLOOP_RATTITUDE:
-            {
-                float stickinput[3];
-                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
-                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
-                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
-                float rateDesiredAxisRate = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
-                // limit corrective rate to maximum rates to not give it overly large impact over manual rate when joined together
-                rateDesiredAxis[t] = boundf(pid_apply(&stabSettings.outerPids[t], local_error[t], dT),
-                                            -StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t],
-                                            StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t]
-                                            );
-                // Compute the weighted average rate desired
-                // Using max() rather than sqrt() for cpu speed;
-                // - this makes the stick region into a square;
-                // - this is a feature!
-                // - hold a roll angle and add just pitch without the stick sensitivity changing
-                float magnitude = fabsf(stickinput[t]);
-                if (t < 2) {
-                    magnitude = fmaxf(fabsf(stickinput[0]), fabsf(stickinput[1]));
-                }
-
-                // modify magnitude to move the Att to Rate transition to the place
-                // specified by the user
-                // we are looking for where the stick angle == transition angle
-                // and the Att rate equals the Rate rate
-                // that's where Rate x (1-StickAngle) [Attitude pulling down max X Ratt proportion]
-                // == Rate x StickAngle [Rate pulling up according to stick angle]
-                // * StickAngle [X Ratt proportion]
-                // so 1-x == x*x or x*x+x-1=0 where xE(0,1)
-                // (-1+-sqrt(1+4))/2 = (-1+sqrt(5))/2
-                // and quadratic formula says that is 0.618033989f
-                // I tested 14.01 and came up with .61 without even remembering this number
-                // I thought that moving the P,I, and maxangle terms around would change this value
-                // and that I would have to take these into account, but varying
-                // all P's and I's by factors of 1/2 to 2 didn't change it noticeably
-                // and varying maxangle from 4 to 120 didn't either.
-                // so for now I'm not taking these into account
-                // while working with this, it occurred to me that Attitude mode,
-                // set up with maxangle=190 would be similar to Ratt, and it is.
-                #define STICK_VALUE_AT_MODE_TRANSITION 0.618033989f
-
-                // the following assumes the transition would otherwise be at 0.618033989f
-                // and THAT assumes that Att ramps up to max roll rate
-                // when a small number of degrees off of where it should be
-
-                // if below the transition angle (still in attitude mode)
-                // '<=' instead of '<' keeps rattitude_mode_transition_stick_position==1.0 from causing DZ
-                if (magnitude <= stabSettings.rattitude_mode_transition_stick_position) {
-                    magnitude *= STICK_VALUE_AT_MODE_TRANSITION / stabSettings.rattitude_mode_transition_stick_position;
-                } else {
-                    magnitude = (magnitude - stabSettings.rattitude_mode_transition_stick_position)
-                                * (1.0f - STICK_VALUE_AT_MODE_TRANSITION)
-                                / (1.0f - stabSettings.rattitude_mode_transition_stick_position)
-                                + STICK_VALUE_AT_MODE_TRANSITION;
-                }
-                rateDesiredAxis[t] = (1.0f - magnitude) * rateDesiredAxis[t] + magnitude * rateDesiredAxisRate;
-            }
+        if (reinit) {
+            stabSettings.outerPids[t].iAccumulator = 0;
+        }
+        switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
+        case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
+            rateDesiredAxis[t] = pid_apply(&stabSettings.outerPids[t], local_error[t], dT);
             break;
-            case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
-                // FIXME: local_error[] is rate - attitude for Weak Leveling
-                // The only ramifications are:
-                // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS
-                // Changing Rate mode max rate currently requires a change to Kp
-                // That would be changed to Attitude mode max angle affecting Kp
-                // Also does not take dT into account
-            {
-                float stickinput[3];
-                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
-                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
-                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
-                float rate_input    = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
-                float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
-                weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
-
-                // Compute desired rate as input biased towards leveling
-                rateDesiredAxis[t] = rate_input + weak_leveling;
+        case STABILIZATIONSTATUS_OUTERLOOP_RATTITUDE:
+        {
+            float stickinput[3];
+            stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
+            stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
+            stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
+            float rateDesiredAxisRate = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
+            // limit corrective rate to maximum rates to not give it overly large impact over manual rate when joined together
+            rateDesiredAxis[t] = boundf(pid_apply(&stabSettings.outerPids[t], local_error[t], dT),
+                                        -StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t],
+                                        StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t]
+                                        );
+            // Compute the weighted average rate desired
+            // Using max() rather than sqrt() for cpu speed;
+            // - this makes the stick region into a square;
+            // - this is a feature!
+            // - hold a roll angle and add just pitch without the stick sensitivity changing
+            float magnitude = fabsf(stickinput[t]);
+            if (t < 2) {
+                magnitude = fmaxf(fabsf(stickinput[0]), fabsf(stickinput[1]));
             }
-            break;
-            case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
-                rateDesiredAxis[t] = stabilizationDesiredAxis[t]; // default for all axes
-                // now test limits for pitch and/or roll
-                if (t == 1) { // pitch
-                    if (attitudeState.Pitch < -stabSettings.stabBank.PitchMax) {
-                        // attitude exceeds pitch max.
-                        // zero rate desired if also -ve
-                        if (rateDesiredAxis[t] < 0.0f) {
-                            rateDesiredAxis[t] = 0.0f;
-                        }
-                    } else if (attitudeState.Pitch > stabSettings.stabBank.PitchMax) {
-                        // attitude exceeds pitch max
-                        // zero rate desired if also +ve
-                        if (rateDesiredAxis[t] > 0.0f) {
-                            rateDesiredAxis[t] = 0.0f;
-                        }
+
+            // modify magnitude to move the Att to Rate transition to the place
+            // specified by the user
+            // we are looking for where the stick angle == transition angle
+            // and the Att rate equals the Rate rate
+            // that's where Rate x (1-StickAngle) [Attitude pulling down max X Ratt proportion]
+            // == Rate x StickAngle [Rate pulling up according to stick angle]
+            // * StickAngle [X Ratt proportion]
+            // so 1-x == x*x or x*x+x-1=0 where xE(0,1)
+            // (-1+-sqrt(1+4))/2 = (-1+sqrt(5))/2
+            // and quadratic formula says that is 0.618033989f
+            // I tested 14.01 and came up with .61 without even remembering this number
+            // I thought that moving the P,I, and maxangle terms around would change this value
+            // and that I would have to take these into account, but varying
+            // all P's and I's by factors of 1/2 to 2 didn't change it noticeably
+            // and varying maxangle from 4 to 120 didn't either.
+            // so for now I'm not taking these into account
+            // while working with this, it occurred to me that Attitude mode,
+            // set up with maxangle=190 would be similar to Ratt, and it is.
+#define STICK_VALUE_AT_MODE_TRANSITION 0.618033989f
+
+            // the following assumes the transition would otherwise be at 0.618033989f
+            // and THAT assumes that Att ramps up to max roll rate
+            // when a small number of degrees off of where it should be
+
+            // if below the transition angle (still in attitude mode)
+            // '<=' instead of '<' keeps rattitude_mode_transition_stick_position==1.0 from causing DZ
+            if (magnitude <= stabSettings.rattitude_mode_transition_stick_position) {
+                magnitude *= STICK_VALUE_AT_MODE_TRANSITION / stabSettings.rattitude_mode_transition_stick_position;
+            } else {
+                magnitude = (magnitude - stabSettings.rattitude_mode_transition_stick_position)
+                            * (1.0f - STICK_VALUE_AT_MODE_TRANSITION)
+                            / (1.0f - stabSettings.rattitude_mode_transition_stick_position)
+                            + STICK_VALUE_AT_MODE_TRANSITION;
+            }
+            rateDesiredAxis[t] = (1.0f - magnitude) * rateDesiredAxis[t] + magnitude * rateDesiredAxisRate;
+        }
+        break;
+        case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
+            // FIXME: local_error[] is rate - attitude for Weak Leveling
+            // The only ramifications are:
+            // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS
+            // Changing Rate mode max rate currently requires a change to Kp
+            // That would be changed to Attitude mode max angle affecting Kp
+            // Also does not take dT into account
+        {
+            float stickinput[3];
+            stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
+            stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
+            stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
+            float rate_input    = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
+            float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
+            weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
+
+            // Compute desired rate as input biased towards leveling
+            rateDesiredAxis[t] = rate_input + weak_leveling;
+        }
+        break;
+        case STABILIZATIONSTATUS_OUTERLOOP_DIRECTWITHLIMITS:
+            rateDesiredAxis[t] = stabilizationDesiredAxis[t]; // default for all axes
+            // now test limits for pitch and/or roll
+            if (t == 1) { // pitch
+                if (attitudeState.Pitch < -stabSettings.stabBank.PitchMax) {
+                    // attitude exceeds pitch max.
+                    // zero rate desired if also -ve
+                    if (rateDesiredAxis[t] < 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
                     }
-                } else if (t == 0) { // roll
-                    if (attitudeState.Roll < -stabSettings.stabBank.RollMax) {
-                        // attitude exceeds roll max.
-                        // zero rate desired if also -ve
-                        if (rateDesiredAxis[t] < 0.0f) {
-                            rateDesiredAxis[t] = 0.0f;
-                        }
-                    } else if (attitudeState.Roll > stabSettings.stabBank.RollMax) {
-                        // attitude exceeds roll max
-                        // zero rate desired if also +ve
-                        if (rateDesiredAxis[t] > 0.0f) {
-                            rateDesiredAxis[t] = 0.0f;
-                        }
+                } else if (attitudeState.Pitch > stabSettings.stabBank.PitchMax) {
+                    // attitude exceeds pitch max
+                    // zero rate desired if also +ve
+                    if (rateDesiredAxis[t] > 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
                     }
                 }
-                break;
+            } else if (t == 0) { // roll
+                if (attitudeState.Roll < -stabSettings.stabBank.RollMax) {
+                    // attitude exceeds roll max.
+                    // zero rate desired if also -ve
+                    if (rateDesiredAxis[t] < 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
+                    }
+                } else if (attitudeState.Roll > stabSettings.stabBank.RollMax) {
+                    // attitude exceeds roll max
+                    // zero rate desired if also +ve
+                    if (rateDesiredAxis[t] > 0.0f) {
+                        rateDesiredAxis[t] = 0.0f;
+                    }
+                }
+            }
+            break;
 
-            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
-            default:
-                rateDesiredAxis[t] = stabilizationDesiredAxis[t];
-                break;
-            }
-        } else {
-            switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
-#ifdef REVOLUTION
-            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
-                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEHOLD, reinit);
-                break;
-            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO:
-                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEVARIO, reinit);
-                break;
-#endif /* REVOLUTION */
-            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
-            default:
-                rateDesiredAxis[t] = stabilizationDesiredAxis[t];
-                break;
-            }
+        case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+        default:
+            rateDesiredAxis[t] = stabilizationDesiredAxis[t];
+            break;
         }
     }
 
@@ -314,7 +323,7 @@ static void stabilizationOuterloopTask()
         }
     }
 
-    // update cruisecontrol based on attitude
+// update cruisecontrol based on attitude
     cruisecontrol_compute_factor(&attitudeState, rateDesired.Thrust);
     stabSettings.monitor.rateupdates = 0;
 }

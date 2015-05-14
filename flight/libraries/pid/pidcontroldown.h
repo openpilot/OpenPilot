@@ -34,16 +34,20 @@ extern "C" {
 #include <pid.h>
 #include <stabilizationdesired.h>
 }
-#include "pathfollowerfsm.h"
+#include "pidcontroldowncallback.h"
 
 class PIDControlDown {
 public:
     PIDControlDown();
     ~PIDControlDown();
-    void Initialize(PathFollowerFSM *fsm);
+    void Initialize(PIDControlDownCallback *callback);
     void SetThrustLimits(float min_thrust, float max_thrust);
     void Deactivate();
     void Activate();
+    bool IsActive()
+    {
+        return mActive;
+    }
     void UpdateParameters(float kp, float ki, float kd, float beta, float dT, float velocityMax);
     void UpdateNeutralThrust(float neutral);
     void UpdateVelocitySetpoint(float setpoint);
@@ -58,6 +62,14 @@ public:
     void ControlPositionWithPath(struct path_status *progress);
     void UpdateBrakeVelocity(float startingVelocity, float dT, float brakeRate, float currentVelocity, float *updatedVelocity);
     void UpdateVelocityStateWithBrake(float pvDown, float path_time, float brakeRate);
+    void DisableNeutralThrustCalc()
+    {
+        mAllowNeutralThrustCalc = false;
+    }
+    void EnableNeutralThrustCalc()
+    {
+        mAllowNeutralThrustCalc = true;
+    }
 
 private:
     void setup_neutralThrustCalc();
@@ -69,7 +81,7 @@ private:
     float mVelocitySetpointCurrent;
     float mVelocityState;
     float mDownCommand;
-    PathFollowerFSM *mFSM;
+    PIDControlDownCallback *mCallback;
     float mNeutral;
     float mVelocityMax;
     struct pid PIDpos;
@@ -77,7 +89,6 @@ private:
     float mPositionState;
     float mMinThrust;
     float mMaxThrust;
-    uint8_t mActive;
 
     struct NeutralThrustEstimation {
         uint32_t count;
@@ -90,6 +101,8 @@ private:
         bool     have_correction;
     };
     struct NeutralThrustEstimation neutralThrustEst;
+    bool mActive;
+    bool mAllowNeutralThrustCalc;
 };
 
 #endif // PIDCONTROLDOWN_H

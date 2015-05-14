@@ -79,7 +79,8 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "SystemSettings" <<
         "RevoSettings" <<
         "MagState" <<
-        "FlightBatterySettings";
+        "FlightBatterySettings" <<
+        "ReceiverStatus";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

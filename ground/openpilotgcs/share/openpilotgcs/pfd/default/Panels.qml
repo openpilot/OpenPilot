@@ -913,6 +913,60 @@ Item {
     }
 
     SvgElementImage {
+        id: rx_quality_label
+        elementName: "rx-quality-label"
+        sceneSize: panels.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: oplm_bg.z+8
+
+        states: State {
+             name: "fading"
+             when: show_panels == true
+             PropertyChanges { target: rx_quality_label; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
+        }
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
+    }
+
+    SvgElementPositionItem {
+        id: rx_quality_text
+        sceneSize: panels.sceneSize
+        elementName: "rx-quality-text"
+        z: oplm_bg.z+9
+
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+
+        states: State {
+             name: "fading"
+             when: show_panels == true
+             PropertyChanges { target: rx_quality_text; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
+        }
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; easing.type: anim_type; easing.amplitude: anim_amplitude; easing.period: anim_period;  duration: duration_value }
+            }
+        }
+
+        Text {
+             text: ReceiverStatus.Quality > 0 ? ReceiverStatus.Quality+"%" : "?? %"
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: pt_bold.name
+                 pixelSize: Math.floor(parent.height * 1.4)
+                 weight: Font.DemiBold
+             }
+        }
+    }
+
+    SvgElementImage {
         id: oplm_mousearea
         elementName: "oplm-panel-mousearea"
         sceneSize: panels.sceneSize

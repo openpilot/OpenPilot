@@ -44,6 +44,7 @@ struct pios_usart_cfg {
     USART_InitTypeDef init;
     struct stm32_gpio rx;
     struct stm32_gpio tx;
+    struct stm32_gpio dtr;
     struct stm32_irq  irq;
 };
 

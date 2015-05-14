@@ -56,7 +56,7 @@ public:
     UrlFactory();
     ~UrlFactory();
     QString MakeImageUrl(const MapType::Types &type, const core::Point &pos, const int &zoom, const QString &language);
-    internals::PointLatLng GetLatLngFromGeodecoder(const QString &keywords, GeoCoderStatusCode::Types &status);
+    internals::PointLatLng GetLatLngFromGeodecoder(const QString &keywords, QString &status);
     Placemark GetPlacemarkFromGeocoder(internals::PointLatLng location);
     int Timeout;
 private:
@@ -79,7 +79,7 @@ protected:
     void setIsCorrectGoogleVersions(bool value);
     QString MakeGeocoderUrl(QString keywords);
     QString MakeReverseGeocoderUrl(internals::PointLatLng &pt, const QString &language);
-    internals::PointLatLng GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, GeoCoderStatusCode::Types &status);
+    internals::PointLatLng GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, QString &status);
     Placemark GetPlacemarkFromReverseGeocoderUrl(const QString &url, const bool &useCache);
 };
 }

@@ -376,49 +376,48 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
     }
 
     uint8_t processedBytes = (*position);
-    uint8_t count = 0;
 
     // stop processing as soon as a complete packet is received, error is encountered or buffer is processed entirely
-    while ((count = length - (*position)) > 0
+    while ((length > (*position))
            && iproc->state != UAVTALK_STATE_COMPLETE
            && iproc->state != UAVTALK_STATE_ERROR) {
         // Receive state machine
-        if (iproc->state == UAVTALK_STATE_SYNC &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_SYNC &&
             !UAVTalkProcess_SYNC(connection, iproc, rxbuffer, length, position)) {
             break;
         }
 
-        if (iproc->state == UAVTALK_STATE_TYPE &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_TYPE &&
             !UAVTalkProcess_TYPE(connection, iproc, rxbuffer, length, position)) {
             break;
         }
 
-        if (iproc->state == UAVTALK_STATE_SIZE &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_SIZE &&
             !UAVTalkProcess_SIZE(connection, iproc, rxbuffer, length, position)) {
             break;
         }
 
-        if (iproc->state == UAVTALK_STATE_OBJID &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_OBJID &&
             !UAVTalkProcess_OBJID(connection, iproc, rxbuffer, length, position)) {
             break;
         }
 
-        if (iproc->state == UAVTALK_STATE_INSTID &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_INSTID &&
             !UAVTalkProcess_INSTID(connection, iproc, rxbuffer, length, position)) {
             break;
         }
 
-        if (iproc->state == UAVTALK_STATE_TIMESTAMP &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_TIMESTAMP &&
             !UAVTalkProcess_TIMESTAMP(connection, iproc, rxbuffer, length, position)) {
             break;
         }
 
-        if (iproc->state == UAVTALK_STATE_DATA &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_DATA &&
             !UAVTalkProcess_DATA(connection, iproc, rxbuffer, length, position)) {
             break;
         }
 
-        if (iproc->state == UAVTALK_STATE_CS &&
+        if ((length > (*position)) && iproc->state == UAVTALK_STATE_CS &&
             !UAVTalkProcess_CS(connection, iproc, rxbuffer, length, position)) {
             break;
         }

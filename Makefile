@@ -113,6 +113,9 @@ endif
 # Include tools installers
 include $(ROOT_DIR)/make/tools.mk
 
+# Include third party builders if available
+-include $(ROOT_DIR)/make/3rdparty/3rdparty.mk
+
 # We almost need to consider autoconf/automake instead of this
 ifeq ($(UNAME), Linux)
     QT_SPEC = linux-g++
@@ -160,10 +163,10 @@ DIRS += $(UAVOBJGENERATOR_DIR)
 
 .PHONY: uavobjgenerator
 uavobjgenerator: | $(UAVOBJGENERATOR_DIR)
-	$(V1) ( cd $(UAVOBJGENERATOR_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="$(UAVOGEN_BUILD_CONF) $(UAVOGEN_SILENT)" && \
-	    $(MAKE) --no-print-directory -w ; \
-	)
+	$(V1) cd $(UAVOBJGENERATOR_DIR) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro \
+	    -spec $(QT_SPEC) -r CONFIG+=$(UAVOGEN_BUILD_CONF) CONFIG+=$(UAVOGEN_SILENT) && \
+	    $(MAKE) --no-print-directory -w
 
 UAVOBJ_TARGETS := gcs flight python matlab java wireshark
 
@@ -206,10 +209,9 @@ export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 DIRS += $(OPGCSSYNTHDIR)
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare gpsplatinum
+ALL_BOARDS    := oplinkmini revolution osd revoproto simposix discoveryf4bare gpsplatinum
 
 # Short names of each board (used to display board name in parallel builds)
-coptercontrol_short    := 'cc  '
 oplinkmini_short       := 'oplm'
 revolution_short       := 'revo'
 osd_short              := 'osd '
@@ -469,9 +471,9 @@ OPENPILOTGCS_MAKEFILE := $(OPENPILOTGCS_DIR)/Makefile
 
 .PHONY: openpilotgcs_qmake
 openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
-	$(V1) ( cd $(OPENPILOTGCS_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
-	)
+	$(V1) cd $(OPENPILOTGCS_DIR) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro \
+	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)
 
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
@@ -481,6 +483,8 @@ openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
 openpilotgcs_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(OPENPILOTGCS_DIR))"
 	$(V1) [ ! -d "$(OPENPILOTGCS_DIR)" ] || $(RM) -r "$(OPENPILOTGCS_DIR)"
+
+
 
 ################################
 #
@@ -495,9 +499,9 @@ UPLOADER_MAKEFILE := $(UPLOADER_DIR)/Makefile
 
 .PHONY: uploader_qmake
 uploader_qmake $(UPLOADER_MAKEFILE): | $(UPLOADER_DIR)
-	$(V1) ( cd $(UPLOADER_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
-	) 
+	$(V1) cd $(UPLOADER_DIR) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro \
+	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)
 
 .PHONY: uploader
 uploader: $(UPLOADER_MAKEFILE)
@@ -711,7 +715,7 @@ $(OPFW_RESOURCE): $(FW_TARGETS) | $(OPGCSSYNTHDIR)
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
 ifneq ($(strip $(filter opfw_resource all all_fw all_flight package,$(MAKECMDGOALS))),)
-    $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
+$(OPENPILOTGCS_MAKEFILE): $(OPFW_RESOURCE)
 endif
 
 # Packaging targets: package

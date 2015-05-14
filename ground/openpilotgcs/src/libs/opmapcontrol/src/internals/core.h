@@ -266,7 +266,7 @@ public:
 
     void OnMapClose(); // TODO had as slot
 
-    GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const & keys);
+    QString SetCurrentPositionByKeywords(QString const & keys);
 
     RectLatLng CurrentViewArea();
 

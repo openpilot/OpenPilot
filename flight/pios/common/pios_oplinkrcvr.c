@@ -34,6 +34,7 @@
 
 #include <uavobjectmanager.h>
 #include <oplinkreceiver.h>
+#include <oplinkstatus.h>
 #include <pios_oplinkrcvr_priv.h>
 
 static OPLinkReceiverData oplinkreceiverdata;
@@ -41,9 +42,11 @@ static OPLinkReceiverData oplinkreceiverdata;
 /* Provide a RCVR driver */
 static int32_t PIOS_OPLinkRCVR_Get(uint32_t rcvr_id, uint8_t channel);
 static void PIOS_oplinkrcvr_Supervisor(uint32_t ppm_id);
+static uint8_t PIOS_OPLinkRCVR_Quality_Get(uint32_t oplinkrcvr_id);
 
 const struct pios_rcvr_driver pios_oplinkrcvr_rcvr_driver = {
-    .read = PIOS_OPLinkRCVR_Get,
+    .read        = PIOS_OPLinkRCVR_Get,
+    .get_quality = PIOS_OPLinkRCVR_Quality_Get
 };
 
 /* Local Variables */
@@ -184,6 +187,16 @@ static void PIOS_oplinkrcvr_Supervisor(uint32_t oplinkrcvr_id)
     }
 
     oplinkrcvr_dev->Fresh = false;
+}
+
+static uint8_t PIOS_OPLinkRCVR_Quality_Get(__attribute__((unused)) uint32_t oplinkrcvr_id)
+{
+    uint8_t oplink_quality;
+
+    OPLinkStatusLinkQualityGet(&oplink_quality);
+
+    /* link_status is in the range 0-128, so scale to a % */
+    return oplink_quality * 100 / 128;
 }
 
 #endif /* PIOS_INCLUDE_OPLINKRCVR */

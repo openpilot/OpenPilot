@@ -888,7 +888,7 @@ static void updateSettings(channelContext *channel)
 
     if (port) {
         // Retrieve settings
-        uint8_t speed;
+        HwSettingsTelemetrySpeedOptions speed;
         HwSettingsTelemetrySpeedGet(&speed);
 
         // Set port speed

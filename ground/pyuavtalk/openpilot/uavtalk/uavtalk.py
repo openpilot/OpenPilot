@@ -285,7 +285,7 @@ class UavTalk(object):
         
         self.txLock.acquire()
         
-        header = [SYNC, type | VERSION, 0, 0, 0, 0, 0, 0]
+        header = [SYNC, type | VERSION, 0, 0, 0, 0, 0, 0, 0, 0]
         
         length = HEADER_LENGTH
         if data is not None:

@@ -241,7 +241,11 @@ Item {
         elementName: "close-panel-mousearea"
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
-        z: close_bg.z+100 
+        z: close_bg.z+100
+
+        TooltipArea {
+            text: show_panels == true ? "Close panels" : "Open panels"
+        }
 
         MouseArea {
              id: hidedisp_close;
@@ -314,6 +318,10 @@ Item {
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: rc_input_bg.z+1
+
+        TooltipArea {
+            text: "RC panel"
+        }
 
         MouseArea {
              id: hidedisp_rcinput;
@@ -527,6 +535,10 @@ Item {
         Rectangle {
             anchors.fill: parent
 
+            TooltipArea {
+                  text: "Reset consumed energy"
+            }
+
             MouseArea { 
                id: reset_panel_consumed_energy_mouseArea; 
                anchors.fill: parent;
@@ -581,11 +593,15 @@ Item {
             anchors.fill: parent
             //color: panels.batColors[SystemAlarms.Alarm_Battery]
 
+            TooltipArea {
+                  text: "Reset consumed energy"
+            }
+
             MouseArea { 
                id: reset_panel_consumed_energy_mouseArea2; 
                anchors.fill: parent;
-               visible: display_bat == true ? 1 : 0
                cursorShape: Qt.PointingHandCursor; 
+               visible: display_bat == true ? 1 : 0
                onClicked: qmlWidget.resetConsumedEnergy();
             }
 
@@ -635,6 +651,10 @@ Item {
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: battery_bg.z+6
+
+        TooltipArea {
+            text: "Battery panel"
+        }
 
         MouseArea {
              id: hidedisp_battery;
@@ -816,8 +836,8 @@ Item {
             MouseArea {
                  id: idButton_oplm_mousearea;
                  anchors.fill: parent;
+                 cursorShape: Qt.PointingHandCursor;
                  visible: display_oplm == true ? 1 : 0
-                 cursorShape: display_oplm == true ? Qt.PointingHandCursor  : Qt.ArrowCursor
                  onClicked: select_oplm(index)
             }
 
@@ -896,6 +916,10 @@ Item {
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: oplm_bg.z
+
+        TooltipArea {
+            text: "Link panel"
+        }
 
         MouseArea {
              id: hidedisp_oplm;
@@ -1138,6 +1162,10 @@ Item {
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
+
+        TooltipArea {
+            text: "System panel"
+        }
 
         MouseArea {
              id: hidedisp_system;

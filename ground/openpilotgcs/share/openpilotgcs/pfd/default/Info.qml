@@ -84,6 +84,10 @@ Item {
     //
 
     property real bar_width: (info_bg.height + info_bg.width) / 110
+    property int satsInView: String(GPSSatellites.SatsInView).charCodeAt(0)
+    property variant gps_tooltip: "Altitude : "+GPSPositionSensor.Altitude +"m\n"+ 
+                                  "H/V/P DOP : "+GPSPositionSensor.HDOP+"/"+GPSPositionSensor.VDOP+"/"+GPSPositionSensor.PDOP+"m\n"+
+                                   satsInView+" Sats in view"
 
     Repeater {
         id: satNumberBar
@@ -97,6 +101,10 @@ Item {
             width: Math.round(bar_width)
             radius: width / 4
 
+            TooltipArea {
+               text: gps_tooltip
+            }
+
             x: Math.round((bar_width*4.5) + (bar_width * 1.6 * index))
             height: bar_width * index * 0.6
             y: (bar_width*8) - height
@@ -108,6 +116,10 @@ Item {
     SvgElementPositionItem {
         sceneSize: info.sceneSize
         elementName: "gps-mode-text"
+
+        TooltipArea {
+            text: gps_tooltip
+        }
 
         Text {
             property int satNumber : String(GPSPositionSensor.Satellites).charCodeAt(0)
@@ -127,6 +139,10 @@ Item {
         elementName: "gps-icon"
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
+
+        TooltipArea {
+            text: gps_tooltip
+        }
     }
 
     // Waypoint Info (Top)
@@ -370,6 +386,10 @@ Item {
         Rectangle {
             anchors.fill: parent
 
+            TooltipArea {
+                  text: "Reset consumed energy"
+            }
+
             MouseArea { 
                id: reset_consumed_energy_mouseArea; 
                anchors.fill: parent;
@@ -417,6 +437,10 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
         visible: SystemAlarms.Alarm_PathPlan != 1
+
+        TooltipArea {
+            text: "Reset distance counter"
+        }
 
         MouseArea { id: total_dist_mouseArea2; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: reset_distance()}
 

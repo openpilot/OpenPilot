@@ -60,6 +60,7 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "PathDesired" <<
         "AltitudeHoldDesired" <<
         "GPSPositionSensor" <<
+        "GPSSatellites" <<
         "GCSTelemetryStats" <<
         "SystemAlarms" <<
         "NedAccel" <<

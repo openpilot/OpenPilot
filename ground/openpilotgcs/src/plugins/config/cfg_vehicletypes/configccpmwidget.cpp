@@ -674,7 +674,6 @@ void ConfigCcpmWidget::UpdateMixer()
     if (throwConfigError(QString("HeliCP"))) {
         return;
     }
-
     GUIConfigDataUnion config = getConfigData();
 
     useCCPM   = !(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
@@ -1567,28 +1566,28 @@ bool ConfigCcpmWidget::throwConfigError(QString airframeType)
 
     bool error = false;
 
-    if ((m_aircraft->ccpmServoWChannel->currentIndex() == 0) && (m_aircraft->ccpmServoWChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoWChannel->currentIndex() == 0) && (m_aircraft->ccpmServoWChannel->isVisible())) {
         m_aircraft->ccpmServoWLabel->setText("<font color=red>" + m_aircraft->ccpmServoWLabel->text() + "</font>");
         error = true;
     } else {
         m_aircraft->ccpmServoWLabel->setText(QTextEdit(m_aircraft->ccpmServoWLabel->text()).toPlainText());
     }
 
-    if ((m_aircraft->ccpmServoXChannel->currentIndex() == 0) && (m_aircraft->ccpmServoXChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoXChannel->currentIndex() == 0) && (m_aircraft->ccpmServoXChannel->isVisible())) {
         m_aircraft->ccpmServoXLabel->setText("<font color=red>" + m_aircraft->ccpmServoXLabel->text() + "</font>");
         error = true;
     } else {
         m_aircraft->ccpmServoXLabel->setText(QTextEdit(m_aircraft->ccpmServoXLabel->text()).toPlainText());
     }
 
-    if ((m_aircraft->ccpmServoYChannel->currentIndex() == 0) && (m_aircraft->ccpmServoYChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoYChannel->currentIndex() == 0) && (m_aircraft->ccpmServoYChannel->isVisible())) {
         m_aircraft->ccpmServoYLabel->setText("<font color=red>" + m_aircraft->ccpmServoYLabel->text() + "</font>");
         error = true;
     } else {
         m_aircraft->ccpmServoYLabel->setText(QTextEdit(m_aircraft->ccpmServoYLabel->text()).toPlainText());
     }
 
-    if ((m_aircraft->ccpmServoZChannel->currentIndex() == 0) && (m_aircraft->ccpmServoZChannel->isEnabled())) {
+    if ((m_aircraft->ccpmServoZChannel->currentIndex() == 0) && (m_aircraft->ccpmServoZChannel->isVisible())) {
         m_aircraft->ccpmServoZLabel->setText("<font color=red>" + m_aircraft->ccpmServoZLabel->text() + "</font>");
         error = true;
     } else {

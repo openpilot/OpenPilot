@@ -303,12 +303,12 @@ void NotifyPluginOptionsPage::addDynamicFieldWidget(UAVObjectField *objField)
         if (NotifyPluginOptionsPage::conditionValues.indexOf(_dynamicFieldCondition->currentText()) == NotifyPluginOptionsPage::inrange) {
             _dynamicFieldWidget = new QLineEdit(_form);
 
-            (static_cast<QLineEdit *>(_dynamicFieldWidget))->setInputMask("#999.99 : #999.99;");
+            (static_cast<QLineEdit *>(_dynamicFieldWidget))->setInputMask("#99999.99 : #99999.99;");
             (static_cast<QLineEdit *>(_dynamicFieldWidget))->setText("0000000000");
             (static_cast<QLineEdit *>(_dynamicFieldWidget))->setCursorPosition(0);
         } else {
             _dynamicFieldWidget = new QDoubleSpinBox(_form);
-            (dynamic_cast<QDoubleSpinBox *>(_dynamicFieldWidget))->setRange(-999.99, 999.99);
+            (dynamic_cast<QDoubleSpinBox *>(_dynamicFieldWidget))->setRange(-99999.99, 99999.99);
         }
         break;
     }

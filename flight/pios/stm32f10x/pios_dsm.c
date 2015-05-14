@@ -34,9 +34,12 @@
 
 #include "pios_dsm_priv.h"
 
+// *** UNTESTED CODE ***
+#undef DSM_LINK_QUALITY
 
 /* Forward Declarations */
 static int32_t PIOS_DSM_Get(uint32_t rcvr_id, uint8_t channel);
+static uint8_t PIOS_DSM_Quality_Get(uint32_t rcvr_id);
 static uint16_t PIOS_DSM_RxInCallback(uint32_t context,
                                       uint8_t *buf,
                                       uint16_t buf_len,
@@ -46,7 +49,8 @@ static void PIOS_DSM_Supervisor(uint32_t dsm_id);
 
 /* Local Variables */
 const struct pios_rcvr_driver pios_dsm_rcvr_driver = {
-    .read = PIOS_DSM_Get,
+    .read        = PIOS_DSM_Get,
+    .get_quality = PIOS_DSM_Quality_Get
 };
 
 enum pios_dsm_dev_magic {
@@ -60,11 +64,14 @@ struct pios_dsm_state {
     uint8_t  failsafe_timer;
     uint8_t  frame_found;
     uint8_t  byte_count;
-#ifdef DSM_LOST_FRAME_COUNTER
     uint8_t  frames_lost_last;
-    uint16_t frames_lost;
-#endif
+    float    quality;
 };
+
+/* With an DSM frame rate of 11ms (90Hz) averaging over 18 samples
+ * gives about a 200ms response.
+ */
+#define DSM_FL_WEIGHTED_AVE 18
 
 struct pios_dsm_dev {
     enum pios_dsm_dev_magic   magic;
@@ -164,10 +171,8 @@ static void PIOS_DSM_ResetState(struct pios_dsm_dev *dsm_dev)
     state->receive_timer    = 0;
     state->failsafe_timer   = 0;
     state->frame_found      = 0;
-#ifdef DSM_LOST_FRAME_COUNTER
+    state->quality = 0.0f;
     state->frames_lost_last = 0;
-    state->frames_lost      = 0;
-#endif
     PIOS_DSM_ResetChannels(dsm_dev);
 }
 
@@ -183,13 +188,24 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
     static uint8_t resolution    = 11;
     uint32_t channel_log = 0;
 
-#ifdef DSM_LOST_FRAME_COUNTER
+    // *** UNTESTED CODE ***
+#ifdef DSM_LINK_QUALITY
     /* increment the lost frame counter */
     uint8_t frames_lost = state->received_data[0];
-    state->frames_lost += (frames_lost - state->frames_lost_last);
-    state->frames_lost_last = frames_lost;
-#endif
 
+    /* We only get a lost frame count when the next good frame comes in */
+    /* Present quality as a weighted average of good frames */
+    /* First consider the bad frames */
+    for (int i = 0; i < frames_lost - state->frames_lost_last; i++) {
+        state->quality = (state->quality * (DSM_FL_WEIGHTED_AVE - 1)) /
+                         DSM_FL_WEIGHTED_AVE;
+    }
+    /* And now the good frame */
+    state->quality = ((state->quality * (DSM_FL_WEIGHTED_AVE - 1)) +
+                      100) / DSM_FL_WEIGHTED_AVE;
+
+    state->frames_lost_last = frames_lost;
+#endif /* DSM_LINK_QUALITY */
 
     /* unroll channels */
     uint8_t *s    = &(state->received_data[2]);
@@ -237,11 +253,6 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
             channel_log |= (1 << channel_num);
         }
     }
-
-#ifdef DSM_LOST_FRAME_COUNTER
-    /* put lost frames counter into the last channel for debugging */
-    state->channel_data[PIOS_DSM_NUM_INPUTS - 1] = state->frames_lost;
-#endif
 
     /* all channels processed */
     return 0;
@@ -404,6 +415,19 @@ static void PIOS_DSM_Supervisor(uint32_t dsm_id)
         PIOS_DSM_ResetChannels(dsm_dev);
         state->failsafe_timer = 0;
     }
+}
+
+static uint8_t PIOS_DSM_Quality_Get(uint32_t dsm_id)
+{
+    struct pios_dsm_dev *dsm_dev = (struct pios_dsm_dev *)dsm_id;
+
+    bool valid = PIOS_DSM_Validate(dsm_dev);
+
+    PIOS_Assert(valid);
+
+    struct pios_dsm_state *state = &(dsm_dev->state);
+
+    return (uint8_t)(state->quality + 0.5f);
 }
 
 #endif /* PIOS_INCLUDE_DSM */

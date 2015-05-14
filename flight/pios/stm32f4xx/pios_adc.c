@@ -99,10 +99,11 @@ static void init_dma(void);
 static void init_adc(void);
 #endif
 
-struct dma_config {
+struct pios_adc_pin_config {
     GPIO_TypeDef *port;
     uint32_t     pin;
     uint32_t     channel;
+    bool initialize;
 };
 
 struct adc_accumulator {
@@ -111,7 +112,7 @@ struct adc_accumulator {
 };
 
 #if defined(PIOS_INCLUDE_ADC)
-static const struct dma_config config[] = PIOS_DMA_PIN_CONFIG;
+static const struct pios_adc_pin_config config[] = PIOS_DMA_PIN_CONFIG;
 #define PIOS_ADC_NUM_PINS (sizeof(config) / sizeof(config[0]))
 
 static struct adc_accumulator accumulator[PIOS_ADC_NUM_PINS];
@@ -123,18 +124,11 @@ static uint16_t adc_raw_buffer[2][PIOS_ADC_MAX_SAMPLES][PIOS_ADC_NUM_PINS];
 #if defined(PIOS_INCLUDE_ADC)
 static void init_pins(void)
 {
-    /* Setup analog pins */
-    GPIO_InitTypeDef GPIO_InitStructure;
-
-    GPIO_StructInit(&GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;
     for (uint32_t i = 0; i < PIOS_ADC_NUM_PINS; ++i) {
-        if (config[i].port == NULL) {
+        if (!config[i].initialize) {
             continue;
         }
-        GPIO_InitStructure.GPIO_Pin = config[i].pin;
-        GPIO_Init(config[i].port, &GPIO_InitStructure);
+        PIOS_ADC_PinSetup(i);
     }
 }
 
@@ -454,6 +448,19 @@ void PIOS_ADC_DMA_Handler(void)
 #endif
 }
 
+void PIOS_ADC_PinSetup(uint32_t pin)
+{
+    if (config[pin].port != NULL && pin < PIOS_ADC_NUM_PINS) {
+        /* Setup analog pin */
+        GPIO_InitTypeDef GPIO_InitStructure;
+
+        GPIO_StructInit(&GPIO_InitStructure);
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;
+        GPIO_InitStructure.GPIO_Pin   = config[pin].pin;
+        GPIO_Init(config[pin].port, &GPIO_InitStructure);
+    }
+}
 #endif /* PIOS_INCLUDE_ADC */
 
 /**

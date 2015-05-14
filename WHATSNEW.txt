@@ -1,3 +1,22 @@
+--- RELEASE-15.02.02 ---
+This release fixes a bug that prevents revo onboard mag to work correctly.
+
+Release Notes - OpenPilot - Version RELEASE-15.02.02
+
+The full list of bugfixes in this release is accessible here:
+https://progress.openpilot.org/issues/?filter=12262
+
+** Bug
+    * [OP-1820] - fix onboard mag orientation
+    * [OP-1821] - Tricopter tail servo wrong speed on wizard
+    * [OP-1827] - Version ID wrong in Windows uninstaller
+    * [OP-1857] - PPM on Flexi does not work on CC/CC3D
+
+** Task
+    * [OP-1831] - due to oneshot higher pid values ki now shows "red" warning in stabilization page 
+
+
+
 --- RELEASE-15.02.01 ---
 This release fixes an in important bug that may prevent failsafe to work correctly using CC3D/CC with a PWM receiver.
 

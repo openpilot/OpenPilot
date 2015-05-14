@@ -129,6 +129,10 @@ int opHID_hidapi::enumerate(struct hid_device_info * *current_device_pptr, int *
  */
 int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
 {
+    Q_UNUSED(max);
+    Q_UNUSED(usage_page);
+    Q_UNUSED(usage);
+
     int devices_found = false;
     struct hid_device_info *current_device_ptr    = NULL;
     struct hid_device_info *tmp_device_ptr        = NULL;

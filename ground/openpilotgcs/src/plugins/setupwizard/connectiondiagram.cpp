@@ -81,10 +81,6 @@ void ConnectionDiagram::setupGraphicsScene()
         QList<QString> elementsToShow;
 
         switch (m_configSource->getControllerType()) {
-        case VehicleConfigurationSource::CONTROLLER_CC:
-        case VehicleConfigurationSource::CONTROLLER_CC3D:
-            elementsToShow << "controller-cc";
-            break;
         case VehicleConfigurationSource::CONTROLLER_REVO:
             elementsToShow << "controller-revo";
             break;
@@ -164,14 +160,6 @@ void ConnectionDiagram::setupGraphicsScene()
         QString prefix = "";
         QString suffix = "";
         switch (m_configSource->getControllerType()) {
-        case VehicleConfigurationSource::CONTROLLER_CC:
-        case VehicleConfigurationSource::CONTROLLER_CC3D:
-            prefix = "cc-";
-            if (m_configSource->getEscType() == VehicleConfigurationSource::ESC_ONESHOT ||
-                m_configSource->getEscType() == VehicleConfigurationSource::ESC_SYNCHED) {
-                suffix = "-oneshot";
-            }
-            break;
         case VehicleConfigurationSource::CONTROLLER_REVO:
             prefix = "revo-";
             break;

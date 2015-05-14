@@ -46,7 +46,7 @@
 
 #define CALIBRATION_IDLE_MS                   2000   // Time to wait before calibrating, in [ms]
 #define CALIBRATION_COUNT_MS                  2000   // Time to spend calibrating, in [ms]
-#define ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS 100 // low pass filter
+#define ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS 256 // low pass filter
 
 // Private types
 
@@ -104,9 +104,10 @@ void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsDa
         }
     }
     sensor.zeroPoint = airspeedSettings->ZeroPoint;
+    sensor.scale     = airspeedSettings->Scale;
 
-    // Filter CAS
-    float alpha = airspeedSettings->SamplePeriod / (airspeedSettings->SamplePeriod + ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS); // Low pass filter.
+    // Filter CAS : airspeedSettings->SamplePeriod value is 0 - 255 range
+    float alpha = 1 - (airspeedSettings->SamplePeriod / ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS); // Low pass filter.
 
     airspeedSensor->CalibratedAirspeed = PIOS_MPXV_CalcAirspeed(&sensor, airspeedSensor->SensorValue) * (alpha) + airspeedSensor->CalibratedAirspeed * (1.0f - alpha);
     airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;

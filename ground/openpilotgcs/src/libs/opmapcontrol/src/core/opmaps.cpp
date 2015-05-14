@@ -153,15 +153,6 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             }
             break;
 
-            case MapType::YahooHybrid:
-            case MapType::YahooLabels:
-            case MapType::YahooMap:
-            case MapType::YahooSatellite:
-            {
-                qheader.setRawHeader("Referrer", "http://maps.yahoo.com/");
-            }
-            break;
-
             case MapType::ArcGIS_MapsLT_Map_Labels:
             case MapType::ArcGIS_MapsLT_Map:
             case MapType::ArcGIS_MapsLT_OrtoFoto:

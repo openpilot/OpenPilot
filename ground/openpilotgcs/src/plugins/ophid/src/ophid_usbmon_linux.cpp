@@ -26,7 +26,6 @@
  */
 
 #include "ophid_usbmon.h"
-#include <QDebug>
 #include "ophid_const.h"
 
 
@@ -41,6 +40,8 @@
  */
 void printPortInfo(struct udev_device *dev)
 {
+    Q_UNUSED(dev);
+
     OPHID_DEBUG("   Node: %s", udev_device_get_devnode(dev));
     OPHID_DEBUG("   Subsystem: %s", udev_device_get_subsystem(dev));
     OPHID_DEBUG("   Devtype: %s", udev_device_get_devtype(dev));
@@ -73,7 +74,7 @@ void USBMonitor::deviceEventReceived()
         // this->monitorNotifier->setEnabled(0);
         QString action  = QString(udev_device_get_action(dev));
         QString devtype = QString(udev_device_get_devtype(dev));
-        qDebug() << "[DEBUG] Action: " << action << " device: " << devtype;
+        OPHID_DEBUG("Action: %s device: %s", qPrintable(action), qPrintable(devtype));
         if (action == "add" && devtype == "usb_device") {
             printPortInfo(dev);
             emit deviceDiscovered(makePortInfo(dev));

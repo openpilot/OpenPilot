@@ -26,7 +26,8 @@
  */
 #include "urlfactory.h"
 #include <QRegExp>
-
+#include <QDomDocument>
+#include <QtXml>
 
 namespace core {
 const double UrlFactory::EarthRadiusKm = 6378.137; // WGS-84
@@ -97,6 +98,12 @@ void UrlFactory::TryCorrectGoogleVersions()
     if (CorrectGoogleVersions && !IsCorrectGoogleVersions()) {
         QNetworkReply *reply;
         QNetworkRequest qheader;
+	// This SSL Hack is half assed... technically bad *security* joojoo.
+	// Required due to a QT5 bug on linux and Mac
+	// 
+	QSslConfiguration conf = qheader.sslConfiguration();
+	conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+	qheader.setSslConfiguration(conf);
         QNetworkAccessManager network;
         QEventLoop q;
         QTimer tT;
@@ -109,7 +116,10 @@ void UrlFactory::TryCorrectGoogleVersions()
         qDebug() << "Correct GoogleVersion";
 #endif // DEBUG_URLFACTORY
        // setIsCorrectGoogleVersions(true);
-        QString url = "https://maps.google.com/maps?output=classic";
+        // QString url = "https://www.google.com/maps/@0,-0,7z?dg=dbrw&newdg=1";
+	// We need to switch to the Above url... the /lochp method will be depreciated soon
+	// https://productforums.google.com/forum/#!category-topic/maps/navigation/k6EFrp7J7Jk
+        QString url = "https://www.google.com/lochp";
 
         qheader.setUrl(QUrl(url));
         qheader.setRawHeader("User-Agent", UserAgent);
@@ -126,7 +136,12 @@ void UrlFactory::TryCorrectGoogleVersions()
 #endif // DEBUG_URLFACTORY
             return;
         }
+
         QString html = QString(reply->readAll());
+#ifdef DEBUG_URLFACTORY
+	qDebug() << html;
+#endif // DEBUG_URLFACTORY
+
         QRegExp reg("\"*https://mts0.google.com/vt/lyrs=m@(\\d*)", Qt::CaseInsensitive);
         if (reg.indexIn(html) != -1) {
             QStringList gc = reg.capturedTexts();
@@ -148,6 +163,7 @@ void UrlFactory::TryCorrectGoogleVersions()
             qDebug() << "TryCorrectGoogleVersions, VersionGoogleLabels: " << VersionGoogleLabels;
 #endif // DEBUG_URLFACTORY
         }
+
         reg = QRegExp("\"*https://khms0.google.com/kh/v=(\\d*)", Qt::CaseInsensitive);
         if (reg.indexIn(html) != -1) {
             QStringList gc = reg.capturedTexts();
@@ -157,6 +173,7 @@ void UrlFactory::TryCorrectGoogleVersions()
 
             qDebug() << "TryCorrectGoogleVersions, VersionGoogleSatellite: " << VersionGoogleSatellite;
         }
+
         reg = QRegExp("\"*https://mts0.google.com/vt/lyrs=t@(\\d*),r@(\\d*)", Qt::CaseInsensitive);
         if (reg.indexIn(html) != -1) {
             QStringList gc = reg.capturedTexts();
@@ -208,7 +225,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString sec2    = ""; // after &zoom=...
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
-
+        qDebug() << QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabels).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
         return QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabels).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
@@ -259,6 +276,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         TryCorrectGoogleVersions();
         // http://mt0.google.cn/vt/v=w2t.110&hl=zh-CN&gl=cn&x=12&y=6&z=4&s=Ga
 
+        qDebug() << QString("http://%1%2.google.cn/%3/imgtp=png32&lyrs=%4&hl=%5&gl=cn&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsChina).arg("zh-CN").arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
         return QString("http://%1%2.google.cn/%3/imgtp=png32&lyrs=%4&hl=%5&gl=cn&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsChina).arg("zh-CN").arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
@@ -318,37 +336,26 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         return QString("https://%1%2.gmaptiles.co.kr/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabelsKorea).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
-    case MapType::YahooMap:
-    {
-        return QString("http://maps%1.yimg.com/hx/tl?v=%2&.intl=%3&x=%4&y=%5&z=%6&r=1").arg(((GetServerNum(pos, 2)) + 1)).arg(VersionYahooMap).arg(language).arg(pos.X()).arg((((1 << zoom) >> 1) - 1 - pos.Y())).arg((zoom + 1));
-    }
-
-    case MapType::YahooSatellite:
-    {
-        return QString("http://maps%1.yimg.com/ae/ximg?v=%2&t=a&s=256&.intl=%3&x=%4&y=%5&z=%6&r=1").arg("3").arg(VersionYahooSatellite).arg(language).arg(pos.X()).arg(((1 << zoom) >> 1) - 1 - pos.Y()).arg(zoom + 1);
-    }
-    break;
-    case MapType::YahooLabels:
-    {
-        return QString("http://maps%1.yimg.com/hx/tl?v=%2&t=h&.intl=%3&x=%4&y=%5&z=%6&r=1").arg("1").arg(VersionYahooLabels).arg(language).arg(pos.X()).arg(((1 << zoom) >> 1) - 1 - pos.Y()).arg(zoom + 1);
-    }
-    break;
+    // *.yimg.com has been depreciated. "Here" is what Yahoo uses now. https://developer.here.com/rest-apis/documentation/enterprise-map-tile/topics/request-constructing.html
     case MapType::OpenStreetMap:
     {
         char letter = "abc"[GetServerNum(pos, 3)];
         return QString("http://%1.tile.openstreetmap.org/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
     }
     break;
+    // Need to update tile format to fit http://wiki.openstreetmap.org/wiki/Tile_servers
     case MapType::OpenStreetOsm:
     {
         char letter = "abc"[GetServerNum(pos, 3)];
-        return QString("http://%1.tah.openstreetmap.org/Tiles/tile/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
+        qDebug() << QString("http://%1.tile.openstreetmap.org/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
+        return QString("http://%1.tile.openstreetmap.org/%2/%3/%4.png").arg(letter).arg(zoom).arg(pos.X()).arg(pos.Y());
     }
     break;
     case MapType::OpenStreetMapSurfer:
     {
         // http://tiles1.mapsurfer.net/tms_r.ashx?x=37378&y=20826&z=16
 
+        qDebug() << QString("http://tiles1.mapsurfer.net/tms_r.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
         return QString("http://tiles1.mapsurfer.net/tms_r.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
     }
     break;
@@ -356,6 +363,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
     {
         // http://tiles2.mapsurfer.net/tms_t.ashx?x=9346&y=5209&z=14
 
+        qDebug() << QString("http://tiles2.mapsurfer.net/tms_t.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
         return QString("http://tiles2.mapsurfer.net/tms_t.ashx?x=%1&y=%2&z=%3").arg(pos.X()).arg(pos.Y()).arg(zoom);
     }
     break;
@@ -395,7 +403,8 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
     {
         // http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_ShadedRelief_World_2D/MapServer/tile/1/0/1.jpg
 
-        return QString("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_ShadedRelief_World_2D/MapServer/tile/%1/%2/%3").arg(zoom).arg(pos.Y()).arg(pos.X());
+        qDebug() << QString("http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/%1/%2/%3").arg(zoom).arg(pos.Y()).arg(pos.X());
+        return QString("http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/%1/%2/%3").arg(zoom).arg(pos.Y()).arg(pos.X());
     }
     break;
     case MapType::ArcGIS_Terrain:
@@ -414,6 +423,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         // return string.Format("http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto/MapServer/tile/{0}/{1}/{2}", zoom, pos.Y(), pos.X());
         // http://dc1.maps.lt/cache/mapslt_ortofoto_512/map/_alllayers/L03/R0000001d/C0000002a.jpg
         // TODO verificar
+        qDebug() << QString("http://dc1.maps.lt/cache/mapslt_ortofoto/map/_alllayers/L%1/R%2/C%3.jpg").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
         return QString("http://dc1.maps.lt/cache/mapslt_ortofoto/map/_alllayers/L%1/R%2/C%3.jpg").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
     }
     break;
@@ -426,6 +436,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         // http://dc1.maps.lt/cache/mapslt_512/map/_alllayers/L03/R0000001b/C00000029.png
         // TODO verificar
         // http://dc1.maps.lt/cache/mapslt/map/_alllayers/L02/R0000001c/C00000029.png
+        qDebug() << QString("http://dc1.maps.lt/cache/mapslt/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
         return QString("http://dc1.maps.lt/cache/mapslt/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
     }
     break;
@@ -435,6 +446,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         // return string.Format("http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto_overlay/MapServer/tile/{0}/{1}/{2}", zoom, pos.Y(), pos.X());
         // http://dc1.maps.lt/cache/mapslt_ortofoto_overlay_512/map/_alllayers/L03/R0000001d/C00000029.png
         // TODO verificar
+        qDebug() << QString("http://dc1.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
         return QString("http://dc1.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
     }
     break;
@@ -455,22 +467,33 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString y = QString("%1").arg(QString::number(pos.Y()), 9, (QChar)'0');
         y.insert(3, "/").insert(7, "/");
         // "http://map03.pergo.com.tr/tile/2/000/000/003/000/000/002.png"
+	// This has changed map03 does not exist. (neither does map3) Servers have changed to map1 and map2? 
         return QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4)).arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
     }
     break;
     case MapType::SigPacSpainMap:
     {
-        return QString("http://sigpac.mapa.es/kmlserver/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+	// http://sigpac.magrama.es/fega/h5visor/ is new server location 
+        qDebug() << QString("http://sigpac.mapa.es/kmlserver/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
+        return QString("http://sigpac.magrama.es/SDG/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
     }
     break;
 
     case MapType::YandexMapRu:
     {
+        /*  
+	    Used "oldmaps" to determine map types - https://old.maps.yandex.ru/?ll=-83.110960%2C40.091250&spn=7.745361%2C6.015476&z=7&l=map
+	    map: 'https:\/\/vec0%d.maps.yandex.net\/tiles?l=map&%c&%l',
+            sat: 'https:\/\/sat0%d.maps.yandex.net\/tiles?l=sat&%c&%l',
+            skl: 'https:\/\/vec0%d.maps.yandex.net\/tiles?l=skl&%c&%l',
+									*/
+
         QString server = "vec";
+        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.net/tiles?l=map&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
 
-        // http://vec01.maps.yandex.ru/tiles?l=map&v=2.10.2&x=1494&y=650&z=11
-
-        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.ru/tiles?l=map&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
+// Satllite maps are poor quality, but available. 
+//        QString server = "sat";
+//        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.net/tiles?l=sat&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
     }
     break;
     default:
@@ -492,23 +515,29 @@ void UrlFactory::GetSecGoogleWords(const Point &pos, QString &sec1, QString &sec
 QString UrlFactory::MakeGeocoderUrl(QString keywords)
 {
     QString key = keywords.replace(' ', '+');
-
-    return QString("http://maps.google.com/maps/geo?q=%1&output=csv&key=%2").arg(key).arg(GoogleMapsAPIKey);
+    // CSV output has been depreciated. API key is no longer needed. 
+    return QString("https://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address=%1").arg(key);
 }
 QString UrlFactory::MakeReverseGeocoderUrl(internals::PointLatLng &pt, const QString &language)
 {
-    return QString("http://maps.google.com/maps/geo?hl=%1&ll=%2,%3&output=csv&key=%4").arg(language).arg(QString::number(pt.Lat())).arg(QString::number(pt.Lng())).arg(GoogleMapsAPIKey);
+    // CSV output has been depreciated. API key is no longer needed. 
+    return QString("https://maps.googleapis.com/maps/api/geocode/xml?latlng=%1,%2").arg(QString::number(pt.Lat())).arg(QString::number(pt.Lng()));
 }
-internals::PointLatLng UrlFactory::GetLatLngFromGeodecoder(const QString &keywords, GeoCoderStatusCode::Types &status)
+internals::PointLatLng UrlFactory::GetLatLngFromGeodecoder(const QString &keywords, QString &status)
 {
     return GetLatLngFromGeocoderUrl(MakeGeocoderUrl(keywords), UseGeocoderCache, status);
 }
-internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, GeoCoderStatusCode::Types &status)
+
+QString latxml;
+QString lonxml;
+//QString status;
+
+internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, QString &status)
 {
 #ifdef DEBUG_URLFACTORY
     qDebug() << "Entered GetLatLngFromGeocoderUrl:";
 #endif // DEBUG_URLFACTORY
-    status = GeoCoderStatusCode::Unknow;
+    status = "ZERO_RESULTS";
     internals::PointLatLng ret(0, 0);
     QString urlEnd = url.mid(url.indexOf("geo?q=") + 6);
     urlEnd.replace(QRegExp(
@@ -529,6 +558,10 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
 #endif // DEBUG_URLFACTORY
         QNetworkReply *reply;
         QNetworkRequest qheader;
+        // Lame hack *SSL security == none, bypass QT bug
+        QSslConfiguration conf = qheader.sslConfiguration();
+        conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+        qheader.setSslConfiguration(conf);
         QNetworkAccessManager network;
         network.setProxy(Proxy);
         qheader.setUrl(QUrl(url));
@@ -552,11 +585,86 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
             return internals::PointLatLng(0, 0);
         }
         {
+            geo = reply->readAll();
 #ifdef DEBUG_URLFACTORY
             qDebug() << "GetLatLngFromGeocoderUrl:Reply ok";
+	    qDebug() << geo; // This is the response from the geocode request (no longer in CSV)
 #endif // DEBUG_URLFACTORY
-            geo = reply->readAll();
 
+	    // This is SOOOO horribly hackish, code duplication needs to go. Needed a quick fix. 
+	    QXmlStreamReader reader(geo);
+	    while(!reader.atEnd())
+	    {  
+  		reader.readNext();
+
+  		if(reader.isStartElement())
+  		{
+    		    if(reader.name() == "lat")
+    		    {		
+      			reader.readNext();
+      			if(reader.atEnd()) 
+				break;
+
+      			if(reader.isCharacters())
+      			{
+        		    QString text = reader.text().toString();
+			    qDebug() << text;
+			    latxml = text;
+			    break;
+      			}
+    		    }
+  	        }
+
+	     }
+
+	    while(!reader.atEnd())
+	    {  
+  		reader.readNext();
+
+  		if(reader.isStartElement())
+  		{
+    		    if(reader.name() == "lng")
+    		    {		
+      			reader.readNext();
+      			if(reader.atEnd()) 
+				break;
+
+      			if(reader.isCharacters())
+      			{
+        		    QString text = reader.text().toString();
+			    qDebug() << text;
+			    lonxml = text;
+			    break;
+      			}
+    		    }
+  	        }
+
+	     }
+
+	    QXmlStreamReader reader2(geo);
+	    while(!reader2.atEnd())
+	    {  
+  		reader2.readNext();
+
+  		if(reader2.isStartElement())
+  		{
+    		    if(reader2.name() == "status")
+    		    {		
+      			reader2.readNext();
+      			if(reader2.atEnd()) 
+				break;
+
+      			if(reader2.isCharacters())
+      			{
+        		    QString text = reader2.text().toString();
+			    qDebug() << text;
+			    status = text;
+			    break;
+      			}
+    		    }
+  	        }
+
+	     }
 
             // cache geocoding
             if (useCache && geo.startsWith("200")) {
@@ -567,23 +675,36 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
     }
 
 
-    // parse values
-    // true : 200,4,56.1451640,22.0681787
-    // false: 602,0,0,0
     {
-        QStringList values = geo.split(',');
-        if (values.count() == 4) {
-            status = (GeoCoderStatusCode::Types)QString(values[0]).toInt();
-            if (status == GeoCoderStatusCode::G_GEO_SUCCESS) {
-                double lat = QString(values[2]).toDouble();
-                double lng = QString(values[3]).toDouble();
+            if (status == "OK") {
+                double lat = QString(latxml).toDouble();
+                double lng = QString(lonxml).toDouble();
 
                 ret = internals::PointLatLng(lat, lng);
 #ifdef DEBUG_URLFACTORY
+                qDebug() << "Status is: " << status;
                 qDebug() << "Lat=" << lat << " Lng=" << lng;
 #endif // DEBUG_URLFACTORY
             }
-        }
+	    else if (status == "ZERO_RESULTS") {
+		qDebug() << "No results";
+	    }
+	    else if (status == "OVER_QUERY_LIMIT") {
+		qDebug() << "You are over quota on queries";
+	    }
+	    else if (status == "REQUEST_DENIED") {
+		qDebug() << "Request was denied";
+	    }
+	    else if (status == "INVALID_REQUEST") {
+		qDebug() << "Invalid request, missing address, lat long or location";
+	    }
+	    else if (status == "UNKNOWN_ERROR") {
+		qDebug() << "Some sort of server error.";
+	    }
+	    else
+	    {
+	        qDebug() << "UrlFactory loop error";
+	    }
     }
     return ret;
 }

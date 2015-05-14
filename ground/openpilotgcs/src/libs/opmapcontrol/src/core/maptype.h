@@ -52,11 +52,6 @@ public:
         OpenStreetMapSurfer  = 34,
         OpenStreetMapSurferTerrain = 35,
 
-        YahooMap            = 64,
-        YahooSatellite      = 128,
-        YahooLabels         = 256,
-        YahooHybrid         = 333,
-
         BingMap = 444,
         BingSatellite       = 555,
         BingHybrid          = 666,

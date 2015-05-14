@@ -112,7 +112,7 @@ static inline void matrix_mult_3x3f(float a[3][3], float b[3][3], float result[3
     result[2][2] = a[0][2] * b[2][0] + a[1][2] * b[2][1] + a[2][2] * b[2][2];
 }
 
-inline void matrix_inline_scale_3f(float a[3][3], float scale)
+static inline void matrix_inline_scale_3f(float a[3][3], float scale)
 {
     a[0][0] *= scale;
     a[0][1] *= scale;
@@ -127,7 +127,7 @@ inline void matrix_inline_scale_3f(float a[3][3], float scale)
     a[2][2] *= scale;
 }
 
-inline void rot_about_axis_x(const float rotation, float R[3][3])
+static inline void rot_about_axis_x(const float rotation, float R[3][3])
 {
     float s = sinf(rotation);
     float c = cosf(rotation);
@@ -145,7 +145,7 @@ inline void rot_about_axis_x(const float rotation, float R[3][3])
     R[2][2] = c;
 }
 
-inline void rot_about_axis_y(const float rotation, float R[3][3])
+static inline void rot_about_axis_y(const float rotation, float R[3][3])
 {
     float s = sinf(rotation);
     float c = cosf(rotation);
@@ -163,7 +163,7 @@ inline void rot_about_axis_y(const float rotation, float R[3][3])
     R[2][2] = c;
 }
 
-inline void rot_about_axis_z(const float rotation, float R[3][3])
+static inline void rot_about_axis_z(const float rotation, float R[3][3])
 {
     float s = sinf(rotation);
     float c = cosf(rotation);

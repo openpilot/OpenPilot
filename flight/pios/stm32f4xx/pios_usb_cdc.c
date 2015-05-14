@@ -40,6 +40,7 @@
 /* Implement COM layer driver API */
 static void PIOS_USB_CDC_RegisterTxCallback(uint32_t usbcdc_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USB_CDC_RegisterRxCallback(uint32_t usbcdc_id, pios_com_callback rx_in_cb, uint32_t context);
+static void PIOS_USB_CDC_RegisterCtrlLineCallback(uint32_t usbcdc_id, pios_com_callback_ctrl_line ctrl_line_cb, uint32_t context);
 static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, uint16_t tx_bytes_avail);
 static void PIOS_USB_CDC_RxStart(uint32_t usbcdc_id, uint16_t rx_bytes_avail);
 static bool PIOS_USB_CDC_Available(uint32_t usbcdc_id);
@@ -49,6 +50,7 @@ const struct pios_com_driver pios_usb_cdc_com_driver = {
     .rx_start   = PIOS_USB_CDC_RxStart,
     .bind_tx_cb = PIOS_USB_CDC_RegisterTxCallback,
     .bind_rx_cb = PIOS_USB_CDC_RegisterRxCallback,
+    .bind_ctrl_line_cb = PIOS_USB_CDC_RegisterCtrlLineCallback,
     .available  = PIOS_USB_CDC_Available,
 };
 
@@ -66,6 +68,8 @@ struct pios_usb_cdc_dev {
     uint32_t rx_in_context;
     pios_com_callback tx_out_cb;
     uint32_t tx_out_context;
+    pios_com_callback_ctrl_line ctrl_line_cb;
+    uint32_t ctrl_line_context;
 
     bool     usb_ctrl_if_enabled;
     bool     usb_data_if_enabled;
@@ -323,6 +327,23 @@ static void PIOS_USB_CDC_RegisterTxCallback(uint32_t usbcdc_id, pios_com_callbac
     usb_cdc_dev->tx_out_cb = tx_out_cb;
 }
 
+static void PIOS_USB_CDC_RegisterCtrlLineCallback(uint32_t usbcdc_id, pios_com_callback_ctrl_line ctrl_line_cb, uint32_t context)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
+
+    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
+
+    PIOS_Assert(valid);
+
+    /*
+     * Order is important in these assignments since ISR uses _cb
+     * field to determine if it's ok to dereference _cb and _context
+     */
+    usb_cdc_dev->ctrl_line_context = context;
+    usb_cdc_dev->ctrl_line_cb = ctrl_line_cb;
+}
+
+
 static bool PIOS_USB_CDC_CTRL_EP_IN_Callback(uint32_t usb_cdc_id, uint8_t epnum, uint16_t len);
 
 static void PIOS_USB_CDC_CTRL_IF_Init(uint32_t usb_cdc_id)
@@ -403,6 +424,11 @@ static bool PIOS_USB_CDC_CTRL_IF_Setup(uint32_t usb_cdc_id, struct usb_setup_req
             break;
         case USB_CDC_REQ_SET_CONTROL_LINE_STATE:
             control_line_state = req->wValue;
+            if (usb_cdc_dev->ctrl_line_cb) {
+                (usb_cdc_dev->ctrl_line_cb)(usb_cdc_dev->ctrl_line_context,
+                                            0xff,
+                                            control_line_state);
+            }
             break;
         default:
             /* Unhandled class request */

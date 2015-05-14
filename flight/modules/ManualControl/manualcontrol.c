@@ -108,6 +108,7 @@ static float thrustHi = 0.0f;
 #endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
+static FrameType_t frameType = FRAME_TYPE_MULTIROTOR;
 
 // Private functions
 static void configurationUpdatedCb(UAVObjEvent *ev);
@@ -116,6 +117,7 @@ static void manualControlTask(void);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, FlightModeSettingsData *modeSettings);
 #endif
+static void SettingsUpdatedCb(UAVObjEvent *ev);
 
 #define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
 
@@ -135,11 +137,14 @@ int32_t ManualControlStart()
     // clear alarms
     AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 
+    SettingsUpdatedCb(NULL);
+
     // Make sure unarmed on power up
-    armHandler(true);
+    armHandler(true, frameType);
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     takeOffLocationHandlerInit();
+
 #endif
     // Start main task
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
@@ -164,6 +169,8 @@ int32_t ManualControlInitialize()
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     VtolSelfTuningStatsInitialize();
     VtolPathFollowerSettingsInitialize();
+    VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
+    SystemSettingsConnectCallback(&SettingsUpdatedCb);
 #endif
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&manualControlTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_MANUALCONTROL, STACK_SIZE_BYTES);
 
@@ -171,13 +178,37 @@ int32_t ManualControlInitialize()
 }
 MODULE_INITCALL(ManualControlInitialize, ManualControlStart);
 
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    frameType = GetCurrentFrameType();
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    VtolPathFollowerSettingsTreatCustomCraftAsOptions TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
+
+
+    if (frameType == FRAME_TYPE_CUSTOM) {
+        switch (TreatCustomCraftAs) {
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
+            frameType = FRAME_TYPE_FIXED_WING;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
+            frameType = FRAME_TYPE_MULTIROTOR;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
+            frameType = FRAME_TYPE_GROUND;
+            break;
+        }
+    }
+#endif
+}
+
 /**
  * Module task
  */
 static void manualControlTask(void)
 {
     // Process Arming
-    armHandler(false);
+    armHandler(false, frameType);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     takeOffLocationHandler();
 #endif
@@ -366,9 +397,16 @@ static void manualControlTask(void)
         break;
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 
+    // During development the assistedcontrol implementation is optional and set
+    // set in stabi settings.  Once if we decide to always have this on, it can
+    // can be directly set here...i.e. set the flight mode assist as required.
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+    case FLIGHTSTATUS_FLIGHTMODE_LAND:
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
         newFlightModeAssist = isAssistedFlightMode(position, newMode, &modeSettings);
         if (newFlightModeAssist) {
+            // Set the default thrust state
             switch (newFlightModeAssist) {
             case FLIGHTSTATUS_FLIGHTMODEASSIST_GPSASSIST_PRIMARYTHRUST:
                 newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
@@ -381,28 +419,14 @@ static void manualControlTask(void)
                 newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL; // Effectively None
                 break;
             }
-
-            switch (newAssistedControlState) {
-            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE:
-                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
-                break;
-            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY:
-                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE;
-                break;
-            case FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD:
-                newAssistedControlState = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
-                break;
-            }
         }
         handler = &handler_PATHFOLLOWER;
         break;
 
     case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
     case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
     case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-    case FLIGHTSTATUS_FLIGHTMODE_LAND:
     case FLIGHTSTATUS_FLIGHTMODE_POI:
     case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         handler = &handler_PATHFOLLOWER;
@@ -462,7 +486,7 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
 {
     uint8_t flightModeAssistOption = STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NONE;
     uint8_t isAssistedFlag = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
-    uint8_t FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
+    StabilizationSettingsFlightModeAssistMapOptions FlightModeAssistMap[STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM];
 
     StabilizationSettingsFlightModeAssistMapGet(FlightModeAssistMap);
     if (position < STABILIZATIONSETTINGS_FLIGHTMODEASSISTMAP_NUMELEM) {
@@ -497,10 +521,15 @@ static uint8_t isAssistedFlightMode(uint8_t position, uint8_t flightMode, Flight
             thrustMode = modeSettings->Stabilization6Settings.Thrust;
             break;
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-            // we hard code the "GPS Assisted" PostionHold to use alt-vario which
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+            // we hard code the "GPS Assisted" PostionHold/Roam to use alt-vario which
             // is a more appropriate throttle mode.  "GPSAssist" adds braking
             // and a better throttle management to the standard Position Hold.
             thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO;
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_LAND:
+        case FLIGHTSTATUS_FLIGHTMODE_AUTOTAKEOFF:
+            thrustMode = FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL;
             break;
 
             // other modes will use cruisecontrol as default

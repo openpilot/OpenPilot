@@ -104,15 +104,13 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
     MapDataDelegate::ModeOptions mode = (MapDataDelegate::ModeOptions)ui->cbMode->itemData(ui->cbMode->currentIndex()).toInt();
 
     switch (mode) {
-    case MapDataDelegate::MODE_FLYENDPOINT:
-    case MapDataDelegate::MODE_FLYVECTOR:
-    case MapDataDelegate::MODE_FLYCIRCLERIGHT:
-    case MapDataDelegate::MODE_FLYCIRCLELEFT:
-    case MapDataDelegate::MODE_DRIVEENDPOINT:
-    case MapDataDelegate::MODE_DRIVEVECTOR:
-    case MapDataDelegate::MODE_DRIVECIRCLELEFT:
-    case MapDataDelegate::MODE_DRIVECIRCLERIGHT:
+    case MapDataDelegate::MODE_GOTOENDPOINT:
+    case MapDataDelegate::MODE_FOLLOWVECTOR:
+    case MapDataDelegate::MODE_CIRCLERIGHT:
+    case MapDataDelegate::MODE_CIRCLELEFT:
     case MapDataDelegate::MODE_DISARMALARM:
+    case MapDataDelegate::MODE_LAND:
+    case MapDataDelegate::MODE_BRAKE:
         ui->modeParam1->setVisible(false);
         ui->modeParam2->setVisible(false);
         ui->modeParam3->setVisible(false);
@@ -120,6 +118,16 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
         ui->dsb_modeParam1->setVisible(false);
         ui->dsb_modeParam2->setVisible(false);
         ui->dsb_modeParam3->setVisible(false);
+        ui->dsb_modeParam4->setVisible(false);
+        break;
+    case MapDataDelegate::MODE_VELOCITY:
+        ui->modeParam1->setVisible(true);
+        ui->modeParam2->setVisible(true);
+        ui->modeParam3->setVisible(true);
+        ui->modeParam4->setVisible(false);
+        ui->dsb_modeParam1->setVisible(true);
+        ui->dsb_modeParam2->setVisible(true);
+        ui->dsb_modeParam3->setVisible(true);
         ui->dsb_modeParam4->setVisible(false);
         break;
     case MapDataDelegate::MODE_FIXEDATTITUDE:

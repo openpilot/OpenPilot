@@ -60,11 +60,6 @@ public:
     /// </summary>
 
 
-    // Yahoo version strings
-    QString VersionYahooMap;
-    QString VersionYahooSatellite;
-    QString VersionYahooLabels;
-
     // BingMaps
     QString VersionBingMaps;
 

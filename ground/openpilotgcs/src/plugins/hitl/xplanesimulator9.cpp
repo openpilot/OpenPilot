@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       xplanesimulator.cpp
+ * @file       xplanesimulator9.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -56,25 +56,25 @@
  *
  */
 
-#include "xplanesimulator.h"
+#include "xplanesimulator9.h"
 #include "extensionsystem/pluginmanager.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 #include <math.h>
 
-void TraceBuf(const char *buf, int len);
+void TraceBuf9(const char *buf, int len);
 
-XplaneSimulator::XplaneSimulator(const SimulatorSettings & params) :
+XplaneSimulator9::XplaneSimulator9(const SimulatorSettings & params) :
     Simulator(params)
 {
     resetInitialHomePosition();
 }
 
 
-XplaneSimulator::~XplaneSimulator()
+XplaneSimulator9::~XplaneSimulator9()
 {}
 
-void XplaneSimulator::setupUdpPorts(const QString & host, int inPort, int outPort)
+void XplaneSimulator9::setupUdpPorts(const QString & host, int inPort, int outPort)
 {
     Q_UNUSED(outPort);
 
@@ -83,7 +83,7 @@ void XplaneSimulator::setupUdpPorts(const QString & host, int inPort, int outPor
     resetInitialHomePosition();
 }
 
-bool XplaneSimulator::setupProcess()
+bool XplaneSimulator9::setupProcess()
 {
     emit processOutput(QString("Please start X-Plane manually, and make sure it is setup to output its ") +
                        "data to host " + settings.hostAddress + " UDP port " + QString::number(settings.inPort));
@@ -94,7 +94,7 @@ bool XplaneSimulator::setupProcess()
 /**
  * update data in X-Plane simulator
  */
-void XplaneSimulator::transmitUpdate()
+void XplaneSimulator9::transmitUpdate()
 {
     if (settings.manualControlEnabled) {
         // Read ActuatorDesired from autopilot
@@ -142,7 +142,7 @@ void XplaneSimulator::transmitUpdate()
         buf.append(reinterpret_cast<const char *>(&none), sizeof(none));
         buf.append(reinterpret_cast<const char *>(&none), sizeof(none));
         buf.append(reinterpret_cast<const char *>(&none), sizeof(none));
-// TraceBuf(buf.data(),41);
+// TraceBuf9(buf.data(),41);
 
         if (outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1) {
             emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
@@ -186,7 +186,7 @@ void XplaneSimulator::transmitUpdate()
 /**
  * process data string from X-Plane simulator
  */
-void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
+void XplaneSimulator9::processUpdate(const QByteArray & dataBuf)
 {
     float altitude_msl     = 0;
     float altitude_agl     = 0;
@@ -226,36 +226,36 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
         int channelCounter = dataBuf.size() / 36;
         do {
             switch (buf[0]) { // switch by id
-            case XplaneSimulator::LatitudeLongitudeAltitude:
+            case XplaneSimulator9::LatitudeLongitudeAltitude:
                 latitude     = *((float *)(buf.data() + 4 * 1));
                 longitude    = *((float *)(buf.data() + 4 * 2));
                 altitude_msl = *((float *)(buf.data() + 4 * 3)) * FT2M;
                 altitude_agl = *((float *)(buf.data() + 4 * 4)) * FT2M;
                 break;
 
-            case XplaneSimulator::Speed:
+            case XplaneSimulator9::Speed:
                 airspeed_keas    = *((float *)(buf.data() + 4 * 2));
                 groundspeed_ktgs = *((float *)(buf.data() + 4 * 4));
                 break;
 
-            case XplaneSimulator::PitchRollHeading:
+            case XplaneSimulator9::PitchRollHeading:
                 pitch   = *((float *)(buf.data() + 4 * 1));
                 roll    = *((float *)(buf.data() + 4 * 2));
                 heading = *((float *)(buf.data() + 4 * 3));
                 break;
 
             /*
-                   case XplaneSimulator::SystemPressures:
+                   case XplaneSimulator9::SystemPressures:
                pressure = *((float*)(buf.data()+4*1));
                break;
              */
 
-            case XplaneSimulator::AtmosphereWeather:
+            case XplaneSimulator9::AtmosphereWeather:
                 pressure    = *((float *)(buf.data() + 4 * 1)) * INHG2KPA;
                 temperature = *((float *)(buf.data() + 4 * 2));
                 break;
 
-            case XplaneSimulator::LocVelDistTraveled:
+            case XplaneSimulator9::LocVelDistTraveled:
                 dstX = *((float *)(buf.data() + 4 * 1));
                 dstY = -*((float *)(buf.data() + 4 * 3));
                 dstZ = *((float *)(buf.data() + 4 * 2));
@@ -264,13 +264,13 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
                 velZ = *((float *)(buf.data() + 4 * 5));
                 break;
 
-            case XplaneSimulator::AngularVelocities: // In [rad/s]
+            case XplaneSimulator9::AngularVelocities: // In [rad/s]
                 pitchRate_rad = *((float *)(buf.data() + 4 * 1));
                 rollRate_rad  = *((float *)(buf.data() + 4 * 2));
                 yawRate_rad   = *((float *)(buf.data() + 4 * 3));
                 break;
 
-            case XplaneSimulator::Gload:
+            case XplaneSimulator9::Gload:
                 accX = *((float *)(buf.data() + 4 * 6)) * GEE;
                 accY = *((float *)(buf.data() + 4 * 7)) * GEE;
                 accZ = *((float *)(buf.data() + 4 * 5)) * GEE;
@@ -337,7 +337,7 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
 }
 
 
-void TraceBuf(const char *buf, int len)
+void TraceBuf9(const char *buf, int len)
 {
     QString str;
     bool reminder = true;

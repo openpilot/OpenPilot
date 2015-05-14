@@ -30,7 +30,8 @@
 
 // #include <QObject>
 // #include <simulator.h>
-#include "xplanesimulator.h"
+#include "xplanesimulator9.h"
+#include "xplanesimulator10.h"
 #include "hitlnoisegeneration.h"
 #include "extensionsystem/pluginmanager.h"
 #include <coreplugin/icore.h>

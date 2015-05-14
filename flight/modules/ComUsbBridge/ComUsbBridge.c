@@ -43,6 +43,7 @@
 static void com2UsbBridgeTask(void *parameters);
 static void usb2ComBridgeTask(void *parameters);
 static void updateSettings(UAVObjEvent *ev);
+static void usb2ComBridgeSetCtrlLine(uint32_t com_id, uint32_t mask, uint32_t state);
 
 // ****************
 // Private constants
@@ -95,8 +96,16 @@ static int32_t comUsbBridgeStart(void)
 static int32_t comUsbBridgeInitialize(void)
 {
     // TODO: Get from settings object
-    usart_port     = PIOS_COM_BRIDGE;
-    vcp_port       = PIOS_COM_VCP;
+    usart_port = PIOS_COM_BRIDGE;
+    vcp_port   = PIOS_COM_VCP;
+
+    // Register the call back handler for USB control line changes to simply
+    // pass these onto any handler registered on the USART
+    if (vcp_port) {
+        PIOS_COM_RegisterCtrlLineCallback(vcp_port,
+                                          usb2ComBridgeSetCtrlLine,
+                                          usart_port);
+    }
 
 #ifdef MODULE_COMUSBBRIDGE_BUILTIN
     bridge_enabled = true;
@@ -168,6 +177,14 @@ static void usb2ComBridgeTask(__attribute__((unused)) void *parameters)
     }
 }
 
+/* This routine is registered with the USB driver and will be called in the
+ * event of a control line state change. It will then call down to the USART
+ * driver to drive the required control line state.
+ */
+static void usb2ComBridgeSetCtrlLine(uint32_t com_id, uint32_t mask, uint32_t state)
+{
+    PIOS_COM_SetCtrlLine(com_id, mask, state);
+}
 
 static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
 {

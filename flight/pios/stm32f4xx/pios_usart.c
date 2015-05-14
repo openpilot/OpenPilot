@@ -40,17 +40,19 @@
 
 /* Provide a COM driver */
 static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud);
+static void PIOS_USART_SetCtrlLine(uint32_t usart_id, uint32_t mask, uint32_t state);
 static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USART_TxStart(uint32_t usart_id, uint16_t tx_bytes_avail);
 static void PIOS_USART_RxStart(uint32_t usart_id, uint16_t rx_bytes_avail);
 
 const struct pios_com_driver pios_usart_com_driver = {
-    .set_baud   = PIOS_USART_ChangeBaud,
-    .tx_start   = PIOS_USART_TxStart,
-    .rx_start   = PIOS_USART_RxStart,
-    .bind_tx_cb = PIOS_USART_RegisterTxCallback,
-    .bind_rx_cb = PIOS_USART_RegisterRxCallback,
+    .set_baud      = PIOS_USART_ChangeBaud,
+    .set_ctrl_line = PIOS_USART_SetCtrlLine,
+    .tx_start      = PIOS_USART_TxStart,
+    .rx_start      = PIOS_USART_RxStart,
+    .bind_tx_cb    = PIOS_USART_RegisterTxCallback,
+    .bind_rx_cb    = PIOS_USART_RegisterRxCallback,
 };
 
 enum pios_usart_dev_magic {
@@ -189,6 +191,12 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
     GPIO_Init(usart_dev->cfg->rx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->rx.init);
     GPIO_Init(usart_dev->cfg->tx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->tx.init);
 
+    /* If a DTR line is specified, initialize it */
+    if (usart_dev->cfg->dtr.gpio) {
+        GPIO_Init(usart_dev->cfg->dtr.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->dtr.init);
+        PIOS_USART_SetCtrlLine((uint32_t)usart_dev, COM_CTRL_LINE_DTR_MASK, 0);
+    }
+
     /* Configure the USART */
     USART_Init(usart_dev->cfg->regs, (USART_InitTypeDef *)&usart_dev->cfg->init);
 
@@ -274,6 +282,22 @@ static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud)
 
     /* Write back the new configuration */
     USART_Init(usart_dev->cfg->regs, &USART_InitStructure);
+}
+
+static void PIOS_USART_SetCtrlLine(uint32_t usart_id, uint32_t mask, uint32_t state)
+{
+    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
+
+    bool valid = PIOS_USART_validate(usart_dev);
+
+    PIOS_Assert(valid);
+
+    /* Only attempt to drive DTR if this USART has a GPIO line defined */
+    if (usart_dev->cfg->dtr.gpio && (mask & COM_CTRL_LINE_DTR_MASK)) {
+        GPIO_WriteBit(usart_dev->cfg->dtr.gpio,
+                      usart_dev->cfg->dtr.init.GPIO_Pin,
+                      state & COM_CTRL_LINE_DTR_MASK ? Bit_RESET : Bit_SET);
+    }
 }
 
 static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context)

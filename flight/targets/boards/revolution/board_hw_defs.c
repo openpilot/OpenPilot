@@ -1159,6 +1159,17 @@ static const struct pios_usart_cfg pios_usart_rcvrport_cfg = {
         },
     },
 
+    .dtr                                       = {
+        // FlexIO pin 9
+        .gpio = GPIOC,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_8,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+
     .tx                                        = {
         // *  7: PC6 = TIM8 CH1, USART6 TX
         .gpio = GPIOC,

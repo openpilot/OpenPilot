@@ -283,6 +283,56 @@ int32_t PIOS_COM_ChangeBaud(uint32_t com_id, uint32_t baud)
     return 0;
 }
 
+/**
+ * Set control lines associated with the port
+ * \param[in] port COM port
+ * \param[in] mask Lines to change
+ * \param[in] state New state for lines
+ * \return -1 if port not available
+ * \return 0 on success
+ */
+int32_t PIOS_COM_SetCtrlLine(uint32_t com_id, uint32_t mask, uint32_t state)
+{
+    struct pios_com_dev *com_dev = (struct pios_com_dev *)com_id;
+
+    if (!PIOS_COM_validate(com_dev)) {
+        /* Undefined COM port for this board (see pios_board.c) */
+        return -1;
+    }
+
+    /* Invoke the driver function if it exists */
+    if (com_dev->driver->set_ctrl_line) {
+        com_dev->driver->set_ctrl_line(com_dev->lower_id, mask, state);
+    }
+
+    return 0;
+}
+
+/**
+ * Set control lines associated with the port
+ * \param[in] port COM port
+ * \param[in] ctrl_line_cb Callback function
+ * \param[in] context context to pass to the callback function
+ * \return -1 if port not available
+ * \return 0 on success
+ */
+int32_t PIOS_COM_RegisterCtrlLineCallback(uint32_t com_id, pios_com_callback_ctrl_line ctrl_line_cb, uint32_t context)
+{
+    struct pios_com_dev *com_dev = (struct pios_com_dev *)com_id;
+
+    if (!PIOS_COM_validate(com_dev)) {
+        /* Undefined COM port for this board (see pios_board.c) */
+        return -1;
+    }
+
+    /* Invoke the driver function if it exists */
+    if (com_dev->driver->bind_ctrl_line_cb) {
+        com_dev->driver->bind_ctrl_line_cb(com_dev->lower_id, ctrl_line_cb, context);
+    }
+
+    return 0;
+}
+
 
 static int32_t PIOS_COM_SendBufferNonBlockingInternal(struct pios_com_dev *com_dev, const uint8_t *buffer, uint16_t len)
 {

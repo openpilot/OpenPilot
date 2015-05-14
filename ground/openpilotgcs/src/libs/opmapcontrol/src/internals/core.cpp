@@ -113,6 +113,7 @@ void Core::run()
 
                                 // tile number inversion(BottomLeft -> TopLeft) for pergo maps
                                 if (tl == MapType::PergoTurkeyMap) {
+				    qDebug() << "inverting tiles for Pergo";
                                     img = OPMaps::Instance()->GetImageFrom(tl, Point(task.Pos.X(), maxOfTiles.Height() - task.Pos.Y()), task.Zoom);
                                 } else { // ok
 #ifdef DEBUG_CORE
@@ -264,6 +265,11 @@ void Core::SetMapType(const MapType::Types &value)
         case MapType::ArcGIS_Map:
         case MapType::ArcGIS_Satellite:
         case MapType::ArcGIS_ShadedRelief:
+        {
+                maxzoom = 10;
+        }
+        break;
+
         case MapType::ArcGIS_Terrain:
         {
             if (Projection()->Type() != "PlateCarreeProjection") {

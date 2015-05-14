@@ -10,4 +10,5 @@
  #define DEBUG_MEMORY_CACHE
  #define DEBUG_GetGeocoderFromCache
  #define DEBUG_TIMINGS
+ #define DEBUG_CORE
 #endif // DEBUGHEADER_H

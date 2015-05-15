@@ -460,30 +460,6 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
 		      //http://dc5.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L01/R00000013/C0000001d.png
     }
     break;
-    case MapType::PergoTurkeyMap:
-    {
-        // http://{domain}/{layerName}/{zoomLevel}/{first3LetterOfTileX}/{second3LetterOfTileX}/{third3LetterOfTileX}/{first3LetterOfTileY}/{second3LetterOfTileY}/{third3LetterOfTileXY}.png
-
-        // http://map3.pergo.com.tr/tile/00/000/000/001/000/000/000.png
-        // That means: Zoom Level: 0 TileX: 1 TileY: 0
-
-        // http://domain/tile/14/000/019/371/000/011/825.png
-        // That means: Zoom Level: 14 TileX: 19371 TileY:11825
-
-        // string x = pos.X().ToString("000000000").Insert(3, "/").Insert(7, "/"); // - 000/000/001
-        // string y = pos.Y().ToString("000000000").Insert(3, "/").Insert(7, "/"); // - 000/000/000
-        QString x = QString("%1").arg(QString::number(pos.X()), 9, (QChar)'0');
-        x.insert(3, "/").insert(7, "/");
-        QString y = QString("%1").arg(QString::number(pos.Y()), 9, (QChar)'0');
-        y.insert(3, "/").insert(7, "/");
-        // "http://map03.pergo.com.tr/tile/2/000/000/003/000/000/002.png"
-	// This has changed map03 does not exist. (neither does map3) Servers have changed to map1 and map2 or maps? 
-
-        qDebug() << QString("http://maps.pergo.com.tr/tile/%1/%2/%3.png").arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
-        return QString("http://maps.pergo.com.tr/tile/%1/%2/%3.png").arg(zoom, 2, 10, (QChar)'0').arg(x).arg(y);
-
-    }
-    break;
     case MapType::SigPacSpainMap:
     {
 	// http://sigpac.magrama.es/fega/h5visor/ is new server location 

@@ -62,13 +62,6 @@ QVector<MapType::Types> AllLayersOfType::GetAllLayersOfType(const MapType::Types
         }
         break;
 
-        case MapType::ArcGIS_MapsLT_Map_Hybrid:
-        {
-            types.append(MapType::ArcGIS_MapsLT_OrtoFoto);
-            types.append(MapType::ArcGIS_MapsLT_Map_Labels);
-        }
-        break;
-
         default:
         {
             types.append(type);

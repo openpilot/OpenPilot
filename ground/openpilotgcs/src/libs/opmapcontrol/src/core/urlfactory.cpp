@@ -419,47 +419,6 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         return QString("http://server.arcgisonline.com/ArcGIS/rest/services/NGS_Topo_US_2D/MapServer/tile/%1/%2/%3").arg(zoom).arg(pos.Y()).arg(pos.X());
     }
     break;
-    case MapType::ArcGIS_MapsLT_OrtoFoto:
-    {
-        // http://www.maps.lt/ortofoto/mapslt_ortofoto_vector_512/map/_alllayers/L02/R0000001b/C00000028.jpg
-        // http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto/MapServer/tile/0/9/13
-        // return string.Format("http://www.maps.lt/ortofoto/mapslt_ortofoto_vector_512/map/_alllayers/L{0:00}/R{1:x8}/C{2:x8}.jpg", zoom, pos.Y(), pos.X());
-        // http://dc1.maps.lt/cache/mapslt_ortofoto_512/map/_alllayers/L03/R0000001c/C00000029.jpg
-        // return string.Format("http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto/MapServer/tile/{0}/{1}/{2}", zoom, pos.Y(), pos.X());
-        // http://dc1.maps.lt/cache/mapslt_ortofoto_512/map/_alllayers/L03/R0000001d/C0000002a.jpg
-        // TODO verificar
-        qDebug() << QString("http://dc5.maps.lt/cache/mapslt_ortofoto/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
-        return QString("http://dc5.maps.lt/cache/mapslt_ortofoto/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
-		      //http://dc5.maps.lt/cache/mapslt_ortofoto/map/_alllayers/L01/R00000012/C0000001c.png
-
-    }
-    break;
-    case MapType::ArcGIS_MapsLT_Map:
-    {
-        // http://www.maps.lt/ortofoto/mapslt_ortofoto_vector_512/map/_alllayers/L02/R0000001b/C00000028.jpg
-        // http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto/MapServer/tile/0/9/13
-        // return string.Format("http://www.maps.lt/ortofoto/mapslt_ortofoto_vector_512/map/_alllayers/L{0:00}/R{1:x8}/C{2:x8}.jpg", zoom, pos.Y(), pos.X());
-        // http://arcgis.maps.lt/ArcGIS/rest/services/mapslt/MapServer/tile/7/1162/1684.png
-        // http://dc1.maps.lt/cache/mapslt_512/map/_alllayers/L03/R0000001b/C00000029.png
-        // TODO verificar
-        // http://dc1.maps.lt/cache/mapslt/map/_alllayers/L02/R0000001c/C00000029.png
-        qDebug() << QString("http://dc5.maps.lt/cache/mapslt/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
-        return QString("http://dc5.maps.lt/cache/mapslt/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
-		      //http://dc5.maps.lt/cache/mapslt/map/_alllayers/L01/R00000012/C0000001c.png
-
-    }
-    break;
-    case MapType::ArcGIS_MapsLT_Map_Labels:
-    {
-        // http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto_overlay/MapServer/tile/0/9/13
-        // return string.Format("http://arcgis.maps.lt/ArcGIS/rest/services/mapslt_ortofoto_overlay/MapServer/tile/{0}/{1}/{2}", zoom, pos.Y(), pos.X());
-        // http://dc1.maps.lt/cache/mapslt_ortofoto_overlay_512/map/_alllayers/L03/R0000001d/C00000029.png
-        // TODO verificar
-        qDebug() << QString("http://dc5.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
-        return QString("http://dc5.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L%1/R%2/C%3.png").arg(zoom, 2, 10, (QChar)'0').arg(pos.Y(), 8, 16, (QChar)'0').arg(pos.X(), 8, 16, (QChar)'0');
-		      //http://dc5.maps.lt/cache/mapslt_ortofoto_overlay/map/_alllayers/L01/R00000013/C0000001d.png
-    }
-    break;
     case MapType::SigPacSpainMap:
     {
 	// http://sigpac.magrama.es/fega/h5visor/ is new server location 

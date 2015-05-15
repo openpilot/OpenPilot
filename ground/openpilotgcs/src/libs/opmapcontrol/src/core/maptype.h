@@ -61,25 +61,6 @@ public:
         ArcGIS_ShadedRelief = 799,
         ArcGIS_Terrain      = 811,
 
-        // use these numbers to clean up old stuff
-        // ArcGIS_MapsLT_Map_Old= 877,
-        // ArcGIS_MapsLT_OrtoFoto_Old = 888,
-        // ArcGIS_MapsLT_Map_Labels_Old = 890,
-        // ArcGIS_MapsLT_Map_Hybrid_Old = 899,
-        // ArcGIS_MapsLT_Map=977,
-        // ArcGIS_MapsLT_OrtoFoto=988,
-        // ArcGIS_MapsLT_Map_Labels=990,
-        // ArcGIS_MapsLT_Map_Hybrid=999,
-        // ArcGIS_MapsLT_Map=978,
-        // ArcGIS_MapsLT_OrtoFoto=989,
-        // ArcGIS_MapsLT_Map_Labels=991,
-        // ArcGIS_MapsLT_Map_Hybrid=998,
-
-        ArcGIS_MapsLT_Map = 1000,
-        ArcGIS_MapsLT_OrtoFoto   = 1001,
-        ArcGIS_MapsLT_Map_Labels = 1002,
-        ArcGIS_MapsLT_Map_Hybrid = 1003,
-
         SigPacSpainMap       = 3001,
 
         GoogleMapKorea       = 4001,

@@ -161,15 +161,6 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             }
             break;
 
-            case MapType::ArcGIS_MapsLT_Map_Labels:
-            case MapType::ArcGIS_MapsLT_Map:
-            case MapType::ArcGIS_MapsLT_OrtoFoto:
-            case MapType::ArcGIS_MapsLT_Map_Hybrid:
-            {
-                qheader.setRawHeader("Referrer", "http://www.maps.lt/map/default.aspx?lang=en");
-            }
-            break;
-
             case MapType::OpenStreetMapSurfer:
             case MapType::OpenStreetMapSurferTerrain:
             {

@@ -23,7 +23,7 @@ SOURCES += core.cpp \
     mousewheelzoomtype.cpp
 HEADERS += ./projections/lks94projection.h \
     ./projections/mercatorprojection.h \
-    ./projections/platecarreeprojection.h \
+    ./projections/platecarreeprojection.h 
 SOURCES += ./projections/lks94projection.cpp \
     ./projections/mercatorprojection.cpp \
     ./projections/platecarreeprojection.cpp 

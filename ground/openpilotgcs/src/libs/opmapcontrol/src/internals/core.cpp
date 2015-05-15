@@ -273,18 +273,6 @@ void Core::SetMapType(const MapType::Types &value)
         }
         break;
 
-        case MapType::ArcGIS_MapsLT_Map_Hybrid:
-        case MapType::ArcGIS_MapsLT_Map_Labels:
-        case MapType::ArcGIS_MapsLT_Map:
-        case MapType::ArcGIS_MapsLT_OrtoFoto:
-        {
-            if (Projection()->Type() != "LKS94Projection") {
-                SetProjection(new LKS94Projection());
-                maxzoom = 11;
-            }
-        }
-        break;
-
         default:
         {
             if (Projection()->Type() != "MercatorProjection") {

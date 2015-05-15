@@ -195,7 +195,7 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
 		return ret;
 	    }
             ret = reply->readAll();
-	    qDebug() << "ret " << ret;
+	    //qDebug() << "ret " << ret;
             reply->deleteLater(); // TODO can't this be global??
 
             if (ret.isEmpty()) {

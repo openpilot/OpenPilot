@@ -25,11 +25,9 @@ HEADERS += ./projections/lks94projection.h \
     ./projections/mercatorprojection.h \
     ./projections/mercatorprojectionyandex.h \
     ./projections/platecarreeprojection.h \
-    ./projections/platecarreeprojectionpergo.h
 SOURCES += ./projections/lks94projection.cpp \
     ./projections/mercatorprojection.cpp \
     ./projections/mercatorprojectionyandex.cpp \
-    ./projections/platecarreeprojection.cpp \
-    ./projections/platecarreeprojectionpergo.cpp
+    ./projections/platecarreeprojection.cpp 
 LIBS += -L../build \
     -lcore

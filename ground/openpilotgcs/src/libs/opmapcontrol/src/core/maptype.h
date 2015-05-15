@@ -80,7 +80,6 @@ public:
         ArcGIS_MapsLT_Map_Labels = 1002,
         ArcGIS_MapsLT_Map_Hybrid = 1003,
 
-        PergoTurkeyMap       = 2001,
         SigPacSpainMap       = 3001,
 
         GoogleMapKorea       = 4001,

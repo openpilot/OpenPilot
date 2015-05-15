@@ -468,22 +468,6 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
     }
     break;
 
-    case MapType::YandexMapRu:
-    {
-        /*  
-	    Used "oldmaps" to determine map types - https://old.maps.yandex.ru/?ll=-83.110960%2C40.091250&spn=7.745361%2C6.015476&z=7&l=map
-	    map: 'https:\/\/vec0%d.maps.yandex.net\/tiles?l=map&%c&%l',
-            sat: 'https:\/\/sat0%d.maps.yandex.net\/tiles?l=sat&%c&%l',
-            skl: 'https:\/\/vec0%d.maps.yandex.net\/tiles?l=skl&%c&%l',
-									*/
-
-        QString server = "vec";
-        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.net/tiles?l=map&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
-
-// Satllite maps are poor quality, but available. 
-//        QString server = "sat";
-//        return QString("http://%1").arg(server) + QString("0%2.maps.yandex.net/tiles?l=sat&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4) + 1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
-    }
     break;
     default:
         break;

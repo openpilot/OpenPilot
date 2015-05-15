@@ -65,9 +65,6 @@ ProviderStrings::ProviderStrings()
     // BingMaps
     VersionBingMaps       = "563";
 
-    // YandexMap
-    VersionYandexMap      = "2.16.0";
-    // VersionYandexSatellite = "1.19.0";
     ////////////////////
 
     /// <summary>

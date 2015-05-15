@@ -44,7 +44,6 @@
 #include "rectlatlng.h"
 #include "../internals/projections/lks94projection.h"
 #include "../internals/projections/mercatorprojection.h"
-#include "../internals/projections/mercatorprojectionyandex.h"
 #include "../internals/projections/platecarreeprojection.h"
 #include "../core/geodecoderstatus.h"
 #include "../core/opmaps.h"

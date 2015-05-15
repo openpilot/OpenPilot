@@ -285,15 +285,6 @@ void Core::SetMapType(const MapType::Types &value)
         }
         break;
 
-        case MapType::YandexMapRu:
-        {
-            if (Projection()->Type() != "MercatorProjectionYandex") {
-                SetProjection(new MercatorProjectionYandex());
-                maxzoom = 13;
-            }
-        }
-        break;
-
         default:
         {
             if (Projection()->Type() != "MercatorProjection") {

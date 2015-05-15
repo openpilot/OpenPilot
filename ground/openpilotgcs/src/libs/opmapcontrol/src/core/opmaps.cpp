@@ -120,7 +120,7 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             QString url = MakeImageUrl(type, pos, zoom, LanguageStr);
 #ifdef DEBUG_TIMINGS
             qDebug() << "opmaps after make image url" << time.elapsed();
-#endif // url	"http://vec02.maps.yandex.ru/tiles?l=map&v=2.10.2&x=7&y=5&z=3"	string
+#endif // url can be hard coded for debugging purposes
             qheader.setUrl(QUrl(url));
             qheader.setRawHeader("User-Agent", UserAgent);
             qheader.setRawHeader("Accept", "*/*");
@@ -184,11 +184,6 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             }
             break;
 
-            case MapType::YandexMapRu:
-            {
-                qheader.setRawHeader("Referrer", "http://maps.yandex.ru/");
-            }
-            break;
             default:
                 break;
             }

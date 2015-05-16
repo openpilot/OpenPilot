@@ -102,12 +102,11 @@ MainWindow::MainWindow() :
     m_globalContext(QList<int>() << Constants::C_GLOBAL_ID),
     m_additionalContexts(m_globalContext),
     // keep this in sync with main() in app/main.cpp
-    m_settings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
-                             QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"), this)),
+    m_settings(new QSettings(this)),
     m_globalSettings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::SystemScope,
-                                   QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"), this)),
+                                   m_settings->organizationName(), m_settings->applicationName(), this)),
     m_settingsDatabase(new SettingsDatabase(QFileInfo(m_settings->fileName()).path(),
-                                            QLatin1String("OpenPilotGCS_config"),
+                                            QFileInfo(m_settings->fileName()).baseName(),
                                             this)),
     m_dontSaveSettings(false),
     m_actionManager(new ActionManagerPrivate(this)),
@@ -138,11 +137,6 @@ MainWindow::MainWindow() :
 #ifndef Q_WS_MAC
     qApp->setWindowIcon(QIcon(":/core/images/openpilot_logo_128.png"));
 #endif
-    QCoreApplication::setApplicationName(QLatin1String("OpenPilotGCS"));
-    QCoreApplication::setApplicationVersion(QLatin1String(Core::Constants::GCS_VERSION_LONG));
-    QCoreApplication::setOrganizationName(QLatin1String("OpenPilot"));
-    QCoreApplication::setOrganizationDomain(QLatin1String("openpilot.org"));
-    QSettings::setDefaultFormat(XmlConfig::XmlSettingsFormat);
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
     setDockNestingEnabled(true);

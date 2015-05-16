@@ -111,12 +111,10 @@ typedef QMap<QString, QString> AppOptionValues;
 const int OptionIndent = 4;
 const int DescriptionIndent = 24;
 
-const QLatin1String APP_NAME("OpenPilot GCS");
+const QLatin1String APP_NAME(GCS_NAME);
+const QLatin1String ORG_NAME("OpenPilot");
 
 const QLatin1String CORE_PLUGIN_NAME("Core");
-
-const QLatin1String SETTINGS_ORG_NAME("OpenPilot");
-const QLatin1String SETTINGS_APP_NAME("OpenPilotGCS_config");
 
 const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
 
@@ -445,6 +443,10 @@ int main(int argc, char * *argv)
     // create application
     SharedTools::QtSingleApplication app(APP_NAME, argc, argv);
 
+    QCoreApplication::setApplicationName(APP_NAME);
+    QCoreApplication::setOrganizationName(ORG_NAME);
+    QSettings::setDefaultFormat(XmlConfig::XmlSettingsFormat);
+
     // initialize the plugin manager
     ExtensionSystem::PluginManager pluginManager;
     pluginManager.setFileExtension(QLatin1String("pluginspec"));
@@ -473,8 +475,8 @@ int main(int argc, char * *argv)
     QString settingsPath = Utils::PathUtils().GetDataPath();
     qDebug() << "Loading system settings from" << settingsPath;
     QSettings::setPath(XmlConfig::XmlSettingsFormat, QSettings::SystemScope, settingsPath);
-    qDebug() << "Loading user settings from" << SETTINGS_ORG_NAME << "/" << SETTINGS_APP_NAME;
-    QSettings settings(XmlConfig::XmlSettingsFormat, QSettings::UserScope, SETTINGS_ORG_NAME, SETTINGS_APP_NAME);
+    QSettings settings;
+    qDebug() << "Loading user settings from" << settings.fileName();
 
     // need to reset all user settings?
     if (appOptionValues.contains(RESET_OPTION)) {

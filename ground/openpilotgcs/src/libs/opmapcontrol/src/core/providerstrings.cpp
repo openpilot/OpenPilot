@@ -28,7 +28,8 @@
 
 
 namespace core {
-const QString ProviderStrings::levelsForSigPacSpainMap[] = { "0",         "1",         "2",         "3",       "4",
+const QString ProviderStrings::levelsForSigPacSpainMap[] = { 
+//"0",         "1",         "2",         "3",       "4",
                                                              "MTNSIGPAC",
                                                              "MTN2000",   "MTN2000",   "MTN2000",   "MTN2000", "MTN2000",
                                                              "MTN200",    "MTN200",    "MTN200",
@@ -64,9 +65,6 @@ ProviderStrings::ProviderStrings()
     // BingMaps
     VersionBingMaps       = "563";
 
-    // YandexMap
-    VersionYandexMap      = "2.16.0";
-    // VersionYandexSatellite = "1.19.0";
     ////////////////////
 
     /// <summary>

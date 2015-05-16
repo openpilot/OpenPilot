@@ -34,8 +34,8 @@ namespace mapcontrol {
 MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration) : core(core), config(configuration), MapRenderTransform(1),
     maxZoom(17), minZoom(2), zoomReal(0), zoomDigi(0), isSelected(false), rotation(0)
 {
-    dragons.load(QString::fromUtf8(":/markers/images/dragons1.jpg"));
-    showTileGridLines = false;
+    //dragons.load(QString::fromUtf8(":/markers/images/dragons1.jpg"));
+    showTileGridLines = true;
     isMouseOverMarker = false;
     maprect = QRectF(0, 0, 1022, 680);
     core->SetCurrentRegion(internals::Rectangle(0, 0, maprect.width(), maprect.height()));
@@ -296,7 +296,7 @@ void MapGraphicItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 }
 void MapGraphicItem::DrawMap2D(QPainter *painter)
 {
-    painter->drawImage(this->boundingRect(), dragons.toImage());
+    //painter->drawImage(this->boundingRect(), dragons.toImage());
     if (!lastimage.isNull()) {
         painter->drawImage(core->GetrenderOffset().X() - lastimagepoint.X(), core->GetrenderOffset().Y() - lastimagepoint.Y(), lastimage);
     }

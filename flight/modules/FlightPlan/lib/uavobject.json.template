@@ -1,0 +1,9 @@
+{
+  "name": "$(NAME)",
+  "object_id": $(UOBJID),
+  "size": $(SIZE),
+  "unpackstr": "$(UNPACKSTR)",
+  "fields": [
+$(DATAFIELDS)
+  ]
+}

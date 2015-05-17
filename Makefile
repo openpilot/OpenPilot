@@ -120,7 +120,7 @@ else ifeq ($(UNAME), Darwin)
     UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/uavobjgenerator
 else ifeq ($(UNAME), Windows)
     QT_SPEC = win32-g++
-    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/$(GCS_BUILD_CONF)/uavobjgenerator.exe
+    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/uavobjgenerator.exe
 endif
 
 ##############################
@@ -165,13 +165,13 @@ uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
 UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
 
-uavobjects_%:  $(UAVOBJGENERATOR)
+uavobjects_%:  uavobjgenerator
 	@$(MKDIR) -p $(UAVOBJ_OUT_DIR)/$*
 	$(V1) ( cd $(UAVOBJ_OUT_DIR)/$* && \
 	    $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
-uavobjects_test:  $(UAVOBJGENERATOR)
+uavobjects_test:  uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
@@ -465,7 +465,7 @@ openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
 	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)
 
 .PHONY: openpilotgcs
-openpilotgcs: $(UAVOBJGENERATOR) $(OPENPILOTGCS_MAKEFILE)
+openpilotgcs: uavobjgenerator $(OPENPILOTGCS_MAKEFILE)
 	$(V1) $(MAKE) -w -C $(OPENPILOTGCS_DIR)/$(MAKE_DIR);
 
 .PHONY: openpilotgcs_clean

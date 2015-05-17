@@ -66,7 +66,9 @@ bool UAVObjectGeneratorJson::process_object(ObjectInfo *info)
     // Replace the ($DATAFIELDS) tag
     QStringList datafields;
     QString unpackstr = "<";
+    unsigned int bytecount = 0;
     Q_FOREACH(const FieldInfo *field, info->fields) {
+        bytecount += field->numBytes;
         QString f = "    {\n";
         // Class header
         f.append(QString("      \"name\": \"%1\",\n").arg(field->name));
@@ -127,6 +129,7 @@ bool UAVObjectGeneratorJson::process_object(ObjectInfo *info)
     }
     outCode.replace(QString("$(DATAFIELDS)"), datafields.join(",\n"));
     outCode.replace(QString("$(UNPACKSTR)"), unpackstr);
+    outCode.replace(QString("$(SIZE)"), QString("%1").arg(bytecount));
 
 
     // Write the Json code

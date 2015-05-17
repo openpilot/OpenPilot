@@ -34,7 +34,13 @@ cc3d connected to tcp gateway
 a user connected
 Subscribing to AttitudeState,ManualControlCommand,StabilizationDesired
 
+An alternate example would be to use the serial connection directly
+
+$ node  testserial.js /dev/tty.usbmodem1431 
+Reading json object defs...
+listening on http://*:3000
+Opened cc3d
+a user connected
+Subscribing to AttitudeState,ManualControlCommand,StabilizationDesired
+
 Connect via a web browser to http://localhost:3000
-
-
-

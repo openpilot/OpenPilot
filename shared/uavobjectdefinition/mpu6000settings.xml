@@ -18,7 +18,7 @@
             </options>
         </field>
 
-        <field name="FilterSetting" units="Hz" type="enum" elements="1" defaultvalue="Lowpass_256_Hz">
+        <field name="FilterSetting" units="Hz" type="enum" elements="1" defaultvalue="Lowpass_188_Hz">
             <options>
                 <option>Lowpass_256_Hz</option>
                 <option>Lowpass_188_Hz</option>

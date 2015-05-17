@@ -68,6 +68,7 @@ public:
         GoogleLabelsKorea    = 4003,
         GoogleHybridKorea    = 4005,
 
+	Statkart_Topo2 = 5500
     };
     static QString StrByType(Types const & value)
     {

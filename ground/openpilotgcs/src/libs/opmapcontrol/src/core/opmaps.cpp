@@ -174,6 +174,16 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
                 qheader.setRawHeader("Referrer", "http://www.openstreetmap.org/");
             }
             break;
+	    case MapType::Statkart_Topo2:
+            {
+                qheader.setRawHeader("Referrer", "http://www.norgeskart.no/");
+            }
+            break;
+	    case MapType::Statkart_Topo2:
+            {
+                qheader.setRawHeader("Referrer", "http://www.norgeskart.no/");
+            }
+            break;
 
             default:
                 break;

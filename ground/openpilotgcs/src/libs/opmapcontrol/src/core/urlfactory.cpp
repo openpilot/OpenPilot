@@ -426,6 +426,12 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         return QString("http://sigpac.magrama.es/SDG/raster/%1@3785/%2.%3.%4.img").arg(levelsForSigPacSpainMap[zoom]).arg(zoom).arg(pos.X()).arg((2 << (zoom - 1)) - pos.Y() - 1);
     }
     break;
+    case MapType::Statkart_Topo2:
+    {
+
+        qDebug() << QString("http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo2&zoom=%1&x=%2&y=%3").arg(zoom).arg(pos.X()).arg(pos.Y());
+        return QString("http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo2&zoom=%1&x=%2&y=%3").arg(zoom).arg(pos.X()).arg(pos.Y());
+    }
 
     break;
     default:

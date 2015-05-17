@@ -9,6 +9,7 @@ The goal of this is to be able to control a flight controller over the uavtalk p
 John Aughey - jha@aughey.com
 https://github.com/aughey/nodeuavtalk
 https://github.com/aughey/OpenPilot
+http://quadyearbook.tumblr.com/post/118417923233/nodeuavtalk
 
 # Prerequisites
 Please install the underscore & bufferpack libraries
@@ -18,5 +19,22 @@ $ npm install -g serialport
 $ npm install -g express
 $ npm install -g socket.io
 
+# Starting
 Set your NODE_PATH accordingly
 $ export NODE_PATH="$(npm root -g)"
+
+Set your VCP port to be enabled on your OpenPilot hardware. Then use socat to convert the connection to TCP
+$ socat -x tcp-l:12345,reuseaddr file:/dev/tty.usbmodem1431,nonblock,raw,echo=1,waitlock=/tmp/lock.openpilot
+
+Launch the node script from the commandline
+$ node test.js 
+Reading json object defs...
+listening on http://*:3000
+cc3d connected to tcp gateway
+a user connected
+Subscribing to AttitudeState,ManualControlCommand,StabilizationDesired
+
+Connect via a web browser to http://localhost:3000
+
+
+

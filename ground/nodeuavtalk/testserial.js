@@ -1,6 +1,7 @@
 var SerialPort = require("serialport").SerialPort;
 
-var cc3d_serial = new SerialPort("/dev/ttyAMA0", {
+// must supply serial port name
+var cc3d_serial = new SerialPort(process.argv[2], {
   baudrate: 57600
 });
 

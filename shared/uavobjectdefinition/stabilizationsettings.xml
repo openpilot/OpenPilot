@@ -1,5 +1,4 @@
 <xml>
-
     <object name="StabilizationSettings" singleinstance="true" settings="true" category="Control">
         <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
 
@@ -68,7 +67,7 @@
                 \
                 %0401NE:GPSAssist,\
                 %0402NE:GPSAssist;"
-    />
+        />
 
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

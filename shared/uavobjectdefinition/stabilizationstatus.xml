@@ -2,7 +2,6 @@
     <object name="StabilizationStatus" singleinstance="true" settings="false" category="Control">
         <description>Contains status information to control submodules for stabilization.</description>
 
-
 	<field name="OuterLoop" units="" type="enum" options="Direct,DirectWithLimits,Attitude,Rattitude,Weakleveling,Altitude,AltitudeVario">
 		<elementnames>
 			<elementname>Roll</elementname>

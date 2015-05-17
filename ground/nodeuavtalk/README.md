@@ -10,3 +10,13 @@ John Aughey - jha@aughey.com
 https://github.com/aughey/nodeuavtalk
 https://github.com/aughey/OpenPilot
 
+# Prerequisites
+Please install the underscore & bufferpack libraries
+$ npm install -g underscore
+$ npm install -g bufferpack
+$ npm install -g serialport
+$ npm install -g express
+$ npm install -g socket.io
+
+Set your NODE_PATH accordingly
+$ export NODE_PATH="$(npm root -g)"

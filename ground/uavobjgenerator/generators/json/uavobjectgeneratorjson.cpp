@@ -65,14 +65,35 @@ bool UAVObjectGeneratorJson::process_object(ObjectInfo *info)
 
     // Replace the ($DATAFIELDS) tag
     QStringList datafields;
-    for (int n = 0; n < info->fields.length(); ++n) {
-         QString f = "    {\n";
+    QString unpackstr = "<";
+    Q_FOREACH(const FieldInfo *field, info->fields) {
+        QString f = "    {\n";
         // Class header
-        f.append(QString("      \"name\": \"%1\",\n").arg(info->fields[n]->name));
-        f.append(QString("      \"type\": %1,\n").arg(info->fields[n]->type));
-        f.append(QString("      \"numElements\": %1\n").arg(info->fields[n]->numElements));
+        f.append(QString("      \"name\": \"%1\",\n").arg(field->name));
+        f.append(QString("      \"type\": %1,\n").arg(field->type));
+        f.append(QString("      \"numElements\": %1\n").arg(field->numElements));
+        if(field->type == FIELDTYPE_INT8) {
+            unpackstr.append("b");
+        } else if(field->type == FIELDTYPE_INT16) {
+            unpackstr.append("h");
+        } else if(field->type == FIELDTYPE_INT32) {
+            unpackstr.append("i");
+        } else if(field->type == FIELDTYPE_UINT8) {
+            unpackstr.append("B");
+        } else if(field->type == FIELDTYPE_UINT16) {
+            unpackstr.append("H");
+        } else if(field->type == FIELDTYPE_UINT32) {
+            unpackstr.append("I");
+        } else if(field->type == FIELDTYPE_FLOAT32) {
+            unpackstr.append("f");
+        } else if(field->type == FIELDTYPE_ENUM) {
+            unpackstr.append("B");
+        } else {
+            std::cerr << "json object generator: Unknown field type " << field->type << std::endl;
+        }
+        unpackstr.append("(").append(field->name).append(")");
         // Only for enum types
-        if (info->fields[n]->type == FIELDTYPE_ENUM) {
+        if (field->type == FIELDTYPE_ENUM) {
             /*
             datafields.append(QString("    # Enumeration options\n"));
             // Go through each option
@@ -87,7 +108,7 @@ bool UAVObjectGeneratorJson::process_object(ObjectInfo *info)
             */
         }
         // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames) {
+        if (field->numElements > 1 && !field->defaultElementNames) {
             /*
             datafields.append(QString("    # Array element names\n"));
             // Go through the element names
@@ -105,6 +126,7 @@ bool UAVObjectGeneratorJson::process_object(ObjectInfo *info)
         datafields.append(f);
     }
     outCode.replace(QString("$(DATAFIELDS)"), datafields.join(",\n"));
+    outCode.replace(QString("$(UNPACKSTR)"), unpackstr);
 
 
     // Write the Json code

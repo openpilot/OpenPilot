@@ -126,7 +126,8 @@ isEmpty(TOOLS_DIR) {
     isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$ROOT_DIR/tools)
 }
 
-GCS_APP_TARGET = openpilotgcs
+# Set the default name of the application
+isEmpty(GCS_APP_TARGET):GCS_APP_TARGET = openpilotgcs
 macx {
     GCS_PATH = $$GCS_BUILD_TREE/$${GCS_APP_TARGET}.app/Contents
     GCS_APP_PATH = $$GCS_PATH/MacOS

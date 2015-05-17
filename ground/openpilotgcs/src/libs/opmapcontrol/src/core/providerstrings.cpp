@@ -61,11 +61,6 @@ ProviderStrings::ProviderStrings()
     /// </summary>
     GoogleMapsAPIKey      = "ABQIAAAAWaQgWiEBF3lW97ifKnAczhRAzBk5Igf8Z5n2W3hNnMT0j2TikxTLtVIGU7hCLLHMAuAMt-BO5UrEWA";
 
-    // Yahoo version strings
-    VersionYahooMap       = "4.3";
-    VersionYahooSatellite = "1.9";
-    VersionYahooLabels    = "4.3";
-
     // BingMaps
     VersionBingMaps       = "563";
 

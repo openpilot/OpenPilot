@@ -72,18 +72,8 @@ void RunningDeviceWidget::populate()
     myDevice->devicePicture->scene()->clear();
 
     switch (id) {
-    case 0x0101:
-    case 0x0201:
-        devicePic.load("");
-        break;
     case 0x0301:
         devicePic.load(":/uploader/images/gcs-board-oplink.png");
-        break;
-    case 0x0401:
-        devicePic.load(":/uploader/images/gcs-board-cc.png");
-        break;
-    case 0x0402:
-        devicePic.load(":/uploader/images/gcs-board-cc3d.png");
         break;
     case 0x0903:
         devicePic.load(":/uploader/images/gcs-board-revo.png");

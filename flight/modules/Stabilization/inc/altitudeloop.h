@@ -37,5 +37,6 @@ typedef enum { ALTITUDEHOLD = 0, ALTITUDEVARIO = 1, DIRECT = 2 } ThrustModeType;
 
 void stabilizationAltitudeloopInit();
 float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit);
+void stabilizationDisableAltitudeHold(void);
 
 #endif /* ALTITUDELOOP_H */

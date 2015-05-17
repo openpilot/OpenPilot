@@ -151,6 +151,12 @@ void ConfigRevoHWWidget::usbVCPPortChanged(int index)
     m_ui->cbMain->model()->setData(m_ui->cbMain->model()->index(HwSettings::RM_MAINPORT_COMBRIDGE, 0),
                                    !vcpComBridgeEnabled ? QVariant(0) : QVariant(1 | 32), Qt::UserRole - 1);
 
+    if (!vcpComBridgeEnabled && m_ui->cbRcvr->currentIndex() == HwSettings::RM_RCVRPORT_COMBRIDGE) {
+        m_ui->cbRcvr->setCurrentIndex(HwSettings::RM_RCVRPORT_DISABLED);
+    }
+    m_ui->cbRcvr->model()->setData(m_ui->cbRcvr->model()->index(HwSettings::RM_RCVRPORT_COMBRIDGE, 0),
+                                   !vcpComBridgeEnabled ? QVariant(0) : QVariant(1 | 32), Qt::UserRole - 1);
+
     // _DEBUGCONSOLE modes are mutual exclusive
     if (m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE) {
         if (m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_DEBUGCONSOLE) {

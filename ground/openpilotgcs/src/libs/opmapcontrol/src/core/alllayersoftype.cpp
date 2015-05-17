@@ -55,13 +55,6 @@ QVector<MapType::Types> AllLayersOfType::GetAllLayersOfType(const MapType::Types
         }
         break;
 
-        case MapType::YahooHybrid:
-        {
-            types.append(MapType::YahooSatellite);
-            types.append(MapType::YahooLabels);
-        }
-        break;
-
         case MapType::ArcGIS_MapsLT_Map_Hybrid:
         {
             types.append(MapType::ArcGIS_MapsLT_OrtoFoto);

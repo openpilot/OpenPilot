@@ -127,7 +127,7 @@ void VtolFlyController::SettingsUpdated(void)
     controlNE.UpdateParameters(vtolPathFollowerSettings->HorizontalVelPID.Kp,
                                vtolPathFollowerSettings->HorizontalVelPID.Ki,
                                vtolPathFollowerSettings->HorizontalVelPID.Kd,
-                               vtolPathFollowerSettings->HorizontalVelPID.ILimit,
+                               vtolPathFollowerSettings->HorizontalVelPID.Beta,
                                dT,
                                vtolPathFollowerSettings->HorizontalVelMax);
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);
@@ -136,7 +136,7 @@ void VtolFlyController::SettingsUpdated(void)
     controlDown.UpdateParameters(vtolPathFollowerSettings->VerticalVelPID.Kp,
                                  vtolPathFollowerSettings->VerticalVelPID.Ki,
                                  vtolPathFollowerSettings->VerticalVelPID.Kd,
-                                 vtolPathFollowerSettings->VerticalVelPID.ILimit, // TODO Change to BETA
+                                 vtolPathFollowerSettings->VerticalVelPID.Beta,
                                  dT,
                                  vtolPathFollowerSettings->VerticalVelMax);
     controlDown.UpdatePositionalParameters(vtolPathFollowerSettings->VerticalPosP);
@@ -145,6 +145,9 @@ void VtolFlyController::SettingsUpdated(void)
     VtolSelfTuningStatsGet(&vtolSelfTuningStats);
     controlDown.UpdateNeutralThrust(vtolSelfTuningStats.NeutralThrustOffset + vtolPathFollowerSettings->ThrustLimits.Neutral);
     controlDown.SetThrustLimits(vtolPathFollowerSettings->ThrustLimits.Min, vtolPathFollowerSettings->ThrustLimits.Max);
+
+    // disable neutral thrust calcs which should only be done in a hold mode.
+    controlDown.DisableNeutralThrustCalc();
 }
 
 /**

@@ -19,6 +19,8 @@
 # These are the UAVObjects supposed to be build as part of the OpenPilot target
 # (all architectures)
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += statusgrounddrive
+UAVOBJSRCFILENAMES += pidstatus
 UAVOBJSRCFILENAMES += statusvtolland
 UAVOBJSRCFILENAMES += statusvtolautotakeoff
 UAVOBJSRCFILENAMES += vtolselftuningstats
@@ -106,6 +108,7 @@ UAVOBJSRCFILENAMES += watchdogstatus
 UAVOBJSRCFILENAMES += flightstatus
 UAVOBJSRCFILENAMES += hwsettings
 UAVOBJSRCFILENAMES += receiveractivity
+UAVOBJSRCFILENAMES += receiverstatus
 UAVOBJSRCFILENAMES += cameradesired
 UAVOBJSRCFILENAMES += camerastabsettings
 UAVOBJSRCFILENAMES += altitudeholdsettings

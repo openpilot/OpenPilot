@@ -229,7 +229,7 @@ private:
     {
         core->ReloadMap();
     }
-    GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const & keys)
+    QString SetCurrentPositionByKeywords(QString const & keys)
     {
         return core->SetCurrentPositionByKeywords(keys);
     }

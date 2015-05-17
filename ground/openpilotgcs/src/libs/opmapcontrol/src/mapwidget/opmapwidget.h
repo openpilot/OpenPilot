@@ -350,7 +350,7 @@ public:
         map->ReloadMap(); map->resize();
     }
 
-    GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const & keys)
+    QString SetCurrentPositionByKeywords(QString const & keys)
     {
         return map->SetCurrentPositionByKeywords(keys);
     }

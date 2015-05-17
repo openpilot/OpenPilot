@@ -33,20 +33,48 @@
 
 // defines
 // TODO: NEO8 max rate is for Rom version, flash is limited to 10Hz, need to handle that.
-#define UBX_MAX_RATE_VER8       18
-#define UBX_MAX_RATE_VER7       10
-#define UBX_MAX_RATE            5
+#define UBX_MAX_RATE_VER8 18
+#define UBX_MAX_RATE_VER7 10
+#define UBX_MAX_RATE      5
 
-// time to wait before reinitializing the fsm due to disconnection
-#define UBX_CONNECTION_TIMEOUT  (2000 * 1000)
-// times between retries in case an error does occurs
-#define UBX_ERROR_RETRY_TIMEOUT (1000 * 1000)
+// reset to factory (and 9600 baud), and baud changes are not acked
+// it could be 31 (full PIOS buffer) + 60 (gnss) + overhead bytes at 240 bytes per second
+// = .42 seconds for the longest sentence to be fully transmitted
+// and then it may have to do something like erase flash before replying...
+
+// at low baud rates and high data rates the ubx gps simply must drop some outgoing data
+// and when a lot of data is being dropped, the MON VER reply often gets dropped
+// on the other hand, uBlox documents that some versions discard data that is over a second old
+// implying that it could be over 1 second before a reply is received
+// later versions dropped this and drop data when the send buffer is full and that could be even longer
+// rather than have long timeouts, we will let timeouts * retries handle that if it happens
+
 // timeout for ack reception
-#define UBX_REPLY_TIMEOUT       (500 * 1000)
+#define UBX_REPLY_TIMEOUT             (500 * 1000)
+// timeout for a settings save, in case it has to erase flash
+#define UBX_REPLY_TO_SAVE_TIMEOUT     (3000 * 1000)
 // max retries in case of timeout
-#define UBX_MAX_RETRIES         5
-// pause between each configuration step
-#define UBX_STEP_WAIT_TIME      (10 * 1000)
+#define UBX_MAX_RETRIES               5
+// pause between each verifiably correct configuration step
+#define UBX_VERIFIED_STEP_WAIT_TIME   (50 * 1000)
+// pause between each unverifiably correct configuration step
+#define UBX_UNVERIFIED_STEP_WAIT_TIME (500 * 1000)
+
+#define UBX_CFG_CFG_OP_STORE_SETTINGS \
+    (UBX_CFG_CFG_SETTINGS_IOPORT | \
+     UBX_CFG_CFG_SETTINGS_MSGCONF | \
+     UBX_CFG_CFG_SETTINGS_NAVCONF)
+#define UBX_CFG_CFG_OP_CLEAR_SETTINGS ((~UBX_CFG_CFG_OP_STORE_SETTINGS) & UBX_CFG_CFG_SETTINGS_ALL)
+// don't clear rinv as that is just text as configured by the owner
+#define UBX_CFG_CFG_OP_RESET_SETTINGS \
+    (UBX_CFG_CFG_SETTINGS_IOPORT | \
+     UBX_CFG_CFG_SETTINGS_MSGCONF | \
+     UBX_CFG_CFG_SETTINGS_INFMSG | \
+     UBX_CFG_CFG_SETTINGS_NAVCONF | \
+     UBX_CFG_CFG_SETTINGS_TPCONF | \
+     UBX_CFG_CFG_SETTINGS_SFDRCONF | \
+     UBX_CFG_CFG_SETTINGS_ANTCONF)
+
 // types
 typedef enum {
     UBX_AUTOCONFIG_STATUS_DISABLED = 0,
@@ -54,26 +82,6 @@ typedef enum {
     UBX_AUTOCONFIG_STATUS_DONE,
     UBX_AUTOCONFIG_STATUS_ERROR
 } ubx_autoconfig_status_t;
-// Enumeration options for field UBXDynamicModel
-typedef enum {
-    UBX_DYNMODEL_PORTABLE   = 0,
-    UBX_DYNMODEL_STATIONARY = 2,
-    UBX_DYNMODEL_PEDESTRIAN = 3,
-    UBX_DYNMODEL_AUTOMOTIVE = 4,
-    UBX_DYNMODEL_SEA = 5,
-    UBX_DYNMODEL_AIRBORNE1G = 6,
-    UBX_DYNMODEL_AIRBORNE2G = 7,
-    UBX_DYNMODEL_AIRBORNE4G = 8
-} ubx_config_dynamicmodel_t;
-
-typedef enum {
-    UBX_SBAS_SATS_AUTOSCAN = 0,
-    UBX_SBAS_SATS_WAAS     = 1,
-    UBX_SBAS_SATS_EGNOS    = 2,
-    UBX_SBAS_SATS_MSAS     = 3,
-    UBX_SBAS_SATS_GAGAN    = 4,
-    UBX_SBAS_SATS_SDCM     = 5
-} ubx_config_sats_t;
 
 #define UBX_
 typedef struct {
@@ -94,142 +102,21 @@ typedef struct {
     bool    enableBeiDou;
 } ubx_autoconfig_settings_t;
 
-// Mask for "all supported devices": battery backed RAM, Flash, EEPROM, SPI Flash
-#define UBX_CFG_CFG_ALL_DEVICES_MASK (0x01 | 0x02 | 0x04 | 0x10)
-
 // Sent messages for configuration support
-typedef struct {
-    uint32_t clearMask;
-    uint32_t saveMask;
-    uint32_t loadMask;
-    uint8_t  deviceMask;
-} __attribute__((packed)) ubx_cfg_cfg_t;
+typedef struct UBX_CFG_CFG ubx_cfg_cfg_t;
+typedef struct UBX_CFG_NAV5 ubx_cfg_nav5_t;
+typedef struct UBX_CFG_RATE ubx_cfg_rate_t;
+typedef struct UBX_CFG_MSG ubx_cfg_msg_t;
+typedef struct UBX_CFG_PRT ubx_cfg_prt_t;
+typedef struct UBX_CFG_SBAS ubx_cfg_sbas_t;
+typedef struct UBX_CFG_GNSS_CFGBLOCK ubx_cfg_gnss_cfgblock_t;
+typedef struct UBX_CFG_GNSS ubx_cfg_gnss_t;
+typedef struct UBXSENTHEADER UBXSentHeader_t;
+typedef union  UBXSENTPACKET UBXSentPacket_t;
 
-typedef struct {
-    uint16_t mask;
-    uint8_t  dynModel;
-    uint8_t  fixMode;
-    int32_t  fixedAlt;
-    uint32_t fixedAltVar;
-    int8_t   minElev;
-    uint8_t  drLimit;
-    uint16_t pDop;
-    uint16_t tDop;
-    uint16_t pAcc;
-    uint16_t tAcc;
-    uint8_t  staticHoldThresh;
-    uint8_t  dgpsTimeOut;
-    uint8_t  cnoThreshNumSVs;
-    uint8_t  cnoThresh;
-    uint16_t reserved2;
-    uint32_t reserved3;
-    uint32_t reserved4;
-} __attribute__((packed)) ubx_cfg_nav5_t;
+void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send);
+void ubx_autoconfig_set(ubx_autoconfig_settings_t *config);
+void ubx_reset_sensor_type();
 
-typedef struct {
-    uint16_t measRate;
-    uint16_t navRate;
-    uint16_t timeRef;
-} __attribute__((packed)) ubx_cfg_rate_t;
-
-typedef struct {
-    uint8_t msgClass;
-    uint8_t msgID;
-    uint8_t rate;
-} __attribute__((packed)) ubx_cfg_msg_t;
-
-#define UBX_CFG_SBAS_MODE_ENABLED    0x01
-#define UBX_CFG_SBAS_MODE_TEST       0x02
-#define UBX_CFG_SBAS_USAGE_RANGE     0x01
-#define UBX_CFG_SBAS_USAGE_DIFFCORR  0x02
-#define UBX_CFG_SBAS_USAGE_INTEGRITY 0x04
-
-// SBAS used satellite PNR bitmask (120-151)
-// -------------------------------------1---------1---------1---------1
-// -------------------------------------5---------4---------3---------2
-// ------------------------------------10987654321098765432109876543210
-// WAAS 122, 133, 134, 135, 138---------|---------|---------|---------|
-#define UBX_CFG_SBAS_SCANMODE1_WAAS  0b00000000000001001110000000000100
-// EGNOS 120, 124, 126, 131-------------|---------|---------|---------|
-#define UBX_CFG_SBAS_SCANMODE1_EGNOS 0b00000000000000000000100001010001
-// MSAS 129, 137------------------------|---------|---------|---------|
-#define UBX_CFG_SBAS_SCANMODE1_MSAS  0b00000000000000100000001000000000
-// GAGAN 127, 128-----------------------|---------|---------|---------|
-#define UBX_CFG_SBAS_SCANMODE1_GAGAN 0b00000000000000000000000110000000
-// SDCM 125, 140, 141-------------------|---------|---------|---------|
-#define UBX_CFG_SBAS_SCANMODE1_SDCM  0b00000000001100000000000000100000
-
-#define UBX_CFG_SBAS_SCANMODE2       0x00
-typedef struct {
-    uint8_t  mode;
-    uint8_t  usage;
-    uint8_t  maxSBAS;
-    uint8_t  scanmode2;
-    uint32_t scanmode1;
-} __attribute__((packed)) ubx_cfg_sbas_t;
-
-typedef enum {
-    UBX_GNSS_ID_GPS     = 0,
-    UBX_GNSS_ID_SBAS    = 1,
-    UBX_GNSS_ID_GALILEO = 2,
-    UBX_GNSS_ID_BEIDOU  = 3,
-    UBX_GNSS_ID_IMES    = 4,
-    UBX_GNSS_ID_QZSS    = 5,
-    UBX_GNSS_ID_GLONASS = 6,
-    UBX_GNSS_ID_MAX
-} ubx_config_gnss_id_t;
-
-#define UBX_CFG_GNSS_FLAGS_ENABLED      0x01
-#define UBX_CFG_GNSS_FLAGS_GPS_L1CA     0x010000
-#define UBX_CFG_GNSS_FLAGS_SBAS_L1CA    0x010000
-#define UBX_CFG_GNSS_FLAGS_BEIDOU_B1I   0x010000
-#define UBX_CFG_GNSS_FLAGS_QZSS_L1CA    0x010000
-#define UBX_CFG_GNSS_FLAGS_QZSS_L1SAIF  0x040000
-#define UBX_CFG_GNSS_FLAGS_GLONASS_L1OF 0x010000
-
-#define UBX_CFG_GNSS_NUMCH_VER7         22
-#define UBX_CFG_GNSS_NUMCH_VER8         32
-
-typedef struct {
-    uint8_t  gnssId;
-    uint8_t  resTrkCh;
-    uint8_t  maxTrkCh;
-    uint8_t  resvd;
-    uint32_t flags;
-} __attribute__((packed)) ubx_cfg_gnss_cfgblock_t;
-
-typedef struct {
-    uint8_t msgVer;
-    uint8_t numTrkChHw;
-    uint8_t numTrkChUse;
-    uint8_t numConfigBlocks;
-    ubx_cfg_gnss_cfgblock_t cfgBlocks[UBX_GNSS_ID_MAX];
-} __attribute__((packed)) ubx_cfg_gnss_t;
-
-typedef struct {
-    uint8_t  prolog[2];
-    uint8_t  class;
-    uint8_t  id;
-    uint16_t len;
-} __attribute__((packed)) UBXSentHeader_t;
-
-typedef union {
-    uint8_t buffer[0];
-    struct {
-        UBXSentHeader_t header;
-        union {
-            ubx_cfg_cfg_t  cfg_cfg;
-            ubx_cfg_msg_t  cfg_msg;
-            ubx_cfg_nav5_t cfg_nav5;
-            ubx_cfg_rate_t cfg_rate;
-            ubx_cfg_sbas_t cfg_sbas;
-            ubx_cfg_gnss_t cfg_gnss;
-        } payload;
-        uint8_t resvd[2]; // added space for checksum bytes
-    } message;
-} __attribute__((packed)) UBXSentPacket_t;
-
-void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connected);
-void ubx_autoconfig_set(ubx_autoconfig_settings_t config);
 int32_t ubx_autoconfig_get_status();
 #endif /* UBX_AUTOCONFIG_H_ */

@@ -126,7 +126,7 @@ void VtolAutoTakeoffController::SettingsUpdated(void)
     controlNE.UpdateParameters(vtolPathFollowerSettings->HorizontalVelPID.Kp,
                                vtolPathFollowerSettings->HorizontalVelPID.Ki,
                                vtolPathFollowerSettings->HorizontalVelPID.Kd,
-                               vtolPathFollowerSettings->HorizontalVelPID.ILimit,
+                               vtolPathFollowerSettings->HorizontalVelPID.Beta,
                                dT,
                                vtolPathFollowerSettings->HorizontalVelMax);
 

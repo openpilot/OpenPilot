@@ -132,7 +132,7 @@ void VtolBrakeController::SettingsUpdated(void)
     controlNE.UpdateParameters(vtolPathFollowerSettings->BrakeHorizontalVelPID.Kp,
                                vtolPathFollowerSettings->BrakeHorizontalVelPID.Ki,
                                vtolPathFollowerSettings->BrakeHorizontalVelPID.Kd,
-                               vtolPathFollowerSettings->BrakeHorizontalVelPID.ILimit,
+                               vtolPathFollowerSettings->BrakeHorizontalVelPID.Beta,
                                dT,
                                10.0f * vtolPathFollowerSettings->HorizontalVelMax); // avoid constraining initial fast entry into brake
     controlNE.UpdatePositionalParameters(vtolPathFollowerSettings->HorizontalPosP);

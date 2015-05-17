@@ -126,6 +126,7 @@ UAVOBJS = \
     $${UAVOBJ_XML_DIR}/hwsettings.xml \
     $${UAVOBJ_XML_DIR}/gcsreceiver.xml \
     $${UAVOBJ_XML_DIR}/receiveractivity.xml \
+    $${UAVOBJ_XML_DIR}/receiverstatus.xml \
     $${UAVOBJ_XML_DIR}/attitudesettings.xml \
     $${UAVOBJ_XML_DIR}/txpidsettings.xml \
     $${UAVOBJ_XML_DIR}/cameradesired.xml \

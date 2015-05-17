@@ -1,7 +1,7 @@
 {
-	"name": "$(NAME)",
-	"object_id": $(UOBJID),
-	"fields": [
-	  $(DATAFIELDS)
-	]
+  "name": "$(NAME)",
+  "object_id": $(UOBJID),
+  "fields": [
+$(DATAFIELDS)
+  ]
 }

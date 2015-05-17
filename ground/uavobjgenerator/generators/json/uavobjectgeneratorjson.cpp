@@ -66,11 +66,11 @@ bool UAVObjectGeneratorJson::process_object(ObjectInfo *info)
     // Replace the ($DATAFIELDS) tag
     QStringList datafields;
     for (int n = 0; n < info->fields.length(); ++n) {
-         QString f = "{\n";
+         QString f = "    {\n";
         // Class header
-        f.append(QString("  \"name\": \"%1\",\n").arg(info->fields[n]->name));
-        f.append(QString("  \"type\": %1,\n").arg(info->fields[n]->type));
-        f.append(QString("  \"numElements\": %1\n").arg(info->fields[n]->numElements));
+        f.append(QString("      \"name\": \"%1\",\n").arg(info->fields[n]->name));
+        f.append(QString("      \"type\": %1,\n").arg(info->fields[n]->type));
+        f.append(QString("      \"numElements\": %1\n").arg(info->fields[n]->numElements));
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM) {
             /*
@@ -101,7 +101,7 @@ bool UAVObjectGeneratorJson::process_object(ObjectInfo *info)
             }
             */
         }
-        f.append("}");
+        f.append("    }");
         datafields.append(f);
     }
     outCode.replace(QString("$(DATAFIELDS)"), datafields.join(",\n"));

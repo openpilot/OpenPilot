@@ -7,7 +7,7 @@ cc3d_tcp.connect(12345,"localhost", function() {
   console.log("cc3d connected to tcp gateway");
 });
 
-var uavtalk_decoder = uavtalk_decode.decoder("../uavtalk_json");
+var uavtalk_decoder = uavtalk_decode.decoder("../../build/uavobject-synthetics/json");
 
 var heard = {};
 

@@ -15,7 +15,7 @@ function printhandler(data) {
   console.log(data);
 }
 
-var uavtalk_decoder = uavtalk_decode.decoder("../uavtalk_json");
+var uavtalk_decoder = uavtalk_decode.decoder("../../build/uavobject-synthetics/json");
 
 cc3d_tcp.on("data", uavtalk_packet.parser(function(packet) {
   if(!uavtalk_decoder.ready()) {

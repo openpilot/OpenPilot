@@ -50,6 +50,7 @@
 #include "flightstatus.h"
 #include "accessorydesired.h"
 #include <QPointer>
+#include "systemsettings.h"
 
 class Ui_InputWidget;
 
@@ -62,7 +63,7 @@ public:
     enum txMode { mode1, mode2, mode3, mode4 };
     enum txMovements { moveLeftVerticalStick, moveRightVerticalStick, moveLeftHorizontalStick, moveRightHorizontalStick, moveAccess0, moveAccess1, moveAccess2, moveFlightMode, centerAll, moveAll, nothing };
     enum txMovementType { vertical, horizontal, jump, mix };
-    enum txType { acro, heli };
+    enum txType { acro, heli, ground };
     void startInputWizard()
     {
         goToWizard();
@@ -111,6 +112,7 @@ private:
     int currentChannelNum;
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
+    QList<int> groundChannelOrder;
 
     UAVObject::Metadata manualControlMdata;
     ManualControlCommand *manualCommandObj;
@@ -126,17 +128,25 @@ private:
 
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
-    ManualControlSettings::DataFields previousManualSettingsData;
 
     ActuatorSettings *actuatorSettingsObj;
     ActuatorSettings::DataFields actuatorSettingsData;
-    ActuatorSettings::DataFields previousActuatorSettingsData;
 
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
-    FlightModeSettings::DataFields previousFlightModeSettingsData;
     ReceiverActivity *receiverActivityObj;
     ReceiverActivity::DataFields receiverActivityData;
+
+    SystemSettings *systemSettingsObj;
+    SystemSettings::DataFields systemSettingsData;
+
+    typedef struct {
+        ManualControlSettings::DataFields manualSettingsData;
+        ActuatorSettings::DataFields actuatorSettingsData;
+        FlightModeSettings::DataFields    flightModeSettingsData;
+        SystemSettings::DataFields systemSettingsData;
+    } Memento;
+    Memento memento;
 
     QSvgRenderer *m_renderer;
 
@@ -204,6 +214,7 @@ private slots:
     void updateCalibration();
     void resetChannelSettings();
     void resetActuatorSettings();
+    void forceOneFlightMode();
 
 protected:
     void resizeEvent(QResizeEvent *event);

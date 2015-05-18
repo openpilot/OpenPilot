@@ -1,14 +1,15 @@
 <xml>
     <object name="AltitudeHoldSettings" singleinstance="true" settings="true" category="Control">
-        <description>Settings for the @ref AltitudeHold module</description>
-	<field name="AltitudePI" units="(m/s)/m" type="float" elementnames="Kp,Ki,Ilimit" defaultvalue="0.8,0,0" />
-	<field name="VelocityPI" units="(m/s^2)/(m/s)" type="float" elementnames="Kp,Ki,Ilimit" defaultvalue="0.2,0.0002,2.0" />
+    <description>Settings for the @ref AltitudeHold module</description>
 	<field name="CutThrustWhenZero" units="bool" type="enum" elements="1" options="False,True" defaultvalue="True" />
-        <field name="ThrustExp" units="" type="uint8" elements="1" defaultvalue="128" />
-        <field name="ThrustRate" units="m/s" type="float" elements="1" defaultvalue="5" />
-        <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-        <telemetryflight acked="true" updatemode="onchange" period="0"/>
-        <logging updatemode="manual" period="0"/>
+    <field name="ThrustExp" units="" type="uint8" elements="1" defaultvalue="128" />
+    <field name="ThrustRate" units="m/s" type="float" elements="1" defaultvalue="5" />
+    <field name="ThrustLimits" units="" type="float" elementnames="Min,Neutral,Max" defaultvalue="0.2, 0.5, 0.9"/>
+    <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.4"/>
+    <field name="VerticalVelPID" units="(m/s^2)/(m/s)" type="float" elementnames="Kp,Ki,Kd,Beta" defaultvalue="0.35, 0.45, 0.001, 0.95"/>
+    <access gcs="readwrite" flight="readwrite"/>
+    <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+    <telemetryflight acked="true" updatemode="onchange" period="0"/>
+    <logging updatemode="manual" period="0"/>
     </object>
 </xml>

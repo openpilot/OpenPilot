@@ -12,9 +12,9 @@
 		<field name="RV_TelemetryPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,ComAux,ComBridge" defaultvalue="Telemetry"/>
 		<field name="RV_GPSPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,ComAux,ComBridge" defaultvalue="GPS"/>
 
-		<field name="RM_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Telemetry,PPM+Outputs,Outputs,Telemetry" defaultvalue="PWM"/>
+		<field name="RM_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Telemetry,PPM+Outputs,Outputs,Telemetry,ComBridge" defaultvalue="PWM"/>
 		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
-		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
+		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM,SRXL,DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="TelemetrySpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
 		<field name="GPSSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200,230400" defaultvalue="57600"/>
@@ -23,7 +23,7 @@
 		<field name="USB_VCPPort" units="function" type="enum" elements="1" options="USBTelemetry,ComBridge,DebugConsole,Disabled" defaultvalue="Disabled"/>
 
 		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,Fault,Altitude,Airspeed,TxPID,Battery,Overo,MagBaro,OsdHk" options="Disabled,Enabled" defaultvalue="Disabled"/>
-		<field name="ADCRouting" units="" type="enum" elementnames="adc0,adc1,adc2,adc3" options="Disabled,BatteryVoltage,BatteryCurrent,AnalogAirspeed,Generic" defaultvalue="Disabled"/>
+		<field name="ADCRouting" units="" type="enum" elementnames="adc0,adc1,adc2,adc3,adc4,adc5,adc6,adc7" options="Disabled,BatteryVoltage,BatteryCurrent,AnalogAirspeed,Generic" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
         <field name="WS2811LED_Out" units="" type="enum" elements="1" options="ServoOut1,ServoOut2,ServoOut3,ServoOut4,ServoOut5,ServoOut6,FlexiIOPin3,FlexiIOPin4,Disabled" defaultvalue="Disabled" />
 

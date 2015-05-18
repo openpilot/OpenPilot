@@ -4,7 +4,7 @@ Item {
     id: info
     property variant sceneSize
 
-                             // Uninitialised, Ok,   Warning, Critical, Error                      
+    // Uninitialised, Ok, Warning, Critical, Error
     property variant batColors : ["black", "green", "orange", "red", "red"]
 
     //
@@ -15,16 +15,16 @@ Item {
     property real posNorth_old
     property real total_distance
     property real total_distance_km
-   
+
     property bool init_dist: false
-    
-    property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
+
+    property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East,
                                                         TakeOffLocation.North - PositionState.North)
 
     property real home_distance: Math.sqrt(Math.pow((TakeOffLocation.East - PositionState.East),2) +
                                            Math.pow((TakeOffLocation.North - PositionState.North),2))
 
-    property real wp_heading: 180/3.1415 * Math.atan2(PathDesired.End_East - PositionState.East, 
+    property real wp_heading: 180/3.1415 * Math.atan2(PathDesired.End_East - PositionState.East,
                                                       PathDesired.End_North - PositionState.North)
 
     property real wp_distance: Math.sqrt(Math.pow((PathDesired.End_East - PositionState.East),2) +
@@ -34,28 +34,28 @@ Item {
 
     property real home_eta: (home_distance > 0 && current_velocity > 0 ? Math.round(home_distance/current_velocity) : 0)
     property real home_eta_h: (home_eta > 0 ? Math.floor(home_eta / 3600) : 0 )
-    property real home_eta_m: (home_eta > 0 ? Math.floor((home_eta - home_eta_h*3600)/60) : 0) 
+    property real home_eta_m: (home_eta > 0 ? Math.floor((home_eta - home_eta_h*3600)/60) : 0)
     property real home_eta_s: (home_eta > 0 ? Math.floor(home_eta - home_eta_h*3600 - home_eta_m*60) : 0)
 
     property real wp_eta: (wp_distance > 0 && current_velocity > 0 ? Math.round(wp_distance/current_velocity) : 0)
     property real wp_eta_h: (wp_eta > 0 ? Math.floor(wp_eta / 3600) : 0 )
-    property real wp_eta_m: (wp_eta > 0 ? Math.floor((wp_eta - wp_eta_h*3600)/60) : 0) 
+    property real wp_eta_m: (wp_eta > 0 ? Math.floor((wp_eta - wp_eta_h*3600)/60) : 0)
     property real wp_eta_s: (wp_eta > 0 ? Math.floor(wp_eta - wp_eta_h*3600 - wp_eta_m*60) : 0)
 
-    function reset_distance(){
+    function reset_distance() {
         total_distance = 0;
     }
 
     function compute_distance(posEast,posNorth) {
-        if (total_distance == 0 && !init_dist){init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth;}
+        if (total_distance == 0 && !init_dist) { init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth; }
         if (posEast > posEast_old+3 || posEast < posEast_old-3 || posNorth > posNorth_old+3 || posNorth < posNorth_old-3) {
-        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2)); 
-        total_distance_km = total_distance / 1000;   
+           total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2));
+           total_distance_km = total_distance / 1000;
 
-        posEast_old = posEast;
-        posNorth_old = posNorth;
-        return total_distance;
-        } 
+           posEast_old = posEast;
+           posNorth_old = posNorth;
+           return total_distance;
+        }
     }
 
     function formatTime(time) {
@@ -68,7 +68,7 @@ Item {
     }
 
     // End Functions
-    // 
+    //
     // Start Drawing
 
     SvgElementImage {
@@ -76,24 +76,40 @@ Item {
         sceneSize: info.sceneSize
         elementName: "info-bg"
         width: parent.width
+        opacity: qmlWidget.terrainEnabled ? 0.3 : 1
     }
 
-    // 
+    //
     // GPS Info (Top)
-    //  
+    //
+
+    property real bar_width: (info_bg.height + info_bg.width) / 110
+    property int satsInView: String(GPSSatellites.SatsInView).charCodeAt(0)
+    property variant gps_tooltip: "Altitude : "+GPSPositionSensor.Altitude.toFixed(2) +"m\n"+ 
+                                  "H/V/P DOP : "+GPSPositionSensor.HDOP.toFixed(2)+"/"+GPSPositionSensor.VDOP.toFixed(2)+"/"+GPSPositionSensor.PDOP.toFixed(2)+"m\n"+
+                                   satsInView+" Sats in view"
 
     Repeater {
         id: satNumberBar
-
+        //smooth: true
         // hack, qml/js treats qint8 as a char, necessary to convert it back to integer value
         property int satNumber : String(GPSPositionSensor.Satellites).charCodeAt(0)
 
-        model: 10
-        SvgElementImage {
-            property int minSatNumber : index+1
-            elementName: "gps" + minSatNumber
-            sceneSize: info.sceneSize
-            visible: satNumberBar.satNumber >= minSatNumber
+        model: 13
+        Rectangle {
+            property int minSatNumber : index
+            width: Math.round(bar_width)
+            radius: width / 4
+
+            TooltipArea {
+               text: gps_tooltip
+            }
+
+            x: Math.round((bar_width*4.5) + (bar_width * 1.6 * index))
+            height: bar_width * index * 0.6
+            y: (bar_width*8) - height
+            color: "green"
+            opacity: satNumberBar.satNumber >= minSatNumber ? 1 : 0.4
         }
     }
 
@@ -101,21 +117,38 @@ Item {
         sceneSize: info.sceneSize
         elementName: "gps-mode-text"
 
+        TooltipArea {
+            text: gps_tooltip
+        }
+
         Text {
-            text: ["NO GPS", "NO FIX", "FIX 2D", "FIX 3D"][GPSPositionSensor.Status]
+            property int satNumber : String(GPSPositionSensor.Satellites).charCodeAt(0)
+
+            text: [satNumber > 5 ? " " + satNumber.toString() + " sats - " : ""] + 
+                  ["NO GPS", "NO FIX", "2D", "3D"][GPSPositionSensor.Status] 
             anchors.centerIn: parent
-            font.pixelSize: Math.floor(parent.height*1.3)
+            font.pixelSize: parent.height*1.3
             font.family: pt_bold.name
             font.weight: Font.DemiBold
             color: "white"
         }
     }
 
-    // 
+    SvgElementImage {
+        sceneSize: info.sceneSize
+        elementName: "gps-icon"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        TooltipArea {
+            text: gps_tooltip
+        }
+    }
+
     // Waypoint Info (Top)
     // Only visible when PathPlan is active (WP loaded)
 
-    SvgElementImage  {
+    SvgElementImage {
         sceneSize: info.sceneSize
         elementName: "waypoint-labels"
         width: scaledBounds.width * sceneItem.width
@@ -245,8 +278,7 @@ Item {
         visible: SystemAlarms.Alarm_PathPlan == 1
 
         Text {
-            text: ["FLY END POINT","FLY VECTOR","FLY CIRCLE RIGHT","FLY CIRCLE LEFT","DRIVE END POINT","DRIVE VECTOR","DRIVE CIRCLE LEFT",
-                   "DRIVE CIRCLE RIGHT","FIXED ATTITUDE","SET ACCESSORY","LAND","DISARM ALARM"][PathDesired.Mode]
+            text: ["GOTO ENDPOINT","FOLLOW VECTOR","CIRCLE RIGHT","CIRCLE LEFT","FIXED ATTITUDE","SET ACCESSORY","DISARM ALARM","LAND","BRAKE","VELOCITY","AUTO TAKEOFF"][PathDesired.Mode]
             anchors.centerIn: parent
             color: "cyan"
 
@@ -258,7 +290,6 @@ Item {
         }
     }
 
-    // 
     // Battery Info (Top)
     // Only visible when PathPlan not active and Battery module enabled
 
@@ -266,7 +297,7 @@ Item {
         id: topbattery_voltamp_bg
         sceneSize: info.sceneSize
         elementName: "topbattery-label-voltamp-bg"
-        
+
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: scaledBounds.y * sceneItem.height
@@ -279,7 +310,7 @@ Item {
         }
     }
 
-    SvgElementImage  {
+    SvgElementImage {
         sceneSize: info.sceneSize
         elementName: "topbattery-labels"
         width: scaledBounds.width * sceneItem.width
@@ -292,7 +323,7 @@ Item {
         id: topbattery_volt
         sceneSize: info.sceneSize
         elementName: "topbattery-volt-text"
-        
+
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: scaledBounds.y * sceneItem.height
@@ -355,6 +386,17 @@ Item {
         Rectangle {
             anchors.fill: parent
 
+            TooltipArea {
+                  text: "Reset consumed energy"
+            }
+
+            MouseArea { 
+               id: reset_consumed_energy_mouseArea; 
+               anchors.fill: parent;
+               cursorShape: Qt.PointingHandCursor; 
+               onClicked: qmlWidget.resetConsumedEnergy();
+            }
+
             // Alarm based on FlightBatteryState.EstimatedFlightTime < 120s orange, < 60s red
             color: (FlightBatteryState.EstimatedFlightTime <= 120 && FlightBatteryState.EstimatedFlightTime > 60 ? "orange" :
                    (FlightBatteryState.EstimatedFlightTime <= 60 ? "red": info.batColors[SystemAlarms.Alarm_Battery]))
@@ -376,11 +418,10 @@ Item {
         }
     }
 
-    // 
     // Default counter
     // Only visible when PathPlan not active
 
-    SvgElementImage  {
+    SvgElementImage {
         sceneSize: info.sceneSize
         elementName: "topbattery-total-distance-label"
         width: scaledBounds.width * sceneItem.width
@@ -396,6 +437,10 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
         visible: SystemAlarms.Alarm_PathPlan != 1
+
+        TooltipArea {
+            text: "Reset distance counter"
+        }
 
         MouseArea { id: total_dist_mouseArea2; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: reset_distance()}
 
@@ -417,13 +462,6 @@ Item {
         }
     }
 
-
-    SvgElementImage {
-        id: mask_SatBar
-        elementName: "satbar-mask"
-        sceneSize: info.sceneSize
-    }
-
     //
     // Home info (visible after arming)
     //
@@ -432,19 +470,22 @@ Item {
         id: home_bg
         elementName: "home-bg"
         sceneSize: info.sceneSize
+        x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        states: State  {
+        opacity: qmlWidget.terrainEnabled ? 0.6 : 1
+
+        states: State {
              name: "fading"
-             when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
+             when: TakeOffLocation.Status == 0
+             PropertyChanges { target: home_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - home_bg.width; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; duration: 800 }
+            }
+        }
     }
 
     SvgElementPositionItem {
@@ -455,17 +496,18 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        states: State  {
+        states: State {
              name: "fading_heading"
-             when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_heading_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
+             when: TakeOffLocation.Status == 0
+             PropertyChanges { target: home_heading_text; x: Math.floor(scaledBounds.x * sceneItem.width) - home_bg.width; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; duration: 800 }
+            }
+        }
+
         Text {
             text: "  "+home_heading.toFixed(1)+"°"
             anchors.centerIn: parent
@@ -485,17 +527,17 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        states: State  {
+        states: State {
              name: "fading_distance"
-             when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_distance_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
+             when: TakeOffLocation.Status == 0
+             PropertyChanges { target: home_distance_text; x: Math.floor(scaledBounds.x * sceneItem.width) - home_bg.width; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; duration: 800 }
+            }
+        }
 
         Text {
             text: home_distance.toFixed(0)+" m"
@@ -516,17 +558,17 @@ Item {
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        states: State  {
+        states: State {
              name: "fading_distance"
-             when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_eta_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
+             when: TakeOffLocation.Status == 0
+             PropertyChanges { target: home_eta_text; x: Math.floor(scaledBounds.x * sceneItem.width) - home_bg.width; }
         }
- 
-        transitions: Transition  {
-        SequentialAnimation  {
-              PropertyAnimation  { property: "x"; duration: 800 }
-              }
-        } 
+
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAnimation { property: "x"; duration: 800 }
+            }
+        }
 
         Text {
             text: formatTime(home_eta_h) + ":" + formatTime(home_eta_m) + ":" + formatTime(home_eta_s)

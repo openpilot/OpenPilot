@@ -37,12 +37,16 @@
 #include <QUuid>
 #include <QDebug>
 #include <QMessageBox>
+#include <uavobjecthelper.h>
+#include <objectpersistence.h>
 #include "stabilizationsettings.h"
 #include "stabilizationsettingsbank1.h"
 #include "stabilizationsettingsbank2.h"
 #include "stabilizationsettingsbank3.h"
 #include "mixersettings.h"
 #include "ekfconfiguration.h"
+#include <uavtalk/telemetrymanager.h>
+#include <utils/pathutils.h>
 
 const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
 const char *VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
@@ -53,7 +57,7 @@ const char *VehicleTemplateExportDialog::EXPORT_CUSTOM_NAME    = "custom";
 
 VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::VehicleTemplateExportDialog)
+    ui(new Ui::VehicleTemplateExportDialog), m_autopilotConnected(false)
 {
     ui->setupUi(this);
     connect(ui->ImportButton, SIGNAL(clicked()), this, SLOT(importImage()));
@@ -61,12 +65,29 @@ VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     m_uavoManager = pm->getObject<UAVObjectManager>();
     ui->Photo->setScene(new QGraphicsScene(this));
     ui->Type->setText(setupVehicleType());
+    ui->selectionWidget->setTemplateInfo(m_type, m_subType);
 
     connect(ui->Name, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->Owner, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->ForumNick, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->Size, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
     connect(ui->Weight, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
+
+    connect(ui->exportBtn, SIGNAL(clicked()), this, SLOT(exportTemplate()));
+    connect(ui->saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsTemplate()));
+    connect(ui->importBtn, SIGNAL(clicked()), this, SLOT(importTemplate()));
+    connect(ui->cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->cancelBtn_2, SIGNAL(clicked()), this, SLOT(reject()));
+
+    TelemetryManager *telemManager = pm->getObject<TelemetryManager>();
+    if (telemManager->isConnected()) {
+        onAutoPilotConnect();
+    } else {
+        onAutoPilotDisconnect();
+    }
+
+    connect(telemManager, SIGNAL(connected()), this, SLOT(onAutoPilotConnect()));
+    connect(telemManager, SIGNAL(disconnected()), this, SLOT(onAutoPilotDisconnect()));
 }
 
 VehicleTemplateExportDialog::~VehicleTemplateExportDialog()
@@ -168,17 +189,7 @@ QString VehicleTemplateExportDialog::setupVehicleType()
     }
 }
 
-QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
-{
-    return input.replace(' ', "").replace('|', "").replace('/', "")
-           .replace('\\', "").replace(':', "").replace('"', "")
-           .replace('\'', "").replace('?', "").replace('*', "")
-           .replace('>', "").replace('<', "")
-           .replace('}', "").replace('{', "")
-           .left(truncate);
-}
-
-void VehicleTemplateExportDialog::accept()
+void VehicleTemplateExportDialog::saveTemplate(QString path)
 {
     QJsonObject exportObject;
 
@@ -227,19 +238,13 @@ void VehicleTemplateExportDialog::accept()
                            .arg(fixFilenameString(uuid.toString().right(12)))
                            .arg(fileType);
 
-    QString fullPath = QString("%1%2%3%4%5")
-                       .arg(EXPORT_BASE_NAME)
-                       .arg(QDir::separator())
-                       .arg(getTypeDirectory())
-                       .arg(QDir::separator())
-                       .arg(fileName);
-
-    QDir dir = QFileInfo(fullPath).absoluteDir();
-    if (!dir.exists()) {
-        fullPath = QString("%1%2%3").arg(QDir::homePath(), QDir::separator(), fileName);
+    QString fullPath;
+    if (path.isEmpty()) {
+        fullPath = QString("%1%2%3").arg(QDir::homePath()).arg(QDir::separator()).arg(fileName);
+        fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates"), fileType));
+    } else {
+        fullPath = QString("%1%2%3").arg(path).arg(QDir::separator()).arg(fileName);
     }
-
-    fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates", fileType)));
 
     if (!fullPath.isEmpty()) {
         if (!fullPath.endsWith(fileType)) {
@@ -253,7 +258,59 @@ void VehicleTemplateExportDialog::accept()
             QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1(%2).\nPlease try again.")
                                      .arg(QFileInfo(saveFile).absoluteFilePath(), saveFile.error()), QMessageBox::Ok);
         }
-        QDialog::accept();
+    }
+}
+
+QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
+{
+    return input.replace(' ', "").replace('|', "").replace('/', "")
+           .replace('\\', "").replace(':', "").replace('"', "")
+           .replace('\'', "").replace('?', "").replace('*', "")
+           .replace('>', "").replace('<', "")
+           .replace('}', "").replace('{', "")
+           .left(truncate);
+}
+
+void VehicleTemplateExportDialog::exportTemplate()
+{
+    QString path = QString("%1%2%3%4").arg(Utils::PathUtils().InsertStoragePath("%%STOREPATH%%cloudconfig"))
+                   .arg(QDir::separator()).arg(getTypeDirectory()).arg(QDir::separator());
+    QDir dir;
+
+    dir.mkpath(path);
+    saveTemplate(path);
+}
+
+void VehicleTemplateExportDialog::saveAsTemplate()
+{
+    saveTemplate(QString(""));
+}
+
+void VehicleTemplateExportDialog::importTemplate()
+{
+    QJsonObject *tmpl = ui->selectionWidget->selectedTemplate();
+
+    if (tmpl != NULL) {
+        QList<UAVObject *> updatedObjects;
+        m_uavoManager->fromJson(*tmpl, &updatedObjects);
+        UAVObjectUpdaterHelper helper;
+        foreach(UAVObject * object, updatedObjects) {
+            UAVDataObject *dataObj = dynamic_cast<UAVDataObject *>(object);
+
+            if (dataObj != NULL && dataObj->isKnown()) {
+                helper.doObjectAndWait(dataObj);
+
+                ObjectPersistence *objper = ObjectPersistence::GetInstance(m_uavoManager);
+                ObjectPersistence::DataFields data;
+                data.Operation  = ObjectPersistence::OPERATION_SAVE;
+                data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
+                data.ObjectID   = dataObj->getObjID();
+                data.InstanceID = dataObj->getInstID();
+                objper->setData(data);
+
+                helper.doObjectAndWait(objper);
+            }
+        }
     }
 }
 
@@ -267,6 +324,20 @@ void VehicleTemplateExportDialog::importImage()
         ui->Photo->setSceneRect(ui->Photo->scene()->itemsBoundingRect());
         ui->Photo->fitInView(ui->Photo->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
+}
+
+void VehicleTemplateExportDialog::onAutoPilotConnect()
+{
+    ui->importBtn->setEnabled(true);
+    m_autopilotConnected = true;
+    updateStatus();
+}
+
+void VehicleTemplateExportDialog::onAutoPilotDisconnect()
+{
+    ui->importBtn->setEnabled(false);
+    m_autopilotConnected = false;
+    updateStatus();
 }
 
 QString VehicleTemplateExportDialog::getTypeDirectory()
@@ -291,7 +362,10 @@ QString VehicleTemplateExportDialog::getTypeDirectory()
 
 void VehicleTemplateExportDialog::updateStatus()
 {
-    ui->acceptBtn->setEnabled(ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
-                              ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
-                              ui->Weight->text().length() > 0);
+    bool enabled = m_autopilotConnected && ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
+                   ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
+                   ui->Weight->text().length() > 0;
+
+    ui->exportBtn->setEnabled(enabled);
+    ui->saveAsBtn->setEnabled(enabled);
 }

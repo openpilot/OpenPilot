@@ -49,7 +49,7 @@
 #include <stabilization.h>
 #include <virtualflybar.h>
 #include <cruisecontrol.h>
-
+#include <sanitycheck.h>
 // Private constants
 
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_CRITICAL
@@ -66,6 +66,7 @@ static float axis_lock_accum[3] = { 0, 0, 0 };
 static uint8_t previous_mode[AXES] = { 255, 255, 255, 255 };
 static PiOSDeltatimeConfig timeval;
 static float speedScaleFactor = 1.0f;
+static bool frame_is_multirotor;
 
 // Private functions
 static void stabilizationInnerloopTask();
@@ -95,6 +96,8 @@ void stabilizationInnerloopInit()
 
     // schedule dead calls every FAILSAFE_TIMEOUT_MS to have the watchdog cleared
     PIOS_CALLBACKSCHEDULER_Schedule(callbackHandle, FAILSAFE_TIMEOUT_MS, CALLBACK_UPDATEMODE_LATER);
+
+    frame_is_multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR);
 }
 
 static float get_pid_scale_source_value()
@@ -239,7 +242,12 @@ static void stabilizationInnerloopTask()
     float *actuatorDesiredAxis = &actuator.Roll;
     int t;
     float dT;
+    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR); // check if frame is a multirotor
     dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
+
+    StabilizationStatusOuterLoopData outerLoop;
+    StabilizationStatusOuterLoopGet(&outerLoop);
+    bool allowPiroComp = true;
 
     for (t = 0; t < AXES; t++) {
         bool reinit = (StabilizationStatusInnerLoopToArray(enabled)[t] != previous_mode[t]);
@@ -248,6 +256,15 @@ static void stabilizationInnerloopTask()
         if (t < STABILIZATIONSTATUS_INNERLOOP_THRUST) {
             if (reinit) {
                 stabSettings.innerPids[t].iAccumulator = 0;
+                if (frame_is_multirotor) {
+                    // Multirotors should dump axis lock accumulators when unarmed or throttle is low.
+                    // Fixed wing or ground vehicles can fly/drive with low throttle.
+                    axis_lock_accum[t] = 0;
+                }
+            }
+            // Any self leveling on roll or pitch must prevent pirouette compensation
+            if (t < STABILIZATIONSTATUS_INNERLOOP_YAW && StabilizationStatusOuterLoopToArray(outerLoop)[t] != STABILIZATIONSTATUS_OUTERLOOP_DIRECT) {
+                allowPiroComp = false;
             }
             switch (StabilizationStatusInnerLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:
@@ -308,7 +325,12 @@ static void stabilizationInnerloopTask()
             }
         }
 
-        actuatorDesiredAxis[t] = boundf(actuatorDesiredAxis[t], -1.0f, 1.0f);
+        if (!multirotor) {
+            // we only need to clamp the desired axis to a sane range if the frame is not a multirotor type
+            // we don't want to do any clamping until after the motors are calculated and scaled.
+            // need to figure out what to do with a tricopter tail servo.
+            actuatorDesiredAxis[t] = boundf(actuatorDesiredAxis[t], -1.0f, 1.0f);
+        }
     }
 
     actuator.UpdateTime = dT * 1000;
@@ -322,7 +344,7 @@ static void stabilizationInnerloopTask()
         }
     }
 
-    if (stabSettings.stabBank.EnablePiroComp == STABILIZATIONBANK_ENABLEPIROCOMP_TRUE && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
+    if (allowPiroComp && stabSettings.stabBank.EnablePiroComp == STABILIZATIONBANK_ENABLEPIROCOMP_TRUE && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
         // attempted piro compensation - rotate pitch and yaw integrals (experimental)
         float angleYaw = DEG2RAD(gyro_filtered[2] * dT);
         float sinYaw   = sinf(angleYaw);
@@ -334,7 +356,7 @@ static void stabilizationInnerloopTask()
     }
 
     {
-        uint8_t armed;
+        FlightStatusArmedOptions armed;
         FlightStatusArmedGet(&armed);
         float throttleDesired;
         ManualControlCommandThrottleGet(&throttleDesired);

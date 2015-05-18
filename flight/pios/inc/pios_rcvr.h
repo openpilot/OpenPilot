@@ -35,10 +35,12 @@ struct pios_rcvr_driver {
     void    (*init)(uint32_t id);
     int32_t (*read)(uint32_t id, uint8_t channel);
     xSemaphoreHandle (*get_semaphore)(uint32_t id, uint8_t channel);
+    uint8_t (*get_quality)(uint32_t id);
 };
 
 /* Public Functions */
 extern int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel);
+extern uint8_t PIOS_RCVR_GetQuality(uint32_t rcvr_id);
 extern xSemaphoreHandle PIOS_RCVR_GetSemaphore(uint32_t rcvr_id, uint8_t channel);
 
 /*! Define error codes for PIOS_RCVR_Get */

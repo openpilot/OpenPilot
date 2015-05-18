@@ -18,6 +18,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "flightbatterysettings.h"
 #include "utils/svgimageprovider.h"
 #ifdef USE_OSG
 #include "osgearth.h"
@@ -59,6 +60,7 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "PathDesired" <<
         "AltitudeHoldDesired" <<
         "GPSPositionSensor" <<
+        "GPSSatellites" <<
         "GCSTelemetryStats" <<
         "SystemAlarms" <<
         "NedAccel" <<
@@ -77,10 +79,13 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "SystemSettings" <<
         "RevoSettings" <<
         "MagState" <<
-        "FlightBatterySettings";
+        "FlightBatterySettings" <<
+        "ReceiverStatus";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    m_uavoManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(m_uavoManager);
 
     foreach(const QString &objectName, objectsToExport) {
         UAVObject *object = objManager->getObject(objectName);
@@ -122,6 +127,14 @@ void PfdQmlGadgetWidget::setQmlFile(QString fn)
     foreach(const QQmlError &error, errors()) {
         qDebug() << error.description();
     }
+}
+
+void PfdQmlGadgetWidget::resetConsumedEnergy()
+{
+    FlightBatterySettings *mBatterySettings = FlightBatterySettings::GetInstance(m_uavoManager);
+
+    mBatterySettings->setResetConsumedEnergy(true);
+    mBatterySettings->setData(mBatterySettings->getData());
 }
 
 void PfdQmlGadgetWidget::setEarthFile(QString arg)

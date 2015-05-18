@@ -37,14 +37,17 @@
 #include <manualcontrolsettings.h>
 #include <manualcontrolcommand.h>
 #include <receiveractivity.h>
+#include <receiverstatus.h>
 #include <flightstatus.h>
 #include <flighttelemetrystats.h>
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 #include <stabilizationsettings.h>
+#include <vtolpathfollowersettings.h>
 #endif
 #include <flightmodesettings.h>
 #include <systemsettings.h>
 #include <taskinfo.h>
+#include <sanitycheck.h>
 
 
 #if defined(PIOS_INCLUDE_USB_RCTX)
@@ -72,6 +75,7 @@
 // Private variables
 static xTaskHandle taskHandle;
 static portTickType lastSysTime;
+static FrameType_t frameType = FRAME_TYPE_MULTIROTOR;
 
 #ifdef USE_INPUT_LPF
 static portTickType lastSysTimeLPF;
@@ -84,6 +88,7 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool validInputRange(int16_t min, int16_t max, uint16_t value);
 static void applyDeadband(float *value, float deadband);
+static void SettingsUpdatedCb(UAVObjEvent *ev);
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
 static uint8_t isAssistedFlightMode(uint8_t position);
@@ -98,12 +103,17 @@ static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel
 struct rcvr_activity_fsm {
     ManualControlSettingsChannelGroupsOptions group;
     uint16_t prev[RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP];
-    uint8_t sample_count;
+    uint8_t  sample_count;
+    uint8_t  quality;
 };
 static struct rcvr_activity_fsm activity_fsm;
 
 static void resetRcvrActivity(struct rcvr_activity_fsm *fsm);
 static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm);
+static void resetRcvrStatus(struct rcvr_activity_fsm *fsm);
+static bool updateRcvrStatus(
+    struct rcvr_activity_fsm *fsm,
+    ManualControlSettingsChannelGroupsOptions group);
 
 #define assumptions \
     ( \
@@ -124,6 +134,7 @@ int32_t ReceiverStart()
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
 #endif
+    SettingsUpdatedCb(NULL);
 
     return 0;
 }
@@ -138,15 +149,46 @@ int32_t ReceiverInitialize()
     AccessoryDesiredInitialize();
     ManualControlCommandInitialize();
     ReceiverActivityInitialize();
+    ReceiverStatusInitialize();
     ManualControlSettingsInitialize();
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     StabilizationSettingsInitialize();
+    VtolPathFollowerSettingsInitialize();
+    VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
 #endif
+    SystemSettingsInitialize();
+    SystemSettingsConnectCallback(&SettingsUpdatedCb);
 
 
     return 0;
 }
 MODULE_INITCALL(ReceiverInitialize, ReceiverStart);
+
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    frameType = GetCurrentFrameType();
+
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    uint8_t TreatCustomCraftAs;
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
+
+
+    if (frameType == FRAME_TYPE_CUSTOM) {
+        switch (TreatCustomCraftAs) {
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING:
+            frameType = FRAME_TYPE_FIXED_WING;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_VTOL:
+            frameType = FRAME_TYPE_MULTIROTOR;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_GROUND:
+            frameType = FRAME_TYPE_GROUND;
+            break;
+        }
+    }
+#endif
+}
+
 
 /**
  * Module task
@@ -173,6 +215,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
     /* Initialize the RcvrActivty FSM */
     portTickType lastActivityTime = xTaskGetTickCount();
     resetRcvrActivity(&activity_fsm);
+    resetRcvrStatus(&activity_fsm);
 
     // Main task loop
     lastSysTime = xTaskGetTickCount();
@@ -197,9 +240,13 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 /* Reset the aging timer because activity was detected */
                 lastActivityTime = lastSysTime;
             }
+            /* Read signal quality from the group used for the throttle */
+            (void)updateRcvrStatus(&activity_fsm,
+                                   settings.ChannelGroups.Throttle);
         }
         if (timeDifferenceMs(lastActivityTime, lastSysTime) > 5000) {
             resetRcvrActivity(&activity_fsm);
+            resetRcvrStatus(&activity_fsm);
             lastActivityTime = lastSysTime;
         }
 
@@ -243,22 +290,20 @@ static void receiverTask(__attribute__((unused)) void *parameters)
             }
         }
 
-        // Check settings, if error raise alarm
-        if (settings.ChannelGroups.Roll >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
-            || settings.ChannelGroups.Pitch >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
-            || settings.ChannelGroups.Yaw >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+        /* Read signal quality from the group used for the throttle */
+        (void)updateRcvrStatus(&activity_fsm,
+                               settings.ChannelGroups.Throttle);
+
+        // Sanity Check Throttle and Yaw
+        if (settings.ChannelGroups.Yaw >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
             || settings.ChannelGroups.Throttle >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
             ||
             // Check all channel mappings are valid
-            cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == (uint16_t)PIOS_RCVR_INVALID
-            || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == (uint16_t)PIOS_RCVR_INVALID
-            || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == (uint16_t)PIOS_RCVR_INVALID
+            cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == (uint16_t)PIOS_RCVR_INVALID
             || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] == (uint16_t)PIOS_RCVR_INVALID
             ||
             // Check the driver exists
-            cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == (uint16_t)PIOS_RCVR_NODRIVER
-            || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == (uint16_t)PIOS_RCVR_NODRIVER
-            || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == (uint16_t)PIOS_RCVR_NODRIVER
+            cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == (uint16_t)PIOS_RCVR_NODRIVER
             || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] == (uint16_t)PIOS_RCVR_NODRIVER
             ||
             // Check collective if required
@@ -271,7 +316,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
             settings.FlightModeNumber < 1 || settings.FlightModeNumber > FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM
             ||
             // Similar checks for FlightMode channel but only if more than one flight mode has been set. Otherwise don't care
-            ((settings.FlightModeNumber > 1)
+            ((settings.FlightModeNumber > 1) && (frameType != FRAME_TYPE_GROUND)
              && (settings.ChannelGroups.FlightMode >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
                  || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_INVALID
                  || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_NODRIVER))) {
@@ -282,15 +327,39 @@ static void receiverTask(__attribute__((unused)) void *parameters)
             continue;
         }
 
+
+        if (frameType != FRAME_TYPE_GROUND) {
+            // Sanity Check Pitch and Roll
+            if (settings.ChannelGroups.Roll >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+                || settings.ChannelGroups.Pitch >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+                ||
+                // Check all channel mappings are valid
+                cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == (uint16_t)PIOS_RCVR_INVALID
+                || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == (uint16_t)PIOS_RCVR_INVALID
+                ||
+                // Check the driver exists
+                cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == (uint16_t)PIOS_RCVR_NODRIVER
+                || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == (uint16_t)PIOS_RCVR_NODRIVER) {
+                AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_CRITICAL);
+                cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
+                ManualControlCommandSet(&cmd);
+
+                continue;
+            }
+        }
+
         // decide if we have valid manual input or not
         valid_input_detected &= validInputRange(settings.ChannelMin.Throttle,
                                                 settings.ChannelMax.Throttle, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE])
-                                && validInputRange(settings.ChannelMin.Roll,
-                                                   settings.ChannelMax.Roll, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL])
                                 && validInputRange(settings.ChannelMin.Yaw,
-                                                   settings.ChannelMax.Yaw, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW])
-                                && validInputRange(settings.ChannelMin.Pitch,
-                                                   settings.ChannelMax.Pitch, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH]);
+                                                   settings.ChannelMax.Yaw, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW]);
+
+        if (frameType != FRAME_TYPE_GROUND) {
+            valid_input_detected &= validInputRange(settings.ChannelMin.Roll,
+                                                    settings.ChannelMax.Roll, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL])
+                                    && validInputRange(settings.ChannelMin.Pitch,
+                                                       settings.ChannelMax.Pitch, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH]);
+        }
 
         if (settings.ChannelGroups.Collective != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
             valid_input_detected &= validInputRange(settings.ChannelMin.Collective,
@@ -321,10 +390,14 @@ static void receiverTask(__attribute__((unused)) void *parameters)
         }
 
         if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
-            cmd.Throttle   = settings.FailsafeChannel.Throttle;
-            cmd.Roll       = settings.FailsafeChannel.Roll;
-            cmd.Pitch      = settings.FailsafeChannel.Pitch;
-            cmd.Yaw = settings.FailsafeChannel.Yaw;
+            if (frameType != FRAME_TYPE_GROUND) {
+                cmd.Throttle = settings.FailsafeChannel.Throttle;
+            } else {
+                cmd.Throttle = 0.0f;
+            }
+            cmd.Roll  = settings.FailsafeChannel.Roll;
+            cmd.Pitch = settings.FailsafeChannel.Pitch;
+            cmd.Yaw   = settings.FailsafeChannel.Yaw;
             cmd.Collective = settings.FailsafeChannel.Collective;
             switch (thrustType) {
             case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
@@ -401,6 +474,9 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 applyDeadband(&cmd.Roll, deadband_checked);
                 applyDeadband(&cmd.Pitch, deadband_checked);
                 applyDeadband(&cmd.Yaw, deadband_checked);
+                if (frameType == FRAME_TYPE_GROUND) { // assumes reversible motors
+                    applyDeadband(&cmd.Throttle, deadband_checked);
+                }
             }
 #ifdef USE_INPUT_LPF
             // Apply Low Pass Filter to input channels, time delta between calls in ms
@@ -508,6 +584,12 @@ static void resetRcvrActivity(struct rcvr_activity_fsm *fsm)
     fsm->sample_count = 0;
 }
 
+static void resetRcvrStatus(struct rcvr_activity_fsm *fsm)
+{
+    /* Reset the state */
+    fsm->quality = 0;
+}
+
 static void updateRcvrActivitySample(uint32_t rcvr_id, uint16_t samples[], uint8_t max_channels)
 {
     for (uint8_t channel = 1; channel <= max_channels; channel++) {
@@ -552,6 +634,9 @@ static bool updateRcvrActivityCompare(uint32_t rcvr_id, struct rcvr_activity_fsm
             case MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS:
                 group = RECEIVERACTIVITY_ACTIVEGROUP_SBUS;
                 break;
+            case MANUALCONTROLSETTINGS_CHANNELGROUPS_SRXL:
+                group = RECEIVERACTIVITY_ACTIVEGROUP_SRXL;
+                break;
             case MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS:
                 group = RECEIVERACTIVITY_ACTIVEGROUP_GCS;
                 break;
@@ -578,6 +663,7 @@ static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm)
     if (fsm->group >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
         /* We're out of range, reset things */
         resetRcvrActivity(fsm);
+        resetRcvrStatus(fsm);
     }
 
     extern uint32_t pios_rcvr_group_map[];
@@ -618,6 +704,32 @@ group_completed:
             fsm->sample_count++;
             break;
         }
+    }
+
+    return activity_updated;
+}
+
+/* Read signal quality from the specified group */
+static bool updateRcvrStatus(
+    struct rcvr_activity_fsm *fsm,
+    ManualControlSettingsChannelGroupsOptions group)
+{
+    extern uint32_t pios_rcvr_group_map[];
+    bool activity_updated = false;
+    int8_t quality;
+
+    quality = PIOS_RCVR_GetQuality(pios_rcvr_group_map[group]);
+
+    /* If no driver is detected or any other error then return */
+    if (quality < 0) {
+        return activity_updated;
+    }
+
+    /* Compare with previous sample */
+    if (quality != fsm->quality) {
+        fsm->quality     = quality;
+        ReceiverStatusQualitySet(&fsm->quality);
+        activity_updated = true;
     }
 
     return activity_updated;

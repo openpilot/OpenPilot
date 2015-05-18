@@ -411,9 +411,9 @@ static void handleAccel(float *samples, float temperature)
     AccelSensorData accelSensorData;
 
     updateAccelTempBias(temperature);
-    float accels_out[3] = { samples[0] * agcal.accel_scale.X - agcal.accel_bias.X - accel_temp_bias[0],
-                            samples[1] * agcal.accel_scale.Y - agcal.accel_bias.Y - accel_temp_bias[1],
-                            samples[2] * agcal.accel_scale.Z - agcal.accel_bias.Z - accel_temp_bias[2] };
+    float accels_out[3] = { (samples[0] - agcal.accel_bias.X) * agcal.accel_scale.X - accel_temp_bias[0],
+                            (samples[1] - agcal.accel_bias.Y) * agcal.accel_scale.Y - accel_temp_bias[1],
+                            (samples[2] - agcal.accel_bias.Z) * agcal.accel_scale.Z - accel_temp_bias[2] };
 
     rot_mult(R, accels_out, samples);
     accelSensorData.x = samples[0];
@@ -444,8 +444,8 @@ static void handleGyro(float *samples, float temperature)
 static void handleMag(float *samples, float temperature)
 {
     MagSensorData mag;
-    float mags[3] = { (float)samples[1] - mag_bias[0],
-                      (float)samples[0] - mag_bias[1],
+    float mags[3] = { (float)samples[0] - mag_bias[0],
+                      (float)samples[1] - mag_bias[1],
                       (float)samples[2] - mag_bias[2] };
 
     rot_mult(mag_transform, mags, samples);
@@ -485,7 +485,10 @@ static void updateAccelTempBias(float temperature)
     if ((accel_temp_calibrated) && !accel_temp_calibration_count) {
         accel_temp_calibration_count = TEMP_CALIB_INTERVAL;
         if (accel_temp_calibrated) {
-            float ctemp = boundf(accel_temperature, agcal.temp_calibrated_extent.max, agcal.temp_calibrated_extent.min);
+            float ctemp = boundf(accel_temperature,
+                                 agcal.temp_calibrated_extent.max,
+                                 agcal.temp_calibrated_extent.min);
+
             accel_temp_bias[0] = agcal.accel_temp_coeff.X * ctemp;
             accel_temp_bias[1] = agcal.accel_temp_coeff.Y * ctemp;
             accel_temp_bias[2] = agcal.accel_temp_coeff.Z * ctemp;
@@ -588,8 +591,12 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 
     RevoSettingsBaroTempCorrectionPolynomialGet(&baroCorrection);
     RevoSettingsBaroTempCorrectionExtentGet(&baroCorrectionExtent);
-    baro_temp_correction_enabled = !(baroCorrectionExtent.max - baroCorrectionExtent.min < 0.1f ||
-                                     (baroCorrection.a < 1e-9f && baroCorrection.b < 1e-9f && baroCorrection.c < 1e-9f && baroCorrection.d < 1e-9f));
+    baro_temp_correction_enabled =
+        (baroCorrectionExtent.max - baroCorrectionExtent.min > 0.1f &&
+         (fabsf(baroCorrection.a) > 1e-9f ||
+          fabsf(baroCorrection.b) > 1e-9f ||
+          fabsf(baroCorrection.c) > 1e-9f ||
+          fabsf(baroCorrection.d) > 1e-9f));
 }
 /**
  * @}

@@ -117,7 +117,7 @@
             <x>0</x>
             <y>0</y>
             <width>1228</width>
-            <height>669</height>
+            <height>661</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -722,13 +722,13 @@ font:bold;</string>
                <widget class="QFrame" name="frame_3">
                 <property name="minimumSize">
                  <size>
-                  <width>106</width>
+                  <width>90</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>105</width>
+                  <width>90</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -1126,13 +1126,13 @@ font:bold;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>230</height>
+               <height>275</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>230</height>
+               <height>275</height>
               </size>
              </property>
              <property name="title">
@@ -1348,7 +1348,7 @@ font:bold;</string>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>150</height>
+                     <height>200</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
@@ -1758,6 +1758,12 @@ font:bold;</string>
               </item>
               <item row="1" column="12">
                <widget class="QSpinBox" name="fmsPosNum">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>29</height>
+                 </size>
+                </property>
                 <property name="toolTip">
                  <string>Number of positions your FlightMode switch has.
 
@@ -1795,7 +1801,7 @@ channel value for each flight mode.</string>
                  </font>
                 </property>
                 <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Never select &amp;quot;Manual&amp;quot; as Flight Mode when flying a multitrotor! Never select &amp;quot;Altitude&amp;quot; or &amp;quot;CruiseControl&amp;quot; in Stabilization Modes when using a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>

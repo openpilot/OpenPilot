@@ -60,8 +60,8 @@ PERF_DEFINE_COUNTER(counterParse);
 // ****************
 // Private functions
 
-static void gpsTask(void *parameters);
-static void updateHwSettings(UAVObjEvent *ev);
+static void gpsTask(__attribute__((unused)) void *parameters);
+static void updateHwSettings(__attribute__((unused)) UAVObjEvent *ev);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionSensorData *gpsData);
@@ -69,9 +69,9 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 #endif
 
 #ifdef PIOS_INCLUDE_GPS_UBX_PARSER
-void AuxMagSettingsUpdatedCb(UAVObjEvent *ev);
+void AuxMagSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
 #ifndef PIOS_GPS_MINIMAL
-void updateGpsSettings(UAVObjEvent *ev);
+void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev);
 #endif
 #endif
 
@@ -88,18 +88,18 @@ void updateGpsSettings(UAVObjEvent *ev);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-        #define STACK_SIZE_BYTES   1024
+        #define STACK_SIZE_BYTES   1024+64
 #else
 #if defined(PIOS_GPS_MINIMAL)
         #define GPS_READ_BUFFER    32
 
 #ifdef PIOS_INCLUDE_GPS_NMEA_PARSER
-        #define STACK_SIZE_BYTES   580 // NMEA
+        #define STACK_SIZE_BYTES   580+64 // NMEA
 #else
-        #define STACK_SIZE_BYTES   440 // UBX
+        #define STACK_SIZE_BYTES   440+64 // UBX
 #endif // PIOS_INCLUDE_GPS_NMEA_PARSER
 #else
-        #define STACK_SIZE_BYTES   650
+        #define STACK_SIZE_BYTES   650+64
 #endif // PIOS_GPS_MINIMAL
 #endif // PIOS_GPS_SETS_HOMELOCATION
 
@@ -114,7 +114,8 @@ void updateGpsSettings(UAVObjEvent *ev);
 
 static GPSSettingsData gpsSettings;
 
-static uint32_t gpsPort;
+//static uint32_t gpsPort;
+#define gpsPort PIOS_COM_GPS
 static bool gpsEnabled = false;
 
 static xTaskHandle gpsTaskHandle;
@@ -138,12 +139,12 @@ static struct GPS_RX_STATS gpsRxStats;
 int32_t GPSStart(void)
 {
     if (gpsEnabled) {
-        if (gpsPort) {
+//        if (gpsPort) {
             // Start gps task
             xTaskCreate(gpsTask, "GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
             PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
             return 0;
-        }
+//        }
     }
     return -1;
 }
@@ -156,7 +157,7 @@ int32_t GPSStart(void)
 
 int32_t GPSInitialize(void)
 {
-    gpsPort = PIOS_COM_GPS;
+//    gpsPort = PIOS_COM_GPS;
 
     HwSettingsInitialize();
 #ifdef MODULE_GPS_BUILTIN
@@ -197,7 +198,8 @@ int32_t GPSInitialize(void)
     // must updateHwSettings() before updateGpsSettings() so baud rate is set before GPS serial code starts running
     updateHwSettings(0);
 #else /* if defined(REVOLUTION) */
-    if (gpsPort && gpsEnabled) {
+//    if (gpsPort && gpsEnabled) {
+    if (gpsEnabled) {
         GPSPositionSensorInitialize();
         GPSVelocitySensorInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
@@ -215,7 +217,8 @@ int32_t GPSInitialize(void)
     }
 #endif /* if defined(REVOLUTION) */
 
-    if (gpsPort && gpsEnabled) {
+//    if (gpsPort && gpsEnabled) {
+    if (gpsEnabled) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) && defined(PIOS_INCLUDE_GPS_UBX_PARSER)
         gps_rx_buffer = pios_malloc((sizeof(struct UBXPacket) > NMEA_MAX_PACKET_LENGTH) ? sizeof(struct UBXPacket) : NMEA_MAX_PACKET_LENGTH);
 #elif defined(PIOS_INCLUDE_GPS_UBX_PARSER)
@@ -269,16 +272,19 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     PERF_INIT_COUNTER(counterBytesIn, 0x97510001);
     PERF_INIT_COUNTER(counterRate, 0x97510002);
     PERF_INIT_COUNTER(counterParse, 0x97510003);
-    uint8_t c[GPS_READ_BUFFER];
+//    uint8_t c[GPS_READ_BUFFER];
+uint8_t c[GPS_READ_BUFFER+8];
+    uint16_t bytes_remaining = 0;
 
     // Loop forever
     while (1) {
+if (gpsPort) {
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
         if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
             char *buffer   = 0;
             uint16_t count = 0;
 
-            ubx_autoconfig_run(&buffer, &count);
+            gps_ubx_autoconfig_run(&buffer, &count);
             // Something to send?
             if (count) {
                 // clear ack/nak
@@ -310,7 +316,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 
         // This blocks the task until there is something on the buffer (or 100ms? passes)
         uint16_t cnt;
-        cnt = PIOS_COM_ReceiveBuffer(gpsPort, c, GPS_READ_BUFFER, xDelay);
+        uint16_t bytes_used;
+        cnt = PIOS_COM_ReceiveBuffer(gpsPort, &c[bytes_remaining], GPS_READ_BUFFER-bytes_remaining, xDelay);
+//        cnt = PIOS_COM_ReceiveBuffer(gpsPort, c, GPS_READ_BUFFER, xDelay);
         if (cnt > 0) {
             PERF_TIMED_SECTION_START(counterParse);
             PERF_TRACK_VALUE(counterBytesIn, cnt);
@@ -324,7 +332,13 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
             case GPSSETTINGS_DATAPROTOCOL_UBX:
-                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+                cnt += bytes_remaining;
+                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats, &bytes_used);
+//                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats, &bytes_used);
+#if 1
+                bytes_remaining = cnt - bytes_used;
+                memmove(c, &c[bytes_used], bytes_remaining);
+#endif
                 break;
 #endif
             default:
@@ -380,8 +394,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
             }
         }
+} // if (gpsPort)
         vTaskDelayUntil(&xLastWakeTime, GPS_LOOP_DELAY_MS / portTICK_RATE_MS);
-    }
+    } // while (1)
 }
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
@@ -435,6 +450,93 @@ static void setHomeLocation(GPSPositionSensorData *gpsData)
     }
 }
 #endif /* ifdef PIOS_GPS_SETS_HOMELOCATION */
+
+
+uint32_t hwsettings_gpsspeed_enum_to_baud(uint8_t baud)
+{
+    switch (baud) {
+    case HWSETTINGS_GPSSPEED_2400:
+        return(2400);
+    case HWSETTINGS_GPSSPEED_4800:
+        return(4800);
+    default:
+    case HWSETTINGS_GPSSPEED_9600:
+        return(9600);
+    case HWSETTINGS_GPSSPEED_19200:
+        return(19200);
+    case HWSETTINGS_GPSSPEED_38400:
+        return(38400);
+    case HWSETTINGS_GPSSPEED_57600:
+        return(57600);
+    case HWSETTINGS_GPSSPEED_115200:
+        return(115200);
+    case HWSETTINGS_GPSSPEED_230400:
+        return(230400);
+    }
+}
+
+
+//void debugindex(__attribute__((unused)) int index, __attribute__((unused)) uint8_t c)
+void debugindex(int index, uint8_t c)
+{
+//#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+    static GPSExtendedStatusData olddata;
+    static GPSExtendedStatusData data;
+
+    if (index < 8) {
+      data.FirmwareHash[index] = c;
+    } else {
+      data.BoardType[index-8] = c;
+    }
+
+    if (memcmp(&data, &olddata, sizeof(data))) {
+        olddata = data;
+        static uint8_t mutex; // = 0
+        if (__sync_fetch_and_add(&mutex, 1) == 0) {
+            GPSExtendedStatusSet(&data);
+        }
+        --mutex;
+    }
+//#endif
+}
+
+
+// having already set the GPS's baud rate with a serial command, set the local Revo port baud rate
+void gps_set_fc_baud_from_arg(uint8_t baud, __attribute__((unused)) uint8_t addit)
+{
+    static uint8_t mutex; // = 0
+
+    if (__sync_fetch_and_add(&mutex, 1) == 0) {
+        // Set Revo port hwsettings_baud
+        PIOS_COM_ChangeBaud(PIOS_COM_GPS, hwsettings_gpsspeed_enum_to_baud(baud));
+        GPSPositionSensorCurrentBaudRateSet(&baud);
+    } else {
+        static uint8_t c;
+        debugindex(9, ++c);
+        if (c > 254) c=254;
+    }
+    --mutex;
+
+    debugindex(6, baud);
+    {
+        static uint8_t c;
+        debugindex(7, ++c);
+    }
+}
+
+
+#if 0
+void gps_set_fc_baud_from_settings()
+{
+    HwSettingsGPSSpeedOptions speed;
+
+    // Retrieve settings
+    HwSettingsGPSSpeedGet(&speed);
+
+    gps_set_fc_baud_from_arg((uint8_t) speed);
+}
+#endif
+
 
 /**
  * Update the GPS settings, called on startup.
@@ -509,71 +611,236 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
     // since 9600 baud and lower are not usable, and are best left at NEMA, I could have coded it to do a factory reset
     // - if set to 9600 baud (or lower)
 
-    if (gpsPort) {
-        HwSettingsGPSSpeedOptions speed;
+    // if GPS (UBX or NEMA) is enabled at all
+    static uint32_t previousGpsPort=0xf0f0f0f0; // = 0 means deconfigured and at power up it is deconfigured
+    if (gpsPort && gpsEnabled) {
+//we didn't have a gpsPort when we booted, and disabled did not find GPS's
+//but booting with gpsPort valid immediately worked
+//oh, PIOS_COM_GPS is certainly set during init and not elsewhere
+//and that means changing the GPS port will not be recognized till reboot
+/*
+it autobauds even if autoconfig is disabled
+  initial thought is disable that, but is it a good thing to leave in?
+  we could have several levels, autobaud, autoconfig, save
+  on one hand, always autobaud is good for user
+  on other hand, always autobaud is somewhat disruptive to experimentation?  I can't think why.  To test simulated GPS failure without rewiring?
 
-#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
-        // use 9600 baud during startup if autoconfig is enabled
-        // that is the flag that the code should assumes a factory default baud rate
-        if (ev == NULL && gpsSettings.UbxAutoConfig != GPSSETTINGS_UBXAUTOCONFIG_DISABLED) {
-            speed = HWSETTINGS_GPSSPEED_9600;
-        } else
-#endif
-        {
-            // Retrieve settings
-            HwSettingsGPSSpeedGet(&speed);
-        }
+gps at 2400 baud with autoconfig disabled appears to not have autobauded correctly
+  and autoconfig runs forever if it gets enabled
+  yes it did work, but why is SensorType Unknown?
+    is it running the first step over and over which resets sensor type?
+    no date so no updates means alarmset()
+    and all it takes is a MON_VER to make it OK
+    but why did it work at 57600 and 38400 autobauds?
+      makes me wonder if 2400 is so slow that it never completes before timeout
+      so try 9600 etc.
+    gpstime is working, so baud rate is correct at least part of the time
+      is it possible that once it gets 2400, it can't get out?
+  GPSPositionSensor.Status jumps around from NoGPS to NoFix to Fix3D
+  all else fails try putting gpsPort back the way it was for a test
+    could be that alarm is disabling gpsPort?  that would be stupid
 
-        // must always set the baud here, even if it looks like it is the same
-        // e.g. startup sets 9600 here, ubx_autoconfig sets 57600 there, then the user selects a change back to 9600 here
+Oh!!!!
+  It got stuck because I configured it to 57600 and then let it autobaud to 2400 so it has all messages at 2400
+    so autobaud is not good without deconfiguring for low baud rates
+  the previous procedure was, first change to a new baud rate (assuming it was a higher rate)
+    then ALWAYS configure (including removing messages for 9600 and lower)
+    so the code would never let it get it in a bad way (2400 with OP messages)
+      how about starting at 57600 and going to 2400?
+      doesn't seem like that should work in the old code
 
-        // on    startup (ev == NULL) we must set the Revo port baud rate
-        // after startup (ev != NULL) we must set the Revo port baud rate only if autoconfig is disabled
+So do we need to disable messages somehow at start of config?
+  maybe disable ubx in port
+  maybe disable known messages
+    could use a flag with same tables and don't wait for ack???
+
+will MON_VER work if outProtoMask = 0?
+  if so, then maybe all rates <= 9600 (19200?) should set outProtoMask = 0
+  remember that autoconfig=disabled and u-center is an option for dev experimentation
+  I really want to let them try 19200 with sentences
+
+do we want baud rate to autobaud always?
+  is then there any reason for manual setting of baud?
+
+well these fixes maybe make it so it won't get into trouble
+  but will it get someone out of their own trouble?
+
+first version of new code
+  4800 works but 2400 does not
+  2400 works if no data
+
+if increasing timeouts fixes it
+  maybe we can make timeouts proportional to inverse baud rate
+  doubling timeouts did not fix it
+
+IMPORTANT
+with autoconfig disabled, when you change the baud rate
+  you just get autobauded back to the original baud rate, but don't know it
+  that is confusing
+  it needs one extra step to set desired baud rate after autobauding?
+  changing baud without configuring at all is dangerous
+    changing from 57600 to 2400 and leaving messages enabled
+    if we disable messages, then it is not baud only and it is not baud + configure
+      and that is confusing
+
+it appears that outprotocol=0 means the MON_VER request doesn't reply
+  after setting baud to 2400??? with 0 and flashing, it did not get MON_VER
+
+it will go into 2400 but won't come out
+
+it still might be possible to use outprotocol=0 if we set it back to 1
+  but that is no good, MON_VER will still be bad then
+  well it won't come out of 2400 with messages, even with outprotocol=0
+  it truely never gets started on the FSM because MON_VER is blocked
+  well if MON_VER responds, we could set outprotocol=0 just before MON_VER???
+
+so the big problem is MOV_VER
+  but there are some messages coming back and it must be MON_VER?
+  could try commenting out MON_VER send and see if messages go away
+
+it still bounces NoGPS to NoFix to Fix3D even with MON_VER turned off
+  well this is 2400 with messages so that makes sense
+
+How to get it out of 2400 with messages
+  maybe the problem is that it took a bunch of retries before
+  and now it takes 10 times as many because it has to try all baud rates
+  maybe we can change the cycle factor and make all messages come every 99 cycles at 1000ms per cycle
+    as part of the MON_VER packet
+  maybe only allow autobaud if autoconfig is enabled
+
+test old version
+
+test version where it only uses hwsettings_baud (and thus autobaud is disabled)
+  maybe it is a loop to set gpssettings.ubxautoconfig from a task awakened by gpssettings callback
+where did 38400 come from
+  38400 is boot up HwSettings.GPSSpeed
+  but I had set HwSettings.GPSSpeed to 2400
+  it toggled back and forth between 2400 and 38400 and then locked on 38400
+    it locked at the time the SensorType went to UBX7
+
+There are no GPSSatellites messages being received for UBX7
+
+Is there a reentrancy?
+  maybe we need to just set flags in one thread and do it all from the other thread
+
+maybe from ubx_autoconfig.c I should just set hwsettings and let GPS.c do the real baud rate set.
+  and for gps_ubx_reset_sensor_type() I can just skip it (just GPSPositionSensorSensorTypeSet()) if already being called
+
+nobody set the baud, but it quit working when I changed baud in GCS
+  that might imply that calling HwSettingsGPSSpeedSet() actually change the baud rate.
+  if that is true, (and it probably is) then it is not possible to use the gcs HwSettings.GPSSpeed to change first the GPS and then the port.
+  we need a NewGpsSpeed in GpsSettings.
+
+if we already have a baud rate and configure is enabled,
+  we don't want autobaud running to mess up the acquired baud rate
+  OTOH we need changing the baud to reaquire in case they changed GPS's?
+    we could say that you must reboot after changing a GPS or unplugging/plugging a cable
+
+should autobaud connect also set the GPS baud to HwSettings?
+  autobaud connect (set Revo to GPS baud rate)
+  autobaud change  (set GPS to HwSettings.GPSSpeed)
+  configure
+  save
+  disable
+
+should disable still do autobaud connect on startup and changes?
+
+get GPS at 2400 with sentences
+  see what it does now
+  after baud is correct and we set GPSSpeed, it resets sensortype
+    which causes it to set baud to set baud to GPSSpeed before FSM ran to set GPS baud
+
+design the flow, disabled does nothing
+  if disabled
+    callback sets baud
+    callback resets sensortype
+    ac sees invalid sensor type and ...
+
+how to handle "connection" i.e. when baud is right or when it is wrong
+  want to skip some things in some cases when connection is already correct
+    that will make baud changes quick
+  want to do   some things in some cases when connection is already correct
+    that will allow them to know real status
+  at startup, don't assume connection is valid, test it
+    autobaud does bauds in probability order
+    starting with hwsettings.gpsspeed so it almost isn't even an autobaud
+  once connection is made, we need to avoid resetting sensortype
+    unless what ... 'what' is
+      maybe monitor MON_VER somehow to see if cable gets unplugged
+      maybe don't bother and tell them not to disconnect cables
+      and when something new goes bad, start over with autobaud
+  should we monitor MON_VER to know when connection goes down?
+    if so, we need a better way than resetting sensor type
+    a simple ack would be good.
+
+reset sensor type
+  reduce to just startup and error
+  no, it isn't a problem, it is the baud rate setting that is now associated with it
+  yes, reduce it, it should not be popping back and forth between good and bad just to poll it
+  baud_to_try_index is reset there, where should it be reset?
+
+at least have a procedure for starting over without reboot
+  like when plugging in a different GPS
+  currently the sensortype global is what drives the autoconfig process, so it must be validated
+  as part of the FSM
+  so it is initially detected outside FSM, and then for each configure, it is detected again, but without resetting it
+  that can be done with an FSM wait after sending MON_VER again.
+  error will reset sensor type
+
+how to set baud rate in callback without causing unsyncing
+  for synced baud rate and when allowing autobaud in ...  huh?
+
+IMPORTANT
+the ubx parser doesn't handle partially received buffers
+
+*/
+//new code: at startup does it always need to be HwSettings.GPSSpeed? yes
+
+// must always set the baud here, even if it looks like it is the same
+// e.g. startup sets 9600 here, ubx_autoconfig sets 57600 there, then the user selects a change back to 9600 here
+
+        // on first use of this port (previousGpsPort != gpsPort) we must set the Revo port baud rate
+        // after startup (previousGpsPort == gpsPort) we must set the Revo port baud rate only if autoconfig is disabled
         // always we must set the Revo port baud rate if not using UBX
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
-        if (ev == NULL || gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED || gpsSettings.DataProtocol != GPSSETTINGS_DATAPROTOCOL_UBX)
+        if (ev == NULL
+// test prevport
+|| previousGpsPort != gpsPort
+            || gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED
+// this needs to be disabled if we allow it to autobaud when autoconfig is disabled
+            || gpsSettings.DataProtocol  != GPSSETTINGS_DATAPROTOCOL_UBX)
 #endif
         {
-            // Set Revo port speed
-            switch (speed) {
-            case HWSETTINGS_GPSSPEED_2400:
-                PIOS_COM_ChangeBaud(gpsPort, 2400);
-                break;
-            case HWSETTINGS_GPSSPEED_4800:
-                PIOS_COM_ChangeBaud(gpsPort, 4800);
-                break;
-            case HWSETTINGS_GPSSPEED_9600:
-                PIOS_COM_ChangeBaud(gpsPort, 9600);
-                break;
-            case HWSETTINGS_GPSSPEED_19200:
-                PIOS_COM_ChangeBaud(gpsPort, 19200);
-                break;
-            case HWSETTINGS_GPSSPEED_38400:
-                PIOS_COM_ChangeBaud(gpsPort, 38400);
-                break;
-            case HWSETTINGS_GPSSPEED_57600:
-                PIOS_COM_ChangeBaud(gpsPort, 57600);
-                break;
-            case HWSETTINGS_GPSSPEED_115200:
-                PIOS_COM_ChangeBaud(gpsPort, 115200);
-                break;
-            case HWSETTINGS_GPSSPEED_230400:
-                PIOS_COM_ChangeBaud(gpsPort, 230400);
-                break;
-            }
+#if 1
+            uint8_t speed;
+            // Retrieve settings
+            HwSettingsGPSSpeedGet(&speed);
+            // set fc baud
+            gps_set_fc_baud_from_arg(speed, 1);
+debugindex(2, speed);
+{
+static uint8_t c;
+debugindex(3, ++c);
+}
+#endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
             // even changing the baud rate will make it re-verify the sensor type
-            // that way the user can just try some baud rates and it when the sensor type is valid, the baud rate is correct
-            ubx_reset_sensor_type();
+            // that way the user can just try some baud rates and when the sensor type is valid, the baud rate is correct
+            gps_ubx_reset_sensor_type();
+//careful here if the sensor type is connected to autobaud
+
+// make sure that normal autoconfig still works
+// that you can set just Revo baud manually and both automatically
 #endif
         }
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
         else {
             // it will never do this during startup because ev == NULL
-            ubx_autoconfig_set(NULL);
+            gps_ubx_autoconfig_set(NULL);
         }
 #endif
     }
+    previousGpsPort = gpsPort;
 }
 
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
@@ -588,16 +855,31 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
 
     GPSSettingsGet(&gpsSettings);
 
+#if 0
+    // if GPS is enabled and UBX GPS is enabled
+    if (gpsPort && gpsEnabled && gpsSettings.UbxAutoConfig != GPSSETTINGS_UBXAUTOCONFIG_DISABLED) {
+        newconfig.UbxAutoConfig = gpsSettings.UbxAutoConfig;
+    } else {
+        newconfig.UbxAutoConfig = GPSSETTINGS_UBXAUTOCONFIG_DISABLED;
+    }
+#else
+    // it's OK that ubx auto config is inited and ready to go, when GPS is disabled or running NEMA
+    // because ubx auto config never gets called
+    // setting it up completely means that if we switch from initial NEMA to UBX or disabled to enabled, that it will start normally
+    newconfig.UbxAutoConfig = gpsSettings.UbxAutoConfig;
+#endif
+
     newconfig.navRate = gpsSettings.UbxRate;
 
-    newconfig.autoconfigEnabled = gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED ? false : true;
-    newconfig.storeSettings     = gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGUREANDSTORE;
+//    newconfig.autoconfigEnabled     = gpsSettings.UbxAutoConfig != GPSSETTINGS_UBXAUTOCONFIG_DISABLED;
+//    newconfig.storeSettings         = gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGUREANDSTORE;
+//    newconfig.configStoreAndDisable = gpsSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGSTOREANDDISABLE;
 
-    newconfig.dynamicModel = gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PORTABLE ? UBX_DYNMODEL_PORTABLE :
+    newconfig.dynamicModel = gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PORTABLE   ? UBX_DYNMODEL_PORTABLE   :
                              gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_STATIONARY ? UBX_DYNMODEL_STATIONARY :
                              gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PEDESTRIAN ? UBX_DYNMODEL_PEDESTRIAN :
                              gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AUTOMOTIVE ? UBX_DYNMODEL_AUTOMOTIVE :
-                             gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_SEA ? UBX_DYNMODEL_SEA :
+                             gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_SEA        ? UBX_DYNMODEL_SEA        :
                              gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE1G ? UBX_DYNMODEL_AIRBORNE1G :
                              gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE2G ? UBX_DYNMODEL_AIRBORNE2G :
                              gpsSettings.UbxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE4G ? UBX_DYNMODEL_AIRBORNE4G :
@@ -638,11 +920,11 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
 
     newconfig.SBASChannelsUsed = gpsSettings.UbxSBASChannelsUsed;
 
-    newconfig.SBASSats = gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_WAAS ? UBX_SBAS_SATS_WAAS :
+    newconfig.SBASSats = gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_WAAS  ? UBX_SBAS_SATS_WAAS  :
                          gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_EGNOS ? UBX_SBAS_SATS_EGNOS :
-                         gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_MSAS ? UBX_SBAS_SATS_MSAS :
+                         gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_MSAS  ? UBX_SBAS_SATS_MSAS  :
                          gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_GAGAN ? UBX_SBAS_SATS_GAGAN :
-                         gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_SDCM ? UBX_SBAS_SATS_SDCM : UBX_SBAS_SATS_AUTOSCAN;
+                         gpsSettings.UbxSBASSats == GPSSETTINGS_UBXSBASSATS_SDCM  ? UBX_SBAS_SATS_SDCM  : UBX_SBAS_SATS_AUTOSCAN;
 
     switch (gpsSettings.UbxGNSSMode) {
     case GPSSETTINGS_UBXGNSSMODE_GPSGLONASS:
@@ -677,7 +959,7 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
         break;
     }
 
-    ubx_autoconfig_set(&newconfig);
+    gps_ubx_autoconfig_set(&newconfig);
 }
 #endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
 /**

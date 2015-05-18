@@ -49,6 +49,7 @@
 // later versions dropped this and drop data when the send buffer is full and that could be even longer
 // rather than have long timeouts, we will let timeouts * retries handle that if it happens
 
+#if 0
 // timeout for ack reception
 #define UBX_REPLY_TIMEOUT             (500 * 1000)
 // timeout for a settings save, in case it has to erase flash
@@ -59,7 +60,18 @@
 #define UBX_VERIFIED_STEP_WAIT_TIME   (50 * 1000)
 // pause between each unverifiably correct configuration step
 #define UBX_UNVERIFIED_STEP_WAIT_TIME (500 * 1000)
-
+#else
+// timeout for ack reception
+#define UBX_REPLY_TIMEOUT             (2000 * 1000)
+// timeout for a settings save, in case it has to erase flash
+#define UBX_REPLY_TO_SAVE_TIMEOUT     (3000 * 1000)
+// max retries in case of timeout
+#define UBX_MAX_RETRIES               5
+// pause between each verifiably correct configuration step
+#define UBX_VERIFIED_STEP_WAIT_TIME   (1000 * 1000)
+// pause between each unverifiably correct configuration step
+#define UBX_UNVERIFIED_STEP_WAIT_TIME (2000 * 1000)
+#endif
 #define UBX_CFG_CFG_OP_STORE_SETTINGS \
     (UBX_CFG_CFG_SETTINGS_IOPORT | \
      UBX_CFG_CFG_SETTINGS_MSGCONF | \
@@ -85,9 +97,9 @@ typedef enum {
 
 #define UBX_
 typedef struct {
-    bool    autoconfigEnabled;
-    bool    storeSettings;
-
+//    bool    autoconfigEnabled;
+//    bool    storeSettings;
+    GPSSettingsUbxAutoConfigOptions UbxAutoConfig;
     bool    SBASRanging;
     bool    SBASCorrection;
     bool    SBASIntegrity;
@@ -100,6 +112,7 @@ typedef struct {
     bool    enableGPS;
     bool    enableGLONASS;
     bool    enableBeiDou;
+//    bool    configStoreAndDisable;
 } ubx_autoconfig_settings_t;
 
 // Sent messages for configuration support
@@ -114,9 +127,9 @@ typedef struct UBX_CFG_GNSS ubx_cfg_gnss_t;
 typedef struct UBXSENTHEADER UBXSentHeader_t;
 typedef union  UBXSENTPACKET UBXSentPacket_t;
 
-void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send);
-void ubx_autoconfig_set(ubx_autoconfig_settings_t *config);
-void ubx_reset_sensor_type();
+void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send);
+void gps_ubx_autoconfig_set(ubx_autoconfig_settings_t *config);
+void gps_ubx_reset_sensor_type();
 
 int32_t ubx_autoconfig_get_status();
 #endif /* UBX_AUTOCONFIG_H_ */

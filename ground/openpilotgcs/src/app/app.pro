@@ -16,7 +16,7 @@ include(../libs/version_info/version_info.pri)
 LIBS *= -l$$qtLibraryName(ExtensionSystem) -l$$qtLibraryName(Aggregation)
 
 DEFINES += PLUGIN_REL_PATH=$$shell_quote(\"$$relative_path($$GCS_PLUGIN_PATH, $$GCS_APP_PATH)\")
-DEFINES += GCS_NAME=$$shell_quote(\"$$GCS_APP_TARGET\")
+DEFINES += GCS_NAME=$$shell_quote(\"$$GCS_FULL_NAME\")
 
 win32 {
     RC_FILE = openpilotgcs.rc

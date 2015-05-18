@@ -51,8 +51,14 @@ export DIST_DIR    := $(ROOT_DIR)/build/dist
 
 DIRS = $(DL_DIR) $(TOOLS_DIR) $(BUILD_DIR) $(PACKAGE_DIR) $(DIST_DIR)
 
+# Naming for binaries and packagind etc,.
+OP_BIG_NAME := OpenPilot
+GCS_BIG_NAME := ${OP_BIG_NAME} GCS
+# These should be lowercase with no spaces
+OP_SMALL_NAME := openpilot
+GCS_SMALL_NAME := ${OP_SMALL_NAME}gcs
+
 # Set up default build configurations (debug | release)
-GCS_NAME                := openpilotgcs
 GCS_BUILD_CONF		:= release
 GOOGLE_API_VERSION	:= 14
 
@@ -456,7 +462,7 @@ else
     GCS_SILENT := silent
 endif
 
-OPENPILOTGCS_DIR := $(BUILD_DIR)/$(GCS_NAME)_$(GCS_BUILD_CONF)
+OPENPILOTGCS_DIR := $(BUILD_DIR)/$(GCS_SMALL_NAME)_$(GCS_BUILD_CONF)
 DIRS += $(OPENPILOTGCS_DIR)
 
 OPENPILOTGCS_MAKEFILE := $(OPENPILOTGCS_DIR)/Makefile
@@ -465,7 +471,8 @@ OPENPILOTGCS_MAKEFILE := $(OPENPILOTGCS_DIR)/Makefile
 openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
 	$(V1) cd $(OPENPILOTGCS_DIR) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro \
-	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) GCS_APP_TARGET=$(GCS_NAME) $(GCS_QMAKE_OPTS)
+	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) \
+	    'GCS_FULL_NAME="$(GCS_BIG_NAME)"' GCS_APP_TARGET=$(GCS_SMALL_NAME) $(GCS_QMAKE_OPTS)
 
 .PHONY: openpilotgcs
 openpilotgcs: uavobjgenerator $(OPENPILOTGCS_MAKEFILE)
@@ -717,7 +724,7 @@ endif
 
 # Define some variables
 PACKAGE_LBL       := $(shell $(VERSION_INFO) --format=\$${LABEL})
-PACKAGE_NAME      := OpenPilot
+PACKAGE_NAME      := $(OP_BIG_NAME)
 PACKAGE_SEP       := -
 PACKAGE_FULL_NAME := $(PACKAGE_NAME)$(PACKAGE_SEP)$(PACKAGE_LBL)
 

@@ -1,7 +1,6 @@
 <xml>
     <object name="PathStatus" singleinstance="true" settings="false" category="Navigation">
         <description>Status of the current path mode  Can come from any @ref PathFollower module</description>
-
 	<field name="UID" units="" type="int16" elements="1" default="0"/>
 	<!-- unique ID confirmed with pathfollower in pathstatus to acknowledge a change in PathDesired -->
 	<field name="Status" units="" type="enum" elements="1" options="InProgress,Completed,Warning,Critical"/>
@@ -14,6 +13,7 @@
 	<field name="correction_direction_east" units="m" type="float" elements="1"/>
 	<field name="correction_direction_down" units="m" type="float" elements="1"/>
 	<field name="path_time" units="s" type="float" elements="1"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

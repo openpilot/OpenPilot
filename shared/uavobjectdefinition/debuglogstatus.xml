@@ -5,6 +5,7 @@
         <field name="Entry" units="" type="uint16" elements="1" description="The current log entry id"/>
         <field name="UsedSlots" units="" type="uint16" elements="1" description="Holds the total log entries saved"/>
         <field name="FreeSlots" units="" type="uint16" elements="1" description="The number of free log slots available"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

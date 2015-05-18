@@ -14,6 +14,7 @@
         <field name="SysSlotsActive" units="slots" type="uint16" elements="1"/>
         <field name="UsrSlotsFree" units="slots" type="uint16" elements="1"/>
         <field name="UsrSlotsActive" units="slots" type="uint16" elements="1"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

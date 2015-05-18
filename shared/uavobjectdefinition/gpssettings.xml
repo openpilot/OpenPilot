@@ -4,31 +4,23 @@
         <field name="DataProtocol" units="" type="enum" elements="1" options="NMEA,UBX" defaultvalue="UBX"/>
         <field name="MinSatellites" units="" type="uint8" elements="1" defaultvalue="7"
                description="How many satellites are needed for safe operation. Default to 7"/>
-
         <field name="MaxPDOP" units="" type="float" elements="1" defaultvalue="3.5"
                description="Maximal PDOP allowed for safe operation. Default to 3.5m"/>
-
         <field name="UbxAutoConfig" units="" type="enum" elements="1" 
                options="Disabled,Configure,ConfigureAndStore" defaultvalue="Disabled"
                description="Ubx self configuration. Enable to allow the flight board to auto configure ubx GPS options, store does AutoConfig and save GPS settings (i.e. to prevent issues if gps is power cycled) "/>
-
         <field name="UbxRate" units="Hz" type="int8" elements="1" defaultvalue="5"
                description="Ubx position update rate, -1 for auto. Default to 5"/>
-
         <field name="UbxDynamicModel" units="" type="enum" elements="1" 
                options="Portable,Stationary,Pedestrian,Automotive,Sea,Airborne1G,Airborne2G,Airborne4G" defaultvalue="Airborne1G"
                description="Ubx dynamic model, see UBX datasheet for more details. Default to 'Airborne1G'"/>
-
         <!-- Ubx SBAS settings -->
         <field name="UbxSBASMode" units="" type="enum" elements="1" options="Disabled,Ranging,Correction,Integrity,Ranging+Correction,Ranging+Integrity,Ranging+Correction+Integrity,Correction+Integrity" defaultvalue="Ranging"
                description="How SBAS sats are used. Default to 'Ranging'"/>
-
         <field name="UbxSBASChannelsUsed" units="" type="uint8" elements="1" defaultvalue="3"
                description="Numbers of SBAS channels used. Default to 3"/>
-
         <field name="UbxSBASSats" units="" type="enum" elements="1" options="AutoScan,WAAS,EGNOS,MSAS,GAGAN,SDCM" defaultvalue="AutoScan"
                description="SBASS type to use"/>
-
         <field name="UbxGNSSMode" units="" type="enum" elements="1" 
                options="Default,GPS,GLONASS,GPS+GLONASS,GPS+BeiDou,GLONASS+BeiDou" defaultvalue="Default" 
                description="Ubx GNSS configuration, only applies to Ublox generation 7+ and concurrent GNSS only to generation 8"/>

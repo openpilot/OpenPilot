@@ -8,6 +8,7 @@
 	<field name="UnderrunErrors" units="count" type="uint32" elements="1"/>
 	<field name="DroppedUpdates" units="" type="uint32" elements="1"/>
 	<field name="Packets" units="" type="uint32" elements="1"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

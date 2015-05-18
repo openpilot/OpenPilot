@@ -6,6 +6,7 @@
 	       defaultvalue="None"/>
 	<field name="ActiveChannel" units="channel" type="uint8" elements="1"
 	       defaultvalue="255"/>
+
         <access gcs="readonly" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="onchange" period="0"/>

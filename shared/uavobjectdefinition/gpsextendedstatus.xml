@@ -7,6 +7,7 @@
         <field name="FirmwareHash" units="hex" type="uint8" elements="8"/>
         <field name="FirmwareTag" units="char" type="uint8" elements="26"/>
         <field name="Options" units="" type="uint16" elements="1"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

@@ -10,6 +10,7 @@
         <field name="Yaw" units="degrees" type="float" elements="1"/>
 	<field name="Velocity" units="m/s" type="float" elementnames="North, East, Down"/>
         <field name="Position" units="m" type="float" elementnames="North, East, Down"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="100"/>

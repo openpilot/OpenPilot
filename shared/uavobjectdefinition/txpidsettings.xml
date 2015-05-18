@@ -4,13 +4,13 @@
         <field name="UpdateMode" units="option" type="enum" elements="1" options="Never,When Armed,Always" defaultvalue="When Armed"/>
 	<field name="BankNumber" units="" type="enum" options="Bank1,Bank2,Bank3" elements="1" defaultvalue="Bank1"/>
         <field name="Inputs" units="channel" type="enum"
-		elementnames="Instance1,Instance2,Instance3"
-		options="Throttle,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"
-		defaultvalue="Throttle,Accessory0,Accessory1"/>
+               elementnames="Instance1,Instance2,Instance3"
+               options="Throttle,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"
+               defaultvalue="Throttle,Accessory0,Accessory1"/>
         <field name="ThrottleRange" units="%" type="float" elements="2" elementnames="Min,Max" defaultvalue="0.20,0.80"/>
         <field name="PIDs" units="option" type="enum"
-		elementnames="Instance1,Instance2,Instance3"
-		options="Disabled,
+               elementnames="Instance1,Instance2,Instance3"
+               options="Disabled,
 			Roll Rate.Kp, Roll Rate.Ki, Roll Rate.Kd, Roll Rate.ILimit, Roll Rate.Resp,
 			Pitch Rate.Kp, Pitch Rate.Ki, Pitch Rate.Kd, Pitch Rate.ILimit, Pitch Rate.Resp,
 			Roll+Pitch Rate.Kp, Roll+Pitch Rate.Ki, Roll+Pitch Rate.Kd, Roll+Pitch Rate.ILimit, Roll+Pitch Rate.Resp,
@@ -21,7 +21,7 @@
 			Yaw Attitude.Kp, Yaw Attitude.Ki, Yaw Attitude.ILimit, Yaw Attitude.Resp,
 			Roll.Expo, Pitch.Expo, Roll+Pitch.Expo, Yaw.Expo,
 			GyroTau,AcroPlusFactor,Altitude Pos.Kp,Altitude Velocity.Kp,Altitude Velocity.Ki,Altitude Velocity.Kd,Altitude Velocity.Beta"
-		defaultvalue="Disabled"/>
+               defaultvalue="Disabled"/>
         <field name="MinPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
         <field name="MaxPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
 

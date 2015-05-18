@@ -1,7 +1,6 @@
 <xml>
     <object name="Waypoint" singleinstance="false" settings="false" category="Navigation">
         <description>A waypoint the aircraft can try and hit.  Used by the @ref PathPlanner module</description>
-
         <field name="Position" units="m" type="float" elementnames="North, East, Down"/>
         <field name="Velocity" units="m/s" type="float" elements="1"/>
         <field name="Action" units="" type="uint8" elements="1" />

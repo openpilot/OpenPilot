@@ -101,6 +101,7 @@
 			<elementname>OSDGen</elementname>
 		</elementnames>
 	</field> 
+
         <access gcs="readonly" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="onchange" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="10000"/>

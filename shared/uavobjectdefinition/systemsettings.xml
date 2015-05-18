@@ -5,11 +5,9 @@
         <field name="VehicleName" units="char" type="uint8" elements="20" defaultvalue="0"/>
 	<field name="ThrustControl" units="" type="enum" elements="1" options="Throttle,Collective,None" defaultvalue="Throttle" 
                description="Which way the vehicle controls its thrust. Can be through : **Throttle** (quadcopter, simple brushless planes,  car-type ground vehicles) **Collective** (collective pitch as in most helicopters, 3d quads, constant RPM variable pitch airplanes, and ground vehicles with diesel-electric locomotion) **None** (craft has neither engines nor dynamic brakes). Note that a glider with breaking flaps should likely use 'collective' and use the collective channel to control the brakes for optimum autopilot performance"/>
-
         <field name="GUIConfigData" units="bits" type="uint32" elements="4" defaultvalue="0"/>
         <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="30"
-               description="Vne, i.e. maximum airspeed the airframe can handle - used by autopilot, actuator compensation. As well as possibly by INS for plausibility checks"/>
-               
+               description="Vne, i.e. maximum airspeed the airframe can handle - used by autopilot, actuator compensation. As well as possibly by INS for plausibility checks"/>             
         <field name="AirSpeedMin" units="m/s" type="float" elements="1" defaultvalue="10"
                description="Vs0, i.e stall speed - minimum speed the airframe will be able to fly - used by autopilot, actuator compensation, as well as possibly by INS for plausibility check"/>
                <!--TODO: currently not used by vtols, needs its default changed to 0 as soon as its used by vtols-->

@@ -1,7 +1,6 @@
 <xml>
     <object name="StabilizationBank" singleinstance="true" settings="false" category="Control">
         <description>Currently selected PID bank</description>
-
 	<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>
 	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>
 	<field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>
@@ -15,11 +14,8 @@
 	<field name="RollPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
 	<field name="PitchPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
 	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit"/>
-
 	<field name="AcroInsanityFactor" units="percent" type="float" elements="1" defaultvalue="0.4" limits="%BE:0.0:1.0"/>
-
 	<field name="EnablePiroComp" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
-
 	<field name="EnableThrustPIDScaling" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 	<field name="ThrustPIDScaleCurve" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0.3,0.15,0,-0.15,-0.3"/>
 	<field name="ThrustPIDScaleSource" units="" type="enum" elements="1" options="ManualControlThrottle,StabilizationDesiredThrust,ActuatorDesiredThrust" defaultvalue="ActuatorDesiredThrust" />

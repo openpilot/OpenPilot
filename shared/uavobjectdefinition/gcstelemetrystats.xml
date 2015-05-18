@@ -1,7 +1,6 @@
 <xml>
     <object name="GCSTelemetryStats" singleinstance="true" settings="false" category="System" priority="true">
-        <description>The telemetry statistics from the ground computer</description>
-        
+        <description>The telemetry statistics from the ground computer</description>      
         <field name="Status" units="" type="enum" elements="1" options="Disconnected,HandshakeReq,HandshakeAck,Connected"/>
         <field name="TxDataRate" units="bytes/sec" type="float" elements="1"/>
         <field name="TxBytes" units="bytes" type="uint32" elements="1"/>

@@ -1,15 +1,13 @@
 <xml>
     <object name="RadioComBridgeStats" singleinstance="true" settings="false" category="System">
         <description>Maintains the telemetry statistics from the OPLM RadioComBridge.</description>
-
         <field name="TelemetryTxBytes" units="bytes" type="uint32" elements="1"/>
         <field name="TelemetryTxFailures" units="count" type="uint32" elements="1"/>
         <field name="TelemetryTxRetries" units="count" type="uint32" elements="1"/>
         <field name="TelemetryRxBytes" units="bytes" type="uint32" elements="1"/>
         <field name="TelemetryRxFailures" units="count" type="uint32" elements="1"/>
         <field name="TelemetryRxSyncErrors" units="count" type="uint32" elements="1"/>
-        <field name="TelemetryRxCrcErrors" units="count" type="uint32" elements="1"/>
-        
+        <field name="TelemetryRxCrcErrors" units="count" type="uint32" elements="1"/>    
         <field name="RadioTxBytes" units="bytes" type="uint32" elements="1"/>
         <field name="RadioTxFailures" units="count" type="uint32" elements="1"/>
         <field name="RadioTxRetries" units="count" type="uint32" elements="1"/>

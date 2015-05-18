@@ -7,6 +7,7 @@
         <field name="Altitude" units="m over geoid" type="float" elements="1" defaultvalue="0"/>
         <field name="Be" units="" type="float" elements="3" defaultvalue="0,0,0"/>
         <field name="g_e" units="m/s^2" type="float" elements="1" defaultvalue="9.81"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

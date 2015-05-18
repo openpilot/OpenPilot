@@ -5,6 +5,7 @@
         <field name="UpdateTime" units="ms" type="uint16" elements="1"/>
         <field name="MaxUpdateTime" units="ms" type="uint16" elements="1"/>
         <field name="NumFailedUpdates" units="" type="uint8" elements="1"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

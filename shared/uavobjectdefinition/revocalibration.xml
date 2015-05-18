@@ -8,6 +8,7 @@
         <!-- TODO: reimplement, put elsewhere (later) -->
         <field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
         <field name="MagBiasNullingRate" units="" type="float" elements="1" defaultvalue="0"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

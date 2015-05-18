@@ -2,6 +2,7 @@
     <object name="FlightPlanControl" singleinstance="true" settings="false" category="Navigation">
         <description>Control the flight plan script</description>
         <field name="Command" units="" type="enum" options="Start,Stop,Kill" defaultvalue="Start" elements="1"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="manual" period="0"/>
         <telemetryflight acked="true" updatemode="manual" period="0"/>

@@ -5,7 +5,8 @@
         <field name="ErrorType" units="" type="enum" elements="1" options="None,VMInitError,Exception,IOError,DivByZero,AssertError,AttributeError,ImportError,IndexError,KeyError,MemoryError,NameError,SyntaxError,SystemError,TypeError,ValueError,StopIteration,Warning,UnknownError" defaultvalue="None"/>
         <field name="ErrorFileID" units="" type="uint32" elements="1"/>
         <field name="ErrorLineNum" units="" type="uint32" elements="1"/>
-		<field name="Debug" units="" type="float" elements="2" defaultvalue="0.0"/>
+        <field name="Debug" units="" type="float" elements="2" defaultvalue="0.0"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="2000"/>

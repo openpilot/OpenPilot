@@ -9,6 +9,7 @@
         <field name="InstanceID" units="" type="uint16" elements="1"/>
 	<field name="Size" units="" type="uint16" elements="1" />
 	<field name="Data" units="" type="uint8" elements="200" />
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="manual" period="0"/>

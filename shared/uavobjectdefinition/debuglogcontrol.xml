@@ -12,6 +12,7 @@
 	<field name="Operation" units="" type="enum" elements="1" options="None, Retrieve, FormatFlash" />
 	<field name="Flight" units="" type="uint16" elements="1" />
 	<field name="Entry" units="" type="uint16" elements="1" />
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="manual" period="0"/>
         <telemetryflight acked="true" updatemode="manual" period="0"/>

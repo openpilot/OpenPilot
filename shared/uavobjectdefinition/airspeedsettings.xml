@@ -7,6 +7,7 @@
         <field name="AirspeedSensorType" units="" type="enum" elements="1" options="PixHawkAirspeedMS4525DO,EagleTreeAirspeedV3,DIYDronesMPXV5004,DIYDronesMPXV7002,GroundSpeedBasedWindEstimation,None"  defaultvalue="None"/>
 	    <field name="IMUBasedEstimationLowPassPeriod1" units="s" type="float" elements="1" defaultvalue="0.5" />
         <field name="IMUBasedEstimationLowPassPeriod2" units="s" type="float" elements="1" defaultvalue="10" />
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -1,7 +1,6 @@
 <xml>
     <object name="FaultSettings" singleinstance="true" settings="true" category="System">
         <description>Allows testers to simulate various fault scenarios.</description>
-
         <field name="ActivateFault" units="fault" type="enum" elements="1" options="NoFault,ModuleInitAssert,InitOutOfMemory,InitBusError,RunawayTask,TaskOutOfMemory" defaultvalue="NoFault"/>
 
         <access gcs="readwrite" flight="readwrite"/>

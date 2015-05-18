@@ -18,6 +18,7 @@
 			<elementname>GyroDriftZ</elementname>
 		</elementnames>
 	</field>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="10000"/>

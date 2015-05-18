@@ -4,7 +4,7 @@ APP="${1?}"
 PLUGINS="${APP}/Contents/Plugins"
 OP_PLUGINS="${APP}/Contents/Plugins/OpenPilot"
 QT_LIBS="QtCore QtGui QtMultimedia QtMultimediaWidgets QtNetwork QtOpenGL QtPrintSupport QtQml QtQuick QtScript QtSerialPort QtSql QtSvg QtWidgets QtV8 QtXml"
-QT_DIR=$(otool -L "${APP}/Contents/MacOS/openpilotgcs" | sed -n -e 's/\/QtCore\.framework.*//p' | sed -n -E 's:^.::p')
+QT_DIR=$(otool -L "${APP}/Contents/MacOS/${GCS_SMALL_NAME}" | sed -n -e 's/\/QtCore\.framework.*//p' | sed -n -E 's:^.::p')
 QT_EXTRA="accessible/libqtaccessiblewidgets.dylib bearer/libqgenericbearer.dylib imageformats/libqgif.dylib imageformats/libqico.dylib imageformats/libqjpeg.dylib imageformats/libqmng.dylib imageformats/libqtiff.dylib imageformats/libqsvg.dylib qmltooling/libqmldbg_tcp.dylib sqldrivers/libqsqlodbc.dylib sqldrivers/libqsqlpsql.dylib sqldrivers/libqsqlite.dylib imageformats/libqtga.dylib iconengines/libqsvgicon.dylib"
 
 OSG_EXTRA="libosgViewer.90.dylib"

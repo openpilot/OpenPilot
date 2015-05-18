@@ -135,7 +135,7 @@ isEmpty(GCS_FULL_NAME) {
 }
 
 macx {
-    GCS_PATH = $$GCS_BUILD_TREE/$${GCS_APP_TARGET}.app/Contents
+    GCS_PATH = $$GCS_BUILD_TREE/$${GCS_FULL_NAME}.app/Contents
     GCS_APP_PATH = $$GCS_PATH/MacOS
     GCS_LIBRARY_PATH = $$GCS_PATH/Plugins
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH

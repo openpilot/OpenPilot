@@ -193,6 +193,21 @@ void VtolBrakeController::UpdateVelocityDesired()
             if (!mManualThrust) {
                 controlDown.UpdatePositionSetpoint(positionState.Down);
             }
+
+
+            FlightStatusFlightModeAssistOptions flightModeAssist;
+            FlightStatusFlightModeAssistGet(&flightModeAssist);
+            if (flightModeAssist != FLIGHTSTATUS_FLIGHTMODEASSIST_NONE) {
+                // Notify manualcommand via setting hold state in flightstatus assistedcontrolstate
+                FlightStatusAssistedControlStateOptions assistedControlFlightMode;
+                FlightStatusAssistedControlStateGet(&assistedControlFlightMode);
+                // sanity check that we are in brake state according to flight status, which means
+                // we are being used for gpsassist
+                if (assistedControlFlightMode == FLIGHTSTATUS_ASSISTEDCONTROLSTATE_BRAKE) {
+                    assistedControlFlightMode = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_HOLD;
+                    FlightStatusAssistedControlStateSet(&assistedControlFlightMode);
+                }
+            }
         }
 
         // Update position state and control position to create inputs to velocity control

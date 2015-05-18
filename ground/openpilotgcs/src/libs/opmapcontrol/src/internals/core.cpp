@@ -260,7 +260,7 @@ void Core::SetMapType(const MapType::Types &value)
         case MapType::ArcGIS_Satellite:
         case MapType::ArcGIS_ShadedRelief:
         {
-                maxzoom = 10;
+            maxzoom = 10;
         }
         break;
 
@@ -349,15 +349,13 @@ void Core::OnMapClose()
 }
 QString Core::SetCurrentPositionByKeywords(QString const & keys)
 {
-    QString status = "ZERO_RESULTS";
+    QString status  = "ZERO_RESULTS";
     PointLatLng pos = OPMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
 
     if (!pos.IsEmpty() && (status == "OK")) {
         SetCurrentPosition(pos);
-    }
-    else
-    {
-	qDebug() << "Status is not OK: " << status; 
+    } else {
+        qDebug() << "Status is not OK: " << status;
     }
     return status;
 }

@@ -52,14 +52,14 @@ public:
         OpenStreetMapSurfer  = 34,
         OpenStreetMapSurferTerrain = 35,
 
-        BingMap = 444,
-        BingSatellite       = 555,
-        BingHybrid          = 666,
+        BingMap              = 444,
+        BingSatellite        = 555,
+        BingHybrid           = 666,
 
-        ArcGIS_Map          = 777,
-        ArcGIS_Satellite    = 788,
-        ArcGIS_ShadedRelief = 799,
-        ArcGIS_Terrain      = 811,
+        ArcGIS_Map           = 777,
+        ArcGIS_Satellite     = 788,
+        ArcGIS_ShadedRelief  = 799,
+        ArcGIS_Terrain       = 811,
 
         SigPacSpainMap       = 3001,
 
@@ -68,7 +68,7 @@ public:
         GoogleLabelsKorea    = 4003,
         GoogleHybridKorea    = 4005,
 
-	Statkart_Topo2 = 5500
+        Statkart_Topo2       = 5500
     };
     static QString StrByType(Types const & value)
     {

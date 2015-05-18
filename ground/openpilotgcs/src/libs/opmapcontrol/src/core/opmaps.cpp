@@ -174,7 +174,7 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
                 qheader.setRawHeader("Referrer", "http://www.openstreetmap.org/");
             }
             break;
-	    case MapType::Statkart_Topo2:
+            case MapType::Statkart_Topo2:
             {
                 qheader.setRawHeader("Referrer", "http://www.norgeskart.no/");
             }
@@ -183,24 +183,24 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             default:
                 break;
             }
-	    qDebug() << "Timeout is " << Timeout;
+            qDebug() << "Timeout is " << Timeout;
             reply = network.get(qheader);
-	    qDebug() << "reply " << reply;
+            qDebug() << "reply " << reply;
 
-	    QTime time;
-	    while ((!(reply->isFinished()) || (time.elapsed() > (6 * Timeout)))) {
-		QCoreApplication::processEvents(QEventLoop::AllEvents);
-	    }
+            QTime time;
+            while ((!(reply->isFinished()) || (time.elapsed() > (6 * Timeout)))) {
+                QCoreApplication::processEvents(QEventLoop::AllEvents);
+            }
 
-	    qDebug() << "Finished?" << reply->error() << " abort?" << (time.elapsed() > Timeout * 6);
-	    // If you are seeing Error 6 here you are dealing with a QT SSL Bug!!! 
+            qDebug() << "Finished?" << reply->error() << " abort?" << (time.elapsed() > Timeout * 6);
+            // If you are seeing Error 6 here you are dealing with a QT SSL Bug!!!
 
-	    if ((reply->error() != QNetworkReply::NoError) | (time.elapsed() > Timeout * 6)) {
-		qDebug() << "reply error: " << reply->error() << " see table at - http://doc.qt.io/qt-5/qnetworkreply.html";
-		return ret;
-	    }
+            if ((reply->error() != QNetworkReply::NoError) | (time.elapsed() > Timeout * 6)) {
+                qDebug() << "reply error: " << reply->error() << " see table at - http://doc.qt.io/qt-5/qnetworkreply.html";
+                return ret;
+            }
             ret = reply->readAll();
-	    //qDebug() << "ret " << ret;
+            // qDebug() << "ret " << ret;
             reply->deleteLater(); // TODO can't this be global??
 
             if (ret.isEmpty()) {

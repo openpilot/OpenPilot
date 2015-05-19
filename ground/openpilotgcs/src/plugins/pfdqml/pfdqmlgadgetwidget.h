@@ -19,6 +19,7 @@
 
 #include "pfdqmlgadgetconfiguration.h"
 #include "uavobjectmanager.h"
+#include "revosettings.h"
 #include <QQuickView>
 
 class PfdQmlGadgetWidget : public QQuickView {
@@ -86,6 +87,8 @@ public:
     }
 
     Q_INVOKABLE void resetConsumedEnergy();
+    Q_INVOKABLE void resetEKF();
+    Q_INVOKABLE void restoreEKFSettings();
 
 public slots:
     void setEarthFile(QString arg);
@@ -123,6 +126,8 @@ protected:
 
 private:
     UAVObjectManager *m_uavoManager;
+    RevoSettings *m_RevoSettings;
+    int prevFusionAlgorithm;
     QString m_qmlFileName;
     QString m_earthFile;
     bool m_openGLEnabled;

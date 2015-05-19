@@ -257,11 +257,23 @@ Item {
         visible: (SystemAlarms.Alarm_Attitude > 2) || ((SystemAlarms.Alarm_Attitude > 1) && (SystemAlarms.Alarm_Stabilization > 1))
     }
 
+
     SvgElementImage {
         id: warning_attitude_ekf
         elementName: "warning-attitude-ekf-restart"
         sceneSize: warnings.sceneSize
         anchors.centerIn: background.centerIn
         visible: (SystemAlarms.Alarm_Attitude == 2) && (SystemAlarms.Alarm_Stabilization == 1) && (RevoSettings.FusionAlgorithm > 3)
+
+        TooltipArea {
+           text: "This alarm indicates that EKF must be reinitialized"
+        }
+        
+        MouseArea { 
+           id: reset_panel_consumed_energy_mouseArea; 
+           anchors.fill: parent;
+           cursorShape: Qt.PointingHandCursor;
+           onClicked: qmlWidget.resetEKF();
+        }
     }
 }

@@ -29,6 +29,7 @@
 #include <QtCore/qfileinfo.h>
 #include <QtCore/qdir.h>
 #include <QMouseEvent>
+#include <QTimer>
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -135,6 +136,21 @@ void PfdQmlGadgetWidget::resetConsumedEnergy()
 
     mBatterySettings->setResetConsumedEnergy(true);
     mBatterySettings->setData(mBatterySettings->getData());
+}
+
+void PfdQmlGadgetWidget::resetEKF()
+{
+    m_RevoSettings = RevoSettings::GetInstance(m_uavoManager);
+    prevFusionAlgorithm = m_RevoSettings->getFusionAlgorithm();
+    m_RevoSettings->setFusionAlgorithm(0);
+    m_RevoSettings->setData(m_RevoSettings->getData());
+    QTimer::singleShot(2000, this, SLOT(restoreEKFSettings()));
+}
+
+void PfdQmlGadgetWidget::restoreEKFSettings()
+{
+    m_RevoSettings->setFusionAlgorithm(prevFusionAlgorithm);
+    m_RevoSettings->setData(m_RevoSettings->getData());
 }
 
 void PfdQmlGadgetWidget::setEarthFile(QString arg)

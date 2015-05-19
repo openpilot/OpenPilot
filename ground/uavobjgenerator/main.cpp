@@ -47,7 +47,7 @@ using namespace std;
  */
 void usage()
 {
-    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-matlab] [-wireshark] [-none] [-v] xml_path template_base [UAVObj1] ... [UAVObjN]" << endl;
+    cout << "Usage: uavobjectgenerator [language] [-v] xml_path template_base [UAVObj1] ... [UAVObjN]" << endl;
     cout << "Languages: " << endl;
     cout << "\t-gcs           build groundstation code" << endl;
     cout << "\t-flight        build flight code" << endl;
@@ -55,9 +55,8 @@ void usage()
     cout << "\t-python        build python code" << endl;
     cout << "\t-matlab        build matlab code" << endl;
     cout << "\t-wireshark     build wireshark plugin" << endl;
-    cout << "\tIf no language is specified ( and not -none ) -> all are built." << endl;
+    cout << "\tIf no language is specified none are built - just parse xmls." << endl;
     cout << "Misc: " << endl;
-    cout << "\t-none          build no language - just parse xml's" << endl;
     cout << "\t-h             this help" << endl;
     cout << "\t-v             verbose" << endl;
     cout << "\tinput_path     path to UAVObject definition (.xml) files." << endl;
@@ -109,9 +108,7 @@ int main(int argc, char *argv[])
     bool do_python     = (arguments_stringlist.removeAll("-python") > 0);
     bool do_matlab     = (arguments_stringlist.removeAll("-matlab") > 0);
     bool do_wireshark  = (arguments_stringlist.removeAll("-wireshark") > 0);
-    bool do_none       = (arguments_stringlist.removeAll("-none") > 0); //
 
-    bool do_all        = ((do_gcs || do_flight || do_java || do_python || do_matlab) == false);
     bool do_allObjects = true;
 
     if (arguments_stringlist.length() >= 2) {
@@ -205,47 +202,33 @@ int main(int argc, char *argv[])
         cout << "used units: " << parser->all_units.join(",").toStdString() << endl;
     }
 
-    if (do_none) {
-        return RETURN_OK;
-    }
-
-    // generate flight code if wanted
-    if (do_flight | do_all) {
+    if (do_flight) {
+        // generate flight code if wanted
         cout << "generating flight code" << endl;
         UAVObjectGeneratorFlight flightgen;
         flightgen.generate(parser, templatepath, outputpath);
-    }
-
-    // generate gcs code if wanted
-    if (do_gcs | do_all) {
+    } else if (do_gcs) {
+        // generate gcs code if wanted
         cout << "generating gcs code" << endl;
         UAVObjectGeneratorGCS gcsgen;
         gcsgen.generate(parser, templatepath, outputpath);
-    }
-
-    // generate java code if wanted
-    if (do_java | do_all) {
+    } else if (do_java) {
+        // generate java code if wanted
         cout << "generating java code" << endl;
         UAVObjectGeneratorJava javagen;
         javagen.generate(parser, templatepath, outputpath);
-    }
-
-    // generate python code if wanted
-    if (do_python | do_all) {
+    } else if (do_python) {
+        // generate python code if wanted
         cout << "generating python code" << endl;
         UAVObjectGeneratorPython pygen;
         pygen.generate(parser, templatepath, outputpath);
-    }
-
-    // generate matlab code if wanted
-    if (do_matlab | do_all) {
+    } else if (do_matlab) {
+        // generate matlab code if wanted
         cout << "generating matlab code" << endl;
         UAVObjectGeneratorMatlab matlabgen;
         matlabgen.generate(parser, templatepath, outputpath);
-    }
-
-    // generate wireshark plugin if wanted
-    if (do_wireshark | do_all) {
+    } else if (do_wireshark) {
+        // generate wireshark plugin if wanted
         cout << "generating wireshark code" << endl;
         UAVObjectGeneratorWireshark wiresharkgen;
         wiresharkgen.generate(parser, templatepath, outputpath);

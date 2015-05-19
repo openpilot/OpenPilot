@@ -36,7 +36,7 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser *parser, QString templat
                        << "1" << "2" << "4" << "4" << "1";
 
     QDir matlabTemplatePath    = QDir(templatepath + QString(MATLAB_CODE_DIR));
-    QDir matlabOutputPath      = QDir(outputpath + QString("matlab"));
+    QDir matlabOutputPath      = QDir(outputpath);
     matlabOutputPath.mkpath(matlabOutputPath.absolutePath());
 
     QString matlabCodeTemplate = readFile(matlabTemplatePath.absoluteFilePath("uavobject.m.template"));

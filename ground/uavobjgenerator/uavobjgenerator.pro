@@ -12,6 +12,7 @@ TARGET = uavobjgenerator
 CONFIG += console
 CONFIG -= app_bundle
 TEMPLATE = app
+DESTDIR = $$OUT_PWD # Set a consistent output dir on windows
 SOURCES += main.cpp \
     uavobjectparser.cpp \
     generators/generator_io.cpp \

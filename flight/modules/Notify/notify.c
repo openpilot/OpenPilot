@@ -49,7 +49,7 @@ typedef struct {
 static void updatedCb(UAVObjEvent *ev);
 static void onTimerCb(UAVObjEvent *ev);
 static void checkAlarm(uint8_t alarm, uint8_t *last_alarm, uint32_t *last_alm_time,
-                       uint8_t warn_sequence, uint8_t error_sequence,
+                       uint8_t warn_sequence, uint8_t critical_sequence, uint8_t error_sequence,
                        uint32_t timeBetweenNotifications);
 static AlarmStatus_t *alarmStatus;
 int32_t NotifyInitialize(void)
@@ -111,17 +111,19 @@ void onTimerCb(__attribute__((unused)) UAVObjEvent *ev)
                    &alarmStatus[i].lastAlarm,
                    &alarmStatus[i].lastAlarmTime,
                    alarmsMap[i].warnNotification,
+                   alarmsMap[i].criticalNotification,
                    alarmsMap[i].errorNotification,
                    alarmsMap[i].timeBetweenNotifications);
     }
 }
 
-void checkAlarm(uint8_t alarm, uint8_t *last_alarm, uint32_t *last_alm_time, uint8_t warn_sequence, uint8_t error_sequence, uint32_t timeBetweenNotifications)
+void checkAlarm(uint8_t alarm, uint8_t *last_alarm, uint32_t *last_alm_time, uint8_t warn_sequence, uint8_t critical_sequence, uint8_t error_sequence, uint32_t timeBetweenNotifications)
 {
     if (alarm > SYSTEMALARMS_ALARM_OK) {
         uint32_t current_time = PIOS_DELAY_GetuS();
-        if (*last_alarm < alarm || *last_alm_time + timeBetweenNotifications * 1000 < current_time) {
-            uint8_t sequence = (alarm == SYSTEMALARMS_ALARM_WARNING) ? warn_sequence : error_sequence;
+        if (*last_alarm < alarm || *last_alm_time + timeBetweenNotifications * 1000 > current_time) {
+            uint8_t sequence = (alarm == SYSTEMALARMS_ALARM_WARNING) ? warn_sequence :
+                               ((alarm == SYSTEMALARMS_ALARM_CRITICAL) ? critical_sequence : error_sequence);
             if (sequence != NOTIFY_SEQUENCE_NULL) {
                 PIOS_NOTIFICATION_Default_Ext_Led_Play(
                     &notifications[sequence],

@@ -1,4 +1,4 @@
-Release Notes - OpenPilot - Version RELEASE-15.05
+Release Notes - OpenPilot - Version RELEASE-15.05 RC2
 Fully autonomous flight is now possible with autotakeoff and landing as flight modes available to path plans.  
 An all new implementation of altitude vario provides improved altitude maintenance and smoother flight.
 A new RateTrainer mode for beginners and aerial photography make it easier to learn this mode my limiting the pitch and roll extents.
@@ -7,8 +7,11 @@ It is now easier to takeoff with an improved axislock on yaw implementation.
 Full speed flight just got faster with new motor constraints that maintain your ability to enact roll without requiring a upper throttle limit.
 Setup on GPS just got easier. See the wiki for details.
 New control protocols and support for due telemtry and OSD programing have been added.
+CC3D is no longer supported.
 
 The full list of bugfixes in this release is accessible here:
+
+Release Notes - OpenPilot - Version RELEASE-15.05 RC2
 
 ** Bug
     * [OP-1691] - PIOS_DELAY_WaitmS() in RFM22B causes jitter
@@ -18,11 +21,14 @@ The full list of bugfixes in this release is accessible here:
     * [OP-1794] - AxisLock windup not cleared with low throttle while armed
     * [OP-1834] - Piro Comp - adverse effect in Atti/Ratti Modes
     * [OP-1841] - Serial telemetry is not reliable 
+    * [OP-1847] - GPS assist does not update destination when reusing a flight mode for assist
     * [OP-1855] - Limit parsing error in logs when starting GCS
     * [OP-1858] - PathPlanner AutoTakeoff fixes
     * [OP-1867] - PathPlanner AutoLand simplification
     * [OP-1869] - Allow Analog Airspeed scale
     * [OP-1872] - Vehicle Wiz Tricopter tail servo settings don't save
+    * [OP-1888] - SIGSEGV after starting simulator in HITL
+    * [OP-1893] - Deadband changes max stick input
 
 
 ** Improvement
@@ -47,7 +53,11 @@ The full list of bugfixes in this release is accessible here:
     * [OP-1844] - Create a vagrant environment that contains all the bits for Android development, including Android. 
     * [OP-1848] - Rewrite AltVario/Hold in C++ for functional improvements
     * [OP-1852] - Include version number in window title bar.
+    * [OP-1853] - Ground build tidy
     * [OP-1874] - Various improvements to led notifications
+    * [OP-1882] - vtol path follower thrust control now set to auto as a default
+    * [OP-1884] - Improve low pass filter and gyro tau values
+    * [OP-1887] - PFD update 
 
 ** New Feature
     * [OP-1696] - PathFollower C++ Rewrite: Autonomous Landing, Velocity Roam, RTBL, GroundPathFollower
@@ -59,7 +69,6 @@ The full list of bugfixes in this release is accessible here:
     * [OP-1832] - Need method to get default UAV Object settings in Java UAVObjects
     * [OP-1849] - Support programming/update of minimosd using USB VCP port
     * [OP-1863] - RateTrainer mode - add maxpitch for beginners and aerial photography
-
 
 
 --- RELEASE-15.02.02 ---

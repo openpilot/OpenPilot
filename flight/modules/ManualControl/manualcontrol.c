@@ -59,8 +59,8 @@
 #define CBTASK_PRIORITY                                CALLBACK_TASK_FLIGHTCONTROL
 
 #define ASSISTEDCONTROL_NEUTRALTHROTTLERANGE_FACTOR    0.2f
-#define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_LO 0.92f
-#define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_HI 1.08f
+#define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_LO 0.96f
+#define ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_HI 1.04f
 
 
 // defined handlers
@@ -242,7 +242,7 @@ static void manualControlTask(void)
         // set assist mode to none to avoid an assisted flight mode position
         // carrying over and impacting a newly selected non-assisted flight mode pos
         newFlightModeAssist      = FLIGHTSTATUS_FLIGHTMODEASSIST_NONE;
-        // The following are eqivalent to none effectively. Code should always
+        // The following are equivalent to none effectively. Code should always
         // check the flightmodeassist state.
         newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
         newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
@@ -264,6 +264,16 @@ static void manualControlTask(void)
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
         newFlightModeAssist = isAssistedFlightMode(position, newMode, &modeSettings);
+
+        if (newFlightModeAssist != flightStatus.FlightModeAssist) {
+            // On change of assist mode reinitialise control state.  This is required
+            // for the scenario where a flight position change reuses a flight mode
+            // but adds assistedcontrol.
+            newAssistedControlState  = FLIGHTSTATUS_ASSISTEDCONTROLSTATE_PRIMARY;
+            newAssistedThrottleState = FLIGHTSTATUS_ASSISTEDTHROTTLESTATE_MANUAL;
+        }
+
+
         if (newFlightModeAssist) {
             // assess roll/pitch state
             bool flagRollPitchHasInput = (fabsf(cmd.Roll) > 0.0f || fabsf(cmd.Pitch) > 0.0f);
@@ -301,7 +311,7 @@ static void manualControlTask(void)
                     // retain thrust cmd for later comparison with actual in braking
                     thrustAtBrakeStart = cmd.Thrust;
 
-                    // calculate hi and low value of +-8% as a mini-deadband
+                    // calculate hi and low value of +-4% as a mini-deadband
                     // for use in auto-override in brake sequence
                     thrustLo = ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_LO * thrustAtBrakeStart;
                     thrustHi = ASSISTEDCONTROL_BRAKETHRUST_DEADBAND_FACTOR_HI * thrustAtBrakeStart;

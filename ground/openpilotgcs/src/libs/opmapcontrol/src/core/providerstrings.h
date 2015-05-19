@@ -63,10 +63,6 @@ public:
     // BingMaps
     QString VersionBingMaps;
 
-    // YandexMap
-    QString VersionYandexMap;
-
-
     /// <summary>
     /// Bing Maps Customer Identification, more info here
     /// http://msdn.microsoft.com/en-us/library/bb924353.aspx

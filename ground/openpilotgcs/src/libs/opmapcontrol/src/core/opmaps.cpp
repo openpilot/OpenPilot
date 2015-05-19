@@ -40,6 +40,7 @@ OPMaps *OPMaps::Instance()
 OPMaps::OPMaps() : RetryLoadTile(2), useMemoryCache(true)
 {
     accessmode  = AccessMode::ServerAndCache;
+    // Need to figure out why this is *fixed* to Portugese. This casues pt-PT to be sent with every Google request
     Language    = LanguageType::PortuguesePortugal;
     LanguageStr = LanguageType().toShortString(Language);
     Cache::Instance();
@@ -100,15 +101,15 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             }
         }
         if (accessmode != AccessMode::CacheOnly) {
-            QEventLoop q;
             QNetworkReply *reply;
             QNetworkRequest qheader;
             QNetworkAccessManager network;
-            QTimer tT;
-            tT.setSingleShot(true);
-            connect(&network, SIGNAL(finished(QNetworkReply *)),
-                    &q, SLOT(quit()));
-            connect(&tT, SIGNAL(timeout()), &q, SLOT(quit()));
+            // This SSL Hack is half assed... technically bad *security* joojoo.
+            // Required due to a QT5 bug on linux and Mac
+            //
+            QSslConfiguration conf = qheader.sslConfiguration();
+            conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+            qheader.setSslConfiguration(conf);
             network.setProxy(Proxy);
 #ifdef DEBUG_GMAPS
             qDebug() << "Try Tile from the Internet";
@@ -119,8 +120,7 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             QString url = MakeImageUrl(type, pos, zoom, LanguageStr);
 #ifdef DEBUG_TIMINGS
             qDebug() << "opmaps after make image url" << time.elapsed();
-#endif // url	"http://vec02.maps.yandex.ru/tiles?l=map&v=2.10.2&x=7&y=5&z=3"	string
-       // "http://map3.pergo.com.tr/tile/02/000/000/007/000/000/002.png"
+#endif // url can be hard coded for debugging purposes
             qheader.setUrl(QUrl(url));
             qheader.setRawHeader("User-Agent", UserAgent);
             qheader.setRawHeader("Accept", "*/*");
@@ -145,20 +145,19 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
             }
             break;
 
+            case MapType::GoogleMapKorea:
+            case MapType::GoogleSatelliteKorea:
+            case MapType::GoogleLabelsKorea:
+            {
+                qheader.setRawHeader("Referrer", "http://maps.google.co.kr/");
+            }
+            break;
+
             case MapType::BingHybrid:
             case MapType::BingMap:
             case MapType::BingSatellite:
             {
                 qheader.setRawHeader("Referrer", "http://www.bing.com/maps/");
-            }
-            break;
-
-            case MapType::ArcGIS_MapsLT_Map_Labels:
-            case MapType::ArcGIS_MapsLT_Map:
-            case MapType::ArcGIS_MapsLT_OrtoFoto:
-            case MapType::ArcGIS_MapsLT_Map_Hybrid:
-            {
-                qheader.setRawHeader("Referrer", "http://www.maps.lt/map_beta/");
             }
             break;
 
@@ -175,35 +174,35 @@ QByteArray OPMaps::GetImageFrom(const MapType::Types &type, const Point &pos, co
                 qheader.setRawHeader("Referrer", "http://www.openstreetmap.org/");
             }
             break;
-
-            case MapType::YandexMapRu:
+            case MapType::Statkart_Topo2:
             {
-                qheader.setRawHeader("Referrer", "http://maps.yandex.ru/");
+                qheader.setRawHeader("Referrer", "http://www.norgeskart.no/");
             }
             break;
+
             default:
                 break;
             }
+            qDebug() << "Timeout is " << Timeout;
             reply = network.get(qheader);
-            tT.start(Timeout);
-            q.exec();
+            qDebug() << "reply " << reply;
 
-            if (!tT.isActive()) {
-                errorvars.lock();
-                ++diag.timeouts;
-                errorvars.unlock();
-                return ret;
+            QTime time;
+            while ((!(reply->isFinished()) || (time.elapsed() > (6 * Timeout)))) {
+                QCoreApplication::processEvents(QEventLoop::AllEvents);
             }
-            tT.stop();
-            if ((reply->error() != QNetworkReply::NoError)) {
-                errorvars.lock();
-                ++diag.networkerrors;
-                errorvars.unlock();
-                reply->deleteLater();
+
+            qDebug() << "Finished?" << reply->error() << " abort?" << (time.elapsed() > Timeout * 6);
+            // If you are seeing Error 6 here you are dealing with a QT SSL Bug!!!
+
+            if ((reply->error() != QNetworkReply::NoError) | (time.elapsed() > Timeout * 6)) {
+                qDebug() << "reply error: " << reply->error() << " see table at - http://doc.qt.io/qt-5/qnetworkreply.html";
                 return ret;
             }
             ret = reply->readAll();
+            // qDebug() << "ret " << ret;
             reply->deleteLater(); // TODO can't this be global??
+
             if (ret.isEmpty()) {
 #ifdef DEBUG_GMAPS
                 qDebug() << "Invalid Tile";

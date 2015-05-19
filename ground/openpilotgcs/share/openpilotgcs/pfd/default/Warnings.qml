@@ -254,6 +254,14 @@ Item {
         elementName: "warning-attitude"
         sceneSize: warnings.sceneSize
         anchors.centerIn: background.centerIn
-        visible: SystemAlarms.Alarm_Attitude > 1
+        visible: (SystemAlarms.Alarm_Attitude > 2) || ((SystemAlarms.Alarm_Attitude > 1) && (SystemAlarms.Alarm_Stabilization > 1))
+    }
+
+    SvgElementImage {
+        id: warning_attitude_ekf
+        elementName: "warning-attitude-ekf-restart"
+        sceneSize: warnings.sceneSize
+        anchors.centerIn: background.centerIn
+        visible: (SystemAlarms.Alarm_Attitude == 2) && (SystemAlarms.Alarm_Stabilization == 1) && (RevoSettings.FusionAlgorithm > 3)
     }
 }

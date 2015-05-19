@@ -46,35 +46,34 @@ private slots:
 private:
     enum XplaneOutputData // ***WARNING***: Elements in this enum are in a precise order, do
     { // not change. Cf. http://www.nuclearprojects.com/xplane/info.shtml (outdated version 9 info)
-	// These fields have been updated for X-Plane version 10.x
-	/* 0 */ FramRate,
-	/* 1 */ Times,
-	/* 2 */ SimStats,
-	/* 3 */ Speed,
-	/* 4 */ Gload,
-	/* 5 */ AtmosphereWeather,
-	/* 6 */ AtmosphereAircraft,
-	/* 7 */ SystemPressures,
-	/* 8 */ Joystick1,
-	/* 9 */ Joystick2,
-	/* 10 */ ArtStab,
-	/* 11 */ FlightCon,
-	/* 12 */ WingSweep,
-	/* 13 */ Trim,
-	/* 14 */ Brakes,
-	/* 15 */ AngularMoments,
-	/* 16 */ AngularVelocities,
-	/* 17 */ PitchRollHeading,
-	/* 18 */ AoA,
-	/* 19 */ MagCompass,
-	/* 20 */ LatitudeLongitude,
-	/* 21 */ LocVelDistTraveled,
-	/* 22 */ AllPlanesLat,
-	/* 23 */ AllPlanesLon,
-	/* 24 */ AllPlanesAlt,
-	/* 25 */ ThrottleCommand
-	/* .. */
-
+      // These fields have been updated for X-Plane version 10.x
+      /* 0 */ FramRate,
+        /* 1 */ Times,
+        /* 2 */ SimStats,
+        /* 3 */ Speed,
+        /* 4 */ Gload,
+        /* 5 */ AtmosphereWeather,
+        /* 6 */ AtmosphereAircraft,
+        /* 7 */ SystemPressures,
+        /* 8 */ Joystick1,
+        /* 9 */ Joystick2,
+        /* 10 */ ArtStab,
+        /* 11 */ FlightCon,
+        /* 12 */ WingSweep,
+        /* 13 */ Trim,
+        /* 14 */ Brakes,
+        /* 15 */ AngularMoments,
+        /* 16 */ AngularVelocities,
+        /* 17 */ PitchRollHeading,
+        /* 18 */ AoA,
+        /* 19 */ MagCompass,
+        /* 20 */ LatitudeLongitude,
+        /* 21 */ LocVelDistTraveled,
+        /* 22 */ AllPlanesLat,
+        /* 23 */ AllPlanesLon,
+        /* 24 */ AllPlanesAlt,
+        /* 25 */ ThrottleCommand
+        /* .. */
     };
 
     void processUpdate(const QByteArray & data);

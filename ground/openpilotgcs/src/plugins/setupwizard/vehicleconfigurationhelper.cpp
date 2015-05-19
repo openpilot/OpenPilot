@@ -188,7 +188,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             case VehicleConfigurationSource::GPS_PLATINUM:
             {
                 gpsData.DataProtocol  = GPSSettings::DATAPROTOCOL_UBX;
-                gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_CONFIGURE;
+                gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_ABANDCONFIGURE;
                 AuxMagSettings *magSettings = AuxMagSettings::GetInstance(m_uavoManager);
                 Q_ASSERT(magSettings);
                 AuxMagSettings::DataFields magsData = magSettings->getData();

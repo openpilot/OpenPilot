@@ -49,6 +49,26 @@
 // later versions dropped this and drop data when the send buffer is full and that could be even longer
 // rather than have long timeouts, we will let timeouts * retries handle that if it happens
 
+// known to work
+#if 0
+// timeout for ack reception
+#define UBX_REPLY_TIMEOUT             (400 * 1000) 50 has 1 retry 100 has 1 retry 0 retries at 400, 4@200-200@19200 1@400-200@115200-onetime 1@400@19200
+// timeout for a settings save, in case it has to erase flash
+#define UBX_SAVE_WAIT_TIME            (1000 * 1000)
+// max retries in case of timeout
+#define UBX_MAX_RETRIES               5
+// pause between each verifiably correct configuration step
+#define UBX_VERIFIED_STEP_WAIT_TIME   (20 * 1000)
+// pause between each unverifiably correct configuration step
+#define UBX_UNVERIFIED_STEP_WAIT_TIME (400 * 1000) was 200
+#endif
+
+// need about 60 + 8 char times for the largest config packet to be sent and acked
+// that is about 35ms at 19200 baud, figure 40ms
+// but then there is the hairy problem of the dropped packets that occur
+// when there is more data to send than there is bandwidth
+// we generally avoid turning on the OP data packets for configurations of 9600 baud or lower
+
 #if 0
 // timeout for ack reception
 #define UBX_REPLY_TIMEOUT             (500 * 1000)
@@ -61,16 +81,18 @@
 // pause between each unverifiably correct configuration step
 #define UBX_UNVERIFIED_STEP_WAIT_TIME (500 * 1000)
 #else
-// timeout for ack reception
-#define UBX_REPLY_TIMEOUT             (2000 * 1000)
-// timeout for a settings save, in case it has to erase flash
-#define UBX_REPLY_TO_SAVE_TIMEOUT     (3000 * 1000)
+// timeouts for ack reception
+// 1@265-265@19200
+// 0@272-272
+#define UBX_REPLY_TIMEOUT             (280 * 1000)
+// timeout for a settings save, in case it has to erase flash?
+#define UBX_SAVE_WAIT_TIME            (1000 * 1000)
 // max retries in case of timeout
 #define UBX_MAX_RETRIES               5
-// pause between each verifiably correct configuration step
-#define UBX_VERIFIED_STEP_WAIT_TIME   (1000 * 1000)
-// pause between each unverifiably correct configuration step
-#define UBX_UNVERIFIED_STEP_WAIT_TIME (2000 * 1000)
+// max time for ubx parser to respond to MON_VER
+#define UBX_PARSER_TIMEOUT            (950 * 1000)
+// pause between each unverifiable (no ack/nak) configuration step
+#define UBX_UNVERIFIED_STEP_WAIT_TIME (280 * 1000)
 #endif
 #define UBX_CFG_CFG_OP_STORE_SETTINGS \
     (UBX_CFG_CFG_SETTINGS_IOPORT | \

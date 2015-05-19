@@ -111,74 +111,114 @@ int parse_nmea_stream(uint8_t *rx, uint8_t len, char *gps_rx_buffer, GPSPosition
     static uint8_t rx_count = 0;
     static bool start_flag  = false;
     static bool found_cr    = false;
+    bool goodParse          = false;
     uint8_t c;
+    int i = 0;
 
-    for (int i = 0; i < len; i++) {
-        c = rx[i];
+    while (i < len) {
+        c = rx[i++];
         // detect start while acquiring stream
-        if (!start_flag && (c == '$')) { // NMEA identifier found
-            start_flag = true;
-            found_cr   = false;
-            rx_count   = 0;
-        } else if (!start_flag) {
-            return PARSER_ERROR;
+        // if we find a $ in the middle it was a bad packet (e.g. maybe UBX binary),
+        // and this may be the start of another packet
+        // silently cancel the current sentence
+        if (c == '$') { // NMEA identifier found
+            start_flag = false;
         }
-
+        if (!start_flag) {  // if no NMEA identifier ('$') found yet
+            if (c == '$') { // NMEA identifier found
+                start_flag = true;
+                found_cr   = false;
+                rx_count   = 0;
+            } else {
+                // find a likely candidate for a NMEA string
+                // skip over some e.g. uBlox packets
+                uint8_t *p;
+                p = memchr(&rx[i], '$', len-i);
+                if (p) {
+                    i += p - &rx[i];
+                } else {
+                    i = len;
+                }
+                // if no more data, we can return an error
+                ret = PARSER_ERROR;
+                // loop to restart at the $ if there is one
+                continue;
+            }
+        }
         if (rx_count >= NMEA_MAX_PACKET_LENGTH) {
             // The buffer is already full and we haven't found a valid NMEA sentence.
             // Flush the buffer and note the overflow event.
             gpsRxStats->gpsRxOverflow++;
             start_flag = false;
-            found_cr   = false;
-            rx_count   = 0;
             ret = PARSER_OVERRUN;
+            continue;
         } else {
-            gps_rx_buffer[rx_count] = c;
-            rx_count++;
+#if 1
+            gps_rx_buffer[rx_count++] = c;
+#else
+uint8_t *p;
+i-=1;
+p = memchr(&rx[i], '\r', len-i);
+if (p) {
+    copylen = p - &rx[i];
+    if (rx_count+copylen >= NMEA_MAX_PACKET_LENGTH) {
+    memcpy(&gps_rx_buffer[rx_count], &rx[i], len-i);
+}
+    found_cr = true;
+#endif
         }
 
         // look for ending '\r\n' sequence
         if (!found_cr && (c == '\r')) {
             found_cr = true;
-        } else if (found_cr && (c != '\n')) {
-            found_cr = false; // false end flag
-        } else if (found_cr && (c == '\n')) {
-            // The NMEA functions require a zero-terminated string
-            // As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
-            gps_rx_buffer[rx_count - 2] = 0;
+        } else if (found_cr) {
+            if (c != '\n') {
+                found_cr = false; // false end flag
+            } else {
+                // The NMEA functions require a zero-terminated string
+                // As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
+                gps_rx_buffer[rx_count - 2] = 0;
 
-            // prepare to parse next sentence
-            start_flag = false;
-            found_cr   = false;
-            rx_count   = 0;
-            // Our rxBuffer must look like this now:
-            // [0]           = '$'
-            // ...           = zero or more bytes of sentence payload
-            // [end_pos - 1] = '\r'
-            // [end_pos]     = '\n'
-            //
-            // Prepare to consume the sentence from the buffer
+                // prepare to parse next sentence
+                start_flag = false;
+                // Our rxBuffer must look like this now:
+                // [0]           = '$'
+                // ...           = zero or more bytes of sentence payload
+                // [end_pos - 1] = '\r'
+                // [end_pos]     = '\n'
+                //
+                // Prepare to consume the sentence from the buffer
 
-            // Validate the checksum over the sentence
-            if (!NMEA_checksum(&gps_rx_buffer[1])) { // Invalid checksum.  May indicate dropped characters on Rx.
-                                                     // PIOS_DEBUG_PinHigh(2);
-                gpsRxStats->gpsRxChkSumError++;
-                // PIOS_DEBUG_PinLow(2);
-                ret = PARSER_ERROR;
-            } else { // Valid checksum, use this packet to update the GPS position
-                if (!NMEA_update_position(&gps_rx_buffer[1], GpsData)) {
+                // Validate the checksum over the sentence
+                if (!NMEA_checksum(&gps_rx_buffer[1])) { // Invalid checksum.  May indicate dropped characters on Rx.
                     // PIOS_DEBUG_PinHigh(2);
-                    gpsRxStats->gpsRxParserError++;
+                    gpsRxStats->gpsRxChkSumError++;
                     // PIOS_DEBUG_PinLow(2);
-                } else {
-                    gpsRxStats->gpsRxReceived++;
-                };
-
-                ret = PARSER_COMPLETE;
+                    ret = PARSER_ERROR;
+                } else { // Valid checksum, use this packet to update the GPS position
+                    if (!NMEA_update_position(&gps_rx_buffer[1], GpsData)) {
+                        // PIOS_DEBUG_PinHigh(2);
+                        gpsRxStats->gpsRxParserError++;
+                        // PIOS_DEBUG_PinLow(2);
+                        ret = PARSER_ERROR;
+                    } else {
+                        gpsRxStats->gpsRxReceived++;
+                        goodParse = true;
+                    }
+                }
+                continue;
             }
         }
     }
-    return ret;
+
+    if (goodParse) {
+        // if so much as one good sentence we return a good status so the connection status says "alive"
+        // if we didn't do this, a lot of garbage (e.g. UBX protocol) mixed in with enough NMEA to fly
+        // might think the GPS was offline
+        return PARSER_COMPLETE;
+    } else {
+        return ret;
+    }
 }
 
 static const struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
@@ -429,6 +469,8 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionSensorData *GpsData)
         DEBUG_MSG("PARSE FAILED (\"%s\")\n", params[0]);
                 #endif
         if (gpsDataUpdated && (GpsData->Status == GPSPOSITIONSENSOR_STATUS_NOFIX)) {
+            // leave my new field alone!
+            GPSPositionSensorCurrentBaudRateGet(&GpsData->CurrentBaudRate);
             GPSPositionSensorSet(GpsData);
         }
         return false;
@@ -440,6 +482,8 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionSensorData *GpsData)
                 #ifdef DEBUG_MSGID_IN
         DEBUG_MSG("U");
                 #endif
+        // leave my new field alone!
+        GPSPositionSensorCurrentBaudRateGet(&GpsData->CurrentBaudRate);
         GPSPositionSensorSet(GpsData);
     }
 

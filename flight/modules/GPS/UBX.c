@@ -107,7 +107,7 @@ struct UBX_ACK_NAK ubxLastNak;
 #define UBX_PVT_TIMEOUT (1000)
 // parse incoming character stream for messages in UBX binary format
 
-int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats, __attribute__((unused)) uint16_t *bytes_used)
+int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
 {
     int ret = PARSER_INCOMPLETE; // message not (yet) complete
     enum proto_states {
@@ -126,15 +126,10 @@ int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPosition
     static enum proto_states proto_state = START;
     static uint16_t rx_count = 0;
     struct UBXPacket *ubx    = (struct UBXPacket *)gps_rx_buffer;
-
-#if 0
-    for (int i = 0; i < len; i++) {
-        c = rx[i];
-#else
     int i = 0;
+
     while (i < len) {
         c = rx[i++];
-#endif
         switch (proto_state) {
         case START: // detect protocol
             if (c == UBX_SYNC1) { // first UBX sync char found
@@ -177,12 +172,6 @@ int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPosition
                     proto_state = UBX_CHK1;
                 }
             }
-#if 0 // will never happen
- else {
-                gpsRxStats->gpsRxOverflow++;
-                proto_state = START;
-            }
-#endif
             break;
         case UBX_CHK1:
             ubx->header.ck_a = c;
@@ -198,7 +187,8 @@ int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPosition
                 proto_state = START;
             }
             break;
-        default: break;
+        default:
+            break;
         }
 
         if (proto_state == START) {
@@ -207,10 +197,9 @@ int parse_ubx_stream(uint8_t *rx, uint16_t len, char *gps_rx_buffer, GPSPosition
             gpsRxStats->gpsRxReceived++;
             proto_state = START;
             ret = PARSER_COMPLETE; // message complete & processed
-break;
         }
     }
-*bytes_used = i;
+
     return ret;
 }
 
@@ -539,6 +528,8 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
     GpsPosition->SensorType = sensorType;
 
     if (msgtracker.msg_received == ALL_RECEIVED) {
+        // leave my new field alone!
+        GPSPositionSensorCurrentBaudRateGet(&GpsPosition->CurrentBaudRate);
         GPSPositionSensorSet(GpsPosition);
         msgtracker.msg_received = NONE_RECEIVED;
         id = GPSPOSITIONSENSOR_OBJID;

@@ -121,6 +121,7 @@ static bool gpsEnabled = false;
 static xTaskHandle gpsTaskHandle;
 
 static char *gps_rx_buffer;
+static uint16_t gps_rx_buffer_size;
 
 static uint32_t timeOfLastCommandMs;
 static uint32_t timeOfLastUpdateMs;
@@ -220,13 +221,16 @@ int32_t GPSInitialize(void)
 //    if (gpsPort && gpsEnabled) {
     if (gpsEnabled) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) && defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-        gps_rx_buffer = pios_malloc((sizeof(struct UBXPacket) > NMEA_MAX_PACKET_LENGTH) ? sizeof(struct UBXPacket) : NMEA_MAX_PACKET_LENGTH);
+        gps_rx_buffer_size = (sizeof(struct UBXPacket) > NMEA_MAX_PACKET_LENGTH) ? sizeof(struct UBXPacket) : NMEA_MAX_PACKET_LENGTH;
+        gps_rx_buffer      = pios_malloc(gps_rx_buffer_size);
 #elif defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-        gps_rx_buffer = pios_malloc(sizeof(struct UBXPacket));
+        gps_rx_buffer_size = sizeof(struct UBXPacket);
+        gps_rx_buffer      = pios_malloc(gps_rx_buffer_size);
 #elif defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
-        gps_rx_buffer = pios_malloc(NMEA_MAX_PACKET_LENGTH);
+        gps_rx_buffer_size = NMEA_MAX_PACKET_LENGTH;
+        gps_rx_buffer      = pios_malloc(gps_rx_buffer_size);
 #else
-        gps_rx_buffer = NULL;
+        gps_rx_buffer      = NULL;
 #endif
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) || defined(PIOS_INCLUDE_GPS_UBX_PARSER)
         PIOS_Assert(gps_rx_buffer);
@@ -250,7 +254,14 @@ MODULE_INITCALL(GPSInitialize, GPSStart);
 
 static void gpsTask(__attribute__((unused)) void *parameters)
 {
-    portTickType xDelay = 100 / portTICK_RATE_MS;
+    // 57600 baud = 5760 bytes per second
+    // PIOS serial buffers appear to be 32 bytes long
+    // that is a maximum of 5760/32 = 180 buffers per second
+    // that is 1/180 = 0.005555556 seconds per packet
+    // we must never wait more than 5ms since packet was last drained or it may overflow
+    // 100ms is way slow too, considering we do everything possible to make the sensor data as contemporary as possible
+//    portTickType xDelay = 100 / portTICK_RATE_MS;
+    portTickType xDelay = 5 / portTICK_RATE_MS;
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
@@ -274,12 +285,12 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     PERF_INIT_COUNTER(counterParse, 0x97510003);
 //    uint8_t c[GPS_READ_BUFFER];
 uint8_t c[GPS_READ_BUFFER+8];
-    uint16_t bytes_remaining = 0;
 
     // Loop forever
     while (1) {
 if (gpsPort) {
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+        // do autoconfig stuff for UBX GPS's
         if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
             char *buffer   = 0;
             uint16_t count = 0;
@@ -297,7 +308,7 @@ if (gpsPort) {
             }
         }
 
-        // need to do this whether there is received data or not, or the status (e.g. gcs) is not always correct
+        // need to do this whether there is received data or not, or the status (e.g. gcs) will not always be correct
         int32_t ac_status = ubx_autoconfig_get_status();
         static uint8_t lastStatus = GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED
                                     + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING
@@ -314,11 +325,9 @@ if (gpsPort) {
         }
 #endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
 
-        // This blocks the task until there is something on the buffer (or 100ms? passes)
         uint16_t cnt;
-        uint16_t bytes_used;
-        cnt = PIOS_COM_ReceiveBuffer(gpsPort, &c[bytes_remaining], GPS_READ_BUFFER-bytes_remaining, xDelay);
-//        cnt = PIOS_COM_ReceiveBuffer(gpsPort, c, GPS_READ_BUFFER, xDelay);
+        // This blocks the task until there is something on the buffer (or 100ms? passes)
+        cnt = PIOS_COM_ReceiveBuffer(gpsPort, c, GPS_READ_BUFFER, xDelay);
         if (cnt > 0) {
             PERF_TIMED_SECTION_START(counterParse);
             PERF_TRACK_VALUE(counterBytesIn, cnt);
@@ -332,21 +341,15 @@ if (gpsPort) {
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
             case GPSSETTINGS_DATAPROTOCOL_UBX:
-                cnt += bytes_remaining;
-                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats, &bytes_used);
-//                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats, &bytes_used);
-#if 1
-                bytes_remaining = cnt - bytes_used;
-                memmove(c, &c[bytes_used], bytes_remaining);
-#endif
+                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
                 break;
 #endif
             default:
                 res = NO_PARSER; // this should not happen
                 break;
             }
-
             PERF_TIMED_SECTION_END(counterParse);
+
             if (res == PARSER_COMPLETE) {
                 timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
                 timeOfLastUpdateMs = timeNowMs;
@@ -504,18 +507,26 @@ void debugindex(int index, uint8_t c)
 // having already set the GPS's baud rate with a serial command, set the local Revo port baud rate
 void gps_set_fc_baud_from_arg(uint8_t baud, __attribute__((unused)) uint8_t addit)
 {
+    static uint8_t previous_baud=255;
     static uint8_t mutex; // = 0
 
+// do we need this?
     if (__sync_fetch_and_add(&mutex, 1) == 0) {
+    // don't bother doing the baud change if it is actually the same
+    // might drop less data
+    if (previous_baud != baud) {
+        previous_baud = baud;
         // Set Revo port hwsettings_baud
         PIOS_COM_ChangeBaud(PIOS_COM_GPS, hwsettings_gpsspeed_enum_to_baud(baud));
         GPSPositionSensorCurrentBaudRateSet(&baud);
+    }
     } else {
         static uint8_t c;
         debugindex(9, ++c);
         if (c > 254) c=254;
     }
     --mutex;
+
 
     debugindex(6, baud);
     {
@@ -583,15 +594,15 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
     // - the user can use the same GPS with both an older release of OP (e.g. GPS settings at 38400) and the current release (autoconfig-nostore)
     // - the 57600 could be fixed instead of the 9600 as part of autoconfig-store/nostore and the HwSettings.GPSSpeed be the initial baud rate?
 
-    // About using UBlox GPS's with default settings (9600 baud and NEMA data):
-    // - the default uBlox settings (different than OP settings) are NEMA and 9600 baud
+    // About using UBlox GPS's with default settings (9600 baud and NMEA data):
+    // - the default uBlox settings (different than OP settings) are NMEA and 9600 baud
     // - - and that is OK and you use autoconfig-nostore
     // - - I personally feel that this is the best way to set it up because if OP dev changes GPS settings,
     // - - you get them automatically changed to match whatever version of OP code you are running
     // - - but 9600 is only OK for this autoconfig startup
     // - by my testing, the 9600 initial to 57600 final baud startup takes:
     // - - 0:10 if the GPS has been configured to send OP data at 9600
-    // - - 0:06 if the GPS has default data settings (NEMA) at 9600
+    // - - 0:06 if the GPS has default data settings (NMEA) at 9600
     // - - reminder that even 0:10 isn't that bad.  You need to wait for the GPS to acquire satellites,
 
     // Some things you want to think about if you want to play around with this:
@@ -608,10 +619,10 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
     // - - so you could use autoconfig.nostore with this high baud rate, but not autoconfig.store (once) followed by autoconfig.disabled
     // - - I haven't tested other GPS's in regard to this
 
-    // since 9600 baud and lower are not usable, and are best left at NEMA, I could have coded it to do a factory reset
+    // since 9600 baud and lower are not usable, and are best left at NMEA, I could have coded it to do a factory reset
     // - if set to 9600 baud (or lower)
 
-    // if GPS (UBX or NEMA) is enabled at all
+    // if GPS (UBX or NMEA) is enabled at all
     static uint32_t previousGpsPort=0xf0f0f0f0; // = 0 means deconfigured and at power up it is deconfigured
     if (gpsPort && gpsEnabled) {
 //we didn't have a gpsPort when we booted, and disabled did not find GPS's
@@ -817,11 +828,6 @@ the ubx parser doesn't handle partially received buffers
             HwSettingsGPSSpeedGet(&speed);
             // set fc baud
             gps_set_fc_baud_from_arg(speed, 1);
-debugindex(2, speed);
-{
-static uint8_t c;
-debugindex(3, ++c);
-}
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
             // even changing the baud rate will make it re-verify the sensor type
@@ -863,9 +869,9 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
         newconfig.UbxAutoConfig = GPSSETTINGS_UBXAUTOCONFIG_DISABLED;
     }
 #else
-    // it's OK that ubx auto config is inited and ready to go, when GPS is disabled or running NEMA
+    // it's OK that ubx auto config is inited and ready to go, when GPS is disabled or running NMEA
     // because ubx auto config never gets called
-    // setting it up completely means that if we switch from initial NEMA to UBX or disabled to enabled, that it will start normally
+    // setting it up completely means that if we switch from initial NMEA to UBX or disabled to enabled, that it will start normally
     newconfig.UbxAutoConfig = gpsSettings.UbxAutoConfig;
 #endif
 

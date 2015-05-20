@@ -6,7 +6,7 @@ include(extensionsystem_dependencies.pri)
 
 unix:!macx:!freebsd*:LIBS += -ldl
 
-DEFINES += GCS_TEST_DIR=\\\"$$GCS_SOURCE_TREE\\\"
+DEFINES += GCS_TEST_DIR=$$shell_quote(\"$$GCS_SOURCE_TREE\")
 
 QT += widgets
 

@@ -13,7 +13,7 @@ DEFINES += QTCREATOR_UTILS_LIB
 
 include(../../openpilotgcslibrary.pri)
 
-DEFINES += DATA_REL_PATH=\\\"$$relative_path($$GCS_DATA_PATH, $$GCS_APP_PATH)\\\"
+DEFINES += DATA_REL_PATH=$$shell_quote(\"$$relative_path($$GCS_DATA_PATH, $$GCS_APP_PATH)\")
 
 SOURCES += reloadpromptutils.cpp \
     settingsutils.cpp \

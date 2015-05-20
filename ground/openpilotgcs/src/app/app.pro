@@ -15,8 +15,8 @@ include(../libs/version_info/version_info.pri)
 
 LIBS *= -l$$qtLibraryName(ExtensionSystem) -l$$qtLibraryName(Aggregation)
 
-DEFINES += PLUGIN_REL_PATH=\\\"$$relative_path($$GCS_PLUGIN_PATH, $$GCS_APP_PATH)\\\"
-DEFINES += GCS_NAME=\\\"$$GCS_APP_TARGET\\\"
+DEFINES += PLUGIN_REL_PATH=$$shell_quote(\"$$relative_path($$GCS_PLUGIN_PATH, $$GCS_APP_PATH)\")
+DEFINES += GCS_NAME=$$shell_quote(\"$$GCS_APP_TARGET\")
 
 win32 {
     RC_FILE = openpilotgcs.rc
@@ -33,8 +33,8 @@ win32 {
 } else {
     target.path  = /bin
     INSTALLS    += target
-    QMAKE_RPATHDIR = \'\$$ORIGIN\'/$$relative_path($$GCS_LIBRARY_PATH, $$GCS_APP_PATH)
-    QMAKE_RPATHDIR += \'\$$ORIGIN\'/$$relative_path($$GCS_QT_LIBRARY_PATH, $$GCS_APP_PATH)
+    QMAKE_RPATHDIR  = $$shell_quote(\$$ORIGIN/$$relative_path($$GCS_LIBRARY_PATH, $$GCS_APP_PATH))
+    QMAKE_RPATHDIR += $$shell_quote(\$$ORIGIN/$$relative_path($$GCS_QT_LIBRARY_PATH, $$GCS_APP_PATH))
     include(../rpath.pri)
 
     equals(copyqt, 1) {

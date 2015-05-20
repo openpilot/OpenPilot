@@ -1683,23 +1683,16 @@ void ConfigInputWidget::simpleCalibration(bool enable)
     } else {
         manualCommandData  = manualCommandObj->getData();
         manualSettingsData = manualSettingsObj->getData();
+        systemSettingsData = systemSettingsObj->getData();
 
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, tr("Ground vehicle"),
-                                      tr("<p>Are you configuring a transmitter for your <b>ground vehicle</b> with reversible motor<br>"
-                                         "controlled by throttle stick?</p>"
-                                         "<p>If so, please make sure you've centered throttle control and press <b>Yes</b> button. Otherwise, press No.</p>"
-                                         "<p>Attention, if you press <b>Yes</b>, then the <b>Flight Mode Count</b> will be set to 1.</p>"),
-                                      QMessageBox::Yes | QMessageBox::No);
+        if (systemSettingsData.AirframeType == SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR) {
+            QMessageBox::warning(this, tr("Ground vehicle"),
+                                 tr("<p>Please <b>center</b> throttle control and"
+                                    " press <b>OK</b> when ready."));
 
-        if (reply == QMessageBox::Yes) {
             transmitterType = ground;
             manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =
                 manualCommandData.Channel[ManualControlSettings::CHANNELNUMBER_THROTTLE];
-            /* Make sure to tell controller, this is really a ground vehicle. */
-            systemSettingsData = systemSettingsObj->getData();
-            systemSettingsData.AirframeType = SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR;
-            systemSettingsObj->setData(systemSettingsData);
         }
 
         restoreMdataSingle(manualCommandObj, &manualControlMdata);

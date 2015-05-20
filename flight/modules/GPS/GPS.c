@@ -498,7 +498,9 @@ void gps_set_fc_baud_from_arg(uint8_t baud)
 // must updateHwSettings() before updateGpsSettings() so baud rate is set before GPS serial code starts running
 static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
 {
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
     static uint32_t previousGpsPort=0xf0f0f0f0; // = doesn't match gpsport
+#endif
     // if GPS (UBX or NMEA) is enabled at all
     if (gpsPort && gpsEnabled) {
         // on first use of this port (previousGpsPort != gpsPort) we must set the Revo port baud rate
@@ -529,7 +531,9 @@ static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
         }
 #endif
     }
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
     previousGpsPort = gpsPort;
+#endif
 }
 
 

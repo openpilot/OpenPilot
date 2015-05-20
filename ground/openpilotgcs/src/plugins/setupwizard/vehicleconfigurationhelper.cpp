@@ -176,14 +176,15 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             GPSSettings *gpsSettings = GPSSettings::GetInstance(m_uavoManager);
             Q_ASSERT(gpsSettings);
             GPSSettings::DataFields gpsData = gpsSettings->getData();
-            gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_DISABLED;
 
             switch (m_configSource->getGpsType()) {
             case VehicleConfigurationSource::GPS_NMEA:
                 gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_NMEA;
+                gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_DISABLED;
                 break;
             case VehicleConfigurationSource::GPS_UBX:
                 gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBX;
+                gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_ABANDCONFIGURE;
                 break;
             case VehicleConfigurationSource::GPS_PLATINUM:
             {

@@ -20,9 +20,11 @@ Stefan Cenkov
 Andrés Chavarría Krauser
 Cosimo Corrado
 James Cotton
+Kalyn Doerr
 Steve Doll
 James Duley
 Piotr Esden-Tempski
+Steve Evans
 Peter Farnworth
 Ed Faulkner
 Andrew Finegan
@@ -50,6 +52,7 @@ Stefan Karlsson
 Ricky King
 Thorsten Klose
 Karl Knutsson
+Daniël Koek
 Sami Korhonen
 Hallvard Kristiansen
 Alan Krum

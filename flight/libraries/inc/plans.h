@@ -67,7 +67,7 @@ void plan_setup_AutoTakeoff();
 /**
  * @brief setup pathplanner/pathfollower for braking
  */
-void plan_setup_assistedcontrol(uint8_t timeout_occurred);
+void plan_setup_assistedcontrol();
 
 #define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_NORTH 0
 #define PATHDESIRED_MODEPARAMETER_BRAKE_STARTVELOCITYVECTOR_EAST  1

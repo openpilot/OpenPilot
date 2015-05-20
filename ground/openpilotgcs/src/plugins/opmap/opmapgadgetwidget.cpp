@@ -2318,9 +2318,9 @@ void OPMapGadgetWidget::SetUavPic(QString UAVPic)
 
 void OPMapGadgetWidget::on_tbFind_clicked()
 {
-    QPalette pal = m_widget->leFind->palette();
+    QPalette pal   = m_widget->leFind->palette();
 
-    QString status   = m_map->SetCurrentPositionByKeywords(m_widget->leFind->text());
+    QString status = m_map->SetCurrentPositionByKeywords(m_widget->leFind->text());
 
     if (status == "OK") {
         pal.setColor(m_widget->leFind->backgroundRole(), Qt::green);
@@ -2351,7 +2351,6 @@ void OPMapGadgetWidget::on_tbFind_clicked()
         m_widget->leFind->setPalette(pal);
         qDebug() << "Some sort of code error!";
     }
-
 }
 
 void OPMapGadgetWidget::onHomeDoubleClick(HomeItem *)

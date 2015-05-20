@@ -28,12 +28,14 @@
 
 
 namespace core {
-const QString ProviderStrings::levelsForSigPacSpainMap[] = { "0",         "1",         "2",         "3",       "4",
-                                                             "MTNSIGPAC",
-                                                             "MTN2000",   "MTN2000",   "MTN2000",   "MTN2000", "MTN2000",
-                                                             "MTN200",    "MTN200",    "MTN200",
-                                                             "MTN25",     "MTN25",
-                                                             "ORTOFOTOS", "ORTOFOTOS", "ORTOFOTOS", "ORTOFOTOS" };
+const QString ProviderStrings::levelsForSigPacSpainMap[] = {
+// "0",         "1",         "2",         "3",       "4",
+    "MTNSIGPAC",
+    "MTN2000",  "MTN2000",    "MTN2000",   "MTN2000", "MTN2000",
+    "MTN200",   "MTN200",     "MTN200",
+    "MTN25",    "MTN25",
+    "ORTOFOTOS","ORTOFOTOS",  "ORTOFOTOS", "ORTOFOTOS"
+};
 
 ProviderStrings::ProviderStrings()
 {
@@ -59,14 +61,11 @@ ProviderStrings::ProviderStrings()
     /// Google Maps API generated using http://greatmaps.codeplex.com/
     /// from http://code.google.com/intl/en-us/apis/maps/signup.html
     /// </summary>
-    GoogleMapsAPIKey      = "ABQIAAAAWaQgWiEBF3lW97ifKnAczhRAzBk5Igf8Z5n2W3hNnMT0j2TikxTLtVIGU7hCLLHMAuAMt-BO5UrEWA";
+    GoogleMapsAPIKey = "ABQIAAAAWaQgWiEBF3lW97ifKnAczhRAzBk5Igf8Z5n2W3hNnMT0j2TikxTLtVIGU7hCLLHMAuAMt-BO5UrEWA";
 
     // BingMaps
-    VersionBingMaps       = "563";
+    VersionBingMaps  = "563";
 
-    // YandexMap
-    VersionYandexMap      = "2.16.0";
-    // VersionYandexSatellite = "1.19.0";
     ////////////////////
 
     /// <summary>

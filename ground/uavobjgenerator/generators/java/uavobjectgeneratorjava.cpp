@@ -37,7 +37,7 @@ bool UAVObjectGeneratorJava::generate(UAVObjectParser *parser, QString templatep
                          << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";
 
     javaCodePath     = QDir(templatepath + QString(JAVA_TEMPLATE_DIR));
-    javaOutputPath   = QDir(outputpath + QString("java"));
+    javaOutputPath   = QDir(outputpath);
     javaOutputPath.mkpath(javaOutputPath.absolutePath());
 
     javaCodeTemplate = readFile(javaCodePath.absoluteFilePath("uavobject.java.template"));

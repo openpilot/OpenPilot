@@ -795,9 +795,9 @@ static void applyDeadband(float *value, float deadband)
     if (fabsf(*value) < deadband) {
         *value = 0.0f;
     } else if (*value > 0.0f) {
-        *value -= deadband;
+        *value = (*value - deadband) / (1.0f - deadband);
     } else {
-        *value += deadband;
+        *value = (*value + deadband) / (1.0f - deadband);
     }
 }
 

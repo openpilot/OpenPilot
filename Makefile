@@ -53,8 +53,6 @@ DIRS = $(DL_DIR) $(TOOLS_DIR) $(BUILD_DIR) $(PACKAGE_DIR) $(DIST_DIR)
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
-UAVOGEN_BUILD_CONF	:= release
-ANDROIDGCS_BUILD_CONF	:= debug
 GOOGLE_API_VERSION	:= 14
 
 # Clean out undesirable variables from the environment and command-line
@@ -119,13 +117,13 @@ include $(ROOT_DIR)/make/tools.mk
 # We almost need to consider autoconf/automake instead of this
 ifeq ($(UNAME), Linux)
     QT_SPEC = linux-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/uavobjgenerator
 else ifeq ($(UNAME), Darwin)
     QT_SPEC = macx-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/uavobjgenerator
 else ifeq ($(UNAME), Windows)
     QT_SPEC = win32-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
+    UAVOBJGENERATOR = $(BUILD_DIR)/uavobjgenerator/uavobjgenerator.exe
 endif
 
 ##############################
@@ -152,20 +150,14 @@ clean: all_clean
 #
 ##############################
 
-ifeq ($(V), 1)
-    UAVOGEN_SILENT :=
-else
-    UAVOGEN_SILENT := silent
-endif
-
 UAVOBJGENERATOR_DIR = $(BUILD_DIR)/uavobjgenerator
 DIRS += $(UAVOBJGENERATOR_DIR)
 
 .PHONY: uavobjgenerator
-uavobjgenerator: | $(UAVOBJGENERATOR_DIR)
+uavobjgenerator $(UAVOBJGENERATOR): | $(UAVOBJGENERATOR_DIR)
 	$(V1) cd $(UAVOBJGENERATOR_DIR) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro \
-	    -spec $(QT_SPEC) -r CONFIG+=$(UAVOGEN_BUILD_CONF) CONFIG+=$(UAVOGEN_SILENT) && \
+	    ( [ -f Makefile ] || $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro \
+	    -spec $(QT_SPEC) CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) ) && \
 	    $(MAKE) --no-print-directory -w
 
 UAVOBJ_TARGETS := gcs flight python matlab java wireshark
@@ -176,15 +168,14 @@ uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
 UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
 
-DIRS += $(UAVOBJ_OUT_DIR)
-
-uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
+uavobjects_%:  uavobjgenerator
+	@$(MKDIR) -p $(UAVOBJ_OUT_DIR)/$*
+	$(V1) ( cd $(UAVOBJ_OUT_DIR)/$* && \
 	    $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
-uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
+uavobjects_test:  uavobjgenerator
+	$(V1) $(UAVOBJGENERATOR) -v $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(UAVOBJ_OUT_DIR))"
@@ -476,7 +467,7 @@ openpilotgcs_qmake $(OPENPILOTGCS_MAKEFILE): | $(OPENPILOTGCS_DIR)
 	    -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) CONFIG+=$(GCS_SILENT) $(GCS_QMAKE_OPTS)
 
 .PHONY: openpilotgcs
-openpilotgcs: uavobjects_gcs $(OPENPILOTGCS_MAKEFILE)
+openpilotgcs: uavobjgenerator $(OPENPILOTGCS_MAKEFILE)
 	$(V1) $(MAKE) -w -C $(OPENPILOTGCS_DIR)/$(MAKE_DIR);
 
 .PHONY: openpilotgcs_clean

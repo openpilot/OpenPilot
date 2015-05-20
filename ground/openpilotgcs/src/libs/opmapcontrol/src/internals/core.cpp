@@ -111,18 +111,13 @@ void Core::run()
                             do {
                                 QByteArray img;
 
-                                // tile number inversion(BottomLeft -> TopLeft) for pergo maps
-                                if (tl == MapType::PergoTurkeyMap) {
-                                    img = OPMaps::Instance()->GetImageFrom(tl, Point(task.Pos.X(), maxOfTiles.Height() - task.Pos.Y()), task.Zoom);
-                                } else { // ok
 #ifdef DEBUG_CORE
-                                    qDebug() << "start getting image" << " ID=" << debug;
+                                qDebug() << "start getting image" << " ID=" << debug;
 #endif // DEBUG_CORE
-                                    img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
+                                img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
 #ifdef DEBUG_CORE
-                                    qDebug() << "Core::run:gotimage size:" << img.count() << " ID=" << debug << " time=" << t.elapsed();
+                                qDebug() << "Core::run:gotimage size:" << img.count() << " ID=" << debug << " time=" << t.elapsed();
 #endif // DEBUG_CORE
-                                }
 
                                 if (img.length() != 0) {
                                     Moverlays.lock();
@@ -264,40 +259,15 @@ void Core::SetMapType(const MapType::Types &value)
         case MapType::ArcGIS_Map:
         case MapType::ArcGIS_Satellite:
         case MapType::ArcGIS_ShadedRelief:
+        {
+            maxzoom = 10;
+        }
+        break;
+
         case MapType::ArcGIS_Terrain:
         {
             if (Projection()->Type() != "PlateCarreeProjection") {
                 SetProjection(new PlateCarreeProjection());
-                maxzoom = 13;
-            }
-        }
-        break;
-
-        case MapType::ArcGIS_MapsLT_Map_Hybrid:
-        case MapType::ArcGIS_MapsLT_Map_Labels:
-        case MapType::ArcGIS_MapsLT_Map:
-        case MapType::ArcGIS_MapsLT_OrtoFoto:
-        {
-            if (Projection()->Type() != "LKS94Projection") {
-                SetProjection(new LKS94Projection());
-                maxzoom = 11;
-            }
-        }
-        break;
-
-        case MapType::PergoTurkeyMap:
-        {
-            if (Projection()->Type() != "PlateCarreeProjectionPergo") {
-                SetProjection(new PlateCarreeProjectionPergo());
-                maxzoom = 17;
-            }
-        }
-        break;
-
-        case MapType::YandexMapRu:
-        {
-            if (Projection()->Type() != "MercatorProjectionYandex") {
-                SetProjection(new MercatorProjectionYandex());
                 maxzoom = 13;
             }
         }
@@ -379,15 +349,13 @@ void Core::OnMapClose()
 }
 QString Core::SetCurrentPositionByKeywords(QString const & keys)
 {
-    QString status = "ZERO_RESULTS";
+    QString status  = "ZERO_RESULTS";
     PointLatLng pos = OPMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
 
     if (!pos.IsEmpty() && (status == "OK")) {
         SetCurrentPosition(pos);
-    }
-    else
-    {
-	qDebug() << "Status is not OK: " << status; 
+    } else {
+        qDebug() << "Status is not OK: " << status;
     }
     return status;
 }

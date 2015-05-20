@@ -1,3 +1,76 @@
+Release Notes - OpenPilot - Version RELEASE-15.05 RC2
+Fully autonomous flight is now possible with autotakeoff and landing as flight modes available to path plans.  
+An all new implementation of altitude vario provides improved altitude maintenance and smoother flight.
+A new RateTrainer mode for beginners and aerial photography make it easier to learn this mode my limiting the pitch and roll extents.
+4CH transmitters for multirotor and 2CH for ground is now supported.
+It is now easier to takeoff with an improved axislock on yaw implementation.
+Full speed flight just got faster with new motor constraints that maintain your ability to enact roll without requiring a upper throttle limit.
+Setup on GPS just got easier. See the wiki for details.
+New control protocols and support for due telemtry and OSD programing have been added.
+CC3D is no longer supported.
+
+The full list of bugfixes in this release is accessible here:
+
+Release Notes - OpenPilot - Version RELEASE-15.05 RC2
+
+** Bug
+    * [OP-1691] - PIOS_DELAY_WaitmS() in RFM22B causes jitter
+    * [OP-1756] - Add option to Vehicle Setup Wizard to calibrate all motor outputs at the same time.
+    * [OP-1778] - resolve win_sdk_install.sh issue with https://
+    * [OP-1793] - Fixes for Sensor module
+    * [OP-1794] - AxisLock windup not cleared with low throttle while armed
+    * [OP-1834] - Piro Comp - adverse effect in Atti/Ratti Modes
+    * [OP-1841] - Serial telemetry is not reliable 
+    * [OP-1847] - GPS assist does not update destination when reusing a flight mode for assist
+    * [OP-1855] - Limit parsing error in logs when starting GCS
+    * [OP-1858] - PathPlanner AutoTakeoff fixes
+    * [OP-1867] - PathPlanner AutoLand simplification
+    * [OP-1869] - Allow Analog Airspeed scale
+    * [OP-1872] - Vehicle Wiz Tricopter tail servo settings don't save
+    * [OP-1888] - SIGSEGV after starting simulator in HITL
+    * [OP-1893] - Deadband changes max stick input
+
+
+** Improvement
+    * [OP-1289] - Need Revo to send two telemetry streams for OSD and GCS
+    * [OP-1734] - Clarify the need of reversing servo in FW vehicle wizard
+    * [OP-1736] - Make package label something more meaningful than the date.
+    * [OP-1739] - Add GNSS (GPS/GLONASS) selection to UBX autoconf
+    * [OP-1750] - Revo state estimation CPU optimization
+    * [OP-1776] - Performance optimizations for UAVTalk telemetry
+    * [OP-1783] - Fall back PathPlanner flight mode to PH with config warning if no plan
+    * [OP-1791] - Change the description of the stabilization modes 
+    * [OP-1796] - Upgrade GCS to qt 5.4.1
+    * [OP-1797] - Improve GCS workspace layout management reactivity
+    * [OP-1798] - GCS ophid plugin is too verbose
+    * [OP-1802] - Throttle filterstationary fake pos/vel data rate
+    * [OP-1808] - Make the flight mode switch step in transmitter setup wizard to be optional
+    * [OP-1814] - Reset Button for mAH used
+    * [OP-1828] - Changes ADC module to support other pins as optional analog inputs
+    * [OP-1835] - Add motor constraints in place of overhead throttle buffer for enhanced stability and power.
+    * [OP-1837] - Add support for Multiplex SRXL protocol
+    * [OP-1840] - GPS serlal port needed features
+    * [OP-1844] - Create a vagrant environment that contains all the bits for Android development, including Android. 
+    * [OP-1848] - Rewrite AltVario/Hold in C++ for functional improvements
+    * [OP-1852] - Include version number in window title bar.
+    * [OP-1853] - Ground build tidy
+    * [OP-1874] - Various improvements to led notifications
+    * [OP-1882] - vtol path follower thrust control now set to auto as a default
+    * [OP-1884] - Improve low pass filter and gyro tau values
+    * [OP-1887] - PFD update 
+
+** New Feature
+    * [OP-1696] - PathFollower C++ Rewrite: Autonomous Landing, Velocity Roam, RTBL, GroundPathFollower
+    * [OP-1760] - AutoTakeoff
+    * [OP-1769] - Support Ground Vehicles with 2CH receiver and reversible motor
+    * [OP-1781] - Ground Input Channel Configuration
+    * [OP-1803] - Create UAVTalk objects for receiver signal quality
+    * [OP-1818] - Update OP toolchain for compiling osgearth
+    * [OP-1832] - Need method to get default UAV Object settings in Java UAVObjects
+    * [OP-1849] - Support programming/update of minimosd using USB VCP port
+    * [OP-1863] - RateTrainer mode - add maxpitch for beginners and aerial photography
+
+
 --- RELEASE-15.02.02 ---
 This release fixes a bug that prevents revo onboard mag to work correctly.
 

@@ -1340,10 +1340,11 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
  * @param       boundtick_len       boundary tick length
  * @param       max_val             maximum expected value (used to compute size of arrow ticker)
  * @param       flags               special flags (see hud.h.)
+ * @param       c                   char to show
  */
 // #define VERTICAL_SCALE_FILLED_NUMBER
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
-                             int boundtick_len, __attribute__((unused)) int max_val, int flags)
+                             int boundtick_len, __attribute__((unused)) int max_val, int flags, char c)
 {
     char temp[15];
     struct FontEntry font_info;
@@ -1418,7 +1419,10 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     // Generate the string for the value, as well as calculating its dimensions.
     memset(temp, ' ', 10);
     // my_itoa(v, temp);
-    sprintf(temp, "%d", v);
+    if (halign == -1)
+        sprintf(temp, "%d%c", v, c);
+    else
+        sprintf(temp, "%c%d", c, v);
     // TODO: add auto-sizing.
     calc_text_dimensions(temp, font_info, 1, 0, &dim);
     int xx = 0, i = 0;
@@ -1848,9 +1852,9 @@ void introGraphics(int16_t x, int16_t y)
 void introText(int16_t x, int16_t y)
 {
 #ifdef PIOS_INCLUDE_MSP
-    write_string("v 0.0.1 MSP", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+    write_string("v 1.0.0 MSP", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
 #else
-    write_string("v 0.0.1", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+    write_string("v 1.0.0", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
 #endif
 }
 
@@ -2157,7 +2161,7 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
                 GPSTimeData gpsTime;
                 GPSTimeGet(&gpsTime);
                 if (gpsTime.Hour | gpsTime.Minute | gpsTime.Second) {
-#if 1
+#if 0
                     sprintf(temp, "%02u:%02u:%02u UTC", gpsTime.Hour, gpsTime.Minute, gpsTime.Second);
                     write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
                     d_y += v_spacing;
@@ -2632,11 +2636,11 @@ void updateGraphics()
         }
         // Ground speed in HUD design as vertical scale left side (centered relative to y)
         if (HomePosOnTime && check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData *)&OsdSettings.SpeedSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, OsdSettings.SpeedSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, OsdSettings.SpeedSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, HUD_VSCALE_FLAG_NO_NEGATIVE, 'S');
         }
         // Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (HomePosOnTime && check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData *)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, OsdSettings.AltitudeSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, 0);
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, OsdSettings.AltitudeSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, 0, 'A');
         }
         // Heading in HUD design (centered relative to x)
         // JR_HINT TODO use and test mag heading in-flight
@@ -2658,7 +2662,7 @@ void updateGraphics()
             }
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
         }
-#if 1
+#if 0
         // Vertical speed
         if ((HomePosOnTime || gpsData.Status >= GPSPOSITIONSENSOR_STATUS_FIX2D) && check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
             sprintf(temp, "VS%5.1f%c", (double)-gpsVelocityData.Down, 0x88); // TODO currently m/s for both
@@ -2717,6 +2721,7 @@ void updateGraphics()
 #define ADC_VIDEO      4
 #define ADC_RSSI       5
 #define ADC_VREF       6
+#define AUTO_DETECT_CELL_VOLTAGE	4.3f
         // ADC RSSI
         if (OsdSettings2.RSSI) {
             filteredADC.rssi = filteredADC.rssi * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_RSSI) * ADC_REFERENCE * OsdSettings2.RSSICalibration.Factor / ADC_RESOLUTION + OsdSettings2.RSSICalibration.Offset) * ADC_FILTER;
@@ -2763,14 +2768,14 @@ void updateGraphics()
 #else
         if (OsdSettings2.SensorVoltage) {
             filteredADC.volt = filteredADC.volt * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset) * ADC_FILTER;
-            if (OsdSettings2.SensorVoltageCalibration.Warning < 4.2f) {
+            if (OsdSettings2.SensorVoltageCalibration.Warning < AUTO_DETECT_CELL_VOLTAGE) {
                 static int cell_count = 350;
                 if (cell_count < 100) {
                     WarnMask |= filteredADC.volt < (double)(OsdSettings2.SensorVoltageCalibration.Warning * (float)cell_count) ? WARN_BATT_SVOLT_LOW : 0x00;
                     sprintf(temp, "%ds", cell_count);
                     sprintf(&temp[2], "%5.2fV", filteredADC.volt);  // workaround for not working sprintf(temp, "%ds%5.2fV", cell_count, filteredADC.volt);
                 } else if (cell_count == 100) {
-                    cell_count = (int)(filteredADC.volt / (double)4.2f) + 1;
+                    cell_count = (int)(filteredADC.volt / (double)AUTO_DETECT_CELL_VOLTAGE) + 1;
                     sprintf(temp, " ");
                 } else {
                     cell_count--;
@@ -2831,7 +2836,7 @@ void updateGraphics()
 #endif
 
 #ifdef PIOS_INCLUDE_PACKETRXOK
-#define PACKETRXOK_WARN_THRESHOLD   95
+#define PACKETRXOK_WARN_THRESHOLD   84
         // Show PacketRxOk status data
         if (OsdSettings2.PacketRxOk) {
             PacketRxOk = PacketRxOk_read();

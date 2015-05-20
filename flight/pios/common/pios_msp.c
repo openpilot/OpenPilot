@@ -54,6 +54,7 @@ static uint8_t  MwArmed     = 0;
 static uint8_t  MwMode      = 0;
 static uint16_t MwRcData[8] = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
 static uint16_t MwAngle[2]  = {0, 0};
+static uint16_t MwHeading   = 0;
 
 static uint8_t  MwP[MSP_PIDITEMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static uint8_t  MwI[MSP_PIDITEMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -61,11 +62,14 @@ static uint8_t  MwD[MSP_PIDITEMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static uint8_t  MwRcRate        = 0;
 static uint8_t  MwRcExpo        = 0;
-static uint8_t  MwRollPitchRate = 0;
+static uint8_t  MwRollRate      = 0;
+static uint8_t  MwPitchRate     = 0;
 static uint8_t  MwYawRate       = 0;
 static uint8_t  MwDynThrPID     = 0;
 static uint8_t  MwThrMid        = 0;
 static uint8_t  MwThrExpo       = 0;
+static uint16_t MwTPAbreakpoint = 0;
+static uint8_t  MwYawExpo       = 0;
 
 
 char MSPText[TEXTROWS][TEXTCOLS] = { {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, };
@@ -116,10 +120,10 @@ void setPage(void) {
     case 2:
         sprintf(MSPText[0], "2/2 RC TUNING      Profile %u", MwProfile);
         sprintf(MSPText[1], "                   VALUE");
-        sprintf(MSPText[2], "ROLL PITCH RATE     %3u ", MwRollPitchRate);
-        sprintf(MSPText[3], "YAW RATE            %3u ", MwYawRate);
-        sprintf(MSPText[4], "TPA                 %3u ", MwDynThrPID);
-        sprintf(MSPText[5], "THROTTLE MID        %3u ", MwThrMid);
+        sprintf(MSPText[2], "ROLL RATE           %3u ", MwRollRate);
+        sprintf(MSPText[3], "PITCH RATE          %3u ", MwPitchRate);
+        sprintf(MSPText[4], "YAW RATE            %3u ", MwYawRate);
+        sprintf(MSPText[5], "TPA                 %3u ", MwDynThrPID);
         sprintf(MSPText[6], "THROTTLE EXPO       %3u ", MwThrExpo);
         sprintf(MSPText[7], "RC RATE             %3u ", MwRcRate);
         sprintf(MSPText[8], "RC EXPO             %3u ", MwRcExpo);
@@ -208,7 +212,7 @@ void configSave(void) {
         *tx++ = txCheckSum;
         break;
     case 2:
-        txSize = 7;
+        txSize = 11;
         *tx++ = txSize;
         txCheckSum ^= txSize;
         *tx++ = MSP_SET_RC_TUNING;
@@ -217,8 +221,10 @@ void configSave(void) {
         txCheckSum ^= MwRcRate;
         *tx++ = MwRcExpo;
         txCheckSum ^= MwRcExpo;
-        *tx++ = MwRollPitchRate;
-        txCheckSum ^= MwRollPitchRate;
+        *tx++ = MwRollRate;
+        txCheckSum ^= MwRollRate;
+        *tx++ = MwPitchRate;
+        txCheckSum ^= MwPitchRate;
         *tx++ = MwYawRate;
         txCheckSum ^= MwYawRate;
         *tx++ = MwDynThrPID;
@@ -227,6 +233,12 @@ void configSave(void) {
         txCheckSum ^= MwThrMid;
         *tx++ = MwThrExpo;
         txCheckSum ^= MwThrExpo;
+        *tx++ = (uint8_t) MwTPAbreakpoint;
+        txCheckSum ^= (uint8_t) MwTPAbreakpoint;
+        *tx++ = (uint8_t) (MwTPAbreakpoint >> 8 & 0xFF);
+        txCheckSum ^= (uint8_t) (MwTPAbreakpoint >> 8 & 0xFF);
+        *tx++ = MwYawExpo;
+        txCheckSum ^= MwYawExpo;
         *tx++ = txCheckSum;
         break;
     }
@@ -268,17 +280,16 @@ void configChange(int8_t value) {
     case 2:
         switch (config.Row - delta) {
         case 0:
-            param = &MwRollPitchRate;
+            param = &MwRollRate;
             break;
         case 1:
-            param = &MwYawRate;
+            param = &MwPitchRate;
             break;
         case 2:
-            param = &MwDynThrPID;
+            param = &MwYawRate;
             break;
         case 3:
-            param = &MwThrMid;
-            upper_limit = 100;
+            param = &MwDynThrPID;
             break;
         case 4:
             param = &MwThrExpo;
@@ -454,8 +465,9 @@ void serialMSPCheck(uint8_t cmdMSP)
     {
         uint32_t MwSensorActive;
 
-        MwSensorActive = read16();      // dummy read
-        MwSensorActive = read32();      // dummy read
+        MwSensorActive = read16();      	// dummy read
+        MwSensorActive = read16();      	// dummy read
+        MwSensorActive = read16();      	// dummy read
         MwSensorActive = read32();
         MwProfile = read8() + 1;
         MwArmed = MwSensorActive & MSP_MASK_BOXARM;
@@ -473,26 +485,11 @@ void serialMSPCheck(uint8_t cmdMSP)
     {
         for (i=0; i<2; i++)
             MwAngle[i] = read16();
+	MwHeading = read16();
     }
 
     if (cmdMSP == MSP_PID)
     {
-        /*
-            baseflight code info:
-                enum {
-                    PIDROLL,
-                    PIDPITCH,
-                    PIDYAW,
-                    PIDALT,
-                    PIDPOS,
-                    PIDPOSR,
-                    PIDNAVR,
-                    PIDLEVEL,
-                    PIDMAG,
-                    PIDVEL,
-                    PIDITEMS
-                };
-         */
         for(i=0; i<MSP_PIDITEMS; i++) {
             MwP[i] = read8();
             MwI[i] = read8();
@@ -504,23 +501,16 @@ void serialMSPCheck(uint8_t cmdMSP)
 
     if (cmdMSP == MSP_RC_TUNING)
     {
-        /*
-            baseflight code info:
-                serialize8(cfg.rcRate8);
-                serialize8(cfg.rcExpo8);
-                serialize8(cfg.rollPitchRate);
-                serialize8(cfg.yawRate);
-                serialize8(cfg.dynThrPID);
-                serialize8(cfg.thrMid8);
-                serialize8(cfg.thrExpo8);
-        */
         MwRcRate        = read8();
         MwRcExpo        = read8();
-        MwRollPitchRate = read8();
+        MwRollRate      = read8();
+        MwPitchRate     = read8();
         MwYawRate       = read8();
         MwDynThrPID     = read8();
         MwThrMid        = read8();
         MwThrExpo       = read8();
+        MwTPAbreakpoint = read16();
+        MwYawExpo       = read8();
         modeMSPRequests &= ~REQ_MSP_RC_TUNING;
         setPage();
     }

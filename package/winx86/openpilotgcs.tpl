@@ -12,6 +12,9 @@
 #
 
 ; Some names, paths and constants
+!define OP_BIG_NAME "${OP_BIG_NAME}"
+!define GCS_BIG_NAME "${GCS_BIG_NAME}"
+!define GCS_SMALL_NAME "${GCS_SMALL_NAME}"
 !define PACKAGE_LBL "${PACKAGE_LBL}"
 !define PACKAGE_NAME "${PACKAGE_NAME}"
 !define PACKAGE_SEP "${PACKAGE_SEP}"

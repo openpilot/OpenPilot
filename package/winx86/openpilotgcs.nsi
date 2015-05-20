@@ -36,22 +36,22 @@
   ; Tree root locations (relative to this script location)
   !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
-  !define GCS_BUILD_TREE "..\..\build\openpilotgcs_release"
+  !define GCS_BUILD_TREE "..\..\build\${GCS_SMALL_NAME}_release"
   !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
   !define AEROSIMRC_TREE "${GCS_BUILD_TREE}\misc\AeroSIM-RC"
 
   ; Default installation folder
-  InstallDir "$PROGRAMFILES\OpenPilot"
+  InstallDir "$PROGRAMFILES\${OP_BIG_NAME}"
 
   ; Get installation folder from registry if available
-  InstallDirRegKey HKLM "Software\OpenPilot" "Install Location"
+  InstallDirRegKey HKLM "Software\${OP_BIG_NAME}" "Install Location"
 
 ;--------------------------------
 ; Version information
 
   ; Program name and installer file
-  !define PRODUCT_NAME "OpenPilot GCS"
-  !define INSTALLER_NAME "OpenPilot GCS Installer"
+  !define PRODUCT_NAME "${GCS_BIG_NAME}"
+  !define INSTALLER_NAME "${GCS_BIG_NAME} Installer"
 
   ; Read automatically generated version info
 ; !define PACKAGE_LBL "${DATE}-${TAG_OR_HASH8}"
@@ -122,7 +122,7 @@
 
   ; Remember the installer language
   !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
-  !define MUI_LANGDLL_REGISTRY_KEY "Software\OpenPilot" 
+  !define MUI_LANGDLL_REGISTRY_KEY "Software\${OP_BIG_NAME}" 
   !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
   !define MUI_LANGDLL_ALWAYSSHOW
 
@@ -185,43 +185,43 @@ SectionEnd
 ; Copy GCS plugins
 Section "-Plugins" InSecPlugins
   SectionIn RO
-  SetOutPath "$INSTDIR\lib\openpilotgcs\plugins"
-  File /r "${GCS_BUILD_TREE}\lib\openpilotgcs\plugins\*.dll"
-  File /r "${GCS_BUILD_TREE}\lib\openpilotgcs\plugins\*.pluginspec"
+  SetOutPath "$INSTDIR\lib\${GCS_SMALL_NAME}\plugins"
+  File /r "${GCS_BUILD_TREE}\lib\${GCS_SMALL_NAME}\plugins\*.dll"
+  File /r "${GCS_BUILD_TREE}\lib\${GCS_SMALL_NAME}\plugins\*.pluginspec"
 SectionEnd
 
 ; Copy GCS resources
 Section "-Resources" InSecResources
-  SetOutPath "$INSTDIR\share\openpilotgcs\cloudconfig"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\cloudconfig\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\default_configurations"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\default_configurations\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\dials"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\dials\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\mapicons"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\mapicons\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\models"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\models\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\pfd"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\pfd\*"
-  SetOutPath "$INSTDIR\share\openpilotgcs\stylesheets"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\stylesheets\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\cloudconfig"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\cloudconfig\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\default_configurations"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\default_configurations\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\diagrams"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\diagrams\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\dials"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\dials\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\mapicons"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\mapicons\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\models"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\models\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\pfd"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\pfd\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\stylesheets"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\stylesheets\*"
 SectionEnd
 
 ; Copy Notify plugin sound files
 Section "-Sound files" InSecSounds
-  SetOutPath "$INSTDIR\share\openpilotgcs\sounds"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\sounds\*"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\sounds"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\sounds\*"
 SectionEnd
 
 ; Copy localization files
 ; Disabled until GCS source is stable and properly localized
 Section "-Localization" InSecLocalization
-  SetOutPath "$INSTDIR\share\openpilotgcs\translations"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\openpilotgcs_*.qm"
-  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\qt_*.qm"
+  SetOutPath "$INSTDIR\share\${GCS_SMALL_NAME}\translations"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\translations\openpilotgcs_*.qm"
+  File /r "${GCS_BUILD_TREE}\share\${GCS_SMALL_NAME}\translations\qt_*.qm"
 SectionEnd
 
 ; Copy utility files
@@ -263,45 +263,45 @@ SectionEnd
 Section "Shortcuts" InSecShortcuts
   ; Create desktop and start menu shortcuts
   SetOutPath "$INSTDIR"
-  CreateDirectory "$SMPROGRAMS\OpenPilot"
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS (clean configuration).lnk" "$INSTDIR\bin\openpilotgcs.exe" \
-	"-reset" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot License.lnk" "$INSTDIR\LICENSE.txt" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ReadMe.lnk" "$INSTDIR\README.txt" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ReleaseNotes.lnk" "$INSTDIR\WHATSNEW.txt" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Milestones.lnk" "$INSTDIR\MILESTONES.txt" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Website.lnk" "http://www.openpilot.org" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Wiki.lnk" "http://wiki.openpilot.org" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Forums.lnk" "http://forums.openpilot.org" \
-	"" "$INSTDIR\bin\openpilotgcs.exe" 0
-  CreateShortCut "$DESKTOP\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
-  	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
-  CreateShortCut "$SMPROGRAMS\OpenPilot\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
+  CreateDirectory "$SMPROGRAMS\${OP_BIG_NAME}"
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\${GCS_BIG_NAME}.lnk" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\${GCS_BIG_NAME} (clean configuration).lnk" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" \
+	"-reset" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\OpenPilot License.lnk" "$INSTDIR\LICENSE.txt" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\OpenPilot ReadMe.lnk" "$INSTDIR\README.txt" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\OpenPilot ReleaseNotes.lnk" "$INSTDIR\WHATSNEW.txt" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\OpenPilot Milestones.lnk" "$INSTDIR\MILESTONES.txt" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\OpenPilot Website.lnk" "http://www.openpilot.org" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\OpenPilot Wiki.lnk" "http://wiki.openpilot.org" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\OpenPilot Forums.lnk" "http://forums.openpilot.org" \
+	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0
+  CreateShortCut "$DESKTOP\${GCS_BIG_NAME}.lnk" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" \
+  	"" "$INSTDIR\bin\${GCS_SMALL_NAME}.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\${OP_BIG_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
 SectionEnd
 
 Section ; create uninstall info
   ; Write the installation path into the registry
-  WriteRegStr HKCU "Software\OpenPilot" "Install Location" $INSTDIR
+  WriteRegStr HKCU "Software\${OP_BIG_NAME}" "Install Location" $INSTDIR
 
    ; Write the uninstall keys for Windows
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayName" "OpenPilot GCS"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "UninstallString" '"$INSTDIR\Uninstall.exe"'
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayIcon" '"$INSTDIR\bin\openpilotgcs.exe"'
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "Publisher" "OpenPilot Team"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Ragin' Cajun"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "URLInfoAbout" "http://www.openpilot.org"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "HelpLink" "http://wiki.openpilot.org"
-  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "EstimatedSize" 100600
-  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "NoModify" 1
-  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "NoRepair" 1
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "DisplayName" "${GCS_BIG_NAME}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "UninstallString" '"$INSTDIR\Uninstall.exe"'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "DisplayIcon" '"$INSTDIR\bin\${GCS_SMALL_NAME}.exe"'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "Publisher" "OpenPilot Team"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "DisplayVersion" "Ragin' Cajun"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "URLInfoAbout" "http://www.openpilot.org"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "HelpLink" "http://wiki.openpilot.org"
+  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "EstimatedSize" 100600
+  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "NoModify" 1
+  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}" "NoRepair" 1
 
   ; Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -337,7 +337,7 @@ FunctionEnd
 ;--------------------------------
 ; Uninstaller sections
 
-Section "un.OpenPilot GCS" UnSecProgram
+Section "un.${GCS_BIG_NAME}" UnSecProgram
   ; Remove installed files and/or directories
   RMDir /r /rebootok "$INSTDIR\bin"
   RMDir /r /rebootok "$INSTDIR\lib"
@@ -353,34 +353,35 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /rebootok "$INSTDIR"
 
   ; Remove registry keys
-  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot"
-  DeleteRegKey HKCU "Software\OpenPilot"
+  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OP_BIG_NAME}"
+  DeleteRegKey HKCU "Software\${OP_BIG_NAME}"
 
   ; Remove shortcuts, if any
   SetShellVarContext all
-  Delete /rebootok "$DESKTOP\OpenPilot GCS.lnk"
-  Delete /rebootok "$SMPROGRAMS\OpenPilot\*"
-  RMDir /rebootok "$SMPROGRAMS\OpenPilot"
+  Delete /rebootok "$DESKTOP\${GCS_BIG_NAME}.lnk"
+  Delete /rebootok "$SMPROGRAMS\${OP_BIG_NAME}\*"
+  RMDir /rebootok "$SMPROGRAMS\${OP_BIG_NAME}"
 SectionEnd
 
 Section "un.Maps cache" UnSecCache
   ; Remove maps cache
   SetShellVarContext current
-  RMDir /r /rebootok "$APPDATA\OpenPilot\mapscache"
+  RMDir /r /rebootok "$LOCALAPPDATA\OpenPilot\${GCS_BIG_NAME}"
+  ; Only remove if no other versions have data here
+  RMDir /rebootok "$LOCALAPPDATA\OpenPilot"
 SectionEnd
 
 Section "un.GCS Layout" UnSecConfig
   ; Remove GCS configuration files
   SetShellVarContext current
-  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.db"
-  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.xml"
-  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.ini"
+  Delete /rebootok "$APPDATA\OpenPilot\${GCS_BIG_NAME}.db"
+  Delete /rebootok "$APPDATA\OpenPilot\${GCS_BIG_NAME}.xml"
 SectionEnd
 
 Section "-un.Profile" UnSecProfile
   ; Remove OpenPilot user profile subdirectory if empty
   SetShellVarContext current
-  RMDir "$APPDATA\OpenPilot"
+  RMDir /rebootok "$APPDATA\OpenPilot"
 SectionEnd
 
 ;--------------------------------
@@ -407,6 +408,6 @@ FunctionEnd
 
 Function RunApplication
 
-  Exec '"$INSTDIR\bin\openpilotgcs.exe"'
+  Exec '"$INSTDIR\bin\${GCS_SMALL_NAME}.exe"'
 
 FunctionEnd

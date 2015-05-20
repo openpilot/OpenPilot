@@ -723,8 +723,10 @@ endif
 #  - calls paltform-specific packaging script
 
 # Define some variables
+EMPTY             :=
+SPACE             := $(EMPTY) $(EMPTY)
 PACKAGE_LBL       := $(shell $(VERSION_INFO) --format=\$${LABEL})
-PACKAGE_NAME      := $(OP_BIG_NAME)
+PACKAGE_NAME      := $(subst $(SPACE),,$(OP_BIG_NAME))
 PACKAGE_SEP       := -
 PACKAGE_FULL_NAME := $(PACKAGE_NAME)$(PACKAGE_SEP)$(PACKAGE_LBL)
 

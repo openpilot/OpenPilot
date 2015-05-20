@@ -72,13 +72,7 @@ typedef struct {
         // - wait 1 second (even at 2400, the baud rate change command should clear even an initially full 31 byte PIOS buffer much more quickly)
         // - change Revo port baud rate
         // sometimes fails (much worse for lowest baud rates)
-// FIXME: remove this and retest
-// FIXME: remove this and retest
-// FIXME: remove this and retest
-// FIXME: remove this and retest
-// FIXME: remove this and retest
-// FIXME: remove this and retest
-// FIXME: remove this and retest
+        // FIXME: remove this and retest when someone has time
         uint8_t bufferPaddingForPiosBugAt2400Baud[2]; // must be at least 2 for 2400 to work, probably 1 for 4800 and 0 for 9600+
             } __attribute__((packed));
                 GPSSettingsData gpsSettings;
@@ -167,9 +161,7 @@ static volatile bool current_step_touched = false;
 // both the pointer and what it points to are volatile.  Yuk.
 static volatile status_t *volatile status = 0;
 static uint8_t hwsettings_baud;
-//static HwSettingsGPSSpeedOptions hwsettings_baud;
 static uint8_t baud_to_try_index = 255;
-void debugindex(int index, uint8_t c);
 
 static void append_checksum(UBXSentPacket_t *packet)
 {
@@ -233,18 +225,15 @@ void gps_ubx_reset_sensor_type()
 {
     static uint8_t mutex; // = 0
 
-// is this needed?
+    // is this needed?
+    // what happens if two tasks / threads try to do an XyzSet() at the same time?
     if (__sync_fetch_and_add(&mutex, 1) == 0) {
-    ubxHwVersion      = -1;
-    baud_to_try_index -= 1;  // undo postincrement and start with the one that was most recently successful
-    sensorType        = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
-    GPSPositionSensorSensorTypeSet(&sensorType);
-    // make the sensor type / autobaud code time out immediately to send the request immediately
-    status->lastStepTimestampRaw += 0x8000000UL;
-    } else {
-        static uint8_t c;
-        debugindex(8, ++c);
-        if (c > 254) c=254;
+        ubxHwVersion      = -1;
+        baud_to_try_index -= 1;  // undo postincrement and start with the one that was most recently successful
+        sensorType        = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
+        GPSPositionSensorSensorTypeSet(&sensorType);
+        // make the sensor type / autobaud code time out immediately to send the request immediately
+        status->lastStepTimestampRaw += 0x8000000UL;
     }
     --mutex;
 }
@@ -279,7 +268,6 @@ static void config_gps_baud(uint16_t *bytes_to_send)
     // for protocol masks, bit 0 is UBX enable, bit 1 is NMEA enable
     status->working_packet.message.payload.cfg_prt.inProtoMask  = 1; // 1 = UBX only (bit 0)
     // disable current UBX messages for low baud rates
-//    status->working_packet.message.payload.cfg_prt.outProtoMask = (hwsettings_baud<=HWSETTINGS_GPSSPEED_9600) ? 0 : 1; // 1 = UBX only (bit 0)
     status->working_packet.message.payload.cfg_prt.outProtoMask = 1;
     // Ask GPS to change it's speed
     status->working_packet.message.payload.cfg_prt.baudRate = hwsettings_gpsspeed_enum_to_baud(hwsettings_baud);
@@ -464,6 +452,9 @@ static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
 
 // permanently store our version of GPSSettings.UbxAutoConfig
 // we use this to disable after ConfigStoreAndDisable is complete
+// FIXME: this does not store it permanently
+// all that is needed is for the following to store it permanently like HomeLocation is stored by the flight code
+// GPSSettingsUbxAutoConfigSet((GPSSettingsUbxAutoConfigOptions *) &status->currentSettings.UbxAutoConfig);
 static void setGpsSettings()
 {
     // try casting it correctly and it says:
@@ -475,141 +466,8 @@ static void setGpsSettings()
 }
 
 
-// End User Documentation
-
-// There are two baud rates of interest
-// The baud rate the GPS is talking at
-// The baud rate Revo is talking at
-// These two must match for the GPS to work
-// You only have direct control of the Revo baud rate
-// The two baud rates must be the same for the Revo to send a command to the GPS
-// to tell the GPS to change it's baud rate
-// So you start out by changing Revo's baud rate to match the GPS's
-// and then enable UbxAutoConfig to tell Revo to change the GPS baud every time, just before it changes the Revo baud
-// That is the basis of these instructions
-
-// There are microprocessors and they each have internal settings
-// Revo
-// GPS
-// and each of these settings can be temporary or permanent
-
-// To change a Revo setting
-// Use the System tab in the GCS for all the following
-// Example: in Settings->GPSSettings click on the VALUE for UbxAutoConfig and change it to Disabled
-// Click on UbxAutoConfig itself and the line will turn green and blue
-// To change this setting permanently, press the  red  up arrow (Save) at the top of the screen
-// Permanently means that it uses this setting, even if you reboot Revo, e.g. power off and on
-// To change this setting temporarily, press the green up arrow (Send) at the top of the screen
-// Temporarily means that it overrides the permanent setting, but it goes back to the permanent setting when you reboot Revo, e.g. power off and on
-
-// To change an internal GPS setting you use the OP GCS System tab to tell Revo to make the GPS changes
-// This only works correctly after you have matching baud rates so Revo and GPS can talk together
-// "Settings->GPSSettings->UbxAutoConfig = Configure"         sets the internal GPS setting temporarily
-// "Settings->GPSSettings->UbxAutoConfig = ConfigureAndStore" sets the internal GPS setting permanently
-
-// You want to wind up with a set of permanent settings that work together
-// There are two different sets of permanent settings that work together
-// GPS at 9600 baud and factory defaults
-// Revo configured to start out at 9600 baud, but then completely configure the GPS and switch both to 57600 baud
-// (takes 6 seconds at boot up while you are waiting for it to acquire satellites anyway)
-// This is the preferred way so that if we change the settings in the future, the new release will automatically use the correct settings
-// GPS at 57600 baud with all the settings for the current release stored in the GPS
-// Revo configured to disable UbxAutoConfig since all the GPS settings are permanently stored correctly
-// May require reconfiguring in a future release
-
-// Changable settings of interest
-// AutoConfig mode
-// Settings->GPSSettings->UbxAutoConfig (Disabled, Configure, ConfigureAndStore, default=Configure)
-// Disabled means that changes to the GPS baud setting only affect the Revo port
-// It doesn't try to change the GPS's internal baud rate setting
-// Configure means change the GPS's internal baud setting temporarily (GPS settings revert to the permanent values when GPS is powered off/on)
-// ConfigureAndStore means change the GPS's internal baud setting permanently (even after the GPS is powered off/on)
-// GPS baud rate
-// Settings->HwSettings->GPSSpeed
-// If the baud rates are the same and an AutoConfig mode is enabled this will change both the GPS baud rate and the Revo baud rate
-// If the baud rates are not the same and an AutoConfig mode is enabled it will fail
-// If AutoConfig mode is disabled this will only change the Revo baud rate
-
-// View only settings of interest
-// Detected GPS type
-// Data Objects -> GPSPositionSensor -> SensorType (Unknown, NMEA, UBX, UBX7, UBX8)
-// When it says something other than Unknown, the GPS and Revo baud rates are synced and talking
-// Real time progress of the GPS detection process
-// Data Objects -> GPSPositionSensor -> AutoConfigStatus (DISABLED, RUNNING, DONE, ERROR)
-
-// Syncing the baud rates means that the GPS's internal baud rate setting is the same as the Revo port setting
-// This is necessary for the GPS to work with Revo
-// To sync to and find out an unknown GPS baud rate (or sync to and use a known GPS baud rate)
-// Temporarily change the AutoConfig mode to Disabled
-// Temporarily change the GPS baud rate to a value you think it might be (or go up the list)
-// See if that baud rate is correct (Data Objects->GPSPositionSensor->SensorType will be something besides Unknown)
-// Repeat, changing the GPS baud rate, until found
-
-// Some very important facts:
-// For 9600 baud or lower, the autoconfig will configure it to factory default settings
-// For 19200 baud or higher, the autoconfig will configure it to OP required settings
-// If autoconfig is enabled permanently in Revo, it will assume that the GPS is configured to power up at 9600 baud
-// 57600 baud is recommended for the current release
-// That can be achieved either by
-// autoconfiging the GPS from a permanent 9600 baud (and factory settings) to a temporary 57600 (with OP settings) on each power up
-// or by configuring the GPS with a permanent 57600 (with OP settings) and then permanently disabling autoconfig
-// Some previous releases used 38400 and had some other settings differences
-
-// The user should either:
-// Permanently configure their GPS to 9600 baud factory settings and tell the Revo configuration to load volatile settings at each startup by:
-// (Recommended method because new versions could require new settings and this handles future changes automatically)
-// Syncing the baud rates
-// Setting it to autoconfig.nostore and waiting for it to complete
-// Setting HwSettings.GPSSpeed to 9600 and waiting for it to complete
-// Setting it to autoconfig.store and waiting for it to complete (this tells the GPS to store the 9600 permanently)
-// Permanently setting it to autoconfig.nostore and waiting for it to complete
-// Permanently setting HwSettings.GPSSpeed to 57600 and waiting for it to complete
-// Permanently configure their GPS to 57600 baud, including OpenPilot settings and telling the Revo configuration to just set the baud to 57600 at each startup by:
-// (Less recommended method because new versions could require new settings so you would have to do this again)
-// Syncing the baud rates
-// Setting it to autoconfig.nostore and waiting for it to complete
-// Permanently setting HwSettings.GPSSpeed to 57600 and waiting for it to complete
-// Setting it to autoconfig.store
-// Permanently setting it to autoconfig.disabled
-
-// The algorithm is:
-// If autoconfig is enabled at all
-// It will assume that the GPS boot up baud rate is 9600 and the user wants that changed to HwSettings.GPSSpeed
-// and that change can be either volatile (must be done each boot up) or non-volatile (stored in GPS's non-volatile settings storage)
-// according to whether CONFIGURE is used or CONFIGUREANDSTORE is used
-// The only user who should need CONFIGUREANDSTORE stored permanently in Revo is Dave, who configures many OP GPS's before shipping
-// plug a factory default GPS in to a Revo, power up, wait for it to configure and permanently store in the GPS, power down, ship
-// If autoconfig is not enabled
-// it will use HwSettings.GPSSpeed for the baud rate and not do any configuration changes
-// If GPSSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGUREANDSTORE it will
-// 1 Reset the permanent configuration back to factory default
-// 2 Disable NMEA message settings
-// 3 Add some volatile UBX settings to the copies of the non-volatile ones that are currently running
-// 4 Save the current volatile settings to non-volatile storage
-// If GPSSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGURE it will
-// 2 Disable NMEA message settings
-// 3 Add some volatile UBX settings to the copies of the non-volatile ones that are currently running
-// If the requested baud rate is 9600 or less it skips the step (3) of adding some volatile UBX settings
-
-// Talking points to point out:
-// U-center is no longer needed for any use case with this code
-// 9600 is factory default for GPS's
-// Some GPS can't even permanently store settings and must start at 9600 baud?
-// I have a GPS that sometimes looses settings and reverts to 9600 and this is a fix for that too :)
-// This code handles a GPS configured either way (9600 with factory default settings or e.g. 57600 with OP settings)
-// Autoconfig.nostore at each boot for 9600, autoconfig.disabled for the 57600 with OP settings (or custom settings and baud)
-// This code can permanently configure a GPS to be e.g. 9600 with factory default settings or 57600 with OP settings
-// GPS's with 9600 baud and factory default settings would be a good default for future OP releases
-// Changing the GPS internal settings multiple times in the future is handled automatically
-// This code is written to do a configure from 9600 to 57600
-// (actually 9600 to whatever is stored in HwSettings.GPSSpeed)
-// if autoconfig is enabled at boot up
-// When autoconfiging to 9600 baud or lower, the autoconfig will configure it to factory default settings, not OP settings
-// That is because 9600 baud drops many of the OP messages and because 9600 baud is factory default
-// For 19200 baud or higher, the autoconfig will configure it to OP required settings
-// If autoconfig is enabled permanently in Revo, it will assume that the GPS is configured to power up at 9600 baud
-// This is good for factory default GPS's
-// This is good in case we change some settings in a future release
+// 9600 baud and lower are not usable, and are best left at factory default
+// if the user selects 9600
 
 
 void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
@@ -638,45 +496,20 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
 
         // wait for the normal reply timeout before sending it over and over
         if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) < UBX_PARSER_TIMEOUT) {
-// 1 sec seems to work, except for just 230400 baud rates and then it takes 4 times
-// retries for various timeouts
-// 925-280-280 -> 2@2400
-// 937-280-280 -> 1@2400
             return;
         }
 
-// this is where the autobaud code needs to go as it won't get farther till MON_VER returns something
-// at this point we have already waited for the MON_VER reply to time out (except the first time where it times out without being sent)
-// and the fact we are here says that ubxHwVersion has not been set (it is set externally)
-// so this retry at this baud rate has failed
-// we need gps_ubx_reset_sensor_type() (or what else?) to reset this FSM (baud_to_try_index==-1) and the retry count
-// need a state machine that counts retries and:
-//   no, no retries, just loop through the baud rate over and over till it locks
-//   that may be a bit slower if it misses just one MON_VER than trying twice on the first few (sorted in likelyhood order) baud rates
-//   but it gets to the other baud rates faster and loops faster
+        // at this point we have already waited for the MON_VER reply to time out (except the first time where it times out without being sent)
+        // and the fact we are here says that ubxHwVersion has not been set (it is set externally)
+        // so this try at this baud rate has failed
+        // if we get here
+        //   select the next baud rate, skipping ahead if new baud rate is HwSettings.GPSSpeed
+        //   set Revo baud rate to current++ value (immediate change so we can send right after that) and send the MON_VER request
+        // baud rate search order are most likely matches first
 
-// if we get here
-//   select the next baud rate, skipping ahead if new baud rate is HwSettings.GPSSpeed
-//   set Revo baud rate to current++ value (immediate change so we can send right after that) and send the MON_VER request
-
-// baud rate search order (most likely matches first)
-// HwSettings.GPSSpeed, 57600, 9600, 38400, 115200, 
-// all values from #2 on are only tried if GPSSpeed!=them
-// no, init to HwSettings.GPSSpeed only at power up and if it fails just run the whole list over and over?
-
-// the order to try the baud rates with the most likely first
-// these come after trying HwSettings.GPSSpeed but will not duplicate the HwSettings.GPSSpeed test
-
-// without an if for this block, it autobauds even with autoconfig disabled
-// if (status->currentSettings.UbxAutoConfig != GPSSETTINGS_UBXAUTOCONFIG_DISABLED)
-// this is the same thing
-// if (enabled)
-
-        // if not Disabled, do AutoBaud
+        // if AutoBaud or higher, do AutoBaud
         if (status->currentSettings.UbxAutoConfig >= GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUD) {
             uint8_t baud_to_try;
-            //HwSettingsGPSSpeedOptions  baud_to_try;
-#if 1
             static uint8_t baud_array[] = {
                 HWSETTINGS_GPSSPEED_57600,
                 HWSETTINGS_GPSSPEED_9600,
@@ -700,26 +533,9 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
                 }
             // skip HwSettings.GPSSpeed when you run across it in the list
             } while (baud_to_try == hwsettings_baud);
-#else
-            // no autobaud, just use current setting
-            HwSettingsGPSSpeedGet(&hwsettings_baud);
-            baud_to_try = hwsettings_baud;
-#if 0
-debugindex(0, hwsettings_baud);
-{
-static uint8_t c;
-debugindex(1, ++c);
-}
-#endif
-#endif
             // set the FC (Revo) baud rate
-            gps_set_fc_baud_from_arg(baud_to_try, 2);
+            gps_set_fc_baud_from_arg(baud_to_try);
         }
-
-{
-static uint8_t c;
-debugindex(4, ++c);
-}
 
         // this code is executed even if ubxautoconfig is disabled
         // it detects the "sensor type" = type of GPS
@@ -730,21 +546,6 @@ debugindex(4, ++c);
         return;
     }
 
-#if 0
-    {
-        static uint8_t c;
-        uint8_t baud;
-        GPSPositionSensorCurrentBaudRateGet(&baud);
-        debugindex(8, baud);
-        if (baud != hwsettings_baud) {
-            debugindex(9, ++c);
-// big hack to keep the malfunctioning GPSPositionSensor.CurrentBaudRate correct
-// for some reason it keeps going back to boot value (or default if xml has a default)
-            GPSPositionSensorCurrentBaudRateSet(&baud);
-        }
-    }
-#endif
-
     if (!enabled) {
         // keep resetting the timeouts here if we are not actually going to run the configure code
         // not really necessary, but it keeps the timer from wrapping every 50 seconds
@@ -752,37 +553,12 @@ debugindex(4, ++c);
         return; // autoconfig not enabled
     }
 
-debugindex(5, status->currentStep);
+    // FSM
     switch (status->currentStep) {
-#if 0
-    // if here, we have just verified that the baud rates are in sync
-    case INIT_STEP_START:
-        // we should look for the GPS version again (user may plug in a different GPS and then do autoconfig again)
-//gps_ubx_reset_sensor_type();
-        // do not fall through to next state
-        // or it might try to get the sensor type when the baud rate is half changed
-        // note that resetting sensor type causes it to send MON_VER msg and wait for reply before coming back here
-#if 0
-        set_current_step_if_untouched(INIT_STEP_DISABLE_MSGS);
-        // allow it to get the sensor type immmediately by not setting status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
-        break;
-
-    case INIT_STEP_DISABLE_MSGS:
-        config_gps_baud(bytes_to_send, baud_to_try, 0);
-        // do not fall through to next state
-        // or it might try to get the sensor type when the baud rate is half changed
-        // note that resetting sensor type causes it to send MON_VER msg and wait for reply before coming back here
-#endif
-        set_current_step_if_untouched(INIT_STEP_RESET_GPS);
-        status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
-        break;
-#endif
     // if here, we have verified that the baud rates are in sync sometime in the past
     case INIT_STEP_START:
         // we should look for the GPS version again (user may plug in a different GPS and then do autoconfig again)
         // zero retries for the next state that needs it (INIT_STEP_SAVE)
-// not needed if MON_VER ack is a nop
-//        status->retryCount = 0;
         set_current_step_if_untouched(INIT_STEP_SEND_MON_VER);
         // fall through to next state
         // we can do that if we choose because we haven't sent any data in this state
@@ -792,45 +568,10 @@ debugindex(5, status->currentStep);
         build_request((UBXSentPacket_t *)&status->working_packet, UBX_CLASS_MON, UBX_ID_MON_VER, bytes_to_send);
         // keep timeouts running properly, we (will have) just sent a packet that generates a reply
         set_current_step_if_untouched(INIT_STEP_WAIT_MON_VER_ACK);
-// just for test, remove
-// it messes configure up, config has baud synced, and HwSettings.GPSSpeed is already set with new baud,
-//   so it configures to new baud before GPS has new baud
-// gps_ubx_reset_sensor_type();
         status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
         break;
 
     case INIT_STEP_WAIT_MON_VER_ACK:
-#if 0
-debugindex(0, status->requiredAck.clsID);
-debugindex(1, ubxLastAck.clsID);
-debugindex(2, status->requiredAck.msgID);
-debugindex(3, ubxLastAck.msgID);
-debugindex(4, ubxLastNak.clsID);
-debugindex(5, ubxLastNak.msgID);
-#endif
-#if 0
-        if (ubxLastAck.clsID == status->requiredAck.clsID && ubxLastAck.msgID == status->requiredAck.msgID) {
-            // Continue with next configuration option
-            set_current_step_if_untouched(INIT_STEP_RESET_GPS);
-            // note that we increase the reply timeout in case the GPS must do a flash erase
-        } else if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) < UBX_REPLY_TIMEOUT &&
-                   (ubxLastNak.clsID != status->requiredAck.clsID || ubxLastNak.msgID != status->requiredAck.msgID)) {
-            // allow timeouts to count up by not setting status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
-            break;
-        } else {
-            // timeout or NAK, resend the message or abort
-            status->retryCount++;
-            if (status->retryCount > UBX_MAX_RETRIES) {
-                // give up on the retries
-                set_current_step_if_untouched(INIT_STEP_PRE_ERROR);
-                status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
-            } else {
-                // retry a few times
-                set_current_step_if_untouched(INIT_STEP_SEND_MON_VER);
-            }
-        }
-        break;
-#else
         // wait for previous step
         // extra wait time might well be unnecessary but we want to make sure
         // that we don't stop waiting too soon
@@ -842,7 +583,6 @@ debugindex(5, ubxLastNak.msgID);
         // fall through to next state
         // we can do that if we choose because we haven't sent any data in this state
         // break;
-#endif
 
     // if here, we have just verified that the baud rates are in sync (again)
     case INIT_STEP_RESET_GPS:
@@ -854,14 +594,6 @@ debugindex(5, ubxLastNak.msgID);
 
         // Retrieve desired GPS baud rate once for use throughout this module
         HwSettingsGPSSpeedGet(&hwsettings_baud);
-#if 0
-debugindex(2, hwsettings_baud);
-{
-static uint8_t c;
-debugindex(3, ++c);
-}
-#endif
-//move this up higher / earlier?
 #if !defined(ALWAYS_RESET)
         // ALWAYS_RESET is undefined because it causes stored settings to change even with autoconfig.nostore
         // but with it off, some settings may be enabled that should really be disabled (but aren't) after autoconfig.nostore
@@ -903,14 +635,8 @@ debugindex(3, ++c);
             if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) < UBX_UNVERIFIED_STEP_WAIT_TIME) {
                 return;
             }
-#if 0
-debugindex(8, hwsettings_baud);
-if (hwsettings_baud >= 8) {
-debugindex(9, hwsettings_baud);
-}
-#endif
             // set the Revo GPS port to 9600 baud to match the reset to factory default that has already been done
-            gps_set_fc_baud_from_arg(HWSETTINGS_GPSSPEED_9600, 0);
+            gps_set_fc_baud_from_arg(HWSETTINGS_GPSSPEED_9600);
         }
         // at most, we just set Revo baud and that doesn't send any data
         // fall through to next state
@@ -936,7 +662,6 @@ debugindex(9, hwsettings_baud);
         // so we ignore the ack from this.  it has proven to be reliable (with the addition of two dummy bytes after the packet)
 
         // set the GPS internal baud rate to the user configured value
-//        config_gps_baud(bytes_to_send, hwsettings_baud, 1);
         config_gps_baud(bytes_to_send);
         set_current_step_if_untouched(INIT_STEP_REVO_BAUD);
         status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
@@ -949,14 +674,7 @@ debugindex(9, hwsettings_baud);
             return;
         }
         // set the Revo GPS port baud rate to the (same) user configured value
-#if 0
-debugindex(4, hwsettings_baud);
-{
-static uint8_t c;
-debugindex(5, ++c);
-}
-#endif
-        gps_set_fc_baud_from_arg(hwsettings_baud, 3);
+        gps_set_fc_baud_from_arg(hwsettings_baud);
         status->lastConfigSent = LAST_CONFIG_SENT_START;
         // zero the retries for the first "enable sentence"
         status->retryCount     = 0;
@@ -1014,9 +732,6 @@ debugindex(5, ++c);
         } else {
             // timeout or NAK, resend the message or abort
             status->retryCount++;
-debugindex(0, status->currentStep);
-debugindex(1, status->lastConfigSent);
-debugindex(2, status->retryCount);
             if (status->retryCount > UBX_MAX_RETRIES) {
                 set_current_step_if_untouched(INIT_STEP_PRE_ERROR);
                 status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
@@ -1055,7 +770,6 @@ debugindex(2, status->retryCount);
         }
         // fall through to next state
         // we can do that if we choose because we haven't sent any data in this state
-// we actually must fall through because the FSM won't be entered if DONE, ERROR, or DISABLED
         set_current_step_if_untouched(INIT_STEP_PRE_DONE);
         // break;
 
@@ -1066,7 +780,6 @@ debugindex(2, status->retryCount);
             enabled = false;
             status->currentSettings.UbxAutoConfig = GPSSETTINGS_UBXAUTOCONFIG_DISABLED;
             // like it says
-//            GPSSettingsUbxAutoConfigSet((GPSSettingsUbxAutoConfigOptions *) &status->currentSettings.UbxAutoConfig);
             setGpsSettings();
         }
         set_current_step_if_untouched(INIT_STEP_DONE);
@@ -1089,8 +802,6 @@ debugindex(2, status->retryCount);
 
 // this can be called from a different thread
 // so everything it touches must be declared volatile
-// I hope that I took care of all the concurrency issues that are likely to happen in the lifetime of OpenPilot
-// by lowering the probability from 1 in 50,000 calls to this function (my SWAG) to one in 50,000**3 (forgive my Fortran)
 void gps_ubx_autoconfig_set(ubx_autoconfig_settings_t *config)
 {
     initSteps_t new_step;

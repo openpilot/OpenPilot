@@ -54,7 +54,7 @@ struct GPS_RX_STATS {
 };
 
 int32_t GPSInitialize(void);
-void gps_set_fc_baud_from_arg(uint8_t baud, uint8_t addit);
+void gps_set_fc_baud_from_arg(uint8_t baud);
 uint32_t hwsettings_gpsspeed_enum_to_baud(uint8_t baud);
 
 #endif // GPS_H

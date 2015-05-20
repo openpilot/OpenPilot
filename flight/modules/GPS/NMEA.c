@@ -153,19 +153,7 @@ int parse_nmea_stream(uint8_t *rx, uint8_t len, char *gps_rx_buffer, GPSPosition
             ret = PARSER_OVERRUN;
             continue;
         } else {
-#if 1
             gps_rx_buffer[rx_count++] = c;
-#else
-uint8_t *p;
-i-=1;
-p = memchr(&rx[i], '\r', len-i);
-if (p) {
-    copylen = p - &rx[i];
-    if (rx_count+copylen >= NMEA_MAX_PACKET_LENGTH) {
-    memcpy(&gps_rx_buffer[rx_count], &rx[i], len-i);
-}
-    found_cr = true;
-#endif
         }
 
         // look for ending '\r\n' sequence

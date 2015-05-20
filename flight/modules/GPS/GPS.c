@@ -50,7 +50,6 @@
 #include "UBX.h"
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
 #include "inc/ubx_autoconfig.h"
-// #include "../../libraries/inc/fifo_buffer.h"
 #endif
 
 #include <pios_instrumentation_helper.h>
@@ -88,18 +87,18 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-        #define STACK_SIZE_BYTES   1024+64
+        #define STACK_SIZE_BYTES   1024
 #else
 #if defined(PIOS_GPS_MINIMAL)
         #define GPS_READ_BUFFER    32
 
 #ifdef PIOS_INCLUDE_GPS_NMEA_PARSER
-        #define STACK_SIZE_BYTES   580+64 // NMEA
+        #define STACK_SIZE_BYTES   580 // NMEA
 #else
-        #define STACK_SIZE_BYTES   440+64 // UBX
+        #define STACK_SIZE_BYTES   440 // UBX
 #endif // PIOS_INCLUDE_GPS_NMEA_PARSER
 #else
-        #define STACK_SIZE_BYTES   650+64
+        #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL
 #endif // PIOS_GPS_SETS_HOMELOCATION
 
@@ -114,14 +113,12 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev);
 
 static GPSSettingsData gpsSettings;
 
-//static uint32_t gpsPort;
 #define gpsPort PIOS_COM_GPS
 static bool gpsEnabled = false;
 
 static xTaskHandle gpsTaskHandle;
 
 static char *gps_rx_buffer;
-static uint16_t gps_rx_buffer_size;
 
 static uint32_t timeOfLastCommandMs;
 static uint32_t timeOfLastUpdateMs;
@@ -140,12 +137,10 @@ static struct GPS_RX_STATS gpsRxStats;
 int32_t GPSStart(void)
 {
     if (gpsEnabled) {
-//        if (gpsPort) {
-            // Start gps task
-            xTaskCreate(gpsTask, "GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
-            PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
-            return 0;
-//        }
+        // Start gps task
+        xTaskCreate(gpsTask, "GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+        PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
+        return 0;
     }
     return -1;
 }
@@ -158,8 +153,6 @@ int32_t GPSStart(void)
 
 int32_t GPSInitialize(void)
 {
-//    gpsPort = PIOS_COM_GPS;
-
     HwSettingsInitialize();
 #ifdef MODULE_GPS_BUILTIN
     gpsEnabled = true;
@@ -199,7 +192,6 @@ int32_t GPSInitialize(void)
     // must updateHwSettings() before updateGpsSettings() so baud rate is set before GPS serial code starts running
     updateHwSettings(0);
 #else /* if defined(REVOLUTION) */
-//    if (gpsPort && gpsEnabled) {
     if (gpsEnabled) {
         GPSPositionSensorInitialize();
         GPSVelocitySensorInitialize();
@@ -218,19 +210,15 @@ int32_t GPSInitialize(void)
     }
 #endif /* if defined(REVOLUTION) */
 
-//    if (gpsPort && gpsEnabled) {
     if (gpsEnabled) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) && defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-        gps_rx_buffer_size = (sizeof(struct UBXPacket) > NMEA_MAX_PACKET_LENGTH) ? sizeof(struct UBXPacket) : NMEA_MAX_PACKET_LENGTH;
-        gps_rx_buffer      = pios_malloc(gps_rx_buffer_size);
+        gps_rx_buffer = pios_malloc((sizeof(struct UBXPacket) > NMEA_MAX_PACKET_LENGTH) ? sizeof(struct UBXPacket) : NMEA_MAX_PACKET_LENGTH);
 #elif defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-        gps_rx_buffer_size = sizeof(struct UBXPacket);
-        gps_rx_buffer      = pios_malloc(gps_rx_buffer_size);
+        gps_rx_buffer = pios_malloc(sizeof(struct UBXPacket));
 #elif defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
-        gps_rx_buffer_size = NMEA_MAX_PACKET_LENGTH;
-        gps_rx_buffer      = pios_malloc(gps_rx_buffer_size);
+        gps_rx_buffer = pios_malloc(NMEA_MAX_PACKET_LENGTH);
 #else
-        gps_rx_buffer      = NULL;
+        gps_rx_buffer = NULL;
 #endif
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) || defined(PIOS_INCLUDE_GPS_UBX_PARSER)
         PIOS_Assert(gps_rx_buffer);
@@ -260,7 +248,6 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     // that is 1/180 = 0.005555556 seconds per packet
     // we must never wait more than 5ms since packet was last drained or it may overflow
     // 100ms is way slow too, considering we do everything possible to make the sensor data as contemporary as possible
-//    portTickType xDelay = 100 / portTICK_RATE_MS;
     portTickType xDelay = 5 / portTICK_RATE_MS;
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
 
@@ -283,121 +270,120 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     PERF_INIT_COUNTER(counterBytesIn, 0x97510001);
     PERF_INIT_COUNTER(counterRate, 0x97510002);
     PERF_INIT_COUNTER(counterParse, 0x97510003);
-//    uint8_t c[GPS_READ_BUFFER];
-uint8_t c[GPS_READ_BUFFER+8];
+    uint8_t c[GPS_READ_BUFFER];
 
     // Loop forever
     while (1) {
-if (gpsPort) {
+        if (gpsPort) {
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
-        // do autoconfig stuff for UBX GPS's
-        if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
-            char *buffer   = 0;
-            uint16_t count = 0;
+            // do autoconfig stuff for UBX GPS's
+            if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
+                char *buffer   = 0;
+                uint16_t count = 0;
 
-            gps_ubx_autoconfig_run(&buffer, &count);
-            // Something to send?
-            if (count) {
-                // clear ack/nak
-                ubxLastAck.clsID = 0x00;
-                ubxLastAck.msgID = 0x00;
-                ubxLastNak.clsID = 0x00;
-                ubxLastNak.msgID = 0x00;
+                gps_ubx_autoconfig_run(&buffer, &count);
+                // Something to send?
+                if (count) {
+                    // clear ack/nak
+                    ubxLastAck.clsID = 0x00;
+                    ubxLastAck.msgID = 0x00;
+                    ubxLastNak.clsID = 0x00;
+                    ubxLastNak.msgID = 0x00;
 
-                PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
+                    PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
+                }
             }
-        }
 
-        // need to do this whether there is received data or not, or the status (e.g. gcs) will not always be correct
-        int32_t ac_status = ubx_autoconfig_get_status();
-        static uint8_t lastStatus = GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED
-                                    + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING
-                                    + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE
-                                    + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR;
-        gpspositionsensor.AutoConfigStatus =
-            ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
-            ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
-            ac_status == UBX_AUTOCONFIG_STATUS_ERROR ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR :
-            GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING;
-        if (gpspositionsensor.AutoConfigStatus != lastStatus) {
-            GPSPositionSensorAutoConfigStatusSet(&gpspositionsensor.AutoConfigStatus);
-            lastStatus = gpspositionsensor.AutoConfigStatus;
-        }
+            // need to do this whether there is received data or not, or the status (e.g. gcs) will not always be correct
+            int32_t ac_status = ubx_autoconfig_get_status();
+            static uint8_t lastStatus = GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED
+                                        + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING
+                                        + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE
+                                        + GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR;
+            gpspositionsensor.AutoConfigStatus =
+                ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
+                ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
+                ac_status == UBX_AUTOCONFIG_STATUS_ERROR ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR :
+                GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING;
+            if (gpspositionsensor.AutoConfigStatus != lastStatus) {
+                GPSPositionSensorAutoConfigStatusSet(&gpspositionsensor.AutoConfigStatus);
+                lastStatus = gpspositionsensor.AutoConfigStatus;
+            }
 #endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
 
-        uint16_t cnt;
-        // This blocks the task until there is something on the buffer (or 100ms? passes)
-        cnt = PIOS_COM_ReceiveBuffer(gpsPort, c, GPS_READ_BUFFER, xDelay);
-        if (cnt > 0) {
-            PERF_TIMED_SECTION_START(counterParse);
-            PERF_TRACK_VALUE(counterBytesIn, cnt);
-            PERF_MEASURE_PERIOD(counterRate);
-            int res;
-            switch (gpsSettings.DataProtocol) {
+            uint16_t cnt;
+            // This blocks the task until there is something on the buffer (or 100ms? passes)
+            cnt = PIOS_COM_ReceiveBuffer(gpsPort, c, GPS_READ_BUFFER, xDelay);
+            if (cnt > 0) {
+                PERF_TIMED_SECTION_START(counterParse);
+                PERF_TRACK_VALUE(counterBytesIn, cnt);
+                PERF_MEASURE_PERIOD(counterRate);
+                int res;
+                switch (gpsSettings.DataProtocol) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
-            case GPSSETTINGS_DATAPROTOCOL_NMEA:
-                res = parse_nmea_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
-                break;
+                case GPSSETTINGS_DATAPROTOCOL_NMEA:
+                    res = parse_nmea_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+                    break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-            case GPSSETTINGS_DATAPROTOCOL_UBX:
-                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
-                break;
+                case GPSSETTINGS_DATAPROTOCOL_UBX:
+                    res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+                    break;
 #endif
-            default:
-                res = NO_PARSER; // this should not happen
-                break;
-            }
-            PERF_TIMED_SECTION_END(counterParse);
+                default:
+                    res = NO_PARSER; // this should not happen
+                    break;
+                }
+                PERF_TIMED_SECTION_END(counterParse);
 
-            if (res == PARSER_COMPLETE) {
-                timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-                timeOfLastUpdateMs = timeNowMs;
-                timeOfLastCommandMs = timeNowMs;
+                if (res == PARSER_COMPLETE) {
+                    timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
+                    timeOfLastUpdateMs = timeNowMs;
+                    timeOfLastCommandMs = timeNowMs;
+                }
             }
-        }
 
-        // Check for GPS timeout
-        timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-        if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS ||
-            (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX && gpspositionsensor.AutoConfigStatus == GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR)) {
-            // we have not received any valid GPS sentences for a while.
-            // either the GPS is not plugged in or a hardware problem or the GPS has locked up.
-            GPSPositionSensorStatusOptions status = GPSPOSITIONSENSOR_STATUS_NOGPS;
-            GPSPositionSensorStatusSet(&status);
-            AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
-        } else {
-            // we appear to be receiving GPS sentences OK, we've had an update
-            // criteria for GPS-OK taken from this post...
-            // http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
-            if ((gpspositionsensor.PDOP < gpsSettings.MaxPDOP) && (gpspositionsensor.Satellites >= gpsSettings.MinSatellites) &&
-                (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
-                (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
-                AlarmsClear(SYSTEMALARMS_ALARM_GPS);
+            // Check for GPS timeout
+            timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
+            if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS ||
+                (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX && gpspositionsensor.AutoConfigStatus == GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR)) {
+                // we have not received any valid GPS sentences for a while.
+                // either the GPS is not plugged in or a hardware problem or the GPS has locked up.
+                GPSPositionSensorStatusOptions status = GPSPOSITIONSENSOR_STATUS_NOGPS;
+                GPSPositionSensorStatusSet(&status);
+                AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
+            } else {
+                // we appear to be receiving GPS sentences OK, we've had an update
+                // criteria for GPS-OK taken from this post...
+                // http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
+                if ((gpspositionsensor.PDOP < gpsSettings.MaxPDOP) && (gpspositionsensor.Satellites >= gpsSettings.MinSatellites) &&
+                    (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
+                    (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
+                    AlarmsClear(SYSTEMALARMS_ALARM_GPS);
 #ifdef PIOS_GPS_SETS_HOMELOCATION
-                HomeLocationData home;
-                HomeLocationGet(&home);
+                    HomeLocationData home;
+                    HomeLocationGet(&home);
 
-                if (home.Set == HOMELOCATION_SET_FALSE) {
-                    if (homelocationSetDelay == 0) {
-                        homelocationSetDelay = xTaskGetTickCount();
-                    }
-                    if (xTaskGetTickCount() - homelocationSetDelay > GPS_HOMELOCATION_SET_DELAY) {
-                        setHomeLocation(&gpspositionsensor);
+                    if (home.Set == HOMELOCATION_SET_FALSE) {
+                        if (homelocationSetDelay == 0) {
+                            homelocationSetDelay = xTaskGetTickCount();
+                        }
+                        if (xTaskGetTickCount() - homelocationSetDelay > GPS_HOMELOCATION_SET_DELAY) {
+                            setHomeLocation(&gpspositionsensor);
+                            homelocationSetDelay = 0;
+                        }
+                    } else {
                         homelocationSetDelay = 0;
                     }
-                } else {
-                    homelocationSetDelay = 0;
-                }
 #endif
-            } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
-                       (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
-                AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
-            } else {
-                AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
+                } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
+                           (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
+                    AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
+                } else {
+                    AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
+                }
             }
-        }
-} // if (gpsPort)
+        } // if (gpsPort)
         vTaskDelayUntil(&xLastWakeTime, GPS_LOOP_DELAY_MS / portTICK_RATE_MS);
     } // while (1)
 }
@@ -512,7 +498,7 @@ void gps_set_fc_baud_from_arg(uint8_t baud)
 // must updateHwSettings() before updateGpsSettings() so baud rate is set before GPS serial code starts running
 static void updateHwSettings(UAVObjEvent __attribute__((unused)) *ev)
 {
-    static uint32_t previousGpsPort=0xf0f0f0f0; // = 0 means deconfigured and at power up it is deconfigured
+    static uint32_t previousGpsPort=0xf0f0f0f0; // = doesn't match gpsport
     // if GPS (UBX or NMEA) is enabled at all
     if (gpsPort && gpsEnabled) {
         // on first use of this port (previousGpsPort != gpsPort) we must set the Revo port baud rate

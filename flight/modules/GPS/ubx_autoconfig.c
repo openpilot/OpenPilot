@@ -65,21 +65,22 @@ typedef struct {
     struct {
         union {
             struct {
-        UBXSentPacket_t working_packet; // outbound "buffer"
-        // bufferPaddingForPiosBugAt2400Baud must exist for baud rate change to work at 2400 or 4800
-        // failure mode otherwise:
-        // - send message with baud rate change
-        // - wait 1 second (even at 2400, the baud rate change command should clear even an initially full 31 byte PIOS buffer much more quickly)
-        // - change Revo port baud rate
-        // sometimes fails (much worse for lowest baud rates)
-        // FIXME: remove this and retest when someone has time
-        uint8_t bufferPaddingForPiosBugAt2400Baud[2]; // must be at least 2 for 2400 to work, probably 1 for 4800 and 0 for 9600+
+                UBXSentPacket_t working_packet; // outbound "buffer"
+                // bufferPaddingForPiosBugAt2400Baud must exist for baud rate change to work at 2400 or 4800
+                // failure mode otherwise:
+                // - send message with baud rate change
+                // - wait 1 second (even at 2400, the baud rate change command
+                // - should clear even an initially full 31 byte PIOS buffer much more quickly)
+                // - change Revo port baud rate
+                // sometimes fails (much worse for lowest baud rates)
+                // FIXME: remove this and retest when someone has time
+                uint8_t bufferPaddingForPiosBugAt2400Baud[2]; // must be at least 2 for 2400 to work, probably 1 for 4800 and 0 for 9600+
             } __attribute__((packed));
-                GPSSettingsData gpsSettings;
+            GPSSettingsData gpsSettings;
         } __attribute__((packed));
     } __attribute__((packed));
     volatile ubx_autoconfig_settings_t currentSettings;
-    int8_t  lastConfigSent;          // index of last configuration string sent
+    int8_t  lastConfigSent;         // index of last configuration string sent
     struct UBX_ACK_ACK requiredAck; // Class and id of the message we are waiting for an ACK from GPS
     uint8_t retryCount;
 } status_t;
@@ -163,6 +164,8 @@ static volatile status_t *volatile status = 0;
 static uint8_t hwsettings_baud;
 static uint8_t baud_to_try_index = 255;
 
+// functions
+
 static void append_checksum(UBXSentPacket_t *packet)
 {
     uint8_t i;
@@ -210,7 +213,7 @@ static void build_request(UBXSentPacket_t *packet, uint8_t classID, uint8_t mess
 static void set_current_step_if_untouched(initSteps_t new_steps)
 {
     // assume this one byte initSteps_t is atomic
-    // take care of some but not all concurrency issues
+    // take care of some concurrency issues
 
     if (!current_step_touched) {
         status->currentStep = new_steps;
@@ -259,7 +262,6 @@ static void config_reset(uint16_t *bytes_to_send)
 
 // set the GPS baud rate to the user specified baud rate
 // because we may have started up with 9600 baud (for a GPS with no permanent settings)
-//static void config_gps_baud(uint16_t *bytes_to_send, uint8_t baud, uint16_t outProtoMask)
 static void config_gps_baud(uint16_t *bytes_to_send)
 {
     memset((uint8_t *)status->working_packet.buffer, 0, sizeof(UBXSentHeader_t) + sizeof(ubx_cfg_prt_t));
@@ -420,7 +422,7 @@ static void configure(uint16_t *bytes_to_send)
             // Skip and fall through to next step
             status->lastConfigSent++;
         }
-    // in the else case we must fall through because we must send something each time because successful send is tested externally
+        // in the else case we must fall through because we must send something each time because successful send is tested externally
 
     case LAST_CONFIG_SENT_START + 3:
         config_sbas(bytes_to_send);
@@ -451,7 +453,7 @@ static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
 
 
 // permanently store our version of GPSSettings.UbxAutoConfig
-// we use this to disable after ConfigStoreAndDisable is complete
+// we use this to disable after AbConfigStoreAndDisable is complete
 // FIXME: this does not store it permanently
 // all that is needed is for the following to store it permanently like HomeLocation is stored by the flight code
 // GPSSettingsUbxAutoConfigSet((GPSSettingsUbxAutoConfigOptions *) &status->currentSettings.UbxAutoConfig);
@@ -468,8 +470,6 @@ static void setGpsSettings()
 
 // 9600 baud and lower are not usable, and are best left at factory default
 // if the user selects 9600
-
-
 void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
 {
     *bytes_to_send = 0;
@@ -481,9 +481,11 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
         return;
     }
 
-    // get UBX version whether autoconfig is enabled or not
-    // this allows the user to try some baud rates and visibly see when it works
+    // get UBX version whether autobaud / autoconfig is enabled or not
+    // this allows the user to manually try some baud rates and visibly see when it works
+    // it also is how the autobaud code determines when the baud rate is correct
     // ubxHwVersion is a global set externally by the caller of this function
+    // it is set when the GPS responds to a MON_VER message
     if (ubxHwVersion <= 0) {
         // at low baud rates and high data rates the ubx gps simply must drop some outgoing data
         // this isn't really an error
@@ -521,8 +523,10 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
                 HWSETTINGS_GPSSPEED_2400
             };
 
+            // first try HwSettings.GPSSpeed and then
+            // get the next baud rate to try from the table, but skip over the value of HwSettings.GPSSpeed
             do {
-                // index is inited to be out of bounds, which is interpreted as "currently defined baud rate" (= HwSettigns.GPSSpeed)
+                // index is inited to be out of bounds, which is interpreted as "currently defined baud rate" (= HwSettings.GPSSpeed)
                 if (baud_to_try_index >= sizeof(baud_array)/sizeof(baud_array[0])) {
                     HwSettingsGPSSpeedGet(&hwsettings_baud);
                     baud_to_try = hwsettings_baud;
@@ -553,7 +557,9 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
         return; // autoconfig not enabled
     }
 
+    ////////
     // FSM
+    ////////
     switch (status->currentStep) {
     // if here, we have verified that the baud rates are in sync sometime in the past
     case INIT_STEP_START:
@@ -597,8 +603,8 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
 #if !defined(ALWAYS_RESET)
         // ALWAYS_RESET is undefined because it causes stored settings to change even with autoconfig.nostore
         // but with it off, some settings may be enabled that should really be disabled (but aren't) after autoconfig.nostore
-        // if user requests a low baud rate then we just reset and leave it set to NMEA
-        // because low baud and high OP data rate doesn't play nice
+        // if user requests a low baud rate then we just reset and avoid adding navigation sentences
+        // because low GPS baud and high OP data rate doesn't play nice
         // if user requests that settings be saved, we will reset here too
         // that makes sure that all strange settings are reset to factory default
         // else these strange settings may persist because we don't reset all settings by table

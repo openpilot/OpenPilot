@@ -529,7 +529,7 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
 
     if (msgtracker.msg_received == ALL_RECEIVED) {
         // leave my new field alone!
-        GPSPositionSensorCurrentBaudRateGet(&GpsPosition->CurrentBaudRate);
+        GPSPositionSensorBaudRateGet(&GpsPosition->BaudRate);
         GPSPositionSensorSet(GpsPosition);
         msgtracker.msg_received = NONE_RECEIVED;
         id = GPSPOSITIONSENSOR_OBJID;

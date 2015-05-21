@@ -458,7 +458,7 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionSensorData *GpsData)
                 #endif
         if (gpsDataUpdated && (GpsData->Status == GPSPOSITIONSENSOR_STATUS_NOFIX)) {
             // leave my new field alone!
-            GPSPositionSensorCurrentBaudRateGet(&GpsData->CurrentBaudRate);
+            GPSPositionSensorBaudRateGet(&GpsData->BaudRate);
             GPSPositionSensorSet(GpsData);
         }
         return false;
@@ -471,7 +471,7 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionSensorData *GpsData)
         DEBUG_MSG("U");
                 #endif
         // leave my new field alone!
-        GPSPositionSensorCurrentBaudRateGet(&GpsData->CurrentBaudRate);
+        GPSPositionSensorBaudRateGet(&GpsData->BaudRate);
         GPSPositionSensorSet(GpsData);
     }
 

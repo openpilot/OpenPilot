@@ -33,6 +33,7 @@
 
 #include "inc/ubx_autoconfig.h"
 #include <pios_mem.h>
+#include "taskinfo.h"
 
 // private type definitions
 
@@ -156,7 +157,9 @@ ubx_cfg_msg_t msg_config_ubx7[] = {
 
 // we can enable this when we know how to make the Flight Controller save an object to permanent storage
 // also see comment about simple edit in gpssettings.xml
-// #define AUTOBAUD_CONFIGURE_STORE_AND_DISABLE
+#define AUTOBAUD_CONFIGURE_STORE_AND_DISABLE
+// Alessio Morale May 20 3:16 AM
+// @Cliff you should update the ObjectPersistence uavo passing the object id and the desired operation.
 
 // private variables
 
@@ -459,17 +462,40 @@ static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
 #if defined(AUTOBAUD_CONFIGURE_STORE_AND_DISABLE)
 // permanently store our version of GPSSettings.UbxAutoConfig
 // we use this to disable after AbConfigStoreAndDisable is complete
-// FIXME: this does not store it permanently
-// all that is needed is for the following to store it permanently like HomeLocation is stored by the flight code
-// GPSSettingsUbxAutoConfigSet((GPSSettingsUbxAutoConfigOptions *) &status->currentSettings.UbxAutoConfig);
 static void setGpsSettings()
 {
+    // trying to do this as perfectly as possible we must realize that they may have pressed Send on some fields
+    // and so those fields are not stored permanently
+    // if we write the memory copy to flash, we will have made those permanent
+
+    // we could save off the uavo memory copy to a local buffer with a standard GPSSettingsGet()
+    // load from flash to uavo memory with a UAVObjLoad()
+    // update our one setting in uavo memory with a standard GPSSettingsUbxAutoConfigSet()
+    // save from uavo memory to flash with a UAVObjSave()
+    // modify our saved off copy to have our new setting in it too
+    // and finally copy the local buffer back out to uavo memory
+
+    // that would do it as correctly as possible, but it doesn't work
+    // so we do it the way autotune.c does it
+
+#if 0
+    // get the "in memory" version to a local buffer
+    GPSSettingsGet((void *) &status->gpsSettings);
+    // load the permanent version into memory
+    UAVObjLoad(GPSSettingsHandle(), 0);
+#endif
+    // change the in memory version of the field we want to change
+    GPSSettingsUbxAutoConfigSet((GPSSettingsUbxAutoConfigOptions *) &status->currentSettings.UbxAutoConfig);
+    // save the in memory version to permanent
+    UAVObjSave(GPSSettingsHandle(), 0);
+#if 0
+    // copy the setting into the struct we will use to Set()
+    status->gpsSettings.UbxAutoConfig = status->currentSettings.UbxAutoConfig;
     // try casting it correctly and it says:
     // expected 'struct GPSSettingsData *' but argument is of type 'struct GPSSettingsData *'
     // probably a volatile or align issue
-    GPSSettingsGet((void *) &status->gpsSettings);
-    status->gpsSettings.UbxAutoConfig = status->currentSettings.UbxAutoConfig;
-    GPSSettingsSet((void *) &status->gpsSettings);
+    GPSSettingsSet((void *) &status->gpsSettings);  // set the "in memory" version back into use
+#endif
 }
 #endif
 
@@ -614,9 +640,9 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
         // if user requests that settings be saved, we will reset here too
         // that makes sure that all strange settings are reset to factory default
         // else these strange settings may persist because we don't reset all settings by table
-        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_ABCONFIGANDSTORE
+        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDCONFIGUREANDSTORE
 #if defined(AUTOBAUD_CONFIGURE_STORE_AND_DISABLE)
-            || status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_ABCONFIGSTOREANDDISABLE
+            || status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDCONFIGURESTOREANDDISABLE
 #endif
             )
 #endif
@@ -639,9 +665,9 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
         // if user requests that settings be saved, we will reset here too
         // that makes sure that all strange settings are reset to factory default
         // else these strange settings may persist because we don't reset all settings by hand
-        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_ABCONFIGANDSTORE
+        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDCONFIGUREANDSTORE
 #if defined(AUTOBAUD_CONFIGURE_STORE_AND_DISABLE)
-            || status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_ABCONFIGSTOREANDDISABLE
+            || status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDCONFIGURESTOREANDDISABLE
 #endif
             )
 #endif
@@ -768,9 +794,9 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
     // all configurations have been made
     case INIT_STEP_SAVE:
         // now decide whether to save them permanently into the GPS
-        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_ABCONFIGANDSTORE
+        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDCONFIGUREANDSTORE
 #if defined(AUTOBAUD_CONFIGURE_STORE_AND_DISABLE)
-            || status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_ABCONFIGSTOREANDDISABLE
+            || status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDCONFIGURESTOREANDDISABLE
 #endif
             ) {
             config_save(bytes_to_send);
@@ -797,8 +823,8 @@ void gps_ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
     // the autoconfig has completed normally
     case INIT_STEP_PRE_DONE:
 #if defined(AUTOBAUD_CONFIGURE_STORE_AND_DISABLE)
-        // determine if we need to disable autoconfig via the autoconfig==CONFIGSTOREANDDISABLE setting
-        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_ABCONFIGSTOREANDDISABLE) {
+        // determine if we need to disable autoconfig via the autoconfig==AUTOBAUDCONFIGSTOREANDDISABLE setting
+        if (status->currentSettings.UbxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDCONFIGURESTOREANDDISABLE) {
             enabled = false;
             status->currentSettings.UbxAutoConfig = GPSSETTINGS_UBXAUTOCONFIG_DISABLED;
             // like it says
@@ -841,7 +867,7 @@ void gps_ubx_autoconfig_set(ubx_autoconfig_settings_t *config)
     if (config != NULL) {
         status->currentSettings = *config;
     }
-    if (status->currentSettings.UbxAutoConfig >= GPSSETTINGS_UBXAUTOCONFIG_ABANDCONFIGURE) {
+    if (status->currentSettings.UbxAutoConfig >= GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDANDCONFIGURE) {
         new_step = INIT_STEP_START;
     } else {
         new_step = INIT_STEP_DISABLED;
@@ -857,7 +883,7 @@ void gps_ubx_autoconfig_set(ubx_autoconfig_settings_t *config)
     status->currentStep     = new_step;
     status->currentStepSave = new_step;
 
-    if (status->currentSettings.UbxAutoConfig >= GPSSETTINGS_UBXAUTOCONFIG_ABANDCONFIGURE) {
+    if (status->currentSettings.UbxAutoConfig >= GPSSETTINGS_UBXAUTOCONFIG_AUTOBAUDANDCONFIGURE) {
         // enabled refers to autoconfigure
         // note that sensor type (gps type) detection happens even if completely disabled
         // also note that AutoBaud is less than Configure

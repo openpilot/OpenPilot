@@ -1,4 +1,4 @@
-Source: openpilot
+Source: <NAME>
 Section: electronics
 Priority: optional
 Maintainer: James Duley <james@openpilot.org>
@@ -8,7 +8,7 @@ Homepage: http://www.openpilot.org
 Vcs-Git: git://git.openpilot.org/OpenPilot.git
 Vcs-Browser: http://git.openpilot.org/changelog/OpenPilot
 
-Package: openpilot
+Package: <NAME>
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, qml-module-qtquick-controls, qml-module-qtquick-dialogs, qml-module-qtquick-xmllistmodel, qml-module-qtquick-localstorage, qml-module-qtquick-particles2, qml-module-qtquick-window2, qml-module-qtquick2
 Description: OpenPilot GCS

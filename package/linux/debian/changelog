@@ -1,4 +1,4 @@
-openpilot (<VERSION>) <DIST>; urgency=low
+<NAME> (<VERSION>) <DIST>; urgency=low
 
   * Release from upstream Git repository
 

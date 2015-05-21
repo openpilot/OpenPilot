@@ -16,7 +16,7 @@ DEB_REV              := 1
 ifeq ($(DEB_DIST), trusty)
 DEB_REV              := $(DEB_REV)$(DEB_DIST)1
 endif
-DEB_NAME             := openpilot
+DEB_NAME             := $(OP_SMALL_NAME)
 DEB_ORIG_SRC         := $(PACKAGE_DIR)/$(DEB_NAME)_$(UPSTREAM_VER).orig.tar.gz
 DEB_PACKAGE_DIR      := $(PACKAGE_DIR)/$(DEB_NAME)-$(UPSTREAM_VER)
 DEB_ARCH             := $(shell dpkg --print-architecture)
@@ -24,7 +24,12 @@ DEB_PACKAGE_NAME     := $(DEB_NAME)_$(UPSTREAM_VER)-$(DEB_REV)_$(DEB_ARCH)
 DEB_DIR              := package/linux/debian
 
 SED_DATE_STRG         = $(shell date -R)
-SED_SCRIPT            = s/<VERSION>/$(UPSTREAM_VER)-$(DEB_REV)/;s/<DATE>/$(SED_DATE_STRG)/;s/<DIST>/$(DEB_DIST)/
+SED_SCRIPT            = sed -i -e ' \
+			s/<VERSION>/$(UPSTREAM_VER)-$(DEB_REV)/g; \
+			s/<DATE>/$(SED_DATE_STRG)/g; \
+			s/<DIST>/$(DEB_DIST)/g; \
+			s/<NAME>/$(DEB_NAME)/g; \
+			'
 
 # Ubuntu 14.04 (Trusty Tahr) has different names for the qml-modules
 TRUSTY_DEPS_SED      := s/qml-module-qtquick-controls/qtdeclarative5-controls-plugin/g; \
@@ -51,8 +56,9 @@ package: debian
 .PHONY: debian
 debian: $(DEB_DIR)
 	$(V1) rm -rf debian
-	$(V1) cp -rL $(DEB_DIR) debian
-	$(V1) sed -i -e "$(SED_SCRIPT)" debian/changelog
+	$(V1) cp -r $(DEB_DIR) debian
+	$(V1) cp -T package/linux/45-openpilot-permissions.rules debian/$(DEB_NAME).udev
+	$(V1) $(SED_SCRIPT) debian/changelog debian/control
 ifeq ($(DEB_DIST), trusty)
 	$(V1) sed -i -e "$(TRUSTY_DEPS_SED)" debian/control
 endif
@@ -93,10 +99,11 @@ install:
 	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/applications
 	$(V1) $(MKDIR) -p $(DESTDIR)$(datadir)/pixmaps
 	$(V1) $(MKDIR) -p $(DESTDIR)$(udevdir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/bin/openpilotgcs $(DESTDIR)$(bindir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/lib/openpilotgcs $(DESTDIR)$(libdir)
-	$(V1) $(INSTALL) $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/share/openpilotgcs $(DESTDIR)$(datadir)
-	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications
-	$(V1) $(INSTALL) $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps
+	$(V1) $(INSTALL) $(BUILD_DIR)/$(GCS_SMALL_NAME)_$(GCS_BUILD_CONF)/bin/$(GCS_SMALL_NAME) $(DESTDIR)$(bindir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/$(GCS_SMALL_NAME)_$(GCS_BUILD_CONF)/lib/$(GCS_SMALL_NAME) $(DESTDIR)$(libdir)
+	$(V1) $(INSTALL) $(BUILD_DIR)/$(GCS_SMALL_NAME)_$(GCS_BUILD_CONF)/share/$(GCS_SMALL_NAME) $(DESTDIR)$(datadir)
+	$(V1) $(INSTALL) -T $(ROOT_DIR)/package/linux/openpilot.desktop $(DESTDIR)$(datadir)/applications/$(OP_SMALL_NAME).desktop
+	$(V1) sed -i -e 's/openpilotgcs/$(GCS_SMALL_NAME)/g;s/OpenPilot GCS/$(GCS_BIG_NAME)/g' $(DESTDIR)$(datadir)/applications/$(OP_SMALL_NAME).desktop
+	$(V1) $(INSTALL) -T $(ROOT_DIR)/package/linux/openpilot.png $(DESTDIR)$(datadir)/pixmaps/$(OP_SMALL_NAME).png
 
 

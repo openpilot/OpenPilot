@@ -986,7 +986,6 @@
             <latitude></latitude>
             <longitude></longitude>
             <manualControlEnabled>false</manualControlEnabled>
-            <manualOutput>false</manualOutput>
             <minOutputPeriod>40</minOutputPeriod>
             <outPort>40200</outPort>
             <remoteAddress>127.0.0.1</remoteAddress>
@@ -1022,7 +1021,6 @@
             <latitude></latitude>
             <longitude></longitude>
             <manualControlEnabled>true</manualControlEnabled>
-            <manualOutput>false</manualOutput>
             <minOutputPeriod>40</minOutputPeriod>
             <outPort>9010</outPort>
             <remoteAddress>127.0.0.1</remoteAddress>
@@ -1058,7 +1056,6 @@
             <latitude></latitude>
             <longitude></longitude>
             <manualControlEnabled>true</manualControlEnabled>
-            <manualOutput>false</manualOutput>
             <minOutputPeriod>40</minOutputPeriod>
             <outPort>49000</outPort>
             <remoteAddress>127.0.0.1</remoteAddress>
@@ -1094,7 +1091,6 @@
             <latitude></latitude>
             <longitude></longitude>
             <manualControlEnabled>true</manualControlEnabled>
-            <manualOutput>false</manualOutput>
             <minOutputPeriod>40</minOutputPeriod>
             <outPort>49000</outPort>
             <remoteAddress>127.0.0.1</remoteAddress>

@@ -56,6 +56,10 @@ UAVGadgetDecorator::~UAVGadgetDecorator()
 
 void UAVGadgetDecorator::loadConfiguration(int index)
 {
+    if (index < 0) {
+        return;
+    }
+
     IUAVGadgetConfiguration *config = m_configurations->at(index);
 
     loadConfiguration(config);
@@ -68,7 +72,8 @@ void UAVGadgetDecorator::loadConfiguration(IUAVGadgetConfiguration *config)
     }
     m_activeConfiguration = config;
     int index = m_toolbar->findText(config->name());
-    if (m_toolbar->currentIndex() != index) {
+    if ((m_toolbar->currentIndex() != index) &&
+        (index >= 0)) {
         m_toolbar->setCurrentIndex(index);
     }
     m_gadget->loadConfiguration(config);

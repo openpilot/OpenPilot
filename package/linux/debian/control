@@ -11,5 +11,15 @@ Vcs-Browser: http://git.openpilot.org/changelog/OpenPilot
 Package: <NAME>
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, qml-module-qtquick-controls, qml-module-qtquick-dialogs, qml-module-qtquick-xmllistmodel, qml-module-qtquick-localstorage, qml-module-qtquick-particles2, qml-module-qtquick-window2, qml-module-qtquick2
-Description: OpenPilot GCS
- OpenPilot Ground Control Station software
+Description: Platform for aerial robotics or other mobile vehicular platforms
+ OpenPilot is a next-generation Open Source UAV autopilot created by the 
+ OpenPilot Community (an all volunteer non-profit community). It is a highly 
+ capable platform for multirotors, helicopters, fixed wing aircraft, and
+ other vehicles. 
+ .
+ It has been designed from the ground up by a community of passionate 
+ developers from around the globe, with its core design principles being
+ quality, safety, and ease of use.  Simplicity does not come with any
+ compromises either: with no hard-coded settings, a complete flight plan
+ scripting language and other powerful features, OpenPilot is an extremely
+ capable UAV autopilot platform.

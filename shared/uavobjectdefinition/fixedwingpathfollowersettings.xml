@@ -50,6 +50,14 @@
                 <!-- Wind: degrees of crabbing allowed
                      Speeds: percentage (1.0=100%) of the limit to be over/onder
                      Power & Control: flag to turn on/off 0.0 =off 1.0 = on -->
+
+
+	<field name="TakeOffPitch" units="deg" type="float" elements="1" defaultvalue="25.0"/>
+        <field name="TakeOffLimits" units="" type="float"
+		elementnames="RollDeg,PitchDeg,YawDeg,MaxDecelerationDeltaMPS" defaultvalue="25.0, 25.0, 25.0, 4.0" />
+		<!-- maximum margins allowed during takeoff --> 
+	<field name="LandingPitch" units="deg" type="float" elements="1" defaultvalue="15.0"/>
+
         <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
 
         <access gcs="readwrite" flight="readwrite"/>

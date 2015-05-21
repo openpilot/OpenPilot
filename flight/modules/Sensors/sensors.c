@@ -444,8 +444,8 @@ static void handleGyro(float *samples, float temperature)
 static void handleMag(float *samples, float temperature)
 {
     MagSensorData mag;
-    float mags[3] = { (float)samples[1] - mag_bias[0],
-                      (float)samples[0] - mag_bias[1],
+    float mags[3] = { (float)samples[0] - mag_bias[0],
+                      (float)samples[1] - mag_bias[1],
                       (float)samples[2] - mag_bias[2] };
 
     rot_mult(mag_transform, mags, samples);

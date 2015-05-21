@@ -1706,9 +1706,8 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         systemSettingsData = systemSettingsObj->getData();
 
         if (systemSettingsData.AirframeType == SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR) {
-            QMessageBox::warning(this, tr("Ground vehicle"),
-                                 tr("<p>Please <b>center</b> throttle control and"
-                                    " press <b>OK</b> when ready."));
+            QMessageBox::warning(this, tr("Ground Vehicle"),
+                                 tr("<p>Please <b>center</b> throttle control and press OK when ready.</p>"));
 
             transmitterType = ground;
             manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE] =

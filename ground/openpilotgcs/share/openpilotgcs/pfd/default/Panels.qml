@@ -379,7 +379,6 @@ Item {
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
 
-        x: (scaledBounds.x * sceneItem.width) + (ManualControlCommand.Roll * rc_stick.width * 2.5)
         y: (scaledBounds.y * sceneItem.height) + (ManualControlCommand.Pitch * rc_stick.width * 2.5)
 
         smooth: true
@@ -394,7 +393,7 @@ Item {
         states: State {
              name: "fading"
              when: show_panels == true
-             PropertyChanges { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) + offset_value; }
+             PropertyChanges { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) + (ManualControlCommand.Roll * rc_stick.width * 2.5) + offset_value; }
         }
 
         transitions: Transition {

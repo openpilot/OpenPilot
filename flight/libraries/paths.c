@@ -61,6 +61,7 @@ void path_progress(PathDesiredData *path, float *cur_point, struct path_status *
 
         break;
     case PATHDESIRED_MODE_GOTOENDPOINT:
+    case PATHDESIRED_MODE_AUTOTAKEOFF: // needed for pos hold at end of takeoff
         return path_endpoint(path, cur_point, status, mode3D);
 
         break;

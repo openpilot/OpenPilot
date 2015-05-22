@@ -26,23 +26,13 @@
 extern "C" {
 #include <openpilot.h>
 
-#include <callbackinfo.h>
-
-#include <math.h>
 #include <pid.h>
-#include <CoordinateConversions.h>
 #include <sin_lookup.h>
 #include <pathdesired.h>
 #include <paths.h>
-#include "plans.h"
-#include <sanitycheck.h>
-
-#include <homelocation.h>
-#include <accelstate.h>
 #include <fixedwingpathfollowersettings.h>
 #include <fixedwingpathfollowerstatus.h>
 #include <flightstatus.h>
-#include <flightmodesettings.h>
 #include <pathstatus.h>
 #include <positionstate.h>
 #include <velocitystate.h>
@@ -50,14 +40,7 @@ extern "C" {
 #include <stabilizationdesired.h>
 #include <airspeedstate.h>
 #include <attitudestate.h>
-#include <takeofflocation.h>
-#include <poilocation.h>
-#include <manualcontrolcommand.h>
 #include <systemsettings.h>
-#include <stabilizationbank.h>
-#include <stabilizationdesired.h>
-#include <vtolselftuningstats.h>
-#include <pathsummary.h>
 }
 
 // C++ includes

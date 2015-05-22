@@ -28,21 +28,21 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef FIXEDWINGFLYCONTROLLER_H
-#define FIXEDWINGFLYCONTROLLER_H
+#ifndef FIXEDWINGLANDCONTROLLER_H
+#define FIXEDWINGLANDCONTROLLER_H
 #include "pathfollowercontrol.h"
 
-class FixedWingFlyController : public PathFollowerControl {
+class FixedWingLandController : public PathFollowerControl {
 private:
-    static FixedWingFlyController *p_inst;
-    FixedWingFlyController();
+    static FixedWingLandController *p_inst;
+    FixedWingLandController();
 
 
 public:
-    static FixedWingFlyController *instance()
+    static FixedWingLandController *instance()
     {
         if (!p_inst) {
-            p_inst = new FixedWingFlyController();
+            p_inst = new FixedWingLandController();
         }
         return p_inst;
     }
@@ -55,27 +55,12 @@ public:
     void ObjectiveUpdated(void);
     uint8_t IsActive(void);
     uint8_t Mode(void);
-    void AirspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent * ev);
 
-protected:
-    FixedWingPathFollowerSettingsData *fixedWingSettings;
-
-    uint8_t mActive;
-    uint8_t mMode;
-    // correct speed by measured airspeed
-    float indicatedAirspeedStateBias;
 private:
     void resetGlobals();
-    uint8_t updateAutoPilotFixedWing();
-    void updatePathVelocity(float kFF, bool limited);
-    uint8_t updateFixedDesiredAttitude();
-    bool correctCourse(float *C, float *V, float *F, float s);
-
-    struct pid PIDposH[2];
-    struct pid PIDposV;
-    struct pid PIDcourse;
-    struct pid PIDspeed;
-    struct pid PIDpower;
+    FixedWingPathFollowerSettingsData *fixedWingSettings;
+    uint8_t mActive;
+    uint8_t mMode;
 };
 
-#endif // FIXEDWINGFLYCONTROLLER_H
+#endif // FIXEDWINGLANDCONTROLLER_H

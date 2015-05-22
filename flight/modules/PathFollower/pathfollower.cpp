@@ -93,6 +93,8 @@ extern "C" {
 #include "vtolbrakecontroller.h"
 #include "vtolflycontroller.h"
 #include "fixedwingflycontroller.h"
+#include "fixedwingautotakeoffcontroller.h"
+#include "fixedwinglandcontroller.h"
 #include "grounddrivecontroller.h"
 
 // Private constants
@@ -220,6 +222,8 @@ void pathFollowerInitializeControllersForFrameType()
     case FRAME_TYPE_FIXED_WING:
         if (!fixedwing_initialised) {
             FixedWingFlyController::instance()->Initialize(&fixedWingPathFollowerSettings);
+            FixedWingAutoTakeoffController::instance()->Initialize(&fixedWingPathFollowerSettings);
+            FixedWingLandController::instance()->Initialize(&fixedWingPathFollowerSettings);
             fixedwing_initialised = 1;
         }
         break;
@@ -285,6 +289,14 @@ static void pathFollowerSetActiveController(void)
             case PATHDESIRED_MODE_CIRCLERIGHT:
             case PATHDESIRED_MODE_CIRCLELEFT:
                 activeController = FixedWingFlyController::instance();
+                activeController->Activate();
+                break;
+            case PATHDESIRED_MODE_LAND: // land with optional velocity roam option
+                activeController = FixedWingLandController::instance();
+                activeController->Activate();
+                break;
+            case PATHDESIRED_MODE_AUTOTAKEOFF:
+                activeController = FixedWingAutoTakeoffController::instance();
                 activeController->Activate();
                 break;
             default:
@@ -446,6 +458,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 static void airspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     FixedWingFlyController::instance()->AirspeedStateUpdatedCb(ev);
+    FixedWingAutoTakeoffController::instance()->AirspeedStateUpdatedCb(ev);
 }
 
 

@@ -52,10 +52,10 @@ export DIST_DIR    := $(ROOT_DIR)/build/dist
 DIRS = $(DL_DIR) $(TOOLS_DIR) $(BUILD_DIR) $(PACKAGE_DIR) $(DIST_DIR)
 
 # Naming for binaries and packagind etc,.
-OP_BIG_NAME := OpenPilot
+OP_BIG_NAME := OpenPilot TEST
 GCS_BIG_NAME := ${OP_BIG_NAME} GCS
 # These should be lowercase with no spaces
-OP_SMALL_NAME := openpilot
+OP_SMALL_NAME := openpilottest
 GCS_SMALL_NAME := ${OP_SMALL_NAME}gcs
 
 # Set up default build configurations (debug | release)

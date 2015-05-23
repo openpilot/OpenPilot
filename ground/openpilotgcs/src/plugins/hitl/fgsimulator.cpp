@@ -269,7 +269,7 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     // Get pressure (kpa)
     float pressure     = fields[20].toFloat() * INHG2KPA;
     // Get VelocityState Down (m/s)
-    float velocityStateDown  = -fields[21].toFloat() * FPS2CMPS * 1e-2f;
+    float velocityStateDown  = fields[21].toFloat() * FPS2CMPS * 1e-2f;
     // Get VelocityState East (m/s)
     float velocityStateEast  = fields[22].toFloat() * FPS2CMPS * 1e-2f;
     // Get VelocityState Down (m/s)

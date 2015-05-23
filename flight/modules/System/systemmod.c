@@ -438,9 +438,11 @@ static void callbackSchedulerForEachCallback(int16_t callback_id, const struct p
         return;
     }
     // delayed callback scheduler reports callback stack overflows as remaininng: -1
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
     if (callback_info->stack_remaining < 0 && stackOverflow == STACKOVERFLOW_NONE) {
         stackOverflow = STACKOVERFLOW_WARNING;
     }
+#endif
     // By convention, there is a direct mapping between (not negative) callback scheduler callback_id's and members
     // of the CallbackInfoXXXXElem enums
     PIOS_DEBUG_Assert(callback_id < CALLBACKINFO_RUNNING_NUMELEM);
@@ -649,6 +651,7 @@ void vApplicationIdleHook(void)
 void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
                                    __attribute__((unused)) signed portCHAR *pcTaskName)
 {
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
     stackOverflow = STACKOVERFLOW_CRITICAL;
 #if DEBUG_STACK_OVERFLOW
     static volatile bool wait_here = true;
@@ -656,6 +659,7 @@ void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
         ;
     }
     wait_here = true;
+#endif
 #endif
 }
 

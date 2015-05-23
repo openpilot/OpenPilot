@@ -71,6 +71,8 @@ private:
     PIDControlDown controlDown;
     PIDControlNE controlNE;
     uint8_t mActive;
+    uint8_t mOverride;
+    StatusVtolAutoTakeoffControlStateOptions autotakeoffState;
 };
 
 #endif // VTOLAUTOTAKEOFFCONTROLLER_H

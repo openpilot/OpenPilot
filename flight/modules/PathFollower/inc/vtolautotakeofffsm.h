@@ -47,7 +47,7 @@ typedef enum {
     AUTOTAKEOFF_STATE_THRUSTDOWN, // Thrust down sequence
     AUTOTAKEOFF_STATE_THRUSTOFF, // Thrust is now off
     AUTOTAKEOFF_STATE_DISARMED, // Disarmed
-    AUTOTAKEOFF_STATE_ABORT, // Abort on error triggerig fallback to hold
+    AUTOTAKEOFF_STATE_ABORT, // Abort on error triggerig fallback to land
     AUTOTAKEOFF_STATE_SIZE
 } PathFollowerFSM_AutoTakeoffState_T;
 
@@ -150,7 +150,7 @@ protected:
     void assessAltitude(void);
 
     void setStateTimeout(int32_t count);
-    void fallback_to_hold(void);
+    void fallback_to_land(void);
 
     static PathFollowerFSM_AutoTakeoffStateHandler_T sAutoTakeoffStateTable[AUTOTAKEOFF_STATE_SIZE];
 };

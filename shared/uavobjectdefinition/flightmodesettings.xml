@@ -117,6 +117,7 @@
         <field name="AutoTakeOffHeight" units="m" type="float" elements="1" defaultvalue="2.5" description="height in meters above arming altitude to climb to during autotakeoff"/>
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="30,15" description="stick sensitivity for position roam modes"/>
 	<field name="VarioControlLowPassAlpha" units="" type="float" elements="1" defaultvalue="0.98" description="stick low pass filter for position roam modes"/>
+	<field name="FlightModeChangeRestartsPathPlan" units="bool" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

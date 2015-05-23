@@ -557,7 +557,7 @@ void VtolAutoTakeoffFSM::run_disarmed(__attribute__((unused)) uint8_t flTimeout)
 #endif
 }
 
-void VtolAutoTakeoffFSM::fallback_to_hold(void)
+void VtolAutoTakeoffFSM::fallback_to_land(void)
 {
     PositionStateData positionState;
 
@@ -570,7 +570,7 @@ void VtolAutoTakeoffFSM::fallback_to_hold(void)
     pathDesired->Start.Down       = positionState.Down;
     pathDesired->StartingVelocity = 0.0f;
     pathDesired->EndingVelocity   = 0.0f;
-    pathDesired->Mode = PATHDESIRED_MODE_GOTOENDPOINT;
+    pathDesired->Mode = PATHDESIRED_MODE_LAND;
 
     PathDesiredSet(pathDesired);
 }
@@ -583,7 +583,7 @@ void VtolAutoTakeoffFSM::setup_abort(void)
     mAutoTakeoffData->boundThrustMax        = vtolPathFollowerSettings->ThrustLimits.Max;
     mAutoTakeoffData->flConstrainThrust     = false;
     mAutoTakeoffData->flZeroStabiHorizontal = false;
-    fallback_to_hold();
+    fallback_to_land();
 }
 
 void VtolAutoTakeoffFSM::run_abort(__attribute__((unused)) uint8_t flTimeout)

@@ -56,6 +56,7 @@ extern "C" {
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <vtolselftuningstats.h>
+#include <statusvtolautotakeoff.h>
 #include <pathsummary.h>
 }
 
@@ -66,6 +67,11 @@ extern "C" {
 #include "pidcontroldown.h"
 
 // Private constants
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN             2.0f
+#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX             50.0f
+#define AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT         0.2f
+#define AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START 0.3f
+#define AUTOTAKEOFF_THROTTLE_ABORT_LIMIT                  0.1f
 
 // pointer to a singleton instance
 VtolAutoTakeoffController *VtolAutoTakeoffController::p_inst = 0;
@@ -78,11 +84,34 @@ VtolAutoTakeoffController::VtolAutoTakeoffController()
 void VtolAutoTakeoffController::Activate(void)
 {
     if (!mActive) {
-        mActive = true;
+        mActive   = true;
+        mOverride = true;
         SettingsUpdated();
         fsm->Activate();
         controlDown.Activate();
         controlNE.Activate();
+        autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
+        // We only allow takeoff if the state transition of disarmed to armed occurs
+        // whilst in the autotake flight mode
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        StabilizationDesiredData stabiDesired;
+        StabilizationDesiredGet(&stabiDesired);
+
+        if (flightStatus.Armed) {
+            // Are we inflight?
+            if (stabiDesired.Thrust > AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT || flightStatus.ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+                // ok assume already in flight and just enter position hold
+                // if we are not actually inflight this will just be a violent autotakeoff
+                autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD;
+            } else {
+                autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST;
+                // Note that if this mode was invoked unintentionally whilst in flight, effectively
+                // all inputs get ignored and the vtol continues to fly to its previous
+                // stabi command.
+            }
+        }
+        fsm->setControlState(autotakeoffState);
     }
 }
 
@@ -99,14 +128,39 @@ uint8_t VtolAutoTakeoffController::Mode(void)
 // Objective updated in pathdesired, e.g. same flight mode but new target velocity
 void VtolAutoTakeoffController::ObjectiveUpdated(void)
 {
-    // Set the objective's target velocity
+    if (mOverride) {
+        // override pathDesired from PathPLanner with current position,
+        // as we deliberately don' not care about the location of the waypoints on the map
+        float velocity_down;
+        float autotakeoff_height;
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
+        FlightModeSettingsAutoTakeOffVelocityGet(&velocity_down);
+        FlightModeSettingsAutoTakeOffHeightGet(&autotakeoff_height);
+        autotakeoff_height = fabsf(autotakeoff_height);
+        if (autotakeoff_height < AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN) {
+            autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN;
+        } else if (autotakeoff_height > AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX) {
+            autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX;
+        }
+        controlDown.UpdateVelocitySetpoint(velocity_down);
+        controlNE.UpdateVelocitySetpoint(0.0f, 0.0f);
+        controlNE.UpdatePositionSetpoint(positionState.North, positionState.East);
 
-    controlDown.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]);
-    controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH],
-                                     pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]);
-    controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
-    controlDown.UpdatePositionSetpoint(pathDesired->End.Down);
-    fsm->setControlState((StatusVtolAutoTakeoffControlStateOptions)pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE]);
+
+        controlDown.UpdatePositionSetpoint(positionState.Down - autotakeoff_height);
+        mOverride = false; // further updates always come from ManualControl and will control horizontal position
+
+        mOverride = false;
+    } else {
+        // Set the objective's target velocity
+
+        controlDown.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]);
+        controlNE.UpdateVelocitySetpoint(pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH],
+                                         pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]);
+        controlNE.UpdatePositionSetpoint(pathDesired->End.North, pathDesired->End.East);
+        controlDown.UpdatePositionSetpoint(pathDesired->End.Down);
+    }
 }
 void VtolAutoTakeoffController::Deactivate(void)
 {
@@ -223,6 +277,16 @@ int8_t VtolAutoTakeoffController::UpdateStabilizationDesired(bool yaw_attitude, 
 
     controlNE.GetNECommand(&northCommand, &eastCommand);
     stabDesired.Thrust = controlDown.GetDownCommand();
+    switch (autotakeoffState) {
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED:
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE:
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST:
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT:
+        stabDesired.Thrust = 0.0f;
+        break;
+    default:
+        break;
+    }
 
     float angle_radians = DEG2RAD(attitudeState.Yaw);
     float cos_angle     = cosf(angle_radians);
@@ -255,6 +319,79 @@ int8_t VtolAutoTakeoffController::UpdateStabilizationDesired(bool yaw_attitude, 
 
 void VtolAutoTakeoffController::UpdateAutoPilot()
 {
+    // state machine updates:
+    // Vtol AutoTakeoff invocation from flight mode requires the following sequence:
+    // 1. Arming must be done whilst in the AutoTakeOff flight mode
+    // 2. If the AutoTakeoff flight mode is selected and already armed, requires disarming first
+    // 3. Wait for armed state
+    // 4. Once the user increases the throttle position to above 50%, then and only then initiate auto-takeoff.
+    // 5. Whilst the throttle is < 50% before takeoff, all stick inputs are being ignored.
+    // 6. If during the autotakeoff sequence, at any stage, if the throttle stick position reduces to less than 10%, landing is initiated.
+
+    switch (autotakeoffState) {
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST:
+    {
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        if (!flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
+            fsm->setControlState(autotakeoffState);
+        }
+    }
+    break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED:
+    {
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        if (flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE;
+            fsm->setControlState(autotakeoffState);
+        }
+    }
+    break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE:
+    {
+        ManualControlCommandData cmd;
+        ManualControlCommandGet(&cmd);
+
+        if (cmd.Throttle > AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE;
+            fsm->setControlState(autotakeoffState);
+        }
+    }
+    break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE:
+    {
+        ManualControlCommandData cmd;
+        ManualControlCommandGet(&cmd);
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+
+        // we do not do a takeoff abort in pathplanner mode
+        if (flightStatus.ControlChain.PathPlanner != FLIGHTSTATUS_CONTROLCHAIN_TRUE &&
+            cmd.Throttle < AUTOTAKEOFF_THROTTLE_ABORT_LIMIT) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT;
+            fsm->setControlState(autotakeoffState);
+        }
+    }
+    break;
+
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_ABORT:
+    {
+        FlightStatusData flightStatus;
+        FlightStatusGet(&flightStatus);
+        if (!flightStatus.Armed) {
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
+            fsm->setControlState(autotakeoffState);
+        }
+    }
+    break;
+    case STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD:
+    // nothing to do. land has been requested. stay here for forever until mode change.
+    default:
+        break;
+    }
+
     fsm->Update();
 
     UpdateVelocityDesired();

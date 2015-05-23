@@ -48,8 +48,6 @@
 #include "plans.h"
 #include <sanitycheck.h>
 #include <vtolpathfollowersettings.h>
-#include <statusvtolautotakeoff.h>
-#include <statusvtolland.h>
 #include <manualcontrolcommand.h>
 
 // Private constants
@@ -80,9 +78,6 @@ static uint8_t conditionPointingTowardsNext();
 static uint8_t conditionPythonScript();
 static uint8_t conditionImmediate();
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
-static void planner_setup_pathdesired_land(PathDesiredData *pathDesired);
-static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired);
-static void planner_setup_pathdesired(PathDesiredData *pathDesired, bool overwrite_start_position);
 
 
 // Private variables
@@ -132,8 +127,6 @@ int32_t PathPlannerInitialize()
     VelocityStateInitialize();
     WaypointInitialize();
     WaypointActiveInitialize();
-    StatusVtolAutoTakeoffInitialize();
-    StatusVtolLandInitialize();
 
     pathPlannerHandle = PIOS_CALLBACKSCHEDULER_Create(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER0, STACK_SIZE_BYTES);
     pathDesiredUpdaterHandle = PIOS_CALLBACKSCHEDULER_Create(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER1, STACK_SIZE_BYTES);
@@ -236,17 +229,17 @@ static void pathPlannerTask()
         return;
     }
 
-
     // the transition from pathplanner to another flightmode back to pathplanner
     // triggers a reset back to 0 index in the waypoint list
     if (pathplanner_active == false) {
-        pathplanner_active   = true;
+        pathplanner_active = true;
 
-        // This triggers callback to update variable
-        waypointActive.Index = 0;
-        WaypointActiveSet(&waypointActive);
-
-        return;
+        FlightModeSettingsFlightModeChangeRestartsPathPlanOptions restart;
+        FlightModeSettingsFlightModeChangeRestartsPathPlanGet(&restart);
+        if (restart == FLIGHTMODESETTINGS_FLIGHTMODECHANGERESTARTSPATHPLAN_TRUE) {
+            setWaypoint(0);
+            return;
+        }
     }
 
     WaypointInstGet(waypointActive.Index, &waypoint);
@@ -263,21 +256,6 @@ static void pathPlannerTask()
     if (pathStatus.Status == PATHSTATUS_STATUS_CRITICAL && waypointActive.Index != pathAction.ErrorDestination && pathAction.ErrorDestination >= 0) {
         setWaypoint(pathAction.ErrorDestination);
         return;
-    }
-
-    // check start conditions
-    // autotakeoff requires midpoint thrust if we are in a pending takeoff situation
-    if (pathAction.Mode == PATHACTION_MODE_AUTOTAKEOFF) {
-        pathAction.EndCondition = PATHACTION_ENDCONDITION_LEGREMAINING;
-        if ((uint8_t)pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] == STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE) {
-            ManualControlCommandData cmd;
-            ManualControlCommandGet(&cmd);
-            if (cmd.Throttle > AUTOTAKEOFF_THROTTLE_LIMIT_TO_ALLOW_TAKEOFF_START) {
-                pathDesired.ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] = (float)STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_INITIATE;
-                PathDesiredSet(&pathDesired);
-            }
-            return;
-        }
     }
 
 
@@ -331,22 +309,45 @@ void updatePathDesired()
     WaypointActiveGet(&waypointActive);
     WaypointInstGet(waypointActive.Index, &waypoint);
 
-    // Capture if current mode is takeoff
-    bool autotakeoff = (pathAction.Mode == PATHACTION_MODE_AUTOTAKEOFF);
-
     PathActionInstGet(waypoint.Action, &pathAction);
 
     PathDesiredData pathDesired;
-    switch (pathAction.Mode) {
-    case PATHACTION_MODE_AUTOTAKEOFF:
-        planner_setup_pathdesired_takeoff(&pathDesired);
-        break;
-    case PATHACTION_MODE_LAND:
-        planner_setup_pathdesired_land(&pathDesired);
-        break;
-    default:
-        planner_setup_pathdesired(&pathDesired, autotakeoff);
-        break;
+
+    pathDesired.End.North = waypoint.Position.North;
+    pathDesired.End.East  = waypoint.Position.East;
+    pathDesired.End.Down  = waypoint.Position.Down;
+    pathDesired.EndingVelocity    = waypoint.Velocity;
+    pathDesired.Mode = pathAction.Mode;
+    pathDesired.ModeParameters[0] = pathAction.ModeParameters[0];
+    pathDesired.ModeParameters[1] = pathAction.ModeParameters[1];
+    pathDesired.ModeParameters[2] = pathAction.ModeParameters[2];
+    pathDesired.ModeParameters[3] = pathAction.ModeParameters[3];
+    pathDesired.UID = waypointActive.Index;
+
+
+    if (waypointActive.Index == 0) {
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
+        // First waypoint has itself as start point (used to be home position but that proved dangerous when looping)
+
+        /*pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
+           pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
+           pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
+        // note: if certain flightmodes need to override Start, End or mode parameters, that should happen within
+        // the pathfollower as needed. This also holds if Start is replaced by current position for takeoff and landing
+        pathDesired.Start.North = positionState.North;
+        pathDesired.Start.East  = positionState.East;
+        pathDesired.Start.Down  = positionState.Down;
+        pathDesired.StartingVelocity = pathDesired.EndingVelocity;
+    } else {
+        // Get previous waypoint as start point
+        WaypointData waypointPrev;
+        WaypointInstGet(waypointActive.Index - 1, &waypointPrev);
+
+        pathDesired.Start.North = waypointPrev.Position.North;
+        pathDesired.Start.East  = waypointPrev.Position.East;
+        pathDesired.Start.Down  = waypointPrev.Position.Down;
+        pathDesired.StartingVelocity = waypointPrev.Velocity;
     }
 
     PathDesiredSet(&pathDesired);
@@ -435,112 +436,6 @@ void commandUpdated(__attribute__((unused)) UAVObjEvent *ev)
 void statusUpdated(__attribute__((unused)) UAVObjEvent *ev)
 {
     PIOS_CALLBACKSCHEDULER_Dispatch(pathPlannerHandle);
-}
-
-// Standard setup of a pathDesired command from the waypoint path plan
-static void planner_setup_pathdesired(PathDesiredData *pathDesired, bool overwrite_start_position)
-{
-    pathDesired->End.North = waypoint.Position.North;
-    pathDesired->End.East  = waypoint.Position.East;
-    pathDesired->End.Down  = waypoint.Position.Down;
-    pathDesired->EndingVelocity    = waypoint.Velocity;
-    pathDesired->Mode = pathAction.Mode;
-    pathDesired->ModeParameters[0] = pathAction.ModeParameters[0];
-    pathDesired->ModeParameters[1] = pathAction.ModeParameters[1];
-    pathDesired->ModeParameters[2] = pathAction.ModeParameters[2];
-    pathDesired->ModeParameters[3] = pathAction.ModeParameters[3];
-    pathDesired->UID = waypointActive.Index;
-
-
-    if (waypointActive.Index == 0 || overwrite_start_position) {
-        PositionStateData positionState;
-        PositionStateGet(&positionState);
-        // First waypoint has itself as start point (used to be home position but that proved dangerous when looping)
-
-        /*pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
-           pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
-           pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
-        // note takeoff relies on the start being the current location as it merely ascends and using
-        // the start as assumption current NE location
-        pathDesired->Start.North = positionState.North;
-        pathDesired->Start.East  = positionState.East;
-        pathDesired->Start.Down  = positionState.Down;
-        pathDesired->StartingVelocity = pathDesired->EndingVelocity;
-    } else {
-        // Get previous waypoint as start point
-        WaypointData waypointPrev;
-        WaypointInstGet(waypointActive.Index - 1, &waypointPrev);
-
-        pathDesired->Start.North = waypointPrev.Position.North;
-        pathDesired->Start.East  = waypointPrev.Position.East;
-        pathDesired->Start.Down  = waypointPrev.Position.Down;
-        pathDesired->StartingVelocity = waypointPrev.Velocity;
-    }
-}
-
-#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN 2.0f
-#define AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX 50.0f
-static void planner_setup_pathdesired_takeoff(PathDesiredData *pathDesired)
-{
-    PositionStateData positionState;
-
-    PositionStateGet(&positionState);
-    float velocity_down;
-    float autotakeoff_height;
-    FlightModeSettingsAutoTakeOffVelocityGet(&velocity_down);
-    FlightModeSettingsAutoTakeOffHeightGet(&autotakeoff_height);
-    autotakeoff_height = fabsf(autotakeoff_height);
-    if (autotakeoff_height < AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN) {
-        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MIN;
-    } else if (autotakeoff_height > AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX) {
-        autotakeoff_height = AUTOTAKEOFF_TO_INCREMENTAL_HEIGHT_MAX;
-    }
-
-
-    pathDesired->Start.North = positionState.North;
-    pathDesired->Start.East  = positionState.East;
-    pathDesired->Start.Down  = positionState.Down;
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_NORTH] = 0.0f;
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_EAST]  = 0.0f;
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_DOWN]  = -velocity_down;
-    // initially halt takeoff.
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_AUTOTAKEOFF_CONTROLSTATE] = (float)STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE;
-
-    pathDesired->End.North = positionState.North;
-    pathDesired->End.East  = positionState.East;
-    pathDesired->End.Down  = positionState.Down - autotakeoff_height;
-
-    pathDesired->StartingVelocity = 0.0f;
-    pathDesired->EndingVelocity   = 0.0f;
-    pathDesired->Mode = PATHDESIRED_MODE_AUTOTAKEOFF;
-
-    pathDesired->UID  = waypointActive.Index;
-}
-
-static void planner_setup_pathdesired_land(PathDesiredData *pathDesired)
-{
-    PositionStateData positionState;
-
-    PositionStateGet(&positionState);
-    float velocity_down;
-
-    FlightModeSettingsLandingVelocityGet(&velocity_down);
-
-    pathDesired->Start.North = positionState.North;
-    pathDesired->Start.East  = positionState.East;
-    pathDesired->Start.Down  = positionState.Down;
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_NORTH] = 0.0f;
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_EAST]  = 0.0f;
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_VELOCITYVECTOR_DOWN]  = velocity_down;
-
-    pathDesired->End.North = positionState.North;
-    pathDesired->End.East  = positionState.East;
-    pathDesired->End.Down  = positionState.Down;
-
-    pathDesired->StartingVelocity = 0.0f;
-    pathDesired->EndingVelocity   = 0.0f;
-    pathDesired->Mode = PATHDESIRED_MODE_LAND;
-    pathDesired->ModeParameters[PATHDESIRED_MODEPARAMETER_LAND_OPTIONS] = (float)PATHDESIRED_MODEPARAMETER_LAND_OPTION_HORIZONTAL_PH;
 }
 
 

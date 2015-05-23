@@ -43,6 +43,7 @@
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <sin_lookup.h>
+#include <sanitycheck.h>
 #include <statusvtolautotakeoff.h>
 
 #define UPDATE_EXPECTED 0.02f
@@ -219,6 +220,14 @@ static void plan_setup_AutoTakeoff_helper(PathDesiredData *pathDesired)
 #define AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT 0.2f
 void plan_setup_AutoTakeoff()
 {
+    FrameType_t frame = GetCurrentFrameType();
+    VtolPathFollowerSettingsTreatCustomCraftAsOptions TreatCustomCraftAs;
+
+    VtolPathFollowerSettingsTreatCustomCraftAsGet(&TreatCustomCraftAs);
+    if (frame == FRAME_TYPE_CUSTOM && TreatCustomCraftAs == VTOLPATHFOLLOWERSETTINGS_TREATCUSTOMCRAFTAS_FIXEDWING) {
+        frame = FRAME_TYPE_FIXED_WING;
+    }
+
     autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORARMED;
     // We only allow takeoff if the state transition of disarmed to armed occurs
     // whilst in the autotake flight mode
@@ -227,18 +236,28 @@ void plan_setup_AutoTakeoff()
     StabilizationDesiredData stabiDesired;
     StabilizationDesiredGet(&stabiDesired);
 
-    // Are we inflight?
-    if (flightStatus.Armed && stabiDesired.Thrust > AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT) {
-        // ok assume already in flight and just enter position hold
-        // if we are not actually inflight this will just be a violent autotakeoff
-        autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD;
-        plan_setup_positionHold();
+    if (frame != FRAME_TYPE_FIXED_WING) {
+        // Are we inflight?
+        if (flightStatus.Armed && stabiDesired.Thrust > AUTOTAKEOFF_INFLIGHT_THROTTLE_CHECK_LIMIT) {
+            // ok assume already in flight and just enter position hold
+            // if we are not actually inflight this will just be a violent autotakeoff
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_POSITIONHOLD;
+            plan_setup_positionHold();
+        } else {
+            if (flightStatus.Armed) {
+                autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST;
+                // Note that if this mode was invoked unintentionally whilst in flight, effectively
+                // all inputs get ignored and the vtol continues to fly to its previous
+                // stabi command.
+            }
+            PathDesiredData pathDesired;
+            plan_setup_AutoTakeoff_helper(&pathDesired);
+            PathDesiredSet(&pathDesired);
+        }
     } else {
+        // fixed wings do not require arming - or sequencing, as the takeoffcontroller has its own independent state machine
         if (flightStatus.Armed) {
-            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_REQUIREUNARMEDFIRST;
-            // Note that if this mode was invoked unintentionally whilst in flight, effectively
-            // all inputs get ignored and the vtol continues to fly to its previous
-            // stabi command.
+            autotakeoffState = STATUSVTOLAUTOTAKEOFF_CONTROLSTATE_WAITFORMIDTHROTTLE;
         }
         PathDesiredData pathDesired;
         plan_setup_AutoTakeoff_helper(&pathDesired);

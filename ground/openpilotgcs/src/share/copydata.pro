@@ -1,4 +1,4 @@
-include(../openpilotgcs.pri)
+include(../../openpilotgcs.pri)
 
 TEMPLATE = aux
 
@@ -6,8 +6,8 @@ DATACOLLECTIONS = cloudconfig default_configurations dials models pfd sounds dia
 
 equals(copydata, 1) {
     for(dir, DATACOLLECTIONS) {
-        exists($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir) {
-            addCopyDirTarget($$dir, $$GCS_SOURCE_TREE/share/openpilotgcs, $$GCS_DATA_PATH)
+        exists($$GCS_SOURCE_TREE/src/share/$$dir) {
+            addCopyDirTarget($$dir, $$GCS_SOURCE_TREE/src/share, $$GCS_DATA_PATH)
         }
     }
 }

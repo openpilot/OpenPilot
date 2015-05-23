@@ -31,6 +31,6 @@ CONFIG   += ordered
 
 DEFINES += USE_PATHPLANNER
 
-SUBDIRS = src share copydata
+SUBDIRS = src copydata
 
 copydata.file = copydata.pro

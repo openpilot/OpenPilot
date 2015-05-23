@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
-SUBDIRS = openpilotgcs/translations copydata
+SUBDIRS = translations copydata
 
 copydata.file = copydata.pro

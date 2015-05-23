@@ -45,17 +45,21 @@
         <field name="ThrustLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
                 <!-- minimum and maximum allowed thrust and setpoint for cruise speed -->
         <field name="Safetymargins" units="" type="float"
-                elementnames="Wind, Stallspeed, Lowspeed, Highspeed, Overspeed, Lowpower, Highpower, Pitchcontrol"
-                defaultvalue="90, 1.0, 0.5, 1.5, 1.0, 1, 0, 1" />
+                elementnames="Wind, Stallspeed, Lowspeed, Highspeed, Overspeed, Lowpower, Highpower, Rollcontrol, Pitchcontrol"
+                defaultvalue="1, 1.0, 0.5, 1.5, 1.0, 1, 1, 1, 1" />
                 <!-- Wind: degrees of crabbing allowed
                      Speeds: percentage (1.0=100%) of the limit to be over/onder
                      Power & Control: flag to turn on/off 0.0 =off 1.0 = on -->
+        <field name="SafetyCutoffLimits" units="" type="float"
+		elementnames="RollDeg,PitchDeg,YawDeg,MaxDecelerationDeltaMPS" defaultvalue="25.0, 25.0, 25.0, 4.0" />
+		<!-- maximum margins from attempted attitude allowed during takeoff
+		     In flight Roll/Pitch are added to RollLimit/PitchLimit as max limits - throttle is cut when beyond
+		     if roll > RollLimit.Max + TakeOffLimits.RollDeg
+		     the same happens when MaxDecelerationDeltaMPS below Lowspeed limit
+		     if speed < Safetymargins.Lowspeed*HorizontalVelMin - TakeOffLimits.MaxDecelerationDeltaMPS --> 
 
 
 	<field name="TakeOffPitch" units="deg" type="float" elements="1" defaultvalue="25.0"/>
-        <field name="TakeOffLimits" units="" type="float"
-		elementnames="RollDeg,PitchDeg,YawDeg,MaxDecelerationDeltaMPS" defaultvalue="25.0, 25.0, 25.0, 4.0" />
-		<!-- maximum margins allowed during takeoff --> 
 	<field name="LandingPitch" units="deg" type="float" elements="1" defaultvalue="15.0"/>
 
         <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>

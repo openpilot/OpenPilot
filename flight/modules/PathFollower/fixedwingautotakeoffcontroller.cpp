@@ -142,10 +142,10 @@ bool FixedWingAutoTakeoffController::isUnsafe(void)
     AttitudeStateData attitude;
     AttitudeStateGet(&attitude);
     // too much bank angle
-    if (fabsf(attitude.Roll) > fixedWingSettings->TakeOffLimits.RollDeg) {
+    if (fabsf(attitude.Roll) > fixedWingSettings->SafetyCutoffLimits.RollDeg) {
         abort = true;
     }
-    if (fabsf(attitude.Pitch - fixedWingSettings->TakeOffPitch) > fixedWingSettings->TakeOffLimits.PitchDeg) {
+    if (fabsf(attitude.Pitch - fixedWingSettings->TakeOffPitch) > fixedWingSettings->SafetyCutoffLimits.PitchDeg) {
         abort = true;
     }
     float deltayaw = attitude.Yaw - initYaw;
@@ -155,7 +155,7 @@ bool FixedWingAutoTakeoffController::isUnsafe(void)
     if (deltayaw < -180.0f) {
         deltayaw += 360.0f;
     }
-    if (fabsf(deltayaw) > fixedWingSettings->TakeOffLimits.YawDeg) {
+    if (fabsf(deltayaw) > fixedWingSettings->SafetyCutoffLimits.YawDeg) {
         abort = true;
     }
     return abort;
@@ -206,7 +206,7 @@ void FixedWingAutoTakeoffController::run_inactive(void) {}
 void FixedWingAutoTakeoffController::run_launch(void)
 {
     // state transition
-    if (maxVelocity > fixedWingSettings->TakeOffLimits.MaxDecelerationDeltaMPS) {
+    if (maxVelocity > fixedWingSettings->SafetyCutoffLimits.MaxDecelerationDeltaMPS) {
         setState(FW_AUTOTAKEOFF_STATE_CLIMB);
     }
 

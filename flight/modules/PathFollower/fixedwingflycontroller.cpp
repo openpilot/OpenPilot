@@ -228,6 +228,7 @@ void FixedWingFlyController::updatePathVelocity(float kFF, bool limited)
 uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
 {
     uint8_t result = 1;
+    bool cutThrust = false;
 
     const float dT = fixedWingSettings->UpdatePeriod / 1000.0f;
 
@@ -333,6 +334,7 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     if (indicatedAirspeedState > fixedWingSettings->HorizontalVelMax * fixedWingSettings->Safetymargins.Highspeed) {
         fixedWingPathFollowerStatus.Errors.Highspeed = 1;
         result = 0;
+        cutThrust = true;
     }
     if (indicatedAirspeedState < fixedWingSettings->HorizontalVelMin * fixedWingSettings->Safetymargins.Lowspeed) {
         fixedWingPathFollowerStatus.Errors.Lowspeed = 1;
@@ -341,6 +343,10 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     if (indicatedAirspeedState < systemSettings.AirSpeedMin * fixedWingSettings->Safetymargins.Stallspeed) {
         fixedWingPathFollowerStatus.Errors.Stallspeed = 1;
         result = 0;
+    }
+    if (indicatedAirspeedState < fixedWingSettings->HorizontalVelMin * fixedWingSettings->Safetymargins.Lowspeed - fixedWingSettings->SafetyCutoffLimits.MaxDecelerationDeltaMPS) {
+        cutThrust = true;
+        result    = 0;
     }
 
     /**
@@ -373,20 +379,26 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     if (fixedWingSettings->ThrustLimit.Neutral + powerCommand >= fixedWingSettings->ThrustLimit.Max && // thrust at maximum
         velocityState.Down > 0.0f && // we ARE going down
         descentspeedDesired < 0.0f && // we WANT to go up
-        airspeedError > 0.0f && // we are too slow already
-        fixedWingSettings->Safetymargins.Lowpower > 0.5f) { // alarm switched on
+        airspeedError > 0.0f) { // we are too slow already
         fixedWingPathFollowerStatus.Errors.Lowpower = 1;
-        result = 0;
+
+        if (fixedWingSettings->Safetymargins.Lowpower > 0.5f) { // alarm switched on
+            result = 0;
+        }
     }
     // Error condition: plane keeps climbing despite minimum thrust (opposite of above)
     fixedWingPathFollowerStatus.Errors.Highpower = 0;
     if (fixedWingSettings->ThrustLimit.Neutral + powerCommand <= fixedWingSettings->ThrustLimit.Min && // thrust at minimum
         velocityState.Down < 0.0f && // we ARE going up
         descentspeedDesired > 0.0f && // we WANT to go down
-        airspeedError < 0.0f && // we are too fast already
-        fixedWingSettings->Safetymargins.Highpower > 0.5f) { // alarm switched on
+        airspeedError < 0.0f) { // we are too fast already
+        // this alarm is often switched off because of false positives, however we still want to cut throttle if it happens
+        cutThrust = true;
         fixedWingPathFollowerStatus.Errors.Highpower = 1;
-        result = 0;
+
+        if (fixedWingSettings->Safetymargins.Highpower > 0.5f) { // alarm switched on
+            result = 0;
+        }
     }
 
     /**
@@ -418,7 +430,17 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
         fixedWingSettings->Safetymargins.Pitchcontrol > 0.5f) { // alarm switched on
         fixedWingPathFollowerStatus.Errors.Pitchcontrol = 1;
         result = 0;
+        cutThrust = true;
     }
+    // Error condition: pitch way out of wack
+    if (fixedWingSettings->Safetymargins.Pitchcontrol > 0.5f &&
+        (attitudeState.Pitch < fixedWingSettings->PitchLimit.Min - fixedWingSettings->SafetyCutoffLimits.PitchDeg ||
+         attitudeState.Pitch > fixedWingSettings->PitchLimit.Max + fixedWingSettings->SafetyCutoffLimits.PitchDeg)) {
+        fixedWingPathFollowerStatus.Errors.Pitchcontrol = 1;
+        result = 0;
+        cutThrust = true;
+    }
+
 
     /**
      * Compute desired roll command
@@ -456,7 +478,15 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
                               fixedWingSettings->RollLimit.Min,
                               fixedWingSettings->RollLimit.Max);
 
-    // TODO: find a check to determine loss of directional control. Likely needs some check of derivative
+    // Error condition: roll way out of wack
+    fixedWingPathFollowerStatus.Errors.Rollcontrol = 0;
+    if (fixedWingSettings->Safetymargins.Rollcontrol > 0.5f &&
+        (attitudeState.Roll < fixedWingSettings->RollLimit.Min - fixedWingSettings->SafetyCutoffLimits.RollDeg ||
+         attitudeState.Roll > fixedWingSettings->RollLimit.Max + fixedWingSettings->SafetyCutoffLimits.RollDeg)) {
+        fixedWingPathFollowerStatus.Errors.Rollcontrol = 1;
+        result = 0;
+        cutThrust = true;
+    }
 
 
     /**
@@ -465,6 +495,10 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     // TODO implement raw control mode for yaw and base on Accels.Y
     stabDesired.Yaw = 0.0f;
 
+    // safety cutoff condition
+    if (cutThrust) {
+        stabDesired.Thrust = 0.0f;
+    }
 
     stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

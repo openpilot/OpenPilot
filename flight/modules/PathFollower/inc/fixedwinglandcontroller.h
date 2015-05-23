@@ -6,7 +6,7 @@
  * @brief CONTROL interface class for pathfollower fixed wing fly controller
  * @{
  *
- * @file       FixedWingCONTROL.h
+ * @file       fixedwinglandcontroller.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2015.
  * @brief      Executes CONTROL for fixed wing fly objectives
  *

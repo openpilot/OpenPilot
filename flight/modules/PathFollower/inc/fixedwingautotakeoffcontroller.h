@@ -43,7 +43,17 @@ typedef enum {
 } FixedWingAutoTakeoffControllerState_T;
 
 class FixedWingAutoTakeoffController : public FixedWingFlyController {
+protected:
+    static FixedWingAutoTakeoffController *p_inst;
+
 public:
+    static FixedWingFlyController *instance()
+    {
+        if (!p_inst) {
+            p_inst = new FixedWingAutoTakeoffController();
+        }
+        return p_inst;
+    }
     void Activate(void);
     void UpdateAutoPilot(void);
 

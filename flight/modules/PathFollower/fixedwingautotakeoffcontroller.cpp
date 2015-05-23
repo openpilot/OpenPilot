@@ -43,6 +43,10 @@ extern "C" {
 
 // Private constants
 
+// pointer to a singleton instance
+FixedWingAutoTakeoffController *FixedWingAutoTakeoffController::p_inst = 0;
+
+
 // Called when mode first engaged
 void FixedWingAutoTakeoffController::Activate(void)
 {

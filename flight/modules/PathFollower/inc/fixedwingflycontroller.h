@@ -33,7 +33,7 @@
 #include "pathfollowercontrol.h"
 
 class FixedWingFlyController : public PathFollowerControl {
-private:
+protected:
     static FixedWingFlyController *p_inst;
     FixedWingFlyController();
 

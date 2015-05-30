@@ -55,18 +55,23 @@ endif
 #
 ##############################
 
+AVR_SDK_HOST := http://blog.spitzenpfeil.org/arduino/mirror_released
+AVR_SDK_MD5_HOST := file:///Users/steve/Downloads/ArduinoArchives
+
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
         ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2
         ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2/+md5
-        AVR_SDK_URL := http://blog.spitzenpfeil.org/arduino/mirror_released/arduino-1.6.4-linux64.tar.xz
+        AVR_SDK_URL := $(AVR_SDK_HOST)/arduino-1.6.4-linux64.tar.xz
+        AVR_SDK_MD5_URL := $(AVR_SDK_MD5_HOST)/arduino-1.6.4-linux64.tar.xz.md5
         QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x64-5.4.1.run
         QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x64-5.4.1.run.md5
         QT_SDK_ARCH := gcc_64
 else
         ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2
         ARM_SDK_MD5_URL := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-linux.tar.bz2/+md5
-        AVR_SDK_URL := http://blog.spitzenpfeil.org/arduino/mirror_released/arduino-1.6.4-linux32.tar.xz
+        AVR_SDK_URL := $(AVR_SDK_HOST)/arduino-1.6.4-linux32.tar.xz
+        AVR_SDK_MD5_URL := $(AVR_SDK_MD5_HOST)/arduino-1.6.4-linux32.tar.xz.md5
         QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x86-5.4.1.run
         QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x86-5.4.1.run.md5
         QT_SDK_ARCH := gcc
@@ -77,7 +82,8 @@ else
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2/+md5
-    AVR_SDK_URL := http://blog.spitzenpfeil.org/arduino/mirror_released/arduino-1.6.4-macosx.zip
+    AVR_SDK_URL := $(AVR_SDK_HOST)/arduino-1.6.4-macosx.zip
+    AVR_SDK_MD5_URL := $(AVR_SDK_MD5_HOST)/arduino-1.6.4-macosx.zip.md5
     AVR_SDK_PREFIX = $(AVR_SDK_DIR)/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-
     QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
     QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg.md5
@@ -90,7 +96,8 @@ else ifeq ($(UNAME), Darwin)
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip/+md5
-    AVR_SDK_URL := http://blog.spitzenpfeil.org/arduino/mirror_released/arduino-1.6.4-windows.zip
+    AVR_SDK_URL := $(AVR_SDK_HOST)/arduino-1.6.4-windows.zip
+    AVR_SDK_MD5_URL := $(AVR_SDK_MD5_HOST)/arduino-1.6.4-windows.zip.md5
     AVR_SDK_PREFIX = $(AVR_SDK_DIR)/hardware/tools/avr/bin/avr-
     QT_SDK_URL     := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
     QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe.md5
@@ -109,7 +116,7 @@ endif
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
 ARM_SDK_DIR    := $(TOOLS_DIR)/gcc-arm-none-eabi-4_9-2014q4
-AVR_SDK_DIR    := $(TOOLS_DIR)/arduino-1.6.4
+AVR_SDK_DIR    := $(TOOLS_DIR)/arduino-1.6.4/
 QT_SDK_DIR     := $(TOOLS_DIR)/qt-5.4.1
 UNCRUSTIFY_DIR := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR    := $(TOOLS_DIR)/doxygen-1.8.3.1
@@ -320,22 +327,6 @@ define DOWNLOAD_TEMPLATE
 	)
 endef
 
-##############################
-#
-# Cross platform download template, no MD5
-#  $(1) = Package URL
-#  $(2) = Package file
-#
-##############################
-
-define DOWNLOAD_TEMPLATE_NO_MD5
-@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(2))
-	$(V1) ( \
-		cd "$(DL_DIR)" && \
-		$(ECHO) $(MSG_DOWNLOADING) $(1) && \
-		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(2)" "$(1)"; \
-	)
-endef
 
 ##############################
 #
@@ -378,51 +369,6 @@ $(1)_distclean:
 	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $(DL_DIR)/$(5))
 	$(V1) [ ! -f "$(DL_DIR)/$(5)" ]     || $(RM) "$(DL_DIR)/$(5)"
 	$(V1) [ ! -f "$(DL_DIR)/$(5).md5" ] || $(RM) "$(DL_DIR)/$(5).md5"
-
-endef
-
-##############################
-#
-# No MD5 common tool install template
-#  $(1) = tool name
-#  $(2) = tool extract/build directory
-#  $(3) = tool distribution URL
-#  $(4) = tool distribution file
-#  $(5) = optional extra build recipes template
-#  $(6) = optional extra clean recipes template
-#
-##############################
-# Note that the following creates a subdirectory for the tool as it is
-# assumed to not have the correct top level naming
-##############################
-
-define TOOL_INSTALL_TEMPLATE_NO_MD5
-
-.PHONY: $(addprefix $(1)_, install clean distclean)
-
-$(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
-	
-	$(call DOWNLOAD_TEMPLATE_NO_MD5,$(3),$(4))
-	
-	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
-	$(V1) $(MKDIR) -p $$(call toprel, $(2))
-
-	$(if $(filter $(suffix $(4)), .zip),
-		$(V1) $(UNZIP) $(UNZIP_SILENT) -d $$(call toprel, $(2)) $$(call toprel, $(DL_DIR)/$(4)),
-		$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(2)) -xf $$(call toprel, $(DL_DIR)/$(4))
-	)
-
-	$(5)
-
-$(1)_clean:
-	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
-	$(V1) [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
-
-	$(6)
-
-$(1)_distclean:
-	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $(DL_DIR)/$(4))
-	$(V1) [ ! -f "$(DL_DIR)/$(4)" ]     || $(RM) "$(DL_DIR)/$(4)"
 
 endef
 
@@ -672,7 +618,7 @@ endef
 #
 ##############################
 
-$(eval $(call TOOL_INSTALL_TEMPLATE_NO_MD5,avr_sdk,$(AVR_SDK_DIR),$(AVR_SDK_URL),$(notdir $(AVR_SDK_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,avr_sdk,$(AVR_SDK_DIR),$(AVR_SDK_URL),$(AVR_SDK_MD5_URL),$(notdir $(AVR_SDK_URL))))
 
 ifeq ($(shell [ -d "$(AVR_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export AVR_SDK_PREFIX

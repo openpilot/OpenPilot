@@ -71,12 +71,14 @@ ifeq ($(UNAME), Linux)
         QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-linux-x86-5.4.1.run.md5
         QT_SDK_ARCH := gcc
     endif
+    AVR_SDK_PREFIX := $(AVR_SDK_DIR)/bin/avr-
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-mac.tar.bz2/+md5
     AVR_SDK_URL := http://blog.spitzenpfeil.org/arduino/mirror_released/arduino-1.6.4-macosx.zip
+    AVR_SDK_PREFIX := $(AVR_SDK_DIR)/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-
     QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
     QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg.md5
     QT_SDK_ARCH := clang_64
@@ -89,6 +91,7 @@ else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.9/4.9-2014-q4-major/+download/gcc-arm-none-eabi-4_9-2014q4-20141203-win32.zip/+md5
     AVR_SDK_URL := http://blog.spitzenpfeil.org/arduino/mirror_released/arduino-1.6.4-windows.zip
+    AVR_SDK_PREFIX := $(AVR_SDK_DIR)/hardware/tools/avr/bin/avr-
     QT_SDK_URL     := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
     QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe.md5
     QT_SDK_ARCH    := mingw491_32
@@ -668,13 +671,11 @@ endef
 # AVR SDK
 #
 ##############################
-# Note that this is currently OS X specific
-##############################
 
 $(eval $(call TOOL_INSTALL_TEMPLATE_NO_MD5,avr_sdk,$(AVR_SDK_DIR),$(AVR_SDK_URL),$(notdir $(AVR_SDK_URL))))
 
 ifeq ($(shell [ -d "$(AVR_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    export AVR_SDK_PREFIX := $(AVR_SDK_DIR)/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-
+    export AVR_SDK_PREFIX
 else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(AVR_SDK_DIR)) not found (make avr_sdk_install), using system PATH)

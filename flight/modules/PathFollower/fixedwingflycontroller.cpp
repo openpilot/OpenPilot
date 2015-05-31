@@ -63,6 +63,7 @@ void FixedWingFlyController::Activate(void)
         SettingsUpdated();
         resetGlobals();
         mMode   = pathDesired->Mode;
+        lastAirspeedUpdate = 0;
     }
 }
 
@@ -227,10 +228,11 @@ void FixedWingFlyController::updatePathVelocity(float kFF, bool limited)
  */
 uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
 {
-    uint8_t result = 1;
-    bool cutThrust = false;
+    uint8_t result   = 1;
+    bool cutThrust   = false;
+    bool hasAirspeed = true;
 
-    const float dT = fixedWingSettings->UpdatePeriod / 1000.0f;
+    const float dT   = fixedWingSettings->UpdatePeriod / 1000.0f;
 
     VelocityDesiredData velocityDesired;
     VelocityStateData velocityState;
@@ -243,7 +245,7 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     float groundspeedProjection;
     float indicatedAirspeedState;
     float indicatedAirspeedDesired;
-    float airspeedError;
+    float airspeedError = 0.0f;
 
     float pitchCommand;
 
@@ -266,56 +268,99 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     AirspeedStateGet(&airspeedState);
     SystemSettingsGet(&systemSettings);
 
+
     /**
      * Compute speed error and course
      */
-    // missing sensors for airspeed-direction we have to assume within
-    // reasonable error that measured airspeed is actually the airspeed
-    // component in forward pointing direction
-    // airspeedVector is normalized
-    airspeedVector[0]     = cos_lookup_deg(attitudeState.Yaw);
-    airspeedVector[1]     = sin_lookup_deg(attitudeState.Yaw);
 
-    // current ground speed projected in forward direction
-    groundspeedProjection = velocityState.North * airspeedVector[0] + velocityState.East * airspeedVector[1];
-
-    // note that airspeedStateBias is ( calibratedAirspeed - groundspeedProjection ) at the time of measurement,
-    // but thanks to accelerometers,  groundspeedProjection reacts faster to changes in direction
-    // than airspeed and gps sensors alone
-    indicatedAirspeedState = groundspeedProjection + indicatedAirspeedStateBias;
-
-    // fluidMovement is a vector describing the aproximate movement vector of
-    // the surrounding fluid in 2d space (aka wind vector)
-    fluidMovement[0] = velocityState.North - (indicatedAirspeedState * airspeedVector[0]);
-    fluidMovement[1] = velocityState.East - (indicatedAirspeedState * airspeedVector[1]);
-
-    // calculate the movement vector we need to fly to reach velocityDesired -
-    // taking fluidMovement into account
-    courseComponent[0] = velocityDesired.North - fluidMovement[0];
-    courseComponent[1] = velocityDesired.East - fluidMovement[1];
-
-    indicatedAirspeedDesired = boundf(sqrtf(courseComponent[0] * courseComponent[0] + courseComponent[1] * courseComponent[1]),
-                                      fixedWingSettings->HorizontalVelMin,
-                                      fixedWingSettings->HorizontalVelMax);
-
-    // if we could fly at arbitrary speeds, we'd just have to move towards the
-    // courseComponent vector as previously calculated and we'd be fine
-    // unfortunately however we are bound by min and max air speed limits, so
-    // we need to recalculate the correct course to meet at least the
-    // velocityDesired vector direction at our current speed
-    // this overwrites courseComponent
-    bool valid = correctCourse(courseComponent, (float *)&velocityDesired.North, fluidMovement, indicatedAirspeedDesired);
-
-    // Error condition: wind speed too high, we can't go where we want anymore
-    fixedWingPathFollowerStatus.Errors.Wind = 0;
-    if ((!valid) &&
-        fixedWingSettings->Safetymargins.Wind > 0.5f) { // alarm switched on
-        fixedWingPathFollowerStatus.Errors.Wind = 1;
+    // check for airspeed sensor
+    fixedWingPathFollowerStatus.Errors.AirspeedSensor = 0;
+    if (fixedWingSettings->UseAirspeedSensor == FIXEDWINGPATHFOLLOWERSETTINGS_USEAIRSPEEDSENSOR_FALSE) {
+        // fallback algo triggered voluntarily
+        hasAirspeed = false;
+        fixedWingPathFollowerStatus.Errors.AirspeedSensor = 1;
+    } else if (PIOS_DELAY_GetuSSince(lastAirspeedUpdate) > 1000000) {
+        // no airspeed update in one second, assume airspeed sensor failure
+        hasAirspeed = false;
         result = 0;
+        fixedWingPathFollowerStatus.Errors.AirspeedSensor = 1;
     }
 
-    // Airspeed error
-    airspeedError = indicatedAirspeedDesired - indicatedAirspeedState;
+
+    if (hasAirspeed) {
+        // missing sensors for airspeed-direction we have to assume within
+        // reasonable error that measured airspeed is actually the airspeed
+        // component in forward pointing direction
+        // airspeedVector is normalized
+        airspeedVector[0]     = cos_lookup_deg(attitudeState.Yaw);
+        airspeedVector[1]     = sin_lookup_deg(attitudeState.Yaw);
+
+        // current ground speed projected in forward direction
+        groundspeedProjection = velocityState.North * airspeedVector[0] + velocityState.East * airspeedVector[1];
+
+        // note that airspeedStateBias is ( calibratedAirspeed - groundspeedProjection ) at the time of measurement,
+        // but thanks to accelerometers,  groundspeedProjection reacts faster to changes in direction
+        // than airspeed and gps sensors alone
+        indicatedAirspeedState = groundspeedProjection + indicatedAirspeedStateBias;
+
+        // fluidMovement is a vector describing the aproximate movement vector of
+        // the surrounding fluid in 2d space (aka wind vector)
+        fluidMovement[0] = velocityState.North - (indicatedAirspeedState * airspeedVector[0]);
+        fluidMovement[1] = velocityState.East - (indicatedAirspeedState * airspeedVector[1]);
+
+        // calculate the movement vector we need to fly to reach velocityDesired -
+        // taking fluidMovement into account
+        courseComponent[0] = velocityDesired.North - fluidMovement[0];
+        courseComponent[1] = velocityDesired.East - fluidMovement[1];
+
+        indicatedAirspeedDesired = boundf(sqrtf(courseComponent[0] * courseComponent[0] + courseComponent[1] * courseComponent[1]),
+                                          fixedWingSettings->HorizontalVelMin,
+                                          fixedWingSettings->HorizontalVelMax);
+
+        // if we could fly at arbitrary speeds, we'd just have to move towards the
+        // courseComponent vector as previously calculated and we'd be fine
+        // unfortunately however we are bound by min and max air speed limits, so
+        // we need to recalculate the correct course to meet at least the
+        // velocityDesired vector direction at our current speed
+        // this overwrites courseComponent
+        bool valid = correctCourse(courseComponent, (float *)&velocityDesired.North, fluidMovement, indicatedAirspeedDesired);
+
+        // Error condition: wind speed too high, we can't go where we want anymore
+        fixedWingPathFollowerStatus.Errors.Wind = 0;
+        if ((!valid) &&
+            fixedWingSettings->Safetymargins.Wind > 0.5f) { // alarm switched on
+            fixedWingPathFollowerStatus.Errors.Wind = 1;
+            result = 0;
+        }
+
+        // Airspeed error
+        airspeedError = indicatedAirspeedDesired - indicatedAirspeedState;
+
+        // Error condition: plane too slow or too fast
+        fixedWingPathFollowerStatus.Errors.Highspeed = 0;
+        fixedWingPathFollowerStatus.Errors.Lowspeed  = 0;
+        if (indicatedAirspeedState > systemSettings.AirSpeedMax * fixedWingSettings->Safetymargins.Overspeed) {
+            fixedWingPathFollowerStatus.Errors.Overspeed = 1;
+            result = 0;
+        }
+        if (indicatedAirspeedState > fixedWingSettings->HorizontalVelMax * fixedWingSettings->Safetymargins.Highspeed) {
+            fixedWingPathFollowerStatus.Errors.Highspeed = 1;
+            result = 0;
+            cutThrust = true;
+        }
+        if (indicatedAirspeedState < fixedWingSettings->HorizontalVelMin * fixedWingSettings->Safetymargins.Lowspeed) {
+            fixedWingPathFollowerStatus.Errors.Lowspeed = 1;
+            result = 0;
+        }
+        if (indicatedAirspeedState < systemSettings.AirSpeedMin * fixedWingSettings->Safetymargins.Stallspeed) {
+            fixedWingPathFollowerStatus.Errors.Stallspeed = 1;
+            result = 0;
+        }
+        if (indicatedAirspeedState < fixedWingSettings->HorizontalVelMin * fixedWingSettings->Safetymargins.Lowspeed - fixedWingSettings->SafetyCutoffLimits.MaxDecelerationDeltaMPS) {
+            cutThrust = true;
+            result    = 0;
+        }
+    }
 
     // Vertical speed error
     descentspeedDesired = boundf(
@@ -324,41 +369,19 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
         fixedWingSettings->VerticalVelMax);
     descentspeedError = descentspeedDesired - velocityState.Down;
 
-    // Error condition: plane too slow or too fast
-    fixedWingPathFollowerStatus.Errors.Highspeed = 0;
-    fixedWingPathFollowerStatus.Errors.Lowspeed  = 0;
-    if (indicatedAirspeedState > systemSettings.AirSpeedMax * fixedWingSettings->Safetymargins.Overspeed) {
-        fixedWingPathFollowerStatus.Errors.Overspeed = 1;
-        result = 0;
-    }
-    if (indicatedAirspeedState > fixedWingSettings->HorizontalVelMax * fixedWingSettings->Safetymargins.Highspeed) {
-        fixedWingPathFollowerStatus.Errors.Highspeed = 1;
-        result = 0;
-        cutThrust = true;
-    }
-    if (indicatedAirspeedState < fixedWingSettings->HorizontalVelMin * fixedWingSettings->Safetymargins.Lowspeed) {
-        fixedWingPathFollowerStatus.Errors.Lowspeed = 1;
-        result = 0;
-    }
-    if (indicatedAirspeedState < systemSettings.AirSpeedMin * fixedWingSettings->Safetymargins.Stallspeed) {
-        fixedWingPathFollowerStatus.Errors.Stallspeed = 1;
-        result = 0;
-    }
-    if (indicatedAirspeedState < fixedWingSettings->HorizontalVelMin * fixedWingSettings->Safetymargins.Lowspeed - fixedWingSettings->SafetyCutoffLimits.MaxDecelerationDeltaMPS) {
-        cutThrust = true;
-        result    = 0;
-    }
-
     /**
      * Compute desired thrust command
      */
 
     // Compute the cross feed from vertical speed to pitch, with saturation
-    float speedErrorToPowerCommandComponent = boundf(
-        (airspeedError / fixedWingSettings->HorizontalVelMin) * fixedWingSettings->AirspeedToPowerCrossFeed.Kp,
-        -fixedWingSettings->AirspeedToPowerCrossFeed.Max,
-        fixedWingSettings->AirspeedToPowerCrossFeed.Max
-        );
+    float speedErrorToPowerCommandComponent = 0.0f;
+    if (hasAirspeed) {
+        speedErrorToPowerCommandComponent = boundf(
+            (airspeedError / fixedWingSettings->HorizontalVelMin) * fixedWingSettings->AirspeedToPowerCrossFeed.Kp,
+            -fixedWingSettings->AirspeedToPowerCrossFeed.Max,
+            fixedWingSettings->AirspeedToPowerCrossFeed.Max
+            );
+    }
 
     // Compute final thrust response
     powerCommand = pid_apply(&PIDpower, -descentspeedError, dT) +
@@ -404,34 +427,40 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     /**
      * Compute desired pitch command
      */
-    // Compute the cross feed from vertical speed to pitch, with saturation
-    float verticalSpeedToPitchCommandComponent = boundf(-descentspeedError * fixedWingSettings->VerticalToPitchCrossFeed.Kp,
-                                                        -fixedWingSettings->VerticalToPitchCrossFeed.Max,
-                                                        fixedWingSettings->VerticalToPitchCrossFeed.Max
-                                                        );
+    if (hasAirspeed) {
+        // Compute the cross feed from vertical speed to pitch, with saturation
+        float verticalSpeedToPitchCommandComponent = boundf(-descentspeedError * fixedWingSettings->VerticalToPitchCrossFeed.Kp,
+                                                            -fixedWingSettings->VerticalToPitchCrossFeed.Max,
+                                                            fixedWingSettings->VerticalToPitchCrossFeed.Max
+                                                            );
 
-    // Compute the pitch command as err*Kp + errInt*Ki + X_feed.
-    pitchCommand = -pid_apply(&PIDspeed, airspeedError, dT) + verticalSpeedToPitchCommandComponent;
+        // Compute the pitch command as err*Kp + errInt*Ki + X_feed.
+        pitchCommand = -pid_apply(&PIDspeed, airspeedError, dT) + verticalSpeedToPitchCommandComponent;
 
-    fixedWingPathFollowerStatus.Error.Speed    = airspeedError;
-    fixedWingPathFollowerStatus.ErrorInt.Speed = PIDspeed.iAccumulator;
-    fixedWingPathFollowerStatus.Command.Speed  = pitchCommand;
+        fixedWingPathFollowerStatus.Error.Speed    = airspeedError;
+        fixedWingPathFollowerStatus.ErrorInt.Speed = PIDspeed.iAccumulator;
+        fixedWingPathFollowerStatus.Command.Speed  = pitchCommand;
 
-    stabDesired.Pitch = boundf(fixedWingSettings->PitchLimit.Neutral + pitchCommand,
-                               fixedWingSettings->PitchLimit.Min,
-                               fixedWingSettings->PitchLimit.Max);
+        stabDesired.Pitch = boundf(fixedWingSettings->PitchLimit.Neutral + pitchCommand,
+                                   fixedWingSettings->PitchLimit.Min,
+                                   fixedWingSettings->PitchLimit.Max);
 
-    // Error condition: high speed dive
-    fixedWingPathFollowerStatus.Errors.Pitchcontrol = 0;
-    if (fixedWingSettings->PitchLimit.Neutral + pitchCommand >= fixedWingSettings->PitchLimit.Max && // pitch demand is full up
-        velocityState.Down > 0.0f && // we ARE going down
-        descentspeedDesired < 0.0f && // we WANT to go up
-        airspeedError < 0.0f && // we are too fast already
-        fixedWingSettings->Safetymargins.Pitchcontrol > 0.5f) { // alarm switched on
-        fixedWingPathFollowerStatus.Errors.Pitchcontrol = 1;
-        result = 0;
-        cutThrust = true;
+        // Error condition: high speed dive
+        fixedWingPathFollowerStatus.Errors.Pitchcontrol = 0;
+        if (fixedWingSettings->PitchLimit.Neutral + pitchCommand >= fixedWingSettings->PitchLimit.Max && // pitch demand is full up
+            velocityState.Down > 0.0f && // we ARE going down
+            descentspeedDesired < 0.0f && // we WANT to go up
+            airspeedError < 0.0f && // we are too fast already
+            fixedWingSettings->Safetymargins.Pitchcontrol > 0.5f) { // alarm switched on
+            fixedWingPathFollowerStatus.Errors.Pitchcontrol = 1;
+            result = 0;
+            cutThrust = true;
+        }
+    } else {
+        // no airspeed sensor means we fly with constant pitch, like for landing pathfollower
+        stabDesired.Pitch = fixedWingSettings->LandingPitch;
     }
+
     // Error condition: pitch way out of wack
     if (fixedWingSettings->Safetymargins.Pitchcontrol > 0.5f &&
         (attitudeState.Pitch < fixedWingSettings->PitchLimit.Min - fixedWingSettings->SafetyCutoffLimits.PitchDeg ||
@@ -445,7 +474,12 @@ uint8_t FixedWingFlyController::updateFixedDesiredAttitude()
     /**
      * Compute desired roll command
      */
-    courseError = RAD2DEG(atan2f(courseComponent[1], courseComponent[0])) - attitudeState.Yaw;
+    if (hasAirspeed) {
+        courseError = RAD2DEG(atan2f(courseComponent[1], courseComponent[0])) - attitudeState.Yaw;
+    } else {
+        // fallback based on effective movement direction when in fallback mode, hope that airspeed > wind velocity, or we will never get home
+        courseError = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North)) - RAD2DEG(atan2f(velocityState.East, velocityState.North));
+    }
 
     if (courseError < -180.0f) {
         courseError += 360.0f;
@@ -632,4 +666,6 @@ void FixedWingFlyController::AirspeedStateUpdatedCb(__attribute__((unused)) UAVO
     // changes to groundspeed to offset the airspeed by the same measurement.
     // This has a side effect that in the absence of any airspeed updates, the
     // pathfollower will fly using groundspeed.
+
+    lastAirspeedUpdate = PIOS_DELAY_GetuS();
 }

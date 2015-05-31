@@ -70,6 +70,7 @@ private:
     void updatePathVelocity(float kFF, bool limited);
     uint8_t updateFixedDesiredAttitude();
     bool correctCourse(float *C, float *V, float *F, float s);
+    int32_t lastAirspeedUpdate;
 
     struct pid PIDposH[2];
     struct pid PIDposV;

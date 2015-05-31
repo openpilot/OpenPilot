@@ -20,6 +20,9 @@
         <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.4"/>
                 <!-- proportional coefficient for desired vertical speed in relation to altitude displacement-->
 
+	<field name="UseAirspeedSensor" units="bool" type="enum" elements="1" options="False,True" defaultvalue="True"/>
+		<!-- allows to ignore the airspeed sensor, set to false if you have none, which will trigger fallback algorithm without indicating a fault -->
+
         <!-- these coefficients control actual control outputs -->
         <field name="CoursePI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
                 <!-- coefficients for desired bank angle in relation to ground bearing error - this controls heading -->

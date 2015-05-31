@@ -4,7 +4,7 @@
 	<field name="Error" units="" type="float" elementnames="Course,Speed,Power" />
 	<field name="ErrorInt" units="" type="float" elementnames="Course,Speed,Power" />
 	<field name="Command" units="" type="float" elementnames="Course,Speed,Power" />
-	<field name="Errors" units="" type="uint8" elementnames="Wind,Stallspeed,Lowspeed,Highspeed,Overspeed,Lowpower,Highpower,Rollcontrol,Pitchcontrol" />
+	<field name="Errors" units="" type="uint8" elementnames="Wind,Stallspeed,Lowspeed,Highspeed,Overspeed,Lowpower,Highpower,Rollcontrol,Pitchcontrol,AirspeedSensor" />
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="500"/>

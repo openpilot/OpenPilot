@@ -56,7 +56,7 @@ endif
 ##############################
 
 AVR_SDK_HOST := http://blog.spitzenpfeil.org/arduino/mirror_released
-AVR_SDK_MD5_HOST := file:///Users/steve/Downloads/ArduinoArchives
+AVR_SDK_MD5_HOST := https://wiki.openpilot.org/download/attachments/5472258
 
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
@@ -77,6 +77,7 @@ else
         QT_SDK_ARCH := gcc
     endif
     AVR_SDK_PREFIX = $(AVR_SDK_DIR)/bin/avr-
+    AVR_SDK_ARDUINO_BASE = $(AVR_SDK_DIR)/hardware/arduino/avr
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
@@ -85,6 +86,7 @@ else ifeq ($(UNAME), Darwin)
     AVR_SDK_URL := $(AVR_SDK_HOST)/arduino-1.6.4-macosx.zip
     AVR_SDK_MD5_URL := $(AVR_SDK_MD5_HOST)/arduino-1.6.4-macosx.zip.md5
     AVR_SDK_PREFIX = $(AVR_SDK_DIR)/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-
+    AVR_SDK_ARDUINO_BASE = $(AVR_SDK_DIR)/Arduino.app/Contents/Java/hardware/arduino/avr
     QT_SDK_URL  := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
     QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg.md5
     QT_SDK_ARCH := clang_64
@@ -99,6 +101,7 @@ else ifeq ($(UNAME), Windows)
     AVR_SDK_URL := $(AVR_SDK_HOST)/arduino-1.6.4-windows.zip
     AVR_SDK_MD5_URL := $(AVR_SDK_MD5_HOST)/arduino-1.6.4-windows.zip.md5
     AVR_SDK_PREFIX = $(AVR_SDK_DIR)/hardware/tools/avr/bin/avr-
+    AVR_SDK_ARDUINO_BASE = $(AVR_SDK_DIR)/hardware/arduino/avr
     QT_SDK_URL     := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
     QT_SDK_MD5_URL := http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe.md5
     QT_SDK_ARCH    := mingw491_32
@@ -116,7 +119,8 @@ endif
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
 ARM_SDK_DIR    := $(TOOLS_DIR)/gcc-arm-none-eabi-4_9-2014q4
-AVR_SDK_DIR    := $(TOOLS_DIR)/arduino-1.6.4/
+export AVR_SDK_DIR    := $(TOOLS_DIR)/arduino-1.6.4/
+export AVR_SDK_ARDUINO_BASE
 QT_SDK_DIR     := $(TOOLS_DIR)/qt-5.4.1
 UNCRUSTIFY_DIR := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR    := $(TOOLS_DIR)/doxygen-1.8.3.1
@@ -145,7 +149,9 @@ QT_SDK_PREFIX := $(QT_SDK_DIR)
 #
 ##############################
 
-BUILD_SDK_TARGETS := arm_sdk avr_sdk qt_sdk
+# Exclude AVR tools for now
+# BUILD_SDK_TARGETS := arm_sdk avr_sdk qt_sdk
+BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
     BUILD_SDK_TARGETS += sdl nsis mesawin openssl 
 endif

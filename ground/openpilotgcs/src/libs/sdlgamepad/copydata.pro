@@ -4,7 +4,7 @@ equals(copydata, 1) {
         SDL_DLLS = \
             SDL.dll
         for(dll, SDL_DLLS) {
-            addCopyFileTarget($${dll},$${SDL_DIR}/bin,$${GCS_APP_PATH})
+            addCopyFileTarget($${SDL_DIR}/bin/$${dll},$${GCS_APP_PATH}/$${dll})
         }
     }
 }

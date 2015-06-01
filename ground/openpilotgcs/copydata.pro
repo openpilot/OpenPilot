@@ -31,7 +31,7 @@ equals(copyqt, 1) {
                   libicuuc.so.53 \
                   libicudata.so.53
         for(lib, QT_LIBS) {
-            addCopyFileTarget($${lib},$$[QT_INSTALL_LIBS],$${GCS_QT_LIBRARY_PATH})
+            addCopyFileTarget($$[QT_INSTALL_LIBS]/$${lib},$${GCS_QT_LIBRARY_PATH}/$${lib})
         }
 
         QT_PLUGINS = iconengines/libqsvgicon.so \
@@ -79,7 +79,7 @@ equals(copyqt, 1) {
                    libstdc++-6.dll \
                    libwinpthread-1.dll
         for(dll, QT_DLLS) {
-            addCopyFileTarget($${dll},$$[QT_INSTALL_BINS],$${GCS_APP_PATH})
+            addCopyFileTarget($$[QT_INSTALL_BINS]/$${dll},$${GCS_APP_PATH}/$${dll})
         }
 
         # copy OpenSSL DLLs
@@ -87,14 +87,14 @@ equals(copyqt, 1) {
             ssleay32.dll \
             libeay32.dll
         for(dll, OPENSSL_DLLS) {
-            addCopyFileTarget($${dll},$${OPENSSL_DIR},$${GCS_APP_PATH})
+            addCopyFileTarget($${OPENSSL_DIR}/$${dll},$${GCS_APP_PATH}/$${dll})
         }
 
         # copy OpenGL DLL
         OPENGL_DLLS = \
             opengl32_32/opengl32.dll
         for(dll, OPENGL_DLLS) {
-            addCopyFileTarget($${dll},$${MESAWIN_DIR},$${GCS_APP_PATH})
+            addCopyFileTarget($${MESAWIN_DIR}/$${dll},$${GCS_APP_PATH}/$${dll})
         }
 
         QT_PLUGINS = iconengines/qsvgicon$${DS}.dll \
@@ -110,7 +110,7 @@ equals(copyqt, 1) {
     }
 
     for(plugin, QT_PLUGINS) {
-        addCopyFileTarget($${plugin},$$[QT_INSTALL_PLUGINS],$${GCS_QT_PLUGINS_PATH})
+        addCopyFileTarget($$[QT_INSTALL_PLUGINS]/$${plugin},$${GCS_QT_PLUGINS_PATH}/$${plugin})
     }
 
     # Copy QtQuick2 complete directories
@@ -126,6 +126,6 @@ equals(copyqt, 1) {
                      QtQuick/XmlListModel \
                      QtQuick.2
     for(dir, QT_QUICK2_DIRS) {
-        addCopyDirTarget($${dir},$$[QT_INSTALL_QML],$${GCS_QT_QML_PATH})
+        addCopyDirFilesTargets($$[QT_INSTALL_QML]/$${dir},$${GCS_QT_QML_PATH}/$${dir})
     }
 }

@@ -7,7 +7,7 @@ DATACOLLECTIONS = cloudconfig default_configurations dials models pfd sounds dia
 equals(copydata, 1) {
     for(dir, DATACOLLECTIONS) {
         exists($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir) {
-            addCopyDirTarget($$dir, $$GCS_SOURCE_TREE/share/openpilotgcs, $$GCS_DATA_PATH)
+            addCopyDirFilesTargets($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir, $$GCS_DATA_PATH/$$dir)
         }
     }
 }

@@ -28,17 +28,16 @@ defineReplace(qtLibraryName) {
    return($$RET)
 }
 
+# Adds a target $$2 with a rule to copy $$1 to $$2
 defineTest(addCopyFileTarget) {
-    file = $$1
-    src  = $$2/$$1
-    dest = $$3/$$1
+    file = $$replace(1, "^[a-zA-Z0-9_]", "-")
 
-    $${file}.target    = $$dest
-    $${file}.depends   = $$src
+    $${file}.target    = $$2
+    $${file}.depends   = $$1
 
     # create directory. Better would be an order only dependency
-    $${file}.commands  = -@$(MKDIR) \"$$dirname(dest)\" $$addNewline()
-    $${file}.commands += $(COPY_FILE) \"$$src\" \"$$dest\"
+    $${file}.commands  = -@$(MKDIR) $$shell_quote($$dirname(2)) $$addNewline()
+    $${file}.commands += $(COPY_FILE) $$shell_quote($$1) $$shell_quote($$2)
 
     QMAKE_EXTRA_TARGETS += $$file
     POST_TARGETDEPS += $$eval($${file}.target)
@@ -52,29 +51,13 @@ defineTest(addCopyFileTarget) {
     return(true)
 }
 
-defineTest(addCopyDirTarget) {
-    dir  = $$1
-    src  = $$2/$$1
-    dest = $$3/$$1
+# Adds targets and rules to copy files within $$1 into $$2
+defineTest(addCopyDirFilesTargets) {
+    files = $$system(cd $$system_quote($$1) && find  -type f, lines)
 
-    $${dir}.target    = $$dest
-    $${dir}.depends   = $$src
-    # Windows does not update directory timestamp if files are modified
-    win32: $${dir}.depends += FORCE
-
-    $${dir}.commands  = @rm -rf \"$$dest\" $$addNewline()
-    # create directory. Better would be an order only dependency
-    $${dir}.commands += -@$(MKDIR) \"$$dirname(dest)\" $$addNewline()
-    $${dir}.commands += $(COPY_DIR) \"$$src\" \"$$dest\"
-
-    QMAKE_EXTRA_TARGETS += $$dir
-    POST_TARGETDEPS += $$eval($${dir}.target)
-
-    export($${dir}.target)
-    export($${dir}.depends)
-    export($${dir}.commands)
-    export(QMAKE_EXTRA_TARGETS)
-    export(POST_TARGETDEPS)
+    for(file, files) {
+        addCopyFileTarget($$1/$$file, $$2/$$file)
+    }
 
     return(true)
 }

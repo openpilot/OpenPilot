@@ -44,7 +44,7 @@ equals(copydata, 1) {
                 cc_plugin.ini \
                 plugin.txt
         for(res, PLUGIN_RESOURCES) {
-            addCopyFileTarget($${res},$${RES_DIR},$${PLUGIN_DIR})
+            addCopyFileTarget($${RES_DIR}/$${res},$${PLUGIN_DIR}/$${res})
         }
 
         # Qt DLLs
@@ -52,7 +52,7 @@ equals(copydata, 1) {
                   Qt5Core.dll \
                   Qt5Network.dll
         for(dll, QT_DLLS) {
-            addCopyFileTarget($${dll},$$[QT_INSTALL_BINS],$${SIM_DIR})
+            addCopyFileTarget($$[QT_INSTALL_BINS]/$${dll},$${SIM_DIR}/$${dll})
         }
 
         # MinGW DLLs
@@ -60,7 +60,7 @@ equals(copydata, 1) {
         #             libgcc_s_dw2-1.dll \
         #             mingwm10.dll
         #for(dll, MINGW_DLLS) {
-        #    addCopyFileTarget($${dll},$$(QTMINGW),$${SIM_DIR})
+        #    addCopyFileTarget($$(QTMINGW)/$${dll},$${SIM_DIR}/$${dll})
         #}
     }
 }

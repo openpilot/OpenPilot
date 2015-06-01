@@ -112,9 +112,12 @@ function unpack_obj(obj,data) {
       }
       return null;
     } else {
+      if(obj.name === 'AccelGyroSettings')
+      {
+	console.log("meh AccelGyroSettings wants to act goofy, lets skip it for now");
+	return null;
+      }
       var objdata = unpack_obj(obj,packet.data);
-
-	console.log(objdata);
 
       if ( objdata === null ) {
 	console.log("Null object");

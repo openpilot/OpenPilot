@@ -134,14 +134,12 @@ fs.open(sampleTxt, 'r', function(status, fd) {
 
   	if(!info) {
 	  console.log("NO data");
-    	  return;
+    	  state = 0;
   	}
-
-      console.log(info.name);
-      console.log(info);
-
-//    console.log(headerbuffer);
-//    console.log(message);
+        else
+	{
+	      console.log(info);
+	}
 
       index++;
         state = 0;
@@ -159,5 +157,5 @@ fs.open(sampleTxt, 'r', function(status, fd) {
 }
 
 // Allow parser to load JSON files before attempting to parse. 
-setTimeout(parseLog, 1000); // give decoder time to load the UAVOfiles
+setTimeout(parseLog, 2000); // give decoder time to load the UAVOfiles
 

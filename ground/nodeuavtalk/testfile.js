@@ -79,13 +79,14 @@ fs.open(sampleTxt, 'r', function(status, fd) {
     b.write("<");
 
     while(index < fileSizeInBytes) {
-      console.log("TOP state: " + state + ", index: " + index + ", fileSizeInBytes: " + fileSizeInBytes);
+//      console.log("TOP state: " + state + ", index: " + index +  ", fileSizeInBytes: " + fileSizeInBytes);
       if(state === 0) {
         // sync
         if(data[index] !== 0x3c) {
 //          console.log("Missed sync");
           ++index;
-        } else {
+        } 
+        else {
           headerbuffer[0] = 0x3c;
           headerbufferlen = 1;
           ++state;
@@ -98,6 +99,7 @@ fs.open(sampleTxt, 'r', function(status, fd) {
         data.copy(headerbuffer,headerbufferlen,index,index + tocopy);
         headerbufferlen += tocopy;
         index += tocopy;
+
         if(headerbufferlen === 10) {
           // Decode the header
           var header = bufferpack.unpack("<BBHiH",headerbuffer);
@@ -128,15 +130,15 @@ fs.open(sampleTxt, 'r', function(status, fd) {
       } else if(state === 3) {
         message.crc = data[index];
 
-  	var data = uavtalk_decoder.decode(message);
+  	var info = uavtalk_decoder.decode(message);
 
-  	if(!data) {
+  	if(!info) {
 	  console.log("NO data");
     	  return;
   	}
 
-      console.log(data.name);
-      console.log(data);
+      console.log(info.name);
+      console.log(info);
 
 //    console.log(headerbuffer);
 //    console.log(message);

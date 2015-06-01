@@ -113,7 +113,17 @@ function unpack_obj(obj,data) {
       return null;
     } else {
       var objdata = unpack_obj(obj,packet.data);
-      objdata.name = obj.name;
+
+	console.log(objdata);
+
+      if ( objdata === null ) {
+	console.log("Null object");
+	warned[packet.object_id] = true;
+	return null;
+      }
+      else {
+        objdata.name = obj.name; 
+      }
       return objdata;
     }
     }

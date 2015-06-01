@@ -79,7 +79,7 @@ fs.open(sampleTxt, 'r', function(status, fd) {
     b.write("<");
 
     while(index < fileSizeInBytes) {
-      //console.log("TOP state: " + state + ", index: " + index + ", fileSizeInBytes: " + fileSizeInBytes);
+      console.log("TOP state: " + state + ", index: " + index + ", fileSizeInBytes: " + fileSizeInBytes);
       if(state === 0) {
         // sync
         if(data[index] !== 0x3c) {
@@ -135,15 +135,6 @@ fs.open(sampleTxt, 'r', function(status, fd) {
     	  return;
   	}
 
-  	var info = heard[data.name];
-  	if(!info) {
-    		info = {
-      		last: t,
-      		count: 0
-    	}
-    	heard[data.name] = info;
-      }
-      info.count++;
       console.log(data.name);
       console.log(data);
 

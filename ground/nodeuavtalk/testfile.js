@@ -12,6 +12,7 @@ var uavtalk_decoder = uavtalk_decode.decoder("../../build/uavobject-synthetics/j
 var sampleTxt = process.argv[2];
 var stats = fs.statSync(sampleTxt)
 var fileSizeInBytes = stats["size"]
+var t = new Date().getTime();
 
 function lshift(num, bits) {
   return num * Math.pow(2,bits);
@@ -23,6 +24,17 @@ function min(a,b) {
   } else {
     return b;
   }
+}
+
+function parseLog() {
+
+if(!uavtalk_decoder.ready()) {
+    console.log("JSON files may be missing, or decoded did not have enough time to parse the .json files");
+    return;
+}
+else
+{
+    console.log("UAVTalk Decoder is good to go");
 }
 
 fs.open(sampleTxt, 'r', function(status, fd) {
@@ -59,6 +71,8 @@ fs.open(sampleTxt, 'r', function(status, fd) {
     crc: null
   };
 
+  var heard = {};
+
     var index = 0;
     b = Buffer(1);
     b.clear();
@@ -69,7 +83,7 @@ fs.open(sampleTxt, 'r', function(status, fd) {
       if(state === 0) {
         // sync
         if(data[index] !== 0x3c) {
-        //  console.log("Missed sync");
+//          console.log("Missed sync");
           ++index;
         } else {
           headerbuffer[0] = 0x3c;
@@ -114,12 +128,32 @@ fs.open(sampleTxt, 'r', function(status, fd) {
       } else if(state === 3) {
         message.crc = data[index];
 
-//        callback(message);
-        console.log(message);
+  	var data = uavtalk_decoder.decode(message);
 
-        index++;
+  	if(!data) {
+	  console.log("NO data");
+    	  return;
+  	}
+
+  	var info = heard[data.name];
+  	if(!info) {
+    		info = {
+      		last: t,
+      		count: 0
+    	}
+    	heard[data.name] = info;
+      }
+      info.count++;
+      console.log(data.name);
+      console.log(data);
+
+//    console.log(headerbuffer);
+//    console.log(message);
+
+      index++;
         state = 0;
-      } else {
+      } 
+      else {
         throw("Unknown state");
       }
       if(index > fileSizeInBytes) {
@@ -128,3 +162,9 @@ fs.open(sampleTxt, 'r', function(status, fd) {
 
     }
 });
+
+}
+
+// Allow parser to load JSON files before attempting to parse. 
+setTimeout(parseLog, 1000); // give decoder time to load the UAVOfiles
+

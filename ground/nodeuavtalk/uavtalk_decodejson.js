@@ -34,6 +34,8 @@ function decoder(objpath) {
 		++count;
 		var filename = path.join(objpath,filename);
 		fs.readFile(filename, function(err, data){
+//	          Logging for debugging purposes
+//		  console.log("Reading " + filename);
 		  var json = JSON.parse(data);
 		  var unpackstr = "<"
 		  _.each(json.fields, function(f) {
@@ -100,6 +102,8 @@ function unpack_obj(obj,data) {
     ready: function() { return ready; },
     decode: function(packet) {
     var obj = uavobjects[packet.object_id];
+    // Logging for debugging purposes
+    // console.log(obj);
     if(!obj) {
       if(!warned[packet.object_id]) {
         console.log("JSON Failed to find object");

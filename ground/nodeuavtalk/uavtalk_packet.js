@@ -83,6 +83,9 @@ function parsernew(callback) {
       } else if(state === 3) {
         message.crc = data[index];
 	callback(message);
+//	Logging for debugging purposes
+//      console.log(headerbuffer);
+//      console.log(message);
 	index++;
 	state = 0;
       } else {

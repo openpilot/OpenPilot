@@ -143,6 +143,10 @@ bool FixedWingAutoTakeoffController::isUnsafe(void)
     if (speed > maxVelocity) {
         maxVelocity = speed;
     }
+    // too much total deceleration (crash, insufficient climbing power, ...)
+    if (speed < maxVelocity - fixedWingSettings->SafetyCutoffLimits.MaxDecelerationDeltaMPS) {
+        abort = true;
+    }
     AttitudeStateData attitude;
     AttitudeStateGet(&attitude);
     // too much bank angle

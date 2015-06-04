@@ -342,8 +342,9 @@ define TOOL_INSTALL_TEMPLATE
 
 $(if $(4), $(call DOWNLOAD_AND_CHECK_TEMPLATE,$(3),$(5),$(4)),$(call DOWNLOAD_TEMPLATE,$(3),$(5)))
 
-$(1)_install: $(1)_clean $(DL_DIR)/$(5) | $(TOOLS_DIR)
+$(2): $(DL_DIR)/$(5) | $(TOOLS_DIR)
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
+	$(V1) [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
 
 	$(if $(filter $(suffix $(5)), .zip),
@@ -352,6 +353,8 @@ $(1)_install: $(1)_clean $(DL_DIR)/$(5) | $(TOOLS_DIR)
 	)
 
 	$(6)
+
+$(1)_install: $(2)
 
 $(1)_clean:
 	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))

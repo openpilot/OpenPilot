@@ -63,7 +63,7 @@
 
 
 	<field name="TakeOffPitch" units="deg" type="float" elements="1" defaultvalue="25.0"/>
-	<field name="LandingPitch" units="deg" type="float" elements="1" defaultvalue="15.0"/>
+	<field name="LandingPitch" units="deg" type="float" elements="1" defaultvalue="7.5"/>
 
         <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
 

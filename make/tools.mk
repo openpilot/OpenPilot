@@ -294,22 +294,33 @@ endif
 # Cross platform download template
 #  $(1) = Package URL
 #  $(2) = Package file
-#  $(3) = URL for .md5 file to be tested against Package
 #
 ##############################
 
 define DOWNLOAD_TEMPLATE
-@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(2))
-	$(V1) ( \
-		cd "$(DL_DIR)" && \
-		$(CURL) $(CURL_OPTIONS) --silent -o "$(DL_DIR)/$(2).md5" "$(3)" && \
-		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(2),!=) ]; then \
-			$(ECHO) $(MSG_DOWNLOADING) $(1) && \
-			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(2)" "$(1)" && \
-			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(2)) && \
-			[ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(2),=) ]; \
-		fi; \
-	)
+$(2): | $(DL_DIR)
+	@$(ECHO) $(MSG_DOWNLOADING) $$(call toprel, $(DL_DIR)/$(2))
+	$(V1) $(CURL) $(CURL_OPTIONS) --silent -o "$(DL_DIR)/$(2)" "$(1)"
+endef
+
+##############################
+#
+# Cross platform download and check template
+#  $(1) = Package URL
+#  $(2) = Package file
+#  $(3) = URL for .md5 file to be tested against Package
+#
+##############################
+
+define DOWNLOAD_AND_CHECK_TEMPLATE
+$(call DOWNLOAD_TEMPLATE, $(3), $(2).md5)
+
+$(2): $(2).md5
+
+$(call DOWNLOAD_TEMPLATE, $(1), $(2))
+	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(2))
+	$(V1) $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(2),=) || \
+		( mv $(DL_DIR)/$(2) $(DL_DIR)/$(2).failed && false)
 endef
 
 ##############################
@@ -329,10 +340,9 @@ define TOOL_INSTALL_TEMPLATE
 
 .PHONY: $(addprefix $(1)_, install clean distclean)
 
-$(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
-	
-	$(if $(4), $(call DOWNLOAD_TEMPLATE,$(3),$(5),$(4)),$(call DOWNLOAD_TEMPLATE,$(3),$(5),"$(3).md5"))
-	
+$(if $(4), $(call DOWNLOAD_AND_CHECK_TEMPLATE,$(3),$(5),$(4)),$(call DOWNLOAD_TEMPLATE,$(3),$(5)))
+
+$(1)_install: $(1)_clean $(DL_DIR)/$(5) | $(TOOLS_DIR)
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
 

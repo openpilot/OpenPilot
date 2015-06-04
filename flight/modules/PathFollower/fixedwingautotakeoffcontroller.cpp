@@ -125,9 +125,21 @@ void FixedWingAutoTakeoffController::setAttitude(bool unsafe)
     StabilizationDesiredSet(&stabDesired);
     if (unsafe) {
         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+        pathStatus->Status = PATHSTATUS_STATUS_CRITICAL;
     } else {
         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
     }
+
+    // calculate fractional progress based on altitude
+    float downPos;
+    PositionStateDownGet(&downPos);
+    if (fabsf(pathDesired->End.Down - pathDesired->Start.Down) < 1e-3f) {
+        pathStatus->fractional_progress = 1.0f;
+        pathStatus->error = 0.0f;
+    } else {
+        pathStatus->fractional_progress = (downPos - pathDesired->Start.Down) / (pathDesired->End.Down - pathDesired->Start.Down);
+    }
+    pathStatus->error = fabsf(downPos - pathDesired->End.Down);
 
     PathStatusSet(pathStatus);
 }
@@ -178,6 +190,12 @@ void FixedWingAutoTakeoffController::init_launch(void)
 {
     // find out vector direction of *runway* (if any)
     // and align, otherwise just stay straight ahead
+    pathStatus->path_direction_north = 0.0f;
+    pathStatus->path_direction_east  = 0.0f;
+    pathStatus->path_direction_down  = 0.0f;
+    pathStatus->correction_direction_north = 0.0f;
+    pathStatus->correction_direction_east  = 0.0f;
+    pathStatus->correction_direction_down  = 0.0f;
     if (fabsf(pathDesired->Start.North - pathDesired->End.North) < 1e-3f &&
         fabsf(pathDesired->Start.East - pathDesired->End.East) < 1e-3f) {
         AttitudeStateYawGet(&initYaw);

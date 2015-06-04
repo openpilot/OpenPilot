@@ -103,6 +103,14 @@ int32_t FixedWingLandController::Initialize(FixedWingPathFollowerSettingsData *p
 void FixedWingLandController::resetGlobals()
 {
     pathStatus->path_time = 0.0f;
+    pathStatus->path_direction_north = 0.0f;
+    pathStatus->path_direction_east  = 0.0f;
+    pathStatus->path_direction_down  = 0.0f;
+    pathStatus->correction_direction_north = 0.0f;
+    pathStatus->correction_direction_east  = 0.0f;
+    pathStatus->correction_direction_down  = 0.0f;
+    pathStatus->error = 0.0f;
+    pathStatus->fractional_progress = 0.0f;
 }
 
 /**

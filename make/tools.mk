@@ -298,9 +298,9 @@ endif
 ##############################
 
 define DOWNLOAD_TEMPLATE
-$(2): | $(DL_DIR)
+$(DL_DIR)/$(2): | $(DL_DIR)
 	@$(ECHO) $(MSG_DOWNLOADING) $$(call toprel, $(DL_DIR)/$(2))
-	$(V1) $(CURL) $(CURL_OPTIONS) --silent -o "$(DL_DIR)/$(2)" "$(1)"
+	$(V1) $(CURL) $$(CURL_OPTIONS) -o "$(DL_DIR)/$(2)" "$(1)"
 endef
 
 ##############################
@@ -313,11 +313,13 @@ endef
 ##############################
 
 define DOWNLOAD_AND_CHECK_TEMPLATE
-$(call DOWNLOAD_TEMPLATE, $(3), $(2).md5)
+$(DL_DIR)/$(2).md5: CURL_OPTIONS += --silent
 
-$(2): $(2).md5
+$(call DOWNLOAD_TEMPLATE,$(3),$(2).md5)
 
-$(call DOWNLOAD_TEMPLATE, $(1), $(2))
+$(DL_DIR)/$(2): $(DL_DIR)/$(2).md5
+
+$(call DOWNLOAD_TEMPLATE,$(1),$(2))
 	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(2))
 	$(V1) $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(2),=) || \
 		( mv $(DL_DIR)/$(2) $(DL_DIR)/$(2).failed && false)

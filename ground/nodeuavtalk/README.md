@@ -44,3 +44,10 @@ a user connected
 Subscribing to AttitudeState,ManualControlCommand,StabilizationDesired
 
 Connect via a web browser to http://localhost:3000
+
+This is currently compatioble with versions 14.01 and higher. 
+
+"--- RELEASE-14.01 --- Cruising Ratt ---
+... overhaul of UAVTalk to improve Telemetry and OPLink reliability"
+
+

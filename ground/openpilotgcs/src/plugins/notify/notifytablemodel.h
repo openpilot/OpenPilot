@@ -32,6 +32,7 @@
 #include <QAbstractTableModel>
 #include <QList>
 #include "notificationitem.h"
+#include <QtCore/QDataStream>
 
 enum ColumnNames { eMessageName, eRepeatValue, eExpireTimer, eTurnOn };
 

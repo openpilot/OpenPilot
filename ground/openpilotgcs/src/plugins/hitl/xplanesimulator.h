@@ -30,6 +30,7 @@
 
 #include <QObject>
 #include <simulator.h>
+#include <QtCore/QDataStream>
 
 class XplaneSimulator : public Simulator {
     Q_OBJECT

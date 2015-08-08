@@ -36,6 +36,7 @@
 #include <QSettings>
 #include <QDomElement>
 #include <QObject>
+#include <QtCore/QDataStream>
 
 class XMLCONFIG_EXPORT XmlConfig : QObject {
     Q_OBJECT

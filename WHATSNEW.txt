@@ -1,3 +1,5 @@
+Where did everyone go!! Going to see if I can get some of my old hardware to fly again LOL Pretty much everything I had before is still in the same state as 10 years ago.
+
 --- RELEASE-15.02.02 ---
 This release fixes a bug that prevents revo onboard mag to work correctly.
 
